@@ -528,3 +528,29 @@ pending; S-012 still describes the only delivered alpha.
   - **Minor finding, not fixed:** after the controller's activation attempts are exhausted, the 1 s poll
     timer keeps waking until the option is turned off. This costs a little idle wake-up time, not
     correctness.
+
+### S-018 — V2 package build and privacy audit (Claude, 2026-10-18, about 17:05–17:15 CEST)
+- **Revision:** clean tree at local commit `7f5f463` (0.2.0-alpha.1 candidate). Nothing was published.
+- **Command:** `./scripts/package.ps1`, the default fresh Release /WX build in `build/package`, run with
+  `AETHER_RELEASE_SIGNING_KEY_FILE` cleared.
+- **Audit (`scripts/release/audit_package.py`):** "Package privacy audit passed (setup and uncompressed
+  embedded payload bytes)".
+  - It found no source-root, home-folder or `\Users\` paths, no absolute source paths, no machine
+    name, no private-key material and no CodeView paths with folders.
+  - The freshness check also passed: no source input is newer than the package.
+- **Output in `dist/`** (git-ignored, local only):
+  - `AetherShell-0.2.0-alpha.1-win-x64-setup.exe`, 4,617,216 bytes, SHA-256
+    `96deda1068037856cc305dac1d5b064fb3edb9dcc490ff94862a404afcaa2887`;
+  - an **unsigned** manifest (channel prerelease, one asset), which must stay local;
+  - the checksums file.
+- **Independent second scan (Claude, categories and counts only):**
+  - No `@gmail.com`, no owner account e-mail, no e-mail-shaped strings at all.
+  - No user-profile, Documents or temp paths, and none of the private terms supplied through the
+    environment (account name, machine name).
+  - 4 PE images: setup, app, launcher and updater.
+  - 4 CodeView records, all bare file names (`AetherShellSetup.pdb`, `AetherShellApp.pdb`,
+    `AetherShell.pdb`, `AetherShellUpdater.pdb`).
+- **Not done:**
+  - installing this package;
+  - signing the manifest, which needs the owner's key;
+  - publishing anything.

@@ -73,9 +73,13 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
      - All 14 integration suites (95 cases) have passing runs. A Top Bar fixture fix moved its guard
        band off the screen corner.
      - No combined run has all 14 green yet; desktop activity interrupts the GUI suites.
+   - **Package privacy audit (S-018): passed.**
+     - The Release setup `AetherShell-0.2.0-alpha.1-win-x64-setup.exe` (4,617,216 bytes) is in the
+       local `dist/`, unpublished.
+     - Its manifest is unsigned and must stay local.
    - **Remaining:**
-     - the package privacy audit (`scripts/package.ps1`);
      - Windows 10 and Explorer restart during replacement;
+     - the owner's manifest signature if automatic updates should offer it;
      - push and CI when the owner agrees.
 4. T21 is implemented, unit-tested and checked once on the real desktop (S-015, S-016), including the
    Dock reservation fix and D22. Review it with the rest of V2. Still open before `0.2.0-alpha.1` is
