@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest an improvement to the Dock or the Top Status Bar.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Version 1 deliberately contains only the Dock and the Top Status Bar. Larger ideas (widgets,
+        window management, shell replacement) are tracked for later versions.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

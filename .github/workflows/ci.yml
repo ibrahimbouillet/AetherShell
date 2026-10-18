@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Ibrahim Bouillet
+#
+# Continuous integration: builds the Release configuration with warnings as
+# errors and runs the unit tests. Integration tests (need an interactive
+# desktop) and network tests are excluded here and run on a developer machine.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: CI only reads the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and unit-test (Windows x64, Release)
+    runs-on: windows-2025
+    timeout-minutes: 60
+    steps:
+      - name: Check out the source revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build and run unit tests
+        shell: pwsh
+        run: >
+          ./scripts/build.ps1 -Config release -BuildDir build/ci
+          -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_SOURCE_REVISION=${{ github.sha }}'
+          -Test -TestExclude 'network|integration' -JUnitFile build/ci/test-results.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unit-test-results
+          path: build/ci/test-results.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Prepare manual-install alpha package
+        shell: pwsh
+        run: ./scripts/package.ps1 -BuildDir build/ci -SkipBuild
+
+      - name: Upload installer for review
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: AetherShell-win-x64-alpha
+          path: |
+            dist/*-win-x64-setup.exe
+            dist/*-checksums.txt
+          if-no-files-found: error
+          retention-days: 14

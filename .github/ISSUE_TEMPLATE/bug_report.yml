@@ -1,0 +1,49 @@
+name: Bug report
+description: Something in Aether Shell does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please do not paste logs that contain personal information.
+        Logs are in `%LOCALAPPDATA%\AetherShell\logs` (Settings → General → Diagnostics).
+  - type: input
+    id: version
+    attributes:
+      label: Aether Shell version
+      description: Settings → About
+      placeholder: 0.1.0-alpha.1
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build
+      description: Run `winver`
+      placeholder: Windows 11 24H2 (26100.2033)
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options: [Dock, Top Status Bar, Search, Settings, Updates, Installer / uninstaller, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Display setup
+      description: Number of monitors, scaling (100%, 150%...), taskbar position, light/dark mode, high contrast.

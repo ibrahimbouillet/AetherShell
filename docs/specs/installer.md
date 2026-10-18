@@ -1,0 +1,22 @@
+<!-- Generated from the session's agent workflow; edit freely. -->
+# Module specification: installer (phase B)
+
+Read `AGENTS.md` first; it states the rules every implementer follows. This is the work order that
+was given to the implementing engineer. The real headers in the repository are authoritative where
+they differ from names used here.
+
+Current implementation (2026-10-18): `installer/`, `src/install/`, `launcher/`, `updater/` and
+`src/app/` now exist and build together. See [installer reference](../modules/installer.md),
+[install reference](../modules/install.md) and [test status](../knowledge/TEST_STATUS.md) for the
+executed scope. The numbered instructions below preserve the original work order, including its
+earlier prerequisite assumptions; they do not establish acceptance or override the actual headers.
+
+Module: installer (directory installer/, executable AetherShellSetup.exe). Current dependencies
+are declared in `installer/CMakeLists.txt`.
+Your files: installer/**, scripts/package.ps1, tests/integration/installer/**, docs/modules/installer.md, INSTALLATION.md.
+1. Payload embedding at build time: the setup target embeds the launcher (AetherShell.exe), the updater (AetherShellUpdater.exe), the app (target AetherShellApp built by the lead from src/app; it may not exist yet — guard with if(TARGET AetherShellApp) and support the cache variable AETHER_SETUP_PAYLOAD_DIR as an alternative folder of files), LICENSE and THIRD_PARTY_NOTICES.md. A build-time CMake script (cmake -P, add_custom_command with DEPENDS on every input) computes sizes and SHA-256 and generates payload.rc (RCDATA per file + PAYLOAD_MANIFEST in the install library's schema).
+2. Setup UI (Win32, accessible): wizard window with standard comctl32 v6 controls, IsDialogMessage keyboard navigation, Per-Monitor-V2 DPI scaling, high contrast friendly, dark title bar when the system is dark. Header art: resources/branding/installer/installer-header.png via WIC when present (otherwise draw the product name in the brand accent). Pages: Welcome (what Aether Shell is; runs beside Windows Explorer; does not replace the Windows shell or change system settings; per-user, no administrator rights); License (MIT text read-only); Options (install folder, default %LOCALAPPDATA%\Programs\AetherShell, Browse via IFileOpenDialog FOS_PICKFOLDERS; Start Menu shortcut [on]; desktop shortcut [off]; "Start Aether Shell when I sign in" [off] with explanation; explicit list of the changes that will be made); Progress (cancel allowed until activation; clean rollback of partial work); Finish (Launch Aether Shell [on]); Error page with message and log path. Existing installation: Repair / Upgrade (if newer) / Uninstall; downgrade needs explicit confirmation.
+3. Command line: --silent, --install-root <dir>, --data-dir <dir> (user data root, for tests), --no-shortcuts, --no-launch, --start-with-windows, --repair, --uninstall [--keep-user-data|--remove-user-data] (default keep), --log <file>; documented exit codes; silent mode never prompts. Uninstall: request app exit (never kill), remove Run entry (src/settings StartupRegistration), shortcuts, uninstall key, install root (copy to %TEMP% and relaunch, since a running exe cannot delete itself); remove user data only when explicitly requested. Repair: re-extract and verify the active version, restore launcher, shortcuts, registration; keep settings.
+4. scripts/package.ps1: Release build via scripts/build.ps1, then dist/AetherShell-<version>-win-x64-setup.exe, dist/AetherShell-<version>-manifest.json (scripts/release/make_manifest.py) and -checksums.txt; signs the manifest with scripts/release/sign_manifest.py only when AETHER_RELEASE_SIGNING_KEY_FILE is set, otherwise states clearly that the manifest is unsigned and must not be published. Never print key material.
+5. INSTALLATION.md (end users): install, upgrade, repair, uninstall, what the installer changes, SmartScreen note for unsigned binaries, verifying checksums — only what you implemented and tested.
+Tests (tests/integration/installer): run the built setup with --silent against a temp --install-root and temp --data-dir with --no-shortcuts --no-launch: fresh install (files, install-state.json, payload hashes), repair after deleting a file, uninstall keeps user data by default and removes the root. Registry effects must go to a test registry root (add an option compiled only for tests, or test the library functions directly). Never install into the real location or touch real keys; leave nothing behind.

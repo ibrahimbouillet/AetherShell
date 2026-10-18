@@ -1,0 +1,293 @@
+# Test status
+
+Only executed results are listed as passed or failed. Requirements: [PROJECT_SPEC](../../PROJECT_SPEC.md);
+backlog: [TASKS](../../TASKS.md). Historical runs below retain their recorded scope; they were not all
+independently rerun in this session. Original historical environment: Windows 11 build 26300 x64,
+MSVC 14.51, Debug, Intel UHD, 150% scaling, interactive desktop.
+
+## Executed — passed (2026-10-17, commit 158ffe1)
+| Executable | Cases | Notes |
+|---|---|---|
+| `aether_core_tests` | 23 | JSON (incl. malformed/limits), Result, strings, cancellation, worker pool, signals, atomic files |
+| `aether_diagnostics_tests` | 1 | filtering, sanitization, rotation |
+| `aether_platform_tests` | 8 | dispatcher, message loop, single instance, instance channel, monitors, paths |
+| `aether_graphics_tests` | 6 | easing, tween retargeting, spring frame-rate independence, motion policy, tint floor |
+| `aether_ui_integration_tests` | 2 | glass probe: blur (dark) and no-blur (light) composed on screen; captures checked visually |
+
+## Executed — passed (2026-10-18, commit af0e20f)
+| Executable | Cases | Notes |
+|---|---|---|
+| `aether_net_tests` / `_integration_tests` / `_network_tests` | 55 total after review | loopback HTTP server (redirects, limits, timeouts, cancellation); real TLS to api.github.com; badssl.com certificate failures rejected |
+
+## Executed — passed (2026-10-18, lead re-verification, fresh build `build/lead-verify`)
+| Executable | Result | Notes |
+|---|---|---|
+| `aether_updates_tests` | passed (117 cases per reviewer) | GitHub/HTTP via fakes; signature fixtures from the release scripts |
+| `aether_applications_tests` / `_integration_tests` | passed (72 cases per reviewer) | real discovery, icons and window tracking on this desktop; no launches |
+
+## This session — executed 2026-10-18
+
+Base revision `a9e22cb`, branch `main`, dirty tree with pre-existing untracked service implementations
+and this session's focused fixes/tests/docs; no commit was created. Current OS build 26300 / 64-bit
+was read directly; MSVC 19.51.36257.0 from configure, Debug, /W4 and /WX ON. These runs cover selected
+module tests, not a full project build or full requirement acceptance. Initial private directories
+were checked absent; no existing build directory was deleted. CMakeCache and LastTest.log summaries
+were inspected by the lead after agent executions; that inspection is not an additional test run.
+
+### S-001 — status (FR-005–FR-008; NFR-005/NFR-008)
+
+Fresh final configuration/build, warning-free; **45 unit + 8 read-only integration cases**, 2/2 CTest
+executables passed (13.43 s CTest). Command actually executed:
+
+```powershell
+./scripts/build.ps1 -BuildDir build/wf-codex-status-20261018-final -Modules status `
+  -Target @('aether_status_tests','aether_status_integration_tests') -Jobs 2 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestRegex '^aether_status'
+```
+
+Initial private build `build/wf-codex-status-20261018` passed 43 unit + 8 integration cases; after
+timeout/debounce validation and test-lifetime/race-assumption fixes, the incremental run passed
+45 + 8 before the fresh final run. Root executed all these commands. Real clock, battery/fallback,
+keyboard, network and stop/factory checks ran read-only. No SSID/profile-name read, real settings,
+registry, audio/work-area change, screen capture or application launch.
+
+Independent source review corrected unsafe test state destruction, unknown battery presence and
+cross-sample foreground assertions. **GAP-003 remains:** overlapping Start/Stop deadlock, unsafe
+callback-side destruction and process-lifetime MTA ownership; these are not covered by passing
+cases and full NFR-005 acceptance is not claimed. See [status reference](../modules/status.md).
+
+### S-002 — audio (FR-009; NFR-004/NFR-005/NFR-008)
+
+Agent-executed private initial /WX build and subsequent reviewed-source rebuilds passed; final
+**23 unit + 5 read-only integration cases**, 2/2 CTest executables passed. Lead inspected final
+LastTest.log (23/5, zero failures) and cached /WX ON. Initial command:
+
+```powershell
+./scripts/build.ps1 -BuildDir build/wf-codex-audio-20261018 -Modules status_audio -Jobs 2 `
+  -Test -TestRegex status_audio -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON'
+```
+
+After fixes the same build/test command without `-CMakeArgs` rebuilt changed files; /WX remained ON.
+Concurrent Stop joining, failed-read field reset/recovery and synthetic exception-privacy regressions
+passed. Independent reviewer inspected fixes and logs; no separate second execution is implied.
+Read-only real endpoint lifecycle ran; mutating legacy integration tests were removed **before**
+any execution. No real mute/volume/gain setters were exercised. Real controls/notification echo,
+device unplug/audio-service restart, Windows 10 and UI wiring remain unverified.
+See [audio reference](../modules/status_audio.md).
+
+### S-003 — weather (FR-010; NFR-004/NFR-005)
+
+Agent-executed fresh final /WX build, warning-free; **54 unit cases**, 1/1 CTest executable passed
+(3.23 s CTest). Lead inspected final test log and /WX cache. Command:
+
+```powershell
+./scripts/build.ps1 -BuildDir build/wf-codex-weather-20261018-final -Modules weather -Jobs 2 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestRegex weather
+```
+
+Initial private baseline `build/wf-codex-weather-20261018` passed 50 cases. Four added regressions
+cover freshness at refresh expiry, strict unit metadata, geocoding cancellation precedence and
+exception-message privacy. Official API documentation was consulted; **no live forecast/geocoding
+request** was issued. HTTP/clock/cache behavior uses fakes/temporary roots.
+
+Independent review found **GAP-006** still open: an already-published cached snapshot can outlive the
+6 h display limit while synchronous HTTP blocks scheduling. That missing test/fix prevents complete
+FR-010 acceptance. Live transport, location consent/attribution UI and Windows 10/resume remain
+unverified. See [weather reference](../modules/weather.md).
+
+### S-004 — specification and continuity (NFR-010, T-DOC-1)
+
+Source/registry/workflow existence, Git branch/revision/no remote and canonical document roles were
+inspected. Independent specification review caught and corrected unsupported search UI additions,
+font-use wording, historic-evidence semantics and missing weather expiry/geocoding distinctions.
+Final documentation checks passed: **23 FR + 11 NFR**, unique definitions and complete task/trace
+coverage; **22 documents** checked for local Markdown file targets and whitespace. A targeted
+privacy-pattern scan over those documents plus **72 module source/test files** found no personal
+absolute paths, e-mail patterns, private-key blocks or common credential shapes. The ignored local
+receipt `build/verification-20261018/evidence.json` records scope and source SHA-256 hashes. This is documentation consistency validation,
+not a whole-tree privacy/security certification or product acceptance.
+
+Graphify launcher discovery failed with `uv trampoline failed to canonicalize script path`;
+`uv tool list` was empty, active Python lacked its module, and the old graph was left stale.
+Obsidian 1.14.4 read/search/link checks succeeded for vault `docs` while its app ran. No app settings,
+vault configuration or generated export was changed.
+
+## Earlier continuation: failed attempts / findings (superseded below)
+- Historical: two FileSystem cases failed then were fixed before their commit.
+- This session: one patch write to NetworkProvider.cpp failed during the build (cause not established);
+  the two already-applied battery edits were checked, and the remaining patch was applied afterward.
+- Weather's first regression build failed because a test ReadFile call omitted its required size
+  limit; corrected, then all 54 cases passed in incremental and fresh final builds.
+- Final executed suites have zero failing cases. GAP-003 and GAP-006 remain review findings despite
+  green scoped suites. Graphify availability failure is a tooling limit, not a product test failure.
+
+## Current continuation evidence (2026-10-18)
+
+The owner resumed product implementation after S-004. All results below refer to the preserved
+working tree on base a9e22cb with uncommitted changes, not an already published/released revision.
+Source and executed checks take precedence over earlier "not started" notes.
+
+### S-005 — status lifecycle and owned runtime (T5c/GAP-003)
+Fresh `build/wf-status-lifecycle2-final`, `/W4 /WX`: **49 unit + 10 read-only integration + 1 isolated
+runtime-shutdown cases**, 3/3 CTest pass (18.55 s). Sessions/implementation lifetime supports callback
+ownership and concurrent Stop without joining under the host lifecycle lock. Owned MTA runtime
+cleanup refuses active scopes and is terminal. Independent root review; generic listener-log privacy
+regression. An attempted per-provider MTA teardown crashed during readonly integration and was
+rejected; the final owned-runtime design passed its shutdown process test. See ADR 0008/status docs.
+
+### S-006 — independent weather expiry (T5e/GAP-006)
+`build/wf-weather-scheduler2`, `/W4 /WX`: **56 unit cases**, 1/1 CTest pass. Separate HTTP worker
+keeps six-hour cache expiry publication live while HTTP blocks. A blocked fake proves expiry before
+the request is released. Independent review found no actionable issue. No live API request.
+
+### S-007 — settings/search/accessibility/branding (T5f–T5i)
+- Settings `build/wf-settings2`: **32 unit cases pass /WX**, serialized worker persistence,
+  schema preservation, migration/ranges, failure retry ordering and injected startup registry.
+- Search `build/wf-search2`: initial **5 cases pass /WX**, Debug5000-app p50 6.238/p95 8.747 ms.
+  Earlier150ms/32ms implementations failed the20ms engineering check and were optimized. Added
+  cancellation/closed-dispatcher/2000-app Release cases await the settled full gate.
+- Accessibility `build/wf-accessibility2`: **3 unit + 3 native own-window integration cases pass /WX**;
+  separate MTA client actions/navigation/focus/disconnect. Independent cross-review completed.
+- Branding: original SVG/PNG/wordmarks/banner/installer art; renderer checks **12 raster sizes and
+  8 ICO entries**, resources <5 MiB. Contact sheet and banner opened; small-size optical correction
+  regenerated and inspected again. Final owner visual selection remains Q-002.
+
+### S-008 — desktop surfaces and transient UI (T6–T8)
+- Dock `build/wf-dock2`: initial **14 unit + 2 integration cases pass /WX**, dark/light rest/hover
+  captures viewed. Later independent UIA/AppBar fixes, drag interpolation and hit-test assertions
+  are in the final rerun. Separate MTA focus test records Windows E_ACCESSDENIED instead of
+  pretending OS background focus policy was bypassed.
+- TopBar `build/wf-topbar2`: **7 unit + 2 integration cases pass /WX**. Synthetic own-window dark/light
+  PNGs opened, material/unchanged-work-area/idle checks passed; real providers sampled read-only.
+  Independent review closed wheel accumulation, clock width and AppBar notification issues.
+- Search UI `build/wf-search-ui2`: **4 integration cases pass /WX** after debounce/error/scroll/input/
+  focus fixes. Both guarded synthetic PNGs opened. Standard EDIT Value/name/focusable properties
+  checked from MTA; actual IME composition remains unverified. GPU transitions added afterward
+  await full regression. A foreground-policy-dependent fixture failed, then was made deterministic
+  without activating a foreign application.
+- Settings UI: initial2cases pass /WX in `build/wf-settings-ui2`; delayed startup/reset consent,
+  merge/preservation,15modifier choices, live debounce, full MIT and constrained viewport cases
+  added. A viewport test caught offscreen-child scrolling; corrected, final5case rerun pending.
+
+Captures stay private in temp until individually inspected and copied to approved project screenshot
+assets. A foreign overlap was refused by guards; an early TopBar capture exposed occlusion and was
+removed before acceptance. No such image is publishable. The old glass fixture is being hardened
+with before/after guards and a blur margin before any serial whole-suite integration run.
+
+### S-009 — installation/application and full matrix (T9–T11)
+Fresh `build/wf-install2-final`: **10 unit + 7 integration cases pass /WX**, 2/2 CTest (8.95 s),
+launcher and updater compile. Temporary roots/resource-only DLLs/fake processes cover staging,
+recovery, health success/rollback, signature refusal before shutdown, root containment/reparse/case
+aliases, cancellation and injected registration keys only. Real signed official update remains
+unverified. A test linked stale objects during an overlapping edit/build and failed; settled rerun
+passed. Production has no unsigned verification bypass.
+
+Setup initial `build/wf-app2`: **3 integration cases pass /WX** (11.73 s), silent install/real payload
+hashes/repair/uninstall keep or remove data/malformed CLI. Installed maintenance relocation and own
+200% viewport tests are added; final run pending. Test-only wrapper forces no registration/startup/
+shortcuts/app launch and injects no-op process operations. A temp maintenance executable may remain,
+as allowed by ADR 0005; original exit0 means accepted handoff, child/log owns final outcome.
+
+App target and full wiring compile; own-window lifecycle/health/channel/shutdown test added with
+isolated instance name, temp data, no reservation/hotkeys/updates/weather/running-app display.
+No real external apps are launched. Execution awaits final build.
+
+Root complete Release `/WX` build in `build/wf-release2` is in progress. Earlier global builds were
+intentionally stopped to release source locks during final corrections. The first app link failed
+because install target did not yet exist in its CMake cache; reconfiguration resolved that dependency.
+18 Python release-script cases pass, including a malformed-key diagnostic-location privacy regression.
+
+### S-010 — publication privacy and delivery (T12–T15)
+D18 retains the original development Git history locally. Public export must initialize independent
+history with the public GitHub noreply identity; no old author metadata/history is pushed.
+Filename/content review currently covers447candidate files: no forbidden private/tool/build/key/log
+filenames. Text-pattern hits were synthetic URL userinfo tests or Arrow/Home/End, not personal data.
+Final export needs a refreshed audit after source closure.
+
+Binary review found actual private source/PDB paths in older Debug app/setup. `/PDBALTPATH` now embeds
+only the filename, and `WINRT_NO_SOURCE_LOCATION` removes C++/WinRT source capture for all targets.
+Final Release app/setup/embedded payload must be rebuilt and rescanned. Old binaries must not be
+published. No remote/public repository/CI/release has been created yet; those receipts remain pending.
+
+## Still unqualified
+Windows10/ARM64, physical monitor/DPI changes, real AppBar/full-screen/Explorer restart, real external
+app launch/UWP frame identity, real audio/startup actions, actual IME/screen-reader workflow and live
+owner-signed GitHub update/recovery. Global release performance budgets remain Q-001. Module fake/
+readonly tests do not establish those product claims.
+
+## Requires an interactive Windows desktop
+`integration` label: glass probe, provider integration tests, window tracker, UI Automation tests.
+CI runs `unit` only (`ci` test preset excludes `integration` and `network`).
+
+
+### S-011 — settled native alpha, privacy and delivery (authoritative current continuation)
+
+2026-10-18, Windows 11 x64, preserved development tree; public export starts independent history
+under D18. Complete **Release /W4 /WX build passed**, all **426 unit cases in 17 executables passed**.
+All **91 integration cases in 14 executables have passing scoped runs** on the settled product
+binaries. Aggregate desktop runs were **not uniformly green**: foreign topmost/full-screen activity
+triggered safe capture refusals, Search lost activation, and two Top Bar idle fixtures initially
+sampled pending render work. The latter now establish bounded observed quiescence; perpetual
+rendering still fails. The app fixture accepts suppressed bar visibility only when an actual
+external full-screen foreground exists, while requiring both own HWNDs and health/channel/cleanup.
+No foreign application was activated and no unsafe crop was saved.
+
+| Module | Unit cases | Integration cases |
+|---|---:|---:|
+| core / diagnostics / platform | 23 / 1 / 9 | — |
+| net | 24 | 28 loopback |
+| graphics / accessibility / UI | 6 / 3 / — | — / 3 / 2 |
+| status | 49 | 10 read-only + 1 isolated terminal shutdown |
+| status_audio | 23 | 5 read-only |
+| weather | 56 | — |
+| applications | 57 | 15 read-only/fake |
+| search / settings / updates | 7 / 33 / 101 | — |
+| install | 10 | 7 temporary-root/fake |
+| Dock / Top Bar | 14 / 7 | 2 / 2 |
+| Search UI / Settings UI | — | 5 / 5 |
+| app / setup | 3 / — | 1 / 5 |
+
+Commands executed (full aggregate and then only affected/scoped desktop fixtures):
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-release2 -Jobs 6 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestExclude network
+ctest --test-dir build/wf-release2 -R '^aether_(ui|dock|search_ui)_integration_tests$' --output-on-failure -j 1
+python -m unittest discover -s scripts/release -p 'test_*.py' -q
+./scripts/package.ps1 -BuildDir build/wf-release2 -OutputDir dist/review -SkipBuild
+```
+
+The first isolated capture rerun passed Glass 2 and Search UI 5; Dock privacy checks refused overlap.
+The Dock-only fixture correction expands/repaints a full opaque 128px guard band, checks containment
+(including a negative uncovered-band assertion), raises only its own backdrop/Dock without activation
+and calls DwmFlush. Its final scoped two cases passed (6.81 s CTest); foreign pre/post guards remain.
+A subsequent batch again refused Glass dark and lost Search activation. These environmental failures
+remain recorded; earlier passing scopes are not represented as one clean aggregate execution.
+Eight redacted metadata-only samples found a real visible, non-iconic, non-cloaked foreign topmost
+full-screen window, but were not simultaneous with each refusal and do not prove its precise cause.
+
+Search Release: 5000 synthetic apps p50 **1.409 ms**, p95 **1.962 ms**; 2000 apps p50 **0.512 ms**,
+p95 **0.601 ms**. Seven cases include cancellation, failed dispatcher and malformed empty-index query.
+Settings 33 includes the independently reviewed settle → freeze → flush shutdown admission fix.
+Existing saves/Flush remain durable; late Update/Reset reject, and cancelled quit reenables writes.
+App health-before-discovery is ordering review plus normal smoke, not a deliberately blocked-discovery
+timing test. App-to-updater duplicate/observer/error paths have source review, not live execution.
+
+**32 Python cases pass, no skips** (independent agent execution and root rerun). Package tests reject
+Debug/stale source, ASCII/UTF16 personal/source/machine markers and non-basename CodeView records;
+negative cases redact private strings. Actual final Release app/launcher/updater/setup and raw embedded
+payload bytes pass the binary privacy scan. The package was generated successfully with real sizes
+and hashes. Signing was unavailable; its unsigned manifest stays local and is excluded from assets.
+
+Public candidate audit: **457 files**, no symlinks or forbidden filenames; **313 source headers** have
+MIT SPDX and public author attribution. Markdown/requirement consistency checks cover 72 Markdown
+files, 123 local targets and all 23 FR + 11 NFR IDs. Only six synthetic privacy/containment/URL fixture
+files triggered broad private-pattern candidates; no actionable private content was found. Six
+individually inspected synthetic project-window screenshots are included; no other-app captures.
+
+Owner-authorized production delivery was performed separately from automated tests: setup exit 0,
+Installed apps entry `Aether Shell` / `0.1.0-alpha.1`, launcher present, startup disabled and no app
+launch. The official public repository was created at
+[ibrahimbouillet/AetherShell](https://github.com/ibrahimbouillet/AetherShell). Initial clean-history
+push, actual GitHub CI and first-release asset receipts are pending at this snapshot and will be
+recorded in the delivery follow-up. No original Git history, raw logs or debug artifacts are exported.

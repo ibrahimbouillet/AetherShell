@@ -1,0 +1,71 @@
+# Build output (all configurations and per-task build directories)
+/build/
+/out/
+/install/
+/dist/
+/artifacts/
+CMakeUserPresets.json
+compile_commands.json
+
+# Visual Studio / VS Code / JetBrains machine-specific state
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.aps
+*.ipch
+
+# Compiler and linker intermediates
+*.obj
+*.o
+*.pdb
+*.ilk
+*.idb
+*.exp
+*.lib
+*.res
+*.tlog
+*.log
+*.dmp
+
+# Binaries are produced by CI and never committed
+*.exe
+*.dll
+*.msi
+*.msix
+*.zip
+
+# Secrets, keys and credentials must never be committed
+*.pem
+*.key
+*.pfx
+*.p12
+*.snk
+.env
+.env.*
+secrets/
+**/release-signing/
+
+# Local AI-assistant tooling (graphify knowledge graph, machine-local Claude Code config)
+graphify-out/
+.claude/
+# Regenerable exports (Graphify -> Obsidian) and local Obsidian vault state
+.local/
+.obsidian/
+.trash/
+# Owner's local Obsidian canvas, outside the publishable project documentation.
+/docs/Untitled.canvas
+
+# Python / tooling caches
+__pycache__/
+*.pyc
+.cache/
+node_modules/
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store
