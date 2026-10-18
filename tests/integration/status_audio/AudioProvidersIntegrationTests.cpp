@@ -311,4 +311,3 @@ AETHER_TEST("status_audio integration: concurrent Stop calls wait for an active 
     CHECK(secondReturned);
     CHECK_EQ(calls.load(), 1);
 }
-

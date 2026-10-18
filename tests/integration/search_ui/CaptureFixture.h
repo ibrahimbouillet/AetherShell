@@ -55,4 +55,3 @@ void Save(const Capture& capture, const std::filesystem::path& file) {
     winrt::check_hresult(frame->Commit()); winrt::check_hresult(encoder->Commit());
 }
 }
-
