@@ -100,7 +100,8 @@ AETHER_TEST("taskbar pins: local shortcuts survive without running windows and a
     CHECK_EQ(pins.value()[0].displayName, std::wstring(L"Alpha"));
     CHECK_EQ(pins.value()[1].displayName, std::wstring(L"Middle"));
     CHECK(pins.value()[0].shortcutPath == first.native());
-    CHECK(pins.value()[0].executablePath == firstTarget.native());
+    // The shell resolves shortcut targets to long names; a temp folder can be in 8.3 form (CI runners).
+    CHECK(MakeIdForExecutable(pins.value()[0].executablePath).value() == MakeIdForExecutable(firstTarget.native()).value());
     CHECK(pins.value()[0].id == MakeIdForExecutable(firstTarget.native()).value());
     CHECK(Bytes(first) == before);
     CHECK_EQ(std::filesystem::last_write_time(first), timestamp);
@@ -135,7 +136,7 @@ AETHER_TEST("taskbar pins: catalog reconciliation reuses identity and preserves 
     CHECK_EQ(pin.appUserModelId, std::wstring(L"Aether.Fixture.Editor"));
     CHECK_EQ(pin.displayName, std::wstring(L"Pinned Editor"));
     CHECK(pin.shortcutPath == shortcut.native());
-    CHECK(pin.executablePath == target.native());
+    CHECK(MakeIdForExecutable(pin.executablePath).value() == MakeIdForExecutable(target.native()).value());
     CHECK_EQ(pin.keywords, fixture.options.catalog[0].keywords);
 }
 

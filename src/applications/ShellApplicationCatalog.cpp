@@ -336,6 +336,16 @@ Result<std::filesystem::path> PinDirectory(const TaskbarPinImportOptions& option
     return std::filesystem::path(owned.get()) / L"TaskBar";
 }
 
+// One file can be named in 8.3 short form ("RUNNER~1") and in long form; the shell resolves shortcut
+// targets to the long form. MakeIdForExecutable expands short names, so equal ids mean one executable.
+bool SameExecutable(const std::wstring& left, const std::wstring& right) {
+    if (left.empty() || right.empty()) return false;
+    if (text::EqualsIgnoreCase(left, right)) return true;
+    auto a = MakeIdForExecutable(left);
+    auto b = MakeIdForExecutable(right);
+    return a && b && a.value() == b.value();
+}
+
 const ApplicationInfo* CatalogMatch(const ApplicationInfo& pin, const std::vector<ApplicationInfo>& catalog) {
     const ApplicationInfo* match = nullptr;
     const ApplicationInfo* nameMatch = nullptr;
@@ -350,8 +360,8 @@ const ApplicationInfo* CatalogMatch(const ApplicationInfo& pin, const std::vecto
                               text::EqualsIgnoreCase(pin.appUserModelId, candidate.appUserModelId);
         // A pin's explicit profile identity must never be downgraded to an executable-only catalog
         // entry, nor switched to another profile that happens to share that executable.
-        const bool sameExecutable = pin.appUserModelId.empty() && !pin.executablePath.empty() &&
-                                   text::EqualsIgnoreCase(pin.executablePath, candidate.executablePath);
+        const bool sameExecutable = pin.appUserModelId.empty() &&
+                                   SameExecutable(pin.executablePath, candidate.executablePath);
         if (!sameId && !sameAumid && !sameExecutable) continue;
         if (sameId) return &candidate;
         match = &candidate;

@@ -554,3 +554,29 @@ pending; S-012 still describes the only delivered alpha.
   - installing this package;
   - signing the manifest, which needs the owner's key;
   - publishing anything.
+
+### S-019 — push and Windows CI on `9a2b1bb` (Claude, 2026-10-18, 17:14–17:30 CEST)
+- **Push (owner-approved; no tag, no release):** the five local commits `1180c96..9a2b1bb` were pushed
+  to `origin/main` as a fast-forward from `0893501`.
+  - Before pushing: a fetch, noreply author and committer on every commit, and a privacy scan of the
+    pushed changes.
+- **CI run 39139547133:** **failed** (6 min 52 s). The Release /WX build succeeded; 16 of 17 unit
+  executables passed.
+  - `aether_applications_tests`: 66 passed, 2 failed, both in V2 `TaskbarPinsTests`:
+    "local shortcuts survive…" and "catalog reconciliation reuses identity…".
+- **Root cause:** the GitHub runner's temp folder is reported in 8.3 short form (`RUNNER~1`), while the
+  shell resolves shortcut targets to long names.
+  - Tests compared raw path strings, so the expectations did not match.
+  - The product's `CatalogMatch` also compared executable paths as plain strings, so a pin lost its
+    catalog identity when the two forms differed. That is a real, if rare, defect.
+  - Reproduced on the development PC by pointing `TMP`/`TEMP` at a short-form folder: the same two
+    cases failed.
+- **Fix:**
+  - `SameExecutable` in `src/applications/ShellApplicationCatalog.cpp` compares
+    `MakeIdForExecutable` ids, which expand 8.3 names, when the raw strings differ.
+  - The two tests compare executable identities instead of raw strings.
+- **Re-verification:** `aether_applications_tests` 68/68 with both the normal and the short-form temp
+  folder. The full Release /WX build (0 warnings) passed 17/17 unit executables with the short-form
+  temp folder.
+- **State:** the fix is committed locally. Until it is pushed, `origin/main` (`9a2b1bb`) has a red CI
+  run.

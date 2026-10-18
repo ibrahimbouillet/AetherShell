@@ -77,10 +77,14 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
      - The Release setup `AetherShell-0.2.0-alpha.1-win-x64-setup.exe` (4,617,216 bytes) is in the
        local `dist/`, unpublished.
      - Its manifest is unsigned and must stay local.
+   - **Pushed (S-019).** The owner approved pushing the five commits; `origin/main` is at `9a2b1bb`.
+     - Its Windows CI run 39139547133 **failed**: 2 pin-import unit cases broke on the runner's 8.3
+       short temp path.
+     - The fix (path identity in catalog matching, plus the tests) is committed locally. Push it after
+       the owner agrees, then confirm CI is green.
    - **Remaining:**
      - Windows 10 and Explorer restart during replacement;
-     - the owner's manifest signature if automatic updates should offer it;
-     - push and CI when the owner agrees.
+     - the owner's manifest signature if automatic updates should offer it.
 4. T21 is implemented, unit-tested and checked once on the real desktop (S-015, S-016), including the
    Dock reservation fix and D22. Review it with the rest of V2. Still open before `0.2.0-alpha.1` is
    published:
