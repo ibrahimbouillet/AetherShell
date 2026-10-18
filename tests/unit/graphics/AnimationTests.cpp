@@ -76,17 +76,23 @@ AETHER_TEST("motion policy: reduced motion zeroes durations") {
     CHECK_NEAR(policy.Scale(0.2), 0.0, 0.0);
 }
 
-AETHER_TEST("theme: glass tint stays readable without blur") {
+AETHER_TEST("theme: glass remains translucent with a readable fallback and opaque accessibility settings") {
     for (ThemeMode mode : {ThemeMode::Dark, ThemeMode::Light}) {
-        const auto tokens = MakeDesignTokens(mode);
+        auto tokens = MakeDesignTokens(mode); tokens.transparencyEnabled = true;
         GlassStyle style;
         style.opacity = 0.3f;
         style.backdropBlur = false;
-        CHECK(GlassTintAlpha(tokens, style) >= 0.72f);
+        CHECK(GlassTintAlpha(tokens, style) >= 0.60f);
+        style.opacity = 0.8f;
+        CHECK(GlassTintAlpha(tokens, style) < 0.75f);
         style.backdropBlur = true;
         const float clear = GlassTintAlpha(tokens, style);
         style.opacity = 1.0f;
         CHECK(GlassTintAlpha(tokens, style) > clear);
+        CHECK_NEAR(GlassTintAlpha(tokens, style), 1.0f, 1e-6);
+        tokens.transparencyEnabled = false;
+        style.opacity = 0.3f;
+        CHECK_NEAR(GlassTintAlpha(tokens, style), 1.0f, 0);
     }
     const auto contrast = MakeDesignTokens(ThemeMode::HighContrast);
     CHECK_NEAR(GlassTintAlpha(contrast, GlassStyle{}), 1.0, 0.0);

@@ -28,7 +28,8 @@ constexpr UINT_PTR kLiveApplyTimer = 19;
 constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPostpone = 303,
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
-              kRemovePin = 313, kMovePinUp = 314, kMovePinDown = 315, kLicense = 316, kUpdateSummary = 317;
+              kRemovePin = 313, kMovePinUp = 314, kMovePinDown = 315, kLicense = 316, kUpdateSummary = 317,
+              kDesktopStatus = 318, kImportTaskbarPins = 319;
 bool CanDownloadOrInstall(const updates::UpdateSnapshot& value) {
     return value.state != updates::UpdateState::Checking && value.state != updates::UpdateState::Downloading &&
         (value.prepared.has_value() || static_cast<bool>(value.manifest));
@@ -90,6 +91,7 @@ struct SettingsWindow::Impl {
     std::vector<weather::LocationCandidate> locations;
     std::vector<apps::ApplicationInfo> applications;
     updates::UpdateSnapshot update;
+    std::wstring lastActionStatus;
     bool startupBusy = false;
     bool building = false;
     bool livePending = false;
@@ -239,6 +241,23 @@ void SettingsWindow::Impl::BuildPage() {
         Add(L"STATIC", callbacks.hotkeyStatus ? callbacks.hotkeyStatus() : L"Shortcut status unavailable", 0, 218, 405, 440, 48);
         Add(L"BUTTON", L"Open log folder", WS_TABSTOP, 218, 470, 150, 30, kOpenLogs);
         Add(L"BUTTON", L"Export diagnostics…", WS_TABSTOP, 380, 470, 180, 30, kExport);
+    } else if (page == SettingsPage::Desktop) {
+        check(L"Replace the Windows taskbar (Apply to consent)",
+            [](const Settings& s){return s.general.replaceWindowsTaskbar;},
+            [](Settings& s,bool v){s.general.replaceWindowsTaskbar=v;}, true);
+        Add(L"STATIC", L"Press Apply to enable or disable this mode. Aether Shell hides the Windows "
+            L"taskbar while running and reserves space below maximized applications.", 0, 218, 150, 450, 62);
+        Add(L"STATIC", L"Windows taskbar state is restored when this mode is disabled or Aether Shell exits. "
+            L"A separate recovery helper also restores it if the application stops unexpectedly. "
+            L"If recovery fails, restart Windows Explorer in Task Manager.", 0, 218, 222, 450, 100);
+        Add(L"STATIC", L"Windows Settings remains the native Windows interface. Its taskbar page is not "
+            L"replaced by Aether Shell; configure this mode here.", 0, 218, 334, 450, 62);
+        Add(L"STATIC", L"", 0, 218, 410, 450, 60, kDesktopStatus);
+        owner.RefreshDesktopStatus();
+        HWND import = Add(L"BUTTON", L"Import Windows taskbar pins", WS_TABSTOP, 218, 484, 270, 32, kImportTaskbarPins);
+        ::EnableWindow(import, static_cast<bool>(callbacks.importTaskbarPins));
+        Add(L"STATIC", L"Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins "
+            L"or their order may be unavailable.", 0, 218, 526, 450, 40);
     } else {
         Add(L"STATIC", L"Aether Shell", 0, 218, 98, 430, 36);
         Add(L"STATIC", L"Version " + text::Widen(build::kVersion) + L"\r\nCreated by Ibrahim Bouillet\r\n\r\nA native Windows desktop interface running alongside Explorer.\r\nWeather data: Open-Meteo.com (CC BY 4.0).\r\nNo third-party C++ runtime libraries are bundled.", 0, 218, 152, 440, 140);
@@ -269,7 +288,9 @@ void SettingsWindow::Impl::BuildPage() {
     building = false;
     fieldBaseline = ReadFields();
     SetStartupBusy(startupBusy);
-    Message(L"Changes save automatically. Apply retries saving; startup requires Apply to consent.");
+    if (page == SettingsPage::Desktop) {
+        Message(lastActionStatus.empty() ? L"Taskbar replacement changes require Apply to consent." : lastActionStatus);
+    } else Message(L"Changes save automatically. Apply retries saving; startup requires Apply to consent.");
 }
 
 std::vector<std::wstring> SettingsWindow::Impl::ReadFields() const {
@@ -304,6 +325,8 @@ void SettingsWindow::Impl::SetStartupBusy(bool busy) {
     for (HWND control : pageControls) ::EnableWindow(control, !busy);
     if (!busy && controls.contains(kInstallUpdate))
         ::EnableWindow(controls.at(kInstallUpdate), CanDownloadOrInstall(update));
+    if (!busy && controls.contains(kImportTaskbarPins))
+        ::EnableWindow(controls.at(kImportTaskbarPins), static_cast<bool>(callbacks.importTaskbarPins));
     if (!busy) {
         auto ready=std::move(closeWaiters);closeWaiters.clear();
         for(auto& callback:ready) try { callback(); } catch (...) { Message(L"The close action could not be completed."); }
@@ -482,7 +505,12 @@ void SettingsWindow::Impl::Action(int id) {
         const auto selected = ::SendMessageW(controls[kFirstField+72], CB_GETCURSEL, 0, 0);
         if (selected != CB_ERR && static_cast<std::size_t>(selected) < applications.size()) {
             const auto app = applications[static_cast<std::size_t>(selected)];
-            (void)service.Update([app](Settings& s){ s.dock.pinned.push_back(PinnedApp{app.id,app.displayName,app.parsingName,app.appUserModelId,app.executablePath,app.shortcutPath}); }); BuildPage();
+            (void)service.Update([app](Settings& s){
+                PinnedApp pin; pin.id=app.id; pin.displayName=app.displayName; pin.parsingName=app.parsingName;
+                pin.appUserModelId=app.appUserModelId; pin.executablePath=app.executablePath;
+                pin.shortcutPath=app.shortcutPath; pin.arguments=app.arguments;
+                s.dock.pinned.push_back(std::move(pin));
+            }); BuildPage();
         }
     } else if (id == kRemovePin || id == kMovePinUp || id == kMovePinDown) {
         if (livePending) Apply(false);
@@ -501,6 +529,7 @@ void SettingsWindow::Impl::Action(int id) {
     else if (id == kDisableUpdates && callbacks.disableNotifications) callbacks.disableNotifications();
     else if (id == kOpenLogs && callbacks.openLogFolder) callbacks.openLogFolder();
     else if (id == kExport && callbacks.exportDiagnostics) callbacks.exportDiagnostics();
+    else if (id == kImportTaskbarPins && callbacks.importTaskbarPins) callbacks.importTaskbarPins();
     else if (id == kReleaseDetails) {
         // Fixed project URL; untrusted release-note text is never interpreted as a link.
         ::ShellExecuteW(window, L"open", L"https://github.com/ibrahimbouillet/AetherShell/releases", nullptr, nullptr, SW_SHOWNORMAL);
@@ -595,7 +624,7 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         platform::ApplyImmersiveDarkMode(window, platform::SystemPrefersDarkApps());
         impl_->Add(L"STATIC", L"Aether Shell", 0, 24, 22, 620, 34, 0, false);
         impl_->navigation = impl_->Add(L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | WS_BORDER, 24, 86, 165, 456, kNavigation, false);
-        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About"}) ::SendMessageW(impl_->navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
+        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop"}) ::SendMessageW(impl_->navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
         impl_->status = impl_->Add(L"STATIC", L"", 0, 24, 570, 650, 48, kStatus, false);
         impl_->Add(L"BUTTON", L"Reset defaults…", WS_TABSTOP, 24, 626, 170, 32, kReset, false);
         impl_->Add(L"BUTTON", L"Apply", WS_TABSTOP | BS_DEFPUSHBUTTON, 550, 626, 120, 32, kApply, false);
@@ -623,6 +652,17 @@ HWND SettingsWindow::Control(int id) const noexcept { const auto found = impl_->
 void SettingsWindow::SetUpdateSnapshot(updates::UpdateSnapshot snapshot) {
     impl_->update = std::move(snapshot);
     if (impl_->window && impl_->page == SettingsPage::Updates) { const auto fields = impl_->ReadFields(); impl_->BuildPage(); impl_->RestoreFields(fields); }
+}
+void SettingsWindow::RefreshDesktopStatus() {
+    if (!impl_->window || impl_->page != SettingsPage::Desktop || !impl_->controls.contains(kDesktopStatus)) return;
+    try {
+        const auto status = impl_->callbacks.taskbarStatus ? impl_->callbacks.taskbarStatus() :
+            L"Desktop status is unavailable in this session.";
+        ::SetWindowTextW(impl_->controls.at(kDesktopStatus), status.c_str());
+    } catch (...) { ::SetWindowTextW(impl_->controls.at(kDesktopStatus), L"Desktop status is unavailable."); }
+}
+void SettingsWindow::ReportActionStatus(std::wstring_view message) {
+    try { impl_->lastActionStatus = std::wstring(message); impl_->Message(impl_->lastActionStatus); } catch (...) {}
 }
 Result<void> SettingsWindow::ResetAfterConsent() {
     try { return impl_->ResetAfterConsent(); }

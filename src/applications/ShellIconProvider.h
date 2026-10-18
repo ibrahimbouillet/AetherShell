@@ -3,9 +3,10 @@
 //
 // IIconProvider backed by IShellItemImageFactory.
 //
-//  * The shell item is the application's Apps-folder item (parsing name, else packaged/explicit
-//    AUMID), else its .lnk, else its executable (see shell::CreateApplicationItem), so icons match
-//    what Start shows, including packaged-app plates and shortcut icon overrides.
+//  * Desktop entries prefer an existing validated local .lnk, preserving shortcut/profile icon
+//    overrides. Failed shortcut extraction falls back to the Apps-folder item (parsing name, else
+//    packaged/explicit AUMID), then executable. Other entries retain CreateApplicationItem's normal
+//    Apps-folder/.lnk/executable order, including packaged-app plates. Launch routing is unchanged.
 //  * GetImage(size, SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK). With BIGGERSIZEOK the shell may return
 //    an image larger than requested (it then skips its own low-quality GDI stretch); IconImage
 //    carries the real dimensions and the caller scales.

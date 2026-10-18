@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "applications/ShellIconProvider.h"
 
+#include "applications/ApplicationIdentity.h"
 #include "applications/IconCache.h"
 #include "applications/ShellItems.h"
 #include "diagnostics/Logger.h"
@@ -81,11 +82,9 @@ Result<ExtractedIcon> ReadBitmap(HBITMAP bitmap) {
     return result;
 }
 
-Result<ExtractedIcon> ExtractOnSta(const ApplicationInfo& app, std::uint32_t pixelSize) {
-    auto created = shell::CreateApplicationItem(app);
-    if (!created) return created.error();
+Result<ExtractedIcon> ExtractItem(IShellItem* item, std::uint32_t pixelSize) {
     winrt::com_ptr<IShellItemImageFactory> factory;
-    HRESULT hr = created.value().item->QueryInterface(IID_PPV_ARGS(factory.put()));
+    HRESULT hr = item->QueryInterface(IID_PPV_ARGS(factory.put()));
     if (FAILED(hr)) return platform::ErrorFromHResult(hr, "the shell item has no image factory");
 
     const int side = static_cast<int>(pixelSize);
@@ -94,6 +93,29 @@ Result<ExtractedIcon> ExtractOnSta(const ApplicationInfo& app, std::uint32_t pix
     if (FAILED(hr) || !raw) return platform::ErrorFromHResult(FAILED(hr) ? hr : E_FAIL, "IShellItemImageFactory::GetImage");
     const platform::UniqueGdiObject owner(raw);
     return ReadBitmap(raw);
+}
+
+Result<ExtractedIcon> ExtractOnSta(const ApplicationInfo& app, std::uint32_t pixelSize) {
+    if (app.kind == ApplicationKind::Desktop && !app.shortcutPath.empty()) {
+        // Profile shortcuts may expose an avatar/icon override even when the generic Apps-folder
+        // item shares the executable's logo. This changes presentation only, never launch routing.
+        const auto path = NormalizeShortcutPath(app.shortcutPath);
+        if (path && shell::ShouldPreferShortcutIcon(app)) {
+            auto shortcut = shell::CreateFileItem(*path);
+            if (shortcut) {
+                auto image = ExtractItem(shortcut->get(), pixelSize);
+                if (image) return image;
+            }
+        }
+        // A missing/broken override must still have an honest generic fallback. Avoid asking the
+        // same failed shortcut a second time through CreateApplicationItem's normal fallback chain.
+        auto fallback = app;
+        fallback.shortcutPath.clear();
+        auto created = shell::CreateApplicationItem(fallback);
+        return created ? ExtractItem(created->item.get(), pixelSize) : Result<ExtractedIcon>(created.error());
+    }
+    auto created = shell::CreateApplicationItem(app);
+    return created ? ExtractItem(created->item.get(), pixelSize) : Result<ExtractedIcon>(created.error());
 }
 
 }  // namespace

@@ -8,7 +8,8 @@ Status details: `TASKS.md`; executed evidence: `docs/knowledge/TEST_STATUS.md`; 
 A reliable, beautiful, modular native Windows application ("Aether Shell") with two desktop surfaces
 (Dock, Top Status Bar), supporting search/settings/update UI, a per-user installer, signed GitHub
 Releases updates with rollback, reproducible builds and honest documentation. Current product version
-string: `0.1.0-alpha.1` (development; nothing released).
+string: `0.2.0-alpha.1` (V2 development candidate; its delivery gate is pending). The prior
+`0.1.0-alpha.1` manual-install alpha is public; exact historical receipts remain in HANDOFF.
 
 ## Architecture
 ```
@@ -31,6 +32,11 @@ launcher/, updater/, installer/                 separate executables [implemente
 - **Windows integration [A, ADR 0003]:** top bar = top AppBar reserving its height (optional); Dock
   floating, topmost, no-activate, not an AppBar by default; both hide for full-screen apps; Explorer
   restart handled via `TaskbarCreated`; hotkeys Ctrl+Alt+Space (search), Ctrl+Alt+D (Dock focus).
+- **V2 taskbar mode [implemented, D19/ADR 0009; live qualification pending]:** explicit Desktop Apply
+  consent enables visual replacement. A launcher recovery process temporarily auto-hides/hides the
+  native taskbar, watches the parent and restores state on exit; the parent observes helper failure.
+  The Dock reserves its full animated footprint in this mode. Explorer and native Windows Settings
+  remain separate system components; no Winlogon or administrator change occurs.
 - **Install/update [A, ADR 0004/0005]:** per-user install root with launcher + `versions\<semver>`,
   journaled transaction (Prepared → … → Committed / RolledBack) with a health check.
 - **Data locations [V]:** `%LOCALAPPDATA%\AetherShell\{config,logs,cache,updates}` (`platform/windows/AppPaths.h`).
@@ -50,14 +56,15 @@ No third-party C++ dependencies. Python stdlib scripts for releases. GitHub Acti
 | `src/graphics`, `src/ui` | composition graphics, glass, animation, `SurfaceWindow`, tooltip |
 | `src/status/StatusTypes.h`, `src/applications/ApplicationTypes.h`, `src/settings/Settings.h` | shared contracts |
 | `src/platform/net`, `src/updates`, `src/applications`, `src/status`, `src/weather` | services (see `TASKS.md` for status) |
-| `docs/decisions/` | ADRs 0001–0006 |
+| `docs/decisions/` | ADRs 0001–0009 |
 | `docs/modules/` | per-module reference docs |
 | `docs/knowledge/` | Obsidian vault notes: module index, test status, known issues, log (same files, no second copy) |
 | `tests/{unit,integration,network}/<module>` | tests |
 | `.github/workflows/ci.yml` | CI (Release, /WX, unit tests) |
 
 ## Implementation status (2026-10-18)
-Current evidence is in TEST_STATUS S-005 onward. The settled native Release build uses /W4 /WX.
+The following table preserves the `0.1.0-alpha.1` baseline. Current V2 evidence is in module references
+and the latest TEST_STATUS; the complete V2 Release/publication gate remains pending.
 An alpha is implemented and installed; full Version 1 platform/manual acceptance remains open.
 
 | Area | Current executed scope |
@@ -79,6 +86,9 @@ An alpha is implemented and installed; full Version 1 platform/manual acceptance
 - Earlier usage limits left uncommitted module work; preserve it. Status concurrent lifecycle and weather expiry findings are resolved by scoped regressions;
   remaining product/desktop qualification is in TASKS / module docs.
 - "Microphone in use" unsupported; Wi-Fi SSID intentionally not shown.
+- V2 taskbar mode is a compatibility feature, not official native-taskbar or Windows Settings
+  registration. Helper/app double failure, Windows changes, and actual Explorer recovery still need
+  qualification. Windows pin import reads available shortcuts only and may miss pins/order.
 - Graphify launcher currently fails; the stale graph is not current evidence. Obsidian CLI works
   while its app runs; root docs remain outside the `docs/` vault.
 

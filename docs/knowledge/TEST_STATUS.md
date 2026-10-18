@@ -330,3 +330,164 @@ action, not permission for automated tests to mutate real user registration.
 The final documentation receipt changes only Markdown and skips an unchanged native CI rebuild;
 the release binary remains tied to the exact successful source run above. S-011’s aggregate desktop
 failures and wider Windows 10/real-action/IME/screen-reader/signed-update gaps remain open.
+
+### S-013 — V2 continuation, focused evidence; final app/delivery pending
+
+All following checks were executed locally on 2026-10-18. Build cache configuration was inspected;
+Debug and Release receipts are distinct. Native tests use synthetic windows/fake callbacks and do
+not change the actual taskbar, work area, keyboard layout, audio, startup or native pins.
+
+| Area | Configuration / build tree | Executed result |
+|---|---|---|
+| Available taskbar pin import | Release /W4 /WX, `build/wf-v2-pins` | 66 unit cases pass, including 9 synthetic `.lnk` import cases; no owner pin directory read by tests |
+| Dock placement/reservation model | Debug /W4 /WX, `build/wf-v2-dock` | 19 unit + 2 native cases pass before the later running-icon drag/profile changes; final changed gates pending |
+| Glass and Top Bar visuals | Release /W4 /WX, `build/wf-v2-visuals` | 6 graphics + 8 Top Bar unit and 3 glass + 2 Top Bar native cases pass before later action additions |
+| Desktop settings editor | Debug /W4 /WX, `build/wf-v2-settings` | 7 native cases pass, 15.14 s; consent, concurrent fake import, retained status and unchanged work area |
+| Settings persistence | Release /W4 /WX, `build/wf-v2-settings-roundtrip` | 36 unit cases pass, including 3 new safe-default/roundtrip/invalid-arguments cases |
+| Platform lease | Release /W4 /WX, `build/wf-v2-platform` | 15 unit cases pass, including 6 fake lease/recovery precondition cases |
+| Async controller | Release /W4 /WX, ignored focused harness `build/wf-v2-controller` | 10 injected-session cases pass; normal app target integration remains a separate gate |
+| Release Python tooling | `python -m unittest discover -s scripts/release -p 'test_*.py'` | 32 cases pass, 73.122 s |
+
+Glass paired-background mean RGB changes: dark blur 26.827, light no-blur 18.968, high contrast
+0.000. Four updated Dock/Top Bar PNGs were independently opened before replacing public synthetic
+assets; no owner screenshot or unrelated app content was copied.
+
+Initial full Release build stopped at a launcher WCHAR-to-char narrowing warning under /WX.
+The parser now validates decimal handle digits before explicit conversion. The incremental complete
+build in `build/wf-v2-release` is running; final source changes require a final rebuild after agents
+close their files, all unit checks and serial relevant native gates. Do not claim that intermediate
+successful module linking or tests against an earlier source state verifies the final V2 tree.
+
+Source privacy-pattern review covered 469 candidate files at that point. No actual source root,
+personal root or machine-name matches were found. Broad path/key-marker candidates were URLs,
+relative build commands, Arrow/Home/End text, synthetic URL/privacy-detector fixtures and detector
+constants; these are not real private records. Repeat the final review after all edits. Binary setup
+privacy/source-freshness audit, real native taskbar recovery, install, V2 push/CI and release remain
+pending; S-012 still describes the only delivered alpha.
+
+### S-014 — independent Claude verification of the uncommitted V2 tree (2026-10-18, about 16:00–16:20 CEST)
+- **Revision:** `0893501` plus the uncommitted V2 working tree (60 modified and 12 new files) and Claude's
+  documentation edits. Claude changed no product source.
+- **Command (the CI configuration):** `./scripts/build.ps1 -Config release -BuildDir build/claude-verify -Fresh
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestExclude 'network|integration'`.
+- **Environment:** Windows 11 Pro build 26300 x64, MSVC 14.51, Windows SDK 10.0.26100.
+- **Result:** configure and all 260 build steps succeeded with 0 compiler warnings (/W4 /WX); CTest reported
+  `100% tests passed out of 17`. Each unit executable was then run directly: core 23, diagnostics 1,
+  platform 15, net 24, graphics 6, accessibility 3, status 49, status_audio 23, weather 56, applications 68,
+  search 7, settings 36, updates 101, install 10, dock 22, topbar 9, app 15. That is **468 unit cases passed,
+  0 failed**.
+- **Differences from earlier records:** applications 68 (S-013: 66), dock 22 (19) and topbar 9 (8) come from
+  later source in the same tree. The historical "updates 117 cases" (T5a) is not reproduced: the current
+  executable has 101 cases.
+- **Read-only GitHub checks (`gh`):**
+  - The repository `ibrahimbouillet/AetherShell` is public.
+  - CI run 39123368917 succeeded on `4eed028` (6 min 17 s).
+  - Prerelease `v0.1.0-alpha.1` has two assets: setup 4,451,840 bytes with SHA-256
+    `edeafb8c89ca7c833b4b79dfbaee160267fd7278e3e0e91980f31df67fbb481f`, and the checksums file.
+  - All three public commits use the GitHub noreply identity.
+- **Privacy scan:** `git grep --untracked` over tracked and untracked files for user-profile paths, e-mail
+  domains, the machine name and personal names found 0 files.
+- **Not run:**
+  - integration and network labels (they need a quiet interactive desktop or Internet; S-013 requires GUI
+    suites to run one at a time);
+  - Python release-tool tests and packaging;
+  - any real taskbar or desktop check.
+
+  This run qualifies V2 at unit level only.
+
+### S-015 — T21 taskbar recovery without Aether Shell running (Claude, 2026-10-18, about 16:30–17:00 CEST)
+- **Revision:** `0893501` plus the uncommitted V2 tree, plus T21 by Claude:
+  - `src/platform/windows/TaskbarReplacement.*` and `TaskbarGuardSession.cpp`;
+  - `src/app/TaskbarRecovery.*`, `TaskbarController.*` and `ShellApplication.cpp`;
+  - `installer/main.cpp`;
+  - new tests in `tests/unit/platform/TaskbarReplacementTests.cpp` and
+    `tests/unit/app/TaskbarRecoveryTests.cpp`, and an updated `tests/unit/app/CommandLineTests.cpp`.
+- **Command:** `./scripts/build.ps1 -Config release -BuildDir build/claude-verify -CMakeArgs
+  '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestExclude 'network|integration'` (incremental on the S-014
+  tree).
+- **Result:** 0 compiler warnings (/W4 /WX); CTest `100% tests passed out of 17`. Direct runs:
+  - platform 24 cases (9 new) and app 18 cases (3 new);
+  - every other executable unchanged from S-014;
+  - **480 unit cases passed, 0 failed**.
+- **New cases:**
+  - baseline round trip;
+  - malformed, foreign-schema and oversized baselines rejected;
+  - restore from baseline, then removal and idempotence;
+  - no baseline: only an explicit command shows the taskbar, and auto-hide is untouched;
+  - an unreadable baseline shows the taskbar and is removed;
+  - failures keep the baseline for a retry;
+  - preparation persists before hiding and repairs an earlier crash first;
+  - an unwritable location fails before anything is hidden;
+  - a relative location is refused before any taskbar is touched;
+  - app-level recovery turns replacement off, creates no settings file and leaves settings unchanged
+    on failure.
+
+  All of them use a simulated taskbar and temporary folders.
+- **Setup (integration, silent cases only):** `aether_installer_integration_tests.exe "setup: isolated"
+  "setup: explicit removal" "setup: malformed"` → 3 passed. These cases use temporary roots and
+  `--test-no-registration`, with no baseline present. The GUI viewport and maintenance-relocation cases
+  were not run.
+- **Incident during the first run (fixed):** an existing test,
+  `app: recovery commands without a running instance never start desktop surfaces`, ran
+  `ShellApplication::Run` with `--restore-taskbar` and empty paths.
+  - With the new standalone path, it called the real taskbar backend once to make the Explorer taskbar
+    windows visible. They were already visible, so no state change was expected, and auto-hide was
+    not touched.
+  - It then waited on a result message box. Claude stopped that test process.
+  - Fix: the standalone path now refuses a non-absolute configuration folder before touching any
+    taskbar or showing UI, and `RecoverTaskbars`/`PrepareTaskbarBaseline` refuse relative baseline
+    paths.
+  - The test now expects InvalidArgument; a platform case covers the relative-path refusal.
+  - No file was written outside the test folders (checked).
+- **Not run:**
+  - any real-desktop check of hiding and restoring the taskbar (done later, see S-016);
+  - integration and network suites other than the three setup cases;
+  - packaging.
+
+### S-016 — T21 real-desktop check, owner-authorized (Claude, 2026-10-18, 16:44–16:56 CEST)
+- **Authorization:** the owner asked in the session to "briefly hide my taskbar with the V2 build, stop
+  it, and verify that --restore-taskbar brings it back".
+- **Setup:**
+  - Release /WX `AetherShellApp.exe` and `AetherShell.exe` from `build/claude-verify` were copied into one
+    temporary folder, as the helper requires.
+  - A temporary `--data-dir` held only `replaceWindowsTaskbar=true` and `taskbarPinsImported=true`, so
+    the owner's settings and pins were not read or changed.
+  - The owner's installed `0.1.0-alpha.1` was closed gracefully through the instance channel and
+    restarted afterwards.
+  - Taskbar state was read only through Windows APIs (auto-hide flag, `IsWindowVisible` of the Explorer
+    taskbar windows, work area). No screenshots were taken.
+- **First attempts found a V2 defect.** Replacement never activated; the new log line read "Dock
+  reservation failed (InvalidArgument: invalid Dock placement geometry)".
+  - Cause: on its first AppBar registration the Dock used its own empty AppBar rectangle as the work
+    area, giving a lower edge of 0. The tests inject a synthetic work area, so they never reached this.
+  - Fix in `src/dock/DockWindow.cpp`: use the AppBar rectangle only once it has been positioned.
+  - Taskbar replacement state changes are now logged in `ShellApplication.cpp`.
+- **After the fix (run at 16:54):**
+  - **Running:** replacement became active. The taskbar was hidden, the helper process ran, the baseline
+    file existed and the Dock reserved its bottom area.
+  - **Simulated double failure:** the helper was killed, then the app. The baseline file remained.
+    Explorer itself showed its taskbar again within 3 s, once the killed AppBars disappeared, so a
+    hidden taskbar after a double failure was **not** reproduced on this machine.
+  - **`AetherShellApp.exe --restore-taskbar` with no instance:**
+    - It reported "The Windows taskbar was restored to its saved state. Taskbar replacement is turned
+      off."
+    - It removed the baseline file and set `replaceWindowsTaskbar` to false.
+    - The taskbar stayed visible, and the work area returned to its pre-test value.
+- **Second finding:**
+  - The baseline captured at start recorded the taskbar as *not visible*. This happened in every run:
+    the capture coincides with Explorer's re-layout after the Top Bar AppBar registers.
+  - Restoring that baseline exactly would have hidden the taskbar. `RestoreTaskbars` now shows every
+    Explorer taskbar window and never hides one (D22), and the lease test was updated accordingly.
+- **Limits of this check:**
+  - The owner's taskbar already used auto-hide before the test, so restoring the auto-hide state could
+    not be told apart from leaving it unchanged.
+  - The scripted OK click did not close the result message box: `WM_COMMAND IDOK` was posted. The
+    process exited after the box was closed some other way (probably by the owner), so its exit code
+    was captured only in the no-baseline run (0).
+  - Windows 11 only, one monitor; Windows 10 and Explorer restart during replacement were not tested.
+- **Afterwards:**
+  - Full Release /WX build, 0 warnings, 17/17 unit executables. Platform cases stayed at 24, with the
+    lease case updated.
+  - The owner's taskbar matched the pre-test reading exactly (auto-hide, visibility, work area with
+    0.1 running), and the installed 0.1.0-alpha.1 was running again.
+  - The temporary folder was deleted.

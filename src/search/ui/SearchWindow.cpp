@@ -140,7 +140,7 @@ void SearchWindow::RefreshResults() {
 
 void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     const auto panel = D2D1::RectF(8, 8, context.widthDip - 8, context.heightDip - 8);
-    SetBackdropPanel(panel, tokens_.popupCornerRadius, tokens_.mode != graphics::ThemeMode::HighContrast);
+    SetBackdropPanel(panel, tokens_.popupCornerRadius, tokens_.transparencyEnabled && tokens_.mode != graphics::ThemeMode::HighContrast);
     graphics::GlassStyle style; style.cornerRadius = tokens_.popupCornerRadius; style.backdropBlur = BackdropBlurActive();
     graphics::PaintGlassPanel(context.d2d, panel, tokens_, style);
     winrt::com_ptr<ID2D1SolidColorBrush> brush;

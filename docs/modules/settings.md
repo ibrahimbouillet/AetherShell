@@ -82,8 +82,8 @@ separately below when its integration checks complete.
 
 ## Native editor
 
-`settings_ui` provides a native navigation window for Dock, Top Bar, Weather, Updates, General and
-About. Non-startup fields save after a 350 ms debounce, and pending edits save before navigation or
+`settings_ui` provides a native navigation window for Dock, Top Bar, Weather, Updates, General,
+About and Desktop. Ordinary non-consent fields save after a 350 ms debounce, and pending edits save before navigation or
 hiding. Field mutations merge into the latest model rather than restoring a captured whole-model
 copy. Apply also retries a failed save. Draft numeric values must be complete before they can apply.
 Weather searches run on a worker only after Search; selecting a returned candidate saves it.
@@ -132,3 +132,28 @@ The settled Release gate passed **33 service unit cases**, including a blocked-s
 regression. `SetChangesEnabled(false)` rejects new Update/Reset mutations without cancelling
 accepted saves or Flush; the app calls it after editor/consent settlement and before its final FIFO
 barrier. Reenabling restores writes when quitting is cancelled. Five native editor cases also pass.
+
+## V2 Desktop consent and pin import
+
+Schema-v1 gains additive `general.replaceWindowsTaskbar` and `general.taskbarPinsImported` Boolean
+fields, both default false. Existing files therefore retain coexistence until explicit consent.
+The Desktop page is appended at index 6, preserving older page indexes. Its replacement checkbox
+is `consentOnly`: enabling and disabling both require Apply; debounce, navigation, close and app
+quit settlement cannot apply an unchecked consent draft. A saved true value can resume on later
+normal launches. This is separate from start-with-Windows registration.
+
+The page explains recovery and the unsupported native Windows Settings takeover. Its status label
+refreshes in place through `RefreshDesktopStatus()`, preserving a pending checkbox draft. The
+Import Windows taskbar pins button calls an injected callback and is disabled if unavailable. Import
+reads supported shortcuts without altering Windows pins, merges missing entries and preserves launch
+arguments. Original Windows 11 pin coverage and order are not guaranteed. About and all previous
+pages remain accessible.
+
+On 2026-10-18 the fresh Debug `build/wf-v2-settings` `/W4 /WX` build passed the settings unit
+executable (8.65 seconds) and all **seven native editor cases** in a separate serial run (15.14
+seconds). New cases establish durable Apply-only enable/disable, draft-preserving status refresh,
+fake concurrent import with no implicit consent, action-result retention on reopen, unavailable
+import disabled, pin arguments saved/reloaded and unchanged real work area. The five-case result
+above is the earlier 0.1 baseline. The V2 suite uses temporary settings and fake callbacks, not
+actual taskbar, startup registry, audio or external application changes. Wider product qualification
+and the full Release gate remain separate.

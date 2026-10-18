@@ -23,6 +23,7 @@ shlwapi user32 gdi32 dwmapi uuid`, and `windowsapp` for the C++/WinRT support co
 | `ApplicationIdentity.h` | Pure identity helpers: `MakeIdForAumid`, `MakeIdForExecutable`, `MakeIdForParsingName`, `MakeIdForWindowClass`, `GetIdScheme`, `IsPackagedAumid`, `IsExplicitAumid`, `NormalizeExecutablePath` / `NormalizeShortcutPath` / `NormalizeAbsoluteFilePath` (with `PathPolicy{allowUnc}`), `ValidateParsingName`, `MakeApplicationId`, `RefersToSameApplication` |
 | `CatalogRules.h` | Pure catalog rules: `DiscoveredItem`, `ClassifyDiscoveredItem` → `CatalogDecision`, `IsUninstallerName`, `IsUninstallerExecutable`, `IsHelpViewerExecutable`, `IsUrlTarget`, `IsShellNamespaceTarget`, `MergeDuplicateApplications`, `CombineCatalog` |
 | `ShellApplicationCatalog.h` | `ShellApplicationCatalog(Options{includeStartMenuShortcuts, maxShortcutDepth = 6, maxShortcutFiles = 5000})`, `DiscoverApplications(cancel)` |
+| `TaskbarPins.h` | Worker-only `DiscoverTaskbarPins(cancel, TaskbarPinImportOptions{directory, maxShortcutFiles = 512, catalog})`; best-effort, read-only import of supported local taskbar shortcuts |
 | `LaunchRules.h` | Pure launcher decisions: `MakeLaunchError`, `MakeLaunchErrorFromHResult`, `ShouldTryNextLaunchRoute`, `ChooseWindowToActivate` → `ActivationChoice` |
 | `ShellApplicationLauncher.h` | `ShellApplicationLauncher(IUiDispatcher&)`, `LaunchAsync`, `Activate`, static `LaunchNow` |
 | `WindowEligibility.h` | `WindowFacts`, `ClassifyWindow` → `WindowExclusion`, `IsEligibleAppWindow`, `IsShellWindowClass`, `CollectWindowFacts(HWND)` |
@@ -48,6 +49,46 @@ tracker.Start([](const std::vector<aether::apps::RunningApplication>& running) {
 aether::apps::ShellIconProvider icons(uiDispatcher);
 icons.RequestIcon({app.id, app, 64}, [](const std::wstring& key, auto image) { /* UI thread; image may be null */ });
 ```
+
+## Taskbar pin import
+
+`DiscoverTaskbarPins` supports the owner's V2 request to keep pinned applications in the Dock even
+when they have no open window (FR-002). The app owns the import action, persistence and user feedback;
+this module returns ordinary `ApplicationInfo` records with identity, shortcut, arguments, executable
+and AUMID metadata. It performs no launch and never modifies Windows pins or application settings.
+
+The default root is the documented `FOLDERID_UserPinned` plus the legacy `TaskBar` subdirectory.
+`SHGetKnownFolderPath` uses `KF_FLAG_DONT_VERIFY`, without folder creation. Immediate local `.lnk`
+files are loaded through `IPersistFile` with `STGM_READ`; `IShellLink::Resolve` is deliberately omitted
+for import, so link tracking/search, shortcut rewriting and missing-target repair do not run. No
+registry pin database is read. A missing folder returns an empty success, and cancellation or an
+unreadable folder returns a generic error without user names or paths. The directory must be an
+ordinary local directory; reparse entries and nested directories are skipped. Enumeration is bounded
+at 4096 entries and 512 shortcut files by default; exceeding a bound fails instead of returning an
+unmarked partial import.
+
+Supported entries use the catalog's existing application filters and identity rules. Optional
+`options.catalog` reuses an exact identity or an unambiguous AUMID/executable match with the same
+arguments. Conflicting AUMIDs, ambiguous profiles and differing arguments do not collapse. The
+imported `.lnk` and its arguments remain attached to the record. Matching identities are deduplicated,
+and filename ordering is deterministic so repeated imports do not randomly reorder the same source.
+The caller must merge into its persisted pins and protect existing user ordering.
+
+This is a best-effort source, not a complete Windows 11 pin enumeration API. Modern packaged pins
+may have no `.lnk` in this folder; a packaged AUMID is imported when a readable shortcut exposes it.
+Windows taskbar order is unavailable from these files. Internet `.url` files, document links and
+unsupported shell targets are skipped consistently with the current launcher contract. No binary
+`Taskband`/`CloudStore` format is parsed and no Windows Settings integration is implied. Users can
+pin any catalog application directly in Aether and reorder imported pins afterwards.
+
+Primary references checked for this implementation:
+
+- [Microsoft KNOWNFOLDERID reference](https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid)
+  documents `FOLDERID_UserPinned`; its `TaskBar` child is treated as a best-effort legacy convention.
+- [Microsoft IShellLink::Resolve reference](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-resolve)
+  describes the resolution/search/update behavior omitted by the importer.
+- [Microsoft TaskbarManager reference](https://learn.microsoft.com/en-us/uwp/api/windows.ui.shell.taskbarmanager)
+  lists pin requests and pin-status checks, without a method that returns every user's pin in order.
 
 ## Identity
 
@@ -162,7 +203,10 @@ returned. No `AttachThreadInput`, no synthesized input.
 
 ## Icons (`ShellIconProvider`)
 
-- Shell item: Apps-folder item (parsing name, else packaged/explicit AUMID), else `.lnk`, else `.exe`.
+- Desktop shell item: existing ordinary, validated local `.lnk` first, then Apps-folder item (parsing
+  name, else explicit AUMID), then executable if the shortcut is absent or extraction fails. This
+  preserves a supplied profile icon without changing launch routing. Packaged/Other items retain
+  their original Apps-folder/AUMID, `.lnk`, `.exe` ordering.
   `IShellItemImageFactory::GetImage(size, SIIGBF_ICONONLY | SIIGBF_BIGGERSIZEOK)`; the result may be
   larger than requested and `IconImage` carries its real size.
 - Read back with `GetDIBits` as 32-bpp top-down BGRA, then premultiplied. **The returned DIB is not
@@ -227,15 +271,88 @@ and never escape a public function or a worker task.
 - Launch and activation paths that would start an application or move focus are covered only by unit
   tests of their pure decisions; the automated suite never launches anything or activates windows.
 
+## T17 follow-up: profile icons and a File Explorer pin
+
+**Owner clarification resolved: browser PROFILE avatars and context menus for Dock application
+icons.** This concerns separate browser profiles/windows, rather than signed-in accounts inside web
+tabs. Matching metadata and end-to-end avatar acceptance remain pending. The implemented narrow
+change prefers an existing validated desktop shortcut for icon extraction; its success still depends
+on the application exposing a useful icon through that shortcut. No browser account store, cookies,
+history, profile configuration, avatar directory or actual owner profile was inspected. No default
+pins were changed. An exact avatar cannot be promised without exposed usable metadata.
+
+Current source evidence:
+
+| Source | Observed behavior |
+| --- | --- |
+| `src/applications/WindowTracker.cpp`: `WindowAppUserModelId`, `LookupWindowIdentity`; `WindowIdentityRules.cpp`: `ResolveWindowIdentity` | Reads the window's `PKEY_AppUserModel_ID`; explicit window identity takes precedence over process identity. Distinct exposed AUMIDs can already produce separate running application groups. This does not identify web accounts. |
+| `src/dock/DockModel.cpp`: `BuildDockItems` | An unpinned running entry receives only id, name, executable and AUMID. Existing catalog/shortcut metadata is not reconciled into that entry. |
+| `src/applications/ShellItems.cpp`: `ShouldPreferShortcutIcon`; `ShellIconProvider.cpp`: `ExtractOnSta` | The narrow T17 change prefers an existing ordinary, validated local desktop `.lnk` for icon extraction, then falls back to the generic route if extraction fails. Packaged/Other entries keep their existing order. It does not discover or reconcile a missing profile shortcut. |
+| `src/dock/DockWindow.cpp`: `RequestIcons`; `src/applications/ShellIconProvider.cpp`: `State::Extract`; `IconCache.cpp` | Request/cache identity is application key plus pixel size. Richer shortcut metadata arriving later needs explicit invalidation or an icon-source revision, or an already cached generic icon may remain visible. |
+
+Remaining implementation following clarification:
+
+1. Feed already discovered catalog entries and already imported/persisted pins into a pure matching
+   function. Match an explicit running AUMID exactly, case-insensitively. Never use executable-only
+   matching to substitute a different explicit profile, and do not guess an ambiguous match.
+2. Copy the matched shortcut and trusted launch metadata into the running item's presentation while
+   preserving its running identity/windows. Keep argument-bearing profiles distinct. The desktop
+   shortcut icon preference is already implemented in `ExtractOnSta`; missing/unusable overrides
+   fall back honestly. Keep launch routing separate; changing an icon must not change which profile
+   launches.
+3. Refresh affected Dock images/request markers and the provider cache when that presentation's
+   source changes. Avoid reading shortcut/icon files on the UI thread; extraction remains on its STA
+   worker. A missing/unexposed avatar retains a generic icon with no invented account identity.
+
+Microsoft documents window-level AUMIDs and matching shortcuts in its
+[AppUserModelID guidance](https://learn.microsoft.com/en-us/windows/win32/shell/appids). Its optional
+[RelaunchIconResource property](https://learn.microsoft.com/en-us/windows/win32/properties/props-system-appusermodel-relaunchiconresource)
+can describe the taskbar group icon when explicitly supplied by an application. Reading or supporting
+that additional property is a separate possible extension, not implemented or runtime verified here.
+[IShellLink::GetIconLocation](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishelllinkw-geticonlocation)
+exposes a shortcut's icon definition, and
+[IShellItemImageFactory::GetImage](https://learn.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellitemimagefactory-getimage)
+supports extracting its icon on a worker. These contracts establish possible sources, not a guarantee
+about any particular browser's current metadata.
+
+For File Explorer, the existing catalog classifier already accepts the `Microsoft.Windows.Explorer`
+AppsFolder entry as `aumid:microsoft.windows.explorer` (synthetic test: "catalog rules: shell objects
+from the Apps folder"). Prefer that existing entry when present. A proposed worker-only fallback is
+to obtain the system directory with
+[GetWindowsDirectoryW](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getwindowsdirectoryw),
+handle zero/insufficient-buffer results, append `explorer.exe`, then validate an absolute local
+executable and verify that the file exists. Construct the generic application with that executable,
+the explicit Explorer AUMID/parsing name, and no user folder arguments. Do not launch it to discover
+it. Add it through the existing pin/settings persistence path only after the intended default/import
+preference is settled; deduplicate by identity and preserve existing order and user unpin decisions.
+An added default Explorer pin must not be described as imported Windows state without source evidence.
+
+Two routing-policy cases use temporary synthetic file metadata to cover existing desktop shortcuts,
+Packaged/Other ordering, missing files, directories, wrong extensions, UNC and relative paths. They
+do not demonstrate a real browser avatar or successful shell extraction of a profile-specific image.
+Required checks before claiming the full follow-up complete: synthetic different-AUMID/same-executable
+profiles, conflicting/ambiguous identities, missing shortcut/override, changed source after generic
+cache fill, late callback invalidation, exact arguments after persistence, and Explorer insertion,
+deduplication and preserved unpin/order behavior. Temporary `.lnk`/icon fixtures and fake windows can
+exercise these without owner browser data. Any capture must contain only the project's synthetic
+windows over the private opaque backdrop with existing occlusion guards. No real-profile screenshot,
+account label, avatar, user-specific path or raw owner application listing belongs in public evidence.
+Actual browser behavior would remain a separately authorized manual check, with a sanitized outcome
+only. No runtime discovery, external launch or actual profile-icon extraction was performed for T17.
+
 ## Tests
 
-- Unit (`tests/unit/applications`, 57 cases): identity normalization and path validation (device, UNC,
+- Unit (`tests/unit/applications`, 66 cases): identity normalization and path validation (device, UNC,
   ADS, 8.3 expansion, no expansion on UNC), packaged/explicit AUMID syntax, id preference order, catalog
   filters (uninstallers, help, URLs, documents), classification, dedup/merge and Start-menu enrichment,
   Apps-folder name hardening (`.`/`..` segments), the window eligibility predicate, the window identity
   rule (explicit/synthesized AUMIDs, packaged processes, inaccessible processes, attached/detached
   frames), launch error mapping and window choice, alpha analysis and premultiplication, the LRU cache,
-  icon-provider cancellation and failure coalescing.
+  icon-provider cancellation and failure coalescing. Nine taskbar-import cases use only synthetic
+  temporary shortcuts: retained launch metadata without running windows, deterministic deduplication,
+  unchanged file bytes/write time, profile arguments, catalog reconciliation/ambiguity, packaged
+  AUMIDs, skipped malformed/unsupported files, missing-folder no-creation, cancellation/limits and MTA
+  dispatch. Current V2 focused Release `/W4 /WX` run: 66 passed, 0 failed; no actual user pins read.
 - Integration (`tests/integration/applications`, 15 cases, real desktop, nothing launched): discovery
   (>10 apps with Packaged and Desktop entries, count, duration and log line noted; MTA caller;
   cancellation), every discovered Apps-folder entry resolving to its shell item (the launcher's first

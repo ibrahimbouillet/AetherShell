@@ -9,6 +9,13 @@ startup. It installs a stable launcher, a maintenance setup and versioned progra
 create a Start Menu shortcut and a per-user entry in Windows Installed apps. No administrator
 rights or Explorer replacement are used. Startup is off unless you explicitly enable it.
 
+The `0.2.0-alpha.1` V2 candidate adds an optional taskbar mode after installation. It remains off
+until you open Aether Shell Settings → Desktop, select Replace the Windows taskbar and press Apply.
+Installing or upgrading alone does not supply that consent. Saved prior consent can resume the mode
+on later launches. A normal exit restores the captured Windows taskbar state; recovery limitations
+and emergency commands are in the [user guide](USER_GUIDE.md). Native Windows Settings continues to
+configure the Windows taskbar, not Aether Shell. V2 package/publication validation is still pending.
+
 Unsigned application/setup binaries can trigger SmartScreen. This alpha has no Authenticode
 publisher certificate. Check the exact release source and SHA-256 before deciding to run it:
 

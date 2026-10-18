@@ -28,6 +28,7 @@ ThemeMode DetectThemeMode() noexcept {
 DesignTokens MakeDesignTokens(ThemeMode mode) {
     DesignTokens t;
     t.mode = mode;
+    t.transparencyEnabled = platform::SystemTransparencyEnabled() && mode != ThemeMode::HighContrast;
     t.accent = Color::FromHex(kBrandIndigo);
     t.accentSecondary = Color::FromHex(kBrandCyan);
     t.warning = Color::FromHex(0xFFB547);
@@ -36,7 +37,7 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
         case ThemeMode::Dark:
             t.glass.tint = Color::FromHex(0x161A26);
             t.glass.tintAlphaWithBlur = 0.46f;
-            t.glass.tintAlphaWithoutBlur = 0.86f;
+            t.glass.tintAlphaWithoutBlur = 0.66f;
             t.glass.borderTop = Color::FromHex(0xFFFFFF, 0.24f);
             t.glass.borderBottom = Color::FromHex(0xFFFFFF, 0.06f);
             t.glass.highlight = Color::FromHex(0xFFFFFF, 0.10f);
@@ -53,7 +54,7 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
         case ThemeMode::Light:
             t.glass.tint = Color::FromHex(0xF4F6FC);
             t.glass.tintAlphaWithBlur = 0.58f;
-            t.glass.tintAlphaWithoutBlur = 0.90f;
+            t.glass.tintAlphaWithoutBlur = 0.72f;
             t.glass.borderTop = Color::FromHex(0xFFFFFF, 0.85f);
             t.glass.borderBottom = Color::FromHex(0x1B2033, 0.10f);
             t.glass.highlight = Color::FromHex(0xFFFFFF, 0.35f);

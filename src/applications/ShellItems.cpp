@@ -147,6 +147,17 @@ Result<ApplicationItem> CreateApplicationItem(const ApplicationInfo& app) {
     return last;
 }
 
+bool ShouldPreferShortcutIcon(const ApplicationInfo& app) noexcept {
+    try {
+        if (app.kind != ApplicationKind::Desktop || app.shortcutPath.empty()) return false;
+        auto path = NormalizeShortcutPath(app.shortcutPath);
+        if (!path) return false;
+        const DWORD attributes = ::GetFileAttributesW(path->c_str());
+        return attributes != INVALID_FILE_ATTRIBUTES &&
+               (attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)) == 0;
+    } catch (...) { return false; }
+}
+
 std::string ForLog(std::wstring_view value, std::size_t maxLength) {
     return text::SanitizeForLog(text::Narrow(value), maxLength);
 }

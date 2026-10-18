@@ -22,6 +22,11 @@ template<class Predicate> bool Pump(ManualDispatcher& dispatcher, Predicate pred
     }
     return true;
 }
+std::wstring ControlText(HWND control) {
+    const int length=::GetWindowTextLengthW(control);
+    std::wstring value(static_cast<std::size_t>(length)+1,L'\0');
+    ::GetWindowTextW(control,value.data(),length+1);value.resize(static_cast<std::size_t>(length));return value;
+}
 }
 
 AETHER_TEST("settings UI: native pages persist changes through a private temporary service") {
@@ -178,4 +183,78 @@ AETHER_TEST("settings UI: DPI messages rescale permanent controls and font while
     TEST_NOTE("viewport Apply rect "+std::to_string(reachable.left)+","+std::to_string(reachable.top)+","+std::to_string(reachable.right)+","+std::to_string(reachable.bottom)+"; client "+std::to_string(client.right)+","+std::to_string(client.bottom));
     CHECK(reachable.top>=0);CHECK(reachable.bottom<=client.bottom);
     CHECK(reachable.left>=0);CHECK(reachable.right<=client.right);
+}
+
+AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh preserves consent drafts") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto file=test::MakeTempDirectory("settings-ui-desktop")/L"settings.json";
+    settings::SettingsService service(file,dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    RECT before{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&before,0));
+    std::wstring desktopStatus=L"Synthetic native taskbar retained.";
+    int imports=0;
+    settings::ui::SettingsWindow* editor=nullptr;
+    settings::ui::SettingsCallbacks callbacks;
+    callbacks.taskbarStatus=[&]{return desktopStatus;};
+    callbacks.importTaskbarPins=[&]{
+        ++imports;
+        (void)service.Update([](auto& value){settings::PinnedApp pin;pin.id=L"exe:synthetic-import";pin.displayName=L"Synthetic import";value.dock.pinned.push_back(pin);});
+        editor->ReportActionStatus(L"Synthetic pins imported.");
+    };
+    settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));editor=&window;
+    REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),7);
+    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCURSEL,0,0),6);
+    CHECK_EQ(ControlText(window.Control(318)),desktopStatus);
+    REQUIRE(window.Control(200));CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);
+    ::SendMessageW(window.Handle(),WM_TIMER,19,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+    CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
+    desktopStatus=L"Synthetic recovery helper is ready.";window.RefreshDesktopStatus();
+    CHECK_EQ(ControlText(window.Control(318)),desktopStatus);
+    CHECK_EQ(::SendMessageW(window.Control(200),BM_GETCHECK,0,0),BST_CHECKED);
+    ::SendMessageW(window.Control(319),BM_CLICK,0,0);CHECK_EQ(imports,1);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+    CHECK_EQ(ControlText(window.Control(103)),L"Synthetic pins imported.");
+    CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
+    window.Close();REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    CHECK_EQ(ControlText(window.Control(103)),L"Synthetic pins imported.");
+    CHECK_EQ(::SendMessageW(window.Control(200),BM_GETCHECK,0,0),BST_UNCHECKED);
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().general.replaceWindowsTaskbar && !service.Dirty();}));
+    REQUIRE_EQ(service.Current().dock.pinned.size(),1u);CHECK_EQ(service.Current().dock.pinned[0].id,L"exe:synthetic-import");
+    settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));CHECK(reloaded.Current().general.replaceWindowsTaskbar);
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);::SendMessageW(window.Handle(),WM_TIMER,19,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));CHECK(service.Current().general.replaceWindowsTaskbar);
+    ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Current().general.replaceWindowsTaskbar && !service.Dirty();}));
+    RECT after{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&after,0));CHECK(::EqualRect(&before,&after));
+}
+
+AETHER_TEST("settings UI: adding an application preserves executable arguments and unavailable Desktop actions stay disabled") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto file=test::MakeTempDirectory("settings-ui-pin-arguments")/L"settings.json";
+    settings::SettingsService service(file,dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    apps::ApplicationInfo app;app.id=L"exe:synthetic-profile";app.displayName=L"Synthetic profile";
+    app.executablePath=L"synthetic.exe";app.arguments=L"--profile \"Synthetic profile\"";
+    settings::ui::SettingsCallbacks callbacks;callbacks.catalog=[app]{return std::vector{app};};
+    settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    ::SendMessageW(window.Control(272),CB_SETCURSEL,0,0);::SendMessageW(window.Control(311),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));REQUIRE_EQ(service.Current().dock.pinned.size(),1u);
+    CHECK_EQ(service.Current().dock.pinned[0].arguments,app.arguments);
+    settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));REQUIRE_EQ(reloaded.Current().dock.pinned.size(),1u);
+    CHECK_EQ(reloaded.Current().dock.pinned[0].arguments,app.arguments);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    CHECK_FALSE(::IsWindowEnabled(window.Control(319)));
+    CHECK(ControlText(window.Control(318)).find(L"unavailable")!=std::wstring::npos);
+    CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
 }

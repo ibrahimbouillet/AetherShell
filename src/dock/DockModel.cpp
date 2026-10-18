@@ -16,6 +16,7 @@ apps::ApplicationInfo FromPin(const settings::PinnedApp& pin) {
     apps::ApplicationInfo app;
     app.id = pin.id; app.displayName = pin.displayName; app.parsingName = pin.parsingName;
     app.appUserModelId = pin.appUserModelId; app.executablePath = pin.executablePath; app.shortcutPath = pin.shortcutPath;
+    app.arguments = pin.arguments;
     app.kind = apps::IsPackagedAumid(app.appUserModelId) ? apps::ApplicationKind::Packaged
         : app.executablePath.empty() ? apps::ApplicationKind::Other : apps::ApplicationKind::Desktop;
     return app;
@@ -117,7 +118,11 @@ Result<FittedDock> FitDockItems(const std::vector<DockItem>& items, const settin
 Result<settings::PinnedApp> PinFromApplication(const apps::ApplicationInfo& app) {
     try {
         if (app.id.empty() || text::ToLower(app.id).starts_with(L"window:")) return MakeError(ErrorCode::Unsupported, "application has no persistent launch identity");
-        return settings::PinnedApp{app.id, app.displayName, app.parsingName, app.appUserModelId, app.executablePath, app.shortcutPath};
+        settings::PinnedApp pin;
+        pin.id = app.id; pin.displayName = app.displayName; pin.parsingName = app.parsingName;
+        pin.appUserModelId = app.appUserModelId; pin.executablePath = app.executablePath;
+        pin.shortcutPath = app.shortcutPath; pin.arguments = app.arguments;
+        return pin;
     } catch (...) { return MakeError(ErrorCode::Internal, "application could not be pinned"); }
 }
 Result<std::vector<settings::PinnedApp>> PinApplication(const std::vector<settings::PinnedApp>& pins,
@@ -148,6 +153,48 @@ Result<std::vector<settings::PinnedApp>> MovePin(const std::vector<settings::Pin
         auto pin = std::move(*found); result.erase(found);
         result.insert(result.begin() + static_cast<std::ptrdiff_t>(destination), std::move(pin)); return result;
     } catch (...) { return MakeError(ErrorCode::Internal, "application could not be reordered"); }
+}
+
+Result<std::vector<settings::PinnedApp>> ReorderDockApplications(
+    const settings::DockSettings& settings, const std::vector<apps::RunningApplication>& running,
+    std::wstring_view draggedId, std::wstring_view destinationId) {
+    try {
+        auto model = BuildDockItems(settings, running); if (!model) return model.error();
+        std::erase_if(*model, [](const DockItem& item) {
+            return item.kind != DockItemKind::Pinned && item.kind != DockItemKind::Running;
+        });
+        const auto find = [&](std::wstring_view id) {
+            return std::find_if(model->begin(), model->end(), [&](const DockItem& item) {
+                return text::EqualsIgnoreCase(item.id, id);
+            });
+        };
+        const auto dragged = find(draggedId), target = find(destinationId);
+        if (dragged == model->end() || target == model->end())
+            return MakeError(ErrorCode::NotFound, "application is no longer available for reordering");
+        if (dragged == target) return settings.pinned;
+        const auto from = static_cast<std::size_t>(dragged - model->begin());
+        const auto to = static_cast<std::size_t>(target - model->begin());
+        DockItem moving = std::move((*model)[from]);
+        model->erase(model->begin() + from); model->insert(model->begin() + to, std::move(moving));
+        std::size_t prefix = to + 1;
+        for (std::size_t index = 0; index < model->size(); ++index)
+            if ((*model)[index].kind == DockItemKind::Pinned) prefix = std::max(prefix, index + 1);
+        if (prefix > 64) return MakeError(ErrorCode::InvalidState, "Dock supports at most 64 pinned applications");
+        std::vector<settings::PinnedApp> pins;
+        pins.reserve(prefix);
+        for (std::size_t index = 0; index < prefix; ++index) {
+            const auto& item = (*model)[index];
+            const auto existing = std::find_if(settings.pinned.begin(), settings.pinned.end(), [&](const auto& pin) {
+                return text::EqualsIgnoreCase(pin.id, item.id);
+            });
+            if (existing != settings.pinned.end()) pins.push_back(*existing);
+            else {
+                auto pin = PinFromApplication(item.application); if (!pin) return pin.error();
+                pins.push_back(std::move(*pin));
+            }
+        }
+        return pins;
+    } catch (...) { return MakeError(ErrorCode::Internal, "Dock application could not be reordered"); }
 }
 
 }  // namespace aether::dock

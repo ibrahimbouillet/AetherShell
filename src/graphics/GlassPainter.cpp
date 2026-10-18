@@ -5,6 +5,7 @@
 #include "graphics/WinRT.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cwctype>
 
 namespace aether::graphics {
@@ -51,20 +52,38 @@ void PaintShadow(ID2D1DeviceContext* context, const D2D1_ROUNDED_RECT& shape, co
     shadow->SetInput(0, list.get());
     shadow->SetValue(D2D1_SHADOW_PROP_BLUR_STANDARD_DEVIATION, glass.shadowBlur / 2.0f);
     shadow->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(glass.shadow.r, glass.shadow.g, glass.shadow.b, glass.shadow.a));
+
+    // A drop shadow belongs outside the glass. Painting its opaque silhouette beneath the
+    // translucent tint also darkened the whole panel and effectively defeated the opacity setting.
+    winrt::com_ptr<ID2D1Factory> factory; context->GetFactory(factory.put());
+    winrt::com_ptr<ID2D1RectangleGeometry> outer;
+    winrt::com_ptr<ID2D1RoundedRectangleGeometry> interior;
+    winrt::com_ptr<ID2D1PathGeometry> exterior;
+    winrt::com_ptr<ID2D1GeometrySink> sink;
+    const float spread = glass.shadowBlur * 3.0f + std::abs(glass.shadowOffsetY) + 2.0f;
+    const auto bounds = D2D1::RectF(shape.rect.left - spread, shape.rect.top - spread,
+                                   shape.rect.right + spread, shape.rect.bottom + spread);
+    if (FAILED(factory->CreateRectangleGeometry(bounds, outer.put())) ||
+        FAILED(factory->CreateRoundedRectangleGeometry(shape, interior.put())) ||
+        FAILED(factory->CreatePathGeometry(exterior.put())) || FAILED(exterior->Open(sink.put())) ||
+        FAILED(outer->CombineWithGeometry(interior.get(), D2D1_COMBINE_MODE_EXCLUDE, nullptr, sink.get())) ||
+        FAILED(sink->Close())) return;
+    context->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), exterior.get()), nullptr);
     context->DrawImage(shadow.get(), D2D1::Point2F(0.0f, glass.shadowOffsetY));
+    context->PopLayer();
 }
 
 }  // namespace
 
 float GlassTintAlpha(const DesignTokens& tokens, const GlassStyle& style) noexcept {
     const float opacity = std::clamp(style.opacity, 0.3f, 1.0f);
-    if (tokens.mode == ThemeMode::HighContrast) return 1.0f;
-    if (style.backdropBlur) {
-        // 0.3 -> very clear glass, 1.0 -> nearly solid. 0.8 (default) maps to the token value.
-        return std::clamp(tokens.glass.tintAlphaWithBlur * opacity / 0.8f, 0.12f, 1.0f);
-    }
-    // Without blur, keep a floor that preserves text contrast on busy wallpapers.
-    return std::clamp(tokens.glass.tintAlphaWithoutBlur * (0.75f + 0.25f * opacity / 0.8f), 0.72f, 1.0f);
+    if (tokens.mode == ThemeMode::HighContrast || !tokens.transparencyEnabled) return 1.0f;
+    const float tint = style.backdropBlur ? tokens.glass.tintAlphaWithBlur : tokens.glass.tintAlphaWithoutBlur;
+    // The default preference (.8) maps to the material tint; maximum opacity is truly opaque.
+    // A clear fallback remains translucent on Windows 10 and when host blur is unavailable.
+    if (opacity > 0.8f) return std::clamp(tint + (1.0f - tint) * (opacity - 0.8f) / 0.2f, 0.0f, 1.0f);
+    const float floor = style.backdropBlur ? 0.18f : 0.60f;
+    return std::clamp(tint * opacity / 0.8f, floor, 1.0f);
 }
 
 void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const DesignTokens& tokens,

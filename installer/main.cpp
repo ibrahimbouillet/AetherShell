@@ -9,6 +9,8 @@
 #include "platform/windows/AppPaths.h"
 #include "platform/windows/ComApartment.h"
 #include "platform/windows/DpiUtilities.h"
+#include "platform/windows/SingleInstance.h"
+#include "platform/windows/TaskbarReplacement.h"
 #include "platform/windows/Win32UiDispatcher.h"
 #include "platform/windows/MessageLoop.h"
 #include "platform/windows/WindowUtilities.h"
@@ -167,6 +169,15 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
         auto registry=settings::MakeWindowsStartupRegistry({policy.registry.run,policy.registry.startupApproval});if(!registry)return registry.error();startupRegistry=registry.value();
         auto previous=startupRegistry->ReadRun();if(!previous)return previous.error();previousRun=std::move(previous.value());
     }
+    // D21: repair and uninstall restore a taskbar that Aether Shell left hidden when both the app and its
+    // recovery helper failed. Only a saved baseline triggers this, so settings and other installs are untouched.
+    // A running instance and its helper own the taskbar; the operation's exit request makes them restore it.
+    std::string taskbarNote;
+    if((options.repair || options.uninstall) && !platform::InstanceChannel::FindListenerProcessId(L"AetherShell")) {
+        auto recovered=platform::RecoverTaskbars(platform::TaskbarBaselineFile(options.data/L"config"),false);
+        if(!recovered)taskbarNote="The Windows taskbar could not be restored automatically; restart Windows Explorer from Task Manager.\n";
+        else if(*recovered!=platform::TaskbarRecovery::NothingToRestore)taskbarNote="The Windows taskbar was restored.\n";
+    }
     auto result=options.uninstall ? install::Uninstall(*layout,options.data,options.removeData,policy) :
         options.repair ? install::RepairPackage(package,*layout,policy) : install::InstallPackage(package,*layout,policy);
     if(result && policy.startWithWindows && !options.uninstall) {
@@ -177,7 +188,7 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
     }
     if(!options.uninstall || !options.removeData || !result) {
         (void)fs::EnsureDirectory(options.log.parent_path());
-        (void)fs::WriteFileAtomic(options.log,result ? "Aether Shell setup completed successfully.\n" : "Aether Shell setup failed. Error category: "+std::string(ToString(result.error().code))+"\n");
+        (void)fs::WriteFileAtomic(options.log,(result ? std::string("Aether Shell setup completed successfully.\n") : "Aether Shell setup failed. Error category: "+std::string(ToString(result.error().code))+"\n")+taskbarNote);
     }
     if(!result || options.uninstall)return result;
     bool launch=!options.noLaunch;
@@ -271,7 +282,7 @@ private:
         if(page_==0) {
             Add(L"STATIC",L"A native Dock and Top Status Bar for Windows",0,28,82,600,34);
             Add(L"STATIC",L"Runs alongside Explorer and your Windows taskbar.\r\nInstalls for your account without administrator rights.\r\n\r\nProgram files are installed in the folder you choose.\r\nShortcuts are optional; setup registers an Installed apps entry.\r\nStartup stays off unless you explicitly enable it.",0,28,132,600,180);
-            Add(L"STATIC",options_.uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":options_.repair?L"Repair restores this package's files and keeps your settings.":L"Installing over an existing version keeps your settings.\r\nAn older package is rejected unless you explicitly permit a downgrade.",0,28,335,600,75);
+            Add(L"STATIC",options_.uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":options_.repair?L"Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.":L"Installing over an existing version keeps your settings.\r\nAn older package is rejected unless you explicitly permit a downgrade.",0,28,335,600,75);
             Add(L"BUTTON",L"Next",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,1);
         } else if(page_==1) {
             Add(L"STATIC",L"MIT License",0,28,82,600,26);

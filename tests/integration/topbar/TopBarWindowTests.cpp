@@ -12,10 +12,14 @@
 #include "status/WinRtSupport.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <stdexcept>
+#include <thread>
 #include <vector>
+#include <UIAutomation.h>
 
 using namespace aether;
 using namespace aether::topbar;
@@ -62,6 +66,11 @@ struct Capture {
     std::vector<std::uint8_t> bytes;
 };
 bool PrivateCrop(HWND backdrop, const RECT& crop) {
+    DWORD owner = 0; ::GetWindowThreadProcessId(backdrop, &owner);
+    RECT backdropBounds{};
+    if (owner != ::GetCurrentProcessId() || !::IsWindowVisible(backdrop) || !::GetWindowRect(backdrop, &backdropBounds) ||
+        backdropBounds.left > crop.left || backdropBounds.top > crop.top ||
+        backdropBounds.right < crop.right || backdropBounds.bottom < crop.bottom) return false;
     for (HWND window = ::GetTopWindow(nullptr); window; window = ::GetWindow(window, GW_HWNDNEXT)) {
         if (window == backdrop) return true;
         if (!::IsWindowVisible(window)) continue;
@@ -72,8 +81,10 @@ bool PrivateCrop(HWND backdrop, const RECT& crop) {
     }
     return false;
 }
-Capture CaptureOwnBackdrop(HWND backdrop, const RECT& bounds) {
-    REQUIRE(PrivateCrop(backdrop, bounds));
+Capture CaptureOwnBackdrop(HWND backdrop, const RECT& guardedArea, const RECT& bounds) {
+    REQUIRE(PrivateCrop(backdrop, guardedArea));
+    REQUIRE(bounds.left >= guardedArea.left && bounds.top >= guardedArea.top &&
+            bounds.right <= guardedArea.right && bounds.bottom <= guardedArea.bottom);
     Capture capture{bounds.right - bounds.left, bounds.bottom - bounds.top, {}};
     HDC screen = ::GetDC(nullptr), memory = ::CreateCompatibleDC(screen);
     BITMAPINFO info{}; info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -88,7 +99,7 @@ Capture CaptureOwnBackdrop(HWND backdrop, const RECT& bounds) {
     if (copied) capture.bytes.assign(static_cast<std::uint8_t*>(bits), static_cast<std::uint8_t*>(bits) +
         static_cast<std::size_t>(capture.width) * capture.height * 4);
     ::SelectObject(memory, previous); ::DeleteObject(bitmap); ::DeleteDC(memory); ::ReleaseDC(nullptr, screen);
-    REQUIRE(copied); REQUIRE(PrivateCrop(backdrop, bounds)); return capture;
+    REQUIRE(copied); REQUIRE(PrivateCrop(backdrop, guardedArea)); return capture;
 }
 void Save(const Capture& capture, const std::filesystem::path& file) {
     auto factory = winrt::create_instance<IWICImagingFactory>(CLSID_WICImagingFactory);
@@ -154,14 +165,15 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
     const auto output = std::filesystem::temp_directory_path() / "AetherShellTests";
     std::filesystem::create_directories(output);
     for (const auto mode : {graphics::ThemeMode::Dark, graphics::ThemeMode::Light}) {
-        window.SetTheme(graphics::MakeDesignTokens(mode), graphics::MotionPolicy{true, 1});
+        auto tokens = graphics::MakeDesignTokens(mode); tokens.transparencyEnabled = true;
+        window.SetTheme(tokens, graphics::MotionPolicy{true, 1});
         window.Show(false); RunFor(loop, 350);
         // Reassert that the private backdrop covers every captured pixel before capture.
         REQUIRE(::IsWindowVisible(backdrop.hwnd));
         ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         RunFor(loop, 100);
-        const auto captured = CaptureOwnBackdrop(backdrop.hwnd, captureBounds);
+        const auto captured = CaptureOwnBackdrop(backdrop.hwnd, privateBounds, captureBounds);
         REQUIRE_FALSE(captured.bytes.empty());
         const auto pixel = [&](int x, int y, int channel) {
             return captured.bytes[(static_cast<std::size_t>(y) * captured.width + x) * 4 + channel];
@@ -184,6 +196,24 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
         REQUIRE_EQ(quietIntervals, 2);
         const auto frames = window.RenderCount(); RunFor(loop, 120);
         CHECK_EQ(window.RenderCount(), frames);
+    }
+    // Render distinct kinds rather than using a shared cellular-bars mark for every connection.
+    auto snapshots = Synthetic();
+    for (const auto kind : {status::ConnectionKind::WiFi, status::ConnectionKind::Ethernet, status::ConnectionKind::Cellular}) {
+        snapshots.network.kind = kind;
+        snapshots.network.signalBars = kind == status::ConnectionKind::WiFi ? std::nullopt : std::optional<std::uint8_t>(std::uint8_t{4});
+        window.SetSnapshots(snapshots); RunFor(loop, 180);
+        const auto network = std::find_if(window.Items().begin(), window.Items().end(), [](const auto& entry) {
+            return entry.item.kind == ItemKind::Network;
+        });
+        REQUIRE(network != window.Items().end()); CHECK(network->item.connection == kind);
+        if (kind == status::ConnectionKind::WiFi) {
+            CHECK_FALSE(network->item.level.has_value());
+            CHECK(network->item.accessibleName.find(L"Signal strength unavailable") != std::wstring::npos);
+        }
+        const auto captured = CaptureOwnBackdrop(backdrop.hwnd, privateBounds, captureBounds);
+        Save(captured, output / (kind == status::ConnectionKind::WiFi ? L"topbar-wifi-unknown.png" :
+            kind == status::ConnectionKind::Ethernet ? L"topbar-ethernet.png" : L"topbar-cellular.png"));
     }
     REQUIRE_FALSE(window.Items().empty()); const auto logoId = window.Items().front().item.id;
     const auto beforeUpdate = window.RenderCount();
@@ -208,6 +238,78 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
     CHECK(::EqualRect(&originalWork, &after) != FALSE);
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
+}
+
+AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected interaction requests") {
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    RECT before{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &before, 0) != FALSE);
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false;
+    TopBarWindow window(context); REQUIRE(window.Create(RECT{80, 180, 1180, 228}).ok());
+    settings::TopBarSettings config; config.reserveSpace = false;
+    window.SetSettings(config, true); window.SetSnapshots(Synthetic());
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    int keyboard = 0, network = 0, weather = 0;
+    const DWORD uiThread = ::GetCurrentThreadId(); bool wrongThread = false;
+    auto keyConnection = window.KeyboardRequested.Connect([&] { ++keyboard; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    auto netConnection = window.NetworkRequested.Connect([&] { ++network; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    auto weatherConnection = window.WeatherRequested.Connect([&] { ++weather; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    window.Show(false); RunFor(loop, 100);
+    const auto click = [&](ItemKind kind) {
+        const auto found = std::find_if(window.Items().begin(), window.Items().end(), [kind](const auto& item) { return item.item.kind == kind; });
+        REQUIRE(found != window.Items().end()); REQUIRE(found->item.actionable);
+        const auto x = static_cast<int>(std::lround(window.ToPx((found->rect.left + found->rect.right) / 2)));
+        const auto y = static_cast<int>(std::lround(window.ToPx((found->rect.top + found->rect.bottom) / 2)));
+        ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, MAKELPARAM(x, y));
+    };
+    click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
+    CHECK_EQ(keyboard, 1); CHECK_EQ(network, 1); CHECK_EQ(weather, 1);
+    ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_HOME, 0);
+    for (int index = 0; index < 3; ++index) {
+        ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_RIGHT, 0);
+        ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_RETURN, 0);
+    }
+    CHECK_EQ(keyboard, 2); CHECK_EQ(network, 2); CHECK_EQ(weather, 2);
+    std::atomic<bool> finished{false}; bool passed = false;
+    const HWND hwnd = window.Handle();
+    std::thread client([&] {
+        platform::ComApartment apartment(COINIT_MULTITHREADED);
+        const auto check = [](HRESULT hr) { if (FAILED(hr)) throw std::runtime_error("own Top Bar UIA request failed"); };
+        try {
+            check(apartment.Status());
+            winrt::com_ptr<IUIAutomation> automation;
+            check(::CoCreateInstance(CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), automation.put_void()));
+            winrt::com_ptr<IUIAutomationElement> root; check(automation->ElementFromHandle(hwnd, root.put()));
+            for (const auto kind : {ItemKind::Keyboard, ItemKind::Network, ItemKind::Weather}) {
+                VARIANT id{}; id.vt = VT_BSTR; id.bstrVal = ::SysAllocString((L"item-" + std::to_wstring(static_cast<int>(kind))).c_str());
+                winrt::com_ptr<IUIAutomationCondition> condition;
+                const auto created = automation->CreatePropertyCondition(UIA_AutomationIdPropertyId, id, condition.put());
+                ::VariantClear(&id); check(created);
+                winrt::com_ptr<IUIAutomationElement> element; check(root->FindFirst(TreeScope_Children, condition.get(), element.put()));
+                if (!element) throw std::runtime_error("own Top Bar action missing");
+                CONTROLTYPEID type{}; check(element->get_CurrentControlType(&type));
+                BOOL focusable = FALSE; check(element->get_CurrentIsKeyboardFocusable(&focusable));
+                if (type != UIA_ButtonControlTypeId || !focusable) throw std::runtime_error("own Top Bar action is not accessible");
+                winrt::com_ptr<IUIAutomationInvokePattern> invoke;
+                check(element->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), invoke.put_void()));
+                check(invoke->Invoke());
+            }
+            passed = true;
+        } catch (...) { /* Report a fixed failure without exposing external UIA details. */ }
+        finished.store(true);
+    });
+    while (!finished.load()) RunFor(loop, 20);
+    client.join(); RunFor(loop, 100);
+    CHECK(passed); CHECK_FALSE(wrongThread);
+    CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
+    window.Hide(); click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
+    CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
+    RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
+    CHECK(::EqualRect(&before, &after) != FALSE);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
 }
 
 AETHER_TEST("topbar integration: real providers publish read-only items for three seconds") {

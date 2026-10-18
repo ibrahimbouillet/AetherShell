@@ -150,3 +150,34 @@ AETHER_TEST("topbar controls: a burst of wheel notches accumulates before provid
     CHECK_FALSE(WheelVolumeTarget({}, {}, 1).ok());
     CHECK_FALSE(WheelVolumeTarget(std::numeric_limits<float>::quiet_NaN(), {}, 1).ok());
 }
+
+AETHER_TEST("topbar network: Wi-Fi waves follow actual wireless bars and preserve unknown strength") {
+    DisplayItem item; item.connection = status::ConnectionKind::WiFi;
+    CHECK_FALSE(WiFiWaveCount(item).has_value());
+    const int expected[] = {0, 1, 2, 2, 3, 3};
+    for (int level = 0; level <= 5; ++level) {
+        item.level = level;
+        CHECK(WiFiWaveCount(item) == std::optional<int>(expected[level]));
+    }
+    item.level = 6; CHECK_FALSE(WiFiWaveCount(item).has_value());
+    item.level = 5;
+    for (const auto kind : {status::ConnectionKind::Cellular, status::ConnectionKind::Ethernet,
+                           status::ConnectionKind::Unknown, status::ConnectionKind::None}) {
+        item.connection = kind; CHECK_FALSE(WiFiWaveCount(item).has_value());
+    }
+}
+
+AETHER_TEST("topbar actions: keyboard network and weather remain actionable with unknown readings") {
+    settings::TopBarSettings config;
+    const auto built = BuildDisplayItems({}, config, true);
+    REQUIRE(built.ok());
+    for (const auto kind : {ItemKind::Keyboard, ItemKind::Network, ItemKind::Weather}) {
+        const auto* item = Find(built.value(), kind); REQUIRE(item != nullptr);
+        CHECK(item->actionable); CHECK(item->unknown);
+        CHECK(item->tooltip.find(L"Click to") != std::wstring::npos);
+        CHECK_EQ(item->accessibleName, item->tooltip);
+    }
+    CHECK(Find(built.value(), ItemKind::Keyboard)->tooltip.find(L"Win+Space") != std::wstring::npos);
+    CHECK(Find(built.value(), ItemKind::Microphone)->tooltip.find(L"right-click") != std::wstring::npos);
+    CHECK(Find(built.value(), ItemKind::Microphone)->tooltip.find(L"Recording detection unsupported") != std::wstring::npos);
+}

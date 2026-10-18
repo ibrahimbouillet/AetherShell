@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <limits>
 #include <numbers>
 
 namespace aether::dock {
@@ -60,6 +62,55 @@ Result<DockLayout> ArrangeDockLayout(float iconSize, float spacing, float magnif
         }
         return layout;
     } catch (...) { return MakeError(ErrorCode::Internal, "Dock layout could not be arranged"); }
+}
+
+Result<DockPlacement> PlaceDock(const DockLayout& layout, const RECT& area, UINT dpi,
+                                float iconSize, float magnification, float bottomMargin,
+                                bool reducedMotion) {
+    if (!Valid(iconSize, 0, magnification, layout.windowWidth) || dpi < 48 || dpi > 960 ||
+        area.right <= area.left || area.bottom <= area.top ||
+        !std::isfinite(layout.windowHeight) || layout.windowHeight <= 0 || layout.windowHeight > 512 ||
+        !std::isfinite(layout.panel.top) || !std::isfinite(layout.panel.bottom) ||
+        layout.panel.top < 0 || layout.panel.bottom <= layout.panel.top || layout.panel.bottom > layout.windowHeight ||
+        !std::isfinite(bottomMargin) || bottomMargin < 0 || bottomMargin > 200) {
+        return MakeError(ErrorCode::InvalidArgument, "invalid Dock placement geometry");
+    }
+    const double scale = static_cast<double>(dpi) / 96;
+    const auto availableWidth = static_cast<std::int64_t>(area.right) - area.left;
+    // Converting an exact monitor width to float DIPs and back can land a fraction above the
+    // original integer at fractional DPI. Permit that subpixel error without growing the HWND.
+    if (layout.windowWidth * scale > static_cast<double>(availableWidth) + 0.01 ||
+        layout.windowWidth * scale > static_cast<double>(std::numeric_limits<LONG>::max())) {
+        return MakeError(ErrorCode::InvalidArgument, "Dock exceeds its anchor width");
+    }
+    const auto pixels = [scale](double dip) { return static_cast<LONG>(std::ceil(dip * scale)); };
+    const LONG width = static_cast<LONG>(std::min<std::int64_t>(pixels(layout.windowWidth), availableWidth));
+    const LONG height = pixels(layout.windowHeight);
+    const LONG margin = pixels(bottomMargin);
+    // The resting panel has twelve DIPs of transparent trailing padding for its shadow. Position
+    // its visible edge, rather than the HWND edge, relative to the monitor/work-area boundary.
+    const LONG trailing = pixels(layout.windowHeight - layout.panel.bottom);
+    const auto left = static_cast<std::int64_t>(area.left) + (availableWidth - width) / 2;
+    const auto bottom = static_cast<std::int64_t>(area.bottom) - margin + trailing;
+    if (bottom > std::numeric_limits<LONG>::max() || bottom - height < std::numeric_limits<LONG>::min()) {
+        return MakeError(ErrorCode::InvalidArgument, "Dock exceeds native coordinate limits");
+    }
+    DockPlacement placement;
+    placement.windowPx = {static_cast<LONG>(left), static_cast<LONG>(bottom - height),
+        static_cast<LONG>(left + width), static_cast<LONG>(bottom)};
+    const float baseline = layout.panel.bottom - 18;
+    constexpr float shadowGuard = 12;
+    constexpr float focusGuard = 6;
+    const float bounce = reducedMotion ? 0.0f : 10.0f;
+    const float earliest = std::min(layout.panel.top - shadowGuard,
+        baseline - iconSize * magnification - bounce - focusGuard);
+    const auto firstDrawnPixel = static_cast<std::int64_t>(placement.windowPx.top) +
+        static_cast<LONG>(std::floor(earliest * scale));
+    if (firstDrawnPixel < std::numeric_limits<LONG>::min()) {
+        return MakeError(ErrorCode::InvalidArgument, "Dock exceeds native coordinate limits");
+    }
+    placement.reservationHeightPx = static_cast<LONG>(static_cast<std::int64_t>(area.bottom) - firstDrawnPixel);
+    return placement;
 }
 
 std::optional<std::size_t> HitTest(const DockLayout& layout, D2D1_POINT_2F point) noexcept {

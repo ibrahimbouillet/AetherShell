@@ -17,7 +17,8 @@ remain on the UI thread; provider callbacks copy snapshots into lifetime-guarded
 
 Construct `TopBarWindow(context)`, call `Create()`, connect the request signals and `Show(false)`.
 The signals are `SearchRequested`, `SettingsRequested`, `CheckForUpdatesRequested`, `AboutRequested`,
-`QuitRequested`, and `FullscreenChanged(bool)` for forwarding to the Dock. `Relayout`,
+`QuitRequested`, `KeyboardRequested`, `NetworkRequested`, `WeatherRequested`,
+`MicrophoneSettingsRequested`, and `FullscreenChanged(bool)` for forwarding to the Dock. `Relayout`,
 `OnExplorerRestarted`, `SetTheme(tokens, motion)` and `SetFullscreenHidden` support app/system wiring.
 `SetSnapshots`, `SetSettings`, `Items` and `RenderCount` support deterministic own-window tests.
 `Create(testBoundsPx)` requires `context.allowAppBar = false`.
@@ -46,7 +47,10 @@ Weather is visible only when both weather and its Top Bar item are enabled. Fres
 states remain distinct; cached values have a marker and labelled tooltip, with observation time and
 Open-Meteo attribution. Temperature units are shown explicitly. Glyphs are original vector geometry,
 including network/signal, speaker/mute, microphone/mute, battery/charge/plug and weather categories.
-Wireless bars are filled only from a real `signalBars`; missing strength has an unavailable mark.
+Wi-Fi uses three curved waves and a dot, with the actual Windows `signalBars` (0–5) mapped to
+0–3 active waves. Missing strength keeps the waves outlined and shows an unavailable mark; it
+never becomes a full-strength icon. Cellular retains five vertical bars. Ethernet uses a separate
+monitor/stand glyph, and unknown/offline states remain distinct in their accessible descriptions.
 
 The bar is 32 DIPs high with 12-DIP side margins and configurable top margin. Logo stays left;
 status/date/time align right. Width measurement uses DirectWrite. Weather collapses first, then
@@ -59,13 +63,31 @@ The inherited SurfaceWindow is topmost, a tool window and non-activating for poi
 typography, focus and high-contrast colors use the shared design tokens. Small value-change fades
 finish immediately with reduced motion. Frames are requested for changes/finite animations only.
 
+The shared glass material now keeps the backdrop visible without host blur as well: at the default
+0.8 preference the tint alpha is 0.66 dark / 0.72 light, rather than the former 0.86 / 0.90. The host
+backdrop brush mixes at 0.72 opacity so original desktop detail remains visible through its frost.
+The drop shadow is masked outside the rounded panel; its silhouette no longer adds a second dark
+fill behind the tint. Text and icons retain their own opacity. Maximum material opacity, Windows
+Transparency effects off, and high contrast each produce an opaque panel. Windows 10 keeps the
+documented per-pixel translucent fallback; it does not claim host-backdrop blur support.
+
 Hover shows details; clock click shows the long date. Volume click/microphone click submit real
 asynchronous ToggleMute requests, and volume wheel applies a bounded two-percent increment per
 notch. Unknown volume is never used as a starting value. Failures show an explanatory tooltip.
 The logo opens a native popup menu and emits requests; it does not launch arbitrary commands.
 Arrow/Home/End/Tab navigation, Enter/Space activation and Escape are supported for action items.
 
-`accessibility::AccessibleSurface` exposes a toolbar with Button elements for the logo/audio/mic and
+The urgent T17 interaction correction makes the keyboard, network and visible weather item buttons.
+Pointer, keyboard and UIA Invoke share the same guarded request path. Tooltips announce the action:
+input-language switch (Win+Space), Windows network settings, or Aether's existing Weather settings.
+The application owns these routes; this module never starts a shell process, switches the actual
+layout or performs network/recording operations itself. Microphone primary activation retains mute;
+right-click or Shift+F10/Menu on the focused microphone opens a privacy-settings menu and emits
+`MicrophoneSettingsRequested` only after selection. Hidden, disabled or full-screen-suppressed
+surfaces reject actions; queued requests recheck current availability. No recording/dictation is added.
+
+`accessibility::AccessibleSurface` exposes a toolbar with Button elements for the logo, input/network/
+weather actions and audio/mic, and
 Text elements for status. Bounds are physical screen pixels. Names/status, structure and focus events
 follow model changes. UIA actions post to the window before opening a modal menu so automation calls
 can return. WM_GETOBJECT is forwarded; WM_DESTROY disconnects providers before destroying the model.
@@ -103,6 +125,20 @@ after and must be unchanged; unchanged fake snapshots request no idle frames. A 
 integration starts real providers read-only and prints only item text, without names/private detail.
 No test performs an audio control or weather network request.
 
+V2 regression additions compare the same panel over two different private opaque test patterns.
+Ordinary glass must respond to that background change; high contrast must remain unchanged. These
+checks distinguish real compositing from variance caused only by text/icons. Wi-Fi strength mapping
+is covered by pure tests, and own-window variants render Wi-Fi with unknown strength, Ethernet and
+cellular separately. On 2026-10-18, the Release `/WX` build in `build/wf-v2-visuals` passed six
+graphics and eight Top Bar unit cases, then three glass and two Top Bar integration cases in a
+serial desktop slot (11.70 seconds). Background-change mean RGB deltas were 26.827 for dark host
+blur, 18.968 for light without blur, and 0.000 for the opaque high-contrast material. Work area and
+idle checks passed. All eight generated private-window PNGs were opened and inspected: the glass
+reveals the synthetic stripes, text stays legible, and Wi-Fi/unknown-Wi-Fi/Ethernet/cellular geometry
+is visibly distinct. This does not claim an actual Windows high-contrast user workflow or physical
+multi-monitor/DPI qualification. A separate agent reviewed the material/shadow changes read-only
+and reported no actionable defect.
+
 Executed on 2026-10-18: the private `build/wf-topbar2` build with warnings as errors passed seven
 unit cases and two integration cases (2/2 CTest executables). Dark/light captures were opened and
 visually checked: the complete date/time fits, the original two-ribbon brand mark matches the
@@ -118,3 +154,8 @@ qualification; own-window render tests alone do not establish those behaviors.
 A second agent reviewed final layout/semibold measurement, UIA action deferral and teardown,
 provider ownership/dispatch, reservation opt-out, full-screen hooks and pending-volume echo handling.
 No further actionable finding was reported in that read-only review; the reviewer did not rerun tests.
+
+The T17 source adds a ninth unit case for action metadata with unknown readings and a third native
+case for pointer, keyboard and separate-MTA UIA signal delivery. Callbacks are synthetic and the
+real work area must remain unchanged. Execution is pending the focused build/serial GUI slot;
+the previous eight-unit/two-native Top Bar result above predates these interaction changes.

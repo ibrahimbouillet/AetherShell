@@ -13,14 +13,16 @@ Claude Code specifics.
 - Large parallel work: use the Workflow tool in batches of three modules (implement → independent
   review), each agent restricted to its own module directory and private `build/wf-<module>` folder.
   Usage limits can interrupt runs; resume from the workflow cache instead of restarting.
+- Workflow scripts from earlier sessions (for example `phase-a.js` / `phase-b.js`) targeted the archive
+  copy and modules that are now implemented. Never resume them; write new, scoped workflows.
 - Do not read the whole knowledge vault or graph report; follow the targeted-retrieval order in
   `AGENTS.md` ("Efficient context gathering").
 
 ## graphify
 
 Graphify is optional local navigation, not a product dependency or prerequisite for source reads.
-Follow AGENTS.md's verified discovery state; on 2026-10-18 the launcher fails and its graph is stale.
-Use targeted source/Markdown searches until a working local installation and refresh are verified.
+Follow AGENTS.md's verified discovery state: on 2026-10-18 it runs from Claude Code's shell (0.9.92)
+but no graph exists for this checkout yet. Use targeted source/Markdown searches unless you build one.
 
 When available, `graphify query "<question>"` explores dependencies; `explain <node-id>` and
 `path <id-a> <id-b>` need exact IDs when a name is ambiguous. Confirm graph findings against source;

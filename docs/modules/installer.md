@@ -22,3 +22,10 @@ The settled complete Release build passed all five setup cases, adding installed
 relocation and an isolated 200% DPI/scroll/focus viewport case. Production registration was observed
 separately during owner-authorized alpha delivery: exit 0, Installed apps entry and launcher present,
 startup disabled and no app launch. This delivery observation is not an automated mutation test.
+
+**Taskbar recovery (D21).** When no Aether Shell instance is running, repair and uninstall call
+`platform::RecoverTaskbars` on `<data>\config\taskbar-baseline.json` before the package operation.
+A running instance and its helper restore the taskbar themselves when the operation asks them to exit.
+Only an existing baseline triggers recovery, so settings, other installations and automated tests
+(temporary data roots) are unaffected. A failure does not block repair or uninstall; the setup log
+records it with the manual Explorer-restart instruction.

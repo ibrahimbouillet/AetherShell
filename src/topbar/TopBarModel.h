@@ -44,6 +44,10 @@ struct DisplayItem {
 };
 struct PlacedItem { DisplayItem item; D2D1_RECT_F rect{}; };
 
+// Windows reports 0..5 wireless bars. Wi-Fi uses three curved wave levels, cellular retains
+// five vertical bars; missing strength never becomes a fabricated full-strength reading.
+[[nodiscard]] std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept;
+
 [[nodiscard]] Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& snapshots,
     const settings::TopBarSettings& settings, bool weatherEnabled, std::wstring_view locale = {});
 // Widths correspond to items and include glyph/text padding. Low-priority weather then keyboard

@@ -36,5 +36,10 @@ Result<std::vector<settings::PinnedApp>> UnpinApplication(const std::vector<sett
                                                         std::wstring_view id);
 Result<std::vector<settings::PinnedApp>> MovePin(const std::vector<settings::PinnedApp>& pins,
                                                std::wstring_view id, std::size_t destination);
+// Moving an unpinned application makes it persistent. Earlier running items that must precede its
+// new position become pins too, preserving the requested order under the pins-first model.
+Result<std::vector<settings::PinnedApp>> ReorderDockApplications(
+    const settings::DockSettings& settings, const std::vector<apps::RunningApplication>& running,
+    std::wstring_view draggedId, std::wstring_view destinationId);
 
 }  // namespace aether::dock

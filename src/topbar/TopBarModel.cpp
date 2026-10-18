@@ -60,6 +60,12 @@ std::wstring KindText(status::ConnectionKind value) {
 
 }  // namespace
 
+std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept {
+    if (item.connection != status::ConnectionKind::WiFi || !item.level || *item.level < 0 || *item.level > 5)
+        return std::nullopt;
+    return (*item.level * 3 + 4) / 5;
+}
+
 Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
     const settings::TopBarSettings& config, bool weatherEnabled, std::wstring_view locale) {
     try {
@@ -70,7 +76,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             const bool usable = (snapshot.state == status::WeatherState::Available ||
                                  snapshot.state == status::WeatherState::Cached) && snapshot.temperature &&
                                  std::isfinite(*snapshot.temperature);
-            auto item = Item(ItemKind::Weather, L"—", L"Weather status unavailable");
+            auto item = Item(ItemKind::Weather, L"—", L"Weather status unavailable", true);
             item.unknown = !usable;
             if (usable) {
                 item.text = std::format(L"{:.0f}°{}", *snapshot.temperature,
@@ -88,6 +94,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
                 item.tooltip = L"Weather: " + text::Widen(weather::ToString(snapshot.state));
             }
             if (!snapshot.detail.empty()) item.tooltip += L"\n" + text::Widen(snapshot.detail);
+            item.tooltip += L"\nClick to open weather settings";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
@@ -95,22 +102,24 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             const bool available = s.keyboard.state == status::ProviderState::Available && !s.keyboard.shortLabel.empty();
             auto item = Item(ItemKind::Keyboard, available ? s.keyboard.shortLabel : L"—",
                 available ? s.keyboard.languageName + L" · " + s.keyboard.layoutName
-                          : L"Input language: " + StateText(s.keyboard.state));
+                          : L"Input language: " + StateText(s.keyboard.state), true);
             item.unknown = !available;
             if (available && !s.keyboard.fromForegroundWindow) item.tooltip += L"\nFallback input layout";
+            item.tooltip += L"\nClick to switch input language (Win+Space)";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
         if (config.showNetwork) {
             const bool available = s.network.state == status::ProviderState::Available;
             auto item = Item(ItemKind::Network, L"", available ? KindText(s.network.kind) + L" · " +
-                Connectivity(s.network.connectivity) : L"Network: " + StateText(s.network.state));
+                Connectivity(s.network.connectivity) : L"Network: " + StateText(s.network.state), true);
             item.connection = available ? s.network.kind : status::ConnectionKind::Unknown;
             item.connectivity = available ? s.network.connectivity : status::InternetConnectivity::Unknown;
             item.unknown = !available || item.connection == status::ConnectionKind::Unknown;
             if (available && s.network.signalBars && *s.network.signalBars <= 5) item.level = *s.network.signalBars;
             if ((item.connection == status::ConnectionKind::WiFi || item.connection == status::ConnectionKind::Cellular) && !item.level)
                 item.tooltip += L" · Signal strength unavailable";
+            item.tooltip += L"\nClick to open Windows network settings";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
@@ -140,6 +149,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             }
             item.tooltip += L"\nRecording detection unsupported";
             if (available && !s.microphone.deviceName.empty()) item.tooltip += L"\n" + s.microphone.deviceName;
+            item.tooltip += L"\nClick to toggle mute; right-click for microphone privacy settings";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }

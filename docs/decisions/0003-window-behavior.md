@@ -2,6 +2,11 @@
 
 - Status: accepted (2026-10-17)
 
+> Historical Version 1 baseline. On 2026-10-18 the owner approved D19 / [ADR 0009](0009-reversible-taskbar-replacement.md).
+> It supersedes the blanket no-hide policy and non-AppBar Dock rule only for the optional,
+> explicitly consented V2 replacement mode. The remaining Explorer, full-screen and input policies
+> remain applicable. The text below preserves the original decision rather than rewriting history.
+
 ## Context
 
 Both bars float over the desktop beside the regular Windows taskbar. An AppBar

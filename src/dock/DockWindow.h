@@ -29,6 +29,8 @@ struct DockWindowOptions {
     std::optional<RECT> workAreaPx;
     bool allowWorkAreaReservation = true;
     HWND owner = nullptr;
+    // The application owns reversible native-taskbar visibility; the Dock owns its reserved area.
+    bool replacementTaskbarMode = false;
 };
 
 class DockWindow final : public ui::SurfaceWindow {
@@ -41,12 +43,15 @@ public:
     Result<void> SetSuppressed(bool suppressed);
     Result<void> Relayout();
     Result<void> OnExplorerRestarted();
+    Result<void> SetTaskbarReplacement(bool active);
     Result<void> SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion,
                           const settings::DockSettings& settings);
     [[nodiscard]] Result<DockLayout> Geometry() const;
     [[nodiscard]] std::uint64_t RenderedFrames() const noexcept;
     Signal<> SearchRequested;
     Signal<> SettingsRequested;
+    Signal<> ImportWindowsPinsRequested;
+    Signal<> StartRequested;
 
 protected:
     void OnRender(const ui::RenderContext& context) override;

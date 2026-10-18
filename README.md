@@ -4,8 +4,9 @@ A native Windows desktop interface by **Ibrahim Bouillet**: a floating applicati
 separate Top Status Bar, running alongside Windows Explorer. Built with C++20, Win32,
 Direct2D/DirectWrite and Windows.UI.Composition. MIT licensed.
 
-**[Download 0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) — manual-install development alpha.**
-The native application and per-user installer are available. [Windows Release CI passed](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917).
+**V2 development candidate: `0.2.0-alpha.1`.** The changes below are being qualified; no V2 release
+or CI result is claimed yet. The [published 0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1)
+is the earlier manual-install alpha, with its own [passing Windows CI receipt](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917).
 See [known limitations](KNOWN_LIMITATIONS.md) and [executed evidence](docs/knowledge/TEST_STATUS.md)
 for the scoped tests and remaining Version 1 qualification. Automatic updates are unavailable for
 this alpha; no unsigned manifest is published.
@@ -16,8 +17,19 @@ this alpha; no unsigned manifest is published.
 - Settings: Dock, Top Bar, opt-in weather, updates, shortcuts, startup consent and diagnostics.
 - Delivery: per-user setup, versioned installation, repair, uninstall and authenticated update design.
 
-Windows 10 2004+ and Windows 11, x64. Windows 10 and ARM64 remain unqualified. Explorer and the
-Windows taskbar stay available. Weather is disabled by default; enabling it sends the selected
+V2 adds **Settings → Desktop → Replace the Windows taskbar → Apply**. This optional mode is off
+by default. It hides the native taskbar while Aether Shell runs, reserves the Dock's space below
+maximized windows, and restores Windows on disable/exit with a separate recovery helper. Available
+Windows pinned shortcuts can be imported without modifying the native pins. Glass now reveals the
+backdrop more clearly, and Wi-Fi uses curved waves instead of cellular bars.
+
+Windows Settings keeps its native taskbar page; configure Aether Shell in its own Desktop page.
+Pin coverage/order and recovery across all Windows/Explorer failures remain limited. Read the
+[mode and recovery guide](USER_GUIDE.md) and [known limitations](KNOWN_LIMITATIONS.md) before enabling it.
+
+Windows 10 2004+ and Windows 11, x64. Windows 10 and ARM64 remain unqualified. The native
+Windows taskbar stays visible in the default coexistence mode. Explorer keeps running in either
+mode. Weather is disabled by default; enabling it sends the selected
 coordinates to Open-Meteo. No location detection or Wi-Fi network names are used.
 
 Read the [user guide](USER_GUIDE.md), [installation guide](INSTALLATION.md), and

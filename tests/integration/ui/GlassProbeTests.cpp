@@ -32,6 +32,7 @@ public:
     ProbeWindow(graphics::GraphicsDevice& device, graphics::FrameScheduler& scheduler, graphics::ThemeMode mode,
                 bool blur)
         : SurfaceWindow(device, scheduler), tokens_(graphics::MakeDesignTokens(mode)), blur_(blur) {
+        tokens_.transparencyEnabled = mode != graphics::ThemeMode::HighContrast;
         text_.Initialize(device.DWriteFactory(), tokens_.fontFamily, tokens_.displayFontFamily);
     }
     ~ProbeWindow() override { Destroy(); }
@@ -80,7 +81,9 @@ LRESULT CALLBACK BackdropProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
         const int stripe = 24;
         for (int x = 0; x < client.right; x += stripe) {
             const int i = x / stripe;
-            const COLORREF color = RGB(40 + (i * 53) % 200, 60 + (i * 97) % 180, 90 + (i * 31) % 160);
+            const bool alternate = ::GetWindowLongPtrW(hwnd, GWLP_USERDATA) != 0;
+            const COLORREF color = alternate ? RGB(195 - (i * 31) % 90, 120 + (i * 17) % 100, 35 + (i * 11) % 80)
+                : RGB(40 + (i * 53) % 200, 60 + (i * 97) % 180, 90 + (i * 31) % 160);
             HBRUSH brush = ::CreateSolidBrush(color);
             RECT band{x, 0, x + stripe, client.bottom};
             ::FillRect(dc, &band, brush);
@@ -114,7 +117,7 @@ HWND CreateTestBackdrop(const RECT& rect) {
 
 // A foreign overlay anywhere in the guard band could contribute blurred pixels even outside the
 // saved crop. Inspect only PID, visibility and geometry; never read a foreign title or content.
-bool PrivateBackdropVisible(HWND backdrop, const RECT& guardedArea) {
+bool PrivateBackdropVisible(HWND backdrop, const RECT& guardedArea, DWORD trustedProcess = ::GetCurrentProcessId()) {
     DWORD process = 0; ::GetWindowThreadProcessId(backdrop, &process);
     RECT bounds{};
     if (process != ::GetCurrentProcessId() || !::IsWindowVisible(backdrop) || !::GetWindowRect(backdrop, &bounds) ||
@@ -124,7 +127,7 @@ bool PrivateBackdropVisible(HWND backdrop, const RECT& guardedArea) {
         if (window == backdrop) return true;
         if (!::IsWindowVisible(window)) continue;
         ::GetWindowThreadProcessId(window, &process);
-        if (process == ::GetCurrentProcessId()) continue;
+        if (process == trustedProcess) continue;
         RECT overlap{};
         if (::GetWindowRect(window, &bounds) && ::IntersectRect(&overlap, &bounds, &guardedArea)) return false;
     }
@@ -272,6 +275,7 @@ void RunProbe(graphics::ThemeMode mode, bool blur, const char* name) {
     ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     if (tooltip.Handle()) ::SetWindowPos(tooltip.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     RunLoopFor(loop, 100);
+    CHECK_FALSE(PrivateBackdropVisible(backdrop.hwnd, guardedArea, 0)); // synthetic untrusted overlay classification
     const Capture capture = CapturePrivate(backdrop.hwnd, guardedArea, captureArea);
     const auto path = std::filesystem::temp_directory_path() / "AetherShellTests" / (std::string("probe-") + name + ".png");
     std::filesystem::create_directories(path.parent_path());
@@ -284,6 +288,26 @@ void RunProbe(graphics::ThemeMode mode, bool blur, const char* name) {
     const RECT inside{static_cast<LONG>(40 * scale), offsetY + static_cast<LONG>(36 * scale),
                       static_cast<LONG>(400 * scale), offsetY + static_cast<LONG>(84 * scale)};
     CHECK(LuminanceVariance(capture, inside) > 20.0);
+
+    // Change only our opaque backdrop, leaving the glass content untouched. A flat opaque panel
+    // could pass a text/icon variance check; it cannot pass this composited-background dependency.
+    ::SetWindowLongPtrW(backdrop.hwnd, GWLP_USERDATA, 1);
+    REQUIRE(::InvalidateRect(backdrop.hwnd, nullptr, FALSE) != FALSE);
+    ::UpdateWindow(backdrop.hwnd); RunLoopFor(loop, 300);
+    const auto changed = CapturePrivate(backdrop.hwnd, guardedArea, captureArea);
+    double difference = 0; int samples = 0;
+    const int sampleY = offsetY + static_cast<int>(89 * scale);
+    for (int x = static_cast<int>(45 * scale); x < static_cast<int>(570 * scale); ++x) {
+        const auto* before = capture.Pixel(x, sampleY);
+        const auto* after = changed.Pixel(x, sampleY);
+        for (int channel = 0; channel < 3; ++channel) {
+            difference += std::abs(static_cast<int>(before[channel]) - static_cast<int>(after[channel])); ++samples;
+        }
+    }
+    difference /= samples;
+    TEST_NOTE(std::string("own backdrop response mean RGB delta=") + std::to_string(difference));
+    if (mode == graphics::ThemeMode::HighContrast) CHECK(difference < 2.0);
+    else CHECK(difference > 8.0);
 
     tooltip.Destroy();
     window.Destroy();
@@ -301,4 +325,9 @@ AETHER_TEST("ui probe: dark glass with backdrop blur renders") {
 AETHER_TEST("ui probe: light glass without blur renders") {
     platform::ComApartment com(COINIT_APARTMENTTHREADED);
     RunProbe(graphics::ThemeMode::Light, false, "light-noblur");
+}
+
+AETHER_TEST("ui probe: high contrast stays opaque when the private backdrop changes") {
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    RunProbe(graphics::ThemeMode::HighContrast, false, "high-contrast");
 }

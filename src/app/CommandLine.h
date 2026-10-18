@@ -11,7 +11,7 @@
 
 namespace aether::app {
 
-enum class StartupAction { None, OpenSettings, OpenSearch };
+enum class StartupAction { None, OpenSettings, OpenSearch, Quit, RestoreTaskbar };
 
 struct CommandLine {
     bool autostart = false;          // launched from the Run key at sign-in

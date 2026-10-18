@@ -31,7 +31,7 @@ enum class ThemeMode { Dark, Light, HighContrast };
 struct GlassTokens {
     Color tint;                    // panel tint painted over the (blurred) backdrop
     float tintAlphaWithBlur = 0.5f;
-    float tintAlphaWithoutBlur = 0.88f;  // without blur the panel must be more opaque to stay readable
+    float tintAlphaWithoutBlur = 0.66f;  // stronger tint without blur, while retaining the backdrop
     Color borderTop;               // 1-DIP inner border, gradient from top...
     Color borderBottom;            // ...to bottom
     Color highlight;               // soft specular sheen at the top of the panel
@@ -43,6 +43,7 @@ struct GlassTokens {
 
 struct DesignTokens {
     ThemeMode mode = ThemeMode::Dark;
+    bool transparencyEnabled = true;  // honors Windows accessibility/personalization preference
     GlassTokens glass;
 
     Color textPrimary;

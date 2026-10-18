@@ -80,6 +80,11 @@ struct ApplicationItem {
 // rejected. NotFound when nothing usable exists.
 [[nodiscard]] Result<ApplicationItem> CreateApplicationItem(const ApplicationInfo& app);
 
+// Icon routing only. A Desktop entry's existing ordinary, validated local .lnk may carry a profile
+// icon override that the generic Apps-folder/executable item does not. Worker thread: reads file
+// attributes, never shortcut target content. Packaged/Other entries retain their normal icon route.
+[[nodiscard]] bool ShouldPreferShortcutIcon(const ApplicationInfo& app) noexcept;
+
 // UTF-8, control characters removed, bounded: safe to put in a log line.
 [[nodiscard]] std::string ForLog(std::wstring_view text, std::size_t maxLength = 200);
 

@@ -67,6 +67,16 @@ AETHER_TEST("dock model: transient identities and too many pins fail explicitly"
     std::vector<settings::PinnedApp> pins(64, Pin(L"exe:a")); app.id = L"exe:new";
     CHECK_EQ(PinApplication(pins, app).error().code, ErrorCode::InvalidState);
 }
+AETHER_TEST("dock model: a pinned launch retains arguments without depending on its shortcut file") {
+    apps::ApplicationInfo app; app.id = L"exe:synthetic-profile"; app.displayName = L"Synthetic profile";
+    app.executablePath = L"synthetic.exe"; app.arguments = L"--profile \"Synthetic profile\" --mode=test";
+    auto pin = PinFromApplication(app); REQUIRE(pin.ok()); CHECK_EQ(pin->arguments, app.arguments);
+    settings::DockSettings config; config.pinned.push_back(*pin);
+    auto model = BuildDockItems(config, {}); REQUIRE(model.ok()); REQUIRE_EQ(model->size(), 2u);
+    CHECK_EQ((*model)[1].application.arguments, app.arguments);
+    CHECK_EQ((*model)[1].application.executablePath, app.executablePath);
+    CHECK((*model)[1].application.shortcutPath.empty());
+}
 AETHER_TEST("dock model: moving pins preserves relative order and validates destinations") {
     const std::vector pins{Pin(L"exe:a"), Pin(L"exe:b"), Pin(L"exe:c")};
     auto moved = MovePin(pins, L"exe:a", 2); REQUIRE(moved.ok());
@@ -74,6 +84,38 @@ AETHER_TEST("dock model: moving pins preserves relative order and validates dest
     CHECK_EQ((*moved)[2].id, std::wstring(L"exe:a"));
     CHECK_EQ(MovePin(pins, L"exe:missing", 0).error().code, ErrorCode::NotFound);
     CHECK_EQ(MovePin(pins, L"exe:a", 3).error().code, ErrorCode::InvalidArgument);
+}
+AETHER_TEST("dock drag: unpinned application moves left into pins without launching or losing existing metadata") {
+    settings::DockSettings config;config.pinned={Pin(L"exe:a"),Pin(L"exe:b")};
+    config.pinned[1].arguments=L"--synthetic-profile";
+    const std::vector running{Running(L"exe:c"),Running(L"exe:d")};
+    auto moved=ReorderDockApplications(config,running,L"exe:d",L"exe:a");REQUIRE(moved.ok());
+    REQUIRE_EQ(moved->size(),3u);CHECK_EQ((*moved)[0].id,L"exe:d");CHECK_EQ((*moved)[1].id,L"exe:a");
+    CHECK_EQ((*moved)[2].id,L"exe:b");CHECK_EQ((*moved)[2].arguments,L"--synthetic-profile");
+    config.pinned=*moved;auto items=BuildDockItems(config,running);REQUIRE(items.ok());
+    REQUIRE_EQ(items->size(),5u);CHECK_EQ((*items)[4].id,L"exe:c");CHECK((*items)[1].running);
+}
+AETHER_TEST("dock drag: moving right pins only the necessary running prefix to retain exact order") {
+    settings::DockSettings config;config.pinned={Pin(L"exe:a")};
+    const std::vector running{Running(L"exe:b"),Running(L"exe:c"),Running(L"exe:d"),Running(L"exe:e")};
+    auto moved=ReorderDockApplications(config,running,L"exe:b",L"exe:d");REQUIRE(moved.ok());
+    REQUIRE_EQ(moved->size(),4u);CHECK_EQ((*moved)[0].id,L"exe:a");CHECK_EQ((*moved)[1].id,L"exe:c");
+    CHECK_EQ((*moved)[2].id,L"exe:d");CHECK_EQ((*moved)[3].id,L"exe:b");
+    config.pinned=*moved;auto items=BuildDockItems(config,running);REQUIRE(items.ok());
+    REQUIRE_EQ(items->size(),6u);CHECK_EQ((*items)[5].id,L"exe:e");
+    auto back=ReorderDockApplications(config,running,L"exe:b",L"exe:c");REQUIRE(back.ok());
+    CHECK_EQ((*back)[1].id,L"exe:b");CHECK_EQ((*back)[2].id,L"exe:c");CHECK_EQ((*back)[3].id,L"exe:d");
+}
+AETHER_TEST("dock drag: transient missing and excess pin identities fail without modifying the input") {
+    settings::DockSettings config;config.pinned={Pin(L"exe:a")};
+    const std::vector running{Running(L"window:temporary"),Running(L"exe:c")};
+    CHECK_EQ(ReorderDockApplications(config,running,L"window:temporary",L"exe:a").error().code,ErrorCode::Unsupported);
+    CHECK_EQ(ReorderDockApplications(config,running,L"exe:a",L"exe:c").error().code,ErrorCode::Unsupported);
+    CHECK_EQ(ReorderDockApplications(config,running,L"missing",L"exe:a").error().code,ErrorCode::NotFound);
+    REQUIRE_EQ(config.pinned.size(),1u);CHECK_EQ(config.pinned[0].id,L"exe:a");
+    config.pinned.clear();for(int index=0;index<64;++index)config.pinned.push_back(Pin(L"exe:"+std::to_wstring(index)));
+    CHECK_EQ(ReorderDockApplications(config,{Running(L"exe:new")},L"exe:new",L"exe:0").error().code,ErrorCode::InvalidState);
+    CHECK_EQ(config.pinned.size(),64u);
 }
 AETHER_TEST("dock overflow: shrink before hiding trailing running applications") {
     settings::DockSettings config; config.pinned = {Pin(L"exe:a"), Pin(L"exe:b")};
@@ -147,4 +189,61 @@ AETHER_TEST("dock layout: fitted magnification remains inside the available work
             }
         }
     }
+}
+AETHER_TEST("dock placement: visible bottom gap is not doubled by transparent window padding") {
+    auto layout = ArrangeDockLayout(48, 8, 1.45f, 800, std::vector<float>{1, 1, 1}); REQUIRE(layout.ok());
+    const RECT area{0, 0, 1920, 1080};
+    for (const UINT dpi : {96u, 120u, 144u, 192u}) {
+        for (const float margin : {0.0f, 6.0f, 10.0f, 20.0f}) {
+            auto placed = PlaceDock(*layout, area, dpi, 48, 1.45f, margin, false); REQUIRE(placed.ok());
+            const double scale = static_cast<double>(dpi) / 96;
+            const double panelBottom = placed->windowPx.top + layout->panel.bottom * scale;
+            CHECK(std::abs(panelBottom - (area.bottom - std::ceil(margin * scale))) <= 1.0);
+            CHECK_EQ(placed->windowPx.left + placed->windowPx.right, area.left + area.right);
+        }
+    }
+}
+AETHER_TEST("dock placement: reservation contains every magnified bouncing icon and the panel shadow") {
+    const RECT area{-1920, -200, 0, 1080};
+    for (const float size : {32.0f, 48.0f, 96.0f}) {
+        for (const float magnification : {1.0f, 1.45f, 2.0f}) {
+            auto layout = ArrangeDockLayout(size, 8, magnification, 800, std::vector<float>{magnification}); REQUIRE(layout.ok());
+            for (const UINT dpi : {96u, 120u, 144u, 192u}) {
+                auto placed = PlaceDock(*layout, area, dpi, size, magnification, 10, false); REQUIRE(placed.ok());
+                const double scale = static_cast<double>(dpi) / 96;
+                const double clientBottom = area.bottom - placed->reservationHeightPx;
+                const double shadowTop = placed->windowPx.top + (layout->panel.top - 12) * scale;
+                const double bounceFocusTop = placed->windowPx.top + (layout->items[0].icon.top - 10 - 6) * scale;
+                CHECK(clientBottom <= shadowTop); CHECK(clientBottom <= bounceFocusTop);
+                CHECK(placed->reservationHeightPx <= static_cast<LONG>(std::ceil((size * magnification + 54) * scale)));
+            }
+        }
+    }
+}
+AETHER_TEST("dock placement: reduced motion removes bounce reservation and changed edges do not compound") {
+    auto layout = ArrangeDockLayout(48, 8, 1.8f, 800, std::vector<float>{1}); REQUIRE(layout.ok());
+    const RECT work{0, 40, 1920, 1032};
+    const RECT monitor{0, 40, 1920, 1080};
+    auto ordinary = PlaceDock(*layout, work, 96, 48, 1.8f, 6, false); REQUIRE(ordinary.ok());
+    auto replacement = PlaceDock(*layout, monitor, 96, 48, 1.8f, 6, false); REQUIRE(replacement.ok());
+    auto reduced = PlaceDock(*layout, monitor, 96, 48, 1.8f, 6, true); REQUIRE(reduced.ok());
+    CHECK_EQ(replacement->windowPx.bottom - ordinary->windowPx.bottom, 48);
+    CHECK_EQ(replacement->reservationHeightPx, ordinary->reservationHeightPx);
+    CHECK_EQ(replacement->reservationHeightPx - reduced->reservationHeightPx, 10);
+}
+AETHER_TEST("dock placement: malformed geometry is rejected before native coordinates are calculated") {
+    auto layout = ArrangeDockLayout(48, 8, 1.45f, 800, std::vector<float>{1}); REQUIRE(layout.ok());
+    const RECT area{0, 0, 1920, 1080};
+    CHECK_FALSE(PlaceDock(*layout, area, 0, 48, 1.45f, 10, false).ok());
+    CHECK_FALSE(PlaceDock(*layout, area, 96, 48, 1.45f, -1, false).ok());
+    CHECK_FALSE(PlaceDock(*layout, RECT{0, 0, 100, 1080}, 96, 48, 1.45f, 10, false).ok());
+    auto invalid = *layout; invalid.windowHeight = std::numeric_limits<float>::infinity();
+    CHECK_FALSE(PlaceDock(invalid, area, 96, 48, 1.45f, 10, false).ok());
+    invalid = *layout; invalid.windowWidth = std::numeric_limits<float>::max();
+    CHECK_FALSE(PlaceDock(invalid, area, 96, 48, 1.45f, 10, false).ok());
+    const LONG limit = std::numeric_limits<LONG>::max();
+    CHECK_FALSE(PlaceDock(*layout, RECT{0, limit - 1080, 1920, limit}, 96, 48, 1.45f, 0, false).ok());
+    auto fractional = ArrangeDockLayout(48, 8, 1.45f, 1919.0f * 96 / 144, std::vector<float>{1}); REQUIRE(fractional.ok());
+    auto placed = PlaceDock(*fractional, RECT{0, 0, 1919, 1080}, 144, 48, 1.45f, 10, false); REQUIRE(placed.ok());
+    CHECK_EQ(placed->windowPx.right - placed->windowPx.left, 1919);
 }

@@ -52,6 +52,7 @@ public:
     [[nodiscard]] std::uint64_t RenderCount() const noexcept;
 
     Signal<> SearchRequested, SettingsRequested, CheckForUpdatesRequested, UpdatesRequested, AboutRequested, QuitRequested;
+    Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
     Signal<bool> FullscreenChanged;
 
 protected:
@@ -72,6 +73,7 @@ private:
     std::unique_ptr<Impl> impl_;
     void Rebuild();
     void Activate(int id);
+    void ShowMicrophoneMenu();
 };
 
 }  // namespace aether::topbar

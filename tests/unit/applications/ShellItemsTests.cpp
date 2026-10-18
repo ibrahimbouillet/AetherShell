@@ -5,6 +5,8 @@
 #include "applications/ShellItems.h"
 
 #include <array>
+#include <filesystem>
+#include <fstream>
 
 using namespace aether;
 using namespace aether::apps;
@@ -49,4 +51,41 @@ AETHER_TEST("shell items: an application without any shell item reports NotFound
     const auto refused = shell::CreateApplicationItem(unsafe);
     REQUIRE_FALSE(refused.ok());
     CHECK_EQ(refused.error().code, ErrorCode::InvalidArgument);
+}
+
+AETHER_TEST("shell icons: existing desktop shortcut overrides generic icon identity only for desktop apps") {
+    const auto directory = test::MakeTempDirectory("apps-profile-icon-route");
+    struct Cleanup { std::filesystem::path path; ~Cleanup() { std::error_code error; std::filesystem::remove_all(path, error); } } cleanup{directory};
+    const auto shortcut = directory / L"Synthetic Profile.lnk";
+    std::ofstream(shortcut) << "synthetic routing fixture, never loaded or launched";
+    ApplicationInfo app;
+    app.kind = ApplicationKind::Desktop;
+    app.shortcutPath = shortcut.native();
+    app.appUserModelId = L"Aether.Fixture.Profile";
+    app.parsingName = app.appUserModelId;
+    CHECK(shell::ShouldPreferShortcutIcon(app));
+    app.kind = ApplicationKind::Packaged;
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+    app.kind = ApplicationKind::Other;
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+}
+
+AETHER_TEST("shell icons: absent directory and unsafe shortcut sources cannot override the application icon") {
+    const auto directory = test::MakeTempDirectory("apps-profile-icon-invalid");
+    struct Cleanup { std::filesystem::path path; ~Cleanup() { std::error_code error; std::filesystem::remove_all(path, error); } } cleanup{directory};
+    ApplicationInfo app;
+    app.shortcutPath = (directory / L"Missing.lnk").native();
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+    const auto folder = directory / L"Folder.lnk";
+    std::filesystem::create_directory(folder);
+    app.shortcutPath = folder.native();
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+    const auto wrongType = directory / L"Icon.url";
+    std::ofstream(wrongType) << "synthetic non-shortcut";
+    app.shortcutPath = wrongType.native();
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+    app.shortcutPath = L"\\\\aether-fixture.invalid\\Share\\Profile.lnk";
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
+    app.shortcutPath = L"relative.lnk";
+    CHECK_FALSE(shell::ShouldPreferShortcutIcon(app));
 }

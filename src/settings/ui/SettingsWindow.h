@@ -12,10 +12,11 @@
 #include <windows.h>
 #include <functional>
 #include <memory>
+#include <string_view>
 
 namespace aether::settings::ui {
 
-enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About };
+enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop };
 struct SettingsCallbacks {
     std::function<void()> checkForUpdates, downloadAndInstall, postpone, skip, disableNotifications;
     // Explicit consent only. Implementation performs registry work on a worker and completes on UI.
@@ -24,6 +25,8 @@ struct SettingsCallbacks {
     std::function<void()> openLogFolder, exportDiagnostics;
     std::function<std::vector<apps::ApplicationInfo>()> catalog;
     weather::GeocodingClient* geocoding = nullptr;
+    std::function<void()> importTaskbarPins;
+    std::function<std::wstring()> taskbarStatus;
 };
 
 class SettingsWindow {
@@ -38,6 +41,9 @@ public:
     bool PreTranslate(MSG& message);
     [[nodiscard]] HWND Handle() const noexcept;
     void SetUpdateSnapshot(updates::UpdateSnapshot snapshot);
+    // UI-thread status refreshes preserve uncommitted consent checkboxes and other editor drafts.
+    void RefreshDesktopStatus();
+    void ReportActionStatus(std::wstring_view message);
     // Caller has already obtained explicit reset consent; useful to other native confirmation UI.
     Result<void> ResetAfterConsent();
     [[nodiscard]] HWND Control(int id) const noexcept;

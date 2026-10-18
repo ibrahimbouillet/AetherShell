@@ -29,6 +29,7 @@ struct PinnedApp {
     std::wstring appUserModelId;
     std::wstring executablePath;
     std::wstring shortcutPath;
+    std::wstring arguments;
 };
 
 struct DockSettings {
@@ -87,6 +88,8 @@ struct HotkeyChord {
 
 struct GeneralSettings {
     bool startWithWindows = false;  // only ever set after explicit user consent
+    bool replaceWindowsTaskbar = false; // reversible visual replacement after explicit consent
+    bool taskbarPinsImported = false; // one automatic best-effort import when replacement is selected
     MotionPreference motion = MotionPreference::System;
     bool hotkeysEnabled = true;     // Ctrl+Alt+Space (search), Ctrl+Alt+D (focus Dock)
     HotkeyChord searchHotkey{};

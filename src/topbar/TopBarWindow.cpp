@@ -75,7 +75,31 @@ void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
         return;
     }
     if (item.kind == ItemKind::Network) {
-        if (item.connection == status::ConnectionKind::WiFi || item.connection == status::ConnectionKind::Cellular) {
+        if (item.connection == status::ConnectionKind::WiFi) {
+            const auto waves = WiFiWaveCount(item);
+            const float opacity = brush->GetOpacity();
+            const auto arc = [&](float left, float top, float right, float peak, bool active) {
+                winrt::com_ptr<ID2D1Factory> factory; dc->GetFactory(factory.put());
+                winrt::com_ptr<ID2D1PathGeometry> path;
+                winrt::com_ptr<ID2D1GeometrySink> sink;
+                if (FAILED(factory->CreatePathGeometry(path.put())) || FAILED(path->Open(sink.put()))) return;
+                const float span = right - left;
+                sink->BeginFigure(D2D1::Point2F(x + left, y + top), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddBezier(D2D1::BezierSegment(D2D1::Point2F(x + left + span * 0.28f, y + peak),
+                    D2D1::Point2F(x + right - span * 0.28f, y + peak), D2D1::Point2F(x + right, y + top)));
+                sink->EndFigure(D2D1_FIGURE_END_OPEN);
+                if (FAILED(sink->Close())) return;
+                brush->SetOpacity(opacity * (active ? 1.0f : 0.28f));
+                dc->DrawGeometry(path.get(), brush, stroke);
+            };
+            arc(1, 6, 17, -0.5f, waves && *waves >= 3);
+            arc(4, 9, 14, 5, waves && *waves >= 2);
+            arc(7, 12, 11, 10.5f, waves && *waves >= 1);
+            brush->SetOpacity(opacity);
+            if (waves && *waves > 0) dc->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x + 9, y + 15), 1.4f, 1.4f), brush);
+            else circle(9, 15, 1.1f);
+            if (!waves) { line(14, 13, 17, 16); line(14, 16, 17, 13); }
+        } else if (item.connection == status::ConnectionKind::Cellular) {
             // Signal bars are drawn only when Windows supplied a value; never synthesize full bars.
             for (int index = 0; item.level && index < 5; ++index) {
                 const float top = 15.0f - static_cast<float>(index + 1) * 2.3f;
@@ -181,6 +205,11 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     UINT explorerMessage = 0;
     std::uint64_t frames = 0;
 
+    void EmitRequest(Signal<>& request) noexcept {
+        try { request.Emit(); }
+        catch (...) { AETHER_LOG_ERROR("topbar", "request listener threw an exception"); }
+    }
+
     template <class Snapshot, class Provider>
     void Start(Provider* provider, Snapshot TopBarSnapshots::* member) {
         if (!provider) return;
@@ -238,12 +267,18 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             entry.item.cached ? L"Cached" : entry.item.unknown ? L"Unavailable" : L"";
         item.controlType = entry.item.actionable ? UIA_ButtonControlTypeId : UIA_TextControlTypeId;
         item.boundsPx = ItemBounds(entry.rect); item.isFocusable = entry.item.actionable;
+        item.isEnabled = !destroyed && owner.IsShown() && !fullscreen && ::IsWindowEnabled(owner.Handle());
         item.hasKeyboardFocus = focusedWindow && focused == item.id;
         item.isOffscreen = !owner.IsShown() || fullscreen;
         item.supportsInvoke = entry.item.actionable;
         return item;
     }
     Result<void> Invoke(int id) override {
+        if (destroyed || !owner.IsShown() || fullscreen || !::IsWindowEnabled(owner.Handle()))
+            return MakeError(ErrorCode::Unavailable, "top bar is not available for actions");
+        const auto found = std::find_if(placed.begin(), placed.end(), [id](const auto& entry) { return entry.item.id == id; });
+        if (found == placed.end() || !found->item.actionable)
+            return MakeError(ErrorCode::Unsupported, "top bar item has no action");
         if (!::PostMessageW(owner.Handle(), kDeferredInvoke, static_cast<WPARAM>(id), 0))
             return MakeError(ErrorCode::Unavailable, "top bar action could not be queued");
         return Ok();
@@ -453,7 +488,7 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
 void TopBarWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
     const auto panel = D2D1::RectF(0, 0, context.widthDip, context.heightDip);
-    const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && platform::SystemTransparencyEnabled();
+    const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
     SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur);
     graphics::GlassStyle glass;
     glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
@@ -493,7 +528,10 @@ void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
 }
 void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Invalidate(); }
 void TopBarWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
-    if (button == ui::PointerButton::Left) if (const auto id = HitTest(impl_->placed, point)) Activate(*id);
+    if (const auto id = HitTest(impl_->placed, point)) {
+        if (button == ui::PointerButton::Left) Activate(*id);
+        else if (button == ui::PointerButton::Right && *id == static_cast<int>(ItemKind::Microphone)) ShowMicrophoneMenu();
+    }
 }
 void TopBarWindow::OnWheel(float notches, D2D1_POINT_2F point) {
     if (HitTest(impl_->placed, point) != static_cast<int>(ItemKind::Volume) || !impl_->context.audio ||
@@ -505,7 +543,13 @@ void TopBarWindow::OnWheel(float notches, D2D1_POINT_2F point) {
         impl_->Completion(static_cast<int>(ItemKind::Volume)));
 }
 void TopBarWindow::Activate(int id) {
-    if (id == static_cast<int>(ItemKind::Volume)) {
+    if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
+    const auto item = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& entry) { return entry.item.id == id; });
+    if (item == impl_->placed.end()) return;
+    if (id == static_cast<int>(ItemKind::Keyboard)) impl_->EmitRequest(KeyboardRequested);
+    else if (id == static_cast<int>(ItemKind::Network)) impl_->EmitRequest(NetworkRequested);
+    else if (id == static_cast<int>(ItemKind::Weather)) impl_->EmitRequest(WeatherRequested);
+    else if (id == static_cast<int>(ItemKind::Volume)) {
         if (impl_->context.audio) impl_->context.audio->ToggleMuteAsync(impl_->Completion(id));
         else impl_->ErrorTooltip(MakeError(ErrorCode::Unavailable, "audio unavailable"), id);
     } else if (id == static_cast<int>(ItemKind::Microphone)) {
@@ -527,15 +571,36 @@ void TopBarWindow::Activate(int id) {
             bounds.left + static_cast<int>(ToPx(10)), bounds.bottom + 4, Handle(), nullptr);
         ::DestroyMenu(menu);
         switch (command) {
-            case 1: SearchRequested.Emit(); break; case 2: SettingsRequested.Emit(); break;
-            case 3: CheckForUpdatesRequested.Emit(); break; case 4: AboutRequested.Emit(); break;
-            case 5: QuitRequested.Emit(); break;
-            case 6: if (impl_->updateAvailable) UpdatesRequested.Emit(); break;
+            case 1: impl_->EmitRequest(SearchRequested); break; case 2: impl_->EmitRequest(SettingsRequested); break;
+            case 3: impl_->EmitRequest(CheckForUpdatesRequested); break; case 4: impl_->EmitRequest(AboutRequested); break;
+            case 5: impl_->EmitRequest(QuitRequested); break;
+            case 6: if (impl_->updateAvailable) impl_->EmitRequest(UpdatesRequested); break;
             default: break;
         }
     }
 }
+void TopBarWindow::ShowMicrophoneMenu() {
+    if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
+    const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [](const auto& entry) {
+        return entry.item.kind == ItemKind::Microphone;
+    });
+    if (found == impl_->placed.end()) return;
+    HMENU menu = ::CreatePopupMenu(); if (!menu) return;
+    ::AppendMenuW(menu, MF_STRING, 1, L"Microphone privacy settings…");
+    const auto bounds = impl_->ItemBounds(found->rect);
+    std::weak_ptr<Impl::Gate> weak = impl_->gate;
+    ::SetForegroundWindow(Handle());
+    const auto command = ::TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_TOPALIGN,
+        bounds.left, bounds.bottom + 4, Handle(), nullptr);
+    ::DestroyMenu(menu);
+    if (const auto alive = weak.lock(); alive && alive->owner && command == 1)
+        alive->owner->impl_->EmitRequest(alive->owner->MicrophoneSettingsRequested);
+}
 bool TopBarWindow::OnKeyDown(UINT key) {
+    if ((key == VK_APPS || (key == VK_F10 && (::GetKeyState(VK_SHIFT) & 0x8000))) &&
+        impl_->focused == static_cast<int>(ItemKind::Microphone)) {
+        ShowMicrophoneMenu(); return true;
+    }
     std::vector<int> actions;
     for (const auto& item : impl_->placed) if (item.item.actionable) actions.push_back(item.item.id);
     if (actions.empty()) return false;

@@ -6,7 +6,24 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-Future work.
+### 0.2.0-alpha.1 candidate — V2
+
+- Optional reversible visual taskbar replacement, default off, with explicit Desktop Apply consent,
+  a separate recovery helper, status/errors, and existing-instance quit/restore commands.
+- Dock bottom-margin correction and mandatory animated-footprint AppBar reservation in replacement
+  mode, keeping maximized application content above the Dock.
+- Read-only best-effort Windows pinned-shortcut import with retained launch arguments and deduplication.
+- More visible glass translucency, shadow restricted to the outside, opaque Windows-transparency-off
+  and high-contrast fallback, and distinct Wi-Fi waves/Ethernet/cellular glyphs.
+- Taskbar recovery without Aether Shell running (D21):
+  - the taskbar state is saved before anything is hidden;
+  - `--restore-taskbar` restores it with no instance running, and setup repair/uninstall restore it
+    too;
+  - restoration always shows the taskbar (D22).
+- Fixed: replacement mode never activated on a real desktop because the Dock's first AppBar
+  reservation was rejected.
+- Owner-approved D19 / ADR 0009 records the narrow taskbar-hiding exception. Explorer remains intact;
+  native Windows Settings takeover is unsupported. Full V2 delivery qualification is pending.
 
 ## [0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) — 2026-10-18
 

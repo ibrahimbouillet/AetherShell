@@ -58,6 +58,8 @@ void Fields(S& s, F&& f) {
     f("updates", "channel", s.updates.channel);
     f("updates", "skippedVersion", s.updates.skippedVersion);
     f("general", "startWithWindows", s.general.startWithWindows);
+    f("general", "replaceWindowsTaskbar", s.general.replaceWindowsTaskbar);
+    f("general", "taskbarPinsImported", s.general.taskbarPinsImported);
     f("general", "motion", s.general.motion);
     f("general", "hotkeysEnabled", s.general.hotkeysEnabled);
     f("general", "searchHotkey", s.general.searchHotkey);
@@ -120,7 +122,7 @@ void Read(const json::Value& value, std::vector<PinnedApp>& out, Warnings& warni
     out.clear();
     for (const auto& item : *array) {
         if (!item.IsObject()) { Warn(warnings, name, "ignored a non-object application"); continue; }
-        UnknownMembers(item, {"id", "displayName", "parsingName", "appUserModelId", "executablePath", "shortcutPath"}, warnings);
+        UnknownMembers(item, {"id", "displayName", "parsingName", "appUserModelId", "executablePath", "shortcutPath", "arguments"}, warnings);
         PinnedApp pin;
         const auto field = [&](const char* key, std::wstring& text) {
             if (const auto* input = item.Find(key)) Read(*input, text, warnings, key);
@@ -131,6 +133,7 @@ void Read(const json::Value& value, std::vector<PinnedApp>& out, Warnings& warni
         field("appUserModelId", pin.appUserModelId);
         field("executablePath", pin.executablePath);
         field("shortcutPath", pin.shortcutPath);
+        field("arguments", pin.arguments);
         out.push_back(std::move(pin));
     }
 }
@@ -184,6 +187,7 @@ json::Value Write(const std::vector<PinnedApp>& pins) {
         item.Set("appUserModelId", Write(pin.appUserModelId));
         item.Set("executablePath", Write(pin.executablePath));
         item.Set("shortcutPath", Write(pin.shortcutPath));
+        item.Set("arguments", Write(pin.arguments));
         array.Append(std::move(item));
     }
     return array;
@@ -261,6 +265,11 @@ Result<std::vector<std::string>> Validate(Settings& s) {
         std::set<std::wstring> ids;
         std::vector<PinnedApp> pins;
         for (auto& pin : s.dock.pinned) {
+            // Truncating a command line can change its meaning. Reject malformed metadata instead.
+            if (pin.arguments.size() > 32767 || pin.arguments.find(L'\0') != std::wstring::npos) {
+                Warn(warnings, "pinned", "ignored invalid application arguments");
+                continue;
+            }
             Limit(pin.id, warnings, "pinned.id"); Limit(pin.displayName, warnings, "pinned.displayName");
             Limit(pin.parsingName, warnings, "pinned.parsingName"); Limit(pin.appUserModelId, warnings, "pinned.appUserModelId");
             Limit(pin.executablePath, warnings, "pinned.executablePath"); Limit(pin.shortcutPath, warnings, "pinned.shortcutPath");

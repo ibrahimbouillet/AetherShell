@@ -112,11 +112,14 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     }
     RECT WorkArea() const {
         RECT area = options.workAreaPx.value_or(platform::PrimaryMonitor().workArea);
-        if (appBar && !options.workAreaPx) area.bottom = appBarRect.bottom;
+        // Before the first ABM_SETPOS the AppBar rectangle is still empty; using it would put the
+        // lower edge at 0 and reject every placement (found on the real desktop, 2026-10-18).
+        if (appBar && appBarPositioned && !options.workAreaPx) area.bottom = appBarRect.bottom;
         return area;
     }
     Result<void> Reserve() {
-        const bool wanted = options.allowWorkAreaReservation && settings.reserveSpace && !options.workAreaPx;
+        const bool wanted = options.allowWorkAreaReservation &&
+            (settings.reserveSpace || options.replacementTaskbarMode) && !options.workAreaPx;
         if (!wanted && appBar) {
             APPBARDATA data{sizeof(data)}; data.hWnd = window.Handle();
             appBar = false; appBarPositioned = false;
@@ -132,8 +135,13 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         const auto monitor = platform::PrimaryMonitor();
         data.uEdge = ABE_BOTTOM; data.rc = monitor.bounds;
         ::SHAppBarMessage(ABM_QUERYPOS, &data);
-        const LONG height = static_cast<LONG>(std::ceil(window.ToPx(fitted.iconSize + 30 + static_cast<float>(settings.bottomMargin))));
-        data.rc.top = data.rc.bottom - height;
+        const auto placement = PlaceDock(layout, WorkArea(), window.Dpi(), fitted.iconSize,
+            fitted.magnification, static_cast<float>(settings.bottomMargin), motion.reduced);
+        if (!placement) { updatingBar = false; return placement.error(); }
+        // Honor the shell's returned lower edge so another AppBar or the native auto-hide reveal
+        // strip is preserved. The application releases the ordinary native-taskbar reservation
+        // before enabling replacement mode; the Dock never changes another AppBar's allocation.
+        data.rc.top = data.rc.bottom - placement->reservationHeightPx;
         if (!appBarPositioned || !::EqualRect(&appBarRect, &data.rc)) {
             ::SHAppBarMessage(ABM_SETPOS, &data); appBarRect = data.rc; appBarPositioned = true;
         }
@@ -188,7 +196,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         std::vector<RECT> regions{Pixels(layout.panel, static_cast<float>(window.Dpi()) / 96)};
         for (const auto& item : layout.items) regions.push_back(Pixels(item.icon, static_cast<float>(window.Dpi()) / 96));
         window.SetInputRegionPx(regions);
-        window.SetBackdropPanel(layout.panel, tokens.dockCornerRadius, tokens.mode != graphics::ThemeMode::HighContrast);
+        window.SetBackdropPanel(layout.panel, tokens.dockCornerRadius,
+            tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast);
         return Ok();
     }
     Result<void> Rebuild() {
@@ -230,11 +239,10 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             }
             if (!reorderOffsets.empty()) { (void)Arrange(); window.RequestAnimationFrame(); }
         }
-        const int pixelWidth = static_cast<int>(std::lround(window.ToPx(width)));
-        const int pixelHeight = static_cast<int>(std::lround(window.ToPx(layout.windowHeight)));
-        const int x = (area.left + area.right - pixelWidth) / 2;
-        const int bottom = area.bottom - static_cast<int>(window.ToPx(static_cast<float>(settings.bottomMargin)));
-        window.SetBoundsPx({x, bottom - pixelHeight, x + pixelWidth, bottom});
+        const auto placement = PlaceDock(layout, area, window.Dpi(), fitted.iconSize,
+            fitted.magnification, static_cast<float>(settings.bottomMargin), motion.reduced);
+        if (!placement) return placement.error();
+        window.SetBoundsPx(placement->windowPx);
         RequestIcons();
         (void)accessible.NotifyStructureChanged();
         window.Invalidate();
@@ -314,6 +322,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             ::AppendMenuW(menu.value, MF_SEPARATOR, 0, nullptr);
         }
         ::AppendMenuW(menu.value, MF_STRING, 6, L"Dock settings...");
+        ::AppendMenuW(menu.value, MF_STRING, 7, L"Import Windows taskbar pins");
+        ::AppendMenuW(menu.value, MF_STRING, 8, L"Open Windows Start");
         const auto anchor = Anchor(index);
         const auto chosen = ::TrackPopupMenuEx(menu.value, TPM_RETURNCMD | TPM_NONOTIFY | TPM_RIGHTBUTTON,
             (anchor.left + anchor.right) / 2, anchor.top, window.Handle(), nullptr);
@@ -322,6 +332,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         }
         if (chosen == 1 || chosen == 2) { (void)ActivateItem(item, chosen == 2, index); return; }
         if (chosen == 6) { Emit(window.SettingsRequested); return; }
+        if (chosen == 7) { Emit(window.ImportWindowsPinsRequested); return; }
+        if (chosen == 8) { Emit(window.StartRequested); return; }
         const auto& pins = context.settings.Current().dock.pinned;
         if (chosen == 3) {
             auto changed = item.kind == DockItemKind::Pinned ? UnpinApplication(pins, item.id) : PinApplication(pins, item.application);
@@ -438,6 +450,14 @@ Result<void> DockWindow::OnExplorerRestarted() {
     if (registered) { APPBARDATA data{sizeof(data)}; data.hWnd = Handle(); ::SHAppBarMessage(ABM_REMOVE, &data); }
     impl_->updatingBar = false; return Relayout();
 }
+Result<void> DockWindow::SetTaskbarReplacement(bool active) {
+    return Guard([&]() -> Result<void> {
+        if (!impl_->context.dispatcher.IsUiThread()) return MakeError(ErrorCode::InvalidState, "Dock requires the UI thread");
+        if (impl_->options.replacementTaskbarMode == active) return Ok();
+        impl_->options.replacementTaskbarMode = active;
+        return Handle() ? Relayout() : Ok();
+    });
+}
 Result<void> DockWindow::FocusDock() {
     return Guard([&]() -> Result<void> {
         if (!Handle() || impl_->suppressed) return MakeError(ErrorCode::Unavailable, "Dock is not currently visible");
@@ -514,15 +534,14 @@ void DockWindow::OnDpiChanged(UINT, const RECT&) { impl_->requested.clear(); (vo
 void DockWindow::OnPointerMove(D2D1_POINT_2F point) {
     impl_->pointer = point;
     if (impl_->pressed && !impl_->dragId.empty() && std::hypot(point.x - impl_->pressPoint.x, point.y - impl_->pressPoint.y) >= 6) impl_->dragging = true;
-    const auto hit = HitTest(impl_->layout, point);
-    if (impl_->dragging && hit && impl_->fitted.items[*hit].kind == DockItemKind::Pinned &&
+    auto hit = HitTest(impl_->layout, point);
+    if (impl_->dragging && hit &&
+        (impl_->fitted.items[*hit].kind == DockItemKind::Pinned || impl_->fitted.items[*hit].kind == DockItemKind::Running) &&
         !text::EqualsIgnoreCase(impl_->fitted.items[*hit].id, impl_->dragId)) {
-        const auto pins = impl_->context.settings.Current().dock.pinned;
-        const auto found = std::find_if(pins.begin(), pins.end(), [&](const auto& pin) { return text::EqualsIgnoreCase(pin.id, impl_->fitted.items[*hit].id); });
-        if (found != pins.end()) {
-            auto moved = MovePin(pins, impl_->dragId, static_cast<std::size_t>(found - pins.begin()));
-            if (moved) impl_->SavePins(std::move(*moved));
-        }
+        auto moved = ReorderDockApplications(impl_->context.settings.Current().dock, impl_->running,
+            impl_->dragId, impl_->fitted.items[*hit].id);
+        if (moved) impl_->SavePins(std::move(*moved)); else impl_->ErrorTooltip(moved.error(), *hit);
+        hit = HitTest(impl_->layout, point);
     }
     if (hit != impl_->hovered) {
         impl_->hovered = hit; impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer);
@@ -537,7 +556,8 @@ void DockWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
     const auto hit = HitTest(impl_->layout, point);
     if (button != ui::PointerButton::Left || !hit) return;
     impl_->pressed = hit; impl_->pressPoint = point; impl_->dragging = false;
-    impl_->dragId = impl_->fitted.items[*hit].kind == DockItemKind::Pinned ? impl_->fitted.items[*hit].id : L"";
+    const auto kind = impl_->fitted.items[*hit].kind;
+    impl_->dragId = kind == DockItemKind::Pinned || kind == DockItemKind::Running ? impl_->fitted.items[*hit].id : L"";
     (void)impl_->Arrange(); Invalidate();
 }
 void DockWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {

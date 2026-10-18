@@ -194,7 +194,13 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     Backdrop backdrop(area); REQUIRE(backdrop.hwnd != nullptr);
     dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings});
     dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
+    options.replacementTaskbarMode = true;
     REQUIRE(window.Create(options).ok());
+    const auto replacementBounds = window.BoundsPx();
+    REQUIRE(window.SetTaskbarReplacement(false).ok());
+    REQUIRE(window.SetTaskbarReplacement(true).ok());
+    const auto restoredBounds = window.BoundsPx();
+    CHECK(::EqualRect(&replacementBounds, &restoredBounds));
     const auto inputFilter=loop.AddMessageFilter([hwnd=window.Handle()](MSG& message) {
         // Synthetic input is sent directly. Discard only queued real-cursor moves/leaves for this
         // own test window so the stationary physical cursor cannot change the resting fixture.
@@ -207,6 +213,8 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     REQUIRE(window.SetRunningApplications({running}).ok());
     window.Show(false); ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 300);
     auto restGeometry = window.Geometry(); REQUIRE(restGeometry.ok()); REQUIRE_EQ(restGeometry->items.size(), 4u);
+    const double panelBottom = window.BoundsPx().top + window.ToPx(restGeometry->panel.bottom);
+    CHECK(std::abs(panelBottom - (area.bottom - window.ToPx(static_cast<float>(settings.Current().dock.bottomMargin)))) <= 1.0);
     const auto rest = CaptureOwn(backdrop.hwnd, window.Handle(), window.BoundsPx());
     const auto output = std::filesystem::temp_directory_path() / L"AetherShellTests";
     std::filesystem::create_directories(output);
@@ -273,6 +281,24 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 1200);
     const auto afterDrag = window.Geometry(); REQUIRE(afterDrag.ok());
     CHECK(afterDrag->items[1].icon.left < afterDrag->items[2].icon.left);
+    // The installed alpha only accepted pinned drags. A running icon must also move into the
+    // persistent order, with release consumed as a drag rather than launching that application.
+    REQUIRE(window.SetTheme(tokens,graphics::MotionPolicy{true},settings.Current().dock).ok());
+    const auto beforeRunningDrag=window.Geometry();REQUIRE(beforeRunningDrag.ok());
+    const int launchesBeforeDrag=launcher.launches,activationsBeforeDrag=launcher.activations;
+    ::SendMessageW(window.Handle(),WM_LBUTTONDOWN,0,Point(window,beforeRunningDrag->items[3].icon));
+    ::SendMessageW(window.Handle(),WM_MOUSEMOVE,MK_LBUTTON,Point(window,beforeRunningDrag->items[1].icon));
+    ::TrackMouseEvent(&cancel);
+    while(::PeekMessageW(&leave,window.Handle(),WM_MOUSELEAVE,WM_MOUSELEAVE,PM_REMOVE)){}
+    ::SendMessageW(window.Handle(),WM_LBUTTONUP,0,Point(window,beforeRunningDrag->items[1].icon));
+    REQUIRE_EQ(settings.Current().dock.pinned.size(),3u);
+    CHECK_EQ(settings.Current().dock.pinned[0].id,L"exe:synthetic-c");
+    CHECK_EQ(settings.Current().dock.pinned[1].displayName,L"Synthetic B");
+    CHECK_EQ(settings.Current().dock.pinned[2].displayName,L"Synthetic A");
+    CHECK_EQ(launcher.launches,launchesBeforeDrag);CHECK_EQ(launcher.activations,activationsBeforeDrag);
+    const auto saveDeadline=std::chrono::steady_clock::now()+5s;
+    while(settings.Dirty() && std::chrono::steady_clock::now()<saveDeadline){dispatcher.RunPending();std::this_thread::sleep_for(1ms);}
+    CHECK_FALSE(settings.Dirty());
     const auto after = platform::PrimaryMonitor().workArea;
     CHECK(::EqualRect(&after, &monitor.workArea));
     std::atomic<bool> accessibilityFinished{false};

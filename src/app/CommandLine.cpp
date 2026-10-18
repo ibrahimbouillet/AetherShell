@@ -38,6 +38,10 @@ Result<CommandLine> ParseCommandLine(const std::vector<std::wstring>& arguments)
             result.action = StartupAction::OpenSettings;
         } else if (arg == L"--search") {
             result.action = StartupAction::OpenSearch;
+        } else if (arg == L"--quit") {
+            result.action = StartupAction::Quit;
+        } else if (arg == L"--restore-taskbar") {
+            result.action = StartupAction::RestoreTaskbar;
         } else if (arg == L"--data-dir") {
             auto value = nextValue();
             if (!value || value->empty()) return MakeError(ErrorCode::InvalidArgument, "--data-dir needs a folder");
@@ -49,7 +53,7 @@ Result<CommandLine> ParseCommandLine(const std::vector<std::wstring>& arguments)
             }
             result.healthToken = *value;
         } else {
-            return MakeError(ErrorCode::InvalidArgument, "unknown argument: " + text::Narrow(arg));
+            return MakeError(ErrorCode::InvalidArgument, "unknown command-line argument");
         }
     }
     return result;

@@ -2,8 +2,10 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "applications/ShellApplicationCatalog.h"
 
+#include "applications/ApplicationIdentity.h"
 #include "applications/CatalogRules.h"
 #include "applications/ShellItems.h"
+#include "applications/TaskbarPins.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "platform/windows/AppPaths.h"
@@ -17,6 +19,7 @@
 #include <shobjidl_core.h>
 
 #include <array>
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -166,8 +169,8 @@ public:
         }
     }
 
-    // nullopt when the file is not a readable shortcut or its target no longer exists.
-    std::optional<DiscoveredItem> Read(const std::wstring& path) {
+    // nullopt when unreadable, or when resolution was requested and the target no longer exists.
+    std::optional<DiscoveredItem> Read(const std::wstring& path, bool resolve = true) {
         winrt::com_ptr<IShellLinkW> link;
         if (FAILED(::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(link.put())))) {
             return std::nullopt;
@@ -181,7 +184,7 @@ public:
         // No search heuristics or distributed link tracking (both can scan disks or the network).
         const DWORD flags = SLR_NO_UI | SLR_NOUPDATE | SLR_NOSEARCH | SLR_NOTRACK | SLR_NOLINKINFO |
                             (kResolveTimeoutMs << 16);
-        if (link->Resolve(nullptr, flags) != S_OK) {
+        if (resolve && link->Resolve(nullptr, flags) != S_OK) {
             AETHER_LOG_DEBUG(kLog, "skipping unresolvable shortcut {}", shell::ForLog(path));
             return std::nullopt;
         }
@@ -320,12 +323,148 @@ Result<std::vector<ApplicationInfo>> Discover(const ShellApplicationCatalog::Opt
     return applications;
 }
 
+Result<std::filesystem::path> PinDirectory(const TaskbarPinImportOptions& options) {
+    if (!options.directory.empty()) return options.directory;
+    PWSTR raw = nullptr;
+    // In particular, do not use KF_FLAG_CREATE (platform::KnownFolder creates missing folders).
+    const HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_UserPinned, KF_FLAG_DONT_VERIFY, nullptr, &raw);
+    const shell::UniqueCoTaskMemString owned(raw);
+    if (FAILED(hr) || !owned) {
+        return MakeError(ErrorCode::Unavailable, "Windows pinned shortcuts are unavailable",
+                         static_cast<std::uint32_t>(FAILED(hr) ? hr : E_FAIL));
+    }
+    return std::filesystem::path(owned.get()) / L"TaskBar";
+}
+
+const ApplicationInfo* CatalogMatch(const ApplicationInfo& pin, const std::vector<ApplicationInfo>& catalog) {
+    const ApplicationInfo* match = nullptr;
+    const ApplicationInfo* nameMatch = nullptr;
+    std::size_t matches = 0;
+    std::size_t nameMatches = 0;
+    for (const auto& candidate : catalog) {
+        if (candidate.id.empty()) continue;
+        // An argument-bearing pin is a launch definition, not permission to start a bare catalog app.
+        if (text::Trim(pin.arguments) != text::Trim(candidate.arguments)) continue;
+        const bool sameId = text::EqualsIgnoreCase(pin.id, candidate.id);
+        const bool sameAumid = !pin.appUserModelId.empty() &&
+                              text::EqualsIgnoreCase(pin.appUserModelId, candidate.appUserModelId);
+        // A pin's explicit profile identity must never be downgraded to an executable-only catalog
+        // entry, nor switched to another profile that happens to share that executable.
+        const bool sameExecutable = pin.appUserModelId.empty() && !pin.executablePath.empty() &&
+                                   text::EqualsIgnoreCase(pin.executablePath, candidate.executablePath);
+        if (!sameId && !sameAumid && !sameExecutable) continue;
+        if (sameId) return &candidate;
+        match = &candidate;
+        ++matches;
+        if (text::EqualsIgnoreCase(pin.displayName, candidate.displayName)) {
+            nameMatch = &candidate;
+            ++nameMatches;
+        }
+    }
+    return matches == 1 ? match : (nameMatches == 1 ? nameMatch : nullptr);
+}
+
+Result<std::vector<ApplicationInfo>> DiscoverPins(const CancellationToken& cancel,
+                                                  const TaskbarPinImportOptions& options) {
+    namespace fs = std::filesystem;
+    if (cancel.IsCancelled()) return CancelledError();
+    if (options.maxShortcutFiles == 0 || options.maxShortcutFiles > 4096) {
+        return MakeError(ErrorCode::InvalidArgument, "pin import limit must be between 1 and 4096");
+    }
+    auto directory = PinDirectory(options);
+    if (!directory) return directory.error();
+    // Apply the same absolute local-path policy as launchable shortcuts before touching the folder.
+    auto probePath = NormalizeShortcutPath((directory.value() / L"pin.lnk").native());
+    if (!probePath) return MakeError(ErrorCode::InvalidArgument, "pin import needs an absolute local folder");
+    const fs::path root = fs::path(probePath.value()).parent_path();
+    if (::GetDriveTypeW(root.root_path().c_str()) == DRIVE_REMOTE) {
+        return MakeError(ErrorCode::Unsupported, "pin import needs an ordinary local folder");
+    }
+    const DWORD rootAttributes = ::GetFileAttributesW(root.c_str());
+    if (rootAttributes == INVALID_FILE_ATTRIBUTES) {
+        const DWORD error = ::GetLastError();
+        if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND) return std::vector<ApplicationInfo>{};
+        return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read", error);
+    }
+    if ((rootAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 || (rootAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0) {
+        return MakeError(ErrorCode::Unsupported, "pin import needs an ordinary local folder");
+    }
+    std::error_code error;
+    fs::directory_iterator it(root, error);
+    if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read",
+                                static_cast<std::uint32_t>(error.value()));
+    std::vector<fs::path> shortcuts;
+    std::size_t examined = 0;
+    const fs::directory_iterator end;
+    while (it != end) {
+        if (cancel.IsCancelled()) return CancelledError();
+        if (++examined > 4096) return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
+        const auto& path = it->path();
+        if (text::EqualsIgnoreCase(path.extension().native(), L".lnk")) {
+            const DWORD attributes = ::GetFileAttributesW(path.c_str());
+            if (attributes != INVALID_FILE_ATTRIBUTES &&
+                (attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)) == 0) {
+                if (shortcuts.size() >= options.maxShortcutFiles) {
+                    return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
+                }
+                shortcuts.push_back(path);
+            }
+        }
+        it.increment(error);
+        if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcut enumeration failed",
+                                    static_cast<std::uint32_t>(error.value()));
+    }
+    std::sort(shortcuts.begin(), shortcuts.end(), [](const fs::path& left, const fs::path& right) {
+        const auto a = text::ToLower(left.filename().native());
+        const auto b = text::ToLower(right.filename().native());
+        return a == b ? left.native() < right.native() : a < b;
+    });
+    ShortcutReader reader;
+    std::vector<ApplicationInfo> pins;
+    pins.reserve(shortcuts.size());
+    for (const auto& shortcut : shortcuts) {
+        if (cancel.IsCancelled()) return CancelledError();
+        // Metadata only: Resolve can perform shell work beyond a read and is unnecessary for import.
+        auto item = reader.Read(shortcut.native(), false);
+        if (!item) continue;
+        auto classified = ClassifyDiscoveredItem(*item);
+        if (classified.decision != CatalogDecision::Include) continue;
+        auto pin = std::move(classified.app);
+        if (const auto* match = CatalogMatch(pin, options.catalog)) {
+            auto enriched = *match;
+            enriched.displayName = pin.displayName;
+            enriched.shortcutPath = pin.shortcutPath;
+            enriched.arguments = pin.arguments;
+            if (!pin.executablePath.empty()) enriched.executablePath = pin.executablePath;
+            pin = std::move(enriched);
+        }
+        pins.push_back(std::move(pin));
+    }
+    if (cancel.IsCancelled()) return CancelledError();
+    return MergeDuplicateApplications(std::move(pins));
+}
+
 }  // namespace
 
 Result<std::vector<ApplicationInfo>> ShellApplicationCatalog::DiscoverApplications(const CancellationToken& cancel) {
     const Options options = options_;
     return shell::RunOnSta<std::vector<ApplicationInfo>>([&] { return Discover(options, cancel); },
                                                          "application discovery");
+}
+
+Result<std::vector<ApplicationInfo>> DiscoverTaskbarPins(const CancellationToken& cancel,
+                                                        const TaskbarPinImportOptions& options) noexcept {
+    try {
+        return shell::RunOnSta<std::vector<ApplicationInfo>>([&]() -> Result<std::vector<ApplicationInfo>> {
+            try {
+                return DiscoverPins(cancel, options);
+            } catch (...) {
+                return MakeError(ErrorCode::Internal, "pinned shortcut import failed");
+            }
+        }, "pinned shortcut import");
+    } catch (...) {
+        return MakeError(ErrorCode::Internal, "pinned shortcut import failed");
+    }
 }
 
 }  // namespace aether::apps

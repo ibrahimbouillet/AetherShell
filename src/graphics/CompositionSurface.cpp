@@ -156,6 +156,9 @@ BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_
             const float height = std::max(0.0f, panelPx.bottom - panelPx.top);
             backdrop_.Offset(float3{panelPx.left, panelPx.top, 0.0f});
             backdrop_.Size(float2{width, height});
+            // Mix the frosted host image with the actual desktop behind the transparent HWND.
+            // A fully opaque host brush can flatten wallpaper detail into a solid-looking slab.
+            backdrop_.Opacity(0.72f);
             clipGeometry_.Size(float2{width, height});
             clipGeometry_.CornerRadius(float2{cornerRadiusPx, cornerRadiusPx});
             backdrop_.IsVisible(width > 0.0f && height > 0.0f);

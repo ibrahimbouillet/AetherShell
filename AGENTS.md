@@ -6,12 +6,18 @@ Open other documents only when the task needs them. `PROJECT_SPEC.md` defines th
 source and executed checks establish current behavior. A previous assistant's completion claim is
 not verification. Preserve requirement/decision IDs, link significant tasks to them, and obtain owner
 approval before changing a fundamental objective or protected requirement.
+The owner starts every session with [docs/SESSION_START_PROMPT.md](docs/SESSION_START_PROMPT.md);
+keep that prompt and this file consistent. Work only in the checkout whose `origin` remote is the
+official repository; the original development checkout is a local history archive (D18, GAP-012).
 
 ## Project
 Aether Shell: a native Windows 10 (2004+)/11 desktop interface with exactly two desktop surfaces in
 Version 1 — a floating **bottom Dock** (application icons, launch, search entry, pinning, running
 indicators, animations) and a floating **Top Status Bar** (clock/date, battery, input language,
 network, volume, microphone, optional weather). It runs beside Explorer and never replaces it.
+The owner-approved V2 iteration (`0.2.0-alpha.1`, D19/ADR 0009) adds an optional reversible visual
+replacement of the Windows taskbar. That mode is off by default and requires explicit Apply in
+Settings → Desktop. It does not replace the native Windows Settings taskbar page.
 Owner/author: Ibrahim Bouillet. License: MIT. Official repository: `github.com/ibrahimbouillet/AetherShell`
 (created; delivery receipts are in `HANDOFF.md` and `TASKS.md`). Technical reference: `PROJECT_CONTEXT.md`.
 
@@ -27,8 +33,10 @@ from the owner's other files or applications. When in doubt, leave it out and as
 ## Non-negotiable constraints
 - C++20, Win32, Direct2D/DirectWrite, Windows.UI.Composition. No Electron, no new third-party libraries
   without a recorded decision in `DECISIONS.md`.
-- Never replace `explorer.exe`, edit the Winlogon `Shell` value, disable the taskbar or security features,
-  or require administrator rights. No silent elevation, no hidden autoruns (startup only after consent).
+- Never replace `explorer.exe`, edit the Winlogon `Shell` value, disable security features, or require
+  administrator rights. D19 permits hiding the native taskbar only in the explicitly consented,
+  reversible replacement mode with its recovery helper. Do not extend that exception to permanent
+  disabling, shell replacement or Windows Settings takeover. No silent elevation or hidden autoruns.
 - Never fabricate data (time, battery, network, weather, test results). Unknown stays unknown.
 - No system status items in the Dock. No new desktop surfaces in Version 1.
 - Updates only from official GitHub Releases, verified by the signed manifest + SHA-256 (ADR 0004).
@@ -89,9 +97,9 @@ other version/identity rows retain the prior session's observations unless expli
 | VS Build Tools 2026 (MSVC 14.51), SDK 10.0.26100, CMake 4.4.3, Ninja 1.13 | working | via `scripts/build.ps1` |
 | Python 3.14 (+ Pillow, numpy), OpenSSL (Git for Windows) | working | release scripts, branding renders |
 | `gh` (GitHub CLI) | working, authenticated as `ibrahimbouillet` | repository operations (owner-approved only) |
-| **Graphify** (historically 0.9.92, PyPI `graphifyy`) | **unavailable in this session**: launcher fails with `uv trampoline failed to canonicalize script path`; `uv tool list` is empty | Historical verified interface: `query "<question>"`, `explain <node-id>`, `path <id-a> <id-b>` (exact IDs for ambiguous names), `update .`, `export obsidian --dir .local/graphify-obsidian`. `[EXTRACTED]` edges differ from inferred edges. Existing graph is stale (2026-10-17 21:29 CEST); use source/Markdown until optional local installation is repaired and graph refreshed. |
+| **Graphify** (historically 0.9.92, PyPI `graphifyy`) | works from an ordinary shell (`graphify --version` → 0.9.92, rechecked by Claude 2026-10-18); fails inside the Codex sandbox (`uv trampoline failed to canonicalize script path`) | Historical verified interface: `query "<question>"`, `explain <node-id>`, `path <id-a> <id-b>` (exact IDs for ambiguous names), `update .`, `export obsidian --dir .local/graphify-obsidian`. `[EXTRACTED]` edges differ from inferred edges. No graph exists for this checkout yet; build one with `graphify update .` from an ordinary shell if useful, otherwise use source/Markdown. |
 | **Obsidian** 1.14.4 + CLI (`obsidian`, on PATH) | working **only while the Obsidian app runs** | vault `docs` = the repository's `docs/` folder (config in `docs/.obsidian/`, local, git-ignored); `obsidian search query="..." limit=5`, `obsidian read path="knowledge/HOME.md"`; plain file reads work without it |
-| Claude Code project skill/hooks (`.claude/`, local only) | Claude Code only | Graphify skill and read/search hooks; other assistants ignore it |
+| Claude Code project skill/hooks (`.claude/`, local only) | set up only in the archive copy, not in this checkout | optional; other assistants ignore it |
 | Codex session tools | verified: PowerShell execution, file editing and parallel review/build agents | Each agent owns assigned files and a private build directory. Other connectors/browser tools were available in the environment but not exercised for this task. |
 
 Access requirements: Graphify output (`graphify-out/`) and the Obsidian app/config exist only on the
