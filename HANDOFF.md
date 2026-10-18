@@ -60,12 +60,12 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
 ## NEXT SESSION START HERE
 1. Follow `docs/SESSION_START_PROMPT.md`. Check that `git remote -v` shows the official repository: this
    checkout is the only one for development. The original checkout is a local history archive (GAP-012).
-2. The V2 work (Codex) and Claude's T21 fixes and documentation are committed **locally** as one
-   commit, "Add reversible taskbar replacement with recovery without Aether Shell running". It is one
-   commit ahead of `origin/main`, followed by a small handoff commit.
+2. The V2 work (Codex) and Claude's T21 fixes and documentation are committed as one commit, "Add
+   reversible taskbar replacement with recovery without Aether Shell running", followed by gate,
+   audit and CI-fix commits.
    - Before the commit: a privacy check of every changed or new file and the four changed screenshots.
-   - **Not pushed:** the owner asked not to push yet. Pushing publishes the source and runs CI; do it
-     only when the owner agrees.
+   - **Pushed with the owner's approval** (S-019, S-020): `origin/main` contains all of it. No tag and
+     no release were created; `0.2.0-alpha.1` is not published.
 3. V2 gate (S-017):
    - **Done:**
      - V2 steps 1 and 2: the integration suites and the `ShellApplication.cpp` review (no blocking
@@ -77,11 +77,11 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
      - The Release setup `AetherShell-0.2.0-alpha.1-win-x64-setup.exe` (4,617,216 bytes) is in the
        local `dist/`, unpublished.
      - Its manifest is unsigned and must stay local.
-   - **Pushed (S-019).** The owner approved pushing the five commits; `origin/main` is at `9a2b1bb`.
-     - Its Windows CI run 39139547133 **failed**: 2 pin-import unit cases broke on the runner's 8.3
+   - **Pushed (S-019, S-020).** The owner approved both pushes; no tag, no release.
+     - CI run 39139547133 on `9a2b1bb` **failed**: 2 pin-import unit cases broke on the runner's 8.3
        short temp path.
-     - The fix (path identity in catalog matching, plus the tests) is committed locally. Push it after
-       the owner agrees, then confirm CI is green.
+     - The fix (path identity in catalog matching, plus the tests) is commit `e29e83e`. Its CI run
+       39156124337 **passed**: Release build and 17/17 unit executables.
    - **Remaining:**
      - Windows 10 and Explorer restart during replacement;
      - the owner's manifest signature if automatic updates should offer it.

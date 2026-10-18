@@ -578,5 +578,15 @@ pending; S-012 still describes the only delivered alpha.
 - **Re-verification:** `aether_applications_tests` 68/68 with both the normal and the short-form temp
   folder. The full Release /WX build (0 warnings) passed 17/17 unit executables with the short-form
   temp folder.
-- **State:** the fix is committed locally. Until it is pushed, `origin/main` (`9a2b1bb`) has a red CI
-  run.
+- **State:** the fix was pushed afterwards and CI passed; see S-020.
+
+### S-020 — push and Windows CI on `e29e83e` (Claude, 2026-10-18, 20:50–21:00 CEST)
+- **Push (owner-approved; no tag, no release):** the CI fix commit `e29e83e` was pushed to
+  `origin/main` as a fast-forward from `9a2b1bb`. Local `main` and `origin/main` are in sync.
+- **CI run [39156124337](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39156124337):
+  passed** (8 min 7 s) on `e29e83e3b3bac9ee7dcbb3f2b9602418ba792ed5`.
+  - Release build and 17/17 unit executables passed ("100% tests passed out of 17"), including
+    `aether_applications_tests`, which failed on the runner in S-019.
+  - The workflow uploaded its usual review artifacts (`unit-test-results` and the
+    `AetherShell-win-x64-alpha` manual-install package). These are CI artifacts, not a release.
+- **Not covered by CI:** integration suites, the real desktop, Windows 10 and Explorer restart.
