@@ -60,13 +60,16 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
 ## NEXT SESSION START HERE
 1. Follow `docs/SESSION_START_PROMPT.md`. Check that `git remote -v` shows the official repository: this
    checkout is the only one for development. The original checkout is a local history archive (GAP-012).
-2. `git status` shows Codex's uncommitted V2 work (60 modified and 12 new files) plus Claude's
-   documentation edits. Never discard them. None of it is committed or pushed yet.
-3. Finish the V2 gate described in "V2 continuation" below. The full Release /WX build and the 468 unit
-   cases already pass (S-014), so V2 step 1 needs only the integration/native suites. Run them one at a
-   time on a quiet desktop. Then complete the `src/app/ShellApplication.cpp` review (V2 step 2) and make
-   one coherent V2 commit (source and docs). Run the privacy audit, then push and confirm CI as AGENTS
-   allows.
+2. The V2 work (Codex) and Claude's T21 fixes and documentation are committed **locally** as one
+   commit, "Add reversible taskbar replacement with recovery without Aether Shell running". It is one
+   commit ahead of `origin/main`, followed by a small handoff commit.
+   - Before the commit: a privacy check of every changed or new file and the four changed screenshots.
+   - **Not pushed:** the owner asked not to push yet. Pushing publishes the source and runs CI; do it
+     only when the owner agrees.
+3. Finish the V2 gate described in "V2 continuation" below. The Release /WX build and the 480 unit
+   cases pass (S-015/S-016), so V2 step 1 needs only the integration/native suites. Run them one at a
+   time on a quiet desktop. Then complete the `src/app/ShellApplication.cpp` review (V2 step 2), run
+   the package privacy audit, and push and confirm CI when the owner agrees.
 4. T21 is implemented, unit-tested and checked once on the real desktop (S-015, S-016), including the
    Dock reservation fix and D22. Review it with the rest of V2. Still open before `0.2.0-alpha.1` is
    published:
