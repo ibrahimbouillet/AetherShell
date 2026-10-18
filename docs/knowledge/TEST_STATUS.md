@@ -544,7 +544,7 @@ pending; S-012 still describes the only delivered alpha.
   - an **unsigned** manifest (channel prerelease, one asset), which must stay local;
   - the checksums file.
 - **Independent second scan (Claude, categories and counts only):**
-  - No `@gmail.com`, no owner account e-mail, no e-mail-shaped strings at all.
+  - No Gmail address, no owner account e-mail, no e-mail-shaped strings at all.
   - No user-profile, Documents or temp paths, and none of the private terms supplied through the
     environment (account name, machine name).
   - 4 PE images: setup, app, launcher and updater.
