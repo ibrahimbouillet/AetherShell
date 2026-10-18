@@ -491,3 +491,40 @@ pending; S-012 still describes the only delivered alpha.
   - The owner's taskbar matched the pre-test reading exactly (auto-hide, visibility, work area with
     0.1 running), and the installed 0.1.0-alpha.1 was running again.
   - The temporary folder was deleted.
+
+### S-017 — V2 gate: integration suites and ShellApplication review (Claude, 2026-10-18, 17:00–17:10 CEST)
+- **Revision:** local commit `1180c96` plus one test-fixture change, described below.
+- **Setup:** the build was `build/claude-verify` (Release /WX). The owner's installed 0.1.0-alpha.1 was
+  closed gracefully for a quieter desktop and restarted afterwards. The owner may have been using the
+  PC during the runs.
+- **Command:** `ctest --test-dir build/claude-verify -L integration --timeout 900`, which runs the
+  suites one at a time.
+- **Run 1:** 13 of 14 suites passed. The Top Bar capture case failed in
+  `REQUIRE(PrivateCrop(backdrop, guardedArea))`, and failed again when run alone.
+  - Cause: the fixture's 128 px guard band reached above the top of the screen and included its corner
+    pixel. Explorer keeps four topmost 1x1 helper windows (`ThumbnailDeviceHelperWnd`) there, so the
+    guard correctly refused the capture.
+  - Fix (test fixture only, guard unchanged): the capture area moved 40 px down so the guard band stays
+    below the screen edge. After that the Top Bar suite passed 3/3.
+- **Run 2 (all 14 again):** 11 of 14 suites passed.
+  - The Dock and Top Bar guards refused captures because a foreign window appeared over the guarded
+    area, possibly the auto-hide taskbar sliding up at the bottom of the screen.
+  - A search UI case lost keyboard focus.
+  - Run individually right afterwards, Dock 2/2, Top Bar 3/3 and Search UI 5/5 passed.
+- **Cases per suite** (each passed in at least one run of the current code):
+  net 28, accessibility 3, ui 3, status 10, status runtime shutdown 1, status_audio 5, applications 15,
+  install 7, dock 2, topbar 3, search_ui 5, settings_ui 7, app 1, installer 5. That is **95 integration
+  cases**.
+  - A combined run with all 14 suites green has still **not** been achieved. On an active desktop,
+    foreign windows and focus changes interrupt the GUI suites; the guards were never weakened.
+- **ShellApplication review (V2 step 2), reading the taskbar callback, `ApplySettings`,
+  `FailTaskbarReservation`, the poll timer and `ImportTaskbarPins`:**
+  - The reservation is kept while replacement is still requested or active.
+  - A failed reservation is reset only when the setting is turned off and on again.
+  - The poll timer keeps running until restoration is confirmed.
+  - Imported pins are saved through `settings->Update` with a completion status. `taskbarPinsImported`
+    is set only after a successful read, so a failed read stays retryable.
+  - Pin identities are deduplicated without regard to case, including duplicates within one import.
+  - **Minor finding, not fixed:** after the controller's activation attempts are exhausted, the 1 s poll
+    timer keeps waking until the option is turned off. This costs a little idle wake-up time, not
+    correctness.

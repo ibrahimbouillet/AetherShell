@@ -152,8 +152,10 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
     const float scale = static_cast<float>(monitor.dpi) / 96.0f;
     const int width = static_cast<int>(std::min<LONG>(1100, monitor.workArea.right - monitor.workArea.left - 80));
     const int height = static_cast<int>(std::lround(32 * scale));
-    const RECT captureBounds{monitor.workArea.left + 40, monitor.workArea.top + 100,
-        monitor.workArea.left + 40 + width, monitor.workArea.top + 100 + height + 48};
+    // 140 px keeps the 128 px guard band below the screen's top edge: Explorer can keep topmost 1x1
+    // helper windows at the corner, and the guard rightly refuses any foreign overlap (2026-10-18).
+    const RECT captureBounds{monitor.workArea.left + 40, monitor.workArea.top + 140,
+        monitor.workArea.left + 40 + width, monitor.workArea.top + 140 + height + 48};
     RECT privateBounds = captureBounds;
     ::InflateRect(&privateBounds, 128, 128); // Guard band keeps blur samples over test content too.
     Backdrop backdrop; REQUIRE(backdrop.Create(privateBounds));

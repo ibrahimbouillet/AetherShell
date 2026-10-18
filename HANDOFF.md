@@ -66,10 +66,17 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
    - Before the commit: a privacy check of every changed or new file and the four changed screenshots.
    - **Not pushed:** the owner asked not to push yet. Pushing publishes the source and runs CI; do it
      only when the owner agrees.
-3. Finish the V2 gate described in "V2 continuation" below. The Release /WX build and the 480 unit
-   cases pass (S-015/S-016), so V2 step 1 needs only the integration/native suites. Run them one at a
-   time on a quiet desktop. Then complete the `src/app/ShellApplication.cpp` review (V2 step 2), run
-   the package privacy audit, and push and confirm CI when the owner agrees.
+3. V2 gate (S-017):
+   - **Done:**
+     - V2 steps 1 and 2: the integration suites and the `ShellApplication.cpp` review (no blocking
+       defect).
+     - All 14 integration suites (95 cases) have passing runs. A Top Bar fixture fix moved its guard
+       band off the screen corner.
+     - No combined run has all 14 green yet; desktop activity interrupts the GUI suites.
+   - **Remaining:**
+     - the package privacy audit (`scripts/package.ps1`);
+     - Windows 10 and Explorer restart during replacement;
+     - push and CI when the owner agrees.
 4. T21 is implemented, unit-tested and checked once on the real desktop (S-015, S-016), including the
    Dock reservation fix and D22. Review it with the rest of V2. Still open before `0.2.0-alpha.1` is
    published:
