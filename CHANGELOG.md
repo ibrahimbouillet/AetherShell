@@ -6,7 +6,11 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-Development towards `0.1.0-alpha.1`. Nothing has been released yet.
+Future work.
+
+## [0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) — 2026-10-18
+
+First manual-install native development alpha.
 
 ### Added
 - Modular CMake build with presets, a Visual Studio environment build script and CI.
@@ -23,5 +27,8 @@ Development towards `0.1.0-alpha.1`. Nothing has been released yet.
 - Public specification, traceability, handoff, end-user guides and clean-public-export policy.
 
 ### Qualification
-- Scoped unit/own-window gates are recorded in TEST_STATUS. Full Release/lifecycle/public CI validation
-  is in progress; no public release is claimed. See KNOWN_LIMITATIONS before distribution.
+- Complete Release /WX build and public Windows CI pass. Local evidence: 426 unit cases,
+  91 integration cases across scoped serial runs and 32 release-tool cases. Aggregate desktop
+  interference/refusals remain recorded in TEST_STATUS; full Version 1 acceptance is open.
+- Setup and checksums are published. Automatic updates are unavailable for this alpha; the unsigned
+  manifest remains local. See KNOWN_LIMITATIONS.

@@ -45,3 +45,8 @@ Short milestone summaries; use `git log` for detail.
   Original history stays local under D18; clean official public source repository created.
 - Owner-authorized alpha installation observed separately: Installed apps entry/launcher, startup
   disabled. Public push/CI/release receipts follow; no live signed-update qualification claimed.
+
+### First public manual alpha
+- Clean source pushed at `4eed02879fb79aa60376e9b50c698b295bae163e`; [Windows CI](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917) succeeded.
+- [0.1.0-alpha.1 prerelease](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) published with audited setup/checksums only.
+- Local installation repaired to the CI package; startup disabled. Complete delivery receipts in S-012.

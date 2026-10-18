@@ -4,10 +4,11 @@ A native Windows desktop interface by **Ibrahim Bouillet**: a floating applicati
 separate Top Status Bar, running alongside Windows Explorer. Built with C++20, Win32,
 Direct2D/DirectWrite and Windows.UI.Composition. MIT licensed.
 
-**Development alpha — 0.1.0-alpha.1.** The first complete application and installer are undergoing
-qualification. See [known limitations](KNOWN_LIMITATIONS.md) and [executed test evidence](docs/knowledge/TEST_STATUS.md)
-before relying on a feature. A release is available only when an asset appears on the
-[official Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
+**[Download 0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) — manual-install development alpha.**
+The native application and per-user installer are available. [Windows Release CI passed](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917).
+See [known limitations](KNOWN_LIMITATIONS.md) and [executed evidence](docs/knowledge/TEST_STATUS.md)
+for the scoped tests and remaining Version 1 qualification. Automatic updates are unavailable for
+this alpha; no unsigned manifest is published.
 
 - Dock: pinned and running applications, icons, search, keyboard navigation and motion preferences.
 - Top Bar: real clock/date, battery when present, input language, network, audio and microphone state.

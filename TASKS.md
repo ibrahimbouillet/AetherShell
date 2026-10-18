@@ -6,8 +6,9 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
-Reach **Milestone 1 — first runnable application**: Dock + Top Status Bar visible on the desktop,
-real icons, launching, real clock, safe startup/shutdown.
+**Milestone 1 implementation is delivered as 0.1.0-alpha.1**: native Dock + Top Status Bar, Search,
+Settings and per-user setup. Continue the manual/platform acceptance gaps below; an alpha does not
+mark complete Version 1 acceptance.
 
 ## Current continuation priority
 The owner explicitly resumed implementation through the Dock, Top Bar, runnable app, installer,
@@ -52,8 +53,8 @@ TEST_STATUS S-011. The native alpha is installed; the public source uses indepen
 | T9 | Install/launcher/updater/setup → FR-016, FR-020, FR-021; NFR-003, NFR-005 | updates, settings, branding | Install library: 10 unit + 7 integration cases pass /WX. Setup: five native cases pass, including maintenance relocation/viewport. Tests use temp roots/fakes/injected keys. Production alpha delivery observed separately. |
 | T10 | App lifecycle → FR-001, FR-016, FR-017, FR-021; NFR-002, NFR-005 | T6–T9 | Native Release executable, three CLI cases and isolated lifecycle/health/channel/shutdown case pass. Health-before-discovery ordering and lock-before-cleanup reviewed; updater handoff reviewed without live signed execution. |
 | T11 | Full build/desktop checks → FR-001, FR-003, FR-005–FR-021, FR-023; NFR-002–NFR-009 | T10 | full build and relevant tests; separate explicitly authorized desktop checks for DPI, Explorer restart, full-screen, AppBar, real launches/controls/startup; record gaps |
-| T12 | Official public repo/push/CI → FR-023; NFR-004, NFR-009 | T11 (first runnable build) | official repository created; audited clean export/push and actual CI receipts being completed |
-| T13 | Release pipeline/signing → FR-018, FR-020, FR-021, FR-023; NFR-003, NFR-009 | T9, T12 | real assets, valid manifest/signature/hash, draft release receipt; owner approval for publication/settings |
+| T12 | Official public repo/push/CI → FR-023; NFR-004, NFR-009 | T11 (first runnable build) | public clean history pushed; Windows Release CI green and manual-install alpha published (S-012) |
+| T13 | Release pipeline/signing → FR-018, FR-020, FR-021, FR-023; NFR-003, NFR-009 | T9, T12 | manual-install alpha setup/checksums published (S-012); authenticated update release still requires a real trusted manifest signature and live-cycle qualification |
 | T14 | Release qualification → FR-001, FR-003, FR-009, FR-023; NFR-002, NFR-006, NFR-007, NFR-011 | T11 | Windows 10, monitor changes/removal (primary-monitor V1, not extra bars), accessibility/performance evidence; resolve Q-001 |
 | T15 | End-user docs/screenshots → FR-022, FR-023; NFR-004, NFR-009 | T11 | Guides implemented; six individually inspected synthetic screenshots included. Keep CI/release receipts current; no complete Version 1 acceptance implied. |
 
@@ -62,7 +63,8 @@ TEST_STATUS S-011. The native alpha is installed; the public source uses indepen
   aggregate interactive runs also refused foreign-overlapped captures or lost Search activation.
   See S-011 for per-run evidence; no uniformly green aggregate desktop run is claimed.
 - D18 keeps the original development checkout/history local. The official public repository now
-  exists; audited independent-source push, CI and first manual alpha receipts are being completed.
+  exists; audited independent-source push, successful Windows CI and the first public manual alpha
+  are recorded in S-012.
 - Signing remains owner-controlled. Unsigned manifests stay local; manual alpha assets are only
   audited setup/checksums. Never relax verification for a missing signature.
 - Q-001 global budgets, Q-002 branding direction, Windows 10 and wider real desktop/platform

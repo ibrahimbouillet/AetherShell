@@ -1,7 +1,7 @@
 # Installation
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
-The alpha is under qualification; an absent asset means it has not been released.
+The [first manual-install alpha](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) is available; wider Version 1 qualification remains open.
 
 Run setup as your ordinary Windows user. The wizard explains the product, displays the MIT license,
 and lets you choose a folder (default `%LOCALAPPDATA%\Programs\AetherShell`), shortcuts and optional
@@ -26,7 +26,8 @@ and files. Keep user data is the default; explicitly select removal to delete se
 An older setup is rejected unless downgrade was explicitly permitted. Preserve a backup of user
 data before any intentional downgrade.
 
-Silent commands (use absolute custom paths):
+Silent commands below use the maintenance executable inside the installation folder; the downloaded
+setup filename includes the version and architecture. Use absolute custom paths:
 
 ```powershell
 .\AetherShellSetup.exe --silent --no-launch

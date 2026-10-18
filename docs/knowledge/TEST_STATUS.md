@@ -291,3 +291,42 @@ launch. The official public repository was created at
 [ibrahimbouillet/AetherShell](https://github.com/ibrahimbouillet/AetherShell). Initial clean-history
 push, actual GitHub CI and first-release asset receipts are pending at this snapshot and will be
 recorded in the delivery follow-up. No original Git history, raw logs or debug artifacts are exported.
+
+
+### S-012 — public source, green CI and published alpha
+
+Official repository: [ibrahimbouillet/AetherShell](https://github.com/ibrahimbouillet/AetherShell).
+Initial clean history contains only two new commits (including a trailing-blank-line fixture fix),
+with the owner's public GitHub noreply metadata. Original history/remote-free checkout and owner
+canvas stay local. All 457 source candidates byte-matched the reviewed export; no .git, build,
+logs/PDBs, local tools/graphs/vault state, keys or owner canvas were copied.
+
+[CI run 39123368917](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917) **succeeded** on
+`4eed02879fb79aa60376e9b50c698b295bae163e`: complete Windows x64 Release /WX build, **17 unit executables,
+zero failures and zero skips**, package privacy audit and artifact upload. The JUnit report truncates
+larger native stdout; the 426-case count in S-011 comes from the local complete logs, rather than a
+fabricated CI per-case transcript. Public CI does not run interactive or Internet tests.
+
+[Release v0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) is **published, prerelease, not draft**, targeting that source
+revision. Assets verified against the CI download, server SHA-256 metadata and an authenticated
+release-download byte round-trip before publication:
+
+| Asset | Bytes | SHA-256 |
+|---|---:|---|
+| AetherShell-0.1.0-alpha.1-win-x64-setup.exe | 4451840 | `edeafb8c89ca7c833b4b79dfbaee160267fd7278e3e0e91980f31df67fbb481f` |
+| AetherShell-0.1.0-alpha.1-checksums.txt | 110 | `3bf07a0cb1d4ad0af86ebbc8274fa37cba40c1a53b6e179680bc16b336d02fd9` |
+
+The actual CI setup and all raw embedded payload bytes passed the privacy audit. Only these two
+assets are published: no unsigned manifest/signature placeholder, debug artifacts or raw logs.
+No trusted signing environment was configured; this is a manual-install alpha and the mandatory
+production updater signature checks are intact. Release notes disclose Authenticode absence and
+all remaining qualification from KNOWN_LIMITATIONS.
+
+Owner-authorized delivery was then repaired to this exact CI package: production setup exit 0,
+installed maintenance setup hash equals the published CI asset, startup remains disabled, no app
+launch. Installed apps entry and Start Menu shortcut were observed. This is a separate delivery
+action, not permission for automated tests to mutate real user registration.
+
+The final documentation receipt changes only Markdown and skips an unchanged native CI rebuild;
+the release binary remains tied to the exact successful source run above. S-011’s aggregate desktop
+failures and wider Windows 10/real-action/IME/screen-reader/signed-update gaps remain open.

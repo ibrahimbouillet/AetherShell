@@ -11,9 +11,13 @@ exit 0, Installed apps entry and launcher present, startup disabled, no automati
 This is a delivery observation, separate from the fake/temporary-root automated test policy.
 
 The official public repository now exists at https://github.com/ibrahimbouillet/AetherShell.
-The initial clean-source push, actual GitHub CI and release receipts are being completed; consult
-[Actions](https://github.com/ibrahimbouillet/AetherShell/actions) and
-[Releases](https://github.com/ibrahimbouillet/AetherShell/releases) for actual publication state.
+The clean source is pushed and [Windows Release CI passed](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917) on
+`4eed02879fb79aa60376e9b50c698b295bae163e`. The first [manual-install prerelease is public](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1).
+Its only assets are setup and checksums; no unsigned manifest, PDB or raw log is published.
+Setup: 4,451,840 bytes; SHA-256 `edeafb8c89ca7c833b4b79dfbaee160267fd7278e3e0e91980f31df67fbb481f`.
+The installed maintenance executable matches this exact CI package after a successful repair;
+startup remains disabled and no application was automatically launched. The following documentation
+receipt changes no product source and therefore does not rerun the same CI build. See S-012.
 No live signed-update execution or complete Version 1 acceptance is claimed.
 
 ## NEXT SESSION START HERE
@@ -23,9 +27,9 @@ No live signed-update execution or complete Version 1 acceptance is claimed.
    development uses the separate `AetherShell-public` clean checkout with independent history and
    public GitHub noreply identity. Never push the original history or copy its .git, build/logs/PDBs,
    .local/.claude/.obsidian/graphs or owner `docs/Untitled.canvas`. The canvas remains untouched.
-3. Complete/inspect the first public source CI/release receipts if still pending. The first alpha is
-   manual-install only unless an actual trusted manifest signature is available. Unsigned local
-   manifests are excluded from release assets; the production verifier has no bypass.
+3. Inspect the published alpha and S-012 receipts, then continue outstanding qualification or
+   owner-requested features. The first alpha is manual-install only. Future release publication
+   follows AGENTS and current owner instructions; the production signature verifier has no bypass.
 4. Continue the remaining manual/platform qualification in KNOWN_LIMITATIONS and TASKS. The complete
    Release /W4 /WX build and all 17 unit executables pass. Every integration executable has a passing
    scoped run; aggregate desktop runs also recorded capture-guard refusals and activation interference.

@@ -70,7 +70,7 @@ An alpha is implemented and installed; full Version 1 platform/manual acceptance
 | Dock / Top Bar / Search / Settings UI | implemented; guarded own-window tests and original assets, with per-run results in TEST_STATUS |
 | install / launcher / updater / setup | implemented; 17 install-library + 5 native setup cases pass |
 | app | native Release executable and isolated full lifecycle/health/channel/shutdown case pass |
-| CI/public delivery | official repository exists; actual push/CI/release receipts are maintained in HANDOFF |
+| CI/public delivery | clean history pushed; Windows Release CI green; manual alpha published; exact receipts in HANDOFF / TEST_STATUS S-012 |
 
 ## Known issues, limitations, risks (summary — details in `docs/knowledge/KNOWN_ISSUES.md`)
 - Blur only on Windows 11; Windows 10 untested. Multi-monitor, DPI change and Explorer restart untested.
