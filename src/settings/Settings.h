@@ -21,6 +21,13 @@ enum class ClockFormat { System, Hours12, Hours24 };       // "system" follows t
 enum class DateStyle { WeekdayDayMonth, Short, Long };    // "Sat 17 Oct" / locale short / locale long
 enum class TemperatureUnit { Celsius, Fahrenheit };
 enum class UpdateChannel { Stable, Prerelease };
+enum class ThemePreference { System, Light, Dark };        // "system" follows the Windows light/dark mode
+enum class AccentSource { Windows, Aether };              // Windows accent color or the Aether brand palette
+enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
+enum class KeyboardIndicatorStyle { Compact, TwoLine };   // "FR" or a two-line "FRA / FR" indicator
+
+// Version of the Dock size defaults. 1 is 0.1's 48/10; 2 is the compact 40/4 introduced in 0.2.
+inline constexpr int kCurrentDockMetricsVersion = 2;
 
 struct PinnedApp {
     std::wstring id;  // aether::apps identity ("aumid:...", "exe:...", "shell:...")
@@ -33,15 +40,28 @@ struct PinnedApp {
 };
 
 struct DockSettings {
-    int iconSize = 48;             // DIPs, 32..96
-    int bottomMargin = 10;         // DIPs above the work-area bottom, 0..200
+    int iconSize = 40;             // DIPs, 32..96 (presets: Small 32, Medium 40, Large 48)
+    int bottomMargin = 4;          // DIPs above the work-area bottom, 0..200
     int sideMargin = 16;           // minimum DIPs kept from the work-area sides, 0..400
     int iconSpacing = 8;           // DIPs, 0..32
     double opacity = 0.80;         // glass tint opacity, 0.30..1.00
     double magnification = 1.45;   // hover scale factor, 1.00 (off)..2.00
     bool showRunningApps = true;   // show unpinned running applications
     bool reserveSpace = false;     // register as an AppBar and reserve work area
-    std::vector<PinnedApp> pinned; // in display order
+    std::vector<PinnedApp> pinned; // in display order; at most 64, ids unique ignoring case
+    // Replacement mode: true also reserves hover magnification, launch bounce and focus headroom
+    // (ADR 0009 item 5); false reserves only the visible panel and the bottom gap.
+    bool reserveAnimationSpace = false;
+    // Internal migration marker, 1..2, not shown in the UI. A file without it was written by 0.1:
+    // its untouched 48/10 size defaults move once to 40/4 while customized values are kept. In such a
+    // file an absent iconSize or bottomMargin still means 48 or 10.
+    int metricsVersion = kCurrentDockMetricsVersion;
+    // Application ids the user removed; the automatic taskbar-pin sync never re-adds them.
+    // At most 128 ids, each at most 1024 UTF-16 code units, unique ignoring case.
+    std::vector<std::wstring> dismissedPins;
+    bool explorerDefaultApplied = false;  // the one-time default File Explorer pin was offered
+    bool showStartButton = true;          // Start entry that opens the Windows Start menu
+    bool showTaskViewButton = true;       // Task View entry
 };
 
 struct TopBarSettings {
@@ -59,6 +79,13 @@ struct TopBarSettings {
     bool showMicrophone = true;
     bool showWeather = true;       // only effective when weather.enabled
     bool reserveSpace = true;      // register as a top AppBar so maximized windows stay below it
+    int height = 32;               // bar height in DIPs, 24..48; glyphs, text and reservation follow it
+    bool openWindowsFlyouts = true; // clicks open Windows flyouts; false opens ms-settings pages instead
+    WeatherPlacement weatherPlacement = WeatherPlacement::Left;
+    // TwoLine needs a height of at least 30 DIPs; the Top Bar falls back to Compact below that.
+    KeyboardIndicatorStyle keyboardIndicator = KeyboardIndicatorStyle::TwoLine;
+    bool showNotificationAreaButton = true; // effective only while taskbar replacement is active
+    bool showBatteryPercent = true;
 };
 
 struct WeatherSettings {
@@ -90,7 +117,11 @@ struct GeneralSettings {
     bool startWithWindows = false;  // only ever set after explicit user consent
     bool replaceWindowsTaskbar = false; // reversible visual replacement after explicit consent
     bool taskbarPinsImported = false; // one automatic best-effort import when replacement is selected
+    bool syncTaskbarPins = true;    // additively sync Windows taskbar pins while replacement is on
     MotionPreference motion = MotionPreference::System;
+    ThemePreference themeMode = ThemePreference::System;  // high contrast always takes precedence
+    AccentSource accentSource = AccentSource::Windows;
+    double animationSpeed = 1.0;    // MotionPolicy duration scale, 0.5 (faster)..1.5 (slower)
     bool hotkeysEnabled = true;     // Ctrl+Alt+Space (search), Ctrl+Alt+D (focus Dock)
     HotkeyChord searchHotkey{};
     HotkeyChord focusDockHotkey{0x0003, 0x44};

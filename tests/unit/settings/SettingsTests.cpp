@@ -119,7 +119,9 @@ AETHER_TEST("settings serialization: defaults round trip without changing existi
     REQUIRE(parsed.ok());
     CHECK(parsed->warnings.empty());
     CHECK_EQ(*ToJson(parsed->value), *document);
-    CHECK_EQ(parsed->value.dock.iconSize, 48);
+    CHECK_EQ(parsed->value.dock.iconSize, 40);
+    CHECK_EQ(parsed->value.dock.bottomMargin, 4);
+    CHECK_EQ(parsed->value.dock.metricsVersion, 2);
     CHECK(parsed->value.topBar.reserveSpace);
     CHECK_FALSE(parsed->value.dock.reserveSpace);
     CHECK_FALSE(parsed->value.weather.enabled);
@@ -196,7 +198,7 @@ AETHER_TEST("settings serialization: wrong types and unknown members warn withou
     auto parsed = FromJson(*root);
     REQUIRE(parsed.ok());
     CHECK(parsed->warnings.size() >= 8u);
-    CHECK_EQ(parsed->value.dock.iconSize, 48);
+    CHECK_EQ(parsed->value.dock.iconSize, 40);
     CHECK_FALSE(parsed->value.weather.enabled);
     CHECK_EQ(parsed->value.general.logLevel, std::string("info"));
     for (const auto& warning : parsed->warnings) {
@@ -468,7 +470,7 @@ AETHER_TEST("settings service: throwing mutators preserve model and do not queue
     SettingsService service(store, dispatcher); Load(service, dispatcher);
     const auto result = service.Update([](Settings& s) { s.dock.iconSize = 80; throw std::runtime_error("synthetic-private-data"); });
     REQUIRE_FALSE(result.ok()); CHECK_EQ(result.error().code, ErrorCode::Internal);
-    CHECK_EQ(service.Current().dock.iconSize, 48); CHECK_FALSE(service.Dirty()); CHECK(store->saved.empty());
+    CHECK_EQ(service.Current().dock.iconSize, 40); CHECK_FALSE(service.Dirty()); CHECK(store->saved.empty());
     CHECK(result.error().message.find("synthetic-private") == std::string::npos);
 }
 
@@ -514,7 +516,7 @@ AETHER_TEST("settings service: reset applies defaults immediately and queues a b
     ManualDispatcher dispatcher; auto store = std::make_shared<MemoryStore>(); store->initial.dock.iconSize = 96;
     bool saved = false; SettingsService service(store, dispatcher); Load(service, dispatcher);
     REQUIRE(service.ResetToDefaults([&](Result<void> result) { saved = result.ok(); }).ok());
-    CHECK_EQ(service.Current().dock.iconSize, 48);
+    CHECK_EQ(service.Current().dock.iconSize, 40);
     REQUIRE(Pump(dispatcher, [&] { return saved; }));
     REQUIRE_EQ(store->resetFlags.size(), 1u); CHECK(store->resetFlags[0]);
 }

@@ -31,7 +31,6 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
     t.transparencyEnabled = platform::SystemTransparencyEnabled() && mode != ThemeMode::HighContrast;
     t.accent = Color::FromHex(kBrandIndigo);
     t.accentSecondary = Color::FromHex(kBrandCyan);
-    t.warning = Color::FromHex(0xFFB547);
 
     switch (mode) {
         case ThemeMode::Dark:
@@ -50,6 +49,9 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
             t.hoverOverlay = Color::FromHex(0xFFFFFF, 0.10f);
             t.pressedOverlay = Color::FromHex(0xFFFFFF, 0.18f);
             t.fallbackIconBackground = Color::FromHex(0x3A4258);
+            t.success = Color::FromHex(0x6CCB5F);
+            t.caution = Color::FromHex(0xFCE100);
+            t.critical = Color::FromHex(0xFF99A4);
             break;
         case ThemeMode::Light:
             t.glass.tint = Color::FromHex(0xF4F6FC);
@@ -67,6 +69,9 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
             t.hoverOverlay = Color::FromHex(0x0E1530, 0.07f);
             t.pressedOverlay = Color::FromHex(0x0E1530, 0.13f);
             t.fallbackIconBackground = Color::FromHex(0xC9D0E3);
+            t.success = Color::FromHex(0x0F7B0F);
+            t.caution = Color::FromHex(0x9D5D00);
+            t.critical = Color::FromHex(0xC42B1C);
             break;
         case ThemeMode::HighContrast: {
             // System colors; no translucency, no decorative effects.
@@ -92,9 +97,13 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
             t.accent = highlight;
             t.accentSecondary = highlight;
             t.focusRingWidth = 3.0f;
+            t.success = windowText;
+            t.caution = windowText;
+            t.critical = windowText;
             break;
         }
     }
+    t.warning = t.caution;
     return t;
 }
 

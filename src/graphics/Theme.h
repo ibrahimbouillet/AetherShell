@@ -55,7 +55,12 @@ struct DesignTokens {
     Color runningIndicator;
     Color hoverOverlay;
     Color pressedOverlay;
-    Color warning;
+    Color warning;          // legacy name of `caution`; MakeDesignTokens keeps both equal
+    // Status roles. High contrast maps all three to the system text color, so a state never depends
+    // on color alone there.
+    Color success;
+    Color caution;
+    Color critical;
     Color fallbackIconBackground;
 
     // Geometry (DIPs)
@@ -81,7 +86,8 @@ struct DesignTokens {
     float fontSizeTitle = 16.0f;
     float fontSizeSearch = 20.0f;
 
-    // Motion (seconds, before MotionPolicy scaling)
+    // Motion (seconds, before MotionPolicy scaling). Springs and gesture constants: graphics::Motion().
+    double durationMicro = 0.083;  // hover and press feedback
     double durationFast = 0.12;
     double durationNormal = 0.22;
     double durationSlow = 0.36;

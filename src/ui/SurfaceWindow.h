@@ -97,6 +97,10 @@ protected:
     virtual void OnPointerLeave() {}
     virtual void OnPointerDown(PointerButton /*button*/, D2D1_POINT_2F /*dip*/) {}
     virtual void OnPointerUp(PointerButton /*button*/, D2D1_POINT_2F /*dip*/) {}
+    // The window lost mouse capture to another window or to the system (WM_CAPTURECHANGED), for
+    // example while dragging. Not raised for the base class's own release when the left button goes
+    // up; that release is followed by OnPointerUp instead.
+    virtual void OnPointerCaptureLost() {}
     virtual void OnWheel(float /*notches*/, D2D1_POINT_2F /*dip*/) {}
     // Return true when the key was handled.
     virtual bool OnKeyDown(UINT /*virtualKey*/) { return false; }
@@ -133,6 +137,7 @@ private:
     bool backdropBlurRequested_ = false;
     bool shown_ = false;
     bool trackingLeave_ = false;
+    bool releasingCapture_ = false;
     bool renderPending_ = false;
     bool animationPending_ = false;
     bool inRender_ = false;

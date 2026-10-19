@@ -154,7 +154,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     }
     void RequestIcons() {
         for (const auto& item : fitted.items) {
-            if (item.kind == DockItemKind::Search || item.kind == DockItemKind::Overflow) continue;
+            if (!IsApplicationItem(item.kind)) continue;
             const auto key = ImageKey(item);
             if (!requested.insert(key).second) continue;
             std::weak_ptr<bool> lifetime = alive;
@@ -276,6 +276,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     Result<void> ActivateItem(const DockItem& item, bool forceNew, std::size_t anchor) {
         if (item.kind == DockItemKind::Search) { Emit(window.SearchRequested); return Ok(); }
         if (item.kind == DockItemKind::Overflow) { MenuAt(anchor); return Ok(); }
+        if (item.kind == DockItemKind::Start) { Emit(window.StartRequested); return Ok(); }
+        if (!IsApplicationItem(item.kind)) return MakeError(ErrorCode::Unsupported, "this Dock entry is not available yet");
         if (!forceNew && item.runningApplication) {
             auto result = context.launcher.Activate(*item.runningApplication);
             if (!result) ErrorTooltip(result.error(), anchor);
@@ -311,7 +313,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             ::AppendMenuW(menu.value, MF_SEPARATOR, 0, nullptr);
         } else {
             ::AppendMenuW(menu.value, MF_STRING, 1, item.kind == DockItemKind::Search ? L"Search applications" : L"Open");
-            if (item.kind != DockItemKind::Search) {
+            if (IsApplicationItem(item.kind)) {
                 if (item.application.kind == apps::ApplicationKind::Desktop) ::AppendMenuW(menu.value, MF_STRING, 2, L"New instance");
                 ::AppendMenuW(menu.value, MF_STRING, 3, item.kind == DockItemKind::Pinned ? L"Unpin from Dock" : L"Pin to Dock");
                 if (item.kind == DockItemKind::Pinned) {
@@ -498,6 +500,8 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
                 {rect.left + size * 0.73f, rect.top + size * 0.73f}, primary.get(), std::max(1.6f, size * 0.045f));
         } else if (item.kind == DockItemKind::Overflow) {
             for (int dot = 0; dot < 3; ++dot) context.d2d->FillEllipse({{rect.left + size * (0.3f + 0.2f * dot), rect.top + size / 2}, 2.5f, 2.5f}, primary.get());
+        } else if (!IsApplicationItem(item.kind)) {
+            // Start and Task View tiles arrive with their glyphs in the Dock stream; nothing emits them yet.
         } else {
             const auto key = impl_->ImageKey(item);
             auto* bitmap = impl_->bitmaps.Find(key);
@@ -535,8 +539,7 @@ void DockWindow::OnPointerMove(D2D1_POINT_2F point) {
     impl_->pointer = point;
     if (impl_->pressed && !impl_->dragId.empty() && std::hypot(point.x - impl_->pressPoint.x, point.y - impl_->pressPoint.y) >= 6) impl_->dragging = true;
     auto hit = HitTest(impl_->layout, point);
-    if (impl_->dragging && hit &&
-        (impl_->fitted.items[*hit].kind == DockItemKind::Pinned || impl_->fitted.items[*hit].kind == DockItemKind::Running) &&
+    if (impl_->dragging && hit && IsReorderable(impl_->fitted.items[*hit].kind) &&
         !text::EqualsIgnoreCase(impl_->fitted.items[*hit].id, impl_->dragId)) {
         auto moved = ReorderDockApplications(impl_->context.settings.Current().dock, impl_->running,
             impl_->dragId, impl_->fitted.items[*hit].id);
@@ -557,7 +560,7 @@ void DockWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
     if (button != ui::PointerButton::Left || !hit) return;
     impl_->pressed = hit; impl_->pressPoint = point; impl_->dragging = false;
     const auto kind = impl_->fitted.items[*hit].kind;
-    impl_->dragId = kind == DockItemKind::Pinned || kind == DockItemKind::Running ? impl_->fitted.items[*hit].id : L"";
+    impl_->dragId = IsReorderable(kind) ? impl_->fitted.items[*hit].id : L"";
     (void)impl_->Arrange(); Invalidate();
 }
 void DockWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {

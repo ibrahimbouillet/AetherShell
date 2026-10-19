@@ -275,8 +275,15 @@ LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
             OnPointerDown(PointerButton::Left, PointFromLParam(lParam));
             return 0;
         case WM_LBUTTONUP:
-            if (::GetCapture() == hwnd_) ::ReleaseCapture();
+            if (::GetCapture() == hwnd_) {
+                releasingCapture_ = true;
+                ::ReleaseCapture();  // sends WM_CAPTURECHANGED synchronously
+                releasingCapture_ = false;
+            }
             OnPointerUp(PointerButton::Left, PointFromLParam(lParam));
+            return 0;
+        case WM_CAPTURECHANGED:
+            if (!releasingCapture_) OnPointerCaptureLost();
             return 0;
         case WM_RBUTTONDOWN: OnPointerDown(PointerButton::Right, PointFromLParam(lParam)); return 0;
         case WM_RBUTTONUP: OnPointerUp(PointerButton::Right, PointFromLParam(lParam)); return 0;

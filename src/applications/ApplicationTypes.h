@@ -39,6 +39,10 @@ struct ApplicationInfo {
     std::wstring shortcutPath;    // .lnk the entry was discovered from, when any
     std::wstring arguments;       // only from a trusted shortcut definition; never user-typed text
     std::wstring keywords;        // extra searchable text (publisher, description), may be empty
+    // Presentation only, never used for launching or identity: an icon resource ("<file>,<index>")
+    // declared by a running window. It can contain user paths or profile names: never log it or
+    // write it to test output. Empty when unknown.
+    std::wstring iconResource;
 };
 
 struct RunningWindow {
@@ -55,6 +59,12 @@ struct RunningApplication {
     std::uint32_t processId = 0;
     std::vector<RunningWindow> windows;  // most recently active first
     bool foreground = false;             // owns the foreground window
+    // From the most recent window of the group that declares them (the shell's
+    // System.AppUserModel.RelaunchIconResource and RelaunchDisplayNameResource window properties).
+    // Presentation only. They can contain user paths or profile names: never log them or write them
+    // to test output. Empty when unknown.
+    std::wstring relaunchIconResource;
+    std::wstring relaunchDisplayName;
 };
 
 // Enumerates installed applications. Blocking; call from a worker thread.

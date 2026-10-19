@@ -30,7 +30,13 @@ float Width(std::size_t count, float size, float spacing, float magnification) {
 
 Result<std::vector<DockItem>> BuildDockItems(const settings::DockSettings& settings,
                                            const std::vector<apps::RunningApplication>& running) {
+    return BuildDockItems(DockModelInputs{settings, running, {}});
+}
+
+Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
     try {
+        const auto& settings = inputs.settings;
+        const auto running = inputs.running;
         std::vector<DockItem> items;
         DockItem search;
         search.id = L"aether:search"; search.displayName = L"Search applications";
@@ -160,9 +166,7 @@ Result<std::vector<settings::PinnedApp>> ReorderDockApplications(
     std::wstring_view draggedId, std::wstring_view destinationId) {
     try {
         auto model = BuildDockItems(settings, running); if (!model) return model.error();
-        std::erase_if(*model, [](const DockItem& item) {
-            return item.kind != DockItemKind::Pinned && item.kind != DockItemKind::Running;
-        });
+        std::erase_if(*model, [](const DockItem& item) { return !IsReorderable(item.kind); });
         const auto find = [&](std::wstring_view id) {
             return std::find_if(model->begin(), model->end(), [&](const DockItem& item) {
                 return text::EqualsIgnoreCase(item.id, id);

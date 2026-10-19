@@ -32,6 +32,12 @@ void Fields(S& s, F&& f) {
     f("dock", "showRunningApps", s.dock.showRunningApps);
     f("dock", "reserveSpace", s.dock.reserveSpace);
     f("dock", "pinned", s.dock.pinned);
+    f("dock", "reserveAnimationSpace", s.dock.reserveAnimationSpace);
+    f("dock", "metricsVersion", s.dock.metricsVersion);
+    f("dock", "dismissedPins", s.dock.dismissedPins);
+    f("dock", "explorerDefaultApplied", s.dock.explorerDefaultApplied);
+    f("dock", "showStartButton", s.dock.showStartButton);
+    f("dock", "showTaskViewButton", s.dock.showTaskViewButton);
     f("topBar", "topMargin", s.topBar.topMargin);
     f("topBar", "opacity", s.topBar.opacity);
     f("topBar", "clockFormat", s.topBar.clockFormat);
@@ -46,6 +52,12 @@ void Fields(S& s, F&& f) {
     f("topBar", "showMicrophone", s.topBar.showMicrophone);
     f("topBar", "showWeather", s.topBar.showWeather);
     f("topBar", "reserveSpace", s.topBar.reserveSpace);
+    f("topBar", "height", s.topBar.height);
+    f("topBar", "openWindowsFlyouts", s.topBar.openWindowsFlyouts);
+    f("topBar", "weatherPlacement", s.topBar.weatherPlacement);
+    f("topBar", "keyboardIndicator", s.topBar.keyboardIndicator);
+    f("topBar", "showNotificationAreaButton", s.topBar.showNotificationAreaButton);
+    f("topBar", "showBatteryPercent", s.topBar.showBatteryPercent);
     f("weather", "enabled", s.weather.enabled);
     f("weather", "locationName", s.weather.locationName);
     f("weather", "latitude", s.weather.latitude);
@@ -65,6 +77,10 @@ void Fields(S& s, F&& f) {
     f("general", "searchHotkey", s.general.searchHotkey);
     f("general", "focusDockHotkey", s.general.focusDockHotkey);
     f("general", "logLevel", s.general.logLevel);
+    f("general", "syncTaskbarPins", s.general.syncTaskbarPins);
+    f("general", "themeMode", s.general.themeMode);
+    f("general", "accentSource", s.general.accentSource);
+    f("general", "animationSpeed", s.general.animationSpeed);
 }
 
 template <class E> struct EnumNames;
@@ -88,6 +104,27 @@ template <> struct EnumNames<UpdateChannel> {
     static constexpr std::array values{std::pair{UpdateChannel::Stable, "stable"},
         std::pair{UpdateChannel::Prerelease, "prerelease"}};
 };
+template <> struct EnumNames<ThemePreference> {
+    static constexpr std::array values{std::pair{ThemePreference::System, "system"},
+        std::pair{ThemePreference::Light, "light"}, std::pair{ThemePreference::Dark, "dark"}};
+};
+template <> struct EnumNames<AccentSource> {
+    static constexpr std::array values{std::pair{AccentSource::Windows, "windows"},
+        std::pair{AccentSource::Aether, "aether"}};
+};
+template <> struct EnumNames<WeatherPlacement> {
+    static constexpr std::array values{std::pair{WeatherPlacement::Left, "left"},
+        std::pair{WeatherPlacement::Right, "right"}};
+};
+// The first name of each list is the default: Validate() falls back to it for unknown values.
+template <> struct EnumNames<KeyboardIndicatorStyle> {
+    static constexpr std::array values{std::pair{KeyboardIndicatorStyle::TwoLine, "two-line"},
+        std::pair{KeyboardIndicatorStyle::Compact, "compact"}};
+};
+
+// Version 1 (0.1) wrote the Dock size defaults 48/10 and no dock.metricsVersion.
+constexpr int kLegacyDockIconSize = 48;
+constexpr int kLegacyDockBottomMargin = 10;
 
 void UnknownMembers(const json::Value& object, const std::set<std::string>& known, Warnings& warnings) {
     if (const auto* members = object.AsObject()) {
@@ -114,6 +151,16 @@ void Read(const json::Value& value, HotkeyChord& out, Warnings& warnings, std::s
     UnknownMembers(value, {"modifiers", "virtualKey"}, warnings);
     if (const auto* item = value.Find("modifiers")) Read(*item, out.modifiers, warnings, name);
     if (const auto* item = value.Find("virtualKey")) Read(*item, out.virtualKey, warnings, name);
+}
+
+void Read(const json::Value& value, std::vector<std::wstring>& out, Warnings& warnings, std::string_view name) {
+    const auto* array = value.AsArray();
+    if (!array) return Warn(warnings, name, "expected an array; used default");
+    out.clear();
+    for (const auto& item : *array) {
+        if (const auto* text = item.AsString()) out.push_back(text::Widen(*text));
+        else Warn(warnings, name, "ignored a non-string entry");
+    }
 }
 
 void Read(const json::Value& value, std::vector<PinnedApp>& out, Warnings& warnings, std::string_view name) {
@@ -177,6 +224,11 @@ json::Value Write(const HotkeyChord& value) {
     object.Set("virtualKey", value.virtualKey);
     return object;
 }
+json::Value Write(const std::vector<std::wstring>& values) {
+    auto array = json::Value::MakeArray();
+    for (const auto& value : values) array.Append(Write(value));
+    return array;
+}
 json::Value Write(const std::vector<PinnedApp>& pins) {
     auto array = json::Value::MakeArray();
     for (const auto& pin : pins) {
@@ -218,6 +270,18 @@ void Limit(std::wstring& value, Warnings& warnings, const char* name) {
     if (value.back() >= 0xD800 && value.back() <= 0xDBFF) value.pop_back();
     Warn(warnings, name, "limited to 1024 UTF-16 code units");
 }
+// Moves the untouched version-1 size defaults to the compact defaults once. Customized sizes are kept,
+// and the marker then records the current version, so a later explicit 48/10 choice is respected.
+void MigrateDockMetrics(DockSettings& dock, Warnings& warnings) {
+    if (dock.metricsVersion >= kCurrentDockMetricsVersion) return;
+    if (dock.iconSize == kLegacyDockIconSize && dock.bottomMargin == kLegacyDockBottomMargin) {
+        const DockSettings defaults;
+        dock.iconSize = defaults.iconSize;
+        dock.bottomMargin = defaults.bottomMargin;
+        warnings.emplace_back("dock: moved the previous default size to the compact default");
+    }
+    dock.metricsVersion = kCurrentDockMetricsVersion;
+}
 bool ValidChord(const HotkeyChord& chord) {
     return chord.modifiers != 0 && (chord.modifiers & ~0x0Fu) == 0 && chord.virtualKey >= 0x20 &&
         chord.virtualKey <= 0xFE && chord.virtualKey != 0x5B && chord.virtualKey != 0x5C &&
@@ -231,16 +295,19 @@ Result<std::vector<std::string>> Validate(Settings& s) {
         Warnings warnings;
         s.schemaVersion = kCurrentSchemaVersion;
         const Settings defaults;
-        Clamp(s.dock.iconSize, 32, 96, 48, warnings, "iconSize");
-        Clamp(s.dock.bottomMargin, 0, 200, 10, warnings, "bottomMargin");
-        Clamp(s.dock.sideMargin, 0, 400, 16, warnings, "sideMargin");
-        Clamp(s.dock.iconSpacing, 0, 32, 8, warnings, "iconSpacing");
-        Clamp(s.dock.opacity, 0.30, 1.00, 0.80, warnings, "dock.opacity");
-        Clamp(s.dock.magnification, 1.00, 2.00, 1.45, warnings, "magnification");
-        Clamp(s.topBar.topMargin, 0, 100, 6, warnings, "topMargin");
-        Clamp(s.topBar.opacity, 0.30, 1.00, 0.80, warnings, "topBar.opacity");
-        Clamp(s.weather.refreshMinutes, 15, 180, 30, warnings, "refreshMinutes");
-        Clamp(s.updates.checkIntervalHours, 6, 168, 24, warnings, "checkIntervalHours");
+        Clamp(s.dock.iconSize, 32, 96, defaults.dock.iconSize, warnings, "iconSize");
+        Clamp(s.dock.bottomMargin, 0, 200, defaults.dock.bottomMargin, warnings, "bottomMargin");
+        Clamp(s.dock.sideMargin, 0, 400, defaults.dock.sideMargin, warnings, "sideMargin");
+        Clamp(s.dock.iconSpacing, 0, 32, defaults.dock.iconSpacing, warnings, "iconSpacing");
+        Clamp(s.dock.opacity, 0.30, 1.00, defaults.dock.opacity, warnings, "dock.opacity");
+        Clamp(s.dock.magnification, 1.00, 2.00, defaults.dock.magnification, warnings, "magnification");
+        Clamp(s.dock.metricsVersion, 1, kCurrentDockMetricsVersion, defaults.dock.metricsVersion, warnings, "metricsVersion");
+        Clamp(s.topBar.topMargin, 0, 100, defaults.topBar.topMargin, warnings, "topMargin");
+        Clamp(s.topBar.opacity, 0.30, 1.00, defaults.topBar.opacity, warnings, "topBar.opacity");
+        Clamp(s.topBar.height, 24, 48, defaults.topBar.height, warnings, "topBar.height");
+        Clamp(s.weather.refreshMinutes, 15, 180, defaults.weather.refreshMinutes, warnings, "refreshMinutes");
+        Clamp(s.updates.checkIntervalHours, 6, 168, defaults.updates.checkIntervalHours, warnings, "checkIntervalHours");
+        Clamp(s.general.animationSpeed, 0.5, 1.5, defaults.general.animationSpeed, warnings, "animationSpeed");
         if (s.weather.latitude.has_value() != s.weather.longitude.has_value() ||
             (s.weather.latitude && (!std::isfinite(*s.weather.latitude) || !std::isfinite(*s.weather.longitude)))) {
             s.weather.latitude.reset(); s.weather.longitude.reset();
@@ -262,6 +329,7 @@ Result<std::vector<std::string>> Validate(Settings& s) {
                 if (!found) { value = EnumNames<T>::values.front().first; Warn(warnings, name, "unknown enum; used default"); }
             }
         });
+        // Identities compare case-insensitively, matching the Dock model.
         std::set<std::wstring> ids;
         std::vector<PinnedApp> pins;
         for (auto& pin : s.dock.pinned) {
@@ -273,13 +341,24 @@ Result<std::vector<std::string>> Validate(Settings& s) {
             Limit(pin.id, warnings, "pinned.id"); Limit(pin.displayName, warnings, "pinned.displayName");
             Limit(pin.parsingName, warnings, "pinned.parsingName"); Limit(pin.appUserModelId, warnings, "pinned.appUserModelId");
             Limit(pin.executablePath, warnings, "pinned.executablePath"); Limit(pin.shortcutPath, warnings, "pinned.shortcutPath");
-            if (pin.id.empty() || !ids.insert(pin.id).second || pins.size() >= 64) {
+            if (pin.id.empty() || !ids.insert(text::ToLower(pin.id)).second || pins.size() >= 64) {
                 Warn(warnings, "pinned", "ignored missing identity, duplicate or excess application");
                 continue;
             }
             pins.push_back(std::move(pin));
         }
         s.dock.pinned = std::move(pins);
+        std::set<std::wstring> dismissedIds;
+        std::vector<std::wstring> dismissed;
+        for (auto& id : s.dock.dismissedPins) {
+            Limit(id, warnings, "dismissedPins");
+            if (id.empty() || !dismissedIds.insert(text::ToLower(id)).second || dismissed.size() >= 128) {
+                Warn(warnings, "dismissedPins", "ignored an empty, duplicate or excess application id");
+                continue;
+            }
+            dismissed.push_back(std::move(id));
+        }
+        s.dock.dismissedPins = std::move(dismissed);
         if (!ValidChord(s.general.searchHotkey)) {
             s.general.searchHotkey = defaults.general.searchHotkey;
             Warn(warnings, "searchHotkey", "invalid chord; used default");
@@ -331,10 +410,19 @@ Result<ParsedSettings> FromJson(const json::Value& root) {
                 badGroups.insert(name);
             }
         }
+        // A missing marker means the file predates it (version 1). There an absent iconSize or
+        // bottomMargin meant the version-1 defaults, so those are seeded before the members are read.
+        const auto* dock = badGroups.contains("dock") ? nullptr : root.Find("dock");
+        if (!dock || !dock->Find("metricsVersion")) {
+            parsed.value.dock.iconSize = kLegacyDockIconSize;
+            parsed.value.dock.bottomMargin = kLegacyDockBottomMargin;
+            parsed.value.dock.metricsVersion = 1;
+        }
         Fields(parsed.value, [&](const char* group, const char* key, auto& value) {
             if (badGroups.contains(group)) return;
             if (const auto* object = root.Find(group)) if (const auto* field = object->Find(key)) Read(*field, value, parsed.warnings, key);
         });
+        MigrateDockMetrics(parsed.value.dock, parsed.warnings);
         for (const char* group : {"dock", "topBar", "weather", "updates", "general"}) {
             std::set<std::string> known;
             Fields(parsed.value, [&](const char* name, const char* key, auto&) { if (std::string_view(group) == name) known.insert(key); });
