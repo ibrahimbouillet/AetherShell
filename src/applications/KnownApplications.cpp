@@ -66,7 +66,13 @@ Result<std::wstring> SystemWindowsDirectory() {
 }
 
 bool IsFileExplorerExecutable(std::wstring_view executablePath, std::wstring_view windowsDirectory) {
-    if (text::Trim(executablePath).empty()) return false;
+    const auto trimmed = text::Trim(executablePath);
+    // Cheap rejection first: the tracker asks for every window.
+    constexpr std::wstring_view kFileName = L"explorer.exe";
+    if (trimmed.size() <= kFileName.size() ||
+        !text::EqualsIgnoreCase(trimmed.substr(trimmed.size() - kFileName.size()), kFileName)) {
+        return false;
+    }
     const auto canonical = CanonicalExplorerPath(windowsDirectory);
     if (!canonical) return false;
     PathPolicy policy;

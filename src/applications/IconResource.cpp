@@ -21,11 +21,12 @@ bool StartsWithIgnoreCase(std::wstring_view value, std::wstring_view prefix) noe
 Result<IconResource> ParseIconResource(std::wstring_view value) {
     // Messages never contain the value itself: it can name a user-profile folder.
     if (value.size() > kMaxIconResourceLength) return Rejected("is too long");
-    const auto trimmed = text::Trim(value);
-    if (trimmed.empty()) return Rejected("is empty");
-    if (std::any_of(trimmed.begin(), trimmed.end(), [](wchar_t c) { return c < 0x20 || c == 0x7F; })) {
+    // Checked before trimming: a line break or tab anywhere is not part of a declared resource.
+    if (std::any_of(value.begin(), value.end(), [](wchar_t c) { return c < 0x20 || c == 0x7F; })) {
         return Rejected("contains control characters");
     }
+    const auto trimmed = text::Trim(value);
+    if (trimmed.empty()) return Rejected("is empty");
     if (trimmed.find(L'"') != std::wstring_view::npos) return Rejected("is quoted");
     if (trimmed.front() == L'@' || StartsWithIgnoreCase(trimmed, L"ms-resource:")) {
         return Rejected("is an indirect string");

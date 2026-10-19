@@ -21,16 +21,18 @@ bool HasControlCharacters(std::wstring_view value) noexcept {
 
 }  // namespace
 
+// Control characters are checked before trimming: a line break or tab anywhere disqualifies a value.
 std::wstring SanitizeRelaunchDisplayName(std::wstring_view raw) {
+    if (HasControlCharacters(raw)) return {};
     const auto trimmed = text::Trim(raw);
-    if (trimmed.empty() || trimmed.size() > kMaxRelaunchDisplayNameLength) return {};
-    if (trimmed.front() == L'@' || HasControlCharacters(trimmed)) return {};
+    if (trimmed.empty() || trimmed.size() > kMaxRelaunchDisplayNameLength || trimmed.front() == L'@') return {};
     return std::wstring(trimmed);
 }
 
 std::wstring SanitizeRelaunchIconResource(std::wstring_view raw) {
+    if (HasControlCharacters(raw)) return {};
     const auto trimmed = text::Trim(raw);
-    if (trimmed.empty() || trimmed.size() > kMaxIconResourceLength || HasControlCharacters(trimmed)) return {};
+    if (trimmed.empty() || trimmed.size() > kMaxIconResourceLength) return {};
     return std::wstring(trimmed);
 }
 

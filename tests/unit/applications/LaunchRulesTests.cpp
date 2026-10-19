@@ -83,12 +83,30 @@ AETHER_TEST("activation choice: background application") {
     const auto minimized = ChooseWindowToActivate({Window(1, true), Window(2, true)}, nullptr, nullptr);
     REQUIRE(minimized.has_value());
     CHECK(minimized->window == FakeWindow(1));
+    CHECK_FALSE(minimized->minimize);
+
+    // A lone minimized window is restored, never minimized again.
+    const auto restore = ChooseWindowToActivate({Window(7, true)}, FakeWindow(99), FakeWindow(99));
+    REQUIRE(restore.has_value());
+    CHECK(restore->window == FakeWindow(7));
+    CHECK_FALSE(restore->minimize);
+    CHECK_FALSE(restore->alreadyActive);
 }
 
 AETHER_TEST("activation choice: application already in front") {
+    // Taskbar parity: a click on the application whose only window is in front minimizes it.
     const auto single = ChooseWindowToActivate({Window(1)}, FakeWindow(1), FakeWindow(1));
     REQUIRE(single.has_value());
+    CHECK(single->window == FakeWindow(1));
     CHECK(single->alreadyActive);
+    CHECK(single->minimize);
+    CHECK_FALSE(single->cycled);
+
+    // The same through an owned dialog in front of the only window.
+    const auto owned = ChooseWindowToActivate({Window(4)}, FakeWindow(40), FakeWindow(4));
+    REQUIRE(owned.has_value());
+    CHECK(owned->window == FakeWindow(4));
+    CHECK(owned->minimize);
 
     // Cycles to the least recently active window.
     const auto cycle = ChooseWindowToActivate({Window(1), Window(2), Window(3)}, FakeWindow(1), FakeWindow(1));
@@ -96,6 +114,7 @@ AETHER_TEST("activation choice: application already in front") {
     CHECK(cycle->window == FakeWindow(3));
     CHECK(cycle->cycled);
     CHECK_FALSE(cycle->alreadyActive);
+    CHECK_FALSE(cycle->minimize);
 
     // The foreground window is an owned dialog: its root owner identifies the application.
     const auto dialog = ChooseWindowToActivate({Window(5), Window(6)}, FakeWindow(42), FakeWindow(5));
