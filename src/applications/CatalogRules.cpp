@@ -150,6 +150,17 @@ bool IsShellNamespaceTarget(std::wstring_view target) noexcept {
     return text::Trim(target).starts_with(L"::{");
 }
 
+std::optional<std::wstring> AppsFolderChildName(std::wstring_view absoluteParsingName) {
+    for (const std::wstring_view prefix : {kAppsFolderParsingPrefix, std::wstring_view(L"shell:AppsFolder\\")}) {
+        if (StartsWithIgnoreCase(absoluteParsingName, prefix)) {
+            const auto child = absoluteParsingName.substr(prefix.size());
+            if (child.empty()) return std::nullopt;
+            return std::wstring(child);
+        }
+    }
+    return std::nullopt;
+}
+
 CatalogClassification ClassifyDiscoveredItem(const DiscoveredItem& item) {
     const auto displayName = text::Trim(item.displayName);
     if (displayName.empty()) return Skip(CatalogDecision::SkipInvalid);

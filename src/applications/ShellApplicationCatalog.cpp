@@ -4,7 +4,9 @@
 
 #include "applications/ApplicationIdentity.h"
 #include "applications/CatalogRules.h"
+#include "applications/KnownApplications.h"
 #include "applications/ShellItems.h"
+#include "applications/TaskbandScan.h"
 #include "applications/TaskbarPins.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
@@ -21,6 +23,7 @@
 #include <array>
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -34,9 +37,9 @@ constexpr std::string_view kLog = "applications";
 // Upper bound for one IShellLink::Resolve (it only checks that the target exists: searching and link
 // tracking are disabled).
 constexpr DWORD kResolveTimeoutMs = 1000;
-// "::{4234D49B-0245-4DF3-B780-3893943456E1}" is the Apps folder's own parsing name.
-constexpr std::wstring_view kAppsFolderParsingPrefix = L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\";
-constexpr std::wstring_view kAppsFolderShellPrefix = L"shell:AppsFolder\\";
+// Packaged AUMIDs confirmed through the Apps folder when no catalog is available (each probe parses
+// one shell item).
+constexpr std::size_t kMaxAppsFolderProbes = 64;
 
 Error CancelledError() { return MakeError(ErrorCode::Cancelled, "application discovery was cancelled"); }
 
@@ -56,10 +59,8 @@ bool StartsWithIgnoreCase(std::wstring_view value, std::wstring_view prefix) noe
 // fallback for any other shape.
 std::wstring AppsFolderRelativeName(IShellItem* item) {
     if (auto parsing = shell::GetDisplayName(item, SIGDN_DESKTOPABSOLUTEPARSING)) {
-        std::wstring_view name = *parsing;
-        if (StartsWithIgnoreCase(name, kAppsFolderParsingPrefix)) return std::wstring(name.substr(kAppsFolderParsingPrefix.size()));
-        if (StartsWithIgnoreCase(name, kAppsFolderShellPrefix)) return std::wstring(name.substr(kAppsFolderShellPrefix.size()));
-        if (!name.starts_with(L"::{")) return std::wstring(name);
+        if (auto child = AppsFolderChildName(*parsing)) return std::move(*child);
+        if (!parsing->starts_with(L"::{")) return std::move(*parsing);
     }
     return shell::GetDisplayName(item, SIGDN_PARENTRELATIVEPARSING).value_or(std::wstring{});
 }
@@ -69,6 +70,22 @@ public:
     AppsFolderReader()
         : packageFamilyKey_(shell::PropertyKeyFromName(L"System.AppUserModel.PackageFamilyName")),
           packageFullNameKey_(shell::PropertyKeyFromName(L"System.AppUserModel.PackageFullName")) {}
+
+    // Facts of one Apps-folder item (an enumerated child, or an item reached from a pinned shortcut).
+    DiscoveredItem Read(IShellItem* item) const {
+        DiscoveredItem result;
+        result.displayName = shell::GetDisplayName(item, SIGDN_NORMALDISPLAY).value_or(std::wstring{});
+        result.parsingName = AppsFolderRelativeName(item);
+        winrt::com_ptr<IShellItem2> properties;
+        if (FAILED(item->QueryInterface(IID_PPV_ARGS(properties.put())))) return result;
+        result.appUserModelId = shell::GetStringProperty(properties.get(), PKEY_AppUserModel_ID).value_or(std::wstring{});
+        result.targetPath = shell::GetStringProperty(properties.get(), PKEY_Link_TargetParsingPath).value_or(std::wstring{});
+        result.arguments = shell::GetStringProperty(properties.get(), PKEY_Link_Arguments).value_or(std::wstring{});
+        result.hasPackageIdentity =
+            (packageFamilyKey_ && shell::GetStringProperty(properties.get(), *packageFamilyKey_).has_value()) ||
+            (packageFullNameKey_ && shell::GetStringProperty(properties.get(), *packageFullNameKey_).has_value());
+        return result;
+    }
 
     Result<std::vector<DiscoveredItem>> ReadAll(const CancellationToken& cancel) const {
         winrt::com_ptr<IShellItem> folder;
@@ -102,21 +119,6 @@ public:
     }
 
 private:
-    DiscoveredItem Read(IShellItem* item) const {
-        DiscoveredItem result;
-        result.displayName = shell::GetDisplayName(item, SIGDN_NORMALDISPLAY).value_or(std::wstring{});
-        result.parsingName = AppsFolderRelativeName(item);
-        winrt::com_ptr<IShellItem2> properties;
-        if (FAILED(item->QueryInterface(IID_PPV_ARGS(properties.put())))) return result;
-        result.appUserModelId = shell::GetStringProperty(properties.get(), PKEY_AppUserModel_ID).value_or(std::wstring{});
-        result.targetPath = shell::GetStringProperty(properties.get(), PKEY_Link_TargetParsingPath).value_or(std::wstring{});
-        result.arguments = shell::GetStringProperty(properties.get(), PKEY_Link_Arguments).value_or(std::wstring{});
-        result.hasPackageIdentity =
-            (packageFamilyKey_ && shell::GetStringProperty(properties.get(), *packageFamilyKey_).has_value()) ||
-            (packageFullNameKey_ && shell::GetStringProperty(properties.get(), *packageFullNameKey_).has_value());
-        return result;
-    }
-
     std::optional<PROPERTYKEY> packageFamilyKey_;
     std::optional<PROPERTYKEY> packageFullNameKey_;
 };
@@ -170,7 +172,11 @@ public:
     }
 
     // nullopt when unreadable, or when resolution was requested and the target no longer exists.
-    std::optional<DiscoveredItem> Read(const std::wstring& path, bool resolve = true) {
+    // Pin mode (`appsFolder` set): a shortcut without a file target whose ID list names an Apps-folder
+    // item is read through that item (classified like a catalog entry; the .lnk stays attached for
+    // its icon), and `fromIdList` reports it.
+    std::optional<DiscoveredItem> Read(const std::wstring& path, bool resolve = true,
+                                       const AppsFolderReader* appsFolder = nullptr, bool* fromIdList = nullptr) {
         winrt::com_ptr<IShellLinkW> link;
         if (FAILED(::CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(link.put())))) {
             return std::nullopt;
@@ -194,6 +200,14 @@ public:
         if (link->GetPath(buffer_.data(), static_cast<int>(buffer_.size()), nullptr, 0) == S_OK) {
             result.targetPath = buffer_.c_str();
         }
+        if (result.targetPath.empty() && appsFolder) {
+            if (auto item = AppsFolderItemOf(link.get())) {
+                DiscoveredItem pinned = appsFolder->Read(item.get());
+                pinned.shortcutPath = path;
+                if (fromIdList) *fromIdList = true;
+                return pinned;
+            }
+        }
         // Advertised (Windows Installer) shortcuts report an icon file in %WINDIR%\Installer instead of
         // the real target; the Apps folder resolves those itself.
         if (!installerDirectory_.empty() && StartsWithIgnoreCase(result.targetPath, installerDirectory_)) return std::nullopt;
@@ -211,6 +225,19 @@ public:
     }
 
 private:
+    // The Apps-folder item a shortcut's ID list points to (documented IShellLink::GetIDList and
+    // SHCreateItemFromIDList); null for any other target. Nothing is launched or resolved.
+    static winrt::com_ptr<IShellItem> AppsFolderItemOf(IShellLinkW* link) {
+        PIDLIST_ABSOLUTE raw = nullptr;
+        if (FAILED(link->GetIDList(&raw)) || !raw) return nullptr;
+        const shell::UniqueIdList idList(raw);
+        winrt::com_ptr<IShellItem> item;
+        if (FAILED(::SHCreateItemFromIDList(idList.get(), IID_PPV_ARGS(item.put())))) return nullptr;
+        const auto parsing = shell::GetDisplayName(item.get(), SIGDN_DESKTOPABSOLUTEPARSING);
+        if (!parsing || !AppsFolderChildName(*parsing)) return nullptr;
+        return item;
+    }
+
     std::wstring buffer_;
     std::wstring installerDirectory_;
     DisplayNameResolver names_;
@@ -374,8 +401,83 @@ const ApplicationInfo* CatalogMatch(const ApplicationInfo& pin, const std::vecto
     return matches == 1 ? match : (nameMatches == 1 ? nameMatch : nullptr);
 }
 
-Result<std::vector<ApplicationInfo>> DiscoverPins(const CancellationToken& cancel,
-                                                  const TaskbarPinImportOptions& options) {
+// The Windows taskbar's pin list: HKCU ...\Explorer\Taskband "Favorites" (REG_BINARY), read-only with
+// documented RegGetValueW. A missing value is an empty list (file-name order). The size is checked
+// before anything is allocated; a value that grows between the two calls is read once more.
+Result<std::vector<std::uint8_t>> ReadTaskbandFavorites(std::size_t maxBytes) {
+    constexpr wchar_t kKey[] = L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Taskband";
+    constexpr wchar_t kValue[] = L"Favorites";
+    for (int attempt = 0; attempt < 2; ++attempt) {
+        DWORD size = 0;
+        LSTATUS status = ::RegGetValueW(HKEY_CURRENT_USER, kKey, kValue, RRF_RT_REG_BINARY, nullptr, nullptr, &size);
+        if (status == ERROR_FILE_NOT_FOUND || status == ERROR_PATH_NOT_FOUND) return std::vector<std::uint8_t>{};
+        if (status != ERROR_SUCCESS) return platform::ErrorFromWin32(static_cast<DWORD>(status), "reading the Windows pin list");
+        if (size > maxBytes) return MakeError(ErrorCode::Unsupported, "the Windows pin list exceeds the size limit");
+        std::vector<std::uint8_t> data(size);
+        if (size == 0) return data;
+        DWORD read = size;
+        status = ::RegGetValueW(HKEY_CURRENT_USER, kKey, kValue, RRF_RT_REG_BINARY, nullptr, data.data(), &read);
+        if (status == ERROR_MORE_DATA) continue;
+        if (status == ERROR_FILE_NOT_FOUND || status == ERROR_PATH_NOT_FOUND) return std::vector<std::uint8_t>{};
+        if (status != ERROR_SUCCESS) return platform::ErrorFromWin32(static_cast<DWORD>(status), "reading the Windows pin list");
+        data.resize(std::min<std::size_t>(read, data.size()));
+        return data;
+    }
+    return MakeError(ErrorCode::Unavailable, "the Windows pin list changed while it was read");
+}
+
+std::string_view SourceName(TaskbandSource source) noexcept {
+    switch (source) {
+        case TaskbandSource::None: return "none";
+        case TaskbandSource::Injected: return "injected";
+        case TaskbandSource::Registry: return "registry";
+    }
+    return "unknown";
+}
+
+// Decides which packaged AUMIDs of the pin list are installed. With a catalog, only its packaged
+// entries count (it was discovered from the Apps folder); without one, the Apps folder is asked, a
+// bounded number of times, with each answer remembered.
+class PackagedAumidConfirmer {
+public:
+    explicit PackagedAumidConfirmer(const std::vector<ApplicationInfo>& catalog) : useCatalog_(!catalog.empty()) {
+        for (const auto& app : catalog) {
+            const auto aumid = text::Trim(app.appUserModelId);
+            if (IsPackagedAumid(aumid)) known_.insert_or_assign(text::ToLower(aumid), true);
+        }
+    }
+
+    bool operator()(std::wstring_view aumid) {
+        const auto key = text::ToLower(aumid);
+        if (const auto known = known_.find(key); known != known_.end()) return known->second;
+        if (useCatalog_ || probes_ >= kMaxAppsFolderProbes) return false;
+        ++probes_;
+        const bool installed = shell::CreateAppsFolderItem(aumid).ok();
+        known_.insert_or_assign(key, installed);
+        return installed;
+    }
+
+private:
+    bool useCatalog_;
+    std::size_t probes_ = 0;
+    std::unordered_map<std::wstring, bool> known_;
+};
+
+// A packaged pin found only in the pin list: the catalog's entry, else the Apps-folder item itself.
+std::optional<ApplicationInfo> ResolvePackagedPin(const std::wstring& aumid, const std::vector<ApplicationInfo>& catalog,
+                                                  const AppsFolderReader& appsFolder) {
+    const auto found = std::find_if(catalog.begin(), catalog.end(), [&](const ApplicationInfo& app) {
+        return text::EqualsIgnoreCase(text::Trim(app.appUserModelId), aumid);
+    });
+    if (found != catalog.end()) return *found;
+    auto item = shell::CreateAppsFolderItem(aumid);
+    if (!item) return std::nullopt;
+    auto classified = ClassifyDiscoveredItem(appsFolder.Read(item.value().get()));
+    if (classified.decision != CatalogDecision::Include) return std::nullopt;
+    return std::move(classified.app);
+}
+
+Result<TaskbarPinSet> DiscoverPins(const CancellationToken& cancel, const TaskbarPinImportOptions& options) {
     namespace fs = std::filesystem;
     if (cancel.IsCancelled()) return CancelledError();
     if (options.maxShortcutFiles == 0 || options.maxShortcutFiles > 4096) {
@@ -390,55 +492,71 @@ Result<std::vector<ApplicationInfo>> DiscoverPins(const CancellationToken& cance
     if (::GetDriveTypeW(root.root_path().c_str()) == DRIVE_REMOTE) {
         return MakeError(ErrorCode::Unsupported, "pin import needs an ordinary local folder");
     }
+    std::vector<fs::path> shortcuts;
     const DWORD rootAttributes = ::GetFileAttributesW(root.c_str());
     if (rootAttributes == INVALID_FILE_ATTRIBUTES) {
         const DWORD error = ::GetLastError();
-        if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND) return std::vector<ApplicationInfo>{};
-        return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read", error);
-    }
-    if ((rootAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 || (rootAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0) {
-        return MakeError(ErrorCode::Unsupported, "pin import needs an ordinary local folder");
-    }
-    std::error_code error;
-    fs::directory_iterator it(root, error);
-    if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read",
-                                static_cast<std::uint32_t>(error.value()));
-    std::vector<fs::path> shortcuts;
-    std::size_t examined = 0;
-    const fs::directory_iterator end;
-    while (it != end) {
-        if (cancel.IsCancelled()) return CancelledError();
-        if (++examined > 4096) return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
-        const auto& path = it->path();
-        if (text::EqualsIgnoreCase(path.extension().native(), L".lnk")) {
-            const DWORD attributes = ::GetFileAttributesW(path.c_str());
-            if (attributes != INVALID_FILE_ATTRIBUTES &&
-                (attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)) == 0) {
-                if (shortcuts.size() >= options.maxShortcutFiles) {
-                    return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
-                }
-                shortcuts.push_back(path);
-            }
+        // A missing folder has no shortcuts; the pin list may still name packaged pins.
+        if (error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND) {
+            return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read", error);
         }
-        it.increment(error);
-        if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcut enumeration failed",
+    } else {
+        if ((rootAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 || (rootAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0) {
+            return MakeError(ErrorCode::Unsupported, "pin import needs an ordinary local folder");
+        }
+        std::error_code error;
+        fs::directory_iterator it(root, error);
+        if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcuts could not be read",
                                     static_cast<std::uint32_t>(error.value()));
+        std::size_t examined = 0;
+        const fs::directory_iterator end;
+        while (it != end) {
+            if (cancel.IsCancelled()) return CancelledError();
+            if (++examined > 4096) return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
+            const auto& path = it->path();
+            if (text::EqualsIgnoreCase(path.extension().native(), L".lnk")) {
+                const DWORD attributes = ::GetFileAttributesW(path.c_str());
+                if (attributes != INVALID_FILE_ATTRIBUTES &&
+                    (attributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT)) == 0) {
+                    if (shortcuts.size() >= options.maxShortcutFiles) {
+                        return MakeError(ErrorCode::Unsupported, "pin folder exceeds the import limit");
+                    }
+                    shortcuts.push_back(path);
+                }
+            }
+            it.increment(error);
+            if (error) return MakeError(ErrorCode::Unavailable, "pinned shortcut enumeration failed",
+                                        static_cast<std::uint32_t>(error.value()));
+        }
     }
     std::sort(shortcuts.begin(), shortcuts.end(), [](const fs::path& left, const fs::path& right) {
         const auto a = text::ToLower(left.filename().native());
         const auto b = text::ToLower(right.filename().native());
         return a == b ? left.native() < right.native() : a < b;
     });
+
+    TaskbarPinSet result;
     ShortcutReader reader;
-    std::vector<ApplicationInfo> pins;
-    pins.reserve(shortcuts.size());
-    for (const auto& shortcut : shortcuts) {
+    const AppsFolderReader appsFolder;
+    std::vector<std::optional<ApplicationInfo>> imported(shortcuts.size());
+    std::vector<std::wstring> fileNames;
+    fileNames.reserve(shortcuts.size());
+    for (std::size_t i = 0; i < shortcuts.size(); ++i) {
         if (cancel.IsCancelled()) return CancelledError();
+        fileNames.push_back(shortcuts[i].filename().native());
         // Metadata only: Resolve can perform shell work beyond a read and is unnecessary for import.
-        auto item = reader.Read(shortcut.native(), false);
-        if (!item) continue;
+        bool fromIdList = false;
+        auto item = reader.Read(shortcuts[i].native(), false, &appsFolder, &fromIdList);
+        if (!item) {
+            ++result.skipped;
+            continue;
+        }
         auto classified = ClassifyDiscoveredItem(*item);
-        if (classified.decision != CatalogDecision::Include) continue;
+        if (classified.decision != CatalogDecision::Include) {
+            ++result.skipped;
+            continue;
+        }
+        if (fromIdList) ++result.pidlShortcuts;
         auto pin = std::move(classified.app);
         if (const auto* match = CatalogMatch(pin, options.catalog)) {
             auto enriched = *match;
@@ -448,13 +566,89 @@ Result<std::vector<ApplicationInfo>> DiscoverPins(const CancellationToken& cance
             if (!pin.executablePath.empty()) enriched.executablePath = pin.executablePath;
             pin = std::move(enriched);
         }
-        pins.push_back(std::move(pin));
+        imported[i] = std::move(pin);
+    }
+
+    // Windows order and packaged pins from the pin list; any failure keeps file-name order.
+    const TaskbandSource source = SelectTaskbandSource(options);
+    std::optional<TaskbandScan> scan;
+    if (source != TaskbandSource::None) {
+        auto blob = source == TaskbandSource::Injected ? options.taskbandReader()
+                                                       : ReadTaskbandFavorites(options.maxTaskbandBytes);
+        if (blob) {
+            PackagedAumidConfirmer confirm(options.catalog);
+            auto scanned = ScanTaskband(blob.value(), fileNames,
+                                        [&confirm](std::wstring_view aumid) { return confirm(aumid); },
+                                        options.maxTaskbandBytes);
+            if (scanned) {
+                scan = std::move(scanned).value();
+            } else {
+                AETHER_LOG_WARN(kLog, "Windows pin order unavailable: {}", ToString(scanned.error().code));
+            }
+        } else {
+            AETHER_LOG_WARN(kLog, "Windows pin list unavailable: {}", ToString(blob.error().code));
+        }
     }
     if (cancel.IsCancelled()) return CancelledError();
-    return MergeDuplicateApplications(std::move(pins));
+
+    struct Ordered {
+        std::optional<std::size_t> offset;  // position in the pin list
+        std::size_t sequence = 0;           // file-name order, then pin-list-only packaged pins
+        ApplicationInfo app;
+    };
+    std::vector<Ordered> ordered;
+    std::size_t matchedShortcuts = 0;
+    for (std::size_t i = 0; i < imported.size(); ++i) {
+        if (!imported[i]) continue;
+        std::optional<std::size_t> offset;
+        if (scan) offset = scan->shortcutOffsets[i];
+        if (offset) ++matchedShortcuts;
+        ordered.push_back(Ordered{offset, i, std::move(*imported[i])});
+    }
+    if (scan) {
+        for (const auto& [offset, aumid] : scan->packaged) {
+            if (cancel.IsCancelled()) return CancelledError();
+            auto app = ResolvePackagedPin(aumid, options.catalog, appsFolder);
+            if (!app) {
+                ++result.skipped;
+                continue;
+            }
+            ++result.fromTaskband;
+            ordered.push_back(Ordered{offset, imported.size() + ordered.size(), std::move(*app)});
+        }
+    }
+    std::stable_sort(ordered.begin(), ordered.end(), [](const Ordered& a, const Ordered& b) {
+        if (a.offset.has_value() != b.offset.has_value()) return a.offset.has_value();
+        if (a.offset && *a.offset != *b.offset) return *a.offset < *b.offset;
+        return a.sequence < b.sequence;
+    });
+    result.windowsOrder = matchedShortcuts > 0 || result.fromTaskband > 0;
+
+    std::wstring windowsDirectory = options.windowsDirectory;
+    if (windowsDirectory.empty()) windowsDirectory = SystemWindowsDirectory().value_or(std::wstring{});
+    std::vector<ApplicationInfo> pins;
+    pins.reserve(ordered.size());
+    for (auto& entry : ordered) {
+        CanonicalizeFileExplorer(entry.app, windowsDirectory);
+        pins.push_back(std::move(entry.app));
+    }
+    result.pins = MergeDuplicateApplications(std::move(pins));
+    AETHER_LOG_INFO(kLog,
+                    "taskbar pins: {} imported ({} order; pin list: {}), {} packaged from the pin list, {} by ID "
+                    "list, {} skipped",
+                    result.pins.size(), result.windowsOrder ? "Windows" : "file-name", SourceName(source),
+                    result.fromTaskband, result.pidlShortcuts, result.skipped);
+    return result;
 }
 
 }  // namespace
+
+TaskbandSource SelectTaskbandSource(const TaskbarPinImportOptions& options) noexcept {
+    if (!options.useTaskbandOrder) return TaskbandSource::None;
+    if (options.taskbandReader) return TaskbandSource::Injected;
+    // Directory overrides belong to isolated callers (tests): never pair them with the user's list.
+    return options.directory.empty() ? TaskbandSource::Registry : TaskbandSource::None;
+}
 
 Result<std::vector<ApplicationInfo>> ShellApplicationCatalog::DiscoverApplications(const CancellationToken& cancel) {
     const Options options = options_;
@@ -462,16 +656,27 @@ Result<std::vector<ApplicationInfo>> ShellApplicationCatalog::DiscoverApplicatio
                                                          "application discovery");
 }
 
-Result<std::vector<ApplicationInfo>> DiscoverTaskbarPins(const CancellationToken& cancel,
-                                                        const TaskbarPinImportOptions& options) noexcept {
+Result<TaskbarPinSet> DiscoverTaskbarPinSet(const CancellationToken& cancel,
+                                            const TaskbarPinImportOptions& options) noexcept {
     try {
-        return shell::RunOnSta<std::vector<ApplicationInfo>>([&]() -> Result<std::vector<ApplicationInfo>> {
+        return shell::RunOnSta<TaskbarPinSet>([&]() -> Result<TaskbarPinSet> {
             try {
                 return DiscoverPins(cancel, options);
             } catch (...) {
                 return MakeError(ErrorCode::Internal, "pinned shortcut import failed");
             }
         }, "pinned shortcut import");
+    } catch (...) {
+        return MakeError(ErrorCode::Internal, "pinned shortcut import failed");
+    }
+}
+
+Result<std::vector<ApplicationInfo>> DiscoverTaskbarPins(const CancellationToken& cancel,
+                                                        const TaskbarPinImportOptions& options) noexcept {
+    try {
+        auto set = DiscoverTaskbarPinSet(cancel, options);
+        if (!set) return set.error();
+        return std::move(set.value().pins);
     } catch (...) {
         return MakeError(ErrorCode::Internal, "pinned shortcut import failed");
     }

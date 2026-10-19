@@ -8,6 +8,7 @@
 
 #include "applications/ApplicationTypes.h"
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -51,6 +52,15 @@ struct CatalogClassification {
 [[nodiscard]] bool IsUrlTarget(std::wstring_view target) noexcept;
 // "::{CLSID}..." shell namespace objects (File Explorer, Control Panel, Run...).
 [[nodiscard]] bool IsShellNamespaceTarget(std::wstring_view target) noexcept;
+
+// The Apps folder's own absolute parsing name prefix ("::{4234D49B-0245-4DF3-B780-3893943456E1}\").
+inline constexpr std::wstring_view kAppsFolderParsingPrefix = L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\";
+
+// The child name inside the Apps folder ("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App") when
+// `absoluteParsingName` (SIGDN_DESKTOPABSOLUTEPARSING) names an Apps-folder child, either as
+// "::{4234D49B-...}\<name>" or "shell:AppsFolder\<name>" (prefixes ignore case). nullopt for any
+// other item or an empty child name.
+[[nodiscard]] std::optional<std::wstring> AppsFolderChildName(std::wstring_view absoluteParsingName);
 
 // Applies the catalog filters and builds the ApplicationInfo (with its id, see MakeApplicationId):
 //  * uninstallers (by name or target executable)                                 -> SkipUninstaller
