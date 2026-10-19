@@ -18,6 +18,9 @@
 // Command lines are never built from text: ShellExecuteEx receives a PIDL or a file path, and
 // arguments only ever come from the shortcut file itself.
 //
+// Log lines name the launch route and the identity scheme, never the display name: a running
+// group's name can be a browser profile name chosen by a person (see RunningPresentation.h).
+//
 // Threading: launches run on a dedicated single-threaded-apartment worker (shell verbs and context
 // menu handlers require an STA); completions are posted to the UI dispatcher. Activate() runs on the
 // UI thread. The destructor discards queued launches and drops completions that have not run yet, but
@@ -47,7 +50,9 @@ public:
     // declined), AccessDenied, Unsupported, InvalidArgument (invalid paths), Platform.
     void LaunchAsync(const ApplicationInfo& app, std::function<void(Result<void>)> completion) override;
 
-    // UI thread only (InvalidState otherwise). See IApplicationLauncher and ChooseWindowToActivate.
+    // UI thread only (InvalidState otherwise). See IApplicationLauncher and ChooseWindowToActivate:
+    // activates, restores a minimized window, cycles several windows, and minimizes the application's
+    // only window when it is already in front (ShowWindowAsync, so a hung application cannot block).
     // Never uses AttachThreadInput or synthesized input to get around the foreground lock: when
     // SetForegroundWindow is refused the window's taskbar button flashes and AccessDenied
     // ("Windows prevented activation") is returned.

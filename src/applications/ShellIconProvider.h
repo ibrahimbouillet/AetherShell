@@ -3,6 +3,11 @@
 //
 // IIconProvider backed by IShellItemImageFactory.
 //
+//  * An ApplicationInfo::iconResource (the relaunch icon a running window declared for its group,
+//    for example a browser profile's avatar) is tried first, only in the form ParseIconResource
+//    accepts ("<local path>.ico,0"), only for an ordinary file on a non-network drive (no directory,
+//    reparse point, device or cloud placeholder), and never logged. Any failure falls back to the
+//    chain below.
 //  * Desktop entries prefer an existing validated local .lnk, preserving shortcut/profile icon
 //    overrides. Failed shortcut extraction falls back to the Apps-folder item (parsing name, else
 //    packaged/explicit AUMID), then executable. Other entries retain CreateApplicationItem's normal

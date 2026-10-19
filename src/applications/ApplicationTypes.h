@@ -81,8 +81,9 @@ public:
     // Asynchronous: the launch runs on a worker thread; `completion` runs on the UI thread.
     virtual void LaunchAsync(const ApplicationInfo& app, std::function<void(Result<void>)> completion) = 0;
     // UI thread. Brings the application's most recent window forward (restoring it when minimized);
-    // when it is already in front, cycles to its next window. Respects foreground-lock rules: when
-    // Windows refuses activation the taskbar button is flashed and an error is returned.
+    // when it is already in front, cycles to its next window, or minimizes its only window (the
+    // Windows taskbar's click behaviour). Respects foreground-lock rules: when Windows refuses
+    // activation the taskbar button is flashed and an error is returned.
     virtual Result<void> Activate(const RunningApplication& app) = 0;
 };
 

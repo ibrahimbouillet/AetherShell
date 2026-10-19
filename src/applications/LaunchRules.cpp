@@ -74,12 +74,14 @@ std::optional<ActivationChoice> ChooseWindowToActivate(const std::vector<Running
     };
     const auto front = std::find_if(windows.begin(), windows.end(), isFront);
     if (front != windows.end()) {
-        if (windows.size() == 1) return ActivationChoice{front->handle, true, false};
         // Least recently active window that is not the one in front.
         for (auto it = windows.rbegin(); it != windows.rend(); ++it) {
-            if (it->handle != nullptr && it->handle != front->handle) return ActivationChoice{it->handle, false, true};
+            if (it->handle != nullptr && it->handle != front->handle) {
+                return ActivationChoice{it->handle, false, true, false};
+            }
         }
-        return ActivationChoice{front->handle, true, false};
+        // The only live window is in front: the taskbar minimizes it on a click.
+        return ActivationChoice{front->handle, true, false, true};
     }
     const auto visible = std::find_if(windows.begin(), windows.end(),
                                       [](const RunningWindow& window) { return window.handle && !window.minimized; });
