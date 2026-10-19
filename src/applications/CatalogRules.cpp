@@ -161,6 +161,13 @@ std::optional<std::wstring> AppsFolderChildName(std::wstring_view absoluteParsin
     return std::nullopt;
 }
 
+bool IsAppsFolderParsingName(std::wstring_view absoluteParsingName) noexcept {
+    auto name = text::Trim(absoluteParsingName);
+    if (!name.empty() && name.back() == L'\\') name.remove_suffix(1);
+    const auto folder = kAppsFolderParsingPrefix.substr(0, kAppsFolderParsingPrefix.size() - 1);
+    return text::EqualsIgnoreCase(name, folder) || text::EqualsIgnoreCase(name, L"shell:AppsFolder");
+}
+
 CatalogClassification ClassifyDiscoveredItem(const DiscoveredItem& item) {
     const auto displayName = text::Trim(item.displayName);
     if (displayName.empty()) return Skip(CatalogDecision::SkipInvalid);

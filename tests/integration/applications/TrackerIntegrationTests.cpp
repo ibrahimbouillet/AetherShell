@@ -18,7 +18,9 @@
 #include <algorithm>
 #include <chrono>
 #include <functional>
+#include <map>
 #include <optional>
+#include <string>
 #include <thread>
 
 using namespace aether;
@@ -73,6 +75,17 @@ private:
     HWND hwnd_ = nullptr;
 };
 
+std::string SchemeName(IdScheme scheme) {
+    switch (scheme) {
+        case IdScheme::Aumid: return "aumid";
+        case IdScheme::Executable: return "exe";
+        case IdScheme::Shell: return "shell";
+        case IdScheme::Window: return "window";
+        case IdScheme::Invalid: break;
+    }
+    return "invalid";
+}
+
 }  // namespace
 
 AETHER_TEST("tracker: lists the desktop's application windows and excludes our own") {
@@ -109,25 +122,37 @@ AETHER_TEST("tracker: lists the desktop's application windows and excludes our o
     // Give display-name resolution (STA worker) a moment, then take the settled state.
     PumpUntil([] { return false; }, std::chrono::milliseconds(1500));
 
+    // Notes carry counts and identity schemes only: titles, names, ids and relaunch properties of the
+    // desktop's real windows can name people, documents or profiles.
     std::size_t windowCount = 0;
+    std::map<std::string, std::size_t> schemes;
+    std::size_t withRelaunchIcon = 0;
+    std::size_t withRelaunchName = 0;
+    std::size_t minimized = 0;
     for (const auto& app : latest) {
         CHECK_FALSE(app.id.empty());
         CHECK(GetIdScheme(app.id) != IdScheme::Invalid);
         CHECK_FALSE(app.windows.empty());
         CHECK_NE(app.processId, ::GetCurrentProcessId());
-        std::string titles;
+        ++schemes[SchemeName(GetIdScheme(app.id))];
+        if (!app.relaunchIconResource.empty()) ++withRelaunchIcon;
+        if (!app.relaunchDisplayName.empty()) {
+            ++withRelaunchName;
+            // Distinct group names come from it. CHECK, not CHECK_EQ: a failure must not print the name.
+            if (GetIdScheme(app.id) != IdScheme::Window) CHECK(app.displayName == app.relaunchDisplayName);
+        }
         for (const auto& window : app.windows) {
             ++windowCount;
             CHECK(window.handle != probe.Get());
-            if (!titles.empty()) titles += " | ";
-            titles += text::SanitizeForLog(text::Narrow(window.title), 60);
-            if (window.minimized) titles += " (minimized)";
+            if (window.minimized) ++minimized;
         }
-        TEST_NOTE(text::Narrow(app.displayName) + (app.foreground ? " [foreground]" : "") + "  " +
-                  text::Narrow(app.id) + "  pid " + std::to_string(app.processId) + "  windows: " + titles);
     }
-    TEST_NOTE(std::to_string(latest.size()) + " applications, " + std::to_string(windowCount) + " windows, " +
-              std::to_string(notifications) + " notifications");
+    std::string schemeSummary;
+    for (const auto& [scheme, count] : schemes) schemeSummary += " " + scheme + "=" + std::to_string(count);
+    TEST_NOTE(std::to_string(latest.size()) + " applications, " + std::to_string(windowCount) + " windows (" +
+              std::to_string(minimized) + " minimized), " + std::to_string(notifications) + " notifications; id schemes:" +
+              schemeSummary + "; relaunch icon " + std::to_string(withRelaunchIcon) + ", relaunch name " +
+              std::to_string(withRelaunchName));
     CHECK_FALSE(latest.empty());  // at least the console or terminal running the tests
 
     // Snapshot() matches what the listener saw last.

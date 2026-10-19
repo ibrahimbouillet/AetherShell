@@ -225,16 +225,24 @@ public:
     }
 
 private:
-    // The Apps-folder item a shortcut's ID list points to (documented IShellLink::GetIDList and
-    // SHCreateItemFromIDList); null for any other target. Nothing is launched or resolved.
+    // The Apps-folder item a shortcut's ID list points to (documented IShellLink::GetIDList,
+    // SHCreateItemFromIDList and IShellItem::GetParent); null for any other target. Nothing is
+    // launched or resolved. Measured on Windows 11 build 26300: such an item reports only its child
+    // name as its absolute parsing name, so its parent decides.
     static winrt::com_ptr<IShellItem> AppsFolderItemOf(IShellLinkW* link) {
         PIDLIST_ABSOLUTE raw = nullptr;
         if (FAILED(link->GetIDList(&raw)) || !raw) return nullptr;
         const shell::UniqueIdList idList(raw);
         winrt::com_ptr<IShellItem> item;
         if (FAILED(::SHCreateItemFromIDList(idList.get(), IID_PPV_ARGS(item.put())))) return nullptr;
-        const auto parsing = shell::GetDisplayName(item.get(), SIGDN_DESKTOPABSOLUTEPARSING);
-        if (!parsing || !AppsFolderChildName(*parsing)) return nullptr;
+        if (const auto parsing = shell::GetDisplayName(item.get(), SIGDN_DESKTOPABSOLUTEPARSING);
+            parsing && AppsFolderChildName(*parsing)) {
+            return item;
+        }
+        winrt::com_ptr<IShellItem> parent;
+        if (FAILED(item->GetParent(parent.put())) || !parent) return nullptr;
+        const auto folder = shell::GetDisplayName(parent.get(), SIGDN_DESKTOPABSOLUTEPARSING);
+        if (!folder || !IsAppsFolderParsingName(*folder)) return nullptr;
         return item;
     }
 

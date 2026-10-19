@@ -59,8 +59,13 @@ inline constexpr std::wstring_view kAppsFolderParsingPrefix = L"::{4234D49B-0245
 // The child name inside the Apps folder ("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App") when
 // `absoluteParsingName` (SIGDN_DESKTOPABSOLUTEPARSING) names an Apps-folder child, either as
 // "::{4234D49B-...}\<name>" or "shell:AppsFolder\<name>" (prefixes ignore case). nullopt for any
-// other item or an empty child name.
+// other item or an empty child name. Note: an item rebuilt from a shortcut's ID list can report only
+// its child name; check its parent with IsAppsFolderParsingName instead.
 [[nodiscard]] std::optional<std::wstring> AppsFolderChildName(std::wstring_view absoluteParsingName);
+
+// True when `absoluteParsingName` names the Apps folder itself ("::{4234D49B-...}" or
+// "shell:AppsFolder", ignoring case and a trailing backslash).
+[[nodiscard]] bool IsAppsFolderParsingName(std::wstring_view absoluteParsingName) noexcept;
 
 // Applies the catalog filters and builds the ApplicationInfo (with its id, see MakeApplicationId):
 //  * uninstallers (by name or target executable)                                 -> SkipUninstaller
