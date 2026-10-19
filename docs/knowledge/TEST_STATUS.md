@@ -590,3 +590,41 @@ pending; S-012 still describes the only delivered alpha.
   - The workflow uploaded its usual review artifacts (`unit-test-results` and the
     `AetherShell-win-x64-alpha` manual-install package). These are CI artifacts, not a release.
 - **Not covered by CI:** integration suites, the real desktop, Windows 10 and Explorer restart.
+
+### S-021 — real-desktop replacement checks: no auto-hide and Explorer restart (Claude, 2026-10-18, 21:21–21:23 CEST)
+- **Authorization:** the owner allowed the Explorer restart test in the session ("tu peux le faire") and
+  had turned taskbar auto-hide off so that case could be tested. The owner also dropped Windows 10
+  qualification: no Windows 10 machine is available.
+- **Setup:** the same method as S-016.
+  - Release /WX `AetherShellApp.exe` and `AetherShell.exe` from `build/claude-verify` (source `e29e83e`,
+    unchanged since) were copied into one temporary folder.
+  - A temporary `--data-dir` held only `replaceWindowsTaskbar=true` and `taskbarPinsImported=true`.
+  - The installed `0.1.0-alpha.1` was closed through the instance channel and restarted afterwards.
+  - State was read through Windows APIs only; no screenshots.
+- **A first attempt stopped early because of a test-script error.** A PowerShell function returned its
+  log line together with the process. The tool's process cleanup then ended the app.
+  - Even so, Windows showed the taskbar again on its own. Auto-hide was back off and the work area was
+    restored; the baseline had already been removed.
+  - The script was fixed and rerun from a fresh temporary folder.
+- **Phase A, taskbar without auto-hide:**
+  - **Before:** auto-hide off, taskbar visible, work area height 672 (logical pixels of the script
+    process).
+  - **Running:** about 4 s after start, the taskbar was hidden, the helper ran, the baseline was saved,
+    and the Top Bar and Dock reserved their areas (work area 0,42–1280,606).
+    - While replacement is active the taskbar's auto-hide flag reads on: replacement uses it to hide
+      the taskbar.
+  - **After `--quit`:** the app and helper exited and the baseline was removed. Auto-hide was off again,
+    the taskbar visible, and the work area restored exactly.
+- **Phase B, Explorer restart during replacement:**
+  - `explorer.exe` was force-stopped; Windows restarted it by itself within 1 s.
+  - The new Explorer showed its taskbar for about 5–7 s; the app and helper stayed alive. The log shows
+    "Explorer taskbar was (re)created", then "Reconnecting taskbar replacement...".
+  - About 8 s after the restart, the taskbar was hidden again and the reservation re-applied (work area
+    0,42–1280,606). It stayed that way until 30 s.
+  - **After `--quit`:** everything was restored as in phase A, and the safety `--restore-taskbar` step
+    was not needed.
+- **Limits:**
+  - Windows 11 only, one monitor.
+  - The Explorer restart leaves the native taskbar visible for several seconds before it is re-hidden.
+  - File Explorer windows that were open closed with the Explorer process (expected for an Explorer
+    restart).
