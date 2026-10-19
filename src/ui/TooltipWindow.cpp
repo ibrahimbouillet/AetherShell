@@ -11,9 +11,7 @@
 
 namespace aether::ui {
 namespace {
-constexpr float kPaddingX = 10.0f;
-constexpr float kPaddingY = 5.0f;
-constexpr float kShadowMargin = 10.0f;  // room for the soft shadow around the bubble
+constexpr float kSlide = 4.0f;          // the bubble slides this far towards its anchor while appearing
 constexpr float kGap = 8.0f;            // distance from the anchor
 constexpr float kMaxTextWidth = 320.0f;
 }  // namespace
@@ -38,24 +36,39 @@ void TooltipWindow::SetTheme(const graphics::DesignTokens& tokens, const graphic
     Invalidate();
 }
 
+float TooltipWindow::MarginDip() const noexcept {
+    // Room for the shadow around the bubble plus the slide distance.
+    return std::ceil(graphics::ShadowExtent(tokens_.elevation.tooltip)) + kSlide;
+}
+
+bool TooltipWindow::IsWarm(double now) const noexcept {
+    if (IsShown() && !hiding_) return true;
+    return hiddenAt_ >= 0.0 && now >= hiddenAt_ && now - hiddenAt_ < tokens_.tooltipWarmWindow;
+}
+
 void TooltipWindow::ShowFor(const std::wstring& text, const RECT& anchorPx, TooltipPlacement placement) {
     if (!Handle() || text.empty()) return;
+    const double now = graphics::FrameScheduler::Now();
+    const bool showing = IsShown() && !hiding_;
+    const bool warm = IsWarm(now);
     textValue_ = text;
+    placement_ = placement;
     hiding_ = false;
 
     const POINT anchorCenter{(anchorPx.left + anchorPx.right) / 2, (anchorPx.top + anchorPx.bottom) / 2};
     const auto monitor = platform::MonitorForWindow(Handle());
     const UINT dpi = platform::DpiForPoint(anchorCenter);
     const float scale = static_cast<float>(dpi) / 96.0f;
+    const float margin = MarginDip();
 
     graphics::TextStyle style;
-    style.size = tokens_.fontSizeSmall;
+    style.size = tokens_.type.caption;
     const auto measured = text_.Measure(text, style, kMaxTextWidth);
-    const float widthDip = std::ceil(std::min(measured.width, kMaxTextWidth)) + 2 * kPaddingX + 2 * kShadowMargin;
-    const float heightDip = std::ceil(measured.height) + 2 * kPaddingY + 2 * kShadowMargin;
+    const float widthDip = std::ceil(std::min(measured.width, kMaxTextWidth)) + 2 * tokens_.tooltipPaddingX + 2 * margin;
+    const float heightDip = std::ceil(measured.height) + 2 * tokens_.tooltipPaddingY + 2 * margin;
     const int width = static_cast<int>(std::lround(widthDip * scale));
     const int height = static_cast<int>(std::lround(heightDip * scale));
-    const int gap = static_cast<int>(std::lround((kGap - kShadowMargin) * scale));
+    const int gap = static_cast<int>(std::lround((kGap - margin) * scale));
 
     RECT bounds{};
     bounds.left = anchorCenter.x - width / 2;
@@ -69,8 +82,19 @@ void TooltipWindow::ShowFor(const std::wstring& text, const RECT& anchorPx, Tool
     bounds.bottom = bounds.top + height;
     SetBoundsPx(bounds);
 
-    const double now = graphics::FrameScheduler::Now();
-    opacity_.AnimateTo(1.0f, now, motion_.Scale(tokens_.durationFast));
+    const bool instant = !motion_.AllowsMovement() || tokens_.mode == graphics::ThemeMode::HighContrast;
+    if (instant) {
+        opacity_.SnapTo(1.0f);
+        slide_.SnapTo(0.0f);
+    } else if (showing || warm) {
+        // Switching between items: no slide, a short fade only when it was hidden.
+        slide_.SnapTo(0.0f);
+        opacity_.AnimateTo(1.0f, now, motion_.Scale(tokens_.durationMicro), tokens_.curves.decelerate);
+    } else {
+        if (opacity_.Value(now) <= 0.0f) slide_.SnapTo(kSlide);
+        slide_.AnimateTo(0.0f, now, motion_.Scale(tokens_.durationFast), tokens_.curves.decelerate);
+        opacity_.AnimateTo(1.0f, now, motion_.Scale(tokens_.durationFast), tokens_.curves.decelerate);
+    }
     Invalidate();
     RequestAnimationFrame();
     if (!IsShown()) Show(false);
@@ -78,14 +102,21 @@ void TooltipWindow::ShowFor(const std::wstring& text, const RECT& anchorPx, Tool
 
 void TooltipWindow::HideTooltip() {
     if (!IsShown() || hiding_) return;
-    hiding_ = true;
     const double now = graphics::FrameScheduler::Now();
-    opacity_.AnimateTo(0.0f, now, motion_.Scale(tokens_.durationFast));
+    hiddenAt_ = now;
+    if (!motion_.AllowsMovement() || tokens_.mode == graphics::ThemeMode::HighContrast) {
+        opacity_.SnapTo(0.0f);
+        slide_.SnapTo(0.0f);
+        Hide();
+        return;
+    }
+    hiding_ = true;
+    opacity_.AnimateTo(0.0f, now, motion_.Scale(tokens_.durationFast), tokens_.curves.accelerate);
     RequestAnimationFrame();
 }
 
 bool TooltipWindow::OnAnimate(double now) {
-    const bool animating = opacity_.IsAnimating(now);
+    const bool animating = IsAnimating(now);
     if (!animating && hiding_ && opacity_.Value(now) <= 0.0f) {
         hiding_ = false;
         Hide();
@@ -96,27 +127,29 @@ bool TooltipWindow::OnAnimate(double now) {
 void TooltipWindow::OnRender(const RenderContext& context) {
     const float alpha = opacity_.Value(context.now);
     if (alpha <= 0.001f || textValue_.empty()) return;
-    winrt::com_ptr<ID2D1Layer> layer;
-    const D2D1_RECT_F bubble{kShadowMargin, kShadowMargin, context.widthDip - kShadowMargin,
-                             context.heightDip - kShadowMargin};
+    const float margin = MarginDip();
+    const float slide = slide_.Value(context.now);
+    const float dy = placement_ == TooltipPlacement::Above ? -slide : slide;
+    const D2D1_RECT_F bubble{margin, margin + dy, context.widthDip - margin, context.heightDip - margin + dy};
     context.d2d->PushLayer(D2D1::LayerParameters1(D2D1::InfiniteRect(), nullptr, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
                                                   D2D1::IdentityMatrix(), alpha, nullptr,
                                                   D2D1_LAYER_OPTIONS1_NONE),
                            nullptr);
     graphics::GlassStyle glass;
-    glass.cornerRadius = tokens_.tooltipCornerRadius;
+    glass.cornerRadius = tokens_.radii.tooltip;
     glass.opacity = 1.0f;
     glass.backdropBlur = false;
+    glass.elevation = graphics::Elevation::Tooltip;
     graphics::PaintGlassPanel(context.d2d, bubble, tokens_, glass);
 
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     context.d2d->CreateSolidColorBrush(tokens_.textPrimary.ToD2D(), brush.put());
     graphics::TextStyle style;
-    style.size = tokens_.fontSizeSmall;
+    style.size = tokens_.type.caption;
     style.alignment = DWRITE_TEXT_ALIGNMENT_CENTER;
     text_.Draw(context.d2d, textValue_,
-               D2D1::RectF(bubble.left + kPaddingX, bubble.top + kPaddingY, bubble.right - kPaddingX,
-                           bubble.bottom - kPaddingY),
+               D2D1::RectF(bubble.left + tokens_.tooltipPaddingX, bubble.top + tokens_.tooltipPaddingY,
+                           bubble.right - tokens_.tooltipPaddingX, bubble.bottom - tokens_.tooltipPaddingY),
                style, brush.get());
     context.d2d->PopLayer();
 }
