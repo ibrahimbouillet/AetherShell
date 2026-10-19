@@ -20,6 +20,7 @@
 #include "graphics/CompositionSurface.h"
 #include "graphics/FrameScheduler.h"
 #include "graphics/GraphicsDevice.h"
+#include "graphics/Transition.h"
 
 #include <windows.h>
 
@@ -68,12 +69,24 @@ public:
     void SetBoundsPx(const RECT& boundsPx);
     // Rectangles in window-relative pixels that accept input; empty means the whole window.
     void SetInputRegionPx(std::span<const RECT> rects);
-    // Places the blurred backdrop (when available) under the panel shape, in DIPs.
-    void SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur);
+    // Places the blurred backdrop (when available) under the panel shape, in DIPs. ackdropOpacity is
+    // the blurred desktop's opacity under the tint (DesignTokens::glass.backdropOpacity).
+    void SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity = 1.0f);
     [[nodiscard]] bool BackdropBlurActive() const noexcept;
 
+    // Show() and Hide() act at once and cancel a running transition.
     void Show(bool activate = false);
     void Hide();
+
+    // Shows the window and plays 	ransition (usually graphics::MakeEnterTransition) on the compositor.
+    // An instant transition (duration 0: reduced motion, high contrast) shows the resting state at once.
+    void ShowAnimated(const graphics::Transition& transition, bool activate = false);
+    // Plays 	ransition (usually graphics::MakeExitTransition) and hides the window when it completes;
+    // IsShown() stays true until then. An instant transition, or a compositor failure, hides at once.
+    // ShowAnimated, Show or Hide during the exit cancels it.
+    void HideAnimated(const graphics::Transition& transition);
+    [[nodiscard]] bool IsTransitioning() const noexcept { return surface_.IsTransitioning(); }
+    [[nodiscard]] bool IsHiding() const noexcept { return hiding_; }
 
     [[nodiscard]] Result<void> AnimateEntrance(std::chrono::milliseconds duration, float offsetDip = 8.0f);
     [[nodiscard]] Result<void> AnimateExit(std::chrono::milliseconds duration, float offsetDip = -8.0f);
@@ -134,7 +147,9 @@ private:
     std::vector<RECT> inputRegion_;
     D2D1_RECT_F backdropPanelDip_{};
     float backdropRadiusDip_ = 0.0f;
+    float backdropOpacity_ = 1.0f;
     bool backdropBlurRequested_ = false;
+    bool hiding_ = false;
     bool shown_ = false;
     bool trackingLeave_ = false;
     bool releasingCapture_ = false;

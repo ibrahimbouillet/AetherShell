@@ -80,7 +80,7 @@ Result<void> SurfaceWindow::Create(const SurfaceWindowOptions& options, const RE
     }
     deviceReplaced_ = device_.DeviceReplaced.Connect([this] {
         OnDeviceReplaced();
-        if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true);
+        if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_);
         Invalidate();
     });
     OnCreated();
@@ -97,6 +97,7 @@ void SurfaceWindow::Destroy() noexcept {
     }
     surface_.Detach();
     shown_ = false;
+    hiding_ = false;
 }
 
 void SurfaceWindow::SetBoundsPx(const RECT& boundsPx) {
@@ -137,13 +138,14 @@ void SurfaceWindow::ApplyInputRegion() {
     if (::SetWindowRgn(hwnd_, combined.Get(), TRUE)) (void)combined.Release();
 }
 
-void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur) {
+void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity) {
     backdropPanelDip_ = panelDip;
     backdropRadiusDip_ = cornerRadiusDip;
+    backdropOpacity_ = backdropOpacity;
     backdropBlurRequested_ = blur;
     const D2D1_RECT_F panelPx{ToPx(panelDip.left), ToPx(panelDip.top), ToPx(panelDip.right), ToPx(panelDip.bottom)};
     surface_.SetBackdrop(blur ? graphics::BackdropKind::HostBlur : graphics::BackdropKind::None, panelPx,
-                         ToPx(cornerRadiusDip));
+                         ToPx(cornerRadiusDip), backdropOpacity);
 }
 
 bool SurfaceWindow::BackdropBlurActive() const noexcept {
@@ -152,6 +154,10 @@ bool SurfaceWindow::BackdropBlurActive() const noexcept {
 
 void SurfaceWindow::Show(bool activate) {
     if (!hwnd_) return;
+    if (hiding_) {
+        hiding_ = false;
+        surface_.ResetTransition();
+    }
     if (renderPending_) Render(graphics::FrameScheduler::Now());  // avoid showing an empty frame
     ::ShowWindow(hwnd_, activate ? SW_SHOW : SW_SHOWNOACTIVATE);
     if (options_.topmost) {
@@ -162,8 +168,48 @@ void SurfaceWindow::Show(bool activate) {
 
 void SurfaceWindow::Hide() {
     if (!hwnd_) return;
+    hiding_ = false;
     ::ShowWindow(hwnd_, SW_HIDE);
     shown_ = false;
+    // The next Show starts from the resting state, whatever transition ran last.
+    surface_.ResetTransition();
+}
+
+void SurfaceWindow::ShowAnimated(const graphics::Transition& transition, bool activate) {
+    if (!hwnd_) return;
+    hiding_ = false;
+    // Apply the start state before the window becomes visible, so the first composed frame is not
+    // the resting state.
+    graphics::Transition start = transition;
+    start.opacityTo = transition.opacityFrom;
+    start.offsetToX = transition.offsetFromX;
+    start.offsetToY = transition.offsetFromY;
+    start.scaleTo = transition.scaleFrom;
+    start.duration = 0.0;
+    if (!transition.IsInstant()) (void)surface_.Animate(start, ToPx(1.0f));
+    Show(activate);
+    if (auto played = surface_.Animate(transition, ToPx(1.0f)); !played) {
+        AETHER_LOG_WARN("ui", "show transition failed: {}", played.error().Describe());
+        surface_.ResetTransition();
+    }
+}
+
+void SurfaceWindow::HideAnimated(const graphics::Transition& transition) {
+    if (!hwnd_) return;
+    if (!shown_ || transition.IsInstant()) {
+        Hide();
+        return;
+    }
+    hiding_ = true;
+    auto played = surface_.Animate(transition, ToPx(1.0f), [this] {
+        // CompositionSurface drops the completion of a superseded transition; hiding_ also covers a
+        // Show() that reset the visual meanwhile.
+        if (hiding_) Hide();
+    });
+    if (!played) {
+        AETHER_LOG_WARN("ui", "hide transition failed: {}", played.error().Describe());
+        Hide();
+    }
 }
 
 void SurfaceWindow::Invalidate() {
@@ -255,7 +301,7 @@ LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
         case WM_DPICHANGED: {
             dpi_ = HIWORD(wParam);
             OnDpiChanged(dpi_, *reinterpret_cast<const RECT*>(lParam));
-            if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true);
+            if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_);
             Invalidate();
             return 0;
         }

@@ -24,7 +24,9 @@ namespace aether::graphics {
 
 using Seconds = double;
 
-enum class Easing { Linear, OutCubic, InOutCubic, OutQuint, OutBack };
+// Standard, Decelerate and Accelerate are the design-language curves (CurveTokens): (0.2,0,0,1),
+// (0,0,0,1) and (0.3,0,1,1).
+enum class Easing { Linear, OutCubic, InOutCubic, OutQuint, OutBack, Standard, Decelerate, Accelerate };
 
 [[nodiscard]] float Ease(Easing easing, float t) noexcept;
 
@@ -49,6 +51,8 @@ public:
     void SnapTo(float value) noexcept;
     // Starts animating from the value at `now` towards `target`. A zero or negative duration snaps.
     void AnimateTo(float target, Seconds now, Seconds duration, Easing easing = Easing::OutCubic) noexcept;
+    // The same with a cubic-bezier timing curve (for example a CurveTokens entry).
+    void AnimateTo(float target, Seconds now, Seconds duration, const CubicBezier& curve) noexcept;
 
     [[nodiscard]] float Value(Seconds now) const noexcept;
     [[nodiscard]] float Target() const noexcept { return to_; }
@@ -60,6 +64,8 @@ private:
     Seconds start_ = 0.0;
     Seconds duration_ = 0.0;
     Easing easing_ = Easing::Linear;
+    CubicBezier curve_{};
+    bool useCurve_ = false;
 };
 
 class Spring {
@@ -120,6 +126,9 @@ struct MotionPolicy {
         if (!std::isfinite(durationScale)) return 1.0f;
         return durationScale < 0.5f ? 0.5f : durationScale > 1.5f ? 1.5f : durationScale;
     }
+    // False under reduced motion: decorative movement (slides, bounces, scale) is skipped and state
+    // changes are instant.
+    [[nodiscard]] bool AllowsMovement() const noexcept { return !reduced; }
     [[nodiscard]] Seconds Scale(Seconds duration) const noexcept {
         return reduced ? 0.0 : duration * static_cast<double>(EffectiveScale());
     }

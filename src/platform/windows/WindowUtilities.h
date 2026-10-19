@@ -30,6 +30,10 @@ void ExcludeFromPeek(HWND hwnd) noexcept;
 // System colour mode: true when apps should use the dark theme (UISettings-equivalent registry value
 // AppsUseLightTheme under Personalize; defaults to light when unavailable).
 [[nodiscard]] bool SystemPrefersDarkApps() noexcept;
+// Windows (taskbar and Start) colour mode: true when the shell should use the dark theme. Reads the
+// undocumented SystemUsesLightTheme value of the same Personalize key (cosmetic only); when it is absent,
+// falls back to SystemPrefersDarkApps().
+[[nodiscard]] bool SystemPrefersDarkShell() noexcept;
 // "Transparency effects" setting (EnableTransparency); defaults to enabled.
 [[nodiscard]] bool SystemTransparencyEnabled() noexcept;
 // High-contrast theme active.

@@ -27,40 +27,117 @@ Result<void> CompositionSurface::AnimateEntrance(std::chrono::milliseconds durat
     if (!root_ || !device_) return MakeError(ErrorCode::InvalidState, "surface not attached");
     if (duration.count() < 0 || duration > std::chrono::seconds(10) || !std::isfinite(offsetPx))
         return MakeError(ErrorCode::InvalidArgument, "invalid entrance animation");
-    try {
-        root_.StopAnimation(L"Opacity"); root_.StopAnimation(L"Offset");
-        root_.Opacity(1.0f); root_.Offset(float3{0, 0, 0});
-        if (duration.count() == 0) return Ok();
-        const auto& compositor = device_->Compositor();
-        const auto easing = compositor.CreateCubicBezierEasingFunction(float2{0.2f, 0.8f}, float2{0.2f, 1.0f});
-        auto fade = compositor.CreateScalarKeyFrameAnimation();
-        fade.InsertKeyFrame(0, 0); fade.InsertKeyFrame(1, 1, easing); fade.Duration(duration);
-        auto rise = compositor.CreateVector3KeyFrameAnimation();
-        rise.InsertKeyFrame(0, float3{0, offsetPx, 0}); rise.InsertKeyFrame(1, float3{0, 0, 0}, easing); rise.Duration(duration);
-        root_.StartAnimation(L"Opacity", fade); root_.StartAnimation(L"Offset", rise);
-        return Ok();
-    } catch (...) { return MakeError(ErrorCode::Platform, "entrance animation unavailable"); }
+    Transition transition;
+    transition.opacityFrom = duration.count() == 0 ? 1.0f : 0.0f;
+    transition.offsetFromY = duration.count() == 0 ? 0.0f : offsetPx;
+    transition.duration = static_cast<Seconds>(duration.count()) / 1000.0;
+    transition.curve = CurveTokens{}.decelerate;
+    return Animate(transition, 1.0f);
 }
 
 Result<void> CompositionSurface::AnimateExit(std::chrono::milliseconds duration, float offsetPx) {
     if (!root_ || !device_) return MakeError(ErrorCode::InvalidState, "surface not attached");
     if (duration.count() < 0 || duration > std::chrono::seconds(10) || !std::isfinite(offsetPx))
         return MakeError(ErrorCode::InvalidArgument, "invalid exit animation");
-    try {
-        root_.StopAnimation(L"Opacity"); root_.StopAnimation(L"Offset");
-        root_.Opacity(0.0f); root_.Offset(float3{0, offsetPx, 0});
-        if (duration.count() == 0) return Ok();
-        const auto& compositor = device_->Compositor();
-        const auto easing = compositor.CreateCubicBezierEasingFunction(float2{0.4f, 0.0f}, float2{1.0f, 1.0f});
-        auto fade = compositor.CreateScalarKeyFrameAnimation();
-        fade.InsertKeyFrame(0, 1); fade.InsertKeyFrame(1, 0, easing); fade.Duration(duration);
-        auto rise = compositor.CreateVector3KeyFrameAnimation();
-        rise.InsertKeyFrame(0, float3{0, 0, 0}); rise.InsertKeyFrame(1, float3{0, offsetPx, 0}, easing); rise.Duration(duration);
-        root_.StartAnimation(L"Opacity", fade); root_.StartAnimation(L"Offset", rise);
-        return Ok();
-    } catch (...) { return MakeError(ErrorCode::Platform, "exit animation unavailable"); }
+    Transition transition;
+    transition.opacityTo = 0.0f;
+    transition.offsetToY = offsetPx;
+    transition.duration = static_cast<Seconds>(duration.count()) / 1000.0;
+    transition.curve = CurveTokens{}.accelerate;
+    return Animate(transition, 1.0f);
 }
 
+Result<void> CompositionSurface::Animate(const Transition& transition, float pxPerDip, std::function<void()> completed) {
+    if (!root_ || !device_) return MakeError(ErrorCode::InvalidState, "surface not attached");
+    const float values[] = {transition.opacityFrom, transition.opacityTo, transition.offsetFromX, transition.offsetFromY,
+                            transition.offsetToX,   transition.offsetToY,   transition.scaleFrom,   transition.scaleTo,
+                            transition.centerX,     transition.centerY,     pxPerDip};
+    for (const float value : values) {
+        if (!std::isfinite(value)) return MakeError(ErrorCode::InvalidArgument, "invalid transition");
+    }
+    if (pxPerDip <= 0.0f || transition.scaleFrom <= 0.0f || transition.scaleTo <= 0.0f)
+        return MakeError(ErrorCode::InvalidArgument, "invalid transition");
+    const auto clampOpacity = [](float value) { return std::clamp(value, 0.0f, 1.0f); };
+    const float3 offsetFrom{transition.offsetFromX * pxPerDip, transition.offsetFromY * pxPerDip, 0.0f};
+    const float3 offsetTo{transition.offsetToX * pxPerDip, transition.offsetToY * pxPerDip, 0.0f};
+    const float3 scaleFrom{transition.scaleFrom, transition.scaleFrom, 1.0f};
+    const float3 scaleTo{transition.scaleTo, transition.scaleTo, 1.0f};
+    const std::uint64_t generation = ++transitionGeneration_;
+    try {
+        batchCompleted_.revoke();  // a superseded transition never reports completion
+        transitionPending_ = false;
+        root_.StopAnimation(L"Opacity");
+        root_.StopAnimation(L"Offset");
+        root_.StopAnimation(L"Scale");
+        root_.CenterPoint(float3{transition.centerX * pxPerDip, transition.centerY * pxPerDip, 0.0f});
+        if (transition.IsInstant()) {
+            root_.Opacity(clampOpacity(transition.opacityTo));
+            root_.Offset(offsetTo);
+            root_.Scale(scaleTo);
+        } else {
+            const auto& compositor = device_->Compositor();
+            const auto& curve = transition.curve;
+            const auto easing = compositor.CreateCubicBezierEasingFunction(
+                float2{std::clamp(curve.x1, 0.0f, 1.0f), curve.y1}, float2{std::clamp(curve.x2, 0.0f, 1.0f), curve.y2});
+            const auto duration = std::chrono::duration_cast<winrt::Windows::Foundation::TimeSpan>(
+                std::chrono::duration<double>(transition.duration));
+            auto batch = compositor.CreateScopedBatch(wuc::CompositionBatchTypes::Animation);
+            auto fade = compositor.CreateScalarKeyFrameAnimation();
+            fade.InsertKeyFrame(0.0f, clampOpacity(transition.opacityFrom));
+            fade.InsertKeyFrame(1.0f, clampOpacity(transition.opacityTo), easing);
+            fade.Duration(duration);
+            auto move = compositor.CreateVector3KeyFrameAnimation();
+            move.InsertKeyFrame(0.0f, offsetFrom);
+            move.InsertKeyFrame(1.0f, offsetTo, easing);
+            move.Duration(duration);
+            auto scale = compositor.CreateVector3KeyFrameAnimation();
+            scale.InsertKeyFrame(0.0f, scaleFrom);
+            scale.InsertKeyFrame(1.0f, scaleTo, easing);
+            scale.Duration(duration);
+            // Set the end state first, so it stays when the animations finish or are stopped.
+            root_.Opacity(clampOpacity(transition.opacityTo));
+            root_.Offset(offsetTo);
+            root_.Scale(scaleTo);
+            root_.StartAnimation(L"Opacity", fade);
+            root_.StartAnimation(L"Offset", move);
+            root_.StartAnimation(L"Scale", scale);
+            batch.End();
+            transitionPending_ = true;
+            batchCompleted_ = batch.Completed(winrt::auto_revoke,
+                [this, generation, done = std::move(completed)](const auto&, const auto&) {
+                    if (generation != transitionGeneration_) return;
+                    transitionPending_ = false;
+                    batchCompleted_.revoke();
+                    if (done) done();
+                });
+            return Ok();
+        }
+    } catch (const winrt::hresult_error& error) {
+        ResetTransition();
+        return platform::ErrorFromHResult(error.code(), "window transition");
+    } catch (...) {
+        ResetTransition();
+        return MakeError(ErrorCode::Platform, "window transition unavailable");
+    }
+    if (completed) completed();
+    return Ok();
+}
+
+void CompositionSurface::ResetTransition() noexcept {
+    ++transitionGeneration_;
+    transitionPending_ = false;
+    try {
+        batchCompleted_.revoke();
+        if (!root_) return;
+        root_.StopAnimation(L"Opacity");
+        root_.StopAnimation(L"Offset");
+        root_.StopAnimation(L"Scale");
+        root_.Opacity(1.0f);
+        root_.Offset(float3{0, 0, 0});
+        root_.Scale(float3{1, 1, 1});
+    } catch (...) {
+    }
+}
 Result<void> CompositionSurface::Attach(GraphicsDevice& device, HWND hwnd) {
     Detach();
     try {
@@ -101,6 +178,12 @@ Result<void> CompositionSurface::Attach(GraphicsDevice& device, HWND hwnd) {
 }
 
 void CompositionSurface::Detach() noexcept {
+    ++transitionGeneration_;
+    transitionPending_ = false;
+    try {
+        batchCompleted_.revoke();
+    } catch (...) {
+    }
     try {
         if (target_) target_.Root(nullptr);
     } catch (...) {
@@ -135,7 +218,8 @@ Result<void> CompositionSurface::Resize(int widthPx, int heightPx) {
     }
 }
 
-BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx) {
+BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx,
+                                             float opacity) {
     if (!device_ || !backdrop_) return BackdropKind::None;
     if (kind == BackdropKind::HostBlur && !device_->Capabilities().hostBackdrop) kind = BackdropKind::None;
     try {
@@ -156,9 +240,9 @@ BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_
             const float height = std::max(0.0f, panelPx.bottom - panelPx.top);
             backdrop_.Offset(float3{panelPx.left, panelPx.top, 0.0f});
             backdrop_.Size(float2{width, height});
-            // Mix the frosted host image with the actual desktop behind the transparent HWND.
-            // A fully opaque host brush can flatten wallpaper detail into a solid-looking slab.
-            backdrop_.Opacity(0.72f);
+            // The design tokens default to a fully opaque frosted layer (glass.backdropOpacity = 1): a
+            // partly transparent one let the sharp desktop show through and ghost under the blur.
+            backdrop_.Opacity(std::isfinite(opacity) ? std::clamp(opacity, 0.0f, 1.0f) : 1.0f);
             clipGeometry_.Size(float2{width, height});
             clipGeometry_.CornerRadius(float2{cornerRadiusPx, cornerRadiusPx});
             backdrop_.IsVisible(width > 0.0f && height > 0.0f);
