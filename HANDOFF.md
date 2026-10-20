@@ -27,12 +27,15 @@ The published `0.1.0-alpha.1` does not include this work.
 - Merge parents preserve the foundation `d5ccbd6` and all three recovered streams:
   lifecycle `5cf6e72`, applications `1ef9d72`, visual core `4b7c8a8`. Five dirty/untracked visual
   files were copied into the candidate before fixes; their original Claude worktrees remain intact.
-- The linked integration worktree now has detached HEAD at `b87be0d`; **there is no pending merge**.
-  That is the source base for the follow-up corrections. A later **local-only documentation checkpoint
-  `6f63ef3`** records D25 and the test evidence; it was fast-forwarded into local `main`, without push.
-  Check current HEAD/status before resuming: subsequent source work remains in the linked integration
-  worktree until its local milestone commit. Use `git worktree list` to locate it. Its ignored
-  build/log/package outputs are local evidence; there is no pending merge.
+- Local `main` and the detached integration worktree contain source checkpoint **`9bec731`**, above the local-only
+  documentation checkpoint `6f63ef3`. The source checkpoint commits S-023 fullscreen/AppBar fixes,
+  S-024 icon balance, strict UIA diagnostics and two inspected synthetic images. Both local commits
+  were privacy-reviewed and fast-forwarded without push. Later documentation-only checkpoints may
+  follow; inspect HEAD. Remote `origin/main` remains b87be0d.
+- The integration worktree contains **two uncommitted S-025 files** listed below. Preserve them;
+  they are an unverified accessibility investigation, not part of the 9bec731 product checkpoint.
+  Use `git worktree list` to locate that worktree; there is no pending merge. Build/log/experimental
+  outputs are ignored local evidence. The ordinary `main` checkout has no pending source edits.
 - Windows CI [39505236903](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39505236903)
   for `b87be0d` **passed**, 10m33s, including Release build/unit gate and review package upload. This does not qualify the later fullscreen correction.
 - The final local package was rebuilt with embedded source revision **`b87be0d68961`**, then passed
@@ -147,17 +150,42 @@ The published `0.1.0-alpha.1` does not include this work.
   was relaxed; accessibility qualification is unresolved. Remote `origin/main` remains b87be0d;
   local commits are held under D25. No source or documentation was pushed after that instruction.
 
+### Accessibility investigation checkpoint — S-025, incomplete
+
+- Frozen uncommitted files in the integration worktree: `src/ui/accessibility/AccessibleSurface.cpp`
+  and `tests/integration/accessibility/AccessibleSurfaceTests.cpp`. The source permits the immutable
+  `get_ProviderOptions` capability getter after closure; model/property/action guards remain strict.
+  A fourth native case checks owner/MTA metadata before/after closure and stale-element rejection.
+- Focused Release `/WX` compilation passes. The new metadata case passes, but the existing MTA
+  client fails before any action, including a fresh process that excludes the experiment. This is
+  **not a verified Pane-fallback fix**. Final native gate after rebuilding without the experimental TU:
+  **3 pass / 1 fail**, 0.52 s; exact command/logs in S-025. No changes to this investigation were committed.
+- A bounded own-provider experiment confirmed synchronous-send rejection on a repeated disconnect,
+  but its repeated-call success expectation was inconclusive after wrapper invalidation. Early reply
+  did not establish a successful first cleanup. It was moved out of the default suite to ignored
+  `build/manual/AccessibleDisconnectTests.experimental.cpp`; negative logs remain in
+  `build/wf-codex-integrated/evidence/disconnect-experiment.log` and `accessibility-metadata*`.
+  A copy of the uncommitted patch is preserved in ignored `build/manual/accessibility-metadata-unverified.patch`.
+- Do not add sleeps/retries or relax Toolbar/count/invoke/stale-provider assertions. Next bounded
+  diagnostic: record numeric first-call teardown HRESULT/send flags before wrapper invalidation,
+  withholding reentrant provider exposure, and the first MTA failing stage plus own-instance provider
+  callback/thread results. Synchronous teardown and Pane fallback may be different defects. No broad
+  dispatcher/lifetime refactor or generic early-reply behavior has been implemented.
+- The build cache has compiled this investigation; rebuild the chosen source and exact Git revision
+  before preparing a package. The old b87be0d setup is historical and must not be presented as Alpha 2.
+
 ## NEXT SESSION START HERE
 
 1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify official origin,
    local `main` versus `origin/main`, status and all worktrees. The original integration merge is
    pushed at b87be0d; later D25/correction checkpoints are **local only**. Inspect the integration
-   worktree's pending S-023/S-024 source and experimental state before edits. Do not redo the merge
+   worktree's pending S-025 accessibility source and experimental state before edits. Do not redo the merge
    or discard preserved work. No push/tag/release is authorized while D25 remains active.
-2. Finish S-024: fullscreen correction passes 672-unit/123-native gates and the bounded S-023 desktop
+2. Continue S-025: fullscreen correction passes 672-unit/123-native gates and the bounded S-023 desktop
    restore/reflow test. Optical icon balance passes Release and own-window visual inspection; the
    light native UIA root-type failure recurred with diagnostics. Preserve all negative receipts and
-   investigate the teardown hazard in TEST_STATUS S-024. Local commits are allowed; **no push/tag/release (D25)**.
+   investigate the frozen S-025 files and the teardown hazard in TEST_STATUS. Local commits are allowed;
+   **no push/tag/release (D25)**. The optical/fullscreen milestone is saved locally as 9bec731.
    S-022 CI covers b87be0d only.
 3. Obtain the owner's explicit current-session authorization before changing the real desktop
    (ADR0009/T21; this was also required by the previous handoff). With an agreed recovery procedure,

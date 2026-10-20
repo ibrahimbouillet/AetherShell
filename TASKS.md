@@ -10,7 +10,8 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 The next public delivery is Alpha 2 after the owner's additional changes and explicit go-ahead.
 
 **2026-10-20 continuation: finish the interrupted batches (Codex, after Claude's quota stop).**
-`main` starts at `d5ccbd6`. Three saved streams are integrated in a verified candidate in a linked public
+Recovery started at `d5ccbd6`; the later source checkpoint is local-only `9bec731` (D25). Three saved
+streams are integrated in a candidate in a linked public
 worktree without changing their original worktrees: lifecycle `5cf6e72`, applications `1ef9d72`,
 visual core `4b7c8a8`, plus the visual stream's five preserved dirty/untracked files. Follow the
 current HANDOFF, not the older incomplete continuation instructions or an agent's completion claim.
@@ -22,6 +23,7 @@ current HANDOFF, not the older incomplete continuation instructions or an agent'
 | T24 — App/settings integration and delivery gate | FR-014–FR-025; NFR-002–NFR-010 | Appearance, guarded worker pin sync, shell actions, focus-guarded Windows voice typing (D24) and timed suspend/resume wired; policy/native regressions added. Release /WX, 669 unit/122 native/32 release-tool cases pass (S-022); setup payload/freshness privacy audit clear. Source b87be0d pushed; Windows CI passed for b87be0d; authorized desktop gate found the S-023 framed-fullscreen defect, now under correction. Flyout preference routing and manual desktop/voice qualification remain open. No V2 publication or install claimed. |
 | T25 — Framed fullscreen/native ownership follow-up | FR-001, FR-002, FR-011, FR-024; NFR-005–NFR-008 | Style-aware classifier and single suppression authority pass zero-warning Release /WX, 672 unit and 123 native cases (S-023). Corrected bounded desktop launch keeps both bars visible, reflows an own pre-maximized window and restores exact native state. Explorer pin confirmed. Subsequent Dock lifecycle gate has an intermittent UIA root-type failure followed by unchanged-binary pass; both retained. Running-icon pixels and reveal/resume remain open. |
 | T26 — Dock optical icon balance | FR-002; NFR-002, NFR-007, NFR-011 | Removed duplicate 18-percent drawing inset from fixed glyphs; layout/hit/hover geometry and Top Bar unchanged. Release /WX and own synthetic dark/light visual inspection pass (S-024); Dock31 unit/app2 native pass. Light native UIA root-type failure recurred (Pane 50033, own HWND); qualification remains open. Owner screenshot stays private. D25 prohibits push/tag/release. |
+| T27 — Native UIA discovery/teardown investigation | FR-015; NFR-004, NFR-008, NFR-010 | Local milestone9bec731 retains strict failure diagnostics. Two uncommitted integration-worktree files test immutable provider metadata after closure; new metadata regression passes, existing MTA case still fails before actions (S-025). Repeated-disconnect experiment is inconclusive and preserved outside the default suite. Measure first cleanup HRESULT and first failing provider/client stage before choosing a correction. No causal fix or release qualification claimed. |
 
 **T16 — V2 (0.2.0-alpha.1), owner-requested, in progress.** Replace the duplicated taskbar layout
 with a consented reversible visual replacement, protected Dock reservation and lower placement;

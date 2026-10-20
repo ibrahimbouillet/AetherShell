@@ -766,3 +766,34 @@ pending; S-012 still describes the only delivered alpha.
   will evaluate early reply versus deferred cleanup before choosing a production correction.
 - The earlier manual binary hash does not cover these drawing/diagnostic edits. D25 now holds all
   push/tag/release operations; local commits remain allowed. No new V2 release or installation.
+
+### S-025 — incomplete UIA metadata/disconnect investigation (2026-10-21)
+- Local-only checkpoints: `6f63ef3` records D25/evidence, `9bec731` commits the S-023/S-024
+  fullscreen/AppBar/optical work and strict diagnostics. Both were privacy-reviewed and fast-forwarded
+  into local `main`; `origin/main` remains b87be0d. No push/tag/release occurred after D25.
+- Frozen **uncommitted** integration files: `src/ui/accessibility/AccessibleSurface.cpp` and
+  `tests/integration/accessibility/AccessibleSurfaceTests.cpp`. Immutable provider capability metadata
+  now returns `S_OK` after closure; actual properties/actions still require a connected owner-thread
+  model. New regression checks owner/MTA metadata, null output, no model access and strict stale calls.
+- Focused Release `/W4 /WX` build passes. Final native command, after removing the experimental TU
+  from the normal source glob:
+  `ctest --test-dir build/wf-codex-integrated -R '^aether_accessibility_integration_tests$'
+  --timeout 30 --output-on-failure -j1` (with `--output-junit evidence/accessibility-metadata-final.xml`).
+  **3 pass / 1 fail**, 0.52 s CTest elapsed: new metadata, invalid-model and removed-reference cases
+  pass; the existing MTA client fails before invoke/toggle/focus events. Fresh filtered execution
+  excluding the experiment also failed. This is not a verified correction or proof of Pane causation.
+- Experimental raw-node comparison initially failed; metadata-only rerun still failed. In an active
+  synchronous send the repeated disconnect returned `0x8001010D`; after early reply it returned
+  `0x80040201`, as did later recovery. Because wrapper invalidation precedes the measured repeated
+  call, this cannot establish first-call cleanup success or justify a production early-reply change.
+  Assertions were not relaxed. The own never-shown HWND had bounded send/process cleanup and no
+  screenshot/input/settings mutation; the sender is joined before its receiver can be destroyed.
+- The inconclusive TU is preserved in ignored `build/manual/AccessibleDisconnectTests.experimental.cpp`,
+  outside the default suite. Full negative logs remain in ignored `evidence/disconnect-experiment.log`,
+  `accessibility-metadata.log`, `accessibility-metadata-without-experiment.log` and
+  `accessibility-metadata-final.{log,xml}`. The uncommitted metadata patch is also copied under ignored
+  `build/manual/`. No experimental source or raw log was committed.
+- Next: measure the first cleanup HRESULT/send flags with reentrant provider exposure withheld, and
+  the first failing MTA/client/provider stage using numeric/boolean-only diagnostics. Do not infer
+  a causal fix from constant metadata or a passing visual capture. Rebuild the chosen source/revision
+  before packaging; current cached investigation binaries and the historical b87 setup are not Alpha 2.
