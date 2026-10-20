@@ -22,7 +22,7 @@ struct TextStyle {
     DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     bool display = false;  // use the display family (titles, large text)
     bool ellipsis = true;  // trim with an ellipsis instead of wrapping
-    bool small = false;    // optical "Small" family for text of 12 DIPs or less (falls back like the others)
+    bool opticalSmall = false;  // optical "Small" family for text of 12 DIPs or less (falls back like the others)
     bool tabularFigures = false;  // equal-width digits ('tnum'), so changing numbers (clock) do not shift
 };
 

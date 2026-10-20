@@ -48,7 +48,7 @@ public:
     [[nodiscard]] Result<void> AnimateEntrance(std::chrono::milliseconds duration, float offsetPx);
     [[nodiscard]] Result<void> AnimateExit(std::chrono::milliseconds duration, float offsetPx);
 
-    // Plays 	ransition on the root visual (opacity, offset, scale around its center; DIPs times
+    // Plays `transition` on the root visual (opacity, offset, scale around its center; DIPs times
     // pxPerDip). Any running transition stops first and its completion is dropped. completed runs on
     // the UI thread when every keyframe animation has finished (CompositionScopedBatch.Completed, delivered
     // through the thread's DispatcherQueue), or synchronously before returning when the transition is

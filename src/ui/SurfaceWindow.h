@@ -69,7 +69,7 @@ public:
     void SetBoundsPx(const RECT& boundsPx);
     // Rectangles in window-relative pixels that accept input; empty means the whole window.
     void SetInputRegionPx(std::span<const RECT> rects);
-    // Places the blurred backdrop (when available) under the panel shape, in DIPs. ackdropOpacity is
+    // Places the blurred backdrop (when available) under the panel shape, in DIPs. `backdropOpacity` is
     // the blurred desktop's opacity under the tint (DesignTokens::glass.backdropOpacity).
     void SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity = 1.0f);
     [[nodiscard]] bool BackdropBlurActive() const noexcept;
@@ -78,10 +78,10 @@ public:
     void Show(bool activate = false);
     void Hide();
 
-    // Shows the window and plays 	ransition (usually graphics::MakeEnterTransition) on the compositor.
+    // Shows the window and plays `transition` (usually graphics::MakeEnterTransition) on the compositor.
     // An instant transition (duration 0: reduced motion, high contrast) shows the resting state at once.
     void ShowAnimated(const graphics::Transition& transition, bool activate = false);
-    // Plays 	ransition (usually graphics::MakeExitTransition) and hides the window when it completes;
+    // Plays `transition` (usually graphics::MakeExitTransition) and hides the window when it completes;
     // IsShown() stays true until then. An instant transition, or a compositor failure, hides at once.
     // ShowAnimated, Show or Hide during the exit cancels it.
     void HideAnimated(const graphics::Transition& transition);

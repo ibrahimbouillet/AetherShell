@@ -31,14 +31,14 @@ std::wstring TextCache::ResolveFamily(const std::wstring& preferred) const {
 
 IDWriteTextFormat* TextCache::Format(const TextStyle& style) {
     if (!factory_) return nullptr;
-    const bool small = style.small && !style.display;
+    const bool useSmall = style.opticalSmall && !style.display;
     const auto key = std::make_tuple(style.display, static_cast<int>(std::lround(style.size * 100.0f)),
                                      static_cast<int>(style.weight), static_cast<int>(style.alignment),
-                                     static_cast<int>(style.verticalAlignment), style.ellipsis, small);
+                                     static_cast<int>(style.verticalAlignment), style.ellipsis, useSmall);
     if (auto it = formats_.find(key); it != formats_.end()) return it->second.get();
 
     winrt::com_ptr<IDWriteTextFormat> format;
-    const std::wstring& family = style.display ? displayFamily_ : small ? smallFamily_ : textFamily_;
+    const std::wstring& family = style.display ? displayFamily_ : useSmall ? smallFamily_ : textFamily_;
     if (FAILED(factory_->CreateTextFormat(family.c_str(), nullptr, style.weight, DWRITE_FONT_STYLE_NORMAL,
                                           DWRITE_FONT_STRETCH_NORMAL, style.size, L"", format.put()))) {
         return nullptr;
