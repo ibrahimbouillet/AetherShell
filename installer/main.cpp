@@ -41,6 +41,7 @@ struct Options {
     std::string maintenanceToken;
 #ifdef AETHER_SETUP_TEST_MODE
     bool testNoRegistration=false;
+    std::filesystem::path testShortcutDir;  // replaces the Start menu folder for the restore shortcut
 #endif
 };
 Result<Options> Parse() {
@@ -60,6 +61,10 @@ Result<Options> Parse() {
         else if(value==L"--keep-user-data")options.removeData=false;
 #ifdef AETHER_SETUP_TEST_MODE
         else if(value==L"--test-no-registration")options.testNoRegistration=true;
+        else if(value==L"--test-shortcut-dir") {
+            if(++i>=values.size())return MakeError(ErrorCode::InvalidArgument,"test shortcut folder is missing");
+            options.testShortcutDir=values[i];
+        }
 #endif
         else if(value==L"--maintenance-parent" || value==L"--maintenance-token") {
             if(++i>=values.size())return MakeError(ErrorCode::InvalidArgument,"maintenance argument is missing");
@@ -75,9 +80,12 @@ Result<Options> Parse() {
     if(options.repair && options.uninstall)return MakeError(ErrorCode::InvalidArgument,"conflicting setup actions");
     if((options.maintenanceParent!=0)!=!options.maintenanceToken.empty() || (!options.maintenanceToken.empty() && !install::IsHealthToken(options.maintenanceToken)))return MakeError(ErrorCode::InvalidArgument,"invalid maintenance handoff");
 #ifdef AETHER_SETUP_TEST_MODE
+    if(!options.testShortcutDir.empty() && (!options.testNoRegistration || !options.testShortcutDir.is_absolute()))
+        return MakeError(ErrorCode::InvalidArgument,"test shortcut folder requires isolated absolute roots");
     if(options.testNoRegistration) {
         if(!options.root.is_absolute() || !options.data.is_absolute())return MakeError(ErrorCode::InvalidArgument,"test setup requires isolated absolute roots");
-        options.noLaunch=true; options.noShortcuts=true; options.startup=false;
+        // Only the restore shortcut can be created, and only in the isolated test folder.
+        options.noLaunch=true; options.startup=false; if(options.testShortcutDir.empty())options.noShortcuts=true;
     }
 #endif
     return options;
@@ -116,6 +124,7 @@ Result<bool> RelocateMaintenance(const Options& options) {
     if(options.silent)args.emplace_back(L"--silent");if(options.noLaunch)args.emplace_back(L"--no-launch");if(options.noShortcuts)args.emplace_back(L"--no-shortcuts");if(options.startup)args.emplace_back(L"--start-with-windows");if(options.repair)args.emplace_back(L"--repair");if(options.uninstall)args.emplace_back(L"--uninstall");if(options.removeData)args.emplace_back(L"--remove-user-data");if(options.allowDowngrade)args.emplace_back(L"--allow-downgrade");
 #ifdef AETHER_SETUP_TEST_MODE
     if(options.testNoRegistration)args.emplace_back(L"--test-no-registration");
+    if(!options.testShortcutDir.empty()){args.emplace_back(L"--test-shortcut-dir");args.emplace_back(options.testShortcutDir.native());}
 #endif
     std::wstring command=install::QuoteArgument(executable.native());for(const auto& arg:args)command+=L" "+install::QuoteArgument(arg);
     STARTUPINFOEXW startup{};startup.StartupInfo.cb=sizeof(startup);startup.lpAttributeList=attributes;PROCESS_INFORMATION process{};
@@ -151,6 +160,55 @@ public:
 };
 #endif
 
+// D23 safety: a per-user Start menu entry that turns taskbar replacement off and shows the Windows
+// taskbar again (`AetherShell.exe --restore-taskbar`; the launcher forwards the argument).
+constexpr wchar_t kRestoreShortcutName[]=L"Restore Windows taskbar.lnk";
+
+Result<std::filesystem::path> RestoreShortcutFolder(const Options& options) {
+#ifdef AETHER_SETUP_TEST_MODE
+    // Isolated tests never reach the user's Start menu; without a test folder nothing is created.
+    if(options.testNoRegistration) {
+        if(options.testShortcutDir.empty())return MakeError(ErrorCode::Unavailable,"no isolated shortcut folder");
+        return options.testShortcutDir;
+    }
+#else
+    (void)options;
+#endif
+    return platform::KnownFolder(FOLDERID_Programs);
+}
+
+// Creates (or refreshes) the shortcut, or removes it. A file of the same name that does not point at
+// this installation's launcher is never replaced or removed.
+Result<void> RestoreTaskbarShortcut(const install::InstallLayout& layout,const std::filesystem::path& folder,bool remove) try {
+    platform::ComApartment apartment;
+    if(!apartment.IsUsable())return MakeError(ErrorCode::Platform,"cannot initialize shortcut COM",apartment.Status());
+    const auto path=folder/kRestoreShortcutName;
+    winrt::com_ptr<IShellLinkW> link;
+    HRESULT hr=::CoCreateInstance(CLSID_ShellLink,nullptr,CLSCTX_INPROC_SERVER,IID_PPV_ARGS(link.put()));
+    if(FAILED(hr))return MakeError(ErrorCode::Platform,"cannot create shortcut interface",hr);
+    auto persist=link.try_as<IPersistFile>();
+    if(!persist)return MakeError(ErrorCode::Platform,"cannot create shortcut storage");
+    std::error_code error;
+    if(std::filesystem::exists(path,error)) {
+        if(FAILED(persist->Load(path.c_str(),STGM_READ)))return MakeError(ErrorCode::Io,"cannot inspect the restore shortcut");
+        std::array<wchar_t,32768> target{};
+        if(FAILED(link->GetPath(target.data(),static_cast<int>(target.size()),nullptr,SLGP_RAWPATH)))return MakeError(ErrorCode::Io,"cannot inspect the restore shortcut target");
+        if(::_wcsicmp(target.data(),layout.Launcher().c_str())!=0)return Ok();
+        if(remove) {
+            std::filesystem::remove(path,error);
+            return error?Result<void>(MakeError(ErrorCode::Io,"cannot remove the restore shortcut",error.value())):Ok();
+        }
+    } else if(error)return MakeError(ErrorCode::Io,"cannot inspect the Start menu folder",error.value());
+    else if(remove)return Ok();
+    hr=link->SetPath(layout.Launcher().c_str());
+    if(SUCCEEDED(hr))hr=link->SetArguments(L"--restore-taskbar");
+    if(SUCCEEDED(hr))hr=link->SetDescription(L"Aether Shell: stop replacing the Windows taskbar and show it again");
+    if(SUCCEEDED(hr))hr=link->SetWorkingDirectory(layout.root.c_str());
+    if(SUCCEEDED(hr))hr=link->SetIconLocation(layout.Launcher().c_str(),0);
+    if(SUCCEEDED(hr))hr=persist->Save(path.c_str(),TRUE);
+    return SUCCEEDED(hr)?Ok():Result<void>(MakeError(ErrorCode::Platform,"cannot save the restore shortcut",hr));
+} catch(...) { return MakeError(ErrorCode::Internal,"restore shortcut failed"); }
+
 Result<void> Perform(const Options& options,const CancellationToken& cancellation={}) {
     auto layout=install::InstallLayout::Create(options.root); if(!layout)return layout.error();
     auto separate=install::ValidateSeparateRoots(*layout,options.data);if(!separate)return separate;
@@ -185,6 +243,14 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
         Result<void> saved=store?Ok():Result<void>(store.error());
         if(store) {auto loaded=store.value()->Load();if(!loaded)saved=loaded.error();else {loaded->value.general.startWithWindows=true;saved=store.value()->Save(loaded->value,false);}}
         if(!saved) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;}
+    }
+    // The committed installation stays usable without the shortcut, so a failure is only logged.
+    if(result && (options.uninstall || !options.noShortcuts)) {
+        if(auto folder=RestoreShortcutFolder(options); folder) {
+            if(!RestoreTaskbarShortcut(*layout,*folder,options.uninstall))
+                taskbarNote+=options.uninstall?"The Start menu shortcut \"Restore Windows taskbar\" could not be removed.\n":
+                    "The Start menu shortcut \"Restore Windows taskbar\" could not be created; use Settings > Desktop instead.\n";
+        }
     }
     if(!options.uninstall || !options.removeData || !result) {
         (void)fs::EnsureDirectory(options.log.parent_path());
@@ -281,7 +347,7 @@ private:
         Add(L"STATIC",L"Aether Shell  "+std::wstring(build::kVersionW),0,28,24,600,32);
         if(page_==0) {
             Add(L"STATIC",L"A native Dock and Top Status Bar for Windows",0,28,82,600,34);
-            Add(L"STATIC",L"Runs alongside Explorer and your Windows taskbar.\r\nInstalls for your account without administrator rights.\r\n\r\nProgram files are installed in the folder you choose.\r\nShortcuts are optional; setup registers an Installed apps entry.\r\nStartup stays off unless you explicitly enable it.",0,28,132,600,180);
+            Add(L"STATIC",L"While Aether Shell runs, its Dock replaces the Windows taskbar.\r\nQuit Aether Shell, turn this off in Settings > Desktop, or open\r\n\"Restore Windows taskbar\" in the Start menu to get it back.\r\nInstalls for your account without administrator rights.\r\n\r\nProgram files are installed in the folder you choose.\r\nShortcuts are optional; setup registers an Installed apps entry.\r\nStartup stays off unless you explicitly enable it.",0,28,132,600,190);
             Add(L"STATIC",options_.uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":options_.repair?L"Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.":L"Installing over an existing version keeps your settings.\r\nAn older package is rejected unless you explicitly permit a downgrade.",0,28,335,600,75);
             Add(L"BUTTON",L"Next",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,1);
         } else if(page_==1) {
@@ -298,13 +364,13 @@ private:
                 ::SendMessageW(removeData_,BM_SETCHECK,options_.removeData?BST_CHECKED:BST_UNCHECKED,0);
                 Add(L"STATIC",L"Setup will close Aether Shell gracefully and remove its installed files,\r\nshortcuts, startup entry and Installed apps registration.\r\nOther applications and Windows settings are left alone.",0,28,245,600,90);
             } else {
-                shortcut_=Add(L"BUTTON",L"Create a Start Menu shortcut",WS_TABSTOP|BS_AUTOCHECKBOX,28,170,600,28,23);
+                shortcut_=Add(L"BUTTON",L"Create Start menu shortcuts (Aether Shell and Restore Windows taskbar)",WS_TABSTOP|BS_AUTOCHECKBOX,28,170,600,28,23);
                 ::SendMessageW(shortcut_,BM_SETCHECK,options_.noShortcuts?BST_UNCHECKED:BST_CHECKED,0);
                 desktop_=Add(L"BUTTON",L"Create a desktop shortcut",WS_TABSTOP|BS_AUTOCHECKBOX,28,210,600,28,25);
                 ::SendMessageW(desktop_,BM_SETCHECK,options_.desktopShortcut?BST_CHECKED:BST_UNCHECKED,0);
                 startup_=Add(L"BUTTON",L"Start Aether Shell when I sign in (optional)",WS_TABSTOP|BS_AUTOCHECKBOX,28,250,600,28,21);
                 ::SendMessageW(startup_,BM_SETCHECK,options_.startup?BST_CHECKED:BST_UNCHECKED,0);
-                Add(L"STATIC",L"Startup registration changes only after your explicit selection.\r\nWeather is off by default. Your Windows taskbar remains available.\r\nUnsigned binaries may trigger a Windows SmartScreen warning.",0,28,310,600,85);
+                Add(L"STATIC",L"Startup registration changes only after your explicit selection.\r\nWhile Aether Shell runs, its Dock replaces the Windows taskbar; you can\r\nturn this off at any time in Settings > Desktop. Weather is off by default.\r\nUnsigned binaries may trigger a Windows SmartScreen warning.",0,28,300,600,100);
             }
             Add(L"BUTTON",L"Back",WS_TABSTOP,360,468,125,32,8);
             Add(L"BUTTON",options_.uninstall?L"Uninstall":options_.repair?L"Repair":L"Install",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,2);
