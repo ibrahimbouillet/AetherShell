@@ -82,6 +82,7 @@ struct ShadowEntry {
 struct DeviceCache {
     winrt::com_ptr<ID2D1Device> device;
     std::vector<ShadowEntry> shadows;
+    winrt::com_ptr<ID2D1DeviceContext> bakeContext;  // private context for baking shadows
     winrt::com_ptr<ID2D1BitmapBrush1> noiseBrush;
     float noiseDpi = 0.0f;
     float noiseAlpha = -1.0f;
@@ -101,12 +102,20 @@ DeviceCache* CacheFor(ID2D1DeviceContext* context) {
     return &threadCache;
 }
 
-winrt::com_ptr<ID2D1Bitmap1> BakeShadow(ID2D1DeviceContext* context, const ShadowKey& key, float extent) {
+// Bakes on a private device context of the same Direct2D device, so the caller's target, transform,
+// clips and layers (a tooltip's fade layer, for example) never affect the cached bitmap and are never
+// touched while the caller is drawing. Bitmaps are device resources, usable by every context.
+winrt::com_ptr<ID2D1Bitmap1> BakeShadow(DeviceCache& cache, const ShadowKey& key, float extent) {
     const float width = key.bakeWidth + 2.0f * extent;
     const float height = key.bakeHeight + 2.0f * extent;
     const float scale = key.dpi / 96.0f;
     const auto pixels = D2D1::SizeU(static_cast<UINT32>(std::ceil(width * scale)), static_cast<UINT32>(std::ceil(height * scale)));
     if (pixels.width == 0 || pixels.height == 0 || pixels.width > 4096 || pixels.height > 4096) return nullptr;
+    if (!cache.bakeContext &&
+        FAILED(cache.device->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, cache.bakeContext.put()))) {
+        return nullptr;
+    }
+    ID2D1DeviceContext* context = cache.bakeContext.get();
 
     winrt::com_ptr<ID2D1Bitmap1> bitmap;
     const auto properties = D2D1::BitmapProperties1(
@@ -130,40 +139,37 @@ winrt::com_ptr<ID2D1Bitmap1> BakeShadow(ID2D1DeviceContext* context, const Shado
         return nullptr;
     }
 
-    winrt::com_ptr<ID2D1Image> previousTarget;
-    context->GetTarget(previousTarget.put());
-    D2D1_MATRIX_3X2_F previousTransform{};
-    context->GetTransform(&previousTransform);
+    context->SetDpi(key.dpi, key.dpi);
+    context->SetTransform(D2D1::Matrix3x2F::Identity());
+    // The silhouette, recorded once as the shadow effects' input.
     winrt::com_ptr<ID2D1CommandList> list;
-    bool recorded = false;
-    if (SUCCEEDED(context->CreateCommandList(list.put()))) {
-        context->SetTarget(list.get());
-        context->SetTransform(D2D1::Matrix3x2F::Identity());
-        if (auto black = Solid(context, Color{0, 0, 0, 1})) context->FillRoundedRectangle(silhouette, black.get());
-        context->SetTarget(bitmap.get());
-        recorded = SUCCEEDED(list->Close());
+    if (FAILED(context->CreateCommandList(list.put()))) return nullptr;
+    context->SetTarget(list.get());
+    context->BeginDraw();
+    if (auto black = Solid(context, Color{0, 0, 0, 1})) context->FillRoundedRectangle(silhouette, black.get());
+    const bool recorded = SUCCEEDED(context->EndDraw()) && SUCCEEDED(list->Close());
+    context->SetTarget(nullptr);
+    if (!recorded) return nullptr;
+
+    context->SetTarget(bitmap.get());
+    context->BeginDraw();
+    context->Clear(D2D1::ColorF(0, 0, 0, 0));
+    // Only the outside of the silhouette: the shadow never darkens the translucent panel itself.
+    context->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), exterior.get()), nullptr);
+    for (const ShadowLayer* layer : {&key.layers.ambient, &key.layers.key}) {
+        if (!(layer->alpha > 0.0f)) continue;
+        winrt::com_ptr<ID2D1Effect> shadow;
+        if (FAILED(context->CreateEffect(CLSID_D2D1Shadow, shadow.put()))) continue;
+        shadow->SetInput(0, list.get());
+        shadow->SetValue(D2D1_SHADOW_PROP_BLUR_STANDARD_DEVIATION, std::max(0.0f, layer->blur));
+        shadow->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(key.color.r, key.color.g, key.color.b, Clamp01(layer->alpha)));
+        context->DrawImage(shadow.get(), D2D1::Point2F(0.0f, layer->offsetY));
     }
-    if (recorded) {
-        context->SetTarget(bitmap.get());
-        context->SetTransform(D2D1::Matrix3x2F::Identity());
-        context->Clear(D2D1::ColorF(0, 0, 0, 0));
-        // Only the outside of the silhouette: the shadow never darkens the translucent panel itself.
-        context->PushLayer(D2D1::LayerParameters(D2D1::InfiniteRect(), exterior.get()), nullptr);
-        for (const ShadowLayer* layer : {&key.layers.ambient, &key.layers.key}) {
-            if (!(layer->alpha > 0.0f)) continue;
-            winrt::com_ptr<ID2D1Effect> shadow;
-            if (FAILED(context->CreateEffect(CLSID_D2D1Shadow, shadow.put()))) continue;
-            shadow->SetInput(0, list.get());
-            shadow->SetValue(D2D1_SHADOW_PROP_BLUR_STANDARD_DEVIATION, std::max(0.0f, layer->blur));
-            shadow->SetValue(D2D1_SHADOW_PROP_COLOR,
-                             D2D1::Vector4F(key.color.r, key.color.g, key.color.b, Clamp01(layer->alpha)));
-            context->DrawImage(shadow.get(), D2D1::Point2F(0.0f, layer->offsetY));
-        }
-        context->PopLayer();
-    }
-    context->SetTarget(previousTarget.get());
-    context->SetTransform(previousTransform);
-    return recorded ? bitmap : nullptr;
+    context->PopLayer();
+    const HRESULT drawn = context->EndDraw();
+    context->SetTarget(nullptr);
+    if (drawn == static_cast<HRESULT>(D2DERR_RECREATE_TARGET)) cache.bakeContext = nullptr;
+    return SUCCEEDED(drawn) ? bitmap : nullptr;
 }
 
 ID2D1Bitmap1* CachedShadow(ID2D1DeviceContext* context, const ShadowKey& key, float extent) {
@@ -176,7 +182,7 @@ ID2D1Bitmap1* CachedShadow(ID2D1DeviceContext* context, const ShadowKey& key, fl
             return entry.bitmap.get();
         }
     }
-    auto bitmap = BakeShadow(context, key, extent);
+    auto bitmap = BakeShadow(*cache, key, extent);
     if (!bitmap) return nullptr;
     if (cache->shadows.size() >= kMaxCachedShadows) {
         const auto oldest = std::min_element(cache->shadows.begin(), cache->shadows.end(),

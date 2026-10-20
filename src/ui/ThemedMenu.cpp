@@ -337,10 +337,13 @@ Result<MenuSelection> ThemedMenuPresenter::Show(std::span<const MenuEntry> entri
             auto themed = ThemedMenu::Build(entries, tokens_, ::GetDpiForWindow(request.owner));
             if (themed && (*themed)->OwnerDrawn() &&
                 ::SetWindowSubclass(request.owner, &OwnerSubclass, kSubclassId, reinterpret_cast<DWORD_PTR>(themed->get()))) {
+                // The subclass refers to the menu, so it goes before the menu does, however Show ends.
+                struct SubclassScope {
+                    HWND owner;
+                    ~SubclassScope() { ::RemoveWindowSubclass(owner, &OwnerSubclass, kSubclassId); }
+                } scope{request.owner};
                 lastThemed_ = true;
-                auto selection = TrackMenuWithForegroundRule(*ops_, (*themed)->Handle(), request);
-                ::RemoveWindowSubclass(request.owner, &OwnerSubclass, kSubclassId);
-                return selection;
+                return TrackMenuWithForegroundRule(*ops_, (*themed)->Handle(), request);
             }
             if (!themed) AETHER_LOG_WARN("ui", "themed menu unavailable ({}); using the native menu", themed.error().Describe());
         }

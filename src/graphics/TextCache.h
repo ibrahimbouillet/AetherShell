@@ -43,11 +43,11 @@ public:
 
 private:
     [[nodiscard]] std::wstring ResolveFamily(const std::wstring& preferred) const;
-
-    winrt::com_ptr<IDWriteFactory> factory_;
+    // A layout of `text` with the tabular-figures feature applied (falls back to plain figures).
     [[nodiscard]] winrt::com_ptr<IDWriteTextLayout> TabularLayout(std::wstring_view text, IDWriteTextFormat* format,
                                                                   float width, float height);
 
+    winrt::com_ptr<IDWriteFactory> factory_;
     std::wstring textFamily_;
     std::wstring displayFamily_;
     std::wstring smallFamily_;
