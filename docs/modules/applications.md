@@ -470,3 +470,9 @@ read by other applications.
   premultiplied alpha within a measured tolerance) and unusable resources falling back to NotFound; a
   temporary `.lnk` whose ID list points to the Apps-folder File Explorer item imported as the canonical
   File Explorer pin with its bytes and write time unchanged.
+- Receipt for the 0.2.0-alpha.1 parity work (2026-10-20, Windows 11 build 26300): Release `/W4 /WX`
+  build warning-free; all 18 unit suites passed (applications 116 cases). Only the five new integration
+  cases that use the test's own never-shown window or temporary files were run (`window properties:`,
+  `pins by ID list:`, `icon resource:`; 5 passed). The other applications integration cases read the real
+  desktop and run serially in the full integration pass; the Start, Task View, pin-parity and browser
+  profile behaviour still needs the owner-authorized real-desktop checks.
