@@ -42,6 +42,9 @@ public:
     // and flush barriers continue. Re-enable if shutdown is cancelled; this does not change JSON.
     Result<void> SetChangesEnabled(bool enabled);
     Result<std::vector<std::string>> Update(Mutator mutator, Completion completion = {});
+    // Applies Settings{} except general.replaceWindowsTaskbar, which keeps its current value (D23):
+    // a reset changes customization, never desktop ownership. Everything else is reset, including
+    // the pin-import markers, so an emptied Dock imports the Windows taskbar pins once more.
     Result<std::vector<std::string>> ResetToDefaults(Completion completion = {});
     // FIFO barrier. Use before app shutdown, then destroy the service on the UI thread. Fails when
     // an earlier save failed; does not manufacture durability by silently retrying it.

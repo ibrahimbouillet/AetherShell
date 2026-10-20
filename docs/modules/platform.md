@@ -56,3 +56,18 @@ authorized desktop qualification. Native Windows taskbar settings continue to co
 Pure taskbar tests use an in-memory backend. Rendering/app fixtures prohibit real taskbar or work-area
 changes. Exact executed platform/controller counts and remaining V2 gates belong in TEST_STATUS;
 source presence and a fake lease do not establish successful real taskbar replacement.
+
+## Input injection (F0)
+
+`InputInjection.h/.cpp` sends user-triggered key chords only (for example Win+Tab after a click), with
+key-up recovery when Windows inserts only part of a chord. `MakeSendInputInjector()` returns
+`Result<std::unique_ptr<IKeyboardInjector>>`; `SystemKeyboardInjector()` and the `SendKeyChord`
+overloads that use it are the simplest production route. UIPI silently drops input while an elevated
+window is in the foreground, and this cannot be detected. Tests use only a fake injector.
+
+## 0.2 replacement lifecycle notes
+
+The guard protocol (four inherited handles, `launcher/main.cpp`) and the helper are unchanged in
+0.2.0-alpha.1. Explorer-restart, poll-timer and temporary-reveal changes live in the app controller
+(see app.md); the platform seam still restores through `TaskbarVisibilityLease::End` and the D21
+baseline.

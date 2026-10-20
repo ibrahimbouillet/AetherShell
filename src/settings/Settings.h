@@ -115,7 +115,10 @@ struct HotkeyChord {
 
 struct GeneralSettings {
     bool startWithWindows = false;  // only ever set after explicit user consent
-    bool replaceWindowsTaskbar = false; // reversible visual replacement after explicit consent
+    // D23: the Dock replaces the Windows taskbar while Aether Shell runs (reversible). An absent or
+    // non-boolean value means true; false is stored only after an explicit choice (Settings >
+    // Desktop, --restore-taskbar), and ResetToDefaults keeps the current value.
+    bool replaceWindowsTaskbar = true;
     bool taskbarPinsImported = false; // one automatic best-effort import when replacement is selected
     bool syncTaskbarPins = true;    // additively sync Windows taskbar pins while replacement is on
     MotionPreference motion = MotionPreference::System;

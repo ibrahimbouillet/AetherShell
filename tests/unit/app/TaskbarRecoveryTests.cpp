@@ -83,17 +83,67 @@ AETHER_TEST("taskbar recovery without an instance: restores the baseline and tur
     CHECK(DescribeTaskbarRecovery(recovered).find(L"restored") != std::wstring::npos);
 }
 
-AETHER_TEST("taskbar recovery without an instance: no baseline shows the taskbar and creates no settings") {
+AETHER_TEST("taskbar recovery without an instance: no baseline and no settings writes replacement off") {
+    // Behaviour change (D23): the default replaces the taskbar, so the missing file is created with
+    // replacement off; otherwise the next normal start would hide the taskbar again.
     const auto config = test::MakeTempDirectory("app-taskbar-recovery-empty") / L"config";
     SimulatedTaskbar taskbar;
 
     auto recovered = RecoverTaskbarWithoutInstance(config, Lend(taskbar));
     REQUIRE(recovered.ok());
     CHECK(recovered->outcome == platform::TaskbarRecovery::ShownWithoutBaseline);
-    CHECK(recovered->replacementTurnedOff);  // defaults never replace the taskbar
+    CHECK(recovered->replacementTurnedOff);
     CHECK(taskbar.windows[0].visible);
     CHECK_EQ(taskbar.state, unsigned(ABS_ALWAYSONTOP | ABS_AUTOHIDE));
-    CHECK_FALSE(std::filesystem::exists(config / L"settings.json"));
+    REQUIRE(std::filesystem::exists(config / L"settings.json"));
+    CHECK_FALSE(ReplacementSetting(config));
+    CHECK(DescribeTaskbarRecovery(recovered).find(L"is turned off") != std::wstring::npos);
+}
+
+AETHER_TEST("taskbar recovery without an instance: a corrupt settings file is preserved and rewritten off") {
+    const auto config = test::MakeTempDirectory("app-taskbar-recovery-corrupt") / L"config";
+    REQUIRE(fs::EnsureDirectory(config).ok());
+    REQUIRE(fs::WriteFileAtomic(config / L"settings.json", "{ synthetic corrupt settings").ok());
+    SimulatedTaskbar taskbar;
+
+    auto recovered = RecoverTaskbarWithoutInstance(config, Lend(taskbar));
+    REQUIRE(recovered.ok());
+    CHECK(recovered->replacementTurnedOff);
+    CHECK_FALSE(ReplacementSetting(config));
+    bool preserved = false;
+    for (const auto& entry : std::filesystem::directory_iterator(config)) {
+        if (entry.path().filename().wstring().starts_with(L"settings.json.corrupt-")) {
+            preserved = fs::ReadFile(entry.path(), 1024).value() == "{ synthetic corrupt settings";
+        }
+    }
+    CHECK(preserved);
+}
+
+AETHER_TEST("taskbar recovery without an instance: a newer settings schema is never rewritten") {
+    const auto config = test::MakeTempDirectory("app-taskbar-recovery-newer") / L"config";
+    REQUIRE(fs::EnsureDirectory(config).ok());
+    const std::string newer = R"({"schemaVersion":99,"general":{"replaceWindowsTaskbar":true}})";
+    REQUIRE(fs::WriteFileAtomic(config / L"settings.json", newer).ok());
+    SimulatedTaskbar taskbar;
+
+    auto recovered = RecoverTaskbarWithoutInstance(config, Lend(taskbar));
+    REQUIRE(recovered.ok());
+    CHECK(taskbar.windows[0].visible);
+    CHECK_FALSE(recovered->replacementTurnedOff);
+    CHECK_EQ(fs::ReadFile(config / L"settings.json", 1024).value(), newer);
+    CHECK(DescribeTaskbarRecovery(recovered).find(L"Settings > Desktop") != std::wstring::npos);
+}
+
+AETHER_TEST("taskbar recovery without an instance: an explicit off stays off without a rewrite") {
+    const auto config = test::MakeTempDirectory("app-taskbar-recovery-off") / L"config";
+    SaveReplacementSetting(config, false);
+    const auto before = fs::ReadFile(config / L"settings.json", 1024 * 1024).value();
+    SimulatedTaskbar taskbar;
+
+    auto recovered = RecoverTaskbarWithoutInstance(config, Lend(taskbar));
+    REQUIRE(recovered.ok());
+    CHECK(recovered->replacementTurnedOff);
+    CHECK_EQ(fs::ReadFile(config / L"settings.json", 1024 * 1024).value(), before);
 }
 
 AETHER_TEST("taskbar recovery without an instance: a failure is reported and settings stay unchanged") {

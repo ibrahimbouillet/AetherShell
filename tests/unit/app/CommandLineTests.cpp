@@ -3,7 +3,9 @@
 #include "AetherTest.h"
 #include "app/CommandLine.h"
 #include "app/ShellApplication.h"
+#include "platform/windows/AppPaths.h"
 #include "platform/windows/SingleInstance.h"
+#include "platform/windows/TaskbarReplacement.h"
 using namespace aether;
 AETHER_TEST("app: startup action and isolated data arguments are retained") {
     auto parsed=app::ParseCommandLine({L"--autostart",L"--settings",L"--data-dir",L"synthetic-data",L"--post-update-check",L"0123456789abcdef"});
@@ -40,4 +42,19 @@ AETHER_TEST("app: recovery commands without a running instance never start deskt
         REQUIRE_FALSE(result.ok());CHECK_EQ(result.error().code,ErrorCode::InvalidArgument);
         CHECK_EQ(platform::InstanceChannel::FindListenerProcessId(name),DWORD{0});
     }
+}
+AETHER_TEST("app: a test instance refuses taskbar recovery even with resolved data folders") {
+    // D23 guard: only the installed instance name may reach the native taskbar. The refusal comes
+    // before any recovery, message box, settings write or baseline access.
+    const auto root=test::MakeTempDirectory("app-restore-guard");
+    auto paths=platform::AppPaths::Resolve(root);REQUIRE(paths.ok());
+    const auto name=L"AetherShell.CommandTest.Guard."+std::to_wstring(::GetCurrentProcessId());
+    for(const bool requested:{true,false}) {
+        app::CommandLine command;command.action=app::StartupAction::RestoreTaskbar;
+        app::ShellApplication application;auto result=application.Run(command,*paths,name,requested);
+        REQUIRE_FALSE(result.ok());CHECK_EQ(result.error().code,ErrorCode::Unavailable);
+    }
+    CHECK_FALSE(std::filesystem::exists(paths->configDir/L"settings.json"));
+    CHECK_FALSE(std::filesystem::exists(platform::TaskbarBaselineFile(paths->configDir)));
+    CHECK_EQ(platform::InstanceChannel::FindListenerProcessId(name),DWORD{0});
 }

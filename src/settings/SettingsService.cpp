@@ -154,7 +154,10 @@ Result<std::vector<std::string>> SettingsService::ResetToDefaults(Completion com
         if (!impl_->OnUi()) return MakeError(ErrorCode::InvalidState, "settings must be used on the UI thread");
         if (!impl_->loaded || impl_->loading) return MakeError(ErrorCode::InvalidState, "settings have not finished loading");
         if (!impl_->changesEnabled) return MakeError(ErrorCode::InvalidState, "settings changes are disabled for shutdown");
-        return impl_->Apply(Settings{}, true, std::move(completion));
+        // D23: resetting customization never hides or restores the Windows taskbar by itself.
+        Settings next{};
+        next.general.replaceWindowsTaskbar = impl_->current.general.replaceWindowsTaskbar;
+        return impl_->Apply(std::move(next), true, std::move(completion));
     } catch (...) { return MakeError(ErrorCode::Internal, "settings reset failed"); }
 }
 

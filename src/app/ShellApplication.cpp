@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
+#include "app/DesktopPolicy.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
 
@@ -96,6 +97,7 @@ struct ShellApplication::Impl {
     std::wstring hotkeyStatus;
     std::wstring taskbarStatus = L"Windows taskbar visible";
     std::optional<bool> taskbarRequested;
+    bool nativeTaskbarAccess = false;  // see ShellApplication::Run and MayAccessNativeTaskbar
     bool catalogReady = false;
     bool importingPins = false;
     bool taskbarReservationFailed = false;
@@ -126,6 +128,83 @@ struct ShellApplication::Impl {
         if (dock) (void)dock->SetTaskbarReplacement(false);
         if (taskbar) (void)taskbar->Request(false);
         if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+    }
+    // Activation order (D19): the Dock reserves its replacement-mode space and the observation timer
+    // exists before the helper may hide the Windows taskbar. A fresh request resets the retry budget.
+    void EnsureTaskbarReplacement() {
+        if (!taskbar) return;
+        auto reserved = dock ? dock->SetTaskbarReplacement(true)
+                             : Result<void>(MakeError(ErrorCode::Unavailable, "Dock unavailable"));
+        if (!reserved) {
+            AETHER_LOG_WARN("app", "taskbar replacement: Dock reservation failed ({})", reserved.error().Describe());
+            FailTaskbarReservation();
+            return;
+        }
+        // Only active while replacement is requested. Native process checks run on its worker.
+        if (!::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
+            if (dock) (void)dock->SetTaskbarReplacement(false);
+            taskbarStatus = L"Replacement unavailable: recovery observer could not start";
+            if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+            return;
+        }
+        (void)taskbar->Request(true);
+    }
+    void OnTaskbarUpdate(const TaskbarUpdate& update) {
+        AETHER_LOG_INFO("app", "taskbar replacement {}{}: {}", update.active ? "active" : "inactive",
+                        update.suspended ? " (suspended)" : "", text::Narrow(update.status));
+        taskbarStatus = update.status;
+        // Keep the preflight reservation throughout activation/retries and restoration; release it
+        // when nothing more is scheduled (the Windows taskbar is back) or while suspended. A failed
+        // reservation must never be re-enabled by a restoring callback.
+        const bool wanted = settings && settings->Current().general.replaceWindowsTaskbar;
+        const bool reserve = ShouldForceDockReservation(taskbarReservationFailed, wanted, update);
+        if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
+        if (!update.active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
+        if (!ShouldObserveTaskbar(update)) {
+            // Nothing more happens until the next request (setting toggled, Explorer restarted,
+            // resumed); each of them arms the timer again through EnsureTaskbarReplacement or the
+            // next active update.
+            ::KillTimer(events.Handle(), kTaskbarPollTimer);
+        } else if (update.active && !::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
+            taskbarStatus = L"Recovery observation is unavailable; restoring Windows taskbar";
+            (void)taskbar->Request(false);
+        }
+        if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+    }
+    void OnExplorerRestarted() {
+        if (topbar) topbar->OnExplorerRestarted();
+        const bool wanted = taskbar && taskbarRequested.value_or(false) && !closing;
+        if (dock && !dock->OnExplorerRestarted() && wanted && !taskbarReservationFailed) { FailTaskbarReservation(); return; }
+        if (!wanted) return;
+        if (taskbarReservationFailed) {
+            // A new Explorer is a fresh chance for a reservation that failed earlier, for example
+            // while Explorer was not ready at sign-in. Bounded by Explorer restarts.
+            AETHER_LOG_INFO("app", "taskbar replacement: retrying after Explorer restarted");
+            taskbarReservationFailed = false;
+            EnsureTaskbarReplacement();
+            return;
+        }
+        if (taskbar->Suspended()) return;  // the Windows taskbar stays shown until Resume
+        // Reserve before the replaced session can hide the taskbar again (also after the controller
+        // gave up), then replace the session at once through Restart, which times its own quick
+        // retries while the new Explorer finishes starting.
+        if (dock && !dock->SetTaskbarReplacement(true)) { FailTaskbarReservation(); return; }
+        (void)taskbar->Restart();
+    }
+    // Runtime-only temporary reveal of the Windows taskbar (never written to settings). Suspending
+    // goes through the controller's normal restoration path; resuming reserves the Dock space first,
+    // as activation does. Entry point for the Top Bar notification-area button (app integration).
+    Result<void> SetTaskbarReplacementSuspended(bool suspend) {
+        if (!taskbar || !taskbarRequested.value_or(false) || closing)
+            return MakeError(ErrorCode::InvalidState, "taskbar replacement is not requested");
+        if (suspend) return taskbar->Suspend();
+        if (!taskbar->Suspended()) return Ok();
+        if (taskbarReservationFailed) return MakeError(ErrorCode::Unavailable, "Dock space could not be reserved");
+        if (dock && !dock->SetTaskbarReplacement(true)) {
+            FailTaskbarReservation();
+            return MakeError(ErrorCode::Unavailable, "Dock space could not be reserved");
+        }
+        return taskbar->Resume();
     }
     void RequestQuit();
     void OpenSettings(settings::ui::SettingsPage page = settings::ui::SettingsPage::Dock) {
@@ -186,19 +265,7 @@ void ShellApplication::Impl::ApplySettings() {
         taskbarReservationFailed = false;
         AETHER_LOG_INFO("app", "taskbar replacement {}", *taskbarRequested ? "requested" : "turned off");
         if (*taskbarRequested) {
-            auto reserved = dock ? dock->SetTaskbarReplacement(true)
-                                 : Result<void>(MakeError(ErrorCode::Unavailable, "Dock unavailable"));
-            if (!reserved) {
-                AETHER_LOG_WARN("app", "taskbar replacement: Dock reservation failed ({})", reserved.error().Describe());
-                FailTaskbarReservation();
-            }
-            // Only active while replacement is requested. Native process checks run on its worker.
-            else if (::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) (void)taskbar->Request(true);
-            else {
-                if (dock) (void)dock->SetTaskbarReplacement(false);
-                taskbarStatus = L"Replacement unavailable: recovery observer could not start";
-                if (settingsWindow) settingsWindow->RefreshDesktopStatus();
-            }
+            EnsureTaskbarReplacement();
         } else {
             // Keep observing until restoration acknowledges success, including bounded retries.
             (void)taskbar->Request(false);
@@ -313,11 +380,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ ApplySettings(); }));
     connections.push_back(events.DisplayChanged.Connect([this]{ if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
-    connections.push_back(events.ExplorerRestarted.Connect([this]{
-        if(topbar)topbar->OnExplorerRestarted();
-        if(dock && !dock->OnExplorerRestarted() && taskbarRequested.value_or(false))FailTaskbarReservation();
-        else if(taskbar)(void)taskbar->Restart();
-    }));
+    connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
     connections.push_back(events.ResumedFromSleep.Connect(clockChanged));
@@ -326,26 +389,17 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     if (updates) connections.push_back(updates->Subscribe([this](const updates::UpdateSnapshot& snapshot){ if(settingsWindow)settingsWindow->SetUpdateSnapshot(snapshot); RefreshUpdateOffer(snapshot); }));
     (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ if(dock)(void)dock->SetRunningApplications(running); });
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
-    TaskbarController::Options taskbarOptions;
-    taskbarOptions.baselineFile = platform::TaskbarBaselineFile(paths.configDir);
-    taskbar = std::make_unique<TaskbarController>(dispatcher, paths.executableDir / L"AetherShell.exe",
-        [this, weak](bool active, std::wstring status) {
-            if (const auto live = weak.lock(); live && *live) {
-                AETHER_LOG_INFO("app", "taskbar replacement {}: {}", active ? "active" : "inactive", text::Narrow(status));
-                taskbarStatus = std::move(status);
-                // Keep the preflight reservation throughout activation/retries and restoration.
-                // A failed reservation must never be re-enabled by a restoring callback.
-                const bool reserve = !taskbarReservationFailed && (active || settings->Current().general.replaceWindowsTaskbar);
-                if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
-                if (!active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
-                if (active && !::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
-                    taskbarStatus = L"Recovery observation is unavailable; restoring Windows taskbar";
-                    (void)taskbar->Request(false);
-                }
-                if (!active && settings && (!settings->Current().general.replaceWindowsTaskbar || taskbarReservationFailed)) ::KillTimer(events.Handle(), kTaskbarPollTimer);
-                if (settingsWindow) settingsWindow->RefreshDesktopStatus();
-            }
-        }, std::move(taskbarOptions));
+    if (nativeTaskbarAccess) {
+        TaskbarController::Options taskbarOptions;
+        taskbarOptions.baselineFile = platform::TaskbarBaselineFile(paths.configDir);
+        taskbar = std::make_unique<TaskbarController>(dispatcher, paths.executableDir / L"AetherShell.exe",
+            [this, weak](const TaskbarUpdate& update) {
+                if (const auto live = weak.lock(); live && *live) OnTaskbarUpdate(update);
+            }, std::move(taskbarOptions));
+    } else {
+        // Own-window sessions (tests): replacement requests never reach the real Windows taskbar.
+        taskbarStatus = L"Windows taskbar replacement is unavailable in this session";
+    }
     ApplySettings();
     dock->Show(); topbar->Show(); ready = true;
     if (!command.healthToken.empty()) { const auto token = text::Narrow(command.healthToken); worker.Post([token]{ (void)install::SignalHealthy(token); }); }
@@ -543,8 +597,10 @@ void ShellApplication::Impl::Stop() noexcept {
 
 ShellApplication::ShellApplication() : impl_(std::make_unique<Impl>()) {}
 ShellApplication::~ShellApplication() { impl_->Stop(); }
-Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths, std::wstring instanceName) {
+Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths, std::wstring instanceName,
+                                  bool nativeTaskbarAccess) {
     impl_->command = std::move(command); impl_->paths = std::move(paths); impl_->instanceName = std::move(instanceName);
+    impl_->nativeTaskbarAccess = MayAccessNativeTaskbar(impl_->instanceName, nativeTaskbarAccess);
     auto instance = platform::SingleInstanceLock::Acquire(impl_->instanceName); if (!instance) return instance.error();
     if (!instance->IsPrimary()) {
         const auto action = impl_->command.action == StartupAction::Quit ? L"shutdown" :
@@ -560,6 +616,8 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         // resolved data folders nothing is touched and no UI is shown.
         if (!impl_->paths.configDir.is_absolute())
             return MakeError(ErrorCode::InvalidArgument, "taskbar recovery needs the data folder");
+        if (!impl_->nativeTaskbarAccess)
+            return MakeError(ErrorCode::Unavailable, "taskbar recovery is unavailable in this session");
         std::promise<Result<TaskbarRecoveryReport>> promise;
         auto future = promise.get_future();
         WorkerPool recovery{{1, L"Aether taskbar recovery", ComApartment::None}};

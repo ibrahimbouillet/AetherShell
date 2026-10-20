@@ -133,10 +133,52 @@ regression. `SetChangesEnabled(false)` rejects new Update/Reset mutations withou
 accepted saves or Flush; the app calls it after editor/consent settlement and before its final FIFO
 barrier. Reenabling restores writes when quitting is cancelled. Five native editor cases also pass.
 
+## 0.2 schema additions (schema version stays 1)
+
+All new members are additive; 0.1 ignores them with a warning, so rolling back is safe.
+- `dock`: `reserveAnimationSpace` (false), `metricsVersion` (internal, 1..2), `dismissedPins` (at most
+  128 ids, each at most 1024 UTF-16 units, unique ignoring case), `explorerDefaultApplied` (false),
+  `showStartButton` and `showTaskViewButton` (true).
+- `topBar`: `height` (32 DIP, 24..48), `openWindowsFlyouts` (true), `weatherPlacement`
+  (`left`/`right`), `keyboardIndicator` (`two-line`/`compact`, default two-line; two-line needs at least
+  30 DIP and the Top Bar falls back to compact below that), `showNotificationAreaButton` and
+  `showBatteryPercent` (true).
+- `general`: `syncTaskbarPins` (true), `themeMode` (`system`/`light`/`dark`), `accentSource`
+  (`windows`/`aether`), `animationSpeed` (1.0, 0.5..1.5).
+- Dock size defaults are 40/4. `dock.metricsVersion` is an internal marker: a file whose dock group
+  has no marker was written by 0.1 (version 1), and there an absent `iconSize` or `bottomMargin`
+  means 48 or 10. If the effective size is exactly 48/10 it moves once to 40/4 with a migration
+  warning; any other size is kept, and the marker is then written as 2. After that an explicit 48/10
+  is the user's choice and stays.
+- Pinned ids deduplicate ignoring case.
+
+## Taskbar replacement default (D23)
+
+- `general.replaceWindowsTaskbar` defaults to **true**: while Aether Shell runs, its Dock replaces the
+  Windows taskbar. No schema bump: a file without the key (every 0.1 file) reads as true through
+  the struct default, and a non-boolean value falls back to true with one warning.
+- Every save writes the key, so an explicit false (Settings > Desktop, `--restore-taskbar`) persists.
+- `ResetToDefaults` applies `Settings{}` but keeps the current `replaceWindowsTaskbar`: a reset changes
+  customization, never desktop ownership. Everything else resets, including `taskbarPinsImported`,
+  `syncTaskbarPins`, `dismissedPins` and `explorerDefaultApplied`, so an emptied Dock imports the
+  Windows taskbar pins once more.
+- `--restore-taskbar` without a running instance writes false even when the settings file is missing
+  (created) or corrupt (rewritten after the store preserved it as `settings.json.corrupt-*`); a
+  newer-schema file is never rewritten (see app.md).
+- A corrupt file falls back to defaults, which now means replacement on; the earlier explicit off is
+  lost, although the corrupt file is preserved. Downgrading to 0.1 drops the key, so re-upgrading
+  turns the mode on again.
+- `startWithWindows` stays false by default (start at sign-in remains opt-in).
+
+Unit coverage (`TaskbarSettingsTests`, `SettingsSchemaTests`): legacy files without the key read
+true; Settings{} has replacement on and startup off and writes the key; an explicit false survives
+JSON; three non-boolean values fall back to true with exactly one warning; a service reset keeps
+both true and false and resets the other fields through an in-memory store.
+
 ## V2 Desktop consent and pin import
 
 Schema-v1 gains additive `general.replaceWindowsTaskbar` and `general.taskbarPinsImported` Boolean
-fields, both default false. Existing files therefore retain coexistence until explicit consent.
+fields. In 0.1.x both defaulted to false; since D23 (above) replacement defaults to true.
 The Desktop page is appended at index 6, preserving older page indexes. Its replacement checkbox
 is `consentOnly`: enabling and disabling both require Apply; debounce, navigation, close and app
 quit settlement cannot apply an unchecked consent draft. A saved true value can resume on later
