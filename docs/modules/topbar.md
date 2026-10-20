@@ -18,10 +18,18 @@ remain on the UI thread; provider callbacks copy snapshots into lifetime-guarded
 Construct `TopBarWindow(context)`, call `Create()`, connect the request signals and `Show(false)`.
 The signals are `SearchRequested`, `SettingsRequested`, `CheckForUpdatesRequested`, `AboutRequested`,
 `QuitRequested`, `KeyboardRequested`, `NetworkRequested`, `WeatherRequested`,
-`MicrophoneSettingsRequested`, and `FullscreenChanged(bool)` for forwarding to the Dock. `Relayout`,
+`MicrophoneSettingsRequested`, `VoiceTypingRequested`, `ClockRequested`, `PowerSettingsRequested`, `SoundSettingsRequested`,
+`RevealWindowsTaskbarRequested`, `ResumeTaskbarReplacementRequested`, and `FullscreenChanged(bool)`
+for forwarding to the Dock. `Relayout`,
 `OnExplorerRestarted`, `SetTheme(tokens, motion)` and `SetFullscreenHidden` support app/system wiring.
 `SetSnapshots`, `SetSettings`, `Items` and `RenderCount` support deterministic own-window tests.
 `Create(testBoundsPx)` requires `context.allowAppBar = false`.
+`SetTaskbarReplacementState(available, active, suspended)` supplies runtime state without writing
+preferences. The optional externally owned `context.menu` presenter lets isolated tests return a
+selection without displaying a popup; otherwise the shared `ThemedMenuPresenter` is used, with its
+native high-contrast fallback. The final optional `context.menuWindowOps` injects foreground-window
+operations for deterministic voice-typing tests; production uses the shared system implementation.
+Existing context aggregate fields retain their positions.
 
 The optional loaded settings service supplies initial visibility/clock/weather values and live
 updates. A concrete ClockProvider switches second/minute resolution when `showSeconds` changes.
@@ -52,8 +60,13 @@ Wi-Fi uses three curved waves and a dot, with the actual Windows `signalBars` (0
 never becomes a full-strength icon. Cellular retains five vertical bars. Ethernet uses a separate
 monitor/stand glyph, and unknown/offline states remain distinct in their accessible descriptions.
 
-The bar is 32 DIPs high with 12-DIP side margins and configurable top margin. Logo stays left;
-status/date/time align right. Width measurement uses DirectWrite. Weather collapses first, then
+The bar follows the configured 24–48 DIP height with 12-DIP side margins and configurable top margin.
+Large accessibility text can raise the effective height, up to 48 DIPs. Logo stays left;
+status/date/time align right. Weather follows its Left/Right preference. The keyboard supports
+Compact and TwoLine, with its real layout name on the second line, clipped with an ellipsis when
+needed (the full name stays in the tooltip); small heights/large text fall back to Compact.
+The battery-percentage preference hides only the visual number, retaining its real value in the
+tooltip. Width measurement uses DirectWrite. Weather collapses first, then
 language. At extreme widths, network, microphone, volume and battery collapse in that order before
 the clock is clipped. Hit rectangles are deterministic, half-open and never overlap.
 
@@ -71,20 +84,33 @@ fill behind the tint. Text and icons retain their own opacity. Maximum material 
 Transparency effects off, and high contrast each produce an opaque panel. Windows 10 keeps the
 documented per-pixel translucent fallback; it does not claim host-backdrop blur support.
 
-Hover shows details; clock click shows the long date. Volume click/microphone click submit real
+Hover shows details; clock click requests calendar/notifications and battery click requests power
+settings. Volume click/microphone click submit real
 asynchronous ToggleMute requests, and volume wheel applies a bounded two-percent increment per
 notch. Unknown volume is never used as a starting value. Failures show an explanatory tooltip.
-The logo opens a native popup menu and emits requests; it does not launch arbitrary commands.
-Arrow/Home/End/Tab navigation, Enter/Space activation and Escape are supported for action items.
+The logo and every status item use shared themed context-menu models and emit requests; this
+module does not launch commands. Arrow/Home/End/Tab/Shift+Tab navigation, Enter/Space activation,
+Escape and Menu/Shift+F10 context menus are supported for action items. Context-menu selections
+recheck current item/runtime availability after modal message pumping, rejecting stale actions.
 
 The urgent T17 interaction correction makes the keyboard, network and visible weather item buttons.
 Pointer, keyboard and UIA Invoke share the same guarded request path. Tooltips announce the action:
 input-language switch (Win+Space), Windows network settings, or Aether's existing Weather settings.
 The application owns these routes; this module never starts a shell process, switches the actual
 layout or performs network/recording operations itself. Microphone primary activation retains mute;
-right-click or Shift+F10/Menu on the focused microphone opens a privacy-settings menu and emits
-`MicrophoneSettingsRequested` only after selection. Hidden, disabled or full-screen-suppressed
-surfaces reject actions; queued requests recheck current availability. No recording/dictation is added.
+right-click or Shift+F10/Menu on the focused microphone opens mute, Windows voice typing (Win+H),
+and microphone privacy commands. `VoiceTypingRequested` is emitted only after verifying that the
+application which was foreground before the menu has regained focus. A missing, stale or Top Bar
+target, a third application taking foreground, or rejected/unverified focus restoration suppresses
+the request; choose the intended text field again before retrying. The app owns the Windows key
+chord. Aether adds no recording or speech-recognition engine. Hidden, disabled or full-screen-suppressed
+surfaces reject actions; queued requests recheck current availability. Provider refreshes and delayed
+control errors also cannot reopen a tooltip while the bar is suppressed or disabled.
+
+While replacement is active, the optional notification-area button and logo menu request that the
+app restore the Windows taskbar for 60 seconds. During runtime suspension they request Resume.
+The app owns restoration confirmation, the timer and controller calls; the Top Bar neither changes
+the actual taskbar nor persists a temporary suspension.
 
 `accessibility::AccessibleSurface` exposes a toolbar with Button elements for the logo, input/network/
 weather actions and audio/mic, and
@@ -109,6 +135,11 @@ AppBar notifications and an out-of-context foreground hook hide/show the surface
 shared full-screen state. Positioning uses the primary monitor; DPI/display/work-area changes
 relayout the window. The protocol follows Microsoft's
 [documented AppBar lifecycle](https://learn.microsoft.com/en-us/windows/win32/shell/application-desktop-toolbars).
+The pure `ComputeTopBarPlacement` includes the shared Bar elevation's complete shadow footprint in
+the reservation. The HWND retains exterior drawing space; item/input rectangles remain inside the
+panel. Glass uses explicit `Elevation::Bar` and `tokens.glass.backdropOpacity`, and the shared brand,
+arrow/chevron geometry and round stroke tokens. High contrast suppresses decoration/fades; identical
+display models and repeated runtime state request no new frames.
 
 Tests set `allowAppBar=false`, which disables registration and the global foreground hook entirely;
 they never change the real work area. Live reservation/full-screen/Explorer-restart behavior still
@@ -159,3 +190,31 @@ The T17 source adds a ninth unit case for action metadata with unknown readings 
 case for pointer, keyboard and separate-MTA UIA signal delivery. Callbacks are synthetic and the
 real work area must remain unchanged. Execution is pending the focused build/serial GUI slot;
 the previous eight-unit/two-native Top Bar result above predates these interaction changes.
+
+## Codex integration continuation — 2026-10-20, validation pending
+
+The integration worktree now contains the configured height/weather/keyboard/battery preferences,
+shared glyph/material/elevation/menu integration, Clock/Power/Sound request signals, runtime
+notification-area reveal/resume state and actions, Windows voice typing, and stale-menu/hidden-wheel guards. The app owns
+all system actions. Added unit cases cover menu availability, updates, height/DPI/shadow reservation,
+weather placement, keyboard fallback, percentage metadata, runtime notification actions, the Win+H
+menu, and rejected/unverified/third-window focus handoffs (20 unit cases expected in total). A fourth
+own-window integration case injects a fake menu and foreground operations to verify the new signals,
+focus restoration before the voice request, failed handoff suppression, stale-command rejection,
+keyboard context-menu access, tooltip suppression after a provider refresh, repeated-state idle
+behavior and unchanged real work area. `allowAppBar=false`; no real taskbar/audio/network/browser
+action or input injection is called. These additions remain pending execution.
+
+Source inspection and `git diff --check` pass. No new Top Bar build or GUI result is claimed yet;
+the root agent will build these changes in the shared candidate tree and run GUI checks serially.
+Follow-up review also guards asynchronous control-error tooltips after fullscreen suppression or
+shutdown admission closes. The concrete audio providers have no injectable control backend in this
+module; this small guard was inspected, and no real audio action was performed to exercise it.
+
+Combined candidate verification (2026-10-20, TEST_STATUS S-022): Release /W4 /WX passes **20/20 unit
+and 4/4 native cases**, including fake voice-target admission and request signals with no real keys
+or audio change. Fresh dark/light/Wi-Fi/Ethernet synthetic captures were opened and inspected. Actual
+Windows dictation in an editable field, permissions/UIPI and physical keyboard behavior remain manual.
+Real Windows voice typing, text-field focus preservation, microphone consent and supported language
+behavior still require an authorized desktop workflow. Fake foreground assertions establish request
+ordering and rejection only; they do not establish successful dictation into a real application.

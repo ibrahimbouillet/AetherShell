@@ -15,9 +15,12 @@
 
 #include "core/Result.h"
 #include "graphics/GraphicsDevice.h"
+#include "graphics/Transition.h"
 
-#include <functional>
 #include <chrono>
+#include <cstdint>
+#include <functional>
+#include <memory>
 
 namespace aether::graphics {
 
@@ -41,13 +44,25 @@ public:
     // Resizes the drawing surface to the window's client size in pixels.
     [[nodiscard]] Result<void> Resize(int widthPx, int heightPx);
 
-    // Finite compositor-owned entrance; no UI frame loop. Zero duration resets immediately.
+    // Finite compositor-owned entrance (decelerate curve) and exit (accelerate curve); no UI frame loop.
+    // Zero duration applies the end state immediately. Wrappers over Animate().
     [[nodiscard]] Result<void> AnimateEntrance(std::chrono::milliseconds duration, float offsetPx);
     [[nodiscard]] Result<void> AnimateExit(std::chrono::milliseconds duration, float offsetPx);
 
+    // Plays `transition` on the root visual (opacity, offset, scale around its center; DIPs times
+    // pxPerDip). Any running transition stops first and its completion is dropped. completed runs on
+    // the UI thread when every keyframe animation has finished (CompositionScopedBatch.Completed, delivered
+    // through the thread's DispatcherQueue), or synchronously before returning when the transition is
+    // instant. On error nothing was started and completed is not called; the caller applies its end state.
+    [[nodiscard]] Result<void> Animate(const Transition& transition, float pxPerDip, std::function<void()> completed = {});
+    // Stops any transition and returns the root visual to opacity 1, no offset, scale 1.
+    void ResetTransition() noexcept;
+    [[nodiscard]] bool IsTransitioning() const noexcept { return transitionPending_; }
+
     // Places the backdrop under the panel shape (pixels, relative to the window). Requesting HostBlur on
-    // a system without support falls back to None. Returns the effective kind.
-    BackdropKind SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx);
+    // a system without support falls back to None. Returns the effective kind. opacity is the blurred
+    // desktop's opacity under the tint (DesignTokens::glass.backdropOpacity), clamped to 0..1.
+    BackdropKind SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx, float opacity = 1.0f);
     [[nodiscard]] BackdropKind EffectiveBackdrop() const noexcept { return backdropKind_; }
 
     // Redraws the whole surface. The context is cleared to transparent, its DPI set to `dpi` (so the
@@ -57,6 +72,7 @@ public:
     [[nodiscard]] Result<void> Draw(UINT dpi, const std::function<void(ID2D1DeviceContext*)>& draw);
 
 private:
+    void RevokeTransitionCompletion() noexcept;
     GraphicsDevice* device_ = nullptr;
     HWND hwnd_ = nullptr;
     wuc::Desktop::DesktopWindowTarget target_{nullptr};
@@ -67,6 +83,13 @@ private:
     wuc::CompositionSurfaceBrush surfaceBrush_{nullptr};
     wuc::CompositionBackdropBrush hostBackdropBrush_{nullptr};
     wuc::CompositionRoundedRectangleGeometry clipGeometry_{nullptr};
+    // CompositionScopedBatch does not provide IWeakReferenceSource on every supported runtime;
+    // C++/WinRT auto_revoke assumes it does. Keep an explicit strong source and event token instead.
+    wuc::CompositionScopedBatch transitionBatch_{nullptr};
+    winrt::event_token batchCompleted_{};
+    std::uint64_t transitionGeneration_ = 0;
+    bool transitionPending_ = false;
+    std::shared_ptr<bool> alive_ = std::make_shared<bool>(true);
     BackdropKind backdropKind_ = BackdropKind::None;
     int widthPx_ = 1;
     int heightPx_ = 1;

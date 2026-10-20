@@ -274,3 +274,24 @@ AETHER_TEST("catalog rules: a shortcut duplicating a shortcut merges by id") {
     REQUIRE_EQ(catalog.size(), std::size_t{1});
     CHECK_EQ(catalog[0].id, std::wstring(L"exe:c:\\tools\\tool.exe"));
 }
+
+AETHER_TEST("catalog rules: Apps-folder child names from absolute parsing names") {
+    CHECK_EQ(AppsFolderChildName(L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\Microsoft.Windows.Explorer").value_or(L""),
+             std::wstring(L"Microsoft.Windows.Explorer"));
+    CHECK_EQ(AppsFolderChildName(L"::{4234d49b-0245-4df3-b780-3893943456e1}\\Aether.Fixture_123456789abcd!App")
+                 .value_or(L""),
+             std::wstring(L"Aether.Fixture_123456789abcd!App"));
+    CHECK_EQ(AppsFolderChildName(L"SHELL:appsfolder\\Aether.Fixture.Explicit").value_or(L""),
+             std::wstring(L"Aether.Fixture.Explicit"));
+    CHECK_FALSE(AppsFolderChildName(L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\").has_value());
+    CHECK_FALSE(AppsFolderChildName(L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\C:\\").has_value());  // This PC
+    CHECK_FALSE(AppsFolderChildName(L"C:\\Fixture\\Tool.exe").has_value());
+    CHECK_FALSE(AppsFolderChildName(L"").has_value());
+
+    CHECK(IsAppsFolderParsingName(L"::{4234D49B-0245-4DF3-B780-3893943456E1}"));
+    CHECK(IsAppsFolderParsingName(L"::{4234d49b-0245-4df3-b780-3893943456e1}\\"));
+    CHECK(IsAppsFolderParsingName(L"shell:appsfolder"));
+    CHECK_FALSE(IsAppsFolderParsingName(L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\Microsoft.Windows.Explorer"));
+    CHECK_FALSE(IsAppsFolderParsingName(L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"));
+    CHECK_FALSE(IsAppsFolderParsingName(L""));
+}

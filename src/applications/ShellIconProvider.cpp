@@ -4,6 +4,7 @@
 
 #include "applications/ApplicationIdentity.h"
 #include "applications/IconCache.h"
+#include "applications/IconResource.h"
 #include "applications/ShellItems.h"
 #include "diagnostics/Logger.h"
 #include "platform/windows/Handles.h"
@@ -13,6 +14,7 @@
 #include <shobjidl_core.h>
 
 #include <mutex>
+#include <optional>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
@@ -95,7 +97,22 @@ Result<ExtractedIcon> ExtractItem(IShellItem* item, std::uint32_t pixelSize) {
     return ReadBitmap(raw);
 }
 
+// The icon a running window declared for its group (ApplicationInfo::iconResource), when it names an
+// ordinary local .ico file. nullopt means "use the normal chain"; nothing about the path is logged.
+std::optional<ExtractedIcon> ExtractIconResource(const std::wstring& iconResource, std::uint32_t pixelSize) {
+    if (iconResource.empty()) return std::nullopt;
+    const auto resource = ParseIconResource(iconResource);
+    if (!resource) return std::nullopt;
+    if (!ValidateIconResourceFile(*resource)) return std::nullopt;
+    auto item = shell::CreateFileItem(resource->path);
+    if (!item) return std::nullopt;
+    auto image = ExtractItem(item->get(), pixelSize);
+    if (!image) return std::nullopt;
+    return std::move(image).value();
+}
+
 Result<ExtractedIcon> ExtractOnSta(const ApplicationInfo& app, std::uint32_t pixelSize) {
+    if (auto declared = ExtractIconResource(app.iconResource, pixelSize)) return std::move(*declared);
     if (app.kind == ApplicationKind::Desktop && !app.shortcutPath.empty()) {
         // Profile shortcuts may expose an avatar/icon override even when the generic Apps-folder
         // item shares the executable's logo. This changes presentation only, never launch routing.
@@ -170,8 +187,9 @@ struct ShellIconProvider::State {
                 if (extracted) {
                     image = std::make_shared<const IconImage>(std::move(extracted.value().image));
                 } else {
-                    AETHER_LOG_DEBUG(kLog, "no icon for {}: {}", shell::ForLog(request.app.displayName),
-                                     extracted.error().Describe());
+                    // No display name or path: either can name a browser profile or a user folder.
+                    AETHER_LOG_DEBUG(kLog, "no icon for a requested application: {}",
+                                     ToString(extracted.error().code));
                 }
                 std::lock_guard lock(self->mutex);
                 if (image) self->cache.Insert(request.key, request.pixelSize, image);

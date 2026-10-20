@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "dock/DockLayout.h"
+#include "graphics/Animation.h"
 
 #include <algorithm>
 #include <cmath>
@@ -51,8 +52,12 @@ Result<DockLayout> ArrangeDockLayout(float iconSize, float spacing, float magnif
         content += static_cast<float>(scales.empty() ? 0 : scales.size() - 1) * spacing;
         DockLayout layout;
         layout.windowWidth = width;
-        layout.windowHeight = std::ceil(iconSize * magnification + 56);
-        const float baseline = layout.windowHeight - 30;
+        // The shadow margin protects both layers. The bottom also contains the
+        // entrance slide; the top includes lift, scale, bounce and focus outside the icon geometry.
+        const float baselineGap = kDockShadowMargin + kDockEntranceOffset + 18;
+        layout.windowHeight = std::ceil(iconSize * magnification + graphics::MaxBounceHeight(iconSize) +
+            graphics::Motion().liftOffset + 6 + kDockShadowMargin + baselineGap);
+        const float baseline = layout.windowHeight - baselineGap;
         float x = (width - content) / 2;
         layout.panel = {x - 12, baseline - iconSize - 12, x + content + 12, baseline + 18};
         for (const auto scale : scales) {
@@ -66,7 +71,7 @@ Result<DockLayout> ArrangeDockLayout(float iconSize, float spacing, float magnif
 
 Result<DockPlacement> PlaceDock(const DockLayout& layout, const RECT& area, UINT dpi,
                                 float iconSize, float magnification, float bottomMargin,
-                                bool reducedMotion) {
+                                bool reducedMotion, bool reserveAnimationSpace) {
     if (!Valid(iconSize, 0, magnification, layout.windowWidth) || dpi < 48 || dpi > 960 ||
         area.right <= area.left || area.bottom <= area.top ||
         !std::isfinite(layout.windowHeight) || layout.windowHeight <= 0 || layout.windowHeight > 512 ||
@@ -87,7 +92,7 @@ Result<DockPlacement> PlaceDock(const DockLayout& layout, const RECT& area, UINT
     const LONG width = static_cast<LONG>(std::min<std::int64_t>(pixels(layout.windowWidth), availableWidth));
     const LONG height = pixels(layout.windowHeight);
     const LONG margin = pixels(bottomMargin);
-    // The resting panel has twelve DIPs of transparent trailing padding for its shadow. Position
+    // The resting panel has transparent trailing padding for shadow and entrance motion. Position
     // its visible edge, rather than the HWND edge, relative to the monitor/work-area boundary.
     const LONG trailing = pixels(layout.windowHeight - layout.panel.bottom);
     const auto left = static_cast<std::int64_t>(area.left) + (availableWidth - width) / 2;
@@ -99,11 +104,15 @@ Result<DockPlacement> PlaceDock(const DockLayout& layout, const RECT& area, UINT
     placement.windowPx = {static_cast<LONG>(left), static_cast<LONG>(bottom - height),
         static_cast<LONG>(left + width), static_cast<LONG>(bottom)};
     const float baseline = layout.panel.bottom - 18;
-    constexpr float shadowGuard = 12;
+    constexpr float shadowGuard = kDockShadowMargin;
     constexpr float focusGuard = 6;
-    const float bounce = reducedMotion ? 0.0f : 10.0f;
-    const float earliest = std::min(layout.panel.top - shadowGuard,
-        baseline - iconSize * magnification - bounce - focusGuard);
+    const float bounce = reducedMotion ? 0.0f : graphics::MaxBounceHeight(iconSize);
+    // Lift grows the icon equally on both sides; its ambient shadow reaches 3 * 8 + 2 DIPs.
+    const float liftScale = reducedMotion ? 1.0f : 1 + (graphics::Motion().liftScale - 1) / 2;
+    const float iconGuard = reducedMotion ? focusGuard : 29.0f; // includes shadow bucket rounding
+    const float earliest = !reserveAnimationSpace ? layout.panel.top : std::min(layout.panel.top - shadowGuard,
+        baseline - iconSize * magnification * liftScale - bounce -
+        (reducedMotion ? 0.0f : graphics::Motion().liftOffset) - iconGuard);
     const auto firstDrawnPixel = static_cast<std::int64_t>(placement.windowPx.top) +
         static_cast<LONG>(std::floor(earliest * scale));
     if (firstDrawnPixel < std::numeric_limits<LONG>::min()) {

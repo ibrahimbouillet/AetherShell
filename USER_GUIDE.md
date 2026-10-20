@@ -21,9 +21,12 @@ change output volume or mute only when you intend to do so. Network details neve
 The current V2 candidate adds input-language switching through Win+Space from the keyboard item,
 access to Windows network settings from the network item, and access to Weather settings from its
 visible weather item. These new routes are being qualified in T17. Microphone click controls endpoint
-mute; its right-click menu offers privacy settings. It does not start recording or dictation.
+mute; its right-click menu offers privacy settings and **Start Windows voice typing (Win+H)**.
+The voice action returns focus to the previous application before asking Windows to open dictation
+in its active field. Windows controls dictation availability, microphone permission and processing;
+Aether Shell does not capture or store speech. Automated tests do not invoke real dictation.
 
-Settings has Dock, Top Bar, Weather, Updates, General, About and Desktop pages. Weather starts disabled.
+Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop and Appearance pages. Weather starts disabled.
 Choose a location explicitly before enabling it; searching sends only the entered place name to
 Open-Meteo, and forecasts send the chosen coordinates. Cached forecasts disappear after six hours.
 Data attribution: Open-Meteo.com, CC BY 4.0.
@@ -32,17 +35,30 @@ General contains startup consent, motion preferences and shortcut editing. Start
 and optional. Task Manager can independently disable it. High contrast and reduced motion follow
 Windows where supported. The About page contains the MIT license and project attribution.
 
-In the V2 candidate, Desktop contains **Replace the Windows taskbar**. Select it and press Apply to
-consent; unselect it and press Apply to restore coexistence. Checking the box and closing/navigating
-away does not apply that choice. The option starts off; saved consent can resume on later launches.
+In the V2 candidate, Desktop contains **Replace the Windows taskbar**, enabled by default (D23).
+An explicit saved opt-out is preserved. Unselect it and press Apply to restore coexistence; select
+it and press Apply to enable replacement again. Closing/navigating away discards an unapplied change.
 In replacement mode the Dock reserves space below maximized applications. Ordinary manually placed
 windows may still need moving. The status message shows whether replacement is active or unavailable.
 Windows Settings retains its native taskbar page; change Aether Shell's behavior here.
 
 Desktop also offers Import Windows taskbar pins. It reads available supported pinned shortcuts and
 adds missing entries without changing Windows pins or replacing your Aether pins. Some Windows 11
-pins and their original order are unavailable. An empty Dock can import available shortcuts
-automatically after replacement is selected. Use the Dock context menu to adjust entries afterward.
+pins and their original order are unavailable. Replacement mode imports supported pins and supplies
+File Explorer once. Automatic synchronization adds new available pins on startup, enabling sync or
+Explorer restart; it preserves user order and explicit removals. Manual import can reinstate removed
+pins. Appearance contains the automatic-sync switch, theme/accent, icon presets and motion controls.
+
+The candidate Dock has Start, Search and Task View entries. Drag pinned icons to change their saved
+order; dragging a running-only icon changes this session's order without pinning it. Supported
+per-window profile icon metadata can distinguish Chrome profiles; missing metadata remains generic.
+Dock context menus offer applicable window/new-instance/pin actions without guessing a profile.
+
+Top Bar menus expose clock, power, sound and network settings. Its notification-area control
+temporarily shows the Windows taskbar and hides the Aether Dock after restoration completes.
+Replacement resumes after 60 seconds, or immediately through Resume in the Top Bar menu. This delay
+does not detect user activity. These combined candidate interactions await the gates in TEST_STATUS
+S-022; earlier alpha screenshots and test results do not qualify this build.
 
 To restore the native bar, disable the Desktop option or choose Quit from the Top Bar menu.
 

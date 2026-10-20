@@ -25,41 +25,115 @@ and shared completion surviving failed dispatcher delivery. This path is source-
 the live official signed-update cycle remains unqualified. See TEST_STATUS. No real external application launch, real
 audio/startup change or real work-area mutation is claimed by the isolated module tests.
 
-## V2 desktop ownership (D19 / ADR 0009)
+## V2 desktop ownership (D19 / ADR 0009, D23)
 
-`general.replaceWindowsTaskbar` is false by default. The Settings Desktop page requires explicit
-Apply before changing it. The app coordinates a worker-owned `TaskbarGuardSession` using the existing
-versioned launcher; guarded startup, disable/restart and process observation do not run shell waits
-on the live UI thread. A replacement-only observer checks helper state and dispatches status to
-Desktop. Dock replacement mode forces its AppBar reservation and uses the corrected visible bottom
-margin plus its full animated footprint. Explorer remains running.
+**Default on (D23).** `general.replaceWindowsTaskbar` defaults to true: while Aether Shell runs, its
+Dock replaces the Windows taskbar. A settings file without the key, or with a non-boolean value
+(warning), means true. Every save writes the key, so an explicit off (Settings > Desktop,
+`--restore-taskbar`) persists. `ResetToDefaults` keeps the current value and resets everything
+else. Startup at sign-in stays opt-in (`startWithWindows` false; the setup box is unchecked).
+
+**Native access guard.** `ShellApplication::Run(command, paths, instanceName, nativeTaskbarAccess)`
+may reach the real taskbar only when `nativeTaskbarAccess` is true and the instance name is the
+installed `AetherShell` (`DesktopPolicy::MayAccessNativeTaskbar`). Any other session creates no
+`TaskbarController`, never puts the Dock in replacement mode, shows "Windows taskbar replacement is
+unavailable in this session" on the Desktop page, and refuses `--restore-taskbar` recovery without
+an instance (`Unavailable`). Own-window tests run under their own instance names and also pass
+false, so default settings in a fixture can never hide the real taskbar.
+
+**Controller.** The app coordinates a worker-owned `TaskbarGuardSession` through the existing
+versioned launcher; guarded startup, disable/restart and process observation never run shell waits
+on the UI thread. Every status report is a `TaskbarUpdate`:
+- `active`: a guard session runs and the Windows taskbar is hidden;
+- `scheduled`: the controller acts again by itself (a request in progress, a pending activation or
+  restoration retry, or an observed session);
+- `suspended`: replacement is wanted but temporarily suspended;
+- `status`: plain-language text for the Desktop page.
+
+Retries are timed by the controller worker (`wait_until` on the retry time), not by a UI timer. The
+1 s UI poll timer only asks the worker to observe a running helper. It stops as soon as an update
+reports neither `active` nor `scheduled` (for example after the activation attempts are exhausted),
+so nothing wakes periodically afterwards. Turning the setting on again (`EnsureTaskbarReplacement`),
+an Explorer restart or `Resume` starts a fresh request, and the next active update arms the timer.
+This closes the T16-gate poll-timer finding.
+
+**Dock reservation.** `DesktopPolicy::ShouldForceDockReservation` keeps the replacement-mode AppBar
+during activation, its retries, an active session and its restoration. It releases it when the
+controller gave up (the Windows taskbar is back and reserves its own space), while suspended, and
+never re-enables it after the Dock reservation itself failed. The app only switches the mode; the
+reserved height always comes from the Dock's own layout (`PlaceDock`), so a compact Dock reserves
+a compact band and size changes re-reserve on the next relayout. The app assumes no height.
+
+**Explorer restart (TaskbarCreated).** The app re-registers the Top Bar and Dock AppBars, reserves
+the Dock replacement space, then replaces the session through the existing `Restart` path (helper
+protocol unchanged). A restart series retries sooner: the first retry after a failure waits
+`restartRetryDelay` (500 ms) and later ones double up to the ordinary 2 s, with two extra attempts,
+so the overall retry window is not shorter than an ordinary one. A Dock reservation that failed
+earlier (for example while Explorer was not ready) is retried once per TaskbarCreated with a fresh
+request. While suspended, TaskbarCreated changes nothing.
+
+**Temporary reveal (runtime only).** `TaskbarController::Suspend()` shows the Windows taskbar
+through the normal restoration path while replacement stays requested; activation, retries and
+`Restart` are skipped. `Resume()` activates again with a fresh retry budget; `Request(false)` also
+ends a suspension, and re-requesting true keeps it. Nothing is written to settings.
+`ShellApplication::Impl::SetTaskbarReplacementSuspended(bool)` reserves the Dock space and arms
+recovery observation before resuming. Top Bar notification-area access requests a temporary reveal;
+the Dock stays visible until restoration completes, then hides so only the native bottom bar is
+shown. A monotonic 60 s timer starts after restoration. Stale queued timer messages cannot shorten
+a newer reveal. This is a fixed delay, not idle/activity detection. Explicit Resume, disabling
+replacement or Quit cancels it; declining a failed-save quit leaves manual Resume available.
+Full-screen suppression remains combined with the restoration state.
 
 The helper restores the captured native taskbar state after parent death or a normal stop; the
-parent attempts a baseline fallback if the helper dies. After a double failure, the baseline saved on disk restores the taskbar (D21; see below).
-The helper can retain later native Settings state for normal restoration, but a killed helper cannot
-transfer that state to the parent's initial snapshot. This is a disclosed shell-class compatibility
-feature, not official native taskbar registration or Windows Settings takeover.
+parent attempts a baseline fallback if the helper dies. After a double failure, the baseline saved
+on disk restores the taskbar (D21; see below). The helper can retain later native Settings state
+for normal restoration, but a killed helper cannot transfer that state to the parent's initial
+snapshot. This is a disclosed shell-class compatibility feature, not official native taskbar
+registration or Windows Settings takeover.
 
-After catalog discovery, an empty Dock is eligible for an initial read-only pin import when replacement
-was selected and `taskbarPinsImported` is false. The Desktop button can request an explicit import.
-The STA worker reads supported shortcuts, and UI delivery merges missing entries into the latest
-settings, preserving existing pins and arguments. No native taskbar pins are changed. Windows 11
-pin/order coverage remains best effort.
+After catalog discovery, replacement mode imports supported Windows pins and supplies File Explorer
+once. Automatic sync runs at startup, when enabled and after Explorer restarts; it is not a live
+registry watcher. It respects explicit dismissals and user order. Disabling sync stops subsequent
+automatic imports after initial import/Explorer initialization; the Desktop/Dock manual action can
+explicitly reinstate dismissed entries. The STA worker performs discovery and `PlanTaskbarPinSync`
+(including possible 8.3 path IO). UI delivery accepts only the settings revision used for planning;
+edits during IO cause a bounded fresh replan, never a stale overwrite. Automatic eligibility is
+rechecked after IO and before retries. Manual requests coalesce while an import runs. Feedback
+reports counts and persistence failure without logging local app identities. No native taskbar pins
+are changed. Windows 11 pin/order coverage remains best effort; profile routes never silently fall
+back to the default browser.
+
+Appearance preferences produce shared design tokens for Dock, Top Bar and Search; high contrast,
+system/reduced motion and the chosen speed are applied together. The native Appearance settings
+page exposes these values plus Start/Task View tiles, animation reservation, weather side, keyboard
+format and pin sync. Status actions request documented Windows settings or shared key-chord helpers
+only after user interaction. Isolated module tests use fakes and never invoke those system actions.
+Current integration source and policy regressions await the fresh whole-candidate gates (S-022).
+
+Those combined gates now pass (2026-10-20, S-022): Release /W4 /WX, **34 app unit cases and two
+isolated app lifecycle cases**. Default-on settings under a non-production instance cannot change
+the native taskbar/work area. Tests cover policy with fakes; the new real-desktop/voice/recovery
+workflow remains unqualified. D24's microphone menu requests Win+H only after checked focus admission.
 
 `--quit` forwards shutdown to an existing instance and is a successful no-op without one.
-`--restore-taskbar` asks a running instance to disable replacement. Without one (D21), the process
-does the following:
-- It keeps the single-instance lock and runs `RecoverTaskbarWithoutInstance` on a worker.
-- It restores from `<config>\taskbar-baseline.json`, or shows the taskbar windows when no baseline
-  exists.
-- It turns `general.replaceWindowsTaskbar` off, but only in an existing settings file with the current
-  schema.
-- It reports the result in a message box and exits with code 0 on success or 1 on failure.
+`--restore-taskbar` asks a running instance to turn replacement off (persisted). Without one (D21):
+- the process keeps the single-instance lock and runs `RecoverTaskbarWithoutInstance` on a worker;
+- it restores from `<config>\taskbar-baseline.json`, or shows the taskbar windows when no baseline
+  exists;
+- it turns `general.replaceWindowsTaskbar` off. Because the default is on (D23), a missing settings
+  file is created and a corrupt one (already preserved as `settings.json.corrupt-*`) is rewritten
+  with replacement off; a newer-schema file is never rewritten, and the message then names
+  Settings > Desktop;
+- it reports the result in a message box and exits with code 0 on success or 1 on failure.
+
+Setup adds a per-user Start menu shortcut "Restore Windows taskbar" that runs the launcher with
+`--restore-taskbar` (see installer.md).
 
 Recovery actions received while an instance is still starting are retained until settings load
 settles, before the desktop surfaces and the guard start.
 
-The earlier lifecycle result above is the 0.1 baseline. V2 controller/app, full Release, native
-replacement and real Explorer restart qualification remain pending until executed evidence is
-recorded in TEST_STATUS. Automated fixtures keep replacement disabled or use fakes; they never
-hide the real taskbar or change the work area.
+The earlier lifecycle result above is the 0.1 baseline. Unit suites cover the controller (fake
+sessions), the desktop policy tables, recovery with a simulated taskbar and the D23 settings
+semantics. Real replacement, Explorer restart and sign-out qualification remain real-desktop checks
+recorded in TEST_STATUS. Automated fixtures keep replacement off or use fakes and the native access
+guard; they never hide the real taskbar or change the work area.

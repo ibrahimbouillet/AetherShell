@@ -10,6 +10,7 @@
 #include "graphics/Theme.h"
 #include "settings/SettingsService.h"
 #include "ui/SurfaceWindow.h"
+#include "ui/PopupMenu.h"
 
 #include <memory>
 
@@ -22,6 +23,7 @@ struct DockWindowContext {
     apps::IApplicationLauncher& launcher;
     apps::IIconProvider& icons;
     settings::SettingsService& settings;
+    ui::IMenuPresenter* menuPresenter = nullptr; // optional injected presenter; caller owns its lifetime
 };
 
 struct DockWindowOptions {
@@ -38,8 +40,10 @@ public:
     explicit DockWindow(DockWindowContext context);
     ~DockWindow() override;
     Result<void> Create(DockWindowOptions options = {});
+    void Show(bool activate = false);
     Result<void> FocusDock();
     Result<void> SetRunningApplications(std::vector<apps::RunningApplication> applications);
+    Result<void> SetApplicationCatalog(std::vector<apps::ApplicationInfo> applications);
     Result<void> SetSuppressed(bool suppressed);
     Result<void> Relayout();
     Result<void> OnExplorerRestarted();
@@ -52,6 +56,7 @@ public:
     Signal<> SettingsRequested;
     Signal<> ImportWindowsPinsRequested;
     Signal<> StartRequested;
+    Signal<> TaskViewRequested;
 
 protected:
     void OnRender(const ui::RenderContext& context) override;
@@ -61,6 +66,7 @@ protected:
     void OnPointerLeave() override;
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
+    void OnPointerCaptureLost() override;
     bool OnKeyDown(UINT virtualKey) override;
     void OnFocusChanged(bool focused) override;
     void OnDeviceReplaced() override;

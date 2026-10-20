@@ -14,21 +14,23 @@ this alpha; no unsigned manifest is published.
 - Dock: pinned and running applications, icons, search, keyboard navigation and motion preferences.
 - Top Bar: real clock/date, battery when present, input language, network, audio and microphone state.
 - Search: application catalogue matching, accent-insensitive ranking and keyboard selection.
-- Settings: Dock, Top Bar, opt-in weather, updates, shortcuts, startup consent and diagnostics.
+- Settings: Dock, Top Bar, Appearance, opt-in weather, updates, shortcuts, startup consent and diagnostics.
 - Delivery: per-user setup, versioned installation, repair, uninstall and authenticated update design.
 
-V2 adds **Settings → Desktop → Replace the Windows taskbar → Apply**. This optional mode is off
-by default. It hides the native taskbar while Aether Shell runs, reserves the Dock's space below
+V2 replaces the native taskbar on launch by default, preserving an explicit saved opt-out (D23).
+Change it through **Settings → Desktop → Replace the Windows taskbar → Apply**. It hides the native taskbar while Aether Shell runs, reserves the Dock's space below
 maximized windows, and restores Windows on disable/exit with a separate recovery helper. Available
 Windows pinned shortcuts can be imported without modifying the native pins. Glass now reveals the
 backdrop more clearly, and Wi-Fi uses curved waves instead of cellular bars.
+The combined candidate adds drag ordering, profile-aware icon metadata, one-time File Explorer
+initialization, status menus and Windows voice typing; current qualification is recorded in the handoff.
 
 Windows Settings keeps its native taskbar page; configure Aether Shell in its own Desktop page.
 Pin coverage/order and recovery across all Windows/Explorer failures remain limited. Read the
-[mode and recovery guide](USER_GUIDE.md) and [known limitations](KNOWN_LIMITATIONS.md) before enabling it.
+[mode and recovery guide](USER_GUIDE.md) and [known limitations](KNOWN_LIMITATIONS.md) before using it.
 
 Windows 10 2004+ and Windows 11, x64. Windows 10 and ARM64 remain unqualified. The native
-Windows taskbar stays visible in the default coexistence mode. Explorer keeps running in either
+Windows taskbar stays visible with the published 0.1 alpha or an explicit V2 opt-out. Explorer keeps running in either
 mode. Weather is disabled by default; enabling it sends the selected
 coordinates to Open-Meteo. No location detection or Wi-Fi network names are used.
 
@@ -54,6 +56,8 @@ Build on Windows with Visual Studio C++ Build Tools, a Windows SDK, CMake and Ni
 
 See [BUILDING](BUILDING.md) for focused modules and interactive tests. Python is needed for release
 packaging/branding tools, not to run the app. No third-party C++ runtime library is bundled.
+See [ARCHITECTURE](ARCHITECTURE.md) for module and trust boundaries and [TESTING](TESTING.md) for
+test isolation, performance and manual desktop qualification.
 
 For contributors and coding assistants: start with [AGENTS](AGENTS.md), [HANDOFF](HANDOFF.md),
 [PROJECT_SPEC](PROJECT_SPEC.md) and [TASKS](TASKS.md). The Markdown/source files are portable;

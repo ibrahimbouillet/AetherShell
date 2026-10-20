@@ -22,6 +22,78 @@ template<class Predicate> bool Pump(ManualDispatcher& dispatcher, Predicate pred
     }
     return true;
 }
+
+AETHER_TEST("settings UI: appearance controls preserve custom size and opt-out while saving preferences") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto root=test::MakeTempDirectory("appearance-ui");
+    settings::SettingsService service(root/L"settings.json",dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    REQUIRE(service.Update([](settings::Settings& s){s.general.replaceWindowsTaskbar=false;s.dock.iconSize=64;}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+    settings::ui::SettingsWindow window(service,dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
+    CHECK_EQ(::SendMessageW(window.Control(203),CB_GETCURSEL,0,0),LRESULT{3});
+    ::SendMessageW(window.Control(200),CB_SETCURSEL,2,0);
+    ::SendMessageW(window.Control(201),CB_SETCURSEL,1,0);
+    ::SetWindowTextW(window.Control(202),L"1.25");
+    ::SendMessageW(window.Control(204),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SendMessageW(window.Control(205),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SendMessageW(window.Control(206),BM_SETCHECK,BST_CHECKED,0);
+    ::SendMessageW(window.Control(207),CB_SETCURSEL,1,0);
+    ::SendMessageW(window.Control(208),CB_SETCURSEL,0,0);
+    ::SendMessageW(window.Control(209),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().general.themeMode==settings::ThemePreference::Dark && !service.Dirty();}));
+    CHECK_EQ(service.Current().dock.iconSize,64);
+    CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
+    CHECK_EQ(service.Current().general.accentSource,settings::AccentSource::Aether);
+    CHECK_EQ(service.Current().general.animationSpeed,1.25);
+    CHECK_FALSE(service.Current().dock.showStartButton);CHECK_FALSE(service.Current().dock.showTaskViewButton);
+    CHECK(service.Current().dock.reserveAnimationSpace);
+    CHECK_EQ(service.Current().topBar.weatherPlacement,settings::WeatherPlacement::Right);
+    CHECK_EQ(service.Current().topBar.keyboardIndicator,settings::KeyboardIndicatorStyle::Compact);
+    CHECK_FALSE(service.Current().general.syncTaskbarPins);
+    ::SendMessageW(window.Control(203),CB_SETCURSEL,0,0);
+    ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().dock.iconSize==32 && !service.Dirty();}));
+    window.Close();
+    settings::SettingsService reloaded(root/L"settings.json",dispatcher);REQUIRE(reloaded.Load({}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));
+    CHECK_EQ(reloaded.Current().general.themeMode,settings::ThemePreference::Dark);
+    CHECK_EQ(reloaded.Current().dock.iconSize,32);CHECK_FALSE(reloaded.Current().general.replaceWindowsTaskbar);
+}
+
+AETHER_TEST("settings UI: explicit remove records dismissal and manual add reinstates the same launch metadata") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto root=test::MakeTempDirectory("pin-dismissal-ui");
+    settings::SettingsService service(root/L"settings.json",dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    apps::ApplicationInfo app;app.id=L"aumid:synthetic.browser.profile";app.displayName=L"Synthetic profile";
+    app.appUserModelId=L"Synthetic.Browser.Profile";app.executablePath=L"C:\\Synthetic\\Browser.exe";
+    app.shortcutPath=L"C:\\Synthetic\\Profile.lnk";app.arguments=L"--profile-directory=\"Synthetic Profile\"";
+    REQUIRE(service.Update([&](settings::Settings& s){
+        settings::PinnedApp pin;pin.id=app.id;pin.displayName=app.displayName;pin.appUserModelId=app.appUserModelId;
+        pin.executablePath=app.executablePath;pin.shortcutPath=app.shortcutPath;pin.arguments=app.arguments;
+        s.dock.pinned.push_back(pin);s.general.replaceWindowsTaskbar=false;
+        for(unsigned i=0;i<128;++i)s.dock.dismissedPins.push_back(L"synthetic-dismissed-"+std::to_wstring(i));
+    }).ok());
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+    settings::ui::SettingsCallbacks callbacks;callbacks.catalog=[app]{return std::vector<apps::ApplicationInfo>{app};};
+    settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));REQUIRE(window.Show().ok());
+    ::SendMessageW(window.Control(312),LB_SETCURSEL,0,0);::SendMessageW(window.Control(313),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().dock.pinned.empty() && !service.Dirty();}));
+    REQUIRE_EQ(service.Current().dock.dismissedPins.size(),std::size_t{128});CHECK_EQ(service.Current().dock.dismissedPins.back(),app.id);
+    CHECK_EQ(service.Current().dock.dismissedPins.front(),L"synthetic-dismissed-1");
+    ::SendMessageW(window.Control(272),CB_SETCURSEL,0,0);::SendMessageW(window.Control(311),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().dock.pinned.size()==1 && !service.Dirty();}));
+    CHECK_EQ(service.Current().dock.dismissedPins.size(),std::size_t{127});CHECK_EQ(service.Current().dock.pinned.front().arguments,app.arguments);
+    CHECK_EQ(service.Current().dock.pinned.front().shortcutPath,app.shortcutPath);
+    window.Close();
+}
 std::wstring ControlText(HWND control) {
     const int length=::GetWindowTextLengthW(control);
     std::wstring value(static_cast<std::size_t>(length)+1,L'\0');
@@ -192,6 +264,10 @@ AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh 
     const auto file=test::MakeTempDirectory("settings-ui-desktop")/L"settings.json";
     settings::SettingsService service(file,dispatcher);
     REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    // Start from a persisted opt-out: D23 makes a missing file default on. This fixture exercises
+    // explicit Apply in both directions, independently of that first-launch policy.
+    REQUIRE(service.Update([](auto& value){value.general.replaceWindowsTaskbar=false;}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
     RECT before{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&before,0));
     std::wstring desktopStatus=L"Synthetic native taskbar retained.";
     int imports=0;
@@ -205,7 +281,7 @@ AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh 
     };
     settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));editor=&window;
     REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
-    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),7);
+    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),8);
     CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCURSEL,0,0),6);
     CHECK_EQ(ControlText(window.Control(318)),desktopStatus);
     REQUIRE(window.Control(200));CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
@@ -242,6 +318,7 @@ AETHER_TEST("settings UI: adding an application preserves executable arguments a
     const auto file=test::MakeTempDirectory("settings-ui-pin-arguments")/L"settings.json";
     settings::SettingsService service(file,dispatcher);
     REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    const bool initialReplacement=service.Current().general.replaceWindowsTaskbar;
     apps::ApplicationInfo app;app.id=L"exe:synthetic-profile";app.displayName=L"Synthetic profile";
     app.executablePath=L"synthetic.exe";app.arguments=L"--profile \"Synthetic profile\"";
     settings::ui::SettingsCallbacks callbacks;callbacks.catalog=[app]{return std::vector{app};};
@@ -256,5 +333,34 @@ AETHER_TEST("settings UI: adding an application preserves executable arguments a
     REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
     CHECK_FALSE(::IsWindowEnabled(window.Control(319)));
     CHECK(ControlText(window.Control(318)).find(L"unavailable")!=std::wstring::npos);
-    CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
+    CHECK_EQ(service.Current().general.replaceWindowsTaskbar,initialReplacement);
+}
+
+AETHER_TEST("settings UI: a default-on Desktop choice persists only an explicitly applied opt-out") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto file=test::MakeTempDirectory("settings-ui-desktop-default")/L"settings.json";
+    settings::SettingsService service(file,dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    REQUIRE(service.Current().general.replaceWindowsTaskbar);
+    RECT before{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&before,0));
+    settings::ui::SettingsWindow window(service,dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    REQUIRE(window.Control(200));
+    CHECK_EQ(::SendMessageW(window.Control(200),BM_GETCHECK,0,0),BST_CHECKED);
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);
+    ::SendMessageW(window.Handle(),WM_TIMER,19,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+    CHECK(service.Current().general.replaceWindowsTaskbar);
+    window.Close();REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    CHECK_EQ(::SendMessageW(window.Control(200),BM_GETCHECK,0,0),BST_CHECKED);
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);
+    ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE(Pump(dispatcher,[&]{return !service.Current().general.replaceWindowsTaskbar && !service.Dirty();}));
+    settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));
+    CHECK_FALSE(reloaded.Current().general.replaceWindowsTaskbar);
+    RECT after{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&after,0));
+    CHECK(::EqualRect(&before,&after));  // no taskbar controller or native setting action is attached
 }

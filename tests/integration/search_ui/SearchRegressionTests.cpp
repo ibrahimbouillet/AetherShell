@@ -6,6 +6,7 @@
 #include "search/ui/SearchWindow.h"
 #include "CaptureFixture.h"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <filesystem>
@@ -138,8 +139,16 @@ AETHER_TEST("search UI: repeated Open preserves its restore target and native in
 
 AETHER_TEST("search UI: dark and light own-window captures include query selection and inline launch error") {
     Fixture fixture; auto& window = *fixture.window; const auto monitor = platform::PrimaryMonitor();
-    const RECT area{monitor.workArea.left + 40, monitor.workArea.top + 40, monitor.workArea.left + 840, monitor.workArea.top + 720};
-    RECT privateBounds = area; ::InflateRect(&privateBounds, 128, 128);
+    const int areaWidth = std::min(800, platform::Width(monitor.workArea) - 360);
+    const int areaHeight = std::min(500, platform::Height(monitor.workArea) - 400);
+    REQUIRE(areaWidth >= 320); REQUIRE(areaHeight >= 260);
+    const int areaLeft = monitor.workArea.left + (platform::Width(monitor.workArea) - areaWidth) / 2;
+    const int areaTop = monitor.workArea.top + (platform::Height(monitor.workArea) - areaHeight) / 2;
+    const RECT area{areaLeft, areaTop, areaLeft + areaWidth, areaTop + areaHeight};
+    window.SetPlacementArea(area);
+    RECT privateBounds = window.BoundsPx(); ::InflateRect(&privateBounds, 138, 138);
+    REQUIRE(privateBounds.left >= monitor.workArea.left); REQUIRE(privateBounds.top >= monitor.workArea.top);
+    REQUIRE(privateBounds.right <= monitor.workArea.right); REQUIRE(privateBounds.bottom <= monitor.workArea.bottom);
     Backdrop backdrop; REQUIRE(backdrop.Create(privateBounds));
     window.SetPlacementArea(area); window.Open(); fixture.Query(L"Test Application");
     fixture.launcher.fail = true;

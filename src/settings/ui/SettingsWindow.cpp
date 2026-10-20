@@ -241,6 +241,20 @@ void SettingsWindow::Impl::BuildPage() {
         Add(L"STATIC", callbacks.hotkeyStatus ? callbacks.hotkeyStatus() : L"Shortcut status unavailable", 0, 218, 405, 440, 48);
         Add(L"BUTTON", L"Open log folder", WS_TABSTOP, 218, 470, 150, 30, kOpenLogs);
         Add(L"BUTTON", L"Export diagnostics…", WS_TABSTOP, 380, 470, 180, 30, kExport);
+    } else if (page == SettingsPage::Appearance) {
+        choice(L"Color mode", {L"Follow Windows", L"Light", L"Dark"}, [](const Settings& s){return s.general.themeMode;}, [](Settings& s,int v){s.general.themeMode=static_cast<ThemePreference>(v);});
+        choice(L"Accent color", {L"Windows", L"Aether"}, [](const Settings& s){return s.general.accentSource;}, [](Settings& s,int v){s.general.accentSource=static_cast<AccentSource>(v);});
+        number(L"Animation duration (0.5–1.5)", [](const Settings& s){return s.general.animationSpeed;}, [](Settings& s,double v){s.general.animationSpeed=v;});
+        choice(L"Dock icon preset", {L"Small — 32 DIPs", L"Medium — 40 DIPs", L"Large — 48 DIPs", L"Keep custom size"},
+            [](const Settings& s){return s.dock.iconSize==32?0:s.dock.iconSize==40?1:s.dock.iconSize==48?2:3;},
+            [](Settings& s,int v){if(v>=0 && v<3)s.dock.iconSize=v==0?32:v==1?40:48;});
+        check(L"Show Windows Start in the Dock", [](const Settings& s){return s.dock.showStartButton;}, [](Settings& s,bool v){s.dock.showStartButton=v;});
+        check(L"Show Task View in the Dock", [](const Settings& s){return s.dock.showTaskViewButton;}, [](Settings& s,bool v){s.dock.showTaskViewButton=v;});
+        check(L"Reserve extra space for Dock animations", [](const Settings& s){return s.dock.reserveAnimationSpace;}, [](Settings& s,bool v){s.dock.reserveAnimationSpace=v;});
+        choice(L"Weather position", {L"Left", L"Right"}, [](const Settings& s){return s.topBar.weatherPlacement;}, [](Settings& s,int v){s.topBar.weatherPlacement=static_cast<WeatherPlacement>(v);});
+        choice(L"Keyboard indicator", {L"Compact", L"Two lines"}, [](const Settings& s){return s.topBar.keyboardIndicator;}, [](Settings& s,int v){s.topBar.keyboardIndicator=static_cast<KeyboardIndicatorStyle>(v);});
+        check(L"Add newly discovered Windows taskbar pins", [](const Settings& s){return s.general.syncTaskbarPins;}, [](Settings& s,bool v){s.general.syncTaskbarPins=v;});
+        Add(L"STATIC", L"High contrast and reduced motion take precedence. A custom Dock size is kept until you choose a preset.", 0, 218, 512, 450, 48);
     } else if (page == SettingsPage::Desktop) {
         check(L"Replace the Windows taskbar (Apply to consent)",
             [](const Settings& s){return s.general.replaceWindowsTaskbar;},
@@ -496,6 +510,10 @@ void SettingsWindow::Impl::SearchLocation() {
 
 void SettingsWindow::Impl::Action(int id) {
     if (startupBusy) return;
+    const auto pinSaved = [this, weak = std::weak_ptr<bool>(alive)](Result<void> persisted) {
+        if (const auto live = weak.lock(); live && *live)
+            Message(persisted ? L"Pinned applications saved." : L"Pins changed in memory; saving failed. Apply again to retry.");
+    };
     if (id == kApply) Apply(true);
     else if (id == kReset) {
         if (::MessageBoxW(window, L"Reset settings and disable startup? A backup of the existing file will be kept.", L"Aether Shell", MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
@@ -505,21 +523,30 @@ void SettingsWindow::Impl::Action(int id) {
         const auto selected = ::SendMessageW(controls[kFirstField+72], CB_GETCURSEL, 0, 0);
         if (selected != CB_ERR && static_cast<std::size_t>(selected) < applications.size()) {
             const auto app = applications[static_cast<std::size_t>(selected)];
-            (void)service.Update([app](Settings& s){
+            const auto result = service.Update([app](Settings& s){
                 PinnedApp pin; pin.id=app.id; pin.displayName=app.displayName; pin.parsingName=app.parsingName;
                 pin.appUserModelId=app.appUserModelId; pin.executablePath=app.executablePath;
                 pin.shortcutPath=app.shortcutPath; pin.arguments=app.arguments;
                 s.dock.pinned.push_back(std::move(pin));
-            }); BuildPage();
+                std::erase_if(s.dock.dismissedPins,[&](const auto& id){return text::EqualsIgnoreCase(id,app.id);});
+            }, pinSaved); BuildPage();
+            if (!result) Message(L"Pinned application could not be added.");
         }
     } else if (id == kRemovePin || id == kMovePinUp || id == kMovePinDown) {
         if (livePending) Apply(false);
         const auto selected = ::SendMessageW(controls[kPinList], LB_GETCURSEL, 0, 0);
         if (selected != LB_ERR) {
-            (void)service.Update([id,selected](Settings& s){ const auto at=static_cast<std::size_t>(selected); if(at>=s.dock.pinned.size())return;
-                if(id==kRemovePin)s.dock.pinned.erase(s.dock.pinned.begin()+at);
+            const auto result = service.Update([id,selected](Settings& s){ const auto at=static_cast<std::size_t>(selected); if(at>=s.dock.pinned.size())return;
+                if(id==kRemovePin){
+                    const auto removed=s.dock.pinned[at].id;
+                    s.dock.pinned.erase(s.dock.pinned.begin()+at);
+                    std::erase_if(s.dock.dismissedPins,[&](const auto& item){return text::EqualsIgnoreCase(item,removed);});
+                    if(s.dock.dismissedPins.size()>=128)s.dock.dismissedPins.erase(s.dock.dismissedPins.begin());
+                    s.dock.dismissedPins.push_back(removed);
+                }
                 else if(id==kMovePinUp && at>0)std::swap(s.dock.pinned[at],s.dock.pinned[at-1]);
-                else if(id==kMovePinDown && at+1<s.dock.pinned.size())std::swap(s.dock.pinned[at],s.dock.pinned[at+1]); }); BuildPage();
+                else if(id==kMovePinDown && at+1<s.dock.pinned.size())std::swap(s.dock.pinned[at],s.dock.pinned[at+1]); }, pinSaved); BuildPage();
+            if (!result) Message(L"Pinned applications could not be changed.");
         }
     } else if (id == kGeoSearch) SearchLocation();
     else if (id == kCheckUpdate && callbacks.checkForUpdates) callbacks.checkForUpdates();
@@ -624,7 +651,7 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         platform::ApplyImmersiveDarkMode(window, platform::SystemPrefersDarkApps());
         impl_->Add(L"STATIC", L"Aether Shell", 0, 24, 22, 620, 34, 0, false);
         impl_->navigation = impl_->Add(L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | WS_BORDER, 24, 86, 165, 456, kNavigation, false);
-        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop"}) ::SendMessageW(impl_->navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
+        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance"}) ::SendMessageW(impl_->navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
         impl_->status = impl_->Add(L"STATIC", L"", 0, 24, 570, 650, 48, kStatus, false);
         impl_->Add(L"BUTTON", L"Reset defaults…", WS_TABSTOP, 24, 626, 170, 32, kReset, false);
         impl_->Add(L"BUTTON", L"Apply", WS_TABSTOP | BS_DEFPUSHBUTTON, 550, 626, 120, 32, kApply, false);

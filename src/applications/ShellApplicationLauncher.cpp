@@ -141,8 +141,21 @@ RouteOutcome TryExecutable(const ApplicationInfo& app, std::wstring_view name) {
     return ExecuteFile(path.value(), folder.empty() ? nullptr : folder.c_str(), name);
 }
 
+// Logs name the identity scheme only: display names of running groups can be browser profile names.
+std::string_view SchemeForLog(const ApplicationInfo& app) noexcept {
+    switch (GetIdScheme(app.id)) {
+        case IdScheme::Aumid: return "an AUMID application";
+        case IdScheme::Executable: return "an executable application";
+        case IdScheme::Shell: return "a shell application";
+        case IdScheme::Window: return "a window-only application";
+        case IdScheme::Invalid: break;
+    }
+    return "an application";
+}
+
 Result<void> Launch(const ApplicationInfo& app) {
     const std::wstring name = NameOf(app);
+    const std::string_view what = SchemeForLog(app);
     std::optional<Error> lastFailure;
     for (const Route route : {Route::AppsFolder, Route::Activation, Route::Shortcut, Route::Executable}) {
         RouteOutcome outcome;
@@ -154,17 +167,18 @@ Result<void> Launch(const ApplicationInfo& app) {
         }
         if (!outcome) continue;
         if (outcome->ok()) {
-            AETHER_LOG_INFO(kLog, "launched {} through the {}", shell::ForLog(name), RouteName(route));
+            AETHER_LOG_INFO(kLog, "launched {} through the {}", what, RouteName(route));
             return Ok();
         }
         const Error& error = outcome->error();
-        AETHER_LOG_WARN(kLog, "launching {} through the {} failed: {}", shell::ForLog(name), RouteName(route),
-                        error.Describe());
+        // The error code only: its message names the application.
+        AETHER_LOG_WARN(kLog, "launching {} through the {} failed: {} (0x{:08X})", what, RouteName(route),
+                        ToString(error.code), static_cast<std::uint32_t>(error.platformCode));
         if (!ShouldTryNextLaunchRoute(error)) return error;
         lastFailure = error;
     }
     if (lastFailure) return *lastFailure;
-    AETHER_LOG_WARN(kLog, "nothing launchable for {}", shell::ForLog(name));
+    AETHER_LOG_WARN(kLog, "nothing launchable for {}", what);
     return MakeLaunchError(ERROR_FILE_NOT_FOUND, name);
 }
 
@@ -235,6 +249,12 @@ Result<void> ShellApplicationLauncher::Activate(const RunningApplication& app) {
         const HWND foregroundRoot = foreground ? ::GetAncestor(foreground, GA_ROOTOWNER) : nullptr;
         const auto choice = ChooseWindowToActivate(live, foreground, foregroundRoot);
         if (!choice) return MakeError(ErrorCode::NotFound, name + " has no open window.");
+        if (choice->minimize) {
+            // Taskbar parity: clicking the application whose only window is in front minimizes it.
+            // Asynchronous, so a hung application cannot block the UI thread.
+            ::ShowWindowAsync(choice->window, SW_MINIMIZE);
+            return Ok();
+        }
         if (choice->alreadyActive) return Ok();
 
         const HWND target = choice->window;

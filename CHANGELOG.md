@@ -8,7 +8,7 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ### 0.2.0-alpha.1 candidate — V2
 
-- Optional reversible visual taskbar replacement, default off, with explicit Desktop Apply consent,
+- Reversible visual taskbar replacement enabled by default (D23), preserving explicit opt-out, with Desktop Apply controls,
   a separate recovery helper, status/errors, and existing-instance quit/restore commands.
 - Dock bottom-margin correction and mandatory animated-footprint AppBar reservation in replacement
   mode, keeping maximized application content above the Dock.
@@ -24,6 +24,16 @@ All notable changes to Aether Shell are documented here. The format follows
   reservation was rejected.
 - Owner-approved D19 / ADR 0009 records the narrow taskbar-hiding exception. Explorer remains intact;
   native Windows Settings takeover is unsupported. Full V2 delivery qualification is pending.
+- Interrupted batch recovery adds shared theme/glyph/menu/transition primitives, compact Dock tiles,
+  pin and running-item reordering, profile-aware presentation, one-time Explorer pin initialization,
+  additive pin sync with dismissal/revision protection, and an Appearance settings page.
+- Top Bar actions include keyboard/network/weather/clock/power/sound access and temporary native
+  taskbar reveal with manual or 60-second resume. The Dock hides only after native restoration.
+- The microphone menu requests Windows voice typing (Win+H) in the previous application; endpoint
+  mute and microphone privacy settings remain separate actions. Aether does not record speech.
+- Review fixes reject unknown profile relaunches, validate icon-file ancestors, reject foreign menu
+  item pointers and stale modal actions, and prevent hidden animated Search rows from activating.
+  Fresh combined native/desktop qualification is in progress; see TEST_STATUS S-022.
 
 ## [0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) — 2026-10-18
 

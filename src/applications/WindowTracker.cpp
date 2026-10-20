@@ -3,8 +3,10 @@
 #include "applications/WindowTracker.h"
 
 #include "applications/ApplicationIdentity.h"
+#include "applications/KnownApplications.h"
 #include "applications/ShellItems.h"
 #include "applications/WindowEligibility.h"
+#include "applications/WindowProperties.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "platform/windows/Handles.h"
@@ -45,12 +47,6 @@ constexpr std::array<EventRange, 5> kHookedEvents{{
 }};
 
 bool IsTopLevel(HWND hwnd) noexcept { return ::GetAncestor(hwnd, GA_PARENT) == ::GetDesktopWindow(); }
-
-std::wstring WindowAppUserModelId(HWND hwnd) {
-    winrt::com_ptr<IPropertyStore> store;
-    if (FAILED(::SHGetPropertyStoreForWindow(hwnd, IID_PPV_ARGS(store.put())))) return {};
-    return shell::GetStringProperty(store.get(), PKEY_AppUserModel_ID).value_or(std::wstring{});
-}
 
 std::wstring ExecutableStem(const std::wstring& path) {
     return std::filesystem::path(path).stem().native();
@@ -94,7 +90,8 @@ bool SameApplications(const std::vector<RunningApplication>& a, const std::vecto
                           return x.id == y.id && x.displayName == y.displayName &&
                                  x.executablePath == y.executablePath && x.appUserModelId == y.appUserModelId &&
                                  x.processId == y.processId && x.foreground == y.foreground &&
-                                 SameWindows(x.windows, y.windows);
+                                 x.relaunchIconResource == y.relaunchIconResource &&
+                                 x.relaunchDisplayName == y.relaunchDisplayName && SameWindows(x.windows, y.windows);
                       });
 }
 
@@ -103,7 +100,7 @@ bool SameApplications(const std::vector<RunningApplication>& a, const std::vecto
 WindowTracker::WindowTracker(IUiDispatcher& dispatcher) : WindowTracker(dispatcher, Options{}) {}
 
 WindowTracker::WindowTracker(IUiDispatcher& dispatcher, Options options)
-    : dispatcher_(dispatcher), options_(options) {}
+    : dispatcher_(dispatcher), options_(options), windowsDirectory_(SystemWindowsDirectory().value_or(std::wstring{})) {}
 
 WindowTracker::~WindowTracker() {
     Stop();
@@ -288,11 +285,13 @@ const WindowTracker::ProcessIdentity& WindowTracker::LookupProcess(DWORD process
     return processes_.insert_or_assign(processId, std::move(identity)).first->second;
 }
 
-WindowIdentity WindowTracker::Identify(HWND hwnd, const std::wstring& className) {
+WindowIdentity WindowTracker::Identify(HWND hwnd, const std::wstring& className, WindowShellProperties& properties) {
     WindowIdentityFacts facts;
     facts.className = className;
     ::GetWindowThreadProcessId(hwnd, &facts.windowProcessId);
-    facts.windowAumid = WindowAppUserModelId(hwnd);
+    // One property store per window gives the identity and the group's relaunch presentation.
+    properties = ReadWindowShellProperties(hwnd).value_or(WindowShellProperties{});
+    facts.windowAumid = properties.aumid;
 
     DWORD identityProcess = facts.windowProcessId;
     if (IsApplicationFrameClass(className)) {
@@ -317,10 +316,17 @@ WindowIdentity WindowTracker::Identify(HWND hwnd, const std::wstring& className)
 
     WindowIdentity identity = ResolveWindowIdentity(facts);
     if (ShouldRememberFrameIdentity(facts, identity)) frameIdentities_[hwnd] = identity;
+    // File Explorer windows that expose no AppUserModelID join the ones that do (the desktop and
+    // taskbar windows of the same process are already excluded by class).
+    CanonicalizeFileExplorerWindow(identity, windowsDirectory_);
     return identity;
 }
 
-std::wstring WindowTracker::DisplayNameFor(const WindowIdentity& identity, const std::wstring& firstTitle) {
+std::wstring WindowTracker::DisplayNameFor(const WindowIdentity& identity, const std::wstring& firstTitle,
+                                           const std::wstring& relaunchDisplayName) {
+    // The name the window declared for its taskbar group (for example a browser profile's name)
+    // tells groups of one executable apart.
+    if (!relaunchDisplayName.empty() && GetIdScheme(identity.id) != IdScheme::Window) return relaunchDisplayName;
     if (GetIdScheme(identity.id) == IdScheme::Window) return firstTitle;
     if (const auto resolved = displayNames_.find(identity.id);
         resolved != displayNames_.end() && !resolved->second.empty()) {
@@ -379,7 +385,8 @@ void WindowTracker::Refresh() {
     for (const HWND hwnd : windows) {  // EnumWindows returns windows in z-order: most recent first
         const WindowFacts facts = CollectWindowFacts(hwnd);
         if (!IsEligibleAppWindow(facts)) continue;
-        WindowIdentity identity = Identify(hwnd, facts.className);
+        WindowShellProperties properties;
+        WindowIdentity identity = Identify(hwnd, facts.className, properties);
         if (identity.id.empty()) continue;
         seenProcesses.insert(identity.processId);
         auto existing = std::find_if(applications.begin(), applications.end(),
@@ -395,6 +402,9 @@ void WindowTracker::Refresh() {
             existing = std::prev(applications.end());
         }
         existing->windows.push_back(RunningWindow{hwnd, facts.title, ::IsIconic(hwnd) != FALSE});
+        // From the most recent window of the group that declares them (z-order: most recent first).
+        if (existing->relaunchIconResource.empty()) existing->relaunchIconResource = std::move(properties.relaunchIconResource);
+        if (existing->relaunchDisplayName.empty()) existing->relaunchDisplayName = std::move(properties.relaunchDisplayName);
         if (hwnd == foreground || hwnd == foregroundRoot) existing->foreground = true;
         tracked.insert(hwnd);
     }
@@ -403,7 +413,7 @@ void WindowTracker::Refresh() {
     std::unordered_map<std::wstring, std::uint64_t> order;
     for (std::size_t i = 0; i < applications.size(); ++i) {
         auto& app = applications[i];
-        app.displayName = DisplayNameFor(identities[i], app.windows.front().title);
+        app.displayName = DisplayNameFor(identities[i], app.windows.front().title, app.relaunchDisplayName);
         const auto known = firstSeen_.find(app.id);
         order[app.id] = known != firstSeen_.end() ? known->second : nextOrder_++;
     }

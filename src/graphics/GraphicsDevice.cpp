@@ -3,6 +3,8 @@
 #include "graphics/GraphicsDevice.h"
 
 #include "diagnostics/Logger.h"
+#include "graphics/GlassPainter.h"
+#include "graphics/Glyphs.h"
 #include "platform/windows/OsVersion.h"
 #include "platform/windows/Win32Error.h"
 
@@ -99,12 +101,15 @@ Result<void> GraphicsDevice::HandleDeviceLost() {
         AETHER_LOG_WARN("graphics", "rendering device lost (reason 0x{:08X}); recreating",
                         static_cast<unsigned>(reason));
     }
+    ReleaseGlassResources();
     if (auto result = CreateDevices(); !result) return result.error();
     DeviceReplaced.Emit();
     return Ok();
 }
 
 void GraphicsDevice::Shutdown() noexcept {
+    ReleaseGlassResources();
+    ReleaseGlyphResources();
     compositionDevice_ = nullptr;
     compositor_ = nullptr;
     d2dDevice_ = nullptr;

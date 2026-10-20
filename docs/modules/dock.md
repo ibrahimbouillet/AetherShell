@@ -8,9 +8,11 @@ The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.
 
 ## Model and layout
 
-`BuildDockItems` merges case-insensitive application identities, including duplicate running
-groups, while preserving pinned order and accumulating windows for activation. Pin/unpin/move
-helpers return new lists and reject transient window-only identities. `FitDockItems` first reduces
+`BuildDockItems` emits configurable Start, Search and Task View entries before application items.
+It merges case-insensitive identities, including duplicate running groups, while preserving pinned
+order and accumulating windows for activation. Session ordering can temporarily move unpinned
+groups among those pins. Pin helpers require a trusted launch route and reject transient window-only
+identities; activation of existing windows remains available. `FitDockItems` first reduces
 icon size to 32 DIPs, then places trailing running applications in an overflow menu; on exceptionally
 narrow work areas pins can also overflow. The minimum fallback keeps search with an overflow menu.
 
@@ -31,18 +33,19 @@ bounds include hover headroom; its input region
 is the panel and current icons. DPI, display and work-area changes relayout and refresh icon size.
 `SetTheme` applies validated settings immediately, and settings notifications keep pin order live.
 
-Search and settings emit signals to the application. Normal clicks activate a running group or
-launch a non-running application; middle click requests a new instance. The native context menu
+Start, Search, Task View and settings emit signals to the application. Normal clicks activate a running group or
+launch a non-running application; middle click requests a new instance only with a trusted route.
+The shared themed context-menu presenter (native fallback in high contrast)
 provides Open, New instance, Pin/Unpin, Move left/right, overflow applications and settings. The
 Windows taskbar-pin import and Windows Start entries emit `ImportWindowsPinsRequested` and
 `StartRequested`; the application owns discovery and shell activation outside the Dock module.
-Application drag reordering starts at six DIPs and persists through the asynchronous settings service.
-Pinned and unpinned running icons are both draggable. Moving a running icon pins it; earlier
-running icons that must precede its destination become pins as well, preserving the exact requested
-order under the pins-first model. Existing pin launch metadata is retained. Search and overflow
-remain fixed, and a transient window-only identity or the 64-pin limit produces a visible error
-without committing a partial order. A completed drag consumes its release rather than launching
-the moved application.
+Application drag reordering starts at six DIPs; holding for the shared long-press interval lifts an
+icon. Pinned and unpinned running icons are both draggable. Running icons move only in the session
+and never pin themselves or their neighbours; closing their last window removes that session slot.
+Moving a pin persists only the order of existing pins through the asynchronous settings service.
+Existing pin launch metadata is retained. Fixed entries and overflow never move. Explicit Unpin
+records `dismissedPins` so automatic Windows pin sync cannot re-add the item; explicit Pin removes
+that dismissal. A completed drag consumes its release rather than launching the moved application.
 Reordered slots spring from their currently drawn positions to their new slots; reduced motion
 snaps directly. Hit testing follows these positions during the transition.
 Launch errors appear in a temporary anchored tooltip. Tooltip delay is a one-shot timer.
@@ -59,9 +62,12 @@ re-registering after Explorer restarts. The V2 `replacementTaskbarMode` option a
 `SetTaskbarReplacement` force reservation while the application's reversible taskbar mode is active,
 even when the ordinary floating-mode `dock.reserveSpace` preference is false. The application owns
 native-taskbar visibility/restoration. Dock placement respects the AppBar allocation returned by
-Explorer, including other AppBars and an auto-hide reveal strip. Reservation covers the maximum
-magnification, launch bounce, focus outline and panel shadow; it is stable while hovering rather
-than resizing other applications every animation frame. Reduced motion omits bounce headroom.
+Explorer, including other AppBars and an auto-hide reveal strip. The HWND always includes 32 DIPs
+for the two-layer shadow (whose default extent is 31), entrance slide, magnification, lift, bounce and focus outline;
+visual margins remain outside the input region. With `reserveAnimationSpace=false` (default),
+reservation covers the resting panel and bottom gap. When true, it also covers the maximum
+magnification, bounce, lift, focus and panel shadow. It stays stable while hovering; reduced
+motion omits bounce/lift reservation.
 Before the first `ABM_SETPOS`, the work area comes from the monitor, not from the still-empty AppBar
 rectangle (a real-desktop defect fixed on 2026-10-18, TEST_STATUS S-016). Tests can explicitly
 prohibit all reservation and supply a synthetic work area. The production application's tracker, catalog,
@@ -127,3 +133,39 @@ The subsequent running-icon drag correction adds three model cases and expands b
 fixtures with a running-to-pinned drag, unchanged fake launch/activation counters and asynchronous
 save completion. That correction's new checks are pending until its focused rebuild finishes;
 the 19+2 receipt above predates it. The installed alpha still has the original pin-only drag policy.
+
+## Combined V2 consumer checkpoint — 2026-10-20
+
+The current integration worktree implements the fixed entries, session-only running drag, safe
+profile presentation, shared glyph/menu/material consumers and compact reservation policy described
+above. `SetApplicationCatalog` builds the pure `ApplicationIndex` and resolves running groups through
+`ResolveRunningPresentation`; an unmatched explicit profile can activate its windows but cannot
+launch a generic browser or become a persistent pin. Icon keys include `IconSourceFingerprint`, so
+later catalog metadata requests a new icon instead of retaining a generic image. Old callbacks and
+unused CPU/GPU entries cannot replace that refreshed source.
+
+The app connects `StartRequested`, `SearchRequested` and `TaskViewRequested` to its shell-action
+controller, and provides the catalog after discovery. The Dock does not synthesize global keys or
+perform shell actions itself. `DockWindowContext::menuPresenter` can inject an in-memory presenter;
+production uses `ThemedMenuPresenter` with anchored placement and foreground restoration.
+The visual region follows the panel/icons plus their shadow and entrance extents, excluding empty
+side/headroom regions. Pointer invocation waits for the finite compositor entrance to settle;
+switching to reduced motion or high contrast cancels that entrance immediately.
+Modal commands retain the active presenter, check the owner's lifetime after its nested message loop,
+and resolve the selected item against the current model before acting. Launch, deferred UIA Invoke
+and asynchronous error tooltips require a shown, enabled, unsuppressed surface; closing input
+admission prevents a queued request from launching an application during shutdown.
+
+The updated suite contains 31 unit and three own-window native cases, including configurable fixed
+entries, session order without pinning, profile route refusal/catalog enrichment, source-sensitive
+icon refresh, explicit Unpin dismissal and compact-versus-animated reservation. Existing captures
+retain their private backdrop and pre/post guards. These edits have not yet been built or executed
+against the combined candidate; previous results above are historical receipts, not validation of
+this checkpoint. Real Chrome profile avatars, launch actions, multi-monitor geometry and AppBar
+recovery remain separate manual qualification.
+
+Combined candidate verification (2026-10-20, TEST_STATUS S-022): Release /W4 /WX passes **31/31 unit
+and 3/3 native cases**. The native checks include fixed-entry requests, unknown-profile route
+refusal, catalog/icon refresh, modal hiding, disabled launch admission and queued-tooltip rejection.
+Fresh dark-rest and light-hover public images contain only the inspected synthetic fixtures. This
+supersedes the pending checkpoint above for automated scope, not actual browser/AppBar qualification.

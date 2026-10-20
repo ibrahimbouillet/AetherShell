@@ -4,6 +4,7 @@
 
 #include "dock/DockLayout.h"
 #include "dock/DockModel.h"
+#include "graphics/Animation.h"
 
 #include <cmath>
 #include <limits>
@@ -12,6 +13,10 @@ using namespace aether;
 using namespace aether::dock;
 
 namespace {
+settings::DockSettings ApplicationSettings() {
+    settings::DockSettings config; config.showStartButton = false; config.showTaskViewButton = false;
+    return config;
+}
 settings::PinnedApp Pin(std::wstring id, std::wstring name = L"Synthetic app") {
     settings::PinnedApp pin; pin.id = std::move(id); pin.displayName = std::move(name); return pin;
 }
@@ -23,7 +28,7 @@ apps::RunningApplication Running(std::wstring id, bool foreground = false) {
 }
 
 AETHER_TEST("dock model: Search precedes ordered pins and unpinned running applications") {
-    settings::DockSettings config; config.pinned = {Pin(L"exe:a", L"A"), Pin(L"exe:b", L"B")};
+    auto config = ApplicationSettings(); config.pinned = {Pin(L"exe:a", L"A"), Pin(L"exe:b", L"B")};
     auto model = BuildDockItems(config, {Running(L"exe:c")}); REQUIRE(model.ok());
     REQUIRE_EQ(model->size(), 4u);
     CHECK_EQ((*model)[0].kind, DockItemKind::Search);
@@ -31,25 +36,25 @@ AETHER_TEST("dock model: Search precedes ordered pins and unpinned running appli
     CHECK_EQ((*model)[3].kind, DockItemKind::Running); CHECK_EQ((*model)[3].id, std::wstring(L"exe:c"));
 }
 AETHER_TEST("dock model: pins merge running state by case-insensitive identity without duplicates") {
-    settings::DockSettings config; config.pinned = {Pin(L"exe:a"), Pin(L"EXE:A")};
+    auto config = ApplicationSettings(); config.pinned = {Pin(L"exe:a"), Pin(L"EXE:A")};
     auto model = BuildDockItems(config, {Running(L"EXE:A", true), Running(L"exe:b")}); REQUIRE(model.ok());
     REQUIRE_EQ(model->size(), 3u);
     CHECK((*model)[1].running); CHECK((*model)[1].foreground); CHECK_EQ((*model)[1].windowCount, 1u);
     CHECK((*model)[1].runningApplication.has_value());
 }
 AETHER_TEST("dock model: disabling unpinned running applications keeps pinned running indicators") {
-    settings::DockSettings config; config.showRunningApps = false; config.pinned = {Pin(L"exe:a")};
+    auto config = ApplicationSettings(); config.showRunningApps = false; config.pinned = {Pin(L"exe:a")};
     auto model = BuildDockItems(config, {Running(L"exe:a"), Running(L"exe:b")}); REQUIRE(model.ok());
     REQUIRE_EQ(model->size(), 2u); CHECK((*model)[1].running);
 }
 AETHER_TEST("dock model: window counts and foreground state merge across matching running entries") {
-    settings::DockSettings config; config.pinned = {Pin(L"exe:a")};
+    auto config = ApplicationSettings(); config.pinned = {Pin(L"exe:a")};
     auto model = BuildDockItems(config, {Running(L"exe:a"), Running(L"exe:a", true)}); REQUIRE(model.ok());
     REQUIRE_EQ(model->size(), 2u); CHECK_EQ((*model)[1].windowCount, 2u); CHECK((*model)[1].foreground);
     REQUIRE((*model)[1].runningApplication.has_value()); CHECK_EQ((*model)[1].runningApplication->windows.size(), 2u);
 }
 AETHER_TEST("dock model: duplicate unpinned tracker identities merge windows and foreground state") {
-    auto model = BuildDockItems(settings::DockSettings{}, {Running(L"exe:a"), Running(L"EXE:A", true)}); REQUIRE(model.ok());
+    auto model = BuildDockItems(ApplicationSettings(), {Running(L"exe:a"), Running(L"EXE:A", true)}); REQUIRE(model.ok());
     REQUIRE_EQ(model->size(), 2u); CHECK_EQ((*model)[1].windowCount, 2u); CHECK((*model)[1].foreground);
     REQUIRE((*model)[1].runningApplication.has_value()); CHECK((*model)[1].runningApplication->foreground);
 }
@@ -69,13 +74,13 @@ AETHER_TEST("dock model: transient identities and too many pins fail explicitly"
 }
 AETHER_TEST("dock model: a pinned launch retains arguments without depending on its shortcut file") {
     apps::ApplicationInfo app; app.id = L"exe:synthetic-profile"; app.displayName = L"Synthetic profile";
-    app.executablePath = L"synthetic.exe"; app.arguments = L"--profile \"Synthetic profile\" --mode=test";
+    app.executablePath = LR"(C:\AetherFixture\synthetic.exe)"; app.shortcutPath = LR"(C:\AetherFixture\profile.lnk)"; app.arguments = L"--profile \"Synthetic profile\" --mode=test";
     auto pin = PinFromApplication(app); REQUIRE(pin.ok()); CHECK_EQ(pin->arguments, app.arguments);
-    settings::DockSettings config; config.pinned.push_back(*pin);
+    auto config = ApplicationSettings(); config.pinned.push_back(*pin);
     auto model = BuildDockItems(config, {}); REQUIRE(model.ok()); REQUIRE_EQ(model->size(), 2u);
     CHECK_EQ((*model)[1].application.arguments, app.arguments);
     CHECK_EQ((*model)[1].application.executablePath, app.executablePath);
-    CHECK((*model)[1].application.shortcutPath.empty());
+    CHECK_EQ((*model)[1].application.shortcutPath, app.shortcutPath);
 }
 AETHER_TEST("dock model: moving pins preserves relative order and validates destinations") {
     const std::vector pins{Pin(L"exe:a"), Pin(L"exe:b"), Pin(L"exe:c")};
@@ -85,40 +90,39 @@ AETHER_TEST("dock model: moving pins preserves relative order and validates dest
     CHECK_EQ(MovePin(pins, L"exe:missing", 0).error().code, ErrorCode::NotFound);
     CHECK_EQ(MovePin(pins, L"exe:a", 3).error().code, ErrorCode::InvalidArgument);
 }
-AETHER_TEST("dock drag: unpinned application moves left into pins without launching or losing existing metadata") {
-    settings::DockSettings config;config.pinned={Pin(L"exe:a"),Pin(L"exe:b")};
+AETHER_TEST("dock drag: running groups move in the session without pinning themselves or neighbours") {
+    auto config = ApplicationSettings();config.pinned={Pin(L"exe:a"),Pin(L"exe:b")};
     config.pinned[1].arguments=L"--synthetic-profile";
+    const std::vector running{Running(L"exe:c"),Running(L"window:temporary")};
+    auto moved=ReorderDockItems(DockModelInputs{config,running,{}},L"window:temporary",L"exe:a");REQUIRE(moved.ok());
+    CHECK_FALSE(moved->pinsChanged);REQUIRE_EQ(moved->pins.size(),2u);
+    CHECK_EQ(moved->pins[1].arguments,L"--synthetic-profile");
+    auto items=BuildDockItems(DockModelInputs{config,running,moved->sessionOrder});REQUIRE(items.ok());
+    REQUIRE_EQ(items->size(),5u);CHECK_EQ((*items)[1].id,L"window:temporary");CHECK_EQ((*items)[1].kind,DockItemKind::Running);
+    auto restarted=BuildDockItems(config,running);REQUIRE(restarted.ok());CHECK_EQ((*restarted)[1].id,L"exe:a");
+}
+AETHER_TEST("dock drag: pinned movement persists only the existing pin order") {
+    auto config = ApplicationSettings();config.pinned={Pin(L"exe:a"),Pin(L"exe:b")};
     const std::vector running{Running(L"exe:c"),Running(L"exe:d")};
-    auto moved=ReorderDockApplications(config,running,L"exe:d",L"exe:a");REQUIRE(moved.ok());
-    REQUIRE_EQ(moved->size(),3u);CHECK_EQ((*moved)[0].id,L"exe:d");CHECK_EQ((*moved)[1].id,L"exe:a");
-    CHECK_EQ((*moved)[2].id,L"exe:b");CHECK_EQ((*moved)[2].arguments,L"--synthetic-profile");
-    config.pinned=*moved;auto items=BuildDockItems(config,running);REQUIRE(items.ok());
-    REQUIRE_EQ(items->size(),5u);CHECK_EQ((*items)[4].id,L"exe:c");CHECK((*items)[1].running);
+    auto moved=ReorderDockItems(DockModelInputs{config,running,{}},L"exe:a",L"exe:d");REQUIRE(moved.ok());
+    REQUIRE_EQ(moved->pins.size(),2u);CHECK(moved->pinsChanged);
+    CHECK_EQ(moved->pins[0].id,L"exe:b");CHECK_EQ(moved->pins[1].id,L"exe:a");
+    config.pinned=moved->pins;
+    auto session=BuildDockItems(DockModelInputs{config,running,moved->sessionOrder});REQUIRE(session.ok());
+    CHECK_EQ((*session)[4].id,L"exe:a");
+    auto restarted=BuildDockItems(config,running);REQUIRE(restarted.ok());CHECK_EQ((*restarted)[2].id,L"exe:a");
 }
-AETHER_TEST("dock drag: moving right pins only the necessary running prefix to retain exact order") {
-    settings::DockSettings config;config.pinned={Pin(L"exe:a")};
-    const std::vector running{Running(L"exe:b"),Running(L"exe:c"),Running(L"exe:d"),Running(L"exe:e")};
-    auto moved=ReorderDockApplications(config,running,L"exe:b",L"exe:d");REQUIRE(moved.ok());
-    REQUIRE_EQ(moved->size(),4u);CHECK_EQ((*moved)[0].id,L"exe:a");CHECK_EQ((*moved)[1].id,L"exe:c");
-    CHECK_EQ((*moved)[2].id,L"exe:d");CHECK_EQ((*moved)[3].id,L"exe:b");
-    config.pinned=*moved;auto items=BuildDockItems(config,running);REQUIRE(items.ok());
-    REQUIRE_EQ(items->size(),6u);CHECK_EQ((*items)[5].id,L"exe:e");
-    auto back=ReorderDockApplications(config,running,L"exe:b",L"exe:c");REQUIRE(back.ok());
-    CHECK_EQ((*back)[1].id,L"exe:b");CHECK_EQ((*back)[2].id,L"exe:c");CHECK_EQ((*back)[3].id,L"exe:d");
-}
-AETHER_TEST("dock drag: transient missing and excess pin identities fail without modifying the input") {
-    settings::DockSettings config;config.pinned={Pin(L"exe:a")};
-    const std::vector running{Running(L"window:temporary"),Running(L"exe:c")};
-    CHECK_EQ(ReorderDockApplications(config,running,L"window:temporary",L"exe:a").error().code,ErrorCode::Unsupported);
-    CHECK_EQ(ReorderDockApplications(config,running,L"exe:a",L"exe:c").error().code,ErrorCode::Unsupported);
-    CHECK_EQ(ReorderDockApplications(config,running,L"missing",L"exe:a").error().code,ErrorCode::NotFound);
-    REQUIRE_EQ(config.pinned.size(),1u);CHECK_EQ(config.pinned[0].id,L"exe:a");
-    config.pinned.clear();for(int index=0;index<64;++index)config.pinned.push_back(Pin(L"exe:"+std::to_wstring(index)));
-    CHECK_EQ(ReorderDockApplications(config,{Running(L"exe:new")},L"exe:new",L"exe:0").error().code,ErrorCode::InvalidState);
-    CHECK_EQ(config.pinned.size(),64u);
+AETHER_TEST("dock drag: fixed and missing targets fail but a full pin list does not prevent session movement") {
+    auto config = ApplicationSettings();
+    for(int index=0;index<64;++index)config.pinned.push_back(Pin(L"exe:"+std::to_wstring(index)));
+    const std::vector running{Running(L"window:temporary")};
+    auto moved=ReorderDockItems(DockModelInputs{config,running,{}},L"window:temporary",L"exe:0");REQUIRE(moved.ok());
+    CHECK_EQ(moved->pins.size(),64u);CHECK_FALSE(moved->pinsChanged);
+    CHECK_EQ(ReorderDockItems(DockModelInputs{config,running,{}},L"missing",L"exe:0").error().code,ErrorCode::NotFound);
+    CHECK_EQ(ReorderDockItems(DockModelInputs{config,running,{}},L"exe:0",L"aether:search").error().code,ErrorCode::NotFound);
 }
 AETHER_TEST("dock overflow: shrink before hiding trailing running applications") {
-    settings::DockSettings config; config.pinned = {Pin(L"exe:a"), Pin(L"exe:b")};
+    auto config = ApplicationSettings(); config.pinned = {Pin(L"exe:a"), Pin(L"exe:b")};
     std::vector<apps::RunningApplication> running;
     for (int i = 0; i < 12; ++i) running.push_back(Running(L"exe:run" + std::to_wstring(i)));
     auto model = BuildDockItems(config, running); REQUIRE(model.ok());
@@ -129,7 +133,7 @@ AETHER_TEST("dock overflow: shrink before hiding trailing running applications")
     CHECK_EQ(fitted->items.size() + fitted->overflow.size() - 1, model->size());
 }
 AETHER_TEST("dock overflow: excess pins remain reachable and extremely narrow work areas keep Search") {
-    settings::DockSettings config;
+    auto config = ApplicationSettings();
     for (int i = 0; i < 64; ++i) config.pinned.push_back(Pin(L"exe:" + std::to_wstring(i)));
     auto model = BuildDockItems(config, {}); REQUIRE(model.ok());
     auto fitted = FitDockItems(*model, config, 300); REQUIRE(fitted.ok());
@@ -176,7 +180,7 @@ AETHER_TEST("dock layout: disabled magnification outside pointer and invalid geo
     CHECK_FALSE(ArrangeDockLayout(48, 8, 1.5f, 800, std::vector<float>{0.5f}).ok());
 }
 AETHER_TEST("dock layout: fitted magnification remains inside the available work width") {
-    settings::DockSettings config; config.magnification = 2;
+    auto config = ApplicationSettings(); config.magnification = 2;
     for (int count = 1; count < 65; ++count) {
         config.pinned.push_back(Pin(L"exe:" + std::to_wstring(count)));
         auto model = BuildDockItems(config, {}); REQUIRE(model.ok());
@@ -212,10 +216,10 @@ AETHER_TEST("dock placement: reservation contains every magnified bouncing icon 
                 auto placed = PlaceDock(*layout, area, dpi, size, magnification, 10, false); REQUIRE(placed.ok());
                 const double scale = static_cast<double>(dpi) / 96;
                 const double clientBottom = area.bottom - placed->reservationHeightPx;
-                const double shadowTop = placed->windowPx.top + (layout->panel.top - 12) * scale;
-                const double bounceFocusTop = placed->windowPx.top + (layout->items[0].icon.top - 10 - 6) * scale;
+                const double shadowTop = placed->windowPx.top + (layout->panel.top - kDockShadowMargin) * scale;
+                const double bounceFocusTop = placed->windowPx.top + (layout->items[0].icon.top - graphics::MaxBounceHeight(size) - graphics::Motion().liftOffset - 6) * scale;
                 CHECK(clientBottom <= shadowTop); CHECK(clientBottom <= bounceFocusTop);
-                CHECK(placed->reservationHeightPx <= static_cast<LONG>(std::ceil((size * magnification + 54) * scale)));
+                CHECK(placed->reservationHeightPx <= static_cast<LONG>(std::ceil((size * magnification * graphics::Motion().liftScale + graphics::MaxBounceHeight(size) + 74) * scale)));
             }
         }
     }
@@ -229,7 +233,18 @@ AETHER_TEST("dock placement: reduced motion removes bounce reservation and chang
     auto reduced = PlaceDock(*layout, monitor, 96, 48, 1.8f, 6, true); REQUIRE(reduced.ok());
     CHECK_EQ(replacement->windowPx.bottom - ordinary->windowPx.bottom, 48);
     CHECK_EQ(replacement->reservationHeightPx, ordinary->reservationHeightPx);
-    CHECK_EQ(replacement->reservationHeightPx - reduced->reservationHeightPx, 10);
+    CHECK(replacement->reservationHeightPx > reduced->reservationHeightPx);
+}
+AETHER_TEST("dock placement: compact reservation excludes animation while the HWND retains its complete footprint") {
+    auto layout=ArrangeDockLayout(40,8,1.45f,800,std::vector<float>{1});REQUIRE(layout.ok());
+    const RECT area{0,0,1920,1080};
+    auto compact=PlaceDock(*layout,area,144,40,1.45f,4,false,false);REQUIRE(compact.ok());
+    auto animated=PlaceDock(*layout,area,144,40,1.45f,4,false,true);REQUIRE(animated.ok());
+    CHECK(::EqualRect(&compact->windowPx,&animated->windowPx));
+    CHECK_EQ(compact->reservationHeightPx,static_cast<LONG>(std::ceil((layout->panel.bottom-layout->panel.top+4)*1.5f)));
+    CHECK(animated->reservationHeightPx>compact->reservationHeightPx);
+    CHECK(layout->panel.bottom+kDockShadowMargin+kDockEntranceOffset<=layout->windowHeight);
+    CHECK(layout->panel.top-kDockShadowMargin>=0);
 }
 AETHER_TEST("dock placement: malformed geometry is rejected before native coordinates are calculated") {
     auto layout = ArrangeDockLayout(48, 8, 1.45f, 800, std::vector<float>{1}); REQUIRE(layout.ok());

@@ -3,15 +3,14 @@
 #pragma once
 
 #include "applications/ApplicationTypes.h"
+#include "applications/RunningPresentation.h"
 #include "settings/Settings.h"
 
 #include <span>
 
 namespace aether::dock {
 
-// Start and TaskView are fixed system entries, ordered Start, Search, Task View, then pins, then
-// running applications. The model does not emit them yet; the Dock stream adds them
-// with their glyph tiles.
+// Fixed system entries precede application items and never become reorder targets.
 enum class DockItemKind { Search, Pinned, Running, Overflow, Start, TaskView };
 
 // Only applications can be dragged or be drop targets; fixed entries never move.
@@ -42,9 +41,9 @@ struct FittedDock {
 struct DockModelInputs {
     const settings::DockSettings& settings;
     std::span<const apps::RunningApplication> running;
-    // Session-only order of reorderable ids (unpinned applications keep their dragged position until
-    // they close). Reserved for the Dock stream: not applied yet, so today's order is unchanged.
+    // Session-only order of application ids; unknown/new applications follow in their default order.
     std::span<const std::wstring> sessionOrder;
+    const apps::ApplicationIndex* catalog = nullptr;
 };
 
 Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs);
@@ -60,8 +59,19 @@ Result<std::vector<settings::PinnedApp>> UnpinApplication(const std::vector<sett
                                                         std::wstring_view id);
 Result<std::vector<settings::PinnedApp>> MovePin(const std::vector<settings::PinnedApp>& pins,
                                                std::wstring_view id, std::size_t destination);
-// Moving an unpinned application makes it persistent. Earlier running items that must precede its
-// new position become pins too, preserving the requested order under the pins-first model.
+struct DockReorderResult {
+    std::vector<settings::PinnedApp> pins;
+    std::vector<std::wstring> sessionOrder;
+    bool pinsChanged = false;
+};
+// Every application can move in the session, including window-only activation groups. Only moving
+// an existing pin changes persisted pin order; a gesture never pins an unpinned application.
+Result<DockReorderResult> ReorderDockItems(const DockModelInputs& inputs,
+                                         std::wstring_view draggedId, std::wstring_view destinationId);
+// Reconcile an external Settings pin-order change while retaining the session's running slots.
+Result<std::vector<std::wstring>> AlignSessionPins(std::span<const std::wstring> sessionOrder,
+                                                  std::span<const settings::PinnedApp> pins);
+// Compatibility helper returning only the persistent portion of ReorderDockItems.
 Result<std::vector<settings::PinnedApp>> ReorderDockApplications(
     const settings::DockSettings& settings, const std::vector<apps::RunningApplication>& running,
     std::wstring_view draggedId, std::wstring_view destinationId);

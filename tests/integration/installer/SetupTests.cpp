@@ -3,9 +3,13 @@
 #include "AetherTest.h"
 #include "install/Install.h"
 #include "core/FileSystem.h"
+#include "platform/windows/ComApartment.h"
 #include "updates/Sha256.h"
 
 #include <windows.h>
+#include <shlobj.h>
+#include <shobjidl.h>
+#include <winrt/base.h>
 #include <filesystem>
 #include <vector>
 #include <chrono>
@@ -19,8 +23,8 @@ struct IsolatedRoot {
     std::filesystem::path path=test::MakeTempDirectory("setup-isolated");
     ~IsolatedRoot(){if(preservedRoots.contains(path))return;std::error_code ignored;std::filesystem::remove_all(path,ignored);}
 };
-DWORD Setup(const std::filesystem::path& root,const std::filesystem::path& data,const std::vector<std::wstring>& extra={},const std::filesystem::path& executable=AETHER_SETUP_TEST_EXE) {
-    std::wstring line=install::QuoteArgument(executable.wstring())+L" --silent --test-no-registration --no-shortcuts --no-launch --install-root "+install::QuoteArgument(root.wstring())+L" --data-dir "+install::QuoteArgument(data.wstring());
+DWORD Setup(const std::filesystem::path& root,const std::filesystem::path& data,const std::vector<std::wstring>& extra={},const std::filesystem::path& executable=AETHER_SETUP_TEST_EXE,bool noShortcuts=true) {
+    std::wstring line=install::QuoteArgument(executable.wstring())+L" --silent --test-no-registration"+(noShortcuts?L" --no-shortcuts":L"")+L" --no-launch --install-root "+install::QuoteArgument(root.wstring())+L" --data-dir "+install::QuoteArgument(data.wstring());
     for(const auto& argument:extra)line+=L" "+install::QuoteArgument(argument);
     STARTUPINFOW startup{sizeof(startup)};PROCESS_INFORMATION process{};
     REQUIRE(::CreateProcessW(executable.c_str(),line.data(),nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,nullptr,&startup,&process)!=FALSE);
@@ -67,5 +71,45 @@ AETHER_TEST("setup: installed maintenance relocates before removing its own root
     REQUIRE_EQ(Setup(root,data,{L"--uninstall"},layout->Maintenance()),DWORD{0});
     const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
     while(std::filesystem::exists(root) && std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(std::chrono::milliseconds(25));
+    CHECK_FALSE(std::filesystem::exists(root));
+}
+
+namespace {
+struct ShortcutTarget { std::wstring path, arguments; };
+ShortcutTarget ReadShortcut(const std::filesystem::path& file) {
+    platform::ComApartment apartment;REQUIRE(apartment.IsUsable());
+    winrt::com_ptr<IShellLinkW> link;REQUIRE(SUCCEEDED(::CoCreateInstance(CLSID_ShellLink,nullptr,CLSCTX_INPROC_SERVER,IID_PPV_ARGS(link.put()))));
+    REQUIRE(SUCCEEDED(link.as<IPersistFile>()->Load(file.c_str(),STGM_READ)));
+    std::vector<wchar_t> path(32768),arguments(32768);
+    REQUIRE(SUCCEEDED(link->GetPath(path.data(),static_cast<int>(path.size()),nullptr,SLGP_RAWPATH)));
+    REQUIRE(SUCCEEDED(link->GetArguments(arguments.data(),static_cast<int>(arguments.size()))));
+    return {path.data(),arguments.data()};
+}
+}
+AETHER_TEST("setup: the Restore Windows taskbar shortcut is created in an isolated folder and removed on uninstall") {
+    // The test-only folder replaces the user's Start menu; nothing is registered, launched or run.
+    IsolatedRoot fixture;const auto root=fixture.path/L"install";const auto data=fixture.path/L"data";const auto menu=fixture.path/L"start-menu";
+    REQUIRE(fs::EnsureDirectory(menu).ok());
+    const auto shortcut=menu/L"Restore Windows taskbar.lnk";
+    REQUIRE_EQ(Setup(root,data,{L"--test-shortcut-dir",menu.native()},AETHER_SETUP_TEST_EXE,false),DWORD{0});
+    auto layout=install::InstallLayout::Create(root);REQUIRE(layout.ok());CheckPayload(*layout);
+    REQUIRE(std::filesystem::is_regular_file(shortcut));
+    const auto target=ReadShortcut(shortcut);
+    CHECK(::_wcsicmp(target.path.c_str(),layout->Launcher().c_str())==0);
+    CHECK_EQ(target.arguments,std::wstring(L"--restore-taskbar"));
+    CHECK_FALSE(std::filesystem::exists(menu/L"Aether Shell.lnk"));  // registration shortcuts stay off in tests
+    CHECK_FALSE(std::filesystem::exists(data/L"config"/L"settings.json"));  // setup does not write the choice
+    // A foreign file with the same name is neither replaced nor removed.
+    const auto foreignMenu=fixture.path/L"foreign-menu";REQUIRE(fs::EnsureDirectory(foreignMenu).ok());
+    REQUIRE(fs::WriteFileAtomic(foreignMenu/L"Restore Windows taskbar.lnk","synthetic foreign file").ok());
+    REQUIRE_EQ(Setup(root,data,{L"--repair",L"--test-shortcut-dir",foreignMenu.native()},AETHER_SETUP_TEST_EXE,false),DWORD{0});
+    CHECK_EQ(fs::ReadFile(foreignMenu/L"Restore Windows taskbar.lnk",1024).value(),std::string("synthetic foreign file"));
+    REQUIRE_EQ(Setup(root,data,{L"--uninstall",L"--test-shortcut-dir",menu.native()},AETHER_SETUP_TEST_EXE,false),DWORD{0});
+    CHECK_FALSE(std::filesystem::exists(root));CHECK_FALSE(std::filesystem::exists(shortcut));
+}
+AETHER_TEST("setup: the isolated shortcut folder requires the isolation flag and an absolute path") {
+    IsolatedRoot fixture;const auto root=fixture.path/L"install";const auto data=fixture.path/L"data";
+    CHECK_EQ(Setup(root,data,{L"--test-shortcut-dir",L"relative-menu"},AETHER_SETUP_TEST_EXE,false),DWORD{2});
+    CHECK_EQ(Setup(root,data,{L"--test-shortcut-dir"},AETHER_SETUP_TEST_EXE,false),DWORD{2});
     CHECK_FALSE(std::filesystem::exists(root));
 }

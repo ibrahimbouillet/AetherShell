@@ -5,10 +5,13 @@
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "graphics/GlassPainter.h"
+#include "graphics/Glyphs.h"
 #include "graphics/TextCache.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "status/ClockProvider.h"
+#include "topbar/TopBarMenu.h"
+#include "ui/ThemedMenu.h"
 #include "ui/TooltipWindow.h"
 #include "ui/accessibility/AccessibleSurface.h"
 
@@ -24,7 +27,6 @@ namespace {
 constexpr UINT kAppBarMessage = WM_APP + 101;
 constexpr UINT kForegroundChanged = WM_APP + 102;
 constexpr UINT kDeferredInvoke = WM_APP + 103;
-constexpr float kHeight = 32.0f;
 thread_local std::vector<HWND> watchedWindows;
 
 void CALLBACK ForegroundEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {
@@ -34,44 +36,27 @@ void CALLBACK ForegroundEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWO
 // All marks are original vector geometry; no icon font or third-party icon set is used.
 void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
            ID2D1SolidColorBrush* brush, const graphics::DesignTokens& tokens, bool updateAvailable) {
-    constexpr float stroke = 1.5f;
+    const float stroke = tokens.glyph.stroke;
+    winrt::com_ptr<ID2D1Factory> strokeFactory; dc->GetFactory(strokeFactory.put());
+    auto* strokeStyle = graphics::RoundStrokeStyle(strokeFactory.get());
     const auto line = [&](float a, float b, float c, float d) {
-        dc->DrawLine(D2D1::Point2F(x + a, y + b), D2D1::Point2F(x + c, y + d), brush, stroke);
+        dc->DrawLine(D2D1::Point2F(x + a, y + b), D2D1::Point2F(x + c, y + d), brush, stroke, strokeStyle);
     };
     const auto circle = [&](float a, float b, float radius) {
-        dc->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x + a, y + b), radius, radius), brush, stroke);
+        dc->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x + a, y + b), radius, radius), brush, stroke, strokeStyle);
     };
     if (item.kind == ItemKind::Logo) {
-        // Same two cubic ribbons and small-size optical correction as render_logo.py.
-        winrt::com_ptr<ID2D1Factory> factory; dc->GetFactory(factory.put());
-        winrt::com_ptr<ID2D1PathGeometry> geometry;
-        winrt::com_ptr<ID2D1GeometrySink> sink;
-        if (FAILED(factory->CreatePathGeometry(geometry.put())) || FAILED(geometry->Open(sink.put()))) return;
-        const auto p = [&](float a, float b) { return D2D1::Point2F(x + 9 + (a - 500) * 0.02124f, y + 9 + (b - 500) * 0.02124f); };
-        sink->BeginFigure(p(150, 610), D2D1_FIGURE_BEGIN_FILLED);
-        sink->AddBezier(D2D1::BezierSegment(p(260, 340), p(445, 170), p(810, 240)));
-        sink->AddLine(p(700, 390));
-        sink->AddBezier(D2D1::BezierSegment(p(500, 350), p(365, 425), p(280, 640)));
-        sink->EndFigure(D2D1_FIGURE_END_CLOSED);
-        sink->BeginFigure(p(245, 770), D2D1_FIGURE_BEGIN_FILLED); sink->AddLine(p(345, 600));
-        sink->AddBezier(D2D1::BezierSegment(p(485, 655), p(615, 575), p(725, 375)));
-        sink->AddLine(p(850, 375));
-        sink->AddBezier(D2D1::BezierSegment(p(715, 700), p(515, 850), p(245, 770)));
-        sink->EndFigure(D2D1_FIGURE_END_CLOSED);
-        if (FAILED(sink->Close())) return;
-        brush->SetColor(tokens.textPrimary.ToD2D());
-        winrt::com_ptr<ID2D1GradientStopCollection> stops;
-        winrt::com_ptr<ID2D1LinearGradientBrush> gradient;
-        const D2D1_GRADIENT_STOP colors[] = {{0, graphics::Color::FromHex(0x5B6CFF).ToD2D()}, {1, graphics::Color::FromHex(0x3DD9E8).ToD2D()}};
-        if (tokens.mode != graphics::ThemeMode::HighContrast && SUCCEEDED(dc->CreateGradientStopCollection(colors, 2, stops.put())))
-            dc->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(x, y), D2D1::Point2F(x + 18, y + 6.3f)), stops.get(), gradient.put());
-        dc->FillGeometry(geometry.get(), gradient ? static_cast<ID2D1Brush*>(gradient.get()) : brush);
+        graphics::PaintBrandMark(dc, D2D1::RectF(x, y, x + 18, y + 18), tokens);
         if (updateAvailable) {
             brush->SetColor(tokens.glass.tint.WithAlpha(1).ToD2D());
             dc->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x + 18, y - 2, x + 28, y + 11), 3, 3), brush);
             brush->SetColor(tokens.textPrimary.ToD2D());
-            line(23, 1, 23, 8); line(20, 4, 23, 1); line(23, 1, 26, 4);
+            graphics::PaintGlyph(dc, graphics::Glyph::ArrowUp, D2D1::RectF(x + 19, y, x + 27, y + 9), brush, stroke);
         }
+        return;
+    }
+    if (item.kind == ItemKind::NotificationArea) {
+        graphics::PaintGlyph(dc, graphics::Glyph::ChevronUp, D2D1::RectF(x + 1, y + 1, x + 17, y + 17), brush, stroke);
         return;
     }
     if (item.kind == ItemKind::Network) {
@@ -90,7 +75,7 @@ void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
                 sink->EndFigure(D2D1_FIGURE_END_OPEN);
                 if (FAILED(sink->Close())) return;
                 brush->SetOpacity(opacity * (active ? 1.0f : 0.28f));
-                dc->DrawGeometry(path.get(), brush, stroke);
+                dc->DrawGeometry(path.get(), brush, stroke, strokeStyle);
             };
             arc(1, 6, 17, -0.5f, waves && *waves >= 3);
             arc(4, 9, 14, 5, waves && *waves >= 2);
@@ -187,6 +172,10 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     bool updateAvailable = false;
     TopBarSnapshots snapshots;
     std::vector<PlacedItem> placed;
+    std::vector<DisplayItem> displayed;
+    D2D1_RECT_F panel{};
+    bool layoutDirty = true;
+    TaskbarReplacementState taskbar;
     graphics::Tween transition{1};
     std::shared_ptr<Gate> gate;
     Connection settingsChanged;
@@ -205,8 +194,15 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     UINT explorerMessage = 0;
     std::uint64_t frames = 0;
 
-    void EmitRequest(Signal<>& request) noexcept {
-        try { request.Emit(); }
+    void EmitRequest(Signal<>& request, std::optional<HWND> inputTarget = {}) noexcept {
+        try {
+            if (inputTarget) {
+                auto& ops = context.menuWindowOps ? *context.menuWindowOps : ui::SystemMenuWindowOps();
+                const auto restored = RestoreVoiceTypingTarget(ops, owner.Handle(), *inputTarget);
+                if (!restored) { ErrorTooltip(restored, static_cast<int>(ItemKind::Microphone)); return; }
+            }
+            request.Emit();
+        }
         catch (...) { AETHER_LOG_ERROR("topbar", "request listener threw an exception"); }
     }
 
@@ -236,6 +232,9 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     void ErrorTooltip(const Result<void>& result, int id) {
         if (result || destroyed) return;
         if (id == static_cast<int>(ItemKind::Volume)) pendingVolume.reset();
+        // A control completion may arrive after fullscreen suppression or shutdown admission closed.
+        // Keep its model cleanup, but never resurrect a tooltip above a hidden/disabled surface.
+        if (fullscreen || !owner.Handle() || !owner.IsShown() || !::IsWindowEnabled(owner.Handle())) return;
         const auto found = std::find_if(placed.begin(), placed.end(), [id](const auto& item) { return item.item.id == id; });
         if (found != placed.end()) tooltip.ShowFor(L"Action failed: " + text::Widen(ToString(result.error().code)),
             ItemBounds(found->rect), ui::TooltipPlacement::Below);
@@ -285,6 +284,10 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     }
     Result<void> Toggle(int) override { return MakeError(ErrorCode::Unsupported, "top bar uses invoke actions"); }
     Result<void> SetFocus(int id) override {
+        if (destroyed || !owner.IsShown() || fullscreen || !::IsWindowEnabled(owner.Handle()))
+            return MakeError(ErrorCode::Unavailable, "top bar is not available for focus");
+        if (std::none_of(placed.begin(), placed.end(), [id](const auto& item) { return item.item.id == id && item.item.actionable; }))
+            return MakeError(ErrorCode::Unsupported, "top bar item cannot receive focus");
         focused = id; ::SetFocus(owner.Handle()); owner.Invalidate();
         return accessibility.NotifyFocusChanged(id);
     }
@@ -411,33 +414,61 @@ Result<void> TopBarWindow::SetUpdateAvailable(bool available) {
     catch (...) { return MakeError(ErrorCode::Internal, "update indicator could not be changed"); }
 }
 void TopBarWindow::SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion) {
-    impl_->tokens = tokens; impl_->motion = motion; impl_->tooltip.SetTheme(tokens, motion); Rebuild();
+    impl_->tokens = tokens; impl_->motion = motion; impl_->tooltip.SetTheme(tokens, motion);
+    impl_->layoutDirty = true;
+    Relayout();
+}
+Result<void> TopBarWindow::SetTaskbarReplacementState(bool available, bool active, bool suspended) {
+    if (!impl_->context.dispatcher.IsUiThread()) return MakeError(ErrorCode::InvalidState, "top bar requires UI thread");
+    if (impl_->destroyed) return MakeError(ErrorCode::InvalidState, "top bar was destroyed");
+    const TaskbarReplacementState next{available, active, suspended};
+    if (next == impl_->taskbar) return Ok();
+    try { impl_->taskbar = next; Rebuild(); return Ok(); }
+    catch (...) { return MakeError(ErrorCode::Internal, "taskbar action state could not be changed"); }
 }
 const std::vector<PlacedItem>& TopBarWindow::Items() const { return impl_->placed; }
 std::uint64_t TopBarWindow::RenderCount() const noexcept { return impl_->frames; }
 
 void TopBarWindow::Rebuild() {
     if (impl_->destroyed || !Handle()) return;
-    auto items = BuildDisplayItems(impl_->snapshots, impl_->settings, impl_->weatherEnabled);
+    auto items = BuildDisplayItems(impl_->snapshots, impl_->settings, impl_->weatherEnabled, {}, impl_->taskbar);
     if (!items) return;
+    for (auto& item : items.value()) if (!item.secondaryText.empty() &&
+        24.0f * impl_->tokens.textScale > impl_->panel.bottom - impl_->panel.top) item.secondaryText.clear();
     if (impl_->updateAvailable) for (auto& item : items.value()) if (item.kind == ItemKind::Logo) {
         item.tooltip += L" · Update available"; item.accessibleName = item.tooltip;
     }
+    if (!impl_->layoutDirty && items.value() == impl_->displayed) return;
+    impl_->displayed = items.value();
+    impl_->layoutDirty = false;
     std::vector<float> widths;
-    graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar;
+    graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
     for (const auto& item : items.value()) {
         const bool glyph = item.kind != ItemKind::Keyboard && item.kind != ItemKind::Clock;
         style.weight = item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
-        widths.push_back(impl_->textCache.Measure(item.text, style).width + (glyph ? 24.0f : 0.0f) + 22.0f);
+        style.tabularFigures = item.kind == ItemKind::Clock || item.kind == ItemKind::Battery;
+        const auto primary = impl_->textCache.Measure(item.text, style).width;
+        const auto secondary = item.secondaryText.empty() ? 0.0f :
+            std::min(80.0f, impl_->textCache.Measure(item.secondaryText, style).width);
+        widths.push_back(std::max(primary, secondary) + (glyph ? 24.0f : 0.0f) + 22.0f);
     }
-    impl_->placed = LayoutItems(items.value(), widths, ToDip(static_cast<float>(BoundsPx().right - BoundsPx().left)));
-    impl_->transition.SnapTo(0.70f);
-    impl_->transition.AnimateTo(1.0f, graphics::FrameScheduler::Now(), impl_->motion.Scale(0.12));
-    if (!impl_->motion.reduced) RequestAnimationFrame();
+    impl_->placed = LayoutItems(items.value(), widths, impl_->panel.right - impl_->panel.left,
+        impl_->panel.bottom - impl_->panel.top, impl_->settings.weatherPlacement);
+    for (auto& item : impl_->placed) {
+        item.rect.left += impl_->panel.left; item.rect.right += impl_->panel.left;
+        item.rect.top += impl_->panel.top; item.rect.bottom += impl_->panel.top;
+    }
+    if (impl_->motion.reduced || impl_->tokens.mode == graphics::ThemeMode::HighContrast) impl_->transition.SnapTo(1.0f);
+    else {
+        impl_->transition.SnapTo(0.70f);
+        impl_->transition.AnimateTo(1.0f, graphics::FrameScheduler::Now(), impl_->motion.Scale(impl_->tokens.durationFast),
+            impl_->tokens.curves.standard);
+        RequestAnimationFrame();
+    }
     const auto notified = impl_->accessibility.NotifyStructureChanged(); (void)notified;
     for (const auto& item : impl_->placed) {
         const auto property = impl_->accessibility.NotifyPropertyChanged(item.item.id); (void)property;
-        if (impl_->hover == item.item.id)
+        if (impl_->hover == item.item.id && Handle() && IsShown() && !impl_->fullscreen && ::IsWindowEnabled(Handle()))
             impl_->tooltip.ShowFor(item.item.tooltip, impl_->ItemBounds(item.rect), ui::TooltipPlacement::Below);
     }
     Invalidate();
@@ -446,22 +477,28 @@ void TopBarWindow::Rebuild() {
 void TopBarWindow::Relayout() {
     if (!Handle() || impl_->destroyed || impl_->relayouting) return;
     impl_->relayouting = true;
-    if (impl_->testBounds) SetBoundsPx(*impl_->testBounds);
-    else {
-        const auto monitor = platform::PrimaryMonitor();
-        const float scale = static_cast<float>(monitor.dpi) / 96.0f;
-        const int margin = static_cast<int>(std::lround(impl_->settings.topMargin * scale));
-        const int height = static_cast<int>(std::lround(kHeight * scale));
-        const int side = static_cast<int>(std::lround(12 * scale));
-        RECT base = monitor.workArea;
+    const auto monitor = platform::PrimaryMonitor();
+    const auto dpi = impl_->testBounds ? Dpi() : monitor.dpi;
+    const int textHeight = static_cast<int>(std::ceil(impl_->tokens.fontSizeBar * impl_->tokens.textScale * 1.3f + 6.0f));
+    const int height = std::clamp(std::max(impl_->settings.height, textHeight), 24, 48);
+    const int margin = impl_->testBounds ? 0 : std::clamp(impl_->settings.topMargin, 0, 100);
+    const float shadow = std::max(4.0f, std::ceil(graphics::ShadowExtent(impl_->tokens.elevation.bar)));
+    RECT base = monitor.workArea;
+    if (impl_->testBounds) {
+        base = *impl_->testBounds;
+        const int side = static_cast<int>(std::lround(12.0f * static_cast<float>(dpi) / 96.0f));
+        base.left -= side; base.right += side;
+    } else {
+        const auto footprint = ComputeTopBarPlacement(monitor.bounds, dpi, height, margin, shadow);
+        if (!footprint) { impl_->relayouting = false; return; }
         if (impl_->context.allowAppBar && impl_->settings.reserveSpace) {
             APPBARDATA data{sizeof(data)}; data.hWnd = Handle(); data.uCallbackMessage = kAppBarMessage;
             if (!impl_->registered) impl_->registered = ::SHAppBarMessage(ABM_NEW, &data) != 0;
             if (impl_->registered) {
                 data.uEdge = ABE_TOP; data.rc = monitor.bounds;
-                data.rc.bottom = data.rc.top + margin + height + static_cast<int>(4 * scale);
+                data.rc.bottom = data.rc.top + footprint->reservationHeightPx;
                 (void)::SHAppBarMessage(ABM_QUERYPOS, &data);
-                data.rc.bottom = data.rc.top + margin + height + static_cast<int>(4 * scale);
+                data.rc.bottom = data.rc.top + footprint->reservationHeightPx;
                 if (!impl_->reservedBounds || !::EqualRect(&data.rc, &*impl_->reservedBounds)) {
                     (void)::SHAppBarMessage(ABM_SETPOS, &data);
                     impl_->reservedBounds = data.rc;
@@ -469,8 +506,18 @@ void TopBarWindow::Relayout() {
                 base = data.rc;
             }
         } else impl_->RemoveAppBar();
-        SetBoundsPx(RECT{base.left + side, base.top + margin, base.right - side, base.top + margin + height});
     }
+    const auto placed = ComputeTopBarPlacement(base, dpi, height, margin, shadow);
+    if (!placed) { impl_->relayouting = false; return; }
+    SetBoundsPx(placed->windowBoundsPx);
+    const auto& panel = placed->panelBoundsPx;
+    impl_->panel = D2D1::RectF(ToDip(static_cast<float>(panel.left)), ToDip(static_cast<float>(panel.top)),
+        ToDip(static_cast<float>(panel.right)), ToDip(static_cast<float>(panel.bottom)));
+    SetInputRegionPx(std::span<const RECT>(&panel, 1));
+    const RECT visual{0, 0, placed->windowBoundsPx.right - placed->windowBoundsPx.left,
+        placed->windowBoundsPx.bottom - placed->windowBoundsPx.top};
+    SetVisualRegionPx(std::span<const RECT>(&visual, 1));
+    impl_->layoutDirty = true;
     impl_->relayouting = false;
     Rebuild();
 }
@@ -479,7 +526,7 @@ void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
 void TopBarWindow::SetFullscreenHidden(bool hidden) {
     if (impl_->fullscreen == hidden) return;
     impl_->fullscreen = hidden;
-    if (hidden) { impl_->tooltip.HideTooltip(); Hide(); }
+    if (hidden) { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Hide(); }
     else Show(false);
     try { FullscreenChanged.Emit(hidden); }
     catch (...) { AETHER_LOG_ERROR("topbar", "fullscreen listener threw an exception"); }
@@ -487,12 +534,12 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
 
 void TopBarWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
-    const auto panel = D2D1::RectF(0, 0, context.widthDip, context.heightDip);
+    const auto panel = impl_->panel;
     const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
-    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur);
+    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, impl_->tokens.glass.backdropOpacity);
     graphics::GlassStyle glass;
     glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
-    glass.backdropBlur = BackdropBlurActive(); glass.shadow = false;
+    glass.backdropBlur = BackdropBlurActive(); glass.elevation = graphics::Elevation::Bar;
     graphics::PaintGlassPanel(context.d2d, panel, impl_->tokens, glass);
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
@@ -500,25 +547,37 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         if ((impl_->hover == entry.item.id && entry.item.actionable) ||
             (impl_->focusedWindow && impl_->focused == entry.item.id)) {
             brush->SetColor(impl_->tokens.hoverOverlay.ToD2D());
-            const auto inset = D2D1::RectF(entry.rect.left + 2, 3, entry.rect.right - 2, kHeight - 3);
-            context.d2d->FillRoundedRectangle(D2D1::RoundedRect(inset, 7, 7), brush.get());
+            const auto inset = D2D1::RectF(entry.rect.left + 2, entry.rect.top + 3, entry.rect.right - 2, entry.rect.bottom - 3);
+            graphics::PaintItemHighlight(context.d2d, inset, impl_->tokens.radii.control, impl_->tokens, 1, 0);
             if (impl_->focusedWindow && impl_->focused == entry.item.id)
                 graphics::PaintFocusRing(context.d2d, inset, 6, impl_->tokens);
         }
         const auto color = entry.item.unknown ? impl_->tokens.textSecondary : impl_->tokens.textPrimary;
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
         const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
-        if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, 7, brush.get(), impl_->tokens, impl_->updateAvailable);
+        if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
+            brush.get(), impl_->tokens, impl_->updateAvailable);
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
-        graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar;
+        graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
         style.weight = entry.item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
-        impl_->textCache.Draw(context.d2d, entry.item.text,
-            D2D1::RectF(entry.rect.left + (glyph ? 34.0f : 10.0f), 0, entry.rect.right - 10, kHeight), style, brush.get());
+        style.tabularFigures = entry.item.kind == ItemKind::Clock || entry.item.kind == ItemKind::Battery;
+        auto textBounds = D2D1::RectF(entry.rect.left + (glyph ? 34.0f : 10.0f), entry.rect.top,
+            entry.rect.right - 10, entry.rect.bottom);
+        if (!entry.item.secondaryText.empty()) {
+            style.alignment = DWRITE_TEXT_ALIGNMENT_CENTER;
+            style.opticalSmall = true;
+            style.size = std::min(12.0f * impl_->tokens.textScale, (entry.rect.bottom - entry.rect.top) * 0.36f);
+            textBounds.bottom = (entry.rect.top + entry.rect.bottom) * 0.5f;
+            impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
+            textBounds.top = textBounds.bottom; textBounds.bottom = entry.rect.bottom;
+            impl_->textCache.Draw(context.d2d, entry.item.secondaryText, textBounds, style, brush.get());
+        } else impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
     }
 }
 bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(now); }
 
 void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
+    if (impl_->destroyed || !Handle() || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
     const auto hovered = HitTest(impl_->placed, point);
     if (hovered == impl_->hover) return;
     impl_->hover = hovered; Invalidate();
@@ -530,11 +589,13 @@ void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->tooltip.HideT
 void TopBarWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
     if (const auto id = HitTest(impl_->placed, point)) {
         if (button == ui::PointerButton::Left) Activate(*id);
-        else if (button == ui::PointerButton::Right && *id == static_cast<int>(ItemKind::Microphone)) ShowMicrophoneMenu();
+        else if (button == ui::PointerButton::Right) ShowItemMenu(*id);
     }
 }
 void TopBarWindow::OnWheel(float notches, D2D1_POINT_2F point) {
-    if (HitTest(impl_->placed, point) != static_cast<int>(ItemKind::Volume) || !impl_->context.audio ||
+    if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle()) ||
+        HitTest(impl_->placed, point) != static_cast<int>(ItemKind::Volume) || !impl_->context.audio ||
+        impl_->snapshots.audio.state != status::ProviderState::Available || !impl_->snapshots.audio.deviceAvailable ||
         !impl_->snapshots.audio.volume || !std::isfinite(*impl_->snapshots.audio.volume)) return;
     const auto target = WheelVolumeTarget(impl_->snapshots.audio.volume, impl_->pendingVolume, notches);
     if (!target) return;
@@ -555,51 +616,69 @@ void TopBarWindow::Activate(int id) {
     } else if (id == static_cast<int>(ItemKind::Microphone)) {
         if (impl_->context.microphone) impl_->context.microphone->ToggleMuteAsync(impl_->Completion(id));
         else impl_->ErrorTooltip(MakeError(ErrorCode::Unavailable, "microphone unavailable"), id);
-    } else if (id == static_cast<int>(ItemKind::Clock)) {
-        const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& item) { return item.item.id == id; });
-        if (found != impl_->placed.end()) impl_->tooltip.ShowFor(found->item.tooltip, impl_->ItemBounds(found->rect), ui::TooltipPlacement::Below);
-    } else if (id == static_cast<int>(ItemKind::Logo)) {
-        HMENU menu = ::CreatePopupMenu();
-        if (!menu) return;
-        ::AppendMenuW(menu, MF_STRING, 1, L"Search…"); ::AppendMenuW(menu, MF_STRING, 2, L"Settings…");
-        if (impl_->updateAvailable) ::AppendMenuW(menu, MF_STRING, 6, L"View available update…");
-        ::AppendMenuW(menu, MF_STRING, 3, L"Check for updates…"); ::AppendMenuW(menu, MF_SEPARATOR, 0, nullptr);
-        ::AppendMenuW(menu, MF_STRING, 4, L"About Aether Shell"); ::AppendMenuW(menu, MF_STRING, 5, L"Quit Aether Shell");
-        const auto bounds = BoundsPx();
-        ::SetForegroundWindow(Handle());
-        const auto command = ::TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_TOPALIGN,
-            bounds.left + static_cast<int>(ToPx(10)), bounds.bottom + 4, Handle(), nullptr);
-        ::DestroyMenu(menu);
-        switch (command) {
-            case 1: impl_->EmitRequest(SearchRequested); break; case 2: impl_->EmitRequest(SettingsRequested); break;
-            case 3: impl_->EmitRequest(CheckForUpdatesRequested); break; case 4: impl_->EmitRequest(AboutRequested); break;
-            case 5: impl_->EmitRequest(QuitRequested); break;
-            case 6: if (impl_->updateAvailable) impl_->EmitRequest(UpdatesRequested); break;
-            default: break;
-        }
-    }
+    } else if (id == static_cast<int>(ItemKind::Clock)) impl_->EmitRequest(ClockRequested);
+    else if (id == static_cast<int>(ItemKind::Battery)) impl_->EmitRequest(PowerSettingsRequested);
+    else if (id == static_cast<int>(ItemKind::NotificationArea)) {
+        if (!impl_->taskbar.available) return;
+        if (impl_->taskbar.suspended) impl_->EmitRequest(ResumeTaskbarReplacementRequested);
+        else if (impl_->taskbar.active) impl_->EmitRequest(RevealWindowsTaskbarRequested);
+    } else if (id == static_cast<int>(ItemKind::Logo)) ShowItemMenu(id);
 }
-void TopBarWindow::ShowMicrophoneMenu() {
+void TopBarWindow::ShowItemMenu(int id) {
     if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
-    const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [](const auto& entry) {
-        return entry.item.kind == ItemKind::Microphone;
+    const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& entry) {
+        return entry.item.id == id;
     });
     if (found == impl_->placed.end()) return;
-    HMENU menu = ::CreatePopupMenu(); if (!menu) return;
-    ::AppendMenuW(menu, MF_STRING, 1, L"Microphone privacy settings…");
-    const auto bounds = impl_->ItemBounds(found->rect);
+    auto entries = BuildTopBarMenu(found->item.kind, impl_->taskbar, impl_->updateAvailable);
+    if (entries.empty()) return;
+    const auto bound = impl_->ItemBounds(found->rect);
+    ui::MenuRequest request; request.owner = Handle(); request.anchor = bound;
+    request.placement = ui::MenuPlacement::BelowAnchor; request.restore = ui::ForegroundRestore::Always;
+    ui::ThemedMenuPresenter themed(impl_->tokens);
+    auto* presenter = impl_->context.menu ? impl_->context.menu : &themed;
     std::weak_ptr<Impl::Gate> weak = impl_->gate;
-    ::SetForegroundWindow(Handle());
-    const auto command = ::TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_TOPALIGN,
-        bounds.left, bounds.bottom + 4, Handle(), nullptr);
-    ::DestroyMenu(menu);
-    if (const auto alive = weak.lock(); alive && alive->owner && command == 1)
-        alive->owner->impl_->EmitRequest(alive->owner->MicrophoneSettingsRequested);
+    impl_->tooltip.HideTooltip();
+    const auto selected = presenter->Show(entries, request);
+    const auto alive = weak.lock();
+    if (!alive || !alive->owner || !selected) return;
+    auto& owner = *alive->owner;
+    auto& state = *owner.impl_;
+    if (state.destroyed || !owner.IsShown() || state.fullscreen || !::IsWindowEnabled(owner.Handle())) return;
+    if (std::none_of(state.placed.begin(), state.placed.end(), [id](const auto& item) {
+        return item.item.id == id && item.item.actionable;
+    })) return;
+    // A callback may have changed availability while the native menu pumped messages. Rebuild the
+    // command model and reject stale commands before emitting any request.
+    const auto current = BuildTopBarMenu(static_cast<ItemKind>(id), state.taskbar, state.updateAvailable);
+    const auto* command = ui::FindMenuCommand(current, selected->command);
+    if (!command || !command->enabled) return;
+    switch (static_cast<BarCommand>(selected->command)) {
+        case BarCommand::Search: state.EmitRequest(owner.SearchRequested); break;
+        case BarCommand::Settings: state.EmitRequest(owner.SettingsRequested); break;
+        case BarCommand::CheckUpdates: state.EmitRequest(owner.CheckForUpdatesRequested); break;
+        case BarCommand::About: state.EmitRequest(owner.AboutRequested); break;
+        case BarCommand::Quit: state.EmitRequest(owner.QuitRequested); break;
+        case BarCommand::ViewUpdate: state.EmitRequest(owner.UpdatesRequested); break;
+        case BarCommand::Keyboard: state.EmitRequest(owner.KeyboardRequested); break;
+        case BarCommand::Network: state.EmitRequest(owner.NetworkRequested); break;
+        case BarCommand::Weather: state.EmitRequest(owner.WeatherRequested); break;
+        case BarCommand::ToggleVolume: owner.Activate(static_cast<int>(ItemKind::Volume)); break;
+        case BarCommand::SoundSettings: state.EmitRequest(owner.SoundSettingsRequested); break;
+        case BarCommand::ToggleMicrophone: owner.Activate(static_cast<int>(ItemKind::Microphone)); break;
+        case BarCommand::MicrophoneSettings: state.EmitRequest(owner.MicrophoneSettingsRequested); break;
+        case BarCommand::VoiceTyping:
+            state.EmitRequest(owner.VoiceTypingRequested, std::optional<HWND>{selected->previousForeground}); break;
+        case BarCommand::PowerSettings: state.EmitRequest(owner.PowerSettingsRequested); break;
+        case BarCommand::Clock: state.EmitRequest(owner.ClockRequested); break;
+        case BarCommand::RevealWindowsTaskbar: state.EmitRequest(owner.RevealWindowsTaskbarRequested); break;
+        case BarCommand::ResumeReplacement: state.EmitRequest(owner.ResumeTaskbarReplacementRequested); break;
+    }
 }
 bool TopBarWindow::OnKeyDown(UINT key) {
     if ((key == VK_APPS || (key == VK_F10 && (::GetKeyState(VK_SHIFT) & 0x8000))) &&
-        impl_->focused == static_cast<int>(ItemKind::Microphone)) {
-        ShowMicrophoneMenu(); return true;
+        impl_->focused) {
+        ShowItemMenu(*impl_->focused); return true;
     }
     std::vector<int> actions;
     for (const auto& item : impl_->placed) if (item.item.actionable) actions.push_back(item.item.id);
@@ -611,7 +690,8 @@ bool TopBarWindow::OnKeyDown(UINT key) {
     int index = found == actions.end() ? 0 : static_cast<int>(found - actions.begin());
     if (key == VK_HOME) index = 0;
     else if (key == VK_END) index = static_cast<int>(actions.size()) - 1;
-    else index = (index + (key == VK_LEFT ? -1 : 1) + static_cast<int>(actions.size())) % static_cast<int>(actions.size());
+    else index = (index + ((key == VK_LEFT || (key == VK_TAB && (::GetKeyState(VK_SHIFT) & 0x8000))) ? -1 : 1) +
+        static_cast<int>(actions.size())) % static_cast<int>(actions.size());
     impl_->focused = actions[static_cast<std::size_t>(index)];
     const auto notified = impl_->accessibility.NotifyFocusChanged(*impl_->focused); (void)notified;
     Invalidate(); return true;

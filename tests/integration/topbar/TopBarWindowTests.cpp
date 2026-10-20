@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
 #include "topbar/TopBarWindow.h"
+#include "topbar/TopBarMenu.h"
 #include "core/Strings.h"
 
 #include "platform/windows/ComApartment.h"
@@ -16,6 +17,7 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <stdexcept>
 #include <thread>
 #include <vector>
@@ -309,6 +311,115 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
     window.Hide(); click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
     CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
+    RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
+    CHECK(::EqualRect(&before, &after) != FALSE);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
+}
+
+AETHER_TEST("topbar integration: fake menus route actions and reject stale taskbar commands") {
+    class FakeMenu final : public ui::IMenuPresenter {
+    public:
+        BarCommand next = BarCommand::Settings;
+        HWND previousForeground = nullptr;
+        std::function<void()> duringShow;
+        std::vector<ui::MenuEntry> last;
+        Result<ui::MenuSelection> Show(std::span<const ui::MenuEntry> entries, const ui::MenuRequest&) override {
+            last.assign(entries.begin(), entries.end());
+            if (duringShow) duringShow();
+            return ui::MenuSelection{static_cast<std::uint32_t>(next), previousForeground};
+        }
+    } menu;
+    class FakeFocus final : public ui::IMenuWindowOps {
+    public:
+        HWND foreground = nullptr;
+        HWND target = reinterpret_cast<HWND>(std::uintptr_t{0x20});
+        bool accept = true;
+        HWND Foreground() noexcept override { return foreground; }
+        bool SetForeground(HWND window) noexcept override { if (accept) foreground = window; return accept; }
+        bool IsValidWindow(HWND window) noexcept override { return window == target; }
+        LONG_PTR ExtendedStyle(HWND) noexcept override { return 0; }
+        void SetExtendedStyle(HWND, LONG_PTR) noexcept override {}
+        UINT Track(HMENU, UINT, POINT, HWND, const TPMPARAMS*) noexcept override { return 0; }
+        void PostNull(HWND) noexcept override {}
+    } focus;
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    RECT before{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &before, 0) != FALSE);
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false; context.menu = &menu;
+    context.menuWindowOps = &focus;
+    TopBarWindow window(context); REQUIRE(window.Create(RECT{80, 180, 1180, 228}).ok());
+    settings::TopBarSettings config; config.reserveSpace = false;
+    window.SetSettings(config, true); window.SetSnapshots(Synthetic());
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    int reveal = 0, resume = 0, sound = 0, privacy = 0, settings = 0, clock = 0, power = 0, voice = 0;
+    bool voiceHadTargetFocus = true;
+    auto revealConnection = window.RevealWindowsTaskbarRequested.Connect([&] { ++reveal; });
+    auto resumeConnection = window.ResumeTaskbarReplacementRequested.Connect([&] { ++resume; });
+    auto soundConnection = window.SoundSettingsRequested.Connect([&] { ++sound; });
+    auto privacyConnection = window.MicrophoneSettingsRequested.Connect([&] { ++privacy; });
+    auto settingsConnection = window.SettingsRequested.Connect([&] { ++settings; });
+    auto clockConnection = window.ClockRequested.Connect([&] { ++clock; });
+    auto powerConnection = window.PowerSettingsRequested.Connect([&] { ++power; });
+    auto voiceConnection = window.VoiceTypingRequested.Connect([&] { ++voice; voiceHadTargetFocus &= focus.foreground == focus.target; });
+    window.Show(false); RunFor(loop, 100);
+    const auto click = [&](ItemKind kind, bool right = false) {
+        const auto found = std::find_if(window.Items().begin(), window.Items().end(), [kind](const auto& p) { return p.item.kind == kind; });
+        REQUIRE(found != window.Items().end());
+        const auto x = static_cast<int>(std::lround(window.ToPx((found->rect.left + found->rect.right) * 0.5f)));
+        const auto y = static_cast<int>(std::lround(window.ToPx((found->rect.top + found->rect.bottom) * 0.5f)));
+        ::SendMessageW(window.Handle(), right ? WM_RBUTTONUP : WM_LBUTTONUP, 0, MAKELPARAM(x, y));
+    };
+    click(ItemKind::Clock); click(ItemKind::Battery);
+    CHECK_EQ(clock, 1); CHECK_EQ(power, 1);
+    menu.next = BarCommand::SoundSettings; click(ItemKind::Volume, true); CHECK_EQ(sound, 1);
+    menu.next = BarCommand::MicrophoneSettings; click(ItemKind::Microphone, true); CHECK_EQ(privacy, 1);
+    menu.next = BarCommand::VoiceTyping; menu.previousForeground = focus.target;
+    focus.foreground = window.Handle();
+    click(ItemKind::Microphone, true); CHECK_EQ(voice, 1); CHECK(voiceHadTargetFocus);
+    focus.foreground = window.Handle(); focus.accept = false;
+    click(ItemKind::Microphone, true); CHECK_EQ(voice, 1); // failed focus restoration suppresses Win+H request
+    focus.accept = true; focus.foreground = reinterpret_cast<HWND>(std::uintptr_t{0x30});
+    click(ItemKind::Microphone, true); CHECK_EQ(voice, 1); // a third foreground window is never overridden
+    menu.previousForeground = nullptr;
+    click(ItemKind::Microphone, true); CHECK_EQ(voice, 1);
+    REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
+    click(ItemKind::NotificationArea); CHECK_EQ(reveal, 1);
+    REQUIRE(window.SetTaskbarReplacementState(true, false, true).ok());
+    click(ItemKind::NotificationArea); CHECK_EQ(resume, 1);
+    REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
+    menu.next = BarCommand::RevealWindowsTaskbar;
+    menu.duringShow = [&] { REQUIRE(window.SetTaskbarReplacementState(false, false, false).ok()); };
+    click(ItemKind::Logo, true); CHECK_EQ(reveal, 1);  // selected command became unavailable during the menu
+    menu.duringShow = {}; menu.next = BarCommand::Settings;
+    ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_HOME, 0);
+    ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_APPS, 0);
+    CHECK_EQ(settings, 1); CHECK(ui::ValidateMenu(menu.last).ok());
+    // A provider/settings refresh must not resurrect a hovered tooltip after fullscreen suppression.
+    const auto hover = window.Items().front().rect;
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, 0, MAKELPARAM(
+        static_cast<int>(window.ToPx((hover.left + hover.right) * 0.5f)),
+        static_cast<int>(window.ToPx((hover.top + hover.bottom) * 0.5f))));
+    window.SetFullscreenHidden(true);
+    auto changedSnapshot = Synthetic(); ++changedSnapshot.clock.minute;
+    window.SetSnapshots(std::move(changedSnapshot));
+    unsigned visibleTooltips = 0;
+    ::EnumThreadWindows(::GetCurrentThreadId(), [](HWND hwnd, LPARAM contextValue) -> BOOL {
+        wchar_t name[64]{};
+        const int length = ::GetClassNameW(hwnd, name, 64);
+        if (::IsWindowVisible(hwnd) && length > 0 && std::wstring_view(name, static_cast<std::size_t>(length)) == L"AetherShell.Tooltip")
+            ++*reinterpret_cast<unsigned*>(contextValue);
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&visibleTooltips));
+    CHECK_EQ(visibleTooltips, 0u); // only this test thread's own windows are inspected; no capture
+    window.SetFullscreenHidden(false); window.SetSnapshots(Synthetic());
+    RunFor(loop, 100);
+    const auto frames = window.RenderCount();
+    REQUIRE(window.SetTaskbarReplacementState(false, false, false).ok());
+    window.SetSnapshots(Synthetic()); RunFor(loop, 80);
+    CHECK_EQ(window.RenderCount(), frames);  // repeated status/snapshots request no frames
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
     CHECK(::EqualRect(&before, &after) != FALSE);
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();

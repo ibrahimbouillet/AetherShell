@@ -68,6 +68,12 @@ bool SystemPrefersDarkApps() noexcept {
     return value.has_value() && *value == 0;
 }
 
+bool SystemPrefersDarkShell() noexcept {
+    const auto value = ReadPersonalizeValue(L"SystemUsesLightTheme");
+    if (!value.has_value()) return SystemPrefersDarkApps();
+    return *value == 0;
+}
+
 bool SystemTransparencyEnabled() noexcept {
     const auto value = ReadPersonalizeValue(L"EnableTransparency");
     return !value.has_value() || *value != 0;

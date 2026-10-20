@@ -10,6 +10,7 @@
 #include "status/audio/AudioProvider.h"
 #include "status/audio/MicrophoneProvider.h"
 #include "topbar/TopBarModel.h"
+#include "ui/PopupMenu.h"
 #include "ui/SurfaceWindow.h"
 #include "weather/WeatherProvider.h"
 
@@ -32,6 +33,10 @@ struct TopBarContext {
     weather::WeatherProvider* weather = nullptr;
     // Isolated rendering tests pass false, so no SHAppBarMessage can run at all.
     bool allowAppBar = true;
+    // Optional externally owned presenter; isolated tests inject a fake that never opens a popup.
+    ui::IMenuPresenter* menu = nullptr;
+    // Focus handoff seam for deterministic voice-typing tests; default uses real window operations.
+    ui::IMenuWindowOps* menuWindowOps = nullptr;
 };
 
 // UI-thread owned. Provider pointers are optional, unstarted and must outlive the window. Create
@@ -47,12 +52,16 @@ public:
     void SetSnapshots(TopBarSnapshots snapshots);
     void SetSettings(const settings::TopBarSettings& settings, bool weatherEnabled);
     [[nodiscard]] Result<void> SetUpdateAvailable(bool available);
+    [[nodiscard]] Result<void> SetTaskbarReplacementState(bool available, bool active, bool suspended);
     void SetFullscreenHidden(bool hidden);
     [[nodiscard]] const std::vector<PlacedItem>& Items() const;
     [[nodiscard]] std::uint64_t RenderCount() const noexcept;
 
     Signal<> SearchRequested, SettingsRequested, CheckForUpdatesRequested, UpdatesRequested, AboutRequested, QuitRequested;
     Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
+    Signal<> ClockRequested, PowerSettingsRequested, SoundSettingsRequested;
+    Signal<> VoiceTypingRequested;
+    Signal<> RevealWindowsTaskbarRequested, ResumeTaskbarReplacementRequested;
     Signal<bool> FullscreenChanged;
 
 protected:
@@ -73,7 +82,7 @@ private:
     std::unique_ptr<Impl> impl_;
     void Rebuild();
     void Activate(int id);
-    void ShowMicrophoneMenu();
+    void ShowItemMenu(int id);
 };
 
 }  // namespace aether::topbar

@@ -5,6 +5,7 @@
 #include "AetherTest.h"
 
 #include "dock/DockModel.h"
+#include "applications/KnownApplications.h"
 
 #include <string>
 #include <vector>
@@ -39,18 +40,18 @@ AETHER_TEST("dock model inputs: the forwarding overload and the inputs overload 
         CHECK_EQ((*inputs)[index].foreground, (*legacy)[index].foreground);
         CHECK_EQ((*inputs)[index].windowCount, (*legacy)[index].windowCount);
     }
-    // A session order is accepted but not applied yet: the order stays pins first, then tracker order.
+    // Session positions apply after the fixed entries without changing the persisted pins.
     const std::vector<std::wstring> order{L"exe:d", L"exe:a", L"exe:c", L"exe:b"};
     auto ordered = BuildDockItems(DockModelInputs{.settings = config, .running = running, .sessionOrder = order});
     REQUIRE(ordered.ok());
-    REQUIRE_EQ(ordered->size(), 5u);
-    CHECK_EQ((*ordered)[1].id, std::wstring(L"exe:a"));
-    CHECK_EQ((*ordered)[2].id, std::wstring(L"exe:b"));
-    CHECK_EQ((*ordered)[3].id, std::wstring(L"exe:c"));
-    CHECK_EQ((*ordered)[4].id, std::wstring(L"exe:d"));
+    REQUIRE_EQ(ordered->size(), 7u);
+    CHECK_EQ((*ordered)[3].id, std::wstring(L"exe:d"));
+    CHECK_EQ((*ordered)[4].id, std::wstring(L"exe:a"));
+    CHECK_EQ((*ordered)[5].id, std::wstring(L"exe:c"));
+    CHECK_EQ((*ordered)[6].id, std::wstring(L"exe:b"));
 }
 
-AETHER_TEST("dock model inputs: fixed entries are never reorderable and are not emitted yet") {
+AETHER_TEST("dock model inputs: configurable fixed entries precede applications and never move") {
     CHECK(IsReorderable(DockItemKind::Pinned));
     CHECK(IsReorderable(DockItemKind::Running));
     for (const auto kind : {DockItemKind::Search, DockItemKind::Overflow, DockItemKind::Start, DockItemKind::TaskView}) {
@@ -69,8 +70,77 @@ AETHER_TEST("dock model inputs: fixed entries are never reorderable and are not 
     config.pinned = {Pin(L"exe:a")};
     auto model = BuildDockItems(DockModelInputs{config, std::vector{Running(L"exe:b")}, {}});
     REQUIRE(model.ok());
-    for (const auto& item : *model) {
-        CHECK(item.kind != DockItemKind::Start);
-        CHECK(item.kind != DockItemKind::TaskView);
-    }
+    REQUIRE_EQ(model->size(),5u);
+    CHECK_EQ((*model)[0].kind,DockItemKind::Start);CHECK_EQ((*model)[1].kind,DockItemKind::Search);
+    CHECK_EQ((*model)[2].kind,DockItemKind::TaskView);
+    config.showStartButton=false;config.showTaskViewButton=false;
+    auto compact=BuildDockItems(config,{});REQUIRE(compact.ok());CHECK_EQ(compact->size(),2u);
+    CHECK_EQ((*compact)[0].kind,DockItemKind::Search);
+}
+
+AETHER_TEST("dock presentation: unmatched explicit profiles activate without unsafe relaunch or pin routes") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    auto running=Running(L"aumid:Synthetic.Profile");running.appUserModelId=L"Synthetic.Profile";
+    running.executablePath=LR"(C:\AetherFixture\browser.exe)";
+    running.relaunchIconResource=LR"(C:\AetherFixture\profile.ico,0)";
+    const std::vector group{running};
+    auto first=BuildDockItems(DockModelInputs{config,group,{}});REQUIRE(first.ok());
+    REQUIRE_EQ(first->size(),2u);const auto before=apps::IconSourceFingerprint((*first)[1].application);
+    CHECK((*first)[1].runningApplication.has_value());CHECK_FALSE(apps::HasLaunchRoute((*first)[1].application));
+    CHECK_FALSE(PinFromApplication((*first)[1].application).ok());
+    apps::ApplicationInfo profile;profile.id=running.id;profile.appUserModelId=running.appUserModelId;
+    profile.shortcutPath=LR"(C:\AetherFixture\trusted-profile.lnk)";profile.arguments=L"--profile=Synthetic";
+    apps::ApplicationIndex index({profile});
+    auto resolved=BuildDockItems(DockModelInputs{config,group,{},&index});REQUIRE(resolved.ok());
+    CHECK(apps::HasLaunchRoute((*resolved)[1].application));
+    CHECK_EQ((*resolved)[1].application.arguments,profile.arguments);
+    CHECK(apps::IconSourceFingerprint((*resolved)[1].application)!=before);
+    CHECK(PinFromApplication((*resolved)[1].application).ok());
+}
+
+AETHER_TEST("dock overflow: extreme width retains Search and keeps fixed entries reachable") {
+    settings::DockSettings config;
+    auto model=BuildDockItems(config,{});REQUIRE(model.ok());
+    auto fitted=FitDockItems(*model,config,56);REQUIRE(fitted.ok());
+    REQUIRE_EQ(fitted->items.size(),1u);CHECK_EQ(fitted->items[0].kind,DockItemKind::Search);
+    CHECK_EQ(fitted->overflow.size(),2u);
+}
+
+AETHER_TEST("dock presentation: a generic executable pin cannot absorb distinct profile identities") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    auto pin=Pin(L"exe:synthetic-browser");pin.executablePath=LR"(C:\AetherFixture\browser.exe)";config.pinned={pin};
+    auto a=Running(L"aumid:Synthetic.Profile.A");a.appUserModelId=L"Synthetic.Profile.A";a.executablePath=pin.executablePath;
+    auto b=Running(L"aumid:Synthetic.Profile.B");b.appUserModelId=L"Synthetic.Profile.B";b.executablePath=pin.executablePath;
+    auto model=BuildDockItems(config,{a,b});REQUIRE(model.ok());REQUIRE_EQ(model->size(),4u);
+    CHECK_FALSE((*model)[1].running);CHECK_EQ((*model)[2].id,a.id);CHECK_EQ((*model)[3].id,b.id);
+}
+
+AETHER_TEST("dock presentation: a legacy Explorer executable pin matches the canonical running group") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    auto pin=Pin(L"exe:synthetic-legacy-explorer");pin.executablePath=LR"(C:\Windows\explorer.exe)";config.pinned={pin};
+    auto running=Running(apps::FileExplorerId());running.appUserModelId=apps::kFileExplorerAumid;
+    running.executablePath=LR"(c:\windows\explorer.exe)";
+    auto model=BuildDockItems(config,{running});REQUIRE(model.ok());REQUIRE_EQ(model->size(),2u);
+    CHECK((*model)[1].running);
+}
+
+AETHER_TEST("dock session: external pin order and new pins preserve running application slots") {
+    const std::vector<std::wstring> session{L"exe:running-a",L"exe:pin-a",L"exe:running-b",L"exe:pin-b"};
+    const std::vector pins{Pin(L"exe:pin-b"),Pin(L"exe:pin-a"),Pin(L"exe:pin-new")};
+    auto aligned=AlignSessionPins(session,pins);REQUIRE(aligned.ok());REQUIRE_EQ(aligned->size(),5u);
+    CHECK_EQ((*aligned)[0],L"exe:running-a");CHECK_EQ((*aligned)[1],L"exe:pin-b");
+    CHECK_EQ((*aligned)[2],L"exe:running-b");CHECK_EQ((*aligned)[3],L"exe:pin-a");CHECK_EQ((*aligned)[4],L"exe:pin-new");
+}
+
+AETHER_TEST("dock presentation: a pinned profile accepts a late window avatar without changing its launch route") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    auto pin=Pin(L"aumid:Synthetic.Profile");pin.appUserModelId=L"Synthetic.Profile";
+    pin.shortcutPath=LR"(C:\AetherFixture\profile.lnk)";pin.arguments=L"--profile=Synthetic";config.pinned={pin};
+    auto running=Running(pin.id);running.appUserModelId=pin.appUserModelId;
+    auto before=BuildDockItems(config,{running});REQUIRE(before.ok());const auto key=apps::IconSourceFingerprint((*before)[1].application);
+    running.relaunchIconResource=LR"(C:\AetherFixture\avatar.ico,0)";
+    auto after=BuildDockItems(config,{running});REQUIRE(after.ok());
+    CHECK_EQ((*after)[1].application.iconResource,running.relaunchIconResource);
+    CHECK_EQ((*after)[1].application.shortcutPath,pin.shortcutPath);CHECK_EQ((*after)[1].application.arguments,pin.arguments);
+    CHECK(apps::IconSourceFingerprint((*after)[1].application)!=key);
 }

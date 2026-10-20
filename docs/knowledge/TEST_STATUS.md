@@ -628,3 +628,64 @@ pending; S-012 still describes the only delivered alpha.
   - The Explorer restart leaves the native taskbar visible for several seconds before it is re-hidden.
   - File Explorer windows that were open closed with the Explorer process (expected for an Explorer
     restart).
+
+### S-022 — interrupted V2 integration recovery (Codex, 2026-10-20, in progress)
+- Source baseline: unchanged public `d5ccbd6`. Candidate: pending merge of `5cf6e72`, `1ef9d72`
+  and `4b7c8a8`, plus preserved visual working files and new integration/review fixes. The original
+  branch worktrees and public `main` remain unchanged.
+- Fresh baseline command: `./scripts/build.ps1 -Config release -BuildDir build/wf-codex-baseline
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestExclude 'network|integration' -Jobs 4`.
+  Full Release /W4 /WX build passed. Unit result: **17/18 executables passed; 526 cases passed,
+  one failed**. Search's 2,000-application p95 was 4.781 ms (budget <2 ms), while concurrent
+  compilation was running; 5,000-application p95 was 4.026 ms. This failure is retained, not a pass.
+  Once all compilers stopped, a quiet targeted rerun passed **7/7 Search cases**: 2,000-app p95
+  **0.227 ms**, 5,000-app p95 **0.491 ms** (0.36 s CTest). The performance budget was not relaxed.
+  The initial failure remains recorded above; this is a scoped rerun, not a new whole-baseline run.
+- Candidate applications: fresh focused Release /W4 /WX build and **120/120 unit cases passed**
+  (`build/wf-codex-parity`, 6.04 s). Includes unknown explicit profile launch rejection, 8.3 identity,
+  worker-only pin planning and ancestor-junction icon rejection with isolated temporary fixtures.
+- Candidate graphics/UI: fresh focused Release /W4 /WX build and **64 graphics + 19 UI unit cases
+  passed** (`build/wf-codex-visuals`, 2/2 executables, 1.08 s). Initial UI and Search UI native runs
+  crashed in CompositionScopedBatch `auto_revoke` registration: the object did not provide the weak
+  reference required by that path. An explicit strong batch/event-token subscription plus lifetime,
+  cancellation and callback guards fixes the reproduced crash. Fresh **12/12 UI native cases pass**,
+  including completion/reset/detach/destruction/throwing-callback regression and guarded RGB probes
+  (dark 17.872, light 18.613, high contrast 0). Search UI initially passed 9/10: a fixed 700 ms wait
+  checked spring idle prematurely. The final **10/10 pass** (7.52 s) waits for explicit layout
+  completion under a 2 s overall deadline, retaining the original <=2 idle-frame assertion.
+  Final UI run: 12/12, 13.03 s. Final headless repeat: graphics64/UI19, 0.74 s. Root independently
+  opened all five synthetic PNGs (Search dark/light and glass dark/light/high contrast); only own
+  fixture/backdrop pixels are visible. These do not establish full-app desktop or actual avatar use.
+- Final frozen whole-candidate **Release /W4 /WX build passed**, including app, launcher, updater,
+  setup and all test executables. Earlier intermediate links lacked newly added/changed Top Bar
+  symbols while source was still being written; reconfiguration and the final frozen rebuild resolve
+  them. No warnings remained.
+- Combined unit gate: `ctest --test-dir build/wf-codex-integrated -L unit --output-on-failure
+  --output-junit evidence/unit.xml -j 1`: **18/18 executables, 669/669 cases passed**, 15.18 s.
+  Includes applications121, Dock31, Top Bar20 and app34. With compilers idle, 2,000-app p95 was
+  **0.231 ms**, 5,000-app p95 **0.435 ms**. Original timing budget unchanged. Raw unit evidence is
+  retained under the ignored candidate build directory before the native gate overwrites LastTest.
+- Combined native gate: `ctest --test-dir build/wf-codex-integrated -L integration -LE network
+  --output-on-failure --output-junit <build>/evidence/integration.xml -j 1`:
+  **14/14 executables, 122/122 cases passed**, 79.94 s. Scoped counts: net28, accessibility3,
+  UI12, status10 + runtime shutdown1, audio5, applications20, install7, Dock3, Top Bar4, Search UI10,
+  Settings UI10, app2, setup7. Own-window/fake/read-only isolation was preserved; no live Internet
+  suite or actual shell/audio/startup/dictation action was invoked. Unit and native raw logs/JUnit
+  remain in the ignored build evidence directory.
+- Six public screenshots were refreshed from the newly executed, independently opened synthetic
+  captures. The frozen setup was relinked after those asset changes; product source/payload behavior
+  did not change. Package command: `./scripts/package.ps1 -BuildDir build/wf-codex-integrated
+  -OutputDir dist -SkipBuild`, signing variable cleared in that process. Final binary/payload privacy
+  and freshness audit passed. Setup: **4,957,184 bytes**, SHA-256
+  `6d0f54e03171aa4f5d80198a20fe5f431633f689fc2d84fb3fdffe024568e70b`.
+  Setup/checksums are local review assets; the unsigned manifest remains local. No V2 tag, install
+  or release publication is implied.
+- Release scripts: **32/32 Python unittest cases passed**, 23.779 s. Initial current-source privacy
+  scan covered 536 files; five pattern hits were inspected as synthetic URL/path rejection fixtures,
+  not private data. Environment-specific path/machine scan found zero. All 17 unpublished commit
+  identities use GitHub noreply addresses; 165 unpublished history blobs/commit messages scanned
+  with zero environment-specific/secret-pattern findings. Repeat the final diff/assets audit before
+  push; these checks do not validate unfinished source or a stale package.
+- No real taskbar/work-area/audio/keyboard/startup setting was changed, no browser profile was read,
+  no Explorer restart/install/publication was performed in this continuation. Native fixtures use
+  only their own windows/fakes; captures require an opaque test backdrop and foreign-window guards.

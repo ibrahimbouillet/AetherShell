@@ -55,6 +55,9 @@ float Ease(Easing easing, float t) noexcept {
             const float u = t - 1.0f;
             return 1.0f + c3 * u * u * u + c1 * u * u;
         }
+        case Easing::Standard: return EvaluateCubicBezier(CubicBezier{0.2f, 0.0f, 0.0f, 1.0f}, t);
+        case Easing::Decelerate: return EvaluateCubicBezier(CubicBezier{0.0f, 0.0f, 0.0f, 1.0f}, t);
+        case Easing::Accelerate: return EvaluateCubicBezier(CubicBezier{0.3f, 0.0f, 1.0f, 1.0f}, t);
     }
     return t;
 }
@@ -169,13 +172,28 @@ void Tween::AnimateTo(float target, Seconds now, Seconds duration, Easing easing
     start_ = now;
     duration_ = duration;
     easing_ = easing;
+    useCurve_ = false;
+}
+
+void Tween::AnimateTo(float target, Seconds now, Seconds duration, const CubicBezier& curve) noexcept {
+    if (duration <= 0.0) {
+        SnapTo(target);
+        return;
+    }
+    if (target == to_ && IsAnimating(now)) return;
+    from_ = Value(now);
+    to_ = target;
+    start_ = now;
+    duration_ = duration;
+    curve_ = curve;
+    useCurve_ = true;
 }
 
 float Tween::Value(Seconds now) const noexcept {
     if (duration_ <= 0.0 || now >= start_ + duration_) return to_;
     if (now <= start_) return from_;
     const float t = static_cast<float>((now - start_) / duration_);
-    return Lerp(from_, to_, Ease(easing_, t));
+    return Lerp(from_, to_, useCurve_ ? EvaluateCubicBezier(curve_, t) : Ease(easing_, t));
 }
 
 void Spring::Step(Seconds dt) noexcept {

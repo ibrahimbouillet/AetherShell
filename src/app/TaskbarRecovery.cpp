@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/TaskbarRecovery.h"
 
+#include "core/FileSystem.h"
 #include "settings/SettingsStore.h"
 
 namespace aether::app {
@@ -17,16 +18,19 @@ Result<TaskbarRecoveryReport> RecoverTaskbarWithoutInstance(const std::filesyste
     if (!store) return report;
     auto loaded = store.value()->Load();
     if (!loaded) return report;
-    if (loaded->report.status == settings::LoadStatus::Defaults) {
-        report.replacementTurnedOff = !loaded->value.general.replaceWindowsTaskbar;
-    } else if (loaded->report.status == settings::LoadStatus::Loaded) {
-        if (!loaded->value.general.replaceWindowsTaskbar) {
-            report.replacementTurnedOff = true;
-        } else {
-            loaded->value.general.replaceWindowsTaskbar = false;
-            report.replacementTurnedOff = store.value()->Save(loaded->value, false).ok();
-        }
+    const auto status = loaded->report.status;
+    // A newer version's file is never rewritten here; the message names Settings > Desktop.
+    if (status == settings::LoadStatus::NewerSchema) return report;
+    if (status == settings::LoadStatus::Loaded && !loaded->value.general.replaceWindowsTaskbar) {
+        report.replacementTurnedOff = true;
+        return report;
     }
+    // D23: defaults replace the taskbar, so a missing file, or a corrupt one (already preserved by
+    // the store as settings.json.corrupt-*), is written with replacement off. Otherwise the next
+    // normal start would hide the taskbar again.
+    if (status != settings::LoadStatus::Loaded && !fs::EnsureDirectory(configDirectory)) return report;
+    loaded->value.general.replaceWindowsTaskbar = false;
+    report.replacementTurnedOff = store.value()->Save(loaded->value, false).ok();
     return report;
 } catch (...) { return MakeError(ErrorCode::Internal, "taskbar recovery failed"); }
 

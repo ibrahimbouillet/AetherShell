@@ -22,6 +22,8 @@ struct TextStyle {
     DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
     bool display = false;  // use the display family (titles, large text)
     bool ellipsis = true;  // trim with an ellipsis instead of wrapping
+    bool opticalSmall = false;  // optical "Small" family for text of 12 DIPs or less (falls back like the others)
+    bool tabularFigures = false;  // equal-width digits ('tnum'), so changing numbers (clock) do not shift
 };
 
 class TextCache {
@@ -41,11 +43,16 @@ public:
 
 private:
     [[nodiscard]] std::wstring ResolveFamily(const std::wstring& preferred) const;
+    // A layout of `text` with the tabular-figures feature applied (falls back to plain figures).
+    [[nodiscard]] winrt::com_ptr<IDWriteTextLayout> TabularLayout(std::wstring_view text, IDWriteTextFormat* format,
+                                                                  float width, float height);
 
     winrt::com_ptr<IDWriteFactory> factory_;
     std::wstring textFamily_;
     std::wstring displayFamily_;
-    std::map<std::tuple<bool, int, int, int, int, bool>, winrt::com_ptr<IDWriteTextFormat>> formats_;
+    std::wstring smallFamily_;
+    winrt::com_ptr<IDWriteTypography> tabular_;
+    std::map<std::tuple<bool, int, int, int, int, bool, bool>, winrt::com_ptr<IDWriteTextFormat>> formats_;
 };
 
 }  // namespace aether::graphics

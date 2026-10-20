@@ -4,7 +4,112 @@
 > personal addresses/accounts/paths, machine names, unrelated app content or captures outside the
 > project's own isolated test windows. Public owner attribution: Ibrahim Bouillet. See AGENTS.md.
 
-## Latest session — Claude, 2026-10-18, about 15:55–16:40 CEST
+## Active continuation — Codex, 2026-10-20–21 (Europe/Paris)
+
+Long-term objective: a native C++20 Windows Dock and Top Status Bar alongside Explorer, with real
+status, accessible interaction, durable settings, safe per-user installation and authenticated
+updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, implemented their
+consumers/app integration, independently reviewed them and completed the automated candidate gates.
+The published `0.1.0-alpha.1` does not include this work.
+
+### Git and preservation checkpoint
+
+- Official public `origin`: `https://github.com/ibrahimbouillet/AetherShell.git`; a fresh fetch confirms
+  recorded remote `main` at `8e11a68`. The original clean local `main` starts at `d5ccbd6`.
+- Recovered streams: `wf/b1-lifecycle` = `5cf6e72`, `wf/b1-parity` = `1ef9d72`,
+  `wf/b1-visual-core` = `4b7c8a8`. Five dirty/untracked visual files were copied byte-for-byte into
+  the integration candidate before review fixes. Original Claude worktrees/files remain untouched.
+- The owner confirmed Claude stopped after quota interruption. Implementation continues in a linked
+  public integration worktree, discoverable with `git worktree list`; it has detached HEAD at
+  `d5ccbd6` with an uncommitted octopus merge of the three streams plus the edits described below.
+  Do not reset/discard it. Coherent commit, safe fast-forward of `main`, push and new CI are next;
+  a later delivery receipt must state their actual outcome before claiming them complete.
+- The archive checkout has no remote and private history; never develop or push from it. No private
+  archive history, owner canvas, private capture, browser profile database or assistant state was copied.
+
+### Implemented and reviewed
+
+- D23: taskbar replacement defaults on, explicit opt-out/reset semantics preserved, setup disclosure
+  and restore shortcut. Canonical default-on docs and native Settings consent fixtures agree.
+- Applications: trusted profile launch/pin routes, best-effort Taskband pin reconciliation, one-time
+  Explorer default, worker-only 8.3 planning, ancestor-junction icon rejection, late profile avatar
+  presentation without changing launch routes. Unknown profiles can activate existing windows but
+  cannot silently launch the default browser profile. Actual Chrome behavior still needs manual checks.
+- Dock: shared roles/glyphs/glass/menus, configurable Start/Search/Task View, saved pin order and
+  session-only running-item drag, dismissal persistence, source-sensitive icon refresh, compact
+  shadow reservation. Reviews fixed invisible empty regions, modal-menu lifetime/stale selection,
+  shutdown/entrance admission, DPI cache retention and queued/async tooltip resurrection.
+- Top Bar: configured height/weather side/keyboard format/battery preference, shared material/glyphs,
+  anchored menus, keyboard/network/weather/clock/power/sound/privacy actions and temporary native
+  taskbar reveal/manual resume. Dock remains visible until native restoration completes; a monotonic
+  60-second timer then resumes replacement. Stale timer messages cannot shorten a newer reveal.
+- Owner clarified **Chrome profile avatars**, **Dock-icon context menus**, and **Windows dictation
+  plus settings/mute** (D24). Do not ask those scope questions again. Voice typing requests Win+H
+  only after verified previous-window focus; Aether does not capture/store speech. No real dictation
+  or audio control was exercised by automation.
+- App/settings: Appearance page, shared theme/motion application, worker pin sync with settings
+  revision/retry/opt-out protection and bounded newest dismissal retention. Native taskbar access
+  remains restricted to the production instance; isolated full-app tests cannot hide it.
+- Graphics/UI/Search: foreign menu-pointer rejection, correct shadow/entrance regions, actual drawn
+  row hit/UIA geometry, entrance pointer guard and accessibility-motion cancellation. A reproduced
+  CompositionScopedBatch crash was fixed with explicit strong batch/event-token ownership and
+  lifetime/cancel/detach/destruction/throwing-callback regressions.
+- Continuity: reusable English `docs/SESSION_START_PROMPT.md` works for Claude/Codex. Added required
+  `ARCHITECTURE.md` and `TESTING.md` (T19/GAP-009). Refreshed six public screenshots from independently
+  inspected own-window synthetic fixtures; no owner desktop screenshot is public material.
+
+### Executed verification — exact scope in TEST_STATUS S-022
+
+- Frozen full Release /W4 /WX build: app/launcher/updater/setup and all tests, zero warnings.
+- Combined unit gate: **18/18 executables, 669/669 cases pass** (15.18 s).
+- Combined serial non-network integration gate: **14/14 executables, 122/122 cases pass** (79.94 s).
+  Includes Dock3, Top Bar4, Settings UI10, app2, UI12 and Search UI10. These are own-window/fake or
+  read-only checks; no actual taskbar/work-area/audio/startup/keyboard/dictation mutation or external
+  app launch. Raw logs/JUnit stay in ignored `build/wf-codex-integrated/evidence`.
+- Release-tool Python tests: **32/32 pass**. Baseline Search initially failed timing under concurrent
+  compilation; its quiet rerun passes, and candidate p95 is 0.231 ms (2,000 apps), 0.435 ms (5,000),
+  with unchanged budgets. Original native crashes and premature 700-ms idle assertion remain recorded;
+  corrected tests retain a bounded two-second settlement deadline and <=2 idle-frame requirement.
+- Local package privacy/freshness audit passes, including setup and uncompressed embedded binaries.
+  `dist/AetherShell-0.2.0-alpha.1-win-x64-setup.exe`: **4,957,184 bytes**, SHA-256
+  `6d0f54e03171aa4f5d80198a20fe5f431633f689fc2d84fb3fdffe024568e70b`.
+  Setup and checksums are review assets only. **Unsigned manifest stays local.**
+- Initial source/history privacy review found no private material; synthetic rejection-test strings
+  were inspected separately. All 17 unpublished commit identities use GitHub noreply addresses;
+  165 unpublished history blobs/commit messages had no environment-specific/secret-pattern finding.
+  Final staged diff/identity audit must precede the source push.
+
+## NEXT SESSION START HERE
+
+1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`; verify official origin, Git
+   status/HEAD/merge parents and worktrees. If the pending merge still exists, finish its final audit
+   and coherent commit; preserve every original worktree. Recheck the original `main` before any
+   fast-forward, then use the already authorized public source push and observe Windows CI. Never
+   force-push or claim a publication/CI receipt that has not happened.
+2. Read the latest delivery receipt added below, TASKS T22–T24 and TEST_STATUS S-022. Automated gates
+   above are complete for the frozen candidate; do not repeat them unless source changes or an actual
+   concern requires it. New CI, actual desktop/voice qualification and V2 publication are separate.
+3. Obtain the owner's explicit current-session authorization before changing the real desktop
+   (ADR0009/T21; this was also required by the previous handoff). With an agreed recovery procedure,
+   check one visible bottom bar, maximized work-area protection, normal quit/restore and temporary
+   reveal/resume; qualify crash/double-failure and Explorer restart separately if authorized. Do not
+   restart Explorer, change actual audio/startup or start dictation in automated tests. S-021 is an
+   older e29e83e desktop receipt, not qualification of this new combined candidate. It records the
+   owner dropping Windows 10 qualification for lack of a machine, not a Windows 10 pass.
+4. Check real Chrome grouping/avatar/launch identity and voice typing in the intended editable field
+   with the owner. HWND focus admission and SendInput acceptance do not prove dictation success.
+   `topBar.openWindowsFlyouts` is persisted but has no routing consumer; fixed status routes are
+   documented honestly. T20 diagnostics export remains unverified. Q-001/Q-002/GAP-010 stay open.
+5. Prepare/review any changed package again, retain unsigned manifests locally, then obtain explicit
+   publication approval for the concrete prerelease assets. No V2 tag/release/install was performed
+   in this session. Never silently enable startup, read private account databases or publish logs,
+   PDBs, keys/locations, owner captures, local assistant state or private archive history.
+6. Update this canonical handoff and TEST_STATUS at every meaningful checkpoint. Use the portable
+   English prompt for the next assistant; proprietary tools/skills are optional and not continuity.
+
+## Historical receipts — previous sessions, superseded as continuation instructions
+
+### Claude, 2026-10-18, about 15:55–16:40 CEST
 Task: the owner asked for one authoritative specification, checked against the original brief, and for
 a standard prompt to start every session. Claude changed no product source and made no commit in this
 checkout. Nothing was pushed or released, and no repository setting was changed.
@@ -57,7 +162,7 @@ checkout. Nothing was pushed or released, and no repository setting was changed.
     - The owner's installed 0.1 alpha was closed for the check and restarted; the taskbar is back to
       its pre-test state.
 
-## NEXT SESSION START HERE
+## Historical continuation list (use the current list above)
 1. Follow `docs/SESSION_START_PROMPT.md`. Check that `git remote -v` shows the official repository: this
    checkout is the only one for development. The original checkout is a local history archive (GAP-012).
 2. The V2 work (Codex) and Claude's T21 fixes and documentation are committed as one commit, "Add

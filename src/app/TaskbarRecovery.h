@@ -18,8 +18,9 @@ struct TaskbarRecoveryReport {
 // `--restore-taskbar` when no Aether Shell instance is running (D21). Blocking: call on a worker.
 // Restores the native taskbar from the persisted baseline (without one, makes its windows visible),
 // then turns the replacement setting off, as the running-instance command does, so that the next
-// normal start does not hide the taskbar again. A newer or unreadable settings file is not touched,
-// and a missing one is not created.
+// normal start does not hide the taskbar again. Because replacement is on by default (D23), a
+// missing settings file is created, and a corrupt one (preserved by the settings store as
+// settings.json.corrupt-*) is rewritten, with replacement off. A newer-schema file is not touched.
 [[nodiscard]] Result<TaskbarRecoveryReport> RecoverTaskbarWithoutInstance(
     const std::filesystem::path& configDirectory,
     const platform::TaskbarBackendFactory& makeBackend =

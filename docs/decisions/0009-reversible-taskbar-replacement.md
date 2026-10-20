@@ -2,8 +2,8 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # ADR 0009 — Reversible visual taskbar replacement
 
-- Status: owner-approved scope change (2026-10-18); platform qualification remains open.
-- Decision: D19; requirements FR-001, FR-002, FR-017, FR-024, NFR-003 and NFR-008.
+- Status: owner-approved scope change (2026-10-18), launch default amended by D23 (recorded 2026-10-20); platform qualification remains open.
+- Decisions: D19, D21–D23; requirements FR-001, FR-002, FR-017, FR-024, NFR-003 and NFR-008.
 - Supersedes: ADR 0003's blanket no-hide policy and non-AppBar Dock rule only in this mode.
 
 ## Context and approval
@@ -22,10 +22,10 @@ configure Windows. Aether Shell's Desktop page owns its own mode and pin import 
 
 1. Keep exactly two persistent surfaces and keep Explorer running. Never modify Winlogon's Shell,
    require elevation, disable security, or add a third-party library for this feature.
-2. Add `general.replaceWindowsTaskbar`, default **false**, as an additive schema-v1 field. The
-   Desktop checkbox requires **Apply** for either direction; live autosave/navigation/close does
-   not consent. Startup remains a separate explicit choice. Persisted consent can resume the mode
-   on a later normal launch.
+2. Add `general.replaceWindowsTaskbar` as an additive schema-v1 field. Originally default false;
+   D23 changes the launch default to **true**, preserving a saved explicit false. The Desktop
+   checkbox requires **Apply** to change either direction; live autosave/navigation/close cannot
+   apply a draft. Reset preserves this choice. Startup at sign-in remains a separate opt-in.
 3. Use the documented taskbar auto-hide state through
    [ABM_SETSTATE](https://learn.microsoft.com/en-us/windows/win32/shell/abm-setstate), preserving
    the captured baseline. Hide only Explorer-owned `Shell_TrayWnd` / `Shell_SecondaryTrayWnd`
@@ -44,11 +44,13 @@ configure Windows. Aether Shell's Desktop page owns its own mode and pin import 
    not automatically relocate every manually positioned window.
 6. Read available `.lnk` taskbar pins on a worker without changing native pins. Merge supported
    entries without duplicates or overwriting existing Aether pins. An empty Dock is eligible for an
-   initial automatic import after replacement consent; successful completion is recorded, while a
+   initial automatic import when replacement is selected; successful completion is recorded, while a
    failed read can remain retryable. A manual import remains available. Windows 11 can
    keep additional pins/order in stores this feature does not parse, so completeness is not claimed.
 7. Keep `--restore-taskbar` and `--quit` as existing-instance recovery entry points. Neither starts
-   a new desktop instance when none is running. They are not an independent system repair utility.
+   new desktop surfaces when none is running. D21 adds independent baseline recovery to
+   `--restore-taskbar`; D23 makes that command persist replacement off even after missing/corrupt
+   settings. `--quit` remains a no-op without an instance.
 
 ## Boundaries and recovery limitations
 
@@ -61,7 +63,8 @@ Restoration is best effort across process/shell failures. If both app and helper
 restoration is not assured. A killed helper cannot transfer later native Settings changes to the
 parent's initial fallback snapshot. Explorer restart, monitor changes, native auto-hide interactions
 and Windows updates require real desktop qualification. The user can disable the Desktop mode or
-quit; if recovery is unavailable, restart Windows Explorer through Task Manager. No unattended
+quit; D21 also provides `--restore-taskbar` and setup repair without a running app. If those cannot
+recover the taskbar, restart Windows Explorer through Task Manager. No unattended
 registry-based recovery or hidden startup mechanism is introduced.
 
 Automated tests retain NFR-008: fake taskbar backend and synthetic windows only, with no native
@@ -105,3 +108,25 @@ Real-desktop findings (2026-10-18, TEST_STATUS S-016):
   not visible. Restoration therefore now shows every Explorer taskbar window and never hides one.
 - **Explorer's own recovery:** on that machine, Explorer showed its taskbar again by itself once the
   killed process's AppBars disappeared. The saved auto-hide state still needed the recovery path.
+
+## Amendment: D23 (owner-requested launch behavior, recorded 2026-10-20)
+
+The owner requested that launching V2 hide the native taskbar so that only Aether's bottom Dock is
+visible, and reiterated the one-Dock requirement. This supersedes the original off-by-default
+condition in decision 2; it does not authorize Explorer replacement or permanent disabling.
+
+- Missing or non-boolean `general.replaceWindowsTaskbar` values use true; a non-boolean value also
+  reports a validation warning. An explicit false persists through saves, launches and reset.
+- Corrupt settings are preserved and replaced by defaults, which can no longer retain an unreadable
+  opt-out. `--restore-taskbar` restores the native taskbar and writes false for missing/corrupt
+  settings; a newer-schema file is never rewritten by that command.
+- Setup discloses the launch behavior. When Start menu shortcuts are selected, it also creates a
+  `Restore Windows taskbar` entry pointing at the stable launcher with `--restore-taskbar`. A
+  same-named foreign shortcut is preserved. Repair keeps the saved replacement choice.
+- Start at sign-in remains off until explicit consent. D19 reservation/helper safeguards, D21
+  independent recovery and D22 show-on-restore remain mandatory.
+- Native taskbar access is denied in own-instance test sessions even with default-on settings.
+  Automated tests remain isolated; prior desktop receipts do not qualify the newly integrated build.
+
+The batch-1 implementation and documentation are being integrated. Current build/test evidence and
+remaining qualification belong in TEST_STATUS and HANDOFF, not in the approval statement.

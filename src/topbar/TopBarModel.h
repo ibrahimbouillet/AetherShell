@@ -14,7 +14,13 @@
 
 namespace aether::topbar {
 
-enum class ItemKind { Logo = 1, Weather, Keyboard, Network, Volume, Microphone, Battery, Clock };
+enum class ItemKind { Logo = 1, Weather, Keyboard, Network, Volume, Microphone, Battery, Clock, NotificationArea };
+struct TaskbarReplacementState {
+    bool available = false;
+    bool active = false;
+    bool suspended = false;
+    bool operator==(const TaskbarReplacementState&) const = default;
+};
 struct TopBarSnapshots {
     status::ClockSnapshot clock;
     status::BatterySnapshot battery;
@@ -28,6 +34,7 @@ struct DisplayItem {
     int id = 0;
     ItemKind kind = ItemKind::Logo;
     std::wstring text;
+    std::wstring secondaryText;
     std::wstring tooltip;
     std::wstring accessibleName;
     bool actionable = false;
@@ -41,6 +48,7 @@ struct DisplayItem {
     status::ChargeState charge = status::ChargeState::Unknown;
     weather::WeatherGlyph weatherGlyph = weather::WeatherGlyph::Unknown;
     std::optional<bool> isDay;
+    bool operator==(const DisplayItem&) const = default;
 };
 struct PlacedItem { DisplayItem item; D2D1_RECT_F rect{}; };
 
@@ -49,11 +57,21 @@ struct PlacedItem { DisplayItem item; D2D1_RECT_F rect{}; };
 [[nodiscard]] std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept;
 
 [[nodiscard]] Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& snapshots,
-    const settings::TopBarSettings& settings, bool weatherEnabled, std::wstring_view locale = {});
+    const settings::TopBarSettings& settings, bool weatherEnabled, std::wstring_view locale = {},
+    TaskbarReplacementState taskbar = {});
 // Widths correspond to items and include glyph/text padding. Low-priority weather then keyboard
 // disappear first; remaining items shrink/clamp without overlapping the logo.
 [[nodiscard]] std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items,
-    const std::vector<float>& widths, float widthDip, float heightDip = 32.0f);
+    const std::vector<float>& widths, float widthDip, float heightDip = 32.0f,
+    settings::WeatherPlacement weatherPlacement = settings::WeatherPlacement::Right);
+struct TopBarPlacement {
+    RECT windowBoundsPx{};
+    RECT panelBoundsPx{};  // relative to window, excludes the exterior shadow
+    int reservationHeightPx = 0;
+};
+// Pure geometry; reserve the complete visible footprint, including the exterior shadow.
+[[nodiscard]] Result<TopBarPlacement> ComputeTopBarPlacement(const RECT& area, UINT dpi, int heightDip,
+                                                           int topMarginDip, float shadowDip);
 [[nodiscard]] std::optional<int> HitTest(const std::vector<PlacedItem>& items, D2D1_POINT_2F point) noexcept;
 [[nodiscard]] Result<float> WheelVolumeTarget(std::optional<float> observed, std::optional<float> pending,
                                              float notches);

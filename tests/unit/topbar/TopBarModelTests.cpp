@@ -181,3 +181,62 @@ AETHER_TEST("topbar actions: keyboard network and weather remain actionable with
     CHECK(Find(built.value(), ItemKind::Microphone)->tooltip.find(L"right-click") != std::wstring::npos);
     CHECK(Find(built.value(), ItemKind::Microphone)->tooltip.find(L"Recording detection unsupported") != std::wstring::npos);
 }
+
+AETHER_TEST("topbar preferences: compact keyboard and hidden battery percentage retain honest tooltips") {
+    TopBarSnapshots snapshots;
+    snapshots.keyboard.state = status::ProviderState::Available;
+    snapshots.keyboard.shortLabel = L"FR"; snapshots.keyboard.layoutName = L"Fixture French layout";
+    snapshots.battery.state = status::ProviderState::Available;
+    snapshots.battery.batteryPresent = true; snapshots.battery.percent = 64;
+    settings::TopBarSettings config;
+    config.keyboardIndicator = settings::KeyboardIndicatorStyle::TwoLine;
+    auto built = BuildDisplayItems(snapshots, config, false);
+    REQUIRE(built.ok());
+    CHECK_EQ(Find(built.value(), ItemKind::Keyboard)->secondaryText, snapshots.keyboard.layoutName);
+    config.keyboardIndicator = settings::KeyboardIndicatorStyle::Compact;
+    config.showBatteryPercent = false;
+    built = BuildDisplayItems(snapshots, config, false);
+    REQUIRE(built.ok());
+    CHECK(Find(built.value(), ItemKind::Keyboard)->secondaryText.empty());
+    CHECK(Find(built.value(), ItemKind::Battery)->text.empty());
+    CHECK(Find(built.value(), ItemKind::Battery)->tooltip.find(L"64%") != std::wstring::npos);
+    CHECK(Find(built.value(), ItemKind::Battery)->actionable);
+    CHECK(Find(built.value(), ItemKind::Clock)->actionable);
+    config.keyboardIndicator = settings::KeyboardIndicatorStyle::TwoLine; config.height = 24;
+    REQUIRE(BuildDisplayItems(snapshots, config, false).ok());
+    CHECK(Find(BuildDisplayItems(snapshots, config, false).value(), ItemKind::Keyboard)->secondaryText.empty());
+}
+
+AETHER_TEST("topbar preferences: weather moves left while status targets remain ordered and separate") {
+    const auto items = BuildDisplayItems({}, {}, true);
+    REQUIRE(items.ok());
+    const std::vector<float> widths(items.value().size(), 50);
+    const auto left = LayoutItems(items.value(), widths, 1000, 48, settings::WeatherPlacement::Left);
+    const auto right = LayoutItems(items.value(), widths, 1000, 48, settings::WeatherPlacement::Right);
+    const auto weatherX = [](const auto& placed) {
+        const auto found = std::find_if(placed.begin(), placed.end(), [](const auto& p) { return p.item.kind == ItemKind::Weather; });
+        return found == placed.end() ? -1.0f : found->rect.left;
+    };
+    CHECK(weatherX(left) < weatherX(right));
+    float previous = 0;
+    for (const auto& item : left) {
+        CHECK(item.rect.left >= previous); CHECK_EQ(item.rect.bottom, 48.0f);
+        previous = item.rect.right;
+    }
+}
+
+AETHER_TEST("topbar actions: notification area is runtime-only and exposes recovery while suspended") {
+    settings::TopBarSettings config;
+    auto items = BuildDisplayItems({}, config, false);
+    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea) == nullptr);
+    items = BuildDisplayItems({}, config, false, {}, {true, true, false});
+    REQUIRE(items.ok());
+    const auto* action = Find(items.value(), ItemKind::NotificationArea);
+    REQUIRE(action != nullptr); CHECK(action->actionable);
+    CHECK(action->tooltip.find(L"60 seconds") != std::wstring::npos);
+    items = BuildDisplayItems({}, config, false, {}, {true, false, true});
+    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea)->tooltip.find(L"Resume") != std::wstring::npos);
+    config.showNotificationAreaButton = false;
+    items = BuildDisplayItems({}, config, false, {}, {true, true, false});
+    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea) == nullptr);
+}

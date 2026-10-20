@@ -40,16 +40,20 @@ namespace aether::apps {
 
 struct ActivationChoice {
     HWND window = nullptr;
-    bool alreadyActive = false;  // the only window is already in front: nothing to do
+    bool alreadyActive = false;  // the only window is already in front
     bool cycled = false;         // the application was in front; another of its windows was chosen
+    bool minimize = false;       // minimize `window` (the only window, already in front)
 };
 
-// Picks the window Activate() brings forward. `windows` are the application's live windows, most
+// Picks what Activate() does, with the Windows taskbar's click behaviour: activate the application,
+// minimize it when its only window is already in front, restore it when it is minimized, and cycle
+// through its windows when it has several. `windows` are the application's live windows, most
 // recently active first, with up-to-date `minimized` flags. `foreground` is GetForegroundWindow()
 // and `foregroundRoot` its GA_ROOTOWNER ancestor (either may be null).
-//  * The application owns the foreground window: with a single window there is nothing to do;
-//    otherwise the least recently active window is chosen, so repeated activations cycle through
-//    every window (each activation moves the chosen window to the front of the MRU order).
+//  * The application owns the foreground window: with a single window, that window is minimized
+//    (alreadyActive and minimize); otherwise the least recently active window is chosen, so repeated
+//    activations cycle through every window (each activation moves the chosen window to the front
+//    of the MRU order).
 //  * Otherwise: the most recently active window that is not minimized; when all are minimized, the
 //    most recently active one (the caller restores it).
 // nullopt when `windows` is empty.

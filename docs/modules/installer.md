@@ -29,3 +29,21 @@ A running instance and its helper restore the taskbar themselves when the operat
 Only an existing baseline triggers recovery, so settings, other installations and automated tests
 (temporary data roots) are unaffected. A failure does not block repair or uninstall; the setup log
 records it with the manual Explorer-restart instruction.
+
+**Default-on replacement (D23).** The Welcome page says that the Dock replaces the Windows taskbar
+while Aether Shell runs and how to get it back (quit, Settings > Desktop, or the Start menu entry
+"Restore Windows taskbar"). The Options page repeats it next to the startup choice, which stays
+unchecked: starting at sign-in remains opt-in. Setup does not override an existing replacement
+choice. Saving startup consent can create settings with the replacement default, while repair
+preserves an existing explicit opt-out.
+
+**"Restore Windows taskbar" shortcut.** With Start menu shortcuts selected (the default), install
+and repair create a per-user `Restore Windows taskbar.lnk` in the Start menu Programs folder. It
+runs the launcher with `--restore-taskbar`, which the launcher forwards to the active version: a
+running instance turns replacement off, otherwise the D21 recovery restores the taskbar and writes
+the setting off. A file of the same name that does not target this installation's launcher is never
+replaced or removed. Uninstall removes the shortcut. A shortcut failure after a committed operation
+is only noted in the setup log. The test executable accepts `--test-shortcut-dir <absolute folder>`
+together with its isolation flag, so the integration suite checks creation (target and argument),
+the foreign-file rule and removal on uninstall in a temporary folder; the user's Start menu is never
+touched by tests, and the production binary has no such switch.

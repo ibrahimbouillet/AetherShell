@@ -10,13 +10,24 @@ struct Capture {
     std::vector<std::uint8_t> bytes;
 };
 bool PrivateCrop(HWND backdrop, const RECT& crop) {
+    // The host backdrop can sample pixels outside the crop. Keep a full opaque 128px guard band,
+    // and refuse to copy anything if either the crop or its blur neighborhood leaves our backdrop.
+    RECT own{};
+    if (!::GetClientRect(backdrop, &own)) return false;
+    POINT origin{};
+    if (!::ClientToScreen(backdrop, &origin)) return false;
+    ::OffsetRect(&own, origin.x, origin.y);
+    RECT guarded = crop;
+    ::InflateRect(&guarded, 128, 128);
+    if (guarded.left < own.left || guarded.top < own.top || guarded.right > own.right || guarded.bottom > own.bottom)
+        return false;
     for (HWND window = ::GetTopWindow(nullptr); window; window = ::GetWindow(window, GW_HWNDNEXT)) {
         if (window == backdrop) return true;
         if (!::IsWindowVisible(window)) continue;
         DWORD process = 0; ::GetWindowThreadProcessId(window, &process);
         if (process == ::GetCurrentProcessId()) continue;
         RECT bounds{}, overlap{};
-        if (::GetWindowRect(window, &bounds) && ::IntersectRect(&overlap, &bounds, &crop)) return false;
+        if (::GetWindowRect(window, &bounds) && ::IntersectRect(&overlap, &bounds, &guarded)) return false;
     }
     return false;
 }

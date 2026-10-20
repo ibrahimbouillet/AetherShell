@@ -9,8 +9,10 @@
 //    coalesces bursts into one re-enumeration, and the listener runs only when the result changed.
 //  * Eligibility: see WindowEligibility.h.
 //  * Identity of a window (pure rule: WindowIdentityRules.h), in order: its own AppUserModelID
-//    (SHGetPropertyStoreForWindow), the packaged AUMID of its process (GetApplicationUserModelId), the
-//    process image path (QueryFullProcessImageNameW). ApplicationFrameHost windows (class
+//    (SHGetPropertyStoreForWindow, see WindowProperties.h), the packaged AUMID of its process
+//    (GetApplicationUserModelId), the process image path (QueryFullProcessImageNameW). Windows of the
+//    system's explorer.exe without an AppUserModelID take the File Explorer identity
+//    (KnownApplications.h), so all File Explorer windows form one group. ApplicationFrameHost windows (class
 //    ApplicationFrameWindow) are identified through the process of their hosted
 //    Windows.UI.Core.CoreWindow; the identity seen while it was attached is remembered because Windows
 //    detaches the CoreWindow while the app is minimized or suspended. Processes that cannot be opened
@@ -19,6 +21,10 @@
 //  * Display names are resolved off the UI thread (Apps-folder name for AUMIDs, FileDescription for
 //    executables) on a small STA worker; until then the executable's file name (or, for AUMID-only
 //    identities, the window title) is used, and the listener runs again once the name is known.
+//    A group whose windows declare a relaunch display name (browsers set one per profile) uses it
+//    instead, so profile groups of one executable get distinct names.
+//  * Relaunch presentation: each group carries the relaunch icon resource and display name of its
+//    most recent window that declares them (RunningApplication). They are never logged.
 //
 // Threading: Start, Stop, Snapshot and the destructor must be called on the UI thread, which must
 // pump messages (hooks and the timer are delivered through its message loop) and should be a COM
@@ -30,6 +36,7 @@
 
 #include "applications/ApplicationTypes.h"
 #include "applications/WindowIdentityRules.h"
+#include "applications/WindowProperties.h"
 #include "core/Dispatcher.h"
 #include "core/WorkerPool.h"
 
@@ -83,14 +90,16 @@ private:
     void OnWinEvent(DWORD event, HWND hwnd);
     void MarkDirty();
     void Refresh();
-    WindowIdentity Identify(HWND hwnd, const std::wstring& className);
+    WindowIdentity Identify(HWND hwnd, const std::wstring& className, WindowShellProperties& properties);
     const ProcessIdentity& LookupProcess(DWORD processId);
-    std::wstring DisplayNameFor(const WindowIdentity& identity, const std::wstring& firstTitle);
+    std::wstring DisplayNameFor(const WindowIdentity& identity, const std::wstring& firstTitle,
+                                const std::wstring& relaunchDisplayName);
     void RequestDisplayName(const WindowIdentity& identity);
     void ReleaseResources() noexcept;
 
     IUiDispatcher& dispatcher_;
     Options options_;
+    std::wstring windowsDirectory_;  // system Windows directory, for File Explorer windows
     Listener listener_;
     bool running_ = false;
     bool timerArmed_ = false;

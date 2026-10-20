@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
+#include "app/DesktopPolicy.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
 
@@ -10,6 +11,9 @@
 #include "applications/WindowTracker.h"
 #include "applications/TaskbarPins.h"
 #include "applications/ApplicationIdentity.h"
+#include "applications/KnownApplications.h"
+#include "applications/SystemShellActions.h"
+#include "applications/TaskbarPinSync.h"
 #include "core/Strings.h"
 #include "core/FileSystem.h"
 #include "core/Time.h"
@@ -18,6 +22,7 @@
 #include "dock/DockWindow.h"
 #include "graphics/FrameScheduler.h"
 #include "graphics/GraphicsDevice.h"
+#include "graphics/SystemPalette.h"
 #include "install/Install.h"
 #include "platform/net/WinHttpClient.h"
 #include "platform/windows/MessageLoop.h"
@@ -26,6 +31,7 @@
 #include "platform/windows/SystemEvents.h"
 #include "platform/windows/Win32UiDispatcher.h"
 #include "platform/windows/WindowUtilities.h"
+#include "platform/windows/InputInjection.h"
 #include "search/SearchService.h"
 #include "search/ui/SearchWindow.h"
 #include "settings/SettingsService.h"
@@ -51,6 +57,7 @@ namespace aether::app {
 namespace {
 constexpr UINT_PTR kUpdaterPollTimer = 0xA371;
 constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
+constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
 struct UpdateLaunchResult {
     std::mutex mutex;
     bool finished = false;
@@ -96,8 +103,17 @@ struct ShellApplication::Impl {
     std::wstring hotkeyStatus;
     std::wstring taskbarStatus = L"Windows taskbar visible";
     std::optional<bool> taskbarRequested;
+    bool nativeTaskbarAccess = false;  // see ShellApplication::Run and MayAccessNativeTaskbar
     bool catalogReady = false;
     bool importingPins = false;
+    bool manualImportQueued = false;
+    std::uint64_t settingsRevision = 0;
+    std::optional<bool> automaticPinSync;
+    TaskbarUpdate desktopState;
+    bool automaticResume = false;
+    bool resumeTimerArmed = false;
+    std::uint64_t resumeDeadline = 0;
+    bool fullscreenSuppressed = false;
     bool taskbarReservationFailed = false;
     bool closing = false;
     bool ready = false;
@@ -108,7 +124,7 @@ struct ShellApplication::Impl {
 
     Result<void> StartSurfaces();
     void ApplySettings();
-    void ImportTaskbarPins();
+    void ImportTaskbarPins(bool manual = false, unsigned retry = 0);
     void OpenWindowsSettings(const wchar_t* uri) {
         if (closing) return;
         const auto weak = std::weak_ptr<bool>(alive);
@@ -126,6 +142,98 @@ struct ShellApplication::Impl {
         if (dock) (void)dock->SetTaskbarReplacement(false);
         if (taskbar) (void)taskbar->Request(false);
         if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+    }
+    // Activation order (D19): the Dock reserves its replacement-mode space and the observation timer
+    // exists before the helper may hide the Windows taskbar. A fresh request resets the retry budget.
+    void EnsureTaskbarReplacement() {
+        if (!taskbar) return;
+        auto reserved = dock ? dock->SetTaskbarReplacement(true)
+                             : Result<void>(MakeError(ErrorCode::Unavailable, "Dock unavailable"));
+        if (!reserved) {
+            AETHER_LOG_WARN("app", "taskbar replacement: Dock reservation failed ({})", reserved.error().Describe());
+            FailTaskbarReservation();
+            return;
+        }
+        // Only active while replacement is requested. Native process checks run on its worker.
+        if (!::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
+            if (dock) (void)dock->SetTaskbarReplacement(false);
+            taskbarStatus = L"Replacement unavailable: recovery observer could not start";
+            if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+            return;
+        }
+        (void)taskbar->Request(true);
+    }
+    void OnTaskbarUpdate(const TaskbarUpdate& update) {
+        desktopState = update;
+        if (dock) (void)dock->SetSuppressed(ShouldSuppressDock(fullscreenSuppressed, update));
+        AETHER_LOG_INFO("app", "taskbar replacement {}{}: {}", update.active ? "active" : "inactive",
+                        update.suspended ? " (suspended)" : "", text::Narrow(update.status));
+        taskbarStatus = update.status;
+        // Keep the preflight reservation throughout activation/retries and restoration; release it
+        // when nothing more is scheduled (the Windows taskbar is back) or while suspended. A failed
+        // reservation must never be re-enabled by a restoring callback.
+        const bool wanted = settings && settings->Current().general.replaceWindowsTaskbar;
+        const bool reserve = ShouldForceDockReservation(taskbarReservationFailed, wanted, update);
+        if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
+        if (!update.active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
+        if (!ShouldObserveTaskbar(update)) {
+            // Nothing more happens until the next request (setting toggled, Explorer restarted,
+            // resumed); each of them arms the timer again through EnsureTaskbarReplacement or the
+            // next active update.
+            ::KillTimer(events.Handle(), kTaskbarPollTimer);
+        } else if (update.active && !::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
+            taskbarStatus = L"Recovery observation is unavailable; restoring Windows taskbar";
+            (void)taskbar->Request(false);
+        }
+        if (settingsWindow) settingsWindow->RefreshDesktopStatus();
+        if (topbar) (void)topbar->SetTaskbarReplacementState(nativeTaskbarAccess && wanted && !closing, update.active, update.suspended);
+        if (automaticResume && update.suspended && !update.active && !resumeTimerArmed) {
+            resumeDeadline = ::GetTickCount64() + 60000;
+            resumeTimerArmed = ::SetTimer(events.Handle(), kTaskbarResumeTimer, 60000, nullptr) != 0;
+            if (!resumeTimerArmed) automaticResume = false; // leave Windows visible; manual Resume remains available
+        } else if (!update.suspended || !wanted) {
+            ::KillTimer(events.Handle(), kTaskbarResumeTimer); resumeTimerArmed = false; automaticResume = false;
+        }
+    }
+    void OnExplorerRestarted() {
+        if (topbar) topbar->OnExplorerRestarted();
+        if (nativeTaskbarAccess && catalogReady && settings && settings->Current().general.replaceWindowsTaskbar && settings->Current().general.syncTaskbarPins) ImportTaskbarPins();
+        const bool wanted = taskbar && taskbarRequested.value_or(false) && !closing;
+        if (dock && !dock->OnExplorerRestarted() && wanted && !taskbarReservationFailed) { FailTaskbarReservation(); return; }
+        if (!wanted) return;
+        if (taskbarReservationFailed) {
+            // A new Explorer is a fresh chance for a reservation that failed earlier, for example
+            // while Explorer was not ready at sign-in. Bounded by Explorer restarts.
+            AETHER_LOG_INFO("app", "taskbar replacement: retrying after Explorer restarted");
+            taskbarReservationFailed = false;
+            EnsureTaskbarReplacement();
+            return;
+        }
+        if (taskbar->Suspended()) return;  // the Windows taskbar stays shown until Resume
+        // Reserve before the replaced session can hide the taskbar again (also after the controller
+        // gave up), then replace the session at once through Restart, which times its own quick
+        // retries while the new Explorer finishes starting.
+        if (dock && !dock->SetTaskbarReplacement(true)) { FailTaskbarReservation(); return; }
+        (void)taskbar->Restart();
+    }
+    // Runtime-only temporary reveal of the Windows taskbar (never written to settings). Suspending
+    // goes through the controller's normal restoration path; resuming reserves the Dock space first,
+    // as activation does. Entry point for the Top Bar notification-area button (app integration).
+    Result<void> SetTaskbarReplacementSuspended(bool suspend) {
+        if (!taskbar || !taskbarRequested.value_or(false) || closing)
+            return MakeError(ErrorCode::InvalidState, "taskbar replacement is not requested");
+        if (suspend) return taskbar->Suspend();
+        if (!taskbar->Suspended()) return Ok();
+        if (taskbarReservationFailed) return MakeError(ErrorCode::Unavailable, "Dock space could not be reserved");
+        if (dock && !dock->SetTaskbarReplacement(true)) {
+            FailTaskbarReservation();
+            return MakeError(ErrorCode::Unavailable, "Dock space could not be reserved");
+        }
+        if (!::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
+            if (dock) (void)dock->SetTaskbarReplacement(false);
+            return MakeError(ErrorCode::Unavailable, "taskbar recovery observer could not resume");
+        }
+        return taskbar->Resume();
     }
     void RequestQuit();
     void OpenSettings(settings::ui::SettingsPage page = settings::ui::SettingsPage::Dock) {
@@ -169,10 +277,14 @@ struct ShellApplication::Impl {
 void ShellApplication::Impl::ApplySettings() {
     if (!settings || !settings->Loaded()) return;
     const auto& value = settings->Current();
-    const auto tokens = graphics::MakeDesignTokens(graphics::DetectThemeMode());
+    graphics::AppearanceOptions appearance;
+    appearance.theme = static_cast<graphics::ThemePreference>(value.general.themeMode);
+    appearance.accent = static_cast<graphics::AccentSource>(value.general.accentSource);
+    const auto tokens = graphics::MakeShellDesignTokens(appearance);
     graphics::MotionPolicy motion;
-    motion.reduced = value.general.motion == settings::MotionPreference::Reduced ||
+    motion.reduced = tokens.mode == graphics::ThemeMode::HighContrast || value.general.motion == settings::MotionPreference::Reduced ||
         (value.general.motion == settings::MotionPreference::System && !platform::SystemAnimationsEnabled());
+    motion.durationScale = static_cast<float>(value.general.animationSpeed);
     if (dock) {
         if (auto themed = dock->SetTheme(tokens, motion, value.dock); !themed && taskbarRequested.value_or(false)) {
             AETHER_LOG_WARN("app", "taskbar replacement: Dock relayout failed ({})", themed.error().Describe());
@@ -186,25 +298,19 @@ void ShellApplication::Impl::ApplySettings() {
         taskbarReservationFailed = false;
         AETHER_LOG_INFO("app", "taskbar replacement {}", *taskbarRequested ? "requested" : "turned off");
         if (*taskbarRequested) {
-            auto reserved = dock ? dock->SetTaskbarReplacement(true)
-                                 : Result<void>(MakeError(ErrorCode::Unavailable, "Dock unavailable"));
-            if (!reserved) {
-                AETHER_LOG_WARN("app", "taskbar replacement: Dock reservation failed ({})", reserved.error().Describe());
-                FailTaskbarReservation();
-            }
-            // Only active while replacement is requested. Native process checks run on its worker.
-            else if (::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) (void)taskbar->Request(true);
-            else {
-                if (dock) (void)dock->SetTaskbarReplacement(false);
-                taskbarStatus = L"Replacement unavailable: recovery observer could not start";
-                if (settingsWindow) settingsWindow->RefreshDesktopStatus();
-            }
+            EnsureTaskbarReplacement();
         } else {
+            ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
             // Keep observing until restoration acknowledges success, including bounded retries.
             (void)taskbar->Request(false);
         }
     }
-    if (catalogReady && value.general.replaceWindowsTaskbar && !value.general.taskbarPinsImported && value.dock.pinned.empty()) ImportTaskbarPins();
+    if (topbar) (void)topbar->SetTaskbarReplacementState(nativeTaskbarAccess && value.general.replaceWindowsTaskbar && !closing, desktopState.active, desktopState.suspended);
+    const bool sync = value.general.replaceWindowsTaskbar && value.general.syncTaskbarPins;
+    const bool syncJustEnabled = sync && automaticPinSync != sync;
+    automaticPinSync = sync;
+    if (nativeTaskbarAccess && catalogReady && value.general.replaceWindowsTaskbar &&
+        (syncJustEnabled || !value.general.taskbarPinsImported || !value.dock.explorerDefaultApplied)) ImportTaskbarPins();
     if (providers && providers->clock) providers->clock->SetResolution(value.topBar.showSeconds ? status::ClockResolution::Seconds : status::ClockResolution::Minutes);
     if (weather) {
         weather::WeatherConfig config; config.enabled = value.weather.enabled; config.latitude = value.weather.latitude;
@@ -258,7 +364,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.disableNotifications = [this] { if (!closing) (void)settings->Update([](settings::Settings& s){ s.updates.notifications = false; }); };
     actions.hotkeyStatus = [this] { return hotkeyStatus; };
     actions.catalog = [this] { return applications; };
-    actions.importTaskbarPins = [this] { ImportTaskbarPins(); };
+    actions.importTaskbarPins = [this] { ImportTaskbarPins(true); };
     actions.taskbarStatus = [this] { return taskbarStatus; };
     actions.geocoding = geocoding.get();
     actions.setStartup = [this](bool enabled, std::function<void(Result<void>)> completion) {
@@ -285,12 +391,13 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     if (auto result = topbar->Create(); !result) return result;
     connections.push_back(dock->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
     connections.push_back(dock->SettingsRequested.Connect([this]{ OpenSettings(); }));
-    connections.push_back(dock->ImportWindowsPinsRequested.Connect([this]{ ImportTaskbarPins(); }));
+    connections.push_back(dock->ImportWindowsPinsRequested.Connect([this]{ ImportTaskbarPins(true); }));
     connections.push_back(dock->StartRequested.Connect([this]{
         if (closing) return;
-        INPUT keys[2]{}; keys[0].type = INPUT_KEYBOARD; keys[0].ki.wVk = VK_LWIN;
-        keys[1] = keys[0]; keys[1].ki.dwFlags = KEYEVENTF_KEYUP;
-        if (::SendInput(2, keys, sizeof(INPUT)) != 2 && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Start could not be opened");
+        if (!apps::OpenStartMenu(dock->Handle()) && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Start could not be opened");
+    }));
+    connections.push_back(dock->TaskViewRequested.Connect([this]{
+        if (!closing && !apps::OpenTaskView() && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Task View could not be opened");
     }));
     connections.push_back(topbar->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
     connections.push_back(topbar->SettingsRequested.Connect([this]{ OpenSettings(settings::ui::SettingsPage::TopBar); }));
@@ -300,24 +407,34 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->QuitRequested.Connect([this]{ RequestQuit(); }));
     connections.push_back(topbar->KeyboardRequested.Connect([this]{
         if (closing) return;
-        INPUT keys[4]{}; for (auto& key : keys) key.type = INPUT_KEYBOARD;
-        keys[0].ki.wVk = VK_LWIN; keys[1].ki.wVk = VK_SPACE;
-        keys[2].ki.wVk = VK_SPACE; keys[2].ki.dwFlags = KEYEVENTF_KEYUP;
-        keys[3].ki.wVk = VK_LWIN; keys[3].ki.dwFlags = KEYEVENTF_KEYUP;
-        if (::SendInput(4, keys, sizeof(INPUT)) != 4 && settingsWindow) settingsWindow->ReportActionStatus(L"Windows keyboard layout switching was unavailable");
+        if (!platform::SendKeyChord({VK_LWIN,VK_SPACE}) && settingsWindow) settingsWindow->ReportActionStatus(L"Windows keyboard layout switching was unavailable");
     }));
     connections.push_back(topbar->NetworkRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:network-status"); }));
     connections.push_back(topbar->WeatherRequested.Connect([this]{ OpenSettings(settings::ui::SettingsPage::Weather); }));
     connections.push_back(topbar->MicrophoneSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:privacy-microphone"); }));
-    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ (void)dock->SetSuppressed(hidden); }));
-    connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ApplySettings(); }));
+    connections.push_back(topbar->VoiceTypingRequested.Connect([this]{
+        if (!closing && !platform::SendKeyChord({VK_LWIN,static_cast<WORD>('H')}) && settingsWindow)
+            settingsWindow->ReportActionStatus(L"Windows voice typing could not be opened");
+    }));
+    connections.push_back(topbar->SoundSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:sound"); }));
+    connections.push_back(topbar->PowerSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:powersleep"); }));
+    connections.push_back(topbar->ClockRequested.Connect([this]{
+        if (!closing && !platform::SendKeyChord({VK_LWIN,VK_MENU,static_cast<WORD>('D')}) && settingsWindow) settingsWindow->ReportActionStatus(L"Windows calendar could not be opened");
+    }));
+    connections.push_back(topbar->RevealWindowsTaskbarRequested.Connect([this]{
+        if (closing) return;
+        automaticResume = true;
+        if (!SetTaskbarReplacementSuspended(true)) { automaticResume = false; if(settingsWindow)settingsWindow->ReportActionStatus(L"Windows taskbar could not be revealed"); }
+    }));
+    connections.push_back(topbar->ResumeTaskbarReplacementRequested.Connect([this]{
+        ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
+        if (!SetTaskbarReplacementSuspended(false) && settingsWindow) settingsWindow->ReportActionStatus(L"Taskbar replacement could not resume; Windows remains available");
+    }));
+    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; (void)dock->SetSuppressed(ShouldSuppressDock(hidden, desktopState)); }));
+    connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ ApplySettings(); }));
     connections.push_back(events.DisplayChanged.Connect([this]{ if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
-    connections.push_back(events.ExplorerRestarted.Connect([this]{
-        if(topbar)topbar->OnExplorerRestarted();
-        if(dock && !dock->OnExplorerRestarted() && taskbarRequested.value_or(false))FailTaskbarReservation();
-        else if(taskbar)(void)taskbar->Restart();
-    }));
+    connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
     connections.push_back(events.ResumedFromSleep.Connect(clockChanged));
@@ -326,26 +443,17 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     if (updates) connections.push_back(updates->Subscribe([this](const updates::UpdateSnapshot& snapshot){ if(settingsWindow)settingsWindow->SetUpdateSnapshot(snapshot); RefreshUpdateOffer(snapshot); }));
     (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ if(dock)(void)dock->SetRunningApplications(running); });
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
-    TaskbarController::Options taskbarOptions;
-    taskbarOptions.baselineFile = platform::TaskbarBaselineFile(paths.configDir);
-    taskbar = std::make_unique<TaskbarController>(dispatcher, paths.executableDir / L"AetherShell.exe",
-        [this, weak](bool active, std::wstring status) {
-            if (const auto live = weak.lock(); live && *live) {
-                AETHER_LOG_INFO("app", "taskbar replacement {}: {}", active ? "active" : "inactive", text::Narrow(status));
-                taskbarStatus = std::move(status);
-                // Keep the preflight reservation throughout activation/retries and restoration.
-                // A failed reservation must never be re-enabled by a restoring callback.
-                const bool reserve = !taskbarReservationFailed && (active || settings->Current().general.replaceWindowsTaskbar);
-                if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
-                if (!active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
-                if (active && !::SetTimer(events.Handle(), kTaskbarPollTimer, 1000, nullptr)) {
-                    taskbarStatus = L"Recovery observation is unavailable; restoring Windows taskbar";
-                    (void)taskbar->Request(false);
-                }
-                if (!active && settings && (!settings->Current().general.replaceWindowsTaskbar || taskbarReservationFailed)) ::KillTimer(events.Handle(), kTaskbarPollTimer);
-                if (settingsWindow) settingsWindow->RefreshDesktopStatus();
-            }
-        }, std::move(taskbarOptions));
+    if (nativeTaskbarAccess) {
+        TaskbarController::Options taskbarOptions;
+        taskbarOptions.baselineFile = platform::TaskbarBaselineFile(paths.configDir);
+        taskbar = std::make_unique<TaskbarController>(dispatcher, paths.executableDir / L"AetherShell.exe",
+            [this, weak](const TaskbarUpdate& update) {
+                if (const auto live = weak.lock(); live && *live) OnTaskbarUpdate(update);
+            }, std::move(taskbarOptions));
+    } else {
+        // Own-window sessions (tests): replacement requests never reach the real Windows taskbar.
+        taskbarStatus = L"Windows taskbar replacement is unavailable in this session";
+    }
     ApplySettings();
     dock->Show(); topbar->Show(); ready = true;
     if (!command.healthToken.empty()) { const auto token = text::Narrow(command.healthToken); worker.Post([token]{ (void)install::SignalHealthy(token); }); }
@@ -354,8 +462,9 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         dispatcher.Post([this, weak, discovered = std::move(discovered)]() mutable {
             if (auto live = weak.lock(); live && *live) {
                 catalogReady = true;
-                if (discovered) { applications = std::move(*discovered); (void)search->Rebuild(applications); }
-                if (settings->Current().general.replaceWindowsTaskbar && !settings->Current().general.taskbarPinsImported && settings->Current().dock.pinned.empty()) ImportTaskbarPins();
+                if (discovered) { applications = std::move(*discovered); (void)search->Rebuild(applications); if(dock)(void)dock->SetApplicationCatalog(applications); }
+                if (nativeTaskbarAccess && settings->Current().general.replaceWindowsTaskbar &&
+                    (settings->Current().general.syncTaskbarPins || !settings->Current().general.taskbarPinsImported || !settings->Current().dock.explorerDefaultApplied)) ImportTaskbarPins();
             }
         });
     });
@@ -365,65 +474,92 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     return Ok();
 }
 
-void ShellApplication::Impl::ImportTaskbarPins() {
-    if (closing || importingPins || !settings || !settings->Loaded()) return;
+void ShellApplication::Impl::ImportTaskbarPins(bool manual, unsigned retry) {
+    if (closing || !settings || !settings->Loaded()) return;
+    const auto automaticAllowed = [&] {
+        const auto& value = settings->Current();
+        return ShouldAutomaticallyImportPins(value.general.replaceWindowsTaskbar,
+            value.general.syncTaskbarPins, value.general.taskbarPinsImported, value.dock.explorerDefaultApplied);
+    };
+    if (!manual && !automaticAllowed()) return;
+    if (importingPins) { manualImportQueued = manualImportQueued || manual; return; }
+    if (!nativeTaskbarAccess) {
+        if (manual && settingsWindow) settingsWindow->ReportActionStatus(L"Windows pin access is unavailable in this isolated session");
+        return;
+    }
     importingPins = true;
+    if (manual) manualImportQueued = false;
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
+    const auto revision = settingsRevision;
     apps::TaskbarPinImportOptions options; options.catalog = applications;
-    const bool firstDesktopPins = settings->Current().general.replaceWindowsTaskbar &&
-        !settings->Current().general.taskbarPinsImported && settings->Current().dock.pinned.empty();
-    if (!worker.Post([this, weak, cancel, firstDesktopPins, options = std::move(options)] {
-        auto imported = apps::DiscoverTaskbarPins(cancel, options);
-        // A first-use desktop default, separately from imported Windows state. Never re-add an
-        // explicitly unpinned Explorer on later launches/imports. All path checks stay on the worker.
-        if (imported && firstDesktopPins && !cancel.IsCancelled()) {
-            const auto found = std::find_if(options.catalog.begin(), options.catalog.end(), [](const auto& app) {
-                return text::EqualsIgnoreCase(app.appUserModelId, L"Microsoft.Windows.Explorer");
-            });
-            if (found != options.catalog.end()) imported->push_back(*found);
-            else {
-                wchar_t directory[32768]{};
-                const UINT length = ::GetWindowsDirectoryW(directory, static_cast<UINT>(std::size(directory)));
-                if (length && length < std::size(directory)) {
-                    const auto path = std::filesystem::path(directory) / L"explorer.exe";
-                    std::error_code error;
-                    if (std::filesystem::is_regular_file(path, error) && !error) {
-                        apps::ApplicationInfo explorer; explorer.displayName = L"File Explorer";
-                        explorer.appUserModelId = L"Microsoft.Windows.Explorer";
-                        explorer.parsingName = explorer.appUserModelId; explorer.executablePath = path.native();
-                        if (auto id = apps::MakeApplicationId(explorer); id) { explorer.id = *id; imported->push_back(std::move(explorer)); }
-                    }
-                }
+    apps::PinSyncInput input;
+    const auto& current = settings->Current();
+    for (const auto& pin : current.dock.pinned)
+        input.existing.push_back({pin.id,pin.appUserModelId,pin.executablePath,pin.arguments});
+    input.dismissedIds = current.dock.dismissedPins;
+    input.explorerDefaultApplied = current.dock.explorerDefaultApplied;
+    input.ignoreDismissed = manual;
+    if (!worker.Post([this, weak, cancel, manual, retry, revision, input = std::move(input), options = std::move(options)]() mutable {
+        Result<apps::TaskbarPinSet> discovered = MakeError(ErrorCode::Internal, "Windows pin discovery failed");
+        Result<apps::PinSyncPlan> plan = MakeError(ErrorCode::Unavailable, "Windows pins could not be read");
+        try {
+            discovered = apps::DiscoverTaskbarPinSet(cancel, options);
+            if (discovered && !cancel.IsCancelled()) {
+                input.windowsPins = discovered->pins;
+                if (auto explorer = apps::MakeFileExplorerApplication(options.catalog); explorer) input.fileExplorer = std::move(*explorer);
+                // Identity comparisons can resolve 8.3 paths: planning must remain on this worker.
+                plan = apps::PlanTaskbarPinSync(input);
             }
-        }
-        dispatcher.Post([this, weak, imported = std::move(imported)]() mutable {
+        } catch (...) { plan = MakeError(ErrorCode::Internal, "Windows pin planning failed"); }
+        dispatcher.Post([this, weak, manual, retry, revision, discovered = std::move(discovered), plan = std::move(plan)]() mutable {
             if (const auto live = weak.lock(); !live || !*live) return;
             importingPins = false;
             if (closing) return;
-            if (!imported) {
-                if (settingsWindow) settingsWindow->ReportActionStatus(L"Windows pinned shortcuts could not be read");
+            if (manualImportQueued) { manualImportQueued = false; ImportTaskbarPins(true); return; }
+            const auto& value = settings->Current();
+            if (!manual && !ShouldAutomaticallyImportPins(value.general.replaceWindowsTaskbar,
+                value.general.syncTaskbarPins, value.general.taskbarPinsImported, value.dock.explorerDefaultApplied)) return;
+            if (!plan || !discovered) {
+                if (settingsWindow) settingsWindow->ReportActionStatus(L"Windows pinned applications could not be read");
                 return;
             }
-            const auto added = std::make_shared<std::size_t>(0);
+            // Never apply a plan over pin edits, dismissals or other settings accepted during IO.
+            // Re-discover against a fresh snapshot, with a bound while the editor remains active.
+            if (settingsRevision != revision) {
+                if (retry < 3) ImportTaskbarPins(manual, retry + 1);
+                else if (settingsWindow) settingsWindow->ReportActionStatus(L"Settings changed during pin import. Try import again.");
+                return;
+            }
+            for (const auto& entry : discovered->pins) {
+                const auto found = std::find_if(applications.begin(), applications.end(), [&](const auto& app) { return text::EqualsIgnoreCase(app.id, entry.id); });
+                if (found == applications.end()) applications.push_back(entry);
+                else if (found->shortcutPath.empty() && !entry.shortcutPath.empty()) *found = entry;
+            }
+            if (dock) (void)dock->SetApplicationCatalog(applications);
+            if (search) (void)search->Rebuild(applications);
+            const auto count = plan->append.size() + (plan->explorerAtFront ? 1u : 0u);
+            const auto toPin = [](const apps::ApplicationInfo& app) {
+                settings::PinnedApp pin; pin.id=app.id; pin.displayName=app.displayName;
+                pin.parsingName=app.parsingName; pin.appUserModelId=app.appUserModelId;
+                pin.executablePath=app.executablePath; pin.shortcutPath=app.shortcutPath;
+                pin.arguments=app.arguments; return pin;
+            };
+            importingPins = true; // Changed observers must not start another import during this commit.
             const auto changed = settings->Update([&](settings::Settings& value) {
-                for (const auto& app : *imported) {
-                    if (value.dock.pinned.size() >= 64) break;
-                    if (std::any_of(value.dock.pinned.begin(), value.dock.pinned.end(), [&](const auto& pin) { return text::EqualsIgnoreCase(pin.id, app.id); })) continue;
-                    settings::PinnedApp pin; pin.id = app.id; pin.displayName = app.displayName;
-                    pin.parsingName = app.parsingName; pin.appUserModelId = app.appUserModelId;
-                    pin.executablePath = app.executablePath; pin.shortcutPath = app.shortcutPath;
-                    pin.arguments = app.arguments;
-                    value.dock.pinned.push_back(std::move(pin)); ++*added;
-                }
+                if (plan->explorerAtFront) value.dock.pinned.insert(value.dock.pinned.begin(), toPin(*plan->explorerAtFront));
+                for (const auto& app : plan->append) value.dock.pinned.push_back(toPin(app));
+                for (const auto& id : plan->reinstatedIds)
+                    std::erase_if(value.dock.dismissedPins, [&](const auto& removed) { return text::EqualsIgnoreCase(id, removed); });
+                if (plan->markExplorerApplied) value.dock.explorerDefaultApplied = true;
                 value.general.taskbarPinsImported = true;
-            }, [this, weak, added](Result<void> persisted) {
+            }, [this, weak, count](Result<void> persisted) {
                 if (const auto live = weak.lock(); live && *live && settingsWindow)
                     settingsWindow->ReportActionStatus(persisted ?
-                        L"Saved " + std::to_wstring(*added) + L" pinned applications. Some Windows pins may require manual addition." :
+                        L"Saved " + std::to_wstring(count) + L" additional pinned applications. Some Windows pins may remain unavailable." :
                         L"Pins changed in memory; saving failed. Apply in Settings to retry.");
             });
-            if (settingsWindow) settingsWindow->ReportActionStatus(changed ?
-                L"Pins updated in memory; saving..." : L"Imported pins could not be applied");
+            importingPins = false;
+            if (settingsWindow) settingsWindow->ReportActionStatus(changed ? L"Pins updated in memory; saving..." : L"Imported pins could not be applied");
         });
     })) {
         importingPins = false;
@@ -468,6 +604,7 @@ void ShellApplication::Impl::InstallUpdate() {
 
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
+    ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     if (dock) ::EnableWindow(dock->Handle(), FALSE);
     if (topbar) ::EnableWindow(topbar->Handle(), FALSE);
@@ -520,6 +657,7 @@ void ShellApplication::Impl::Stop() noexcept {
     stopped = true;
     *alive = false; cancellation.Cancel();
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
+    ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     connections.clear(); channel.Close();
@@ -543,8 +681,10 @@ void ShellApplication::Impl::Stop() noexcept {
 
 ShellApplication::ShellApplication() : impl_(std::make_unique<Impl>()) {}
 ShellApplication::~ShellApplication() { impl_->Stop(); }
-Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths, std::wstring instanceName) {
+Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths, std::wstring instanceName,
+                                  bool nativeTaskbarAccess) {
     impl_->command = std::move(command); impl_->paths = std::move(paths); impl_->instanceName = std::move(instanceName);
+    impl_->nativeTaskbarAccess = MayAccessNativeTaskbar(impl_->instanceName, nativeTaskbarAccess);
     auto instance = platform::SingleInstanceLock::Acquire(impl_->instanceName); if (!instance) return instance.error();
     if (!instance->IsPrimary()) {
         const auto action = impl_->command.action == StartupAction::Quit ? L"shutdown" :
@@ -560,6 +700,8 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         // resolved data folders nothing is touched and no UI is shown.
         if (!impl_->paths.configDir.is_absolute())
             return MakeError(ErrorCode::InvalidArgument, "taskbar recovery needs the data folder");
+        if (!impl_->nativeTaskbarAccess)
+            return MakeError(ErrorCode::Unavailable, "taskbar recovery is unavailable in this session");
         std::promise<Result<TaskbarRecoveryReport>> promise;
         auto future = promise.get_future();
         WorkerPool recovery{{1, L"Aether taskbar recovery", ComApartment::None}};
@@ -589,6 +731,22 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         else if(action==L"search" && !impl_->closing) { if(impl_->ready && impl_->searchWindow)impl_->searchWindow->Open(); else impl_->command.action=StartupAction::OpenSearch; }
     }); !result) return result.error();
     impl_->loop.AddMessageFilter([this](MSG& message){
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarResumeTimer) {
+            const auto delay = TaskbarRevealDelay(impl_->automaticResume, impl_->resumeTimerArmed,
+                impl_->settings->Current().general.replaceWindowsTaskbar, impl_->closing,
+                impl_->desktopState, ::GetTickCount64(), impl_->resumeDeadline);
+            if (!delay) return true;
+            ::KillTimer(impl_->events.Handle(), kTaskbarResumeTimer);
+            if (*delay > 0) {
+                impl_->resumeTimerArmed = ::SetTimer(impl_->events.Handle(), kTaskbarResumeTimer,
+                    static_cast<UINT>(std::min<std::uint64_t>(*delay, 60000)), nullptr) != 0;
+                if (!impl_->resumeTimerArmed) impl_->automaticResume = false;
+                return true;
+            }
+            impl_->resumeTimerArmed = false; impl_->automaticResume = false;
+            (void)impl_->SetTaskbarReplacementSuspended(false);
+            return true;
+        }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarPollTimer) {
             if (impl_->taskbar && !impl_->closing) (void)impl_->taskbar->Refresh();
             return true;

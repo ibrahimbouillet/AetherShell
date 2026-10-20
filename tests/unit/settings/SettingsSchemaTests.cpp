@@ -68,8 +68,8 @@ AETHER_TEST("settings schema: new fields have the documented defaults") {
     CHECK_EQ(defaults.general.themeMode, ThemePreference::System);
     CHECK_EQ(defaults.general.accentSource, AccentSource::Windows);
     CHECK_EQ(defaults.general.animationSpeed, 1.0);
-    // The replacement default changes together with its lifecycle guards, not in the schema step.
-    CHECK_FALSE(defaults.general.replaceWindowsTaskbar);
+    // D23: on by default, flipped together with the lifecycle test guards (nativeTaskbarAccess).
+    CHECK(defaults.general.replaceWindowsTaskbar);
     Settings validated;
     auto warnings = Validate(validated);
     REQUIRE(warnings.ok());

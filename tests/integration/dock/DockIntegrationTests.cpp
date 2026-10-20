@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cmath>
 #include <stdexcept>
+#include <string_view>
 #include <thread>
 
 using namespace aether;
@@ -35,7 +36,9 @@ public:
 };
 class FakeIcons final : public apps::IIconProvider {
 public:
+    std::vector<std::wstring> keys;
     void RequestIcon(apps::IconRequest request, Callback callback) override {
+        keys.push_back(request.key);
         if (request.app.displayName == L"Synthetic B") { callback(request.key, {}); return; }
         auto image = std::make_shared<apps::IconImage>();
         image->width = image->height = request.pixelSize;
@@ -181,7 +184,9 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     REQUIRE(settings.Update([](settings::Settings& value) {
         settings::PinnedApp a; a.id = L"exe:synthetic-a"; a.displayName = L"Synthetic A";
         settings::PinnedApp b; b.id = L"exe:synthetic-b"; b.displayName = L"Synthetic B";
+        a.parsingName=L"Synthetic.Application.A";b.parsingName=L"Synthetic.Application.B";
         value.dock.pinned = {a, b}; value.dock.reserveSpace = true;
+        value.dock.showStartButton=false;value.dock.showTaskViewButton=false;
     }, [&](Result<void> result) { saved = result.ok(); }).ok());
     while (!saved && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
     REQUIRE(saved);
@@ -189,8 +194,10 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     const auto monitor = platform::PrimaryMonitor();
     const LONG width = std::min<LONG>(1000, monitor.workArea.right - monitor.workArea.left - 100);
     const LONG x = (monitor.workArea.left + monitor.workArea.right - width) / 2;
-    // Keep the 128px guard band above the real taskbar rather than making it a routine occluder.
-    const RECT area{x, monitor.workArea.bottom - 420, x + width, monitor.workArea.bottom - 160};
+    // Keep the capture guard and the complete shadow/entrance HWND below-margin above the real
+    // taskbar at the monitor's DPI. The capture guards themselves are unchanged.
+    const LONG bottomInset=144+static_cast<LONG>(std::ceil((dock::kDockShadowMargin+dock::kDockEntranceOffset)*monitor.dpi/96.0f));
+    const RECT area{x, monitor.workArea.bottom - bottomInset - 260, x + width, monitor.workArea.bottom - bottomInset};
     Backdrop backdrop(area); REQUIRE(backdrop.hwnd != nullptr);
     dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings});
     dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
@@ -281,8 +288,7 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 1200);
     const auto afterDrag = window.Geometry(); REQUIRE(afterDrag.ok());
     CHECK(afterDrag->items[1].icon.left < afterDrag->items[2].icon.left);
-    // The installed alpha only accepted pinned drags. A running icon must also move into the
-    // persistent order, with release consumed as a drag rather than launching that application.
+    // Running icons move in the session, without silently becoming pins. The release is consumed.
     REQUIRE(window.SetTheme(tokens,graphics::MotionPolicy{true},settings.Current().dock).ok());
     const auto beforeRunningDrag=window.Geometry();REQUIRE(beforeRunningDrag.ok());
     const int launchesBeforeDrag=launcher.launches,activationsBeforeDrag=launcher.activations;
@@ -291,11 +297,15 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     ::TrackMouseEvent(&cancel);
     while(::PeekMessageW(&leave,window.Handle(),WM_MOUSELEAVE,WM_MOUSELEAVE,PM_REMOVE)){}
     ::SendMessageW(window.Handle(),WM_LBUTTONUP,0,Point(window,beforeRunningDrag->items[1].icon));
-    REQUIRE_EQ(settings.Current().dock.pinned.size(),3u);
-    CHECK_EQ(settings.Current().dock.pinned[0].id,L"exe:synthetic-c");
-    CHECK_EQ(settings.Current().dock.pinned[1].displayName,L"Synthetic B");
-    CHECK_EQ(settings.Current().dock.pinned[2].displayName,L"Synthetic A");
+    REQUIRE_EQ(settings.Current().dock.pinned.size(),2u);
+    CHECK_EQ(settings.Current().dock.pinned[0].displayName,L"Synthetic B");
+    CHECK_EQ(settings.Current().dock.pinned[1].displayName,L"Synthetic A");
     CHECK_EQ(launcher.launches,launchesBeforeDrag);CHECK_EQ(launcher.activations,activationsBeforeDrag);
+    const auto sessionGeometry=window.Geometry();REQUIRE(sessionGeometry.ok());
+    ::SendMessageW(window.Handle(),WM_LBUTTONDOWN,0,Point(window,sessionGeometry->items[1].icon));
+    ::SendMessageW(window.Handle(),WM_LBUTTONUP,0,Point(window,sessionGeometry->items[1].icon));
+    CHECK_EQ(launcher.activations,activationsBeforeDrag+1); // the moved group now owns the drawn slot
+    CHECK_EQ(launcher.launches,launchesBeforeDrag);
     const auto saveDeadline=std::chrono::steady_clock::now()+5s;
     while(settings.Dirty() && std::chrono::steady_clock::now()<saveDeadline){dispatcher.RunPending();std::this_thread::sleep_for(1ms);}
     CHECK_FALSE(settings.Dirty());
@@ -364,4 +374,113 @@ AETHER_TEST("dock integration: dark native Dock renders synthetic icons magnifie
 }
 AETHER_TEST("dock integration: light native Dock renders synthetic icons and becomes idle") {
     Probe(graphics::ThemeMode::Light, "light");
+}
+
+AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit unpin stay isolated") {
+    class FakeMenu final : public ui::IMenuPresenter {
+    public:
+        std::uint32_t choice=0;
+        std::vector<ui::MenuEntry> entries;
+        ui::MenuRequest request;
+        std::function<void()> during;
+        Result<ui::MenuSelection> Show(std::span<const ui::MenuEntry> items,const ui::MenuRequest& value) override {
+            entries.assign(items.begin(),items.end());request=value;
+            if(during)during();
+            return ui::MenuSelection{choice,nullptr};
+        }
+    } menu;
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop;graphics::GraphicsDevice device;REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler;REQUIRE(scheduler.Initialize(loop).ok());ManualDispatcher dispatcher;
+    settings::SettingsService settings(test::MakeTempDirectory("dock-actions")/L"settings.json",dispatcher);
+    REQUIRE(settings.Load({}).ok());
+    const auto deadline=std::chrono::steady_clock::now()+5s;
+    while(!settings.Loaded() && std::chrono::steady_clock::now()<deadline){dispatcher.RunPending();std::this_thread::sleep_for(1ms);}
+    REQUIRE(settings.Loaded());
+    FakeLauncher launcher;FakeIcons icons;
+    dock::DockWindow window({device,scheduler,dispatcher,launcher,icons,settings,&menu});
+    const RECT area{0,0,1000,600};RECT workBefore{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&workBefore,0));
+    dock::DockWindowOptions options;options.workAreaPx=area;options.allowWorkAreaReservation=false;
+    REQUIRE(window.Create(options).ok());
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark),graphics::MotionPolicy{true},settings.Current().dock).ok());
+    window.Show(false);
+    apps::RunningApplication running;running.id=L"aumid:Synthetic.Profile";running.appUserModelId=L"Synthetic.Profile";
+    running.displayName=L"Synthetic profile";running.executablePath=LR"(C:\AetherFixture\browser.exe)";
+    running.relaunchIconResource=LR"(C:\AetherFixture\avatar.ico,0)";
+    running.windows.push_back({reinterpret_cast<HWND>(1),L"Synthetic window",false});
+    REQUIRE(window.SetRunningApplications({running}).ok());
+    int starts=0,searches=0,taskViews=0;
+    auto start=window.StartRequested.Connect([&]{++starts;});
+    auto search=window.SearchRequested.Connect([&]{++searches;});
+    auto taskView=window.TaskViewRequested.Connect([&]{++taskViews;});
+    auto geometry=window.Geometry();REQUIRE(geometry.ok());REQUIRE_EQ(geometry->items.size(),4u);
+    const auto visibleTooltips=[] {
+        int count=0;
+        ::EnumThreadWindows(::GetCurrentThreadId(),[](HWND handle,LPARAM contextValue)->BOOL {
+            wchar_t name[256]{};const int length=::GetClassNameW(handle,name,256);
+            if(::IsWindowVisible(handle) && length>0 &&
+                std::wstring_view(name,static_cast<std::size_t>(length))==L"AetherShell.Tooltip")
+                ++*reinterpret_cast<int*>(contextValue);
+            return TRUE;
+        },reinterpret_cast<LPARAM>(&count));
+        return count;
+    };
+    ::SendMessageW(window.Handle(),WM_MOUSEMOVE,0,Point(window,geometry->items[0].icon));
+    ::SendMessageW(window.Handle(),WM_TIMER,1,0);CHECK_EQ(visibleTooltips(),1);
+    REQUIRE(window.SetSuppressed(true).ok());
+    ::SendMessageW(window.Handle(),WM_TIMER,1,0);CHECK_EQ(visibleTooltips(),0);
+    REQUIRE(window.SetSuppressed(false).ok());
+    ::EnableWindow(window.Handle(),FALSE);
+    ::SendMessageW(window.Handle(),WM_MOUSEMOVE,0,Point(window,geometry->items[0].icon));
+    ::SendMessageW(window.Handle(),WM_TIMER,1,0);CHECK_EQ(visibleTooltips(),0);
+    ::EnableWindow(window.Handle(),TRUE);
+    geometry=window.Geometry();REQUIRE(geometry.ok());
+    HRGN region=::CreateRectRgn(0,0,0,0);REQUIRE(region!=nullptr);
+    const int regionKind=::GetWindowRgn(window.Handle(),region);
+    CHECK(regionKind!=ERROR);CHECK_FALSE(::PtInRegion(region,0,0));::DeleteObject(region);
+    for(std::size_t i=0;i<3;++i){
+        const auto point=Point(window,geometry->items[i].icon);
+        ::SendMessageW(window.Handle(),WM_LBUTTONDOWN,0,point);::SendMessageW(window.Handle(),WM_LBUTTONUP,0,point);
+    }
+    CHECK_EQ(starts,1);CHECK_EQ(searches,1);CHECK_EQ(taskViews,1);CHECK_EQ(launcher.launches,0);
+    window.Hide();
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark),graphics::MotionPolicy{},settings.Current().dock).ok());
+    window.Show(false);
+    if(window.IsTransitioning()) {
+        ::SendMessageW(window.Handle(),WM_LBUTTONDOWN,0,Point(window,geometry->items[0].icon));
+        ::SendMessageW(window.Handle(),WM_LBUTTONUP,0,Point(window,geometry->items[0].icon));
+        CHECK_EQ(starts,1);
+    }
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark),graphics::MotionPolicy{true},settings.Current().dock).ok());
+    CHECK_FALSE(window.IsTransitioning());geometry=window.Geometry();REQUIRE(geometry.ok());
+    ::SendMessageW(window.Handle(),WM_MBUTTONUP,0,Point(window,geometry->items[3].icon));CHECK_EQ(launcher.launches,0);
+    ::SendMessageW(window.Handle(),WM_RBUTTONUP,0,Point(window,geometry->items[3].icon));
+    REQUIRE(ui::FindMenuCommand(menu.entries,2));CHECK_FALSE(ui::FindMenuCommand(menu.entries,2)->enabled);
+    REQUIRE(ui::FindMenuCommand(menu.entries,3));CHECK_FALSE(ui::FindMenuCommand(menu.entries,3)->enabled);
+    CHECK_EQ(menu.request.placement,ui::MenuPlacement::AboveAnchor);CHECK_EQ(menu.request.restore,ui::ForegroundRestore::Always);
+    const auto oldKey=icons.keys.back();const auto requestCount=icons.keys.size();
+    apps::ApplicationInfo profile;profile.id=running.id;profile.appUserModelId=running.appUserModelId;
+    profile.displayName=running.displayName;profile.shortcutPath=LR"(C:\AetherFixture\trusted-profile.lnk)";
+    profile.arguments=L"--profile=Synthetic";
+    REQUIRE(window.SetApplicationCatalog({profile}).ok());
+    CHECK(icons.keys.size()>requestCount);CHECK(icons.keys.back()!=oldKey);
+    geometry=window.Geometry();REQUIRE(geometry.ok());
+    ::EnableWindow(window.Handle(),FALSE);
+    ::SendMessageW(window.Handle(),WM_MBUTTONUP,0,Point(window,geometry->items[3].icon));CHECK_EQ(launcher.launches,0);
+    ::EnableWindow(window.Handle(),TRUE);
+    menu.choice=3;::SendMessageW(window.Handle(),WM_RBUTTONUP,0,Point(window,geometry->items[3].icon));
+    REQUIRE_EQ(settings.Current().dock.pinned.size(),1u);CHECK_EQ(settings.Current().dock.pinned[0].arguments,profile.arguments);
+    geometry=window.Geometry();REQUIRE(geometry.ok());
+    ::SendMessageW(window.Handle(),WM_RBUTTONUP,0,Point(window,geometry->items[3].icon));
+    CHECK(settings.Current().dock.pinned.empty());REQUIRE_EQ(settings.Current().dock.dismissedPins.size(),1u);
+    CHECK_EQ(settings.Current().dock.dismissedPins[0],running.id);
+    REQUIRE(window.SetRunningApplications({}).ok());REQUIRE(window.SetRunningApplications({running}).ok());
+    CHECK(settings.Current().dock.pinned.empty());
+    geometry=window.Geometry();REQUIRE(geometry.ok());
+    menu.choice=1;menu.during=[&]{window.Hide();};
+    const int beforeModal=launcher.activations;
+    ::SendMessageW(window.Handle(),WM_RBUTTONUP,0,Point(window,geometry->items[3].icon));
+    CHECK_EQ(launcher.activations,beforeModal);CHECK_EQ(launcher.launches,0);
+    RECT workAfter{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&workAfter,0));CHECK(::EqualRect(&workBefore,&workAfter));
+    window.Destroy();
 }

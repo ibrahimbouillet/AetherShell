@@ -15,9 +15,10 @@ Aether Shell: a native Windows 10 (2004+)/11 desktop interface with exactly two 
 Version 1 — a floating **bottom Dock** (application icons, launch, search entry, pinning, running
 indicators, animations) and a floating **Top Status Bar** (clock/date, battery, input language,
 network, volume, microphone, optional weather). It runs beside Explorer and never replaces it.
-The owner-approved V2 iteration (`0.2.0-alpha.1`, D19/ADR 0009) adds an optional reversible visual
-replacement of the Windows taskbar. That mode is off by default and requires explicit Apply in
-Settings → Desktop. It does not replace the native Windows Settings taskbar page.
+The owner-approved V2 iteration (`0.2.0-alpha.1`, D19/D23/ADR 0009) adds reversible visual replacement
+of the Windows taskbar. It starts enabled unless the user has saved an explicit opt-out (D23);
+Settings → Desktop requires Apply to change that choice. Quit and `--restore-taskbar` restore the
+native taskbar. It does not replace the native Windows Settings taskbar page.
 Owner/author: Ibrahim Bouillet. License: MIT. Official repository: `github.com/ibrahimbouillet/AetherShell`
 (created; delivery receipts are in `HANDOFF.md` and `TASKS.md`). Technical reference: `PROJECT_CONTEXT.md`.
 
@@ -34,8 +35,8 @@ from the owner's other files or applications. When in doubt, leave it out and as
 - C++20, Win32, Direct2D/DirectWrite, Windows.UI.Composition. No Electron, no new third-party libraries
   without a recorded decision in `DECISIONS.md`.
 - Never replace `explorer.exe`, edit the Winlogon `Shell` value, disable security features, or require
-  administrator rights. D19 permits hiding the native taskbar only in the explicitly consented,
-  reversible replacement mode with its recovery helper. Do not extend that exception to permanent
+  administrator rights. D19/D23 permit hiding the native taskbar only in the reversible replacement
+  mode with its recovery helper, disclosed default and persistent opt-out. Do not extend that exception to permanent
   disabling, shell replacement or Windows Settings takeover. No silent elevation or hidden autoruns.
 - Never fabricate data (time, battery, network, weather, test results). Unknown stays unknown.
 - No system status items in the Dock. No new desktop surfaces in Version 1.

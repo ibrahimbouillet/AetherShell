@@ -16,7 +16,7 @@
 
 namespace aether::settings::ui {
 
-enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop };
+enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop, Appearance };
 struct SettingsCallbacks {
     std::function<void()> checkForUpdates, downloadAndInstall, postpone, skip, disableNotifications;
     // Explicit consent only. Implementation performs registry work on a worker and completes on UI.

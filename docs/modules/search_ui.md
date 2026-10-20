@@ -17,10 +17,13 @@ the existing window and preserves the original foreground window for Close.
 
 A standard Win32 EDIT owns the actual text, selection, clipboard and IME behavior. Its alpha-zero
 layered child avoids duplicate GDI text over the composition surface; DirectWrite draws the mirrored
-text, selection and caret using the current design tokens. Mouse presses over the input forward to
-the real control because alpha-zero layered pixels are hit-transparent. The native caret blink
-interval is respected while open. The edit's accessible name is annotated as "Search applications"
-through the documented
+text, selection and caret using the current design tokens. Because alpha-zero layered pixels are
+hit-transparent, presses over the field reach the Search window, which places the caret (or extends
+the selection with Shift or a drag) by hit-testing the drawn DirectWrite layout and sending
+`EM_SETSEL`, so the caret lands where the glyphs are drawn. The EDIT's font follows the token family
+(falling back to Segoe UI when GDI does not know it) and is recreated only when the size or DPI
+changes. The native caret blink interval is respected while open. The edit's accessible name is
+annotated as "Search applications" through the documented
 [IAccPropServices API](https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-iaccpropservices-sethwndpropstr).
 The SDK annotation GUID definitions live in `NativeEditGuids.cpp`; no third-party library is added.
 
@@ -33,6 +36,33 @@ IDs determine stable result IDs across filtering, and selection changes raise UI
 
 The normal placement follows the cursor's monitor and DPI. `SetPlacementArea` changes only this
 window's placement for deterministic embedded hosts/tests; it never changes the system work area.
+
+## Layout and motion (design language)
+
+The window keeps the height of its placement area (from 18% below the top to 16 px above the bottom,
+plus shadow and entrance guard margins)
+and never resizes per query. Inside it, a glass panel (popup radius, Popup elevation, neutral
+material) is 680 DIPs wide at most and contains: a 48-DIP search field with a Search glyph and an
+underline that becomes a 2-DIP accent bar while focused, an "Applications" caption, 52-DIP result rows
+(32-DIP icons drawn with `DrawIconBitmap`, the name with the matched ranges in the accent text color,
+the kind as secondary text), and a footer hint ("Navigate, Open, Close"). The selected row gets a
+selection pill and a small accent indicator whose position is tweened (fast, standard curve). A failed
+launch shows an inline error with an Error badge above the footer. The panel height follows the
+result count with the slide spring; the frosted backdrop and input rectangle follow the current
+panel. A separate drawing region preserves exterior shadows and entrance movement, while excluding
+the unused fixed-window tail. Narrow visual-only margins return `HTTRANSPARENT`; Windows guarantees
+forwarding only to windows on the same thread. Text honors the Windows text scale up to 1.4x.
+High contrast uses `selectedFill`/`selectedText` for result selection. Pointer hit testing and UIA
+visibility use the currently displayed whole rows, rather than the target height of a growing panel.
+Pointer actions wait until the compositor entrance finishes because the drawing moves independently
+of resting hit geometry; keyboard input remains available during that brief transition.
+
+Open is a compositor transition (fade in, from 12 DIPs lower and 97% scale, normal duration,
+decelerate curve); close fades out to 98% (fast, accelerate) and hides when the compositor reports
+completion, which replaced the close timer. Reopening during a close cancels it. Reduced motion and
+high contrast are instant, including when enabled during an ongoing transition.
+`RenderedFrames()` counts rendered frames: an idle open window renders only
+for caret blinks. `PanelDip()` and `InputDip()` expose the current panel and field rectangles.
 
 ## Verification and remaining qualification
 
@@ -61,3 +91,23 @@ passed in the settled Release build, including finite hide, reopen cancellation 
 rejection. A later capture fixture lost activation on the real desktop and failed before capture;
 the isolated five-case rerun passed. No UI frame loop runs for those transitions. These checks do not establish complete
 manual Search UI qualification.
+
+Design-language restyle (0.2.0-alpha.1): `SearchVisualTests` adds two own-window cases: the panel
+animates its height while the window keeps its bounds and rendering stops when idle, and clicks in the
+field place the caret at the drawn glyph boundary (index 0, 2, 4 and the end). The existing cases keep
+their assertions; the finite-exit case now waits for the compositor completion instead of a timer.
+
+2026-10-20 focused verification: Release with warnings as errors builds and all ten Search UI native
+cases pass. New checks cover preserved exterior drawing, the excluded fixed-window tail, whole-row
+hit testing/UIA during expansion, entrance pointer suppression and immediate policy changes. The
+capture fixture now refuses a copy unless its crop plus a 128-pixel blur guard is inside its opaque
+backdrop, with foreign-window guards before and after. Both final dark/light PNGs were inspected:
+only synthetic applications, readable query selection/error/footer and the private pattern appear.
+
+The initial native executables crashed in shared compositor batch registration; the common graphics
+fix is described in [graphics](graphics.md). A later Search run passed nine cases but failed its idle
+assertion because a fixed 700 ms delay left a small spring velocity tail. The fixture now requires
+explicit layout settlement within two seconds of the resize request, then retains the original
+at-most-two-frames assertion during its 300 ms idle sample. The final ten-case rerun passes; the
+earlier crash and premature-idle failure remain part of the session evidence. Physical DPI/monitor
+changes, Windows 10, actual IME/screen-reader use and cross-process margin behavior remain open.

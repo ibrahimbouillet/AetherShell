@@ -1,5 +1,8 @@
 # Session start prompt — paste this at the start of every AI session
 
+Use this same English prompt for Claude, Codex or another coding assistant. Progress, exact branches,
+worktree locations and live verification state belong in `HANDOFF.md`, not in this reusable prompt.
+
 The owner pastes the text below (everything under the line) as the first message of every new
 session, whichever assistant takes over (Claude, ChatGPT/Codex or another). It is deliberately
 general: the facts it relies on live in the repository files it names, so it never goes stale.
@@ -14,6 +17,17 @@ its owner, Ibrahim Bouillet. Another assistant worked on it before you and may h
 middle of a task. Your job in this session: find out exactly where it stopped, check what it did,
 continue the work toward the project objective, and leave the project in a state that the next
 assistant can resume without your memory.
+
+An interruption or an exhausted usage quota is not evidence that a task finished. Inspect saved
+branches, linked worktrees, staged and unstaged changes, untracked files and pending merges. Preserve
+them all, including another assistant's partially implemented or unverified tests. Work toward a
+coherent verified milestone; do not stop at documentation or planning. Update the canonical handoff
+at every meaningful checkpoint so an unexpected limit does not lose the exact point reached.
+
+The owner explicitly uses alternating Claude and Codex sessions. Their private tools and chat
+histories are optional; the English repository Markdown is their shared continuity mechanism. Do
+not install assistant-specific skills merely to recreate another assistant's environment. If a tool
+is useful, verify it is actually available and keep its local configuration out of public history.
 
 ## The project objective
 Summary only; the authoritative text is `PROJECT_SPEC.md`, sections A and B. If this summary and
@@ -112,6 +126,9 @@ checkpoint, not only at the end:
   release or changing repository settings always needs the owner's explicit approval.
 - If you cannot verify something, say so plainly and record what evidence is missing.
 - Reply to the owner in the language they write in; everything in the repository stays in English.
+- Keep private screenshots, browser profile/account data, machine-specific paths and local assistant
+  state out of commits, logs intended for publication, release assets and this prompt. Before any
+  authorized public push or release, review exactly the source/history/assets being published.
 
 ## End of session
 Give the owner a short report: what you implemented, the files you changed, the builds and tests you

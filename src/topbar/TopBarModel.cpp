@@ -67,7 +67,8 @@ std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept {
 }
 
 Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
-    const settings::TopBarSettings& config, bool weatherEnabled, std::wstring_view locale) {
+    const settings::TopBarSettings& config, bool weatherEnabled, std::wstring_view locale,
+    TaskbarReplacementState taskbar) {
     try {
         std::vector<DisplayItem> result;
         result.push_back(Item(ItemKind::Logo, L"", L"Aether Shell menu", true));
@@ -104,6 +105,8 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
                 available ? s.keyboard.languageName + L" · " + s.keyboard.layoutName
                           : L"Input language: " + StateText(s.keyboard.state), true);
             item.unknown = !available;
+            if (available && config.height >= 30 && config.keyboardIndicator == settings::KeyboardIndicatorStyle::TwoLine)
+                item.secondaryText = s.keyboard.layoutName;
             if (available && !s.keyboard.fromForegroundWindow) item.tooltip += L"\nFallback input layout";
             item.tooltip += L"\nClick to switch input language (Win+Space)";
             item.accessibleName = item.tooltip;
@@ -149,7 +152,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             }
             item.tooltip += L"\nRecording detection unsupported";
             if (available && !s.microphone.deviceName.empty()) item.tooltip += L"\n" + s.microphone.deviceName;
-            item.tooltip += L"\nClick to toggle mute; right-click for microphone privacy settings";
+            item.tooltip += L"\nClick to toggle mute; right-click for Windows voice typing and microphone privacy settings";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
@@ -157,7 +160,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             (s.battery.state == status::ProviderState::Available || s.battery.state == status::ProviderState::Unavailable);
         if (config.showBattery && !(config.hideBatteryWhenAbsent && knownAbsent)) {
             const bool available = s.battery.state == status::ProviderState::Available && s.battery.batteryPresent;
-            auto item = Item(ItemKind::Battery, L"—", L"Battery: " + StateText(s.battery.state));
+            auto item = Item(ItemKind::Battery, L"—", L"Battery: " + StateText(s.battery.state), true);
             item.unknown = !available || !s.battery.percent || *s.battery.percent < 0 || *s.battery.percent > 100;
             const bool powerReported = s.battery.state == status::ProviderState::Available ||
                 s.battery.state == status::ProviderState::Unavailable;
@@ -174,10 +177,12 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
                 const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(*s.battery.remaining).count();
                 item.tooltip += std::format(L"\nEstimated remaining: {} h {} min", minutes / 60, minutes % 60);
             }
+            if (!config.showBatteryPercent) item.text.clear();
+            item.tooltip += L"\nClick to open power settings";
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
-        auto clock = Item(ItemKind::Clock, L"—", L"Clock status unavailable");
+        auto clock = Item(ItemKind::Clock, L"—", L"Clock status unavailable", true);
         status::ClockFormatOptions options;
         options.format = static_cast<status::TimeFormat>(config.clockFormat);
         options.showSeconds = config.showSeconds;
@@ -190,14 +195,20 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             clock.tooltip = longDate ? longDate.value() : time.value();
             if (!s.clock.timeZoneName.empty()) clock.tooltip += L"\n" + s.clock.timeZoneName;
         } else clock.unknown = true;
+        clock.tooltip += L"\nClick to open calendar and notifications";
         clock.accessibleName = clock.tooltip;
         result.push_back(std::move(clock));
+        if (config.showNotificationAreaButton && taskbar.available && (taskbar.active || taskbar.suspended)) {
+            result.push_back(Item(ItemKind::NotificationArea, L"", taskbar.suspended
+                ? L"Resume Aether taskbar replacement"
+                : L"Show the Windows taskbar and notification area for 60 seconds", true));
+        }
         return result;
     } catch (...) { return MakeError(ErrorCode::Internal, "top bar display model failed"); }
 }
 
 std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items, const std::vector<float>& widths,
-                                  float widthDip, float heightDip) {
+                                  float widthDip, float heightDip, settings::WeatherPlacement weatherPlacement) {
     std::vector<PlacedItem> result;
     if (!std::isfinite(widthDip) || !std::isfinite(heightDip) || widthDip <= 0 || heightDip <= 0 || items.empty()) return result;
     const float padding = std::min(10.0f, widthDip / 8.0f);
@@ -217,19 +228,50 @@ std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items, const
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }
     // At extreme widths, retain the clock before decorative/status glyphs. Never overlap targets.
-    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery}) {
+    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery, ItemKind::NotificationArea}) {
         if (total() <= available) break;
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }
     const float sum = total();
     const float scale = sum > available && sum > 0 ? available / sum : 1.0f;
-    float x = widthDip - padding - sum * scale;
+    float leftWeather = 0;
+    if (weatherPlacement == settings::WeatherPlacement::Left) {
+        const auto weather = std::find_if(active.begin(), active.end(), [](const auto& item) { return item.first.kind == ItemKind::Weather; });
+        if (weather != active.end()) {
+            leftWeather = weather->second * scale;
+            const float left = padding + logoWidth + 12.0f;
+            result.push_back({weather->first, {left, 0, left + leftWeather, heightDip}});
+            active.erase(weather);
+        }
+    }
+    float x = widthDip - padding - (sum * scale - leftWeather);
     for (const auto& [item, width] : active) {
         const float actual = width * scale;
         if (actual > 0) result.push_back({item, {x, 0, x + actual, heightDip}});
         x += actual;
     }
     return result;
+}
+
+Result<TopBarPlacement> ComputeTopBarPlacement(const RECT& area, UINT dpi, int heightDip,
+                                              int topMarginDip, float shadowDip) {
+    if (dpi < 48 || dpi > 768 || heightDip < 24 || heightDip > 48 || topMarginDip < 0 || topMarginDip > 100 ||
+        !std::isfinite(shadowDip) || shadowDip < 0 || shadowDip > 128 || area.right <= area.left) {
+        return MakeError(ErrorCode::InvalidArgument, "invalid Top Bar geometry");
+    }
+    const float scale = static_cast<float>(dpi) / 96.0f;
+    const int side = static_cast<int>(std::lround(12.0f * scale));
+    const int height = static_cast<int>(std::lround(static_cast<float>(heightDip) * scale));
+    const int top = static_cast<int>(std::lround(static_cast<float>(topMarginDip) * scale));
+    const int shadow = static_cast<int>(std::ceil(shadowDip * scale));
+    const int width = area.right - area.left - side * 2;
+    if (width <= 0) return MakeError(ErrorCode::Unavailable, "Top Bar monitor is too narrow");
+    TopBarPlacement placed;
+    placed.windowBoundsPx = {area.left + side - shadow, area.top + top - shadow,
+        area.right - side + shadow, area.top + top + height + shadow};
+    placed.panelBoundsPx = {shadow, shadow, shadow + width, shadow + height};
+    placed.reservationHeightPx = top + height + shadow;
+    return placed;
 }
 
 std::optional<int> HitTest(const std::vector<PlacedItem>& items, D2D1_POINT_2F point) noexcept {
