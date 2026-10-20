@@ -18,22 +18,12 @@ updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, im
 consumers/app integration, independently reviewed them and completed the automated candidate gates.
 The published `0.1.0-alpha.1` does not include this work.
 
-### In-progress owner controls request — 2026-10-21 (D26)
+### Owner controls scope — 2026-10-21 (D26)
 
-- D25 remains in force: local work only, no push/tag/release. Owner asks to keep the usable local
-  preview running while development continues; pause only for tests, then restore it. Private launch
-  receipt: ignored `build/manual/owner-preview.json`. Do not publish its paths. No autorun.
-- Preview uses copied S-023/S-024 binaries, not the unfinished controls below. New scope: one grouped
-  Wi-Fi/audio/battery button opening a transient media/system panel, real media playback/session
-  selection, radios, brightness/volume and honest Windows Settings routes for unsupported toggles.
-- Neutral sanded Dock/Bar glass retains blur/tint/grain with a uniform border, no directional light.
-  Owner clarified aligned side margins apply only to maximized windows; never move manually placed windows.
-- Uncommitted modules: `system_controls`, `media_controls`, `controlcenter`; Top Bar grouping;
-  neutral graphics/shared Wi-Fi glyph; UIA RangeValue. App wiring and side AppBar leases implemented; final build/native qualification in progress.
-  Backend Release /WX libraries build;15 safe backend unit cases and focused headless graphics68/68 pass. No actual device
-  controls exercised. Product/native accessibility qualification remains pending.
-- Preserve S-025 metadata investigation in AccessibleSurface.cpp and its test; RangeValue extends
-  those same files. Prior MTA discovery failure remains unresolved. See S-026 for current evidence.
+One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Bar glass is neutral,
+with grain, blur/tint and a uniform border. Side margins apply only to maximized windows; never move
+manually placed owner windows. Keep the usable local preview active except bounded tests, then
+restore it; no autorun. D25 still forbids push/tag/release. Current implementation/evidence follows.
 
 ### S-026 completed local checkpoint — 2026-10-21
 
@@ -64,6 +54,14 @@ The published `0.1.0-alpha.1` does not include this work.
   intermittent discovery/teardown issue causally fixed. S-025 negative evidence stays ignored locally.
 
 ### Git and delivery checkpoint — 2026-10-21
+
+- Latest source checkpoint: **d7e17c4**, committed locally and fast-forwarded into clean local `main`.
+  Documentation receipts may follow it; inspect HEAD. Integration and main contain the same source.
+  Remote origin/main remains **b87be0d**. No push/tag/release occurred under D25.
+- The active copied preview has this checkpoint's tested source contents, but its build metadata
+  still embeds parent revision **2dabf2700610**, because it was compiled before the local commit.
+  This is a local review preview, not a release package. Rebuild exact committed source and repeat
+  appropriate package/freshness gates before any eventual delivery. No setup was installed here.
 
 - Official public `origin`: `https://github.com/ibrahimbouillet/AetherShell.git`.
   Integration merge **`b87be0d68961acecc3777f07a0198c80b28f2912`** was committed, safely fast-forwarded

@@ -851,3 +851,11 @@ pending; S-012 still describes the only delivered alpha.
   files contain14 generic path-pattern lines unchanged from HEAD (not introduced private data).
  15 Markdown files/80 relative links/442 requirement references checked;0 missing/undefined targets.
   No push/tag/release, new package/install, actual device-control test or broad visual approval claimed.
+
+- Source milestone d7e17c4 is committed locally and fast-forwarded into clean local main. Active
+  preview source matches this checkpoint but embeds parent revision2dabf2700610 (compiled before
+  commit); it is a private local review binary, not a current release package. Rebuild committed
+  source and requalify packaging before eventual owner-approved delivery. Publication remains held.
+- Final staged byte audit flagged14 unchanged legacy lines: relative ./scripts commands and literal
+  keyboard-navigation descriptions. Each was inspected as a generic-pattern false positive;0 private or
+  newly introduced findings remain. App/launcher binaries separately pass the unmodified strict audit.

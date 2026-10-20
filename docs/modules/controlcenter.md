@@ -33,3 +33,8 @@ panels reject queued actions; split-radio UIA bounds do not overlap. Refresh is 
 closed panels schedule no polling. Source presence is not qualification: see TEST_STATUS S-026,
 including the prior S-025 MTA discovery issue. Real radio/media/brightness actions require separate
 manual checks and are never automated by integration tests.
+
+S-026 executed scope: full Release /WX build,698 aggregate units; this panel's4 fake native cases and
+accessibility6 native cases pass. The copied local preview is active at source checkpoint d7e17c4.
+Actual controls/session support still require owner manual checks; the moving radial capture overlay
+has no proven cause. No package/install/publication is qualified by these checks.

@@ -3,12 +3,11 @@
 Status records scoped implementation and executed evidence, not complete product acceptance.
 Requirements: [PROJECT_SPEC](../../PROJECT_SPEC.md). Ordered work: [TASKS](../../TASKS.md).
 Commands, counts, historical scope and pending gates: [TEST_STATUS](TEST_STATUS.md), especially
-S-005–S-011. The complete Release /WX build and 426 unit cases (17 executables) pass. All 91 native
-cases (14 executables) have passing scoped final-binary runs, but no uniformly green combined 31/31
-run: aggregate GUI attempts encountered foreign overlap/full-screen or focus-dependent fixture
-closure. Guards remain intact; isolated passes and failed attempts are retained in TEST_STATUS.
-The alpha is installed; the official repository exists without a source push/CI receipt. Final
-packaging/export privacy and approved public release evidence remain pending.
+the latest S-026 checkpoint. Current scoped evidence: full Release /WX build,698 unit cases across
+20 executables, plus passing accessibility6/controlcenter4/Dock3/TopBar5/app2 native runs. This does
+not qualify every device, monitor or user workflow. The new local preview is active; D25 prohibits
+push/tag/release. Earlier module rows retain historical receipts; use HANDOFF/TEST_STATUS for current
+qualification and the b87be0d historical public CI receipt.
 Module references in `docs/modules/` describe the actual APIs and limitations.
 
 | Module | Responsibility | Source / reference | Tests | Current scope/evidence |
@@ -35,7 +34,7 @@ Module references in `docs/modules/` describe the actual APIs and limitations.
 | install / updater / launcher / installer | Verified payloads, journal/rollback, stable launch and per-user setup | [install](../modules/install.md), [setup](../modules/installer.md); `src/install`, `launcher/`, `updater/`, `installer/` | `tests/{unit,integration}/install`, `tests/integration/installer` | S-009: Release /WX 10 unit + 7 install integration and 5 setup cases pass, including maintenance/viewport. Alpha installed separately; signed production recovery remains unqualified. |
 | system_controls | Bounded real radio state and pure Windows routes | [reference](../modules/system_controls.md), `src/system_controls` | `tests/unit/system_controls` | S-026: Release /WX10 safe pure/admission cases pass; real controls unverified. |
 | media_controls | SMTC sessions/playback and internal-display brightness | [reference](../modules/media_controls.md), `src/media_controls` | `tests/unit/media_controls` | S-026: Release /WX5 safe admission cases pass; no actual media/brightness discovery or mutation test. |
-| controlcenter | Transient grouped media/system panel and accessible sliders | [reference](../modules/controlcenter.md), `src/controlcenter` | `tests/integration/controlcenter` | S-026 implementation in progress; native fake tests being compiled; prior UIA discovery gap unresolved. |
+| controlcenter | Transient grouped media/system panel and accessible sliders | [reference](../modules/controlcenter.md), `src/controlcenter` | `tests/integration/controlcenter` | S-026 implementation in progress; native fake4-case gate passes; prior intermittent UIA discovery gap unresolved. |
 | app | Native lifecycle, service/window wiring and channel/health handling | [reference](../modules/app.md), `src/app` | `tests/unit/app`, `tests/integration/app` | Current Release app/CLI unit gate and 1 isolated lifecycle/health/channel/shutdown case pass with private options. Wider desktop/update handoff qualification remains. |
 
 Navigation notes: [Graphics](modules/Graphics.md), [Dock](modules/Dock.md),
