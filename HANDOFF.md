@@ -6,26 +6,38 @@
 
 ## Active continuation — Codex, 2026-10-20–21 (Europe/Paris)
 
+> **OWNER DELIVERY HOLD — 2026-10-21 (D25).** Local commits are permitted, but do not push,
+> create a tag or publish a GitHub Release until the owner explicitly lifts this hold. More owner
+> changes are expected. The next public delivery is **Alpha 2**, the project's second release.
+> Existing `b87be0d` push/CI receipts below predate this instruction. The working candidate still
+> reports `0.2.0-alpha.1`; align its final version/package naming with Alpha 2 before any later delivery.
+
 Long-term objective: a native C++20 Windows Dock and Top Status Bar alongside Explorer, with real
 status, accessible interaction, durable settings, safe per-user installation and authenticated
 updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, implemented their
 consumers/app integration, independently reviewed them and completed the automated candidate gates.
 The published `0.1.0-alpha.1` does not include this work.
 
-### Git and preservation checkpoint
+### Git and delivery checkpoint — 2026-10-21
 
-- Official public `origin`: `https://github.com/ibrahimbouillet/AetherShell.git`; a fresh fetch confirms
-  recorded remote `main` at `8e11a68`. The original clean local `main` starts at `d5ccbd6`.
-- Recovered streams: `wf/b1-lifecycle` = `5cf6e72`, `wf/b1-parity` = `1ef9d72`,
-  `wf/b1-visual-core` = `4b7c8a8`. Five dirty/untracked visual files were copied byte-for-byte into
-  the integration candidate before review fixes. Original Claude worktrees/files remain untouched.
-- The owner confirmed Claude stopped after quota interruption. Implementation continues in a linked
-  public integration worktree, discoverable with `git worktree list`; it has detached HEAD at
-  `d5ccbd6` with an uncommitted octopus merge of the three streams plus the edits described below.
-  Do not reset/discard it. Coherent commit, safe fast-forward of `main`, push and new CI are next;
-  a later delivery receipt must state their actual outcome before claiming them complete.
-- The archive checkout has no remote and private history; never develop or push from it. No private
-  archive history, owner canvas, private capture, browser profile database or assistant state was copied.
+- Official public `origin`: `https://github.com/ibrahimbouillet/AetherShell.git`.
+  Integration merge **`b87be0d68961acecc3777f07a0198c80b28f2912`** was committed, safely fast-forwarded
+  into the original clean `main`, then pushed as `8e11a68..b87be0d`. Both `main` and `origin/main`
+  were rechecked at that exact commit; the main checkout was clean before this delivery-note update.
+- Merge parents preserve the foundation `d5ccbd6` and all three recovered streams:
+  lifecycle `5cf6e72`, applications `1ef9d72`, visual core `4b7c8a8`. Five dirty/untracked visual
+  files were copied into the candidate before fixes; their original Claude worktrees remain intact.
+- The linked integration worktree now has detached HEAD at `b87be0d`; **there is no pending merge**.
+  Its ignored build/log/package outputs are local evidence. Use `git worktree list` to locate it if
+  needed, but resume ordinary work in the official public `main` checkout after inspecting its status.
+- Windows CI [39505236903](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39505236903)
+  for `b87be0d` **passed**, 10m33s, including Release build/unit gate and review package upload. This does not qualify the later fullscreen correction.
+- The final local package was rebuilt with embedded source revision **`b87be0d68961`**, then passed
+  privacy/freshness audit and focused app/setup gates. No V2 tag, release or installation was made.
+  The owner explicitly authorized the bounded real-desktop hide/restore check. It found a fullscreen
+  defect; all native state was restored before coding the correction (checkpoint below).
+- The archive has no remote and private history. Never push/develop there. No private archive history,
+  owner canvas, private capture, browser profile database or local assistant state was copied.
 
 ### Implemented and reviewed
 
@@ -72,23 +84,76 @@ The published `0.1.0-alpha.1` does not include this work.
   corrected tests retain a bounded two-second settlement deadline and <=2 idle-frame requirement.
 - Local package privacy/freshness audit passes, including setup and uncompressed embedded binaries.
   `dist/AetherShell-0.2.0-alpha.1-win-x64-setup.exe`: **4,957,184 bytes**, SHA-256
-  `6d0f54e03171aa4f5d80198a20fe5f431633f689fc2d84fb3fdffe024568e70b`.
+  `4e95a10a749792d90457c020029b321fbc7f4b8fefd970abb0a3e1e0fb985f6c`.
   Setup and checksums are review assets only. **Unsigned manifest stays local.**
 - Initial source/history privacy review found no private material; synthetic rejection-test strings
   were inspected separately. All 17 unpublished commit identities use GitHub noreply addresses;
   165 unpublished history blobs/commit messages had no environment-specific/secret-pattern finding.
-  Final staged diff/identity audit must precede the source push.
+  Final staged audit covered 538 files with zero environment-specific/secret-pattern findings; the configured author identity was GitHub noreply before commit/push.
+
+### Authorized desktop gate and follow-up correction — 2026-10-21 (S-023)
+
+- The owner explicitly approved closing any old Aether instance, checking the candidate's native-bar
+  hide/restore and returning to the initial state. No Aether instance was running initially.
+- Candidate b87be0d ran from copied project binaries with `--data-dir` pointing to a private temporary
+  synthetic configuration. Personal settings stayed untouched; weather/network updates/hotkeys,
+  running-app display, pin import and Explorer initialization were disabled for this ownership test.
+  The owner asked why Explorer's icon was absent: **expected in this restricted fixture**, which had
+  only Start/Search/Task View. A new normal-running/Explorer-default check is now explicitly required.
+- Initial Windows 11 state: native taskbar visible, auto-hide true, work area [0,0,1920,1080].
+  Active candidate: native taskbar hidden, work area [0,93,1920,969], but both Aether surfaces could
+  disappear when a normal framed foreground window covered the monitor. Explicit Normal launch
+  reproduced it after removing the initial Hidden-launch confound. The owner saw the bars return
+  when ordinary Explorer became foreground; their screenshot is private and was not copied here.
+- Both bounded candidate runs exited, the saved baseline was removed, the native taskbar was visible,
+  auto-hide true and work area exactly [0,0,1920,1080]. Read-only Win32 measurements only; no desktop
+  screenshots, Explorer restart, real audio/startup/voice operation or personal settings change.
+- Uncommitted correction in the integration worktree: platform fullscreen classification now rejects
+  framed/child windows while preserving borderless full-monitor/maximized/frame-stripped fullscreen;
+  Top Bar treats raw AppBar fullscreen notifications as reevaluation requests; Dock follows the host's
+  combined suppression authority so raw notifications cannot override temporary native-bar reveal.
+  Added three pure platform cases, one native Top Bar case and Dock regression assertions; cross-review
+  found no blocker. Bool-only suppression logging helps diagnosis without app identity/title leakage.
+- Full Release /W4 /WX rebuild passes with zero warnings. New combined gates pass: **18/18 unit
+  executables, 672/672 cases** (30.16 s), and **14/14 serial non-network integration executables,
+  123/123 cases** (127.00 s). Logs/JUnit are ignored local evidence under
+  `build/wf-codex-integrated/evidence/fullscreen-*`. These results cover the fullscreen correction.
+- A subsequent bounded Dock conformance fix forwards registered activation/position messages to
+  the shell, preserving default message handling and the recursion guard. Its Release /WX rebuild
+  passes; Dock31 unit and app2 native pass. The first targeted Dock native run failed its light
+  fixture's UIA root-type assertion (stage 3), then the unchanged-binary serial rerun passed all
+  three cases (8.28 s). Both raw receipts are retained. Root cause is unproven; no assertion was
+   relaxed. Numeric/boolean-only diagnostics were added for any recurrence.
+- Corrected candidate App SHA-256 `524afc253c84cb28e1523e15b531850f2a80ebf6defa5166748bf2ece221d0bb`
+  repeated the authorized **Normal** desktop launch with running apps and initial pin import enabled.
+  Both Aether HWNDs stayed visible, native taskbar hidden, work area [0,93,1920,969]. A synthetic
+  framed window maximized before launch received two work-area notifications and its visible DWM
+  frame reflowed exactly to that area. On normal CLI quit it returned to [0,0,1920,1080]; native
+  taskbar visibility/auto-hide and work area were restored exactly, helper exited and baseline removed.
+- Own Settings accessibility and private synthetic-data checks confirm five pins including Explorer.
+  This does not prove actual running-icon pixels or Chrome profile completeness. The UI tool could
+  read Settings but could not click without screenshot geometry, so temporary reveal/resume remains
+  unverified. No desktop screenshot, unrelated-app control, Explorer restart, audio, startup or voice
+  operation occurred. The synthetic probe closed itself after its bounded lifetime.
+- The owner then requested equal visual weight for Start/Search/Task View and application icons.
+  The Dock removes an extra 18-percent inset on each side: the shared glyphs already contain internal
+  padding. Layout, hit targets, magnification and Top Bar glyph sizes are unchanged. This later visual
+  edit and UIA diagnostics pass Release /WX and visual inspection (S-024); the targeted Dock gate
+  again fails the light UIA fixture (Pane 50033, successful HRESULTs, correct own HWND). Dock unit and
+  app native pass. The preceding manual binary hash does not cover these later edits. No assertion
+  was relaxed; accessibility qualification is unresolved. Current public main is still b87be0d.
 
 ## NEXT SESSION START HERE
 
-1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`; verify official origin, Git
-   status/HEAD/merge parents and worktrees. If the pending merge still exists, finish its final audit
-   and coherent commit; preserve every original worktree. Recheck the original `main` before any
-   fast-forward, then use the already authorized public source push and observe Windows CI. Never
-   force-push or claim a publication/CI receipt that has not happened.
-2. Read the latest delivery receipt added below, TASKS T22–T24 and TEST_STATUS S-022. Automated gates
-   above are complete for the frozen candidate; do not repeat them unless source changes or an actual
-   concern requires it. New CI, actual desktop/voice qualification and V2 publication are separate.
+1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify official origin, clean
+   `main`, HEAD/remote and all worktrees. The integration merge is committed and pushed, but the integration worktree now has the uncommitted
+   S-023 fullscreen correction and delivery notes. Continue that exact work; do not redo the merge
+   or discard preserved work. Inspect the correction/build state before any new edits.
+2. Finish S-024: fullscreen correction passes 672-unit/123-native gates and the bounded S-023 desktop
+   restore/reflow test. Optical icon balance passes Release and own-window visual inspection; the
+   light native UIA root-type failure recurred with diagnostics. Preserve all negative receipts and
+   investigate the teardown hazard in TEST_STATUS S-024. Local commits are allowed; **no push/tag/release (D25)**.
+   S-022 CI covers b87be0d only.
 3. Obtain the owner's explicit current-session authorization before changing the real desktop
    (ADR0009/T21; this was also required by the previous handoff). With an agreed recovery procedure,
    check one visible bottom bar, maximized work-area protection, normal quit/restore and temporary
@@ -100,8 +165,9 @@ The published `0.1.0-alpha.1` does not include this work.
    with the owner. HWND focus admission and SendInput acceptance do not prove dictation success.
    `topBar.openWindowsFlyouts` is persisted but has no routing consumer; fixed status routes are
    documented honestly. T20 diagnostics export remains unverified. Q-001/Q-002/GAP-010 stay open.
-5. Prepare/review any changed package again, retain unsigned manifests locally, then obtain explicit
-   publication approval for the concrete prerelease assets. No V2 tag/release/install was performed
+5. Respect D25 while the owner adds changes: no push/tag/release. Prepare/review changed packages
+   locally, retain unsigned manifests locally, and obtain explicit approval after the hold is lifted.
+   No V2 tag/release/install was performed
    in this session. Never silently enable startup, read private account databases or publish logs,
    PDBs, keys/locations, owner captures, local assistant state or private archive history.
 6. Update this canonical handoff and TEST_STATUS at every meaningful checkpoint. Use the portable

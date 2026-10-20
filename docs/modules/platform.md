@@ -7,6 +7,51 @@ COM apartments, paths, DPI/monitor helpers, system events, message-loop/dispatch
 single-instance channels and hotkey/window utilities. It depends on core and diagnostics; product
 windows/rendering remain above this layer.
 
+## Fullscreen classification
+
+`IsFullscreenWindow` excludes hidden, minimized, cloaked and shell windows, then checks a pure
+geometry/style policy. Covering the monitor is insufficient: ordinary captioned or resizable
+maximized applications can occupy the same bounds when the native taskbar is auto-hidden.
+`IsFullscreenWindowGeometry` requires valid monitor coverage without `WS_CAPTION`, `WS_THICKFRAME`
+or `WS_CHILD`; `WS_MAXIMIZE` remains allowed and `WS_POPUP` is not required. This preserves a
+frame-stripped fullscreen application's saved maximized state. Chromium's
+[fullscreen handler](https://chromium.googlesource.com/chromium/src/+/lkgr/ui/views/win/fullscreen_handler.cc)
+removes the caption/thickframe bits for its actual fullscreen mode.
+
+This remains a style/geometry compatibility heuristic, not a universal application fullscreen API.
+Applications that retain ordinary frame styles in a custom fullscreen mode are not classified as
+borderless fullscreen. Exclusive-mode games, other custom fullscreen implementations and physical
+monitor/Windows-version behavior require separate qualification. Pure fixtures cover framed
+maximization, borderless/zoomed and frame-stripped styles, all monitor edges, negative coordinates
+and malformed bounds.
+
+### Fullscreen correction validation — 2026-10-21
+
+The combined fullscreen-correction candidate built in Release `/W4 /WX` with zero warnings. Its
+unit run passed **18/18 executables, 672 cases in 30.16 seconds**, including **34 platform cases**;
+the serial isolated native run passed **14/14 executables, 123 cases in 127.00 seconds**.
+Exact commands, source scope and preceding failures belong to
+[TEST_STATUS S-023](../knowledge/TEST_STATUS.md). Earlier S-022 receipts describe the preceding
+candidate and remain historical.
+
+These results validate the pure classification policy and isolated consumers, without changing the
+real taskbar or work area.
+
+A separate owner-authorized bounded desktop retest used freshly copied corrected binaries
+(candidate SHA-256 `524afc253c84cb28e1523e15b531850f2a80ebf6defa5166748bf2ece221d0bb`),
+launched normally with no earlier Aether instance. Initially the native taskbar was visible,
+auto-hide was enabled and the work area was `[0,0,1920,1080]`. During replacement both Aether HWNDs
+were visible, the native taskbar was hidden and the work area was `[0,93,1920,969]`. An owned
+synthetic framed window, already maximized before launch, received two `WM_SETTINGCHANGE` messages
+and its visible DWM frame reflowed exactly to that work area; it returned to the full monitor on exit.
+Normal CLI quit stopped the candidate and helper, removed the baseline and restored the exact
+original native state/work area.
+
+No screenshots, owner-application control, Explorer restart, audio/dictation or startup mutation
+were involved. Running-icon display and temporary reveal/resume were not verified. Real Chrome,
+custom framed fullscreen, exclusive-mode games, crash recovery and physical monitor/Windows-version
+behavior remain separate qualification; successful ordinary quit does not settle those cases.
+
 ## V2 taskbar compatibility seam
 
 `TaskbarReplacement.h/.cpp` implements D19 / [ADR 0009](../decisions/0009-reversible-taskbar-replacement.md)

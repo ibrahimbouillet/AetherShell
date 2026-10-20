@@ -124,6 +124,9 @@ checkpoint, not only at the end:
 - Git: commit only verified, coherent changes with the configured owner identity. No force-push, no
   history rewriting, no destructive resets. Push only as the owner has authorized. Publishing a
   release or changing repository settings always needs the owner's explicit approval.
+- Check current delivery holds in `AGENTS.md`, `HANDOFF.md` and `DECISIONS.md` before any push, tag
+  or release. A later owner hold supersedes an earlier standing publication or push authorization;
+  permission to make local commits does not lift that hold.
 - If you cannot verify something, say so plainly and record what evidence is missing.
 - Reply to the owner in the language they write in; everything in the repository stays in English.
 - Keep private screenshots, browser profile/account data, machine-specific paths and local assistant

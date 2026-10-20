@@ -629,7 +629,7 @@ pending; S-012 still describes the only delivered alpha.
   - File Explorer windows that were open closed with the Explorer process (expected for an Explorer
     restart).
 
-### S-022 — interrupted V2 integration recovery (Codex, 2026-10-20, in progress)
+### S-022 — interrupted V2 integration recovery (Codex, 2026-10-20–21)
 - Source baseline: unchanged public `d5ccbd6`. Candidate: pending merge of `5cf6e72`, `1ef9d72`
   and `4b7c8a8`, plus preserved visual working files and new integration/review fixes. The original
   branch worktrees and public `main` remain unchanged.
@@ -677,7 +677,7 @@ pending; S-012 still describes the only delivered alpha.
   did not change. Package command: `./scripts/package.ps1 -BuildDir build/wf-codex-integrated
   -OutputDir dist -SkipBuild`, signing variable cleared in that process. Final binary/payload privacy
   and freshness audit passed. Setup: **4,957,184 bytes**, SHA-256
-  `6d0f54e03171aa4f5d80198a20fe5f431633f689fc2d84fb3fdffe024568e70b`.
+  `4e95a10a749792d90457c020029b321fbc7f4b8fefd970abb0a3e1e0fb985f6c`.
   Setup/checksums are local review assets; the unsigned manifest remains local. No V2 tag, install
   or release publication is implied.
 - Release scripts: **32/32 Python unittest cases passed**, 23.779 s. Initial current-source privacy
@@ -689,3 +689,80 @@ pending; S-012 still describes the only delivered alpha.
 - No real taskbar/work-area/audio/keyboard/startup setting was changed, no browser profile was read,
   no Explorer restart/install/publication was performed in this continuation. Native fixtures use
   only their own windows/fakes; captures require an opaque test backdrop and foreign-window guards.
+
+- Delivery: integration merge **b87be0d68961acecc3777f07a0198c80b28f2912** was fast-forwarded into
+  clean public `main` and pushed as `8e11a68..b87be0d` (2026-10-21). Original Claude worktrees remain
+  untouched; no pending merge remains. Final pre-push staged audit covered 538 files, zero findings,
+  with configured public noreply identity.
+- After commit, a fresh Release /WX reconfigure/rebuild embeds `b87be0d68961`; product source is the
+  same tested candidate. Focused app/setup confirmation passes **3/3 executables**: app34 unit,
+  app2 native and setup7 native (43 cases, 9.41 s). Final setup above was repackaged/audited from
+  that revision; the earlier precommit local asset is superseded. Unsigned manifest remains local.
+- Windows CI [39505236903](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39505236903)
+  passed on b87be0d (10m33s), including Release/unit gate and review package upload. No V2 release is claimed.
+
+### S-023 — owner-authorized desktop gate and fullscreen correction (Codex, 2026-10-21)
+- Explicit current-session owner authorization: check native taskbar replacement/restoration and
+  return to the initial state. No prior Aether instance existed. Private temporary binaries/data,
+  with no personal settings mutation; bounded cleanup supervisor and normal CLI quit.
+- Initial/fully restored: native taskbar visible, auto-hide true, physical work area [0,0,1920,1080].
+  Candidate b87be0d active: native taskbar hidden, physical work area [0,93,1920,969]. Both Aether
+  surfaces could be hidden over a normal framed foreground window covering the monitor. A second
+  explicit Normal launch reproduced the issue, removing the first Hidden startup confound. Both
+  runs exited, removed their recovery baseline and restored the exact initial native state.
+- No screenshot was captured by the test; the owner's supplied real-desktop screenshot stays private.
+  Restricted fixture deliberately disabled running apps/pin import/Explorer default, leaving three
+  fixed Dock tiles. The owner requested an explicit normal Explorer/running-app check next.
+- Cross-reviewed uncommitted correction: style-aware platform predicate; Top Bar ABN reevaluation;
+  Dock host-owned suppression; bool-only transition log. Three pure platform cases and one native
+  Top Bar case added; Dock assertions expanded. Full Release /W4 /WX rebuild passes with zero warnings.
+- Full serial unit gate: **18/18 executables, 672/672 cases pass** (30.16 s).
+  Serial non-network integration gate: **14/14 executables, 123/123 cases pass** (127.00 s).
+  Commands: `ctest --test-dir build/wf-codex-integrated -L unit --output-on-failure -j1` and
+  `ctest --test-dir build/wf-codex-integrated -L integration -LE network --output-on-failure -j1`,
+  each with a distinct `--output-junit` file. Full logs/JUnit remain in ignored
+  `build/wf-codex-integrated/evidence/fullscreen-{unit,integration}.{log,xml}`. Platform34 unit,
+  Dock31 unit/3 native, Top Bar20 unit/5 native. No actual taskbar/work-area/input/audio mutation.
+- A subsequent Dock lifecycle conformance change forwards registered activation/position messages,
+  preserving default processing and guarding recursive shell notifications. Release /WX passes;
+  targeted Dock31 unit and app2 native pass. Dock native initially failed its light fixture's UIA
+  root-type assertion at stage 3 (search Invoke consequently never ran), then the unchanged-binary
+  serial rerun passed all three cases (8.28 s). Root cause is unproven. Both
+  `appbar-targeted-failed.log` and `appbar-dock-recheck.log` remain ignored local evidence. No waits,
+  retries or assertion relaxations were added to the fixture; privacy-safe numeric diagnostics follow.
+- Bounded corrected desktop test (App SHA-256
+  `524afc253c84cb28e1523e15b531850f2a80ebf6defa5166748bf2ece221d0bb`, uncommitted tree):
+  Normal launch, no earlier Aether; initial pin import/Explorer initialization and running apps enabled
+  in private synthetic settings, no owner settings mutation. Native hidden, both own surfaces visible,
+  work area [0,93,1920,969]. An owned standard framed HWND maximized before activation received two
+  `WM_SETTINGCHANGE` messages and reflowed its visible DWM frame exactly to the work area; client
+  bounds [0,127,1920,969] fit inside it. Normal CLI quit restored native visible/auto-hide true/work
+  area [0,0,1920,1080], helper exit, removed baseline and own-window reflow to full monitor.
+- Own Settings accessibility and private-data boolean/count checks confirm five pins including
+  Explorer. Actual running-icon pixels and Chrome profile completeness remain unverified. Settings
+  was readable but UI clicking failed without screenshot geometry; no bypass or desktop capture was
+  used. Temporary reveal/resume, crash/Explorer restart and physical compatibility remain separate.
+
+### S-024 — owner-requested Dock icon balance (Codex, 2026-10-21)
+- Owner requested balanced Start/Search/Task View and application icon dimensions. The Dock now uses
+  the full existing animated icon slot for fixed glyphs, removing duplicate 18-percent side insets;
+  shared glyph geometry already has optical margins. Layout, hit targets and Top Bar are unchanged.
+- Added numeric UIA root-type/HRESULT/own-HWND-match diagnostics after S-023's intermittent assertion;
+  no assertion weakened, no retry/sleep added. Full incremental Release /W4 /WX rebuild passes with
+  zero warnings. Targeted Dock31 unit and app2 native cases pass; Dock native is **2 pass / 1 fail**
+  (14.31 s aggregate three-executable command). Light root-type check again reports Pane **50033**,
+  type/native-handle HRESULT **0**, and matching requested own HWND. Full stdout/JUnit remain in
+  ignored `evidence/optical-targeted.{log,xml}`. No green native gate is claimed for these later edits.
+- Opened and inspected both generated own-window PNGs: dark rest and light hover show the enlarged
+  Search symbol balanced against synthetic application artwork. The guarded images contain only the
+  test Dock/private pattern and were copied to the two existing `resources/screenshots/dock-*` assets.
+  Start/Task View use the same full animated box; independent source review confirms all their shared
+  paths/strokes stay inside it. No owner screenshot was copied or captured.
+- Independent source review found a shared accessibility teardown hazard: synchronous `WM_CLOSE`
+  reaches `UiaDisconnectProvider` while a send is active, and existing code ignores its HRESULT.
+  [Microsoft forbids that call context](https://learn.microsoft.com/en-us/windows/win32/api/uiautomationcoreapi/nf-uiautomationcoreapi-uiadisconnectprovider).
+  Actual teardown HRESULTs and its causal relationship to the Pane fallback have not been established.
+  Do not weaken root-type/count/action/stale-provider assertions. A bounded own-provider experiment
+  will evaluate early reply versus deferred cleanup before choosing a production correction.
+- The earlier manual binary hash does not cover these drawing/diagnostic edits. D25 now holds all
+  push/tag/release operations; local commits remain allowed. No new V2 release or installation.

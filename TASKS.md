@@ -6,6 +6,9 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
+**Owner delivery hold (2026-10-21, D25): local commits allowed; no push, new tag or GitHub Release.**
+The next public delivery is Alpha 2 after the owner's additional changes and explicit go-ahead.
+
 **2026-10-20 continuation: finish the interrupted batches (Codex, after Claude's quota stop).**
 `main` starts at `d5ccbd6`. Three saved streams are integrated in a verified candidate in a linked public
 worktree without changing their original worktrees: lifecycle `5cf6e72`, applications `1ef9d72`,
@@ -14,9 +17,11 @@ current HANDOFF, not the older incomplete continuation instructions or an agent'
 
 | Task | Requirement links | Current boundary |
 |---|---|---|
-| T22 — Review/fix/integrate batch 1 | FR-003, FR-012–FR-017, FR-020, FR-024; NFR-002–NFR-011 | Three independent source reviews completed. Fixes address default-on consent fixtures/D23 docs, unknown-profile relaunch, declared-icon reparse ancestors, owner-drawn menu data, Search visual/hit geometry and mid-transition accessibility policy. Combined Release /WX, 669 unit and 122 isolated integration cases pass (S-022). Coherent source milestone ready for commit/push; real desktop remains separate. |
+| T22 — Review/fix/integrate batch 1 | FR-003, FR-012–FR-017, FR-020, FR-024; NFR-002–NFR-011 | Three independent source reviews completed. Fixes address default-on consent fixtures/D23 docs, unknown-profile relaunch, declared-icon reparse ancestors, owner-drawn menu data, Search visual/hit geometry and mid-transition accessibility policy. Combined Release /WX, 669 unit and 122 isolated integration cases pass (S-022). Integration merge b87be0d committed/pushed; real desktop remains separate. |
 | T23 — Dock and Top Bar consumers | FR-001–FR-011, FR-014, FR-024; NFR-006, NFR-007, NFR-011 | Shared roles/glyphs/menus/motion, fixed Start/Search/Task View entries, profile presentation and session-only running-item reorder, settings-driven layout and runtime Windows taskbar access implemented. Review fixes cover empty input regions, stale modal actions, shutdown admission and late avatars. Combined Dock31 unit/3 native and Top Bar20 unit/4 native pass, Release /WX (S-022); real desktop/profile checks remain open. |
-| T24 — App/settings integration and delivery gate | FR-014–FR-025; NFR-002–NFR-010 | Appearance, guarded worker pin sync, shell actions, focus-guarded Windows voice typing (D24) and timed suspend/resume wired; policy/native regressions added. Release /WX, 669 unit/122 native/32 release-tool cases pass (S-022); setup payload/freshness privacy audit clear. Source push/CI pending. Flyout preference routing and manual desktop/voice qualification remain open. No V2 publication or install claimed. |
+| T24 — App/settings integration and delivery gate | FR-014–FR-025; NFR-002–NFR-010 | Appearance, guarded worker pin sync, shell actions, focus-guarded Windows voice typing (D24) and timed suspend/resume wired; policy/native regressions added. Release /WX, 669 unit/122 native/32 release-tool cases pass (S-022); setup payload/freshness privacy audit clear. Source b87be0d pushed; Windows CI passed for b87be0d; authorized desktop gate found the S-023 framed-fullscreen defect, now under correction. Flyout preference routing and manual desktop/voice qualification remain open. No V2 publication or install claimed. |
+| T25 — Framed fullscreen/native ownership follow-up | FR-001, FR-002, FR-011, FR-024; NFR-005–NFR-008 | Style-aware classifier and single suppression authority pass zero-warning Release /WX, 672 unit and 123 native cases (S-023). Corrected bounded desktop launch keeps both bars visible, reflows an own pre-maximized window and restores exact native state. Explorer pin confirmed. Subsequent Dock lifecycle gate has an intermittent UIA root-type failure followed by unchanged-binary pass; both retained. Running-icon pixels and reveal/resume remain open. |
+| T26 — Dock optical icon balance | FR-002; NFR-002, NFR-007, NFR-011 | Removed duplicate 18-percent drawing inset from fixed glyphs; layout/hit/hover geometry and Top Bar unchanged. Release /WX and own synthetic dark/light visual inspection pass (S-024); Dock31 unit/app2 native pass. Light native UIA root-type failure recurred (Pane 50033, own HWND); qualification remains open. Owner screenshot stays private. D25 prohibits push/tag/release. |
 
 **T16 — V2 (0.2.0-alpha.1), owner-requested, in progress.** Replace the duplicated taskbar layout
 with a consented reversible visual replacement, protected Dock reservation and lower placement;

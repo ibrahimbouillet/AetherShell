@@ -4,6 +4,12 @@ This is a development alpha, not a fully qualified Version 1 release. The requir
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
 The current V2 candidate is `0.2.0-alpha.1`; earlier `0.1.0-alpha.1` delivery receipts do not qualify
 this candidate. Its full build, package, CI and publication gates are recorded only when executed.
+The owner currently holds all push/tag/release operations (D25); local work and commits remain allowed.
+
+- The corrected Dock light native fixture intermittently exposes its own HWND as UIA Pane rather
+  than the required Toolbar (S-024); root-type/invoke assertions remain strict. Synchronous provider
+  teardown is under investigation and its relationship to this failure is unproven. Passing earlier
+  runs and visual captures do not close this accessibility qualification gap.
 
 - Windows 10 and ARM64 have not been runtime-tested in this continuation.
 - Multi-monitor DPI/removal, Explorer restart, full-screen suppression and AppBar interactions need

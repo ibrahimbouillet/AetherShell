@@ -6,12 +6,18 @@ chosen design). Product requirements and their IDs: [PROJECT_SPEC.md](PROJECT_SP
 Approval and implementation verification are separate: ADRs 0002, 0003 and 0005 are accepted choices;
 D3/D4/D6 retain their existing provisional qualification status until platform/behavior tests run.
 
+**Current delivery hold (D25, owner instruction 2026-10-21):** local commits are permitted; do not
+push, create a tag or publish a release until explicitly authorized again. The next public delivery
+is Alpha 2 (the project's second release), after the owner's additional changes. The existing
+candidate's internal `0.2.0-alpha.1` naming is not a publication commitment; align version/package
+naming before eventual delivery. Earlier push authorization is superseded while this hold is active.
+
 **Approval source.** The owner's brief delegates technical choices to the engineering lead ("choose …
 and document the decision"). D1–D14, D16 and D17 were taken by assistants under that delegation:
 "final" means settled by evidence, not individually reviewed by the owner, and such a decision is
-reopened only through a new entry with new evidence. D15, D18–D21 and D23–D24 record explicit owner
+reopened only through a new entry with new evidence. D15, D18–D21 and D23–D25 record explicit owner
 instructions. D15, D20 and D21 were given to Claude in the conversation that produced them; D18, D19
-and D23–D24 were recorded by Codex from its own conversation with the owner. The conversations are not
+and D23–D25 were recorded by Codex from its own conversation with the owner. The conversations are not
 published in this repository; approval records and executed verification remain distinct.
 A proposal from any assistant stays "proposed" until the owner approves it.
 
@@ -41,6 +47,7 @@ A proposal from any assistant stays "proposed" until the owner approves it.
 | D22 | Restoring the native taskbar shows every Explorer taskbar window and never hides one | real-desktop check (S-016): the baseline captured at start recorded the taskbar as not visible because the capture coincided with Explorer's re-layout; exact restoration would have hidden it | restore the exact saved visibility (Codex's original lease behaviour) | a taskbar window that was hidden before Aether Shell started is shown on restore; Explorer re-applies its own layout afterwards | adopted by Claude under the brief's delegated engineering authority (safety rule "prefer system safety"); owner may review |
 | D23 | V2 visually replaces the native taskbar on launch by default; a saved explicit opt-out persists | owner explicitly requested that launching V2 remove the Windows taskbar and leave only Aether's Dock, then reiterated that only one Dock should be visible; recorded in this continuation on 2026-10-20 | require a separate first-launch Desktop Apply; permanently disable Windows taskbar; discard a saved opt-out | missing/non-boolean replacement values use true; Apply changes the Desktop choice; ResetToDefaults preserves that choice; `--restore-taskbar` persists false even after missing/corrupt settings, without rewriting a newer schema; setup discloses replacement and offers an optional restore shortcut; start at sign-in remains opt-in; D19/D21/D22 recovery and reservation safeguards remain mandatory | owner-approved launch behavior; batch-1 implementation is under integration verification, not a release or real-desktop acceptance receipt |
 | D24 | Microphone menu requests Windows voice typing in the previous application's active field, alongside mute/privacy settings | owner explicitly chose "Windows dictation + settings/mute" in this Codex session, 2026-10-20 | mute/settings only; add an Aether recording service or always-on capture | explicit menu action sends Win+H only after verifying/restoring foreground focus; Windows handles voice support/permissions/processing; no speech capture/storage by Aether; fake automated tests never open real dictation | owner-approved interaction scope; implementation and manual voice/focus qualification remain separate |
+| D25 | Hold all pushes, new tags and GitHub Releases; local commits remain permitted | owner expects additional changes before the next delivery, explicitly instructed 2026-10-21 | publish the current candidate immediately; treat older push authorization as still active | keep work local and documented; the next public delivery is Alpha 2, the project's second release; align final version/package naming before later delivery; require explicit owner go-ahead to lift the hold | owner-approved active delivery hold; supersedes earlier standing push authorization while active |
 
 ## Open questions and implementation discrepancies
 

@@ -27,9 +27,11 @@ for forwarding to the Dock. `Relayout`,
 `SetTaskbarReplacementState(available, active, suspended)` supplies runtime state without writing
 preferences. The optional externally owned `context.menu` presenter lets isolated tests return a
 selection without displaying a popup; otherwise the shared `ThemedMenuPresenter` is used, with its
-native high-contrast fallback. The final optional `context.menuWindowOps` injects foreground-window
+native high-contrast fallback. The optional `context.menuWindowOps` injects foreground-window
 operations for deterministic voice-typing tests; production uses the shared system implementation.
-Existing context aggregate fields retain their positions.
+The final optional `context.fullscreenProbe` supplies a deterministic classifier for isolated tests;
+otherwise runtime observation uses `platform::IsFullscreenWindow`, and `allowAppBar=false` disables
+native observation. Existing context aggregate fields retain their positions.
 
 The optional loaded settings service supplies initial visibility/clock/weather values and live
 updates. A concrete ClockProvider switches second/minute resolution when `showSeconds` changes.
@@ -131,8 +133,11 @@ bounded render quiescence establishes the baseline. Aggregate GUI interference i
 Runtime reservation follows `TopBarSettings::reserveSpace`: ABM_NEW, top-edge QUERYPOS/SETPOS,
 POSCHANGED relayout and REMOVE on destruction. Explorer restart removes/re-registers safely, even
 when both direct window broadcasts and application events forward the notification. Full-screen
-AppBar notifications and an out-of-context foreground hook hide/show the surface and emit the
-shared full-screen state. Positioning uses the primary monitor; DPI/display/work-area changes
+AppBar notifications and an out-of-context foreground hook queue a current-foreground classification
+before hiding/showing the surface and emitting the shared full-screen state. The raw AppBar opening/
+closing boolean cannot override that result; it can be stale or describe a maximized framed window
+when the native taskbar auto-hides. Full-screen state changes log only the new boolean, without
+window identity, title or path. Positioning uses the primary monitor; DPI/display/work-area changes
 relayout the window. The protocol follows Microsoft's
 [documented AppBar lifecycle](https://learn.microsoft.com/en-us/windows/win32/shell/application-desktop-toolbars).
 The pure `ComputeTopBarPlacement` includes the shared Bar elevation's complete shadow footprint in
@@ -186,35 +191,64 @@ A second agent reviewed final layout/semibold measurement, UIA action deferral a
 provider ownership/dispatch, reservation opt-out, full-screen hooks and pending-volume echo handling.
 No further actionable finding was reported in that read-only review; the reviewer did not rerun tests.
 
-The T17 source adds a ninth unit case for action metadata with unknown readings and a third native
+The T17 source added a ninth unit case for action metadata with unknown readings and a third native
 case for pointer, keyboard and separate-MTA UIA signal delivery. Callbacks are synthetic and the
-real work area must remain unchanged. Execution is pending the focused build/serial GUI slot;
-the previous eight-unit/two-native Top Bar result above predates these interaction changes.
+real work area must remain unchanged. The earlier eight-unit/two-native Top Bar result predates
+these interaction changes; their later combined execution is recorded below.
 
-## Codex integration continuation — 2026-10-20, validation pending
+## Integrated V2 behavior and validation
 
 The integration worktree now contains the configured height/weather/keyboard/battery preferences,
 shared glyph/material/elevation/menu integration, Clock/Power/Sound request signals, runtime
 notification-area reveal/resume state and actions, Windows voice typing, and stale-menu/hidden-wheel guards. The app owns
 all system actions. Added unit cases cover menu availability, updates, height/DPI/shadow reservation,
 weather placement, keyboard fallback, percentage metadata, runtime notification actions, the Win+H
-menu, and rejected/unverified/third-window focus handoffs (20 unit cases expected in total). A fourth
+menu, and rejected/unverified/third-window focus handoffs. A fourth
 own-window integration case injects a fake menu and foreground operations to verify the new signals,
 focus restoration before the voice request, failed handoff suppression, stale-command rejection,
 keyboard context-menu access, tooltip suppression after a provider refresh, repeated-state idle
 behavior and unchanged real work area. `allowAppBar=false`; no real taskbar/audio/network/browser
-action or input injection is called. These additions remain pending execution.
+action or input injection is called. Executed scopes are recorded below.
 
-Source inspection and `git diff --check` pass. No new Top Bar build or GUI result is claimed yet;
-the root agent will build these changes in the shared candidate tree and run GUI checks serially.
 Follow-up review also guards asynchronous control-error tooltips after fullscreen suppression or
 shutdown admission closes. The concrete audio providers have no injectable control backend in this
 module; this small guard was inspected, and no real audio action was performed to exercise it.
 
-Combined candidate verification (2026-10-20, TEST_STATUS S-022): Release /W4 /WX passes **20/20 unit
+Historical combined candidate verification (2026-10-20, TEST_STATUS S-022): Release /W4 /WX passes **20/20 unit
 and 4/4 native cases**, including fake voice-target admission and request signals with no real keys
 or audio change. Fresh dark/light/Wi-Fi/Ethernet synthetic captures were opened and inspected. Actual
 Windows dictation in an editable field, permissions/UIPI and physical keyboard behavior remain manual.
 Real Windows voice typing, text-field focus preservation, microphone consent and supported language
 behavior still require an authorized desktop workflow. Fake foreground assertions establish request
 ordering and rejection only; they do not establish successful dictation into a real application.
+
+Follow-up correction (2026-10-21): raw `ABN_FULLSCREENAPP` now queues the same
+canonical foreground check as WinEvent notifications. A fifth native case injects synthetic fullscreen
+state while AppBar access is disabled: stale opening cannot hide a normal window, stale closing
+cannot reveal over current fullscreen, and repeated messages emit no extra state changes. It checks
+only its own HWND and unchanged work area; no external foreground window or actual taskbar is changed.
+The S-022 20-unit/4-native result predates this addition.
+
+Fullscreen-correction verification (2026-10-21, [TEST_STATUS S-023](../knowledge/TEST_STATUS.md)):
+the complete candidate built in Release `/W4 /WX` with zero warnings and passed **18/18 unit
+executables, 672 cases in 30.16 seconds**, then **14/14 isolated native executables, 123 cases in
+127.00 seconds**. Top Bar contributes **20 unit and 5 native cases**, including the new stale-AppBar
+notification regression. Native suites ran serially with isolated windows and unchanged-work-area
+assertions. These receipts supersede the pending execution status of the implementation checkpoint;
+they remain separate from actual desktop qualification.
+
+The subsequent owner-authorized bounded S-023 desktop retest launched freshly copied corrected
+binaries normally with no earlier Aether instance (candidate SHA-256
+`524afc253c84cb28e1523e15b531850f2a80ebf6defa5166748bf2ece221d0bb`). Both Aether HWNDs remained
+visible while the native taskbar was hidden. The work area changed from `[0,0,1920,1080]` to
+`[0,93,1920,969]`; an already-maximized owned synthetic framed window reflowed its visible DWM frame
+to those exact bounds after two `WM_SETTINGCHANGE` messages and reverted on exit. Normal CLI quit
+stopped candidate/helper, removed the baseline and restored the initial visible native taskbar,
+enabled auto-hide and original work area exactly.
+
+The same bounded session confirmed enabled pin import/Explorer default and five pins including File
+Explorer through the project's own Settings accessibility and configuration flags. It did not verify
+running-icon display or temporary reveal/resume. No screenshots, owner-application control,
+Explorer restart, audio/dictation or startup mutation occurred. Real Chrome, framed-fullscreen
+variants, exclusive-mode games, Windows 10 and physical monitor/DPI workflows remain unqualified,
+as do actual voice typing and audio controls.

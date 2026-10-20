@@ -80,6 +80,9 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - Pushing verified milestones to the official repository is covered by the owner's instructions once
   the repository exists; publishing a GitHub Release or changing repository settings needs the owner's
   explicit approval.
+- **Current owner hold (2026-10-21, D25): local commits are allowed, but no push, new tag or GitHub
+  Release until the owner explicitly lifts the hold.** The next public delivery is Alpha 2, after
+  additional owner changes. This supersedes the earlier standing push authorization while active.
 - Never commit: secrets, keys (`*.pem` etc.), build output (`build/`, `dist/`), generated graphs
   (`graphify-out/`, `.local/`), local tool state (`.claude/`, `.obsidian/`).
 - Parallel sessions: one owner per module directory at a time; each builds in its own `build/wf-<name>`.

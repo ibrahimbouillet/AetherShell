@@ -71,7 +71,28 @@ motion omits bounce/lift reservation.
 Before the first `ABM_SETPOS`, the work area comes from the monitor, not from the still-empty AppBar
 rectangle (a real-desktop defect fixed on 2026-10-18, TEST_STATUS S-016). Tests can explicitly
 prohibit all reservation and supply a synthetic work area. The production application's tracker, catalog,
-shutdown and full-screen policy remain in the app module.
+shutdown and full-screen policy remain in the app module. The host calls `SetSuppressed` with its
+combined fullscreen/temporary-native-taskbar-reveal state. The Dock never acts on raw
+`ABN_FULLSCREENAPP` hints independently: a shell notification must neither hide it over an ordinary
+maximized app nor show it while the native taskbar is temporarily revealed.
+While registered, `WM_ACTIVATE` and `WM_WINDOWPOSCHANGED` forward `ABM_ACTIVATE` and
+`ABM_WINDOWPOSCHANGED` respectively, with the existing reservation reentrancy guard and default
+window-message handling preserved. This follows Microsoft's
+[AppBar lifecycle](https://learn.microsoft.com/en-us/windows/win32/shell/application-desktop-toolbars#appbar-size-and-position),
+including same-edge auto-hide z-order coordination. The 2026-10-21 notification correction is
+Release `/WX` built; Dock31 unit and app2 native pass. A bounded desktop check also confirmed
+an owned standard framed window maximized before activation reflowed into the reserved area and
+back on normal exit. This does not establish every external application's behavior. The native
+Dock light fixture has a recurring UIA root-type failure under separate investigation (S-024).
+
+## Fixed-action icon size — 2026-10-21
+
+Start, Search and Task View draw into the same animated icon rectangle as application bitmaps.
+Their shared 16-unit vector grid already leaves optical margins; an additional 18-percent Dock
+inset on each side previously reduced visible artwork to about 55–56 percent of the slot. Removing
+that duplicate inset brings it to about 86–88 percent without changing layout, hit targets,
+magnification, shared stroke width or Top Bar glyphs. Release `/WX` and inspected synthetic dark/light
+captures confirm the drawing change; this does not resolve the separate native UIA qualification.
 
 ## Executed checks
 
