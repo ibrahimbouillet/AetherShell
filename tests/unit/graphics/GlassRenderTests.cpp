@@ -142,6 +142,68 @@ AETHER_TEST("glass render: high contrast paints an opaque system-color panel wit
     for (UINT x = 50; x < 150; ++x) CHECK_EQ(MaxChannelDifference(canvas.At(x, 55), inside), 0);
 }
 
+AETHER_TEST("glass render: desktop glass has no directional light while popup glass keeps its flyout treatment") {
+    CanvasGuard guard;
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light}) {
+        const auto tokens = Glass(mode);
+        for (const auto elevation : {Elevation::Dock, Elevation::Bar}) {
+            D2DCanvas canvas;
+            REQUIRE(canvas.Create(200, 140));
+            auto style = Style(true);
+            style.elevation = elevation;
+            style.noise = false; // Isolate lighting from the deliberately irregular grain.
+            canvas.Begin();
+            PaintGlassPanel(canvas.Context(), kPanel, tokens, style);
+            REQUIRE(canvas.End());
+            int mirroredDifference = 0;
+            UINT worstX = 0, worstY = 0;
+            for (UINT y = 0; y < 110; ++y) {
+                // Sample the flat central band. Direct2D's rounded-corner antialias coverage can
+                // differ by a few channel values after reflection even without directional light.
+                for (UINT x = 64; x < 136; ++x) {
+                    const int difference = MaxChannelDifference(canvas.At(x, y), canvas.At(x, 109 - y));
+                    if (difference > mirroredDifference) { mirroredDifference = difference; worstX = x; worstY = y; }
+                }
+            }
+            if (mirroredDifference > 2) TEST_NOTE("desktop glass mode " + std::to_string(static_cast<int>(mode)) +
+                " elevation " + std::to_string(static_cast<int>(elevation)) + " mirror delta " + std::to_string(mirroredDifference) +
+                " at " + std::to_string(worstX) + "," + std::to_string(worstY) + "; alpha " +
+                std::to_string(canvas.At(worstX, worstY).a) + "/" + std::to_string(canvas.At(worstX, 109 - worstY).a));
+            // Includes the straight top/bottom edge, the interior and the exterior shadow.
+            CHECK(mirroredDifference <= 2);
+            CHECK(canvas.At(100, 55).a < 255); // The sanded material still transmits its backdrop.
+        }
+        D2DCanvas popup;
+        REQUIRE(popup.Create(200, 140));
+        auto style = Style(false);
+        style.elevation = Elevation::Popup;
+        style.noise = false;
+        popup.Begin();
+        PaintGlassPanel(popup.Context(), kPanel, tokens, style);
+        REQUIRE(popup.End());
+        CHECK(MaxChannelDifference(popup.At(100, 32), popup.At(100, 77)) > 3);
+    }
+}
+
+AETHER_TEST("glass render: desktop material stays opaque and untextured when transparency is off") {
+    CanvasGuard guard;
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light}) {
+        auto tokens = Glass(mode);
+        tokens.transparencyEnabled = false;
+        D2DCanvas canvas;
+        REQUIRE(canvas.Create(200, 140));
+        auto style = Style(false);
+        style.elevation = Elevation::Bar;
+        canvas.Begin();
+        PaintGlassPanel(canvas.Context(), kPanel, tokens, style);
+        REQUIRE(canvas.End());
+        const auto center = canvas.At(100, 55);
+        CHECK_EQ(center.a, 255);
+        for (UINT y = 35; y < 75; ++y)
+            for (UINT x = 55; x < 145; ++x) CHECK_EQ(MaxChannelDifference(canvas.At(x, y), center), 0);
+    }
+}
+
 AETHER_TEST("glass render: the grain adds subtle deterministic variation only when enabled") {
     CanvasGuard guard;
     auto tokens = Glass(ThemeMode::Dark);

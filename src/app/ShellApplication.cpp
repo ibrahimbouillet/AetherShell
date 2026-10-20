@@ -4,6 +4,7 @@
 #include "app/DesktopPolicy.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
+#include "app/WorkAreaInsets.h"
 
 #include "applications/ShellApplicationCatalog.h"
 #include "applications/ShellApplicationLauncher.h"
@@ -14,6 +15,7 @@
 #include "applications/KnownApplications.h"
 #include "applications/SystemShellActions.h"
 #include "applications/TaskbarPinSync.h"
+#include "controlcenter/ControlCenterWindow.h"
 #include "core/Strings.h"
 #include "core/FileSystem.h"
 #include "core/Time.h"
@@ -49,6 +51,7 @@
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <future>
+#include <atomic>
 #include <utility>
 #include <mutex>
 #include <algorithm>
@@ -58,6 +61,10 @@ namespace {
 constexpr UINT_PTR kUpdaterPollTimer = 0xA371;
 constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
 constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
+struct RadioCompletionGate {
+    std::mutex mutex;
+    std::function<void(Result<bool>)> deliver;
+};
 struct UpdateLaunchResult {
     std::mutex mutex;
     bool finished = false;
@@ -75,6 +82,7 @@ struct ShellApplication::Impl {
     graphics::FrameScheduler scheduler;
     SystemTimeSource time;
     WorkerPool worker{{1, L"Aether application", ComApartment::SingleThreaded}};
+    WorkerPool controlsWorker{{1, L"Aether quick controls", ComApartment::MultiThreaded}};
     CancellationSource cancellation;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     std::vector<Connection> connections;
@@ -96,6 +104,16 @@ struct ShellApplication::Impl {
     std::unique_ptr<dock::DockWindow> dock;
     std::unique_ptr<topbar::TopBarWindow> topbar;
     std::unique_ptr<TaskbarController> taskbar;
+    std::unique_ptr<WorkAreaInsets> sideInsets;
+    std::unique_ptr<controlcenter::ControlCenterWindow> controls;
+    std::unique_ptr<controlcenter::MediaBrightness> mediaBrightness;
+    controlcenter::ControlCenterState controlState;
+    std::shared_ptr<RadioCompletionGate> radioGate = std::make_shared<RadioCompletionGate>();
+    bool controlRefreshPending = false, controlFullRefreshQueued = false;
+    bool radioGranted = false, radioConsentPending = false, controlActionPending = false;
+    std::optional<controlcenter::ControlIntent> nextControlAction;
+    std::shared_ptr<std::atomic<std::uint64_t>> controlEpoch=std::make_shared<std::atomic<std::uint64_t>>(0);
+    std::shared_ptr<CancellationSource> controlActionCancellation=std::make_shared<CancellationSource>();
     std::vector<apps::ApplicationInfo> applications;
     platform::AppPaths paths;
     CommandLine command;
@@ -125,11 +143,21 @@ struct ShellApplication::Impl {
     Result<void> StartSurfaces();
     void ApplySettings();
     void ImportTaskbarPins(bool manual = false, unsigned retry = 0);
-    void OpenWindowsSettings(const wchar_t* uri) {
+    void RefreshControls(bool full = false);
+    void HandleControl(controlcenter::ControlIntent intent);
+    void QueueControl(controlcenter::ControlIntent intent);
+    void ReportControl(Result<void> result);
+    void PublishControls() {
+        if (!controls || closing) return;
+        if (providers) { controlState.network = providers->network->Current(); controlState.battery = providers->battery->Current(); }
+        if (audio) controlState.audio = audio->Current();
+        controls->SetState(controlState);
+    }
+    void OpenWindowsSettings(std::wstring uri) {
         if (closing) return;
         const auto weak = std::weak_ptr<bool>(alive);
-        worker.Post([this, weak, uri] {
-            const auto result = reinterpret_cast<INT_PTR>(::ShellExecuteW(nullptr, L"open", uri, nullptr, nullptr, SW_SHOWNORMAL));
+        worker.Post([this, weak, uri = std::move(uri)] {
+            const auto result = reinterpret_cast<INT_PTR>(::ShellExecuteW(nullptr, L"open", uri.c_str(), nullptr, nullptr, SW_SHOWNORMAL));
             if (result <= 32) dispatcher.Post([this, weak] {
                 if (const auto live = weak.lock(); live && *live && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Settings could not be opened");
             });
@@ -137,6 +165,7 @@ struct ShellApplication::Impl {
     }
     void FailTaskbarReservation() {
         taskbarReservationFailed = true;
+        if(sideInsets)(void)sideInsets->SetEnabled(false);
         taskbarStatus = L"Dock space could not be reserved; restoring Windows taskbar";
         AETHER_LOG_WARN("app", "taskbar replacement: Dock space could not be reserved");
         if (dock) (void)dock->SetTaskbarReplacement(false);
@@ -176,6 +205,14 @@ struct ShellApplication::Impl {
         const bool reserve = ShouldForceDockReservation(taskbarReservationFailed, wanted, update);
         if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
         if (!update.active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
+        if(sideInsets){
+            const bool enabled=nativeTaskbarAccess&&wanted&&update.active&&!update.suspended&&!closing;
+            if(auto aligned=sideInsets->SetEnabled(enabled);!aligned&&enabled){
+                // An optional side alignment failure never strands the native taskbar or Dock.
+                (void)sideInsets->SetEnabled(false);
+                AETHER_LOG_WARN("app","maximized-window side margins unavailable");
+            }
+        }
         if (!ShouldObserveTaskbar(update)) {
             // Nothing more happens until the next request (setting toggled, Explorer restarted,
             // resumed); each of them arms the timer again through EnsureTaskbarReplacement or the
@@ -196,6 +233,7 @@ struct ShellApplication::Impl {
         }
     }
     void OnExplorerRestarted() {
+        if(sideInsets)(void)sideInsets->OnExplorerRestarted();
         if (topbar) topbar->OnExplorerRestarted();
         if (nativeTaskbarAccess && catalogReady && settings && settings->Current().general.replaceWindowsTaskbar && settings->Current().general.syncTaskbarPins) ImportTaskbarPins();
         const bool wanted = taskbar && taskbarRequested.value_or(false) && !closing;
@@ -274,6 +312,161 @@ struct ShellApplication::Impl {
     void Stop() noexcept;
 };
 
+// This bridge is the only path from the transient panel to real system controls. Isolated test
+// instances cannot discover media/radios, launch Settings, inject keys or change device state.
+void ShellApplication::Impl::RefreshControls(bool full) {
+    if (closing || !controls || !controls->IsShown()) return;
+    PublishControls();
+    if (!nativeTaskbarAccess) return;
+    if (controlRefreshPending || controlActionPending) { controlFullRefreshQueued |= full; return; }
+    controlRefreshPending = true;
+    controlFullRefreshQueued = false;
+    controlState.loading = true;
+    PublishControls();
+    const auto weak = std::weak_ptr<bool>(alive);
+    const auto cancel = cancellation.Token();
+    const bool granted = radioGranted;
+    if (!controlsWorker.Post([this, weak, cancel, full, granted] {
+        Result<controlcenter::MediaSnapshot> media = MakeError(ErrorCode::Unavailable,"media status unavailable");
+        Result<controlcenter::SystemControlsSnapshot> system = MakeError(ErrorCode::Unavailable,"system status unavailable");
+        Result<controlcenter::BrightnessSnapshot> brightness = MakeError(ErrorCode::Unavailable,"brightness unavailable");
+        try {
+            media = mediaBrightness->ReadMedia(cancel);
+            if (full && !cancel.IsCancelled()) {
+                system = controlcenter::QuerySystemControls(granted,cancel);
+                brightness = mediaBrightness->ReadBrightness(cancel);
+            }
+        } catch (...) { /* Publish unavailable fields; never log private metadata or device identity. */ }
+        dispatcher.Post([this,weak,full,media=std::move(media),system=std::move(system),brightness=std::move(brightness)]() mutable {
+            const auto live=weak.lock();if(!live||!*live)return;
+            controlRefreshPending=false;if(closing)return;controlState.loading=false;
+            controlState.mediaAvailable=static_cast<bool>(media);
+            controlState.media=media?std::move(*media):controlcenter::MediaSnapshot{};
+            if(full){
+                controlState.system=system?std::move(*system):controlcenter::SystemControlsSnapshot{};
+                controlState.brightness=brightness?*brightness:controlcenter::BrightnessSnapshot{};
+            }
+            PublishControls();
+            if(nextControlAction){auto next=*nextControlAction;nextControlAction.reset();QueueControl(next);}
+            else if(controlFullRefreshQueued){controlFullRefreshQueued=false;RefreshControls(true);}
+        });
+    })) {controlRefreshPending=false;controlState.loading=false;controlState.message=L"Status worker unavailable";PublishControls();}
+}
+
+void ShellApplication::Impl::ReportControl(Result<void> result) {
+    if(closing)return;
+    // Success never means the requested value is displayed optimistically. Read the actual state.
+    controlState.message=result?L"":L"Windows could not complete this action. Review its settings.";
+    PublishControls();RefreshControls(true);
+}
+
+void ShellApplication::Impl::QueueControl(controlcenter::ControlIntent intent) {
+    using namespace controlcenter;
+    if(closing||!nativeTaskbarAccess||!controls||!controls->IsShown())return;
+    if(controlActionPending||controlRefreshPending){
+        // Last slider target wins; other explicit actions are admitted only once the worker is free.
+        if(intent.kind==ControlIntentKind::Brightness&&(!nextControlAction||nextControlAction->kind==ControlIntentKind::Brightness))nextControlAction=intent;
+        else if(intent.kind==ControlIntentKind::SystemTile&&!nextControlAction)nextControlAction=intent;
+        else{controlState.message=L"Reading Windows status; try the action again shortly";PublishControls();}
+        return;
+    }
+    controlActionPending=true;controlState.message=L"";PublishControls();
+    const auto weak=std::weak_ptr<bool>(alive);const auto cancel=controlActionCancellation->Token();const bool granted=radioGranted;
+    const auto epoch=controlEpoch;const auto generation=epoch->load();
+    if(!controlsWorker.Post([this,weak,cancel,intent,granted,epoch,generation]{
+        Result<void> result=MakeError(ErrorCode::Unavailable,"control unavailable");
+        std::optional<BrightnessSnapshot> brightness;
+        try{
+            if(cancel.IsCancelled()||epoch->load()!=generation)result=MakeError(ErrorCode::Cancelled,"control panel closed");
+            else switch(intent.kind){
+                case ControlIntentKind::SystemTile:
+                    if(intent.enabled&&(intent.control==SystemControl::WiFi||intent.control==SystemControl::Bluetooth))
+                        result=SetRadioEnabled(intent.control==SystemControl::WiFi?RadioKind::WiFi:RadioKind::Bluetooth,*intent.enabled,granted,cancel);
+                    break;
+                case ControlIntentKind::Brightness:
+                    if(intent.percent){auto readback=mediaBrightness->SetBrightness(*intent.percent,cancel);if(readback){brightness=*readback;result=Ok();}else result=readback.error();}break;
+                case ControlIntentKind::SelectMedia:result=mediaBrightness->SelectSession(intent.session);break;
+                case ControlIntentKind::MediaPrevious:case ControlIntentKind::MediaPlayPause:case ControlIntentKind::MediaNext:
+                    result=mediaBrightness->ControlMedia(intent.session,intent.kind==ControlIntentKind::MediaNext?MediaAction::Next:
+                        intent.kind==ControlIntentKind::MediaPrevious?MediaAction::Previous:MediaAction::TogglePlayPause,cancel);break;
+                default:break;
+            }
+        }catch(...){result=MakeError(ErrorCode::Platform,"control operation failed");}
+        dispatcher.Post([this,weak,result=std::move(result),brightness,epoch,generation,intent]()mutable{
+            const auto live=weak.lock();if(!live||!*live)return;
+            controlActionPending=false;if(closing)return;
+            if(epoch->load()!=generation){RefreshControls(true);return;}
+            if(!result&&result.error().code==ErrorCode::AccessDenied&&intent.kind==ControlIntentKind::SystemTile)radioGranted=false;
+            if(brightness)controlState.brightness=*brightness;
+            ReportControl(std::move(result));
+            // Refresh consumes a pending coalesced brightness target after its readback completes.
+        });
+    })){controlActionPending=false;ReportControl(MakeError(ErrorCode::Unavailable,"control worker unavailable"));}
+}
+
+void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) {
+    using namespace controlcenter;
+    if(closing||!nativeTaskbarAccess||!controls||!controls->IsShown())return;
+    const auto open=[this](std::wstring uri){controls->Close();OpenWindowsSettings(std::move(uri));};
+    switch(intent.kind){
+        case ControlIntentKind::AllSettings:open(L"ms-settings:");return;
+        case ControlIntentKind::BatterySettings:open(L"ms-settings:batterysaver");return;
+        case ControlIntentKind::SoundSettings:open(L"ms-settings:sound");return;
+        case ControlIntentKind::DisplaySettings:open(L"ms-settings:display");return;
+        case ControlIntentKind::Volume:case ControlIntentKind::ToggleMute:{
+            if(!audio)return;
+            const auto weak=std::weak_ptr<bool>(alive);
+            auto complete=[this,weak](Result<void> result){dispatcher.Post([this,weak,result=std::move(result)]()mutable{
+                if(const auto live=weak.lock();live&&*live&&!closing){
+                    controlState.message=result?L"":L"Windows could not change the audio output";PublishControls();
+                }
+            });};
+            if(intent.kind==ControlIntentKind::Volume&&intent.percent)audio->SetVolumeAsync(static_cast<float>(*intent.percent)/100,std::move(complete));
+            else if(intent.kind==ControlIntentKind::ToggleMute)audio->ToggleMuteAsync(std::move(complete));
+            return;
+        }
+        case ControlIntentKind::SystemTile:
+            if(intent.control==SystemControl::WiFi||intent.control==SystemControl::Bluetooth){
+                const auto& radio=intent.control==SystemControl::WiFi?controlState.system.wifi:controlState.system.bluetooth;
+                if(!intent.enabled||(!radio.canToggle&&!radio.canRequestAccess)){auto action=ActionFor(intent.control);if(action)open(action->settingsUri);return;}
+                if(radioGranted){QueueControl(intent);return;}
+                if(radioConsentPending)return;
+                radioConsentPending=true;
+                const auto weak=std::weak_ptr<bool>(alive);const auto epoch=controlEpoch;const auto generation=epoch->load();
+                {std::lock_guard lock(radioGate->mutex);radioGate->deliver=[this,weak,intent,epoch,generation](Result<bool> granted){
+                    dispatcher.Post([this,weak,intent,epoch,generation,granted=std::move(granted)]()mutable{
+                        if(const auto live=weak.lock();!live||!*live)return;
+                        radioConsentPending=false;if(closing)return;radioGranted=granted&&*granted;
+                        if(epoch->load()!=generation)return;
+                        if(radioGranted)QueueControl(intent);
+                        else ReportControl(MakeError(ErrorCode::AccessDenied,"radio access denied"));
+                    });
+                };}
+                auto gate=radioGate;
+                auto begun=BeginRadioAccessRequest([gate](Result<bool> granted){std::lock_guard lock(gate->mutex);if(gate->deliver)gate->deliver(std::move(granted));});
+                if(!begun){radioConsentPending=false;ReportControl(begun.error());}
+                return;
+            }
+            [[fallthrough]];
+        case ControlIntentKind::SystemSettings:{
+            auto action=ActionFor(intent.control);if(!action){ReportControl(action.error());return;}
+            if(action->minimumWindowsBuild&&!platform::IsBuildOrGreater(action->minimumWindowsBuild)){ReportControl(MakeError(ErrorCode::Unsupported,"Windows feature unavailable"));return;}
+            if(action->kind==SystemActionKind::Settings){open(action->settingsUri);return;}
+            controls->Close();Result<void> result=MakeError(ErrorCode::Unsupported,"Windows shortcut unavailable");
+            switch(action->shortcut){
+                case SystemShortcut::Accessibility:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('U')});break;
+                case SystemShortcut::LiveCaptions:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('L')});break;
+                case SystemShortcut::Cast:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('K')});break;
+                case SystemShortcut::Project:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('P')});break;
+                case SystemShortcut::None:break;
+            }
+            if(!result&&settingsWindow)settingsWindow->ReportActionStatus(L"The Windows control could not be opened");
+            return;
+        }
+        default:QueueControl(intent);return;
+    }
+}
+
 void ShellApplication::Impl::ApplySettings() {
     if (!settings || !settings->Loaded()) return;
     const auto& value = settings->Current();
@@ -293,6 +486,7 @@ void ShellApplication::Impl::ApplySettings() {
     }
     if (topbar) { topbar->SetTheme(tokens, motion); topbar->SetSettings(value.topBar, value.weather.enabled); }
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
+    if (controls) controls->SetTheme(tokens, motion);
     if (taskbar && taskbarRequested != value.general.replaceWindowsTaskbar) {
         taskbarRequested = value.general.replaceWindowsTaskbar;
         taskbarReservationFailed = false;
@@ -387,8 +581,24 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     topbar::TopBarContext context{graphics, scheduler, dispatcher}; context.settings = settings.get();
     context.clock = providers->clock.get(); context.battery = providers->battery.get(); context.keyboard = providers->keyboard.get();
     context.network = providers->network.get(); context.audio = audio.get(); context.microphone = microphone.get(); context.weather = weather.get();
+    context.groupQuickControls = true;
     topbar = std::make_unique<topbar::TopBarWindow>(context);
     if (auto result = topbar->Create(); !result) return result;
+    mediaBrightness = std::make_unique<controlcenter::MediaBrightness>();
+    controls = std::make_unique<controlcenter::ControlCenterWindow>(graphics, scheduler, dispatcher);
+    if (auto result = controls->Initialize(); !result) return result;
+    sideInsets=std::make_unique<WorkAreaInsets>(nativeTaskbarAccess);
+    connections.push_back(controls->Requested.Connect([this](controlcenter::ControlIntent intent) { HandleControl(intent); }));
+    connections.push_back(controls->Closed.Connect([this]{
+        ++*controlEpoch;controlActionCancellation->Cancel();
+        controlActionCancellation=std::make_shared<CancellationSource>();nextControlAction.reset();
+    }));
+    connections.push_back(controls->RefreshRequested.Connect([this] { RefreshControls(); }));
+    connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
+        if (closing || !controls) return;
+        PublishControls();
+        if (auto opened = controls->Toggle(anchor); opened && controls->IsShown()) RefreshControls(true);
+    }));
     connections.push_back(dock->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
     connections.push_back(dock->SettingsRequested.Connect([this]{ OpenSettings(); }));
     connections.push_back(dock->ImportWindowsPinsRequested.Connect([this]{ ImportTaskbarPins(true); }));
@@ -430,10 +640,10 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
         if (!SetTaskbarReplacementSuspended(false) && settingsWindow) settingsWindow->ReportActionStatus(L"Taskbar replacement could not resume; Windows remains available");
     }));
-    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; (void)dock->SetSuppressed(ShouldSuppressDock(hidden, desktopState)); }));
+    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); (void)dock->SetSuppressed(ShouldSuppressDock(hidden, desktopState)); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ ApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -604,6 +814,7 @@ void ShellApplication::Impl::InstallUpdate() {
 
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
+    if(controls)controls->Close();
     ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     if (dock) ::EnableWindow(dock->Handle(), FALSE);
@@ -655,12 +866,14 @@ void ShellApplication::Impl::ExportDiagnostics() {
 void ShellApplication::Impl::Stop() noexcept {
     if (stopped) return;
     stopped = true;
-    *alive = false; cancellation.Cancel();
+    *alive = false; cancellation.Cancel(); controlActionCancellation->Cancel(); ++*controlEpoch;
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
+    { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
     connections.clear(); channel.Close();
+    controls.reset(); sideInsets.reset();
     if (tracker) tracker->Stop();
     if (updates) updates->Stop();
     if (topbar) topbar.reset();
@@ -671,6 +884,7 @@ void ShellApplication::Impl::Stop() noexcept {
     // AppBars synchronously; no owned AppBar may wait on this same shutdown join.
     if (taskbar) taskbar->Stop();
     taskbar.reset();
+    controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();
     updates.reset(); geocoding.reset(); weather.reset(); audio.reset(); microphone.reset(); providers.reset(); http.reset(); settings.reset();

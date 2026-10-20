@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <limits>
 #include <stdexcept>
 #include <thread>
 #include <vector>
@@ -33,6 +34,8 @@ struct Model final : IAccessibleSurfaceModel {
     AccessibleSurface* surface = nullptr;
     int invoked = 0;
     int toggled = 0;
+    int rangeCalls = 0;
+    int rangeId = 0;
     void ThreadCheck() const { if (::GetCurrentThreadId() != owner) wrongThread.store(true); }
     std::wstring RootName() const override { ThreadCheck(); return L"Aether accessibility test"; }
     CONTROLTYPEID RootControlType() const override { ThreadCheck(); return UIA_ToolBarControlTypeId; }
@@ -52,6 +55,12 @@ struct Model final : IAccessibleSurfaceModel {
         ThreadCheck();
         for (auto& item : items) item.hasKeyboardFocus = item.id == id;
         return surface->NotifyFocusChanged(id);
+    }
+    Result<void> SetRangeValue(int id, double value) override {
+        ThreadCheck();
+        ++rangeCalls; rangeId = id;
+        for (auto& item : items) if (item.id == id) { item.rangeValue = value; return Ok(); }
+        return MakeError(ErrorCode::NotFound, "test range item unavailable");
     }
 };
 
@@ -358,4 +367,182 @@ AETHER_TEST("accessibility integration: pattern availability, disabled actions a
     winrt::com_ptr<IRawElementProviderFragmentRoot> removedRoot;
     CHECK_EQ(first->get_FragmentRoot(removedRoot.put()), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
     CHECK(removedRoot == nullptr);
+}
+
+AETHER_TEST("accessibility integration: immutable provider metadata survives disconnect on owner and MTA threads") {
+    Apartment ui(COINIT_APARTMENTTHREADED);
+    REQUIRE(SUCCEEDED(ui.hr));
+    Window window;
+    REQUIRE(window.Create());
+    const auto root = window.surface.RootProvider();
+    REQUIRE(root.ok());
+    auto* const provider = root.value().get(); // retained on the owner thread until every reader joins
+    constexpr auto expected = static_cast<ProviderOptions>(ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading);
+    ProviderOptions options{};
+    CHECK_EQ(provider->get_ProviderOptions(nullptr), static_cast<HRESULT>(E_POINTER));
+    CHECK_EQ(provider->get_ProviderOptions(&options), static_cast<HRESULT>(S_OK));
+    CHECK(options == expected);
+
+    struct MetadataRead {
+        HRESULT apartment = E_PENDING;
+        HRESULT result = E_PENDING;
+        ProviderOptions options{};
+        bool differentThread = false;
+    };
+    const auto ownerThread = ::GetCurrentThreadId();
+    const auto readFromMta = [&] {
+        MetadataRead read;
+        std::thread reader([&] {
+            Apartment mta(COINIT_MULTITHREADED);
+            read.apartment = mta.hr;
+            read.differentThread = ::GetCurrentThreadId() != ownerThread;
+            // Deliberately call only this immutable getter directly, without COM marshaling.
+            // No property, action, navigation or other model-dependent provider method runs here.
+            if (SUCCEEDED(mta.hr)) read.result = provider->get_ProviderOptions(&read.options);
+        });
+        reader.join();
+        return read;
+    };
+    const auto before = readFromMta();
+    CHECK(SUCCEEDED(before.apartment)); CHECK(before.differentThread);
+    CHECK_EQ(before.result, static_cast<HRESULT>(S_OK)); CHECK(before.options == expected);
+
+    window.surface.Disconnect();
+    options = {};
+    CHECK_EQ(provider->get_ProviderOptions(nullptr), static_cast<HRESULT>(E_POINTER));
+    CHECK_EQ(provider->get_ProviderOptions(&options), static_cast<HRESULT>(S_OK));
+    CHECK(options == expected);
+    const auto after = readFromMta();
+    CHECK(SUCCEEDED(after.apartment)); CHECK(after.differentThread);
+    CHECK_EQ(after.result, static_cast<HRESULT>(S_OK)); CHECK(after.options == expected);
+
+    // Metadata availability never revives a disconnected element or relaxes its property guard.
+    VARIANT value{};
+    CHECK_EQ(provider->GetPropertyValue(UIA_ControlTypePropertyId, &value),
+             static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    ::VariantClear(&value);
+    winrt::com_ptr<IUnknown> pattern;
+    CHECK_EQ(provider->GetPatternProvider(UIA_InvokePatternId, pattern.put()),
+             static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK(pattern == nullptr);
+    CHECK_FALSE(window.model.wrongThread.load());
+    CHECK_EQ(window.model.invoked, 0); CHECK_EQ(window.model.toggled, 0);
+}
+
+AETHER_TEST("accessibility integration: range values expose known metadata and guard user intents") {
+    Apartment ui(COINIT_APARTMENTTHREADED); REQUIRE(SUCCEEDED(ui.hr));
+    Window window; REQUIRE(window.Create());
+    auto& item = window.model.items[0];
+    item.controlType = UIA_SliderControlTypeId; item.supportsRangeValue = true;
+    item.rangeValue = 42; item.rangeSmallChange = 2; item.rangeLargeChange = 10;
+    REQUIRE(window.surface.NotifyStructureChanged().ok());
+    const auto root = window.surface.RootProvider(); REQUIRE(root.ok());
+    auto fragment = root.value().as<IRawElementProviderFragment>();
+    winrt::com_ptr<IRawElementProviderFragment> child;
+    REQUIRE(SUCCEEDED(fragment->Navigate(NavigateDirection_FirstChild, child.put())));
+    REQUIRE(child != nullptr);
+    auto simple = child.as<IRawElementProviderSimple>();
+    winrt::com_ptr<IUnknown> pattern;
+    REQUIRE(SUCCEEDED(simple->GetPatternProvider(UIA_RangeValuePatternId, pattern.put())));
+    REQUIRE(pattern != nullptr);
+    auto range = pattern.as<IRangeValueProvider>();
+    double reading = -1;
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 42.0);
+    CHECK_EQ(range->get_Minimum(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 0.0);
+    CHECK_EQ(range->get_Maximum(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 100.0);
+    CHECK_EQ(range->get_SmallChange(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 2.0);
+    CHECK_EQ(range->get_LargeChange(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 10.0);
+    BOOL readOnly = TRUE;
+    CHECK_EQ(range->get_IsReadOnly(&readOnly), static_cast<HRESULT>(S_OK)); CHECK_FALSE(readOnly);
+    CHECK_EQ(range->get_Value(nullptr), static_cast<HRESULT>(E_POINTER));
+    CHECK_EQ(range->get_IsReadOnly(nullptr), static_cast<HRESULT>(E_POINTER));
+    VARIANT value{};
+    REQUIRE(SUCCEEDED(simple->GetPropertyValue(UIA_IsRangeValuePatternAvailablePropertyId, &value)));
+    CHECK_EQ(value.vt, VT_BOOL); CHECK_EQ(value.boolVal, VARIANT_TRUE); ::VariantClear(&value);
+    REQUIRE(SUCCEEDED(simple->GetPropertyValue(UIA_RangeValueValuePropertyId, &value)));
+    CHECK_EQ(value.vt, VT_R8); CHECK_EQ(value.dblVal, 42.0); ::VariantClear(&value);
+
+    CHECK_EQ(range->SetValue(80), static_cast<HRESULT>(S_OK));
+    CHECK_EQ(window.model.rangeCalls, 1); CHECK_EQ(window.model.rangeId, 11);
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 80.0);
+    CHECK(window.surface.NotifyPropertyChanged(11).ok());
+    CHECK(window.surface.NotifyPropertyChanged(11).ok()); // unchanged known range is safe and needs no invented value
+    for (const double invalid : {-1.0, 101.0, std::numeric_limits<double>::quiet_NaN(),
+                                std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity()})
+        CHECK_EQ(range->SetValue(invalid), static_cast<HRESULT>(E_INVALIDARG));
+    CHECK_EQ(window.model.rangeCalls, 1);
+    item.isEnabled = false;
+    CHECK_EQ(range->SetValue(20), static_cast<HRESULT>(UIA_E_ELEMENTNOTENABLED));
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 80.0);
+    item.isEnabled = true; item.rangeReadOnly = true;
+    CHECK_EQ(range->SetValue(20), static_cast<HRESULT>(UIA_E_INVALIDOPERATION));
+    CHECK_EQ(range->get_IsReadOnly(&readOnly), static_cast<HRESULT>(S_OK)); CHECK(readOnly);
+    item.rangeReadOnly = false; item.supportsRangeValue = false; // unknown reading withdraws this pattern
+    pattern = nullptr;
+    CHECK_EQ(simple->GetPatternProvider(UIA_RangeValuePatternId, pattern.put()), static_cast<HRESULT>(S_OK));
+    CHECK(pattern == nullptr);
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(UIA_E_NOTSUPPORTED));
+    CHECK_EQ(range->SetValue(20), static_cast<HRESULT>(UIA_E_NOTSUPPORTED));
+    REQUIRE(SUCCEEDED(simple->GetPropertyValue(UIA_IsRangeValuePatternAvailablePropertyId, &value)));
+    CHECK_EQ(value.vt, VT_BOOL); CHECK_EQ(value.boolVal, VARIANT_FALSE); ::VariantClear(&value);
+    item.supportsRangeValue = true;
+
+    HRESULT wrongRead = E_PENDING, wrongSet = E_PENDING;
+    std::thread wrongThread([&] {
+        Apartment mta(COINIT_MULTITHREADED);
+        if (FAILED(mta.hr)) return;
+        double ignored = 0;
+        // Raw calls deliberately verify rejection before any model access; this is not COM marshaling.
+        wrongRead = range->get_Value(&ignored); wrongSet = range->SetValue(20);
+    });
+    wrongThread.join();
+    CHECK_EQ(wrongRead, static_cast<HRESULT>(RPC_E_WRONG_THREAD));
+    CHECK_EQ(wrongSet, static_cast<HRESULT>(RPC_E_WRONG_THREAD));
+    CHECK_EQ(window.model.rangeCalls, 1); CHECK_FALSE(window.model.wrongThread.load());
+    window.surface.Disconnect();
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(range->SetValue(20), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(window.model.rangeCalls, 1);
+}
+
+AETHER_TEST("accessibility integration: malformed range models and removed range references fail closed") {
+    Apartment ui(COINIT_APARTMENTTHREADED); REQUIRE(SUCCEEDED(ui.hr));
+    Window window; REQUIRE(window.Create());
+    auto valid = window.model.items[0];
+    valid.supportsRangeValue = true; valid.rangeValue = 50; valid.controlType = UIA_SliderControlTypeId;
+    window.model.items[0] = valid;
+    const auto root = window.surface.RootProvider(); REQUIRE(root.ok());
+    auto fragment = root.value().as<IRawElementProviderFragment>();
+    winrt::com_ptr<IRawElementProviderFragment> child;
+    REQUIRE(SUCCEEDED(fragment->Navigate(NavigateDirection_FirstChild, child.put())));
+    REQUIRE(child != nullptr);
+    auto simple = child.as<IRawElementProviderSimple>();
+    winrt::com_ptr<IUnknown> pattern;
+    REQUIRE(SUCCEEDED(simple->GetPatternProvider(UIA_RangeValuePatternId, pattern.put())));
+    REQUIRE(pattern != nullptr);
+    auto range = pattern.as<IRangeValueProvider>();
+    std::vector<AccessibleItem> malformed;
+    auto invalid = valid; invalid.rangeValue = std::numeric_limits<double>::quiet_NaN(); malformed.push_back(invalid);
+    invalid = valid; invalid.rangeMinimum = std::numeric_limits<double>::infinity(); malformed.push_back(invalid);
+    invalid = valid; invalid.rangeMaximum = std::numeric_limits<double>::infinity(); malformed.push_back(invalid);
+    invalid = valid; invalid.rangeMinimum = 101; malformed.push_back(invalid);
+    invalid = valid; invalid.rangeValue = -1; malformed.push_back(invalid);
+    invalid = valid; invalid.rangeValue = 101; malformed.push_back(invalid);
+    invalid = valid; invalid.rangeSmallChange = -1; malformed.push_back(invalid);
+    invalid = valid; invalid.rangeLargeChange = std::numeric_limits<double>::quiet_NaN(); malformed.push_back(invalid);
+    for (const auto& item : malformed) {
+        window.model.items[0] = item;
+        double reading = 0;
+        CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(E_INVALIDARG));
+        CHECK_EQ(range->SetValue(50), static_cast<HRESULT>(E_INVALIDARG));
+        CHECK_EQ(window.model.rangeCalls, 0);
+    }
+    window.model.items[0] = valid;
+    double reading = 0;
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(S_OK)); CHECK_EQ(reading, 50.0);
+    window.model.items.erase(window.model.items.begin());
+    CHECK(window.surface.NotifyStructureChanged().ok());
+    CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(range->SetValue(50), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(window.model.rangeCalls, 0); CHECK_FALSE(window.model.wrongThread.load());
 }

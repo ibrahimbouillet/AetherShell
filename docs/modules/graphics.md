@@ -18,13 +18,13 @@ lift, a gravity launch bounce, pill indicators).
 
 | Group | Contents |
 |---|---|
-| `glass` | neutral tint (dark `#1E1E1E`, light `#F3F3F3`), tint alpha with and without blur, gradient hairline border, top-weighted sheen (`highlightFraction` 0.30), 1-DIP inner `rim`, `backdropOpacity` 1.0, `noiseAlpha` 0.02 |
+| `glass` | neutral tint (dark `#1E1E1E`, light `#F3F3F3`), tint alpha with and without blur, `uniformBorder` for the desktop surfaces; gradient border, top-weighted sheen (`highlightFraction` 0.30) and 1-DIP inner `rim` for flyouts; `backdropOpacity` 1.0, `noiseAlpha` 0.02 |
 | `surface` | opaque layers and control fills usable by GDI: `background`, `layer`, `card`, `cardStroke`, `subtleFill`, `controlFill*`, `controlStroke*`, `strongStroke`, `divider`, `selectedFill`, `selectedText`, `popupBackground` |
 | `accentRoles` | `fill`, `fillHover`, `fillPressed`, `fillDisabled`, `text`, `textOnAccent` (black or white, whichever contrasts more) |
 | status | `success`, `caution`, `critical`, `info`; `warning` stays an alias of `caution` |
 | `focus` | two-tone ring: `outer` 2 DIP in the text tone, `inner` 1 DIP in the opposite tone, 1-DIP gap |
 | `radii` | control 4, card 6, overlay 8, popup 12, bar 10, tooltip 8, item 10; Dock about 0.3 x the panel height clamped to 14..22 (`DockCornerRadius`) |
-| `elevation` | two layers (key and ambient: blur, offset, alpha) for tooltip, bar, dock, popup and lift |
+| `elevation` | two layers (key and ambient: blur, offset, alpha) for tooltip, bar, dock, popup and lift; bar and dock offsets are zero so their soft separation has no directional cast |
 | `type` | caption 12, body 14, body strong 14 semibold, subtitle 20, title 28; `fontFamily` Segoe UI Variable Text, `displayFontFamily` Segoe UI Variable Display, `smallFamily` Segoe UI Variable Small; every family falls back to Segoe UI when missing |
 | `curves` | standard (0.2,0,0,1), decelerate (0,0,0,1), accelerate (0.3,0,1,1) |
 | `glyph` | 16-DIP grid, 1.5-DIP stroke, `halo` knockout color and width for overlapping marks |
@@ -109,10 +109,16 @@ to a stack local before removing its subscription, and callback exceptions stay 
 
 ## Glass material
 
-`PaintGlassPanel(context, rect, tokens, style)` paints, in order: the two-layer exterior-only shadow,
-the neutral tint, the grain, the top-weighted sheen and inner rim, and the gradient hairline border.
-`GlassStyle` adds `elevation` (None, Tooltip, Bar, Dock, Popup, Lift), `noise` and `highlight` to the
-existing fields; `shadow = false` still means no shadow. `GlassTintAlpha` keeps its semantics.
+`PaintGlassPanel(context, rect, tokens, style)` paints the exterior-only shadow, neutral tint and
+grain. `Elevation::Dock` and `Elevation::Bar` use sanded glass: their shadow is centered, their edge
+is uniformly subtle on every side, and they never paint the top sheen, inner rim or gradient edge.
+This keeps the real blurred backdrop visible without painting a light source onto either desktop
+surface. Popup and tooltip elevations keep their flyout treatment for separation and readability;
+their top sheen and rim still follow `GlassStyle::highlight`.
+
+`GlassStyle` retains `elevation` (None, Tooltip, Bar, Dock, Popup, Lift), `noise` and `highlight`;
+`shadow = false` still means no shadow. Tint strength, compositor blur, grain and the opaque
+high-contrast/transparency-off policies are unchanged. `GlassTintAlpha` keeps its semantics.
 
 - Shadows: `PaintElevation` bakes each (device, bake size, radius, layers, DPI, color) once into a
   bitmap on a private device context of the same Direct2D device (so the caller's clips, layers and
@@ -148,6 +154,13 @@ no icon font, image asset or third-party artwork:
   otherwise Windows blue (`#0078D4` light, `#4CC2FF` dark); text color in high contrast.
 - `PaintGlyph(target, glyph, box, brush, stroke)`: Search, Task View, the Settings navigation marks
   (Dock, Top Bar, Desktop, Weather, Updates, General, About), chevrons, check, close and arrows.
+- `PaintWiFiGlyph(target, box, brush, activeWaves, stroke)`: cached Wi-Fi geometry with zero to
+  three active arcs. The Top Bar model maps its real Windows signal snapshot to that count;
+  graphics never reads or invents network status. Inactive arcs use 28% of the incoming brush
+  opacity. Known zero has a hollow dot; unavailable or invalid counts add an explicit question
+  mark rather than drawing full signal or a disconnected cross. The painter restores brush
+  opacity and the target transform. `BuildWiFiGlyphGeometry` exposes its geometry for headless
+  bounds checks.
 - `PaintStatusBadge`: InfoBar severity circles with a contrasting mark.
 - `RoundStrokeStyle(factory)` for the Top Bar status glyphs, which live with the Top Bar.
 
@@ -166,7 +179,8 @@ Unit (`tests/unit/graphics`, no window): design tokens, motion and transitions, 
 glyph geometry, text formats, and painters rendered headless on a WARP device into an offscreen
 bitmap (`D2DCanvas.h`): exterior-only shadow, shared nine-slice profile, grain, high contrast,
 indicators, highlights, the two-tone focus ring, the lift shadow and icon drawing. Integration
-(`tests/integration/ui`) keeps the glass probe RGB-delta gate on the new material.
+(`tests/integration/ui`) owns the backdrop RGB-delta gate; executed native receipts are dated below
+and in [shared UI](ui.md).
 
 2026-10-20 focused verification: Release with warnings as errors builds successfully; all 64 graphics
 unit cases pass. The first native run exposed an access violation while registering the batch's
@@ -174,6 +188,17 @@ unit cases pass. The first native run exposed an access violation while register
 UI suite passes all 12 cases, including normal completion, cancellation, detach, destruction and
 callback exceptions. These are scoped checks on the current Windows 11 runtime, not Windows 10 or
 whole-product qualification. See [shared UI](ui.md) for the native material results.
+
+2026-10-21 focused verification: the graphics target builds in Release with `/W4 /WX`; all 68
+headless graphics cases pass. Added checks cover neutral Dock/Bar lighting in both palettes,
+transparency-disabled opacity, and Wi-Fi geometry, distinct unknown/zero states, progressive signal
+coverage, bounds and painter state restoration. The initial new lighting check failed at rounded
+antialias corners (4 to 6 channel levels). Its final measurement uses the central straight-edge,
+interior and exterior-shadow band, excluding corner rasterization while retaining the same
+2-level tolerance and a directional Popup positive control. Initial, diagnostic and final receipts
+remain local in ignored `build/wf-control-visuals/headless-graphics-{initial,diagnostic,final}.log`.
+This run creates no windows or captures and changes no system controls. Desktop/compositor blur and
+interactive menu behavior were not requalified for this material change.
 
 ## Not done here
 

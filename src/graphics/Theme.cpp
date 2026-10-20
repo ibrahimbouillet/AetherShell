@@ -38,6 +38,7 @@ void ApplyDarkRoles(DesignTokens& t) {
     t.glass.tintAlphaWithoutBlur = 0.66f;
     t.glass.borderTop = Color::FromHex(0xFFFFFF, 0.16f);
     t.glass.borderBottom = Color::FromHex(0xFFFFFF, 0.05f);
+    t.glass.uniformBorder = Color::FromHex(0xFFFFFF, 0.12f);
     t.glass.highlight = Color::FromHex(0xFFFFFF, 0.05f);
     t.glass.rim = Color::FromHex(0xFFFFFF, 0.06f);
     t.textPrimary = Color::FromHex(0xFFFFFF);
@@ -76,8 +77,8 @@ void ApplyDarkRoles(DesignTokens& t) {
 
     t.elevation.color = Color::FromHex(0x000000);
     t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 2.0f, 0.26f}, ShadowLayer{6.0f, 0.0f, 0.16f}};
-    t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 1.0f, 0.24f}, ShadowLayer{8.0f, 0.0f, 0.14f}};
-    t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 4.0f, 0.30f}, ShadowLayer{10.0f, 1.0f, 0.20f}};
+    t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.24f}, ShadowLayer{8.0f, 0.0f, 0.14f}};
+    t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 0.0f, 0.30f}, ShadowLayer{10.0f, 0.0f, 0.20f}};
     t.elevation.popup = ElevationLayers{ShadowLayer{6.0f, 4.0f, 0.30f}, ShadowLayer{10.0f, 0.0f, 0.22f}};
     t.elevation.lift = ElevationLayers{ShadowLayer{4.0f, 5.0f, 0.34f}, ShadowLayer{8.0f, 2.0f, 0.16f}};
 }
@@ -88,6 +89,7 @@ void ApplyLightRoles(DesignTokens& t) {
     t.glass.tintAlphaWithoutBlur = 0.72f;
     t.glass.borderTop = Color::FromHex(0xFFFFFF, 0.80f);
     t.glass.borderBottom = Color::FromHex(0x000000, 0.10f);
+    t.glass.uniformBorder = Color::FromHex(0x000000, 0.12f);
     t.glass.highlight = Color::FromHex(0xFFFFFF, 0.20f);
     t.glass.rim = Color::FromHex(0xFFFFFF, 0.50f);
     t.textPrimary = Color::FromHex(0x1B1B1B);
@@ -126,8 +128,8 @@ void ApplyLightRoles(DesignTokens& t) {
 
     t.elevation.color = Color::FromHex(0x000000);
     t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 2.0f, 0.14f}, ShadowLayer{6.0f, 0.0f, 0.08f}};
-    t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 1.0f, 0.12f}, ShadowLayer{8.0f, 0.0f, 0.08f}};
-    t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 4.0f, 0.16f}, ShadowLayer{10.0f, 1.0f, 0.10f}};
+    t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.12f}, ShadowLayer{8.0f, 0.0f, 0.08f}};
+    t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 0.0f, 0.16f}, ShadowLayer{10.0f, 0.0f, 0.10f}};
     t.elevation.popup = ElevationLayers{ShadowLayer{6.0f, 4.0f, 0.16f}, ShadowLayer{10.0f, 0.0f, 0.12f}};
     t.elevation.lift = ElevationLayers{ShadowLayer{4.0f, 5.0f, 0.20f}, ShadowLayer{8.0f, 2.0f, 0.10f}};
 }
@@ -148,6 +150,7 @@ void ApplyHighContrastRoles(DesignTokens& t) {
     t.glass.tintAlphaWithoutBlur = 1.0f;
     t.glass.borderTop = windowText;
     t.glass.borderBottom = windowText;
+    t.glass.uniformBorder = windowText;
     t.glass.highlight = window.WithAlpha(0.0f);
     t.glass.rim = window.WithAlpha(0.0f);
     t.glass.noiseAlpha = 0.0f;

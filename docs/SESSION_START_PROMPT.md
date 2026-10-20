@@ -87,6 +87,9 @@ Another assistant's statement that something is done is not evidence. For the wo
 ## Step 4 — Continue the work where it stopped
 - Take the next step named in `HANDOFF.md`; otherwise the highest-priority unfinished task in
   `TASKS.md`. A new instruction from the owner in this session takes priority: record it.
+- Respect D25: do not push, tag or publish until the owner explicitly lifts the hold. Keep the
+  owner's usable local preview active (D26), pausing only for tests and restoring afterward. Read
+  HANDOFF for the ignored private launch receipt; never publish its paths or contents.
 - Work in small, complete, testable slices: implementation, error handling, tests, build integration
   and documentation together.
 - Stay within the objective and the requirements. Never silently change a requirement, the

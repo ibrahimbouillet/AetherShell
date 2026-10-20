@@ -68,6 +68,7 @@ struct GlassTokens {
     float tintAlphaWithoutBlur = 0.66f;  // stronger tint without blur, while retaining the backdrop
     Color borderTop;               // 1-DIP inner border, gradient from top...
     Color borderBottom;            // ...to bottom
+    Color uniformBorder;           // neutral Dock/Top Bar edge, identical on every side
     Color highlight;               // soft specular sheen at the top of the panel
     float highlightFraction = 0.30f;  // the sheen fades out over this fraction of the panel height
     Color rim;                     // 1-DIP inner rim just inside the border, strongest at the top edge

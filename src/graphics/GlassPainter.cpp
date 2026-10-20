@@ -390,6 +390,7 @@ void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const
     const float radius = SafeRadius(rect, style.cornerRadius);
     const D2D1_ROUNDED_RECT shape{rect, radius, radius};
     const bool highContrast = tokens.mode == ThemeMode::HighContrast;
+    const bool neutral = style.elevation == Elevation::Dock || style.elevation == Elevation::Bar;
     if (style.shadow && !highContrast) PaintElevation(context, rect, radius, tokens, style.elevation);
 
     if (auto tint = Solid(context, tokens.glass.tint.WithAlpha(GlassTintAlpha(tokens, style)))) {
@@ -400,7 +401,7 @@ void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const
     if (!highContrast && style.noise && tokens.transparencyEnabled && tokens.glass.noiseAlpha > 0.0f) {
         if (auto* grain = NoiseBrush(context, tokens.glass.noiseAlpha)) context->FillRoundedRectangle(shape, grain);
     }
-    if (!highContrast && style.highlight) {
+    if (!highContrast && !neutral && style.highlight) {
         // Top-weighted sheen: strongest along the top edge, gone after highlightFraction of the height.
         const float fraction = std::clamp(tokens.glass.highlightFraction, 0.05f, 1.0f);
         if (tokens.glass.highlight.a > 0.0f) {
@@ -423,8 +424,12 @@ void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const
     const D2D1_ROUNDED_RECT borderShape{Inflate(rect, -0.5f, -0.5f), std::max(0.0f, radius - 0.5f),
                                         std::max(0.0f, radius - 0.5f)};
     const float borderWidth = highContrast ? 2.0f : 1.0f;
-    if (auto border = Vertical(context, rect.top, rect.bottom, tokens.glass.borderTop, tokens.glass.borderBottom)) {
-        context->DrawRoundedRectangle(borderShape, border.get(), borderWidth);
+    if (neutral || highContrast) {
+        if (auto border = Solid(context, highContrast ? tokens.glass.borderTop : tokens.glass.uniformBorder))
+            context->DrawRoundedRectangle(borderShape, border.get(), borderWidth);
+    } else {
+        if (auto border = Vertical(context, rect.top, rect.bottom, tokens.glass.borderTop, tokens.glass.borderBottom))
+            context->DrawRoundedRectangle(borderShape, border.get(), borderWidth);
     }
 }
 

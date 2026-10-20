@@ -14,7 +14,7 @@
 
 namespace aether::topbar {
 
-enum class ItemKind { Logo = 1, Weather, Keyboard, Network, Volume, Microphone, Battery, Clock, NotificationArea };
+enum class ItemKind { Logo = 1, Weather, Keyboard, Network, Volume, Microphone, Battery, Clock, NotificationArea, QuickControls };
 struct TaskbarReplacementState {
     bool available = false;
     bool active = false;
@@ -48,6 +48,7 @@ struct DisplayItem {
     status::ChargeState charge = status::ChargeState::Unknown;
     weather::WeatherGlyph weatherGlyph = weather::WeatherGlyph::Unknown;
     std::optional<bool> isDay;
+    std::vector<DisplayItem> components; // grouped real network/audio/battery status, no synthetic readings
     bool operator==(const DisplayItem&) const = default;
 };
 struct PlacedItem { DisplayItem item; D2D1_RECT_F rect{}; };
@@ -55,6 +56,7 @@ struct PlacedItem { DisplayItem item; D2D1_RECT_F rect{}; };
 // Windows reports 0..5 wireless bars. Wi-Fi uses three curved wave levels, cellular retains
 // five vertical bars; missing strength never becomes a fabricated full-strength reading.
 [[nodiscard]] std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept;
+[[nodiscard]] Result<std::vector<DisplayItem>> GroupQuickControlItems(std::vector<DisplayItem> items);
 
 [[nodiscard]] Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& snapshots,
     const settings::TopBarSettings& settings, bool weatherEnabled, std::wstring_view locale = {},

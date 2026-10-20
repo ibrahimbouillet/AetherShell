@@ -39,6 +39,7 @@ std::vector<ui::MenuEntry> BuildTopBarMenu(ItemKind item, TaskbarReplacementStat
         case ItemKind::Battery: entries.push_back(command(BarCommand::PowerSettings, L"&Power settings…")); break;
         case ItemKind::Clock: entries.push_back(command(BarCommand::Clock, L"&Calendar and notifications…")); break;
         case ItemKind::NotificationArea: notification(); break;
+        case ItemKind::QuickControls: break; // transient panel is opened by the host, not a menu
     }
     return entries;
 }

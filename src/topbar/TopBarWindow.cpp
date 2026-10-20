@@ -61,29 +61,7 @@ void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
     }
     if (item.kind == ItemKind::Network) {
         if (item.connection == status::ConnectionKind::WiFi) {
-            const auto waves = WiFiWaveCount(item);
-            const float opacity = brush->GetOpacity();
-            const auto arc = [&](float left, float top, float right, float peak, bool active) {
-                winrt::com_ptr<ID2D1Factory> factory; dc->GetFactory(factory.put());
-                winrt::com_ptr<ID2D1PathGeometry> path;
-                winrt::com_ptr<ID2D1GeometrySink> sink;
-                if (FAILED(factory->CreatePathGeometry(path.put())) || FAILED(path->Open(sink.put()))) return;
-                const float span = right - left;
-                sink->BeginFigure(D2D1::Point2F(x + left, y + top), D2D1_FIGURE_BEGIN_HOLLOW);
-                sink->AddBezier(D2D1::BezierSegment(D2D1::Point2F(x + left + span * 0.28f, y + peak),
-                    D2D1::Point2F(x + right - span * 0.28f, y + peak), D2D1::Point2F(x + right, y + top)));
-                sink->EndFigure(D2D1_FIGURE_END_OPEN);
-                if (FAILED(sink->Close())) return;
-                brush->SetOpacity(opacity * (active ? 1.0f : 0.28f));
-                dc->DrawGeometry(path.get(), brush, stroke, strokeStyle);
-            };
-            arc(1, 6, 17, -0.5f, waves && *waves >= 3);
-            arc(4, 9, 14, 5, waves && *waves >= 2);
-            arc(7, 12, 11, 10.5f, waves && *waves >= 1);
-            brush->SetOpacity(opacity);
-            if (waves && *waves > 0) dc->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x + 9, y + 15), 1.4f, 1.4f), brush);
-            else circle(9, 15, 1.1f);
-            if (!waves) { line(14, 13, 17, 16); line(14, 16, 17, 13); }
+            graphics::PaintWiFiGlyph(dc, D2D1::RectF(x,y,x+18,y+18), brush, WiFiWaveCount(item), stroke);
         } else if (item.connection == status::ConnectionKind::Cellular) {
             // Signal bars are drawn only when Windows supplied a value; never synthesize full bars.
             for (int index = 0; item.level && index < 5; ++index) {
@@ -433,6 +411,7 @@ void TopBarWindow::Rebuild() {
     if (impl_->destroyed || !Handle()) return;
     auto items = BuildDisplayItems(impl_->snapshots, impl_->settings, impl_->weatherEnabled, {}, impl_->taskbar);
     if (!items) return;
+    if (impl_->context.groupQuickControls) { items=GroupQuickControlItems(std::move(*items));if(!items)return; }
     for (auto& item : items.value()) if (!item.secondaryText.empty() &&
         24.0f * impl_->tokens.textScale > impl_->panel.bottom - impl_->panel.top) item.secondaryText.clear();
     if (impl_->updateAvailable) for (auto& item : items.value()) if (item.kind == ItemKind::Logo) {
@@ -450,7 +429,8 @@ void TopBarWindow::Rebuild() {
         const auto primary = impl_->textCache.Measure(item.text, style).width;
         const auto secondary = item.secondaryText.empty() ? 0.0f :
             std::min(80.0f, impl_->textCache.Measure(item.secondaryText, style).width);
-        widths.push_back(std::max(primary, secondary) + (glyph ? 24.0f : 0.0f) + 22.0f);
+        const float glyphWidth=item.kind==ItemKind::QuickControls?static_cast<float>(item.components.size())*27.0f:(glyph?24.0f:0.0f);
+        widths.push_back(std::max(primary, secondary) + glyphWidth + 22.0f);
     }
     impl_->placed = LayoutItems(items.value(), widths, impl_->panel.right - impl_->panel.left,
         impl_->panel.bottom - impl_->panel.top, impl_->settings.weatherPlacement);
@@ -557,13 +537,18 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         const auto color = entry.item.unknown ? impl_->tokens.textSecondary : impl_->tokens.textPrimary;
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
         const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
-        if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
+        if(entry.item.kind==ItemKind::QuickControls){
+            float x=entry.rect.left+10;
+            for(const auto& component:entry.item.components){brush->SetColor((component.unknown?impl_->tokens.textSecondary:impl_->tokens.textPrimary).WithAlpha(impl_->transition.Value(context.now)).ToD2D());
+                Glyph(context.d2d,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),impl_->tokens,false);x+=27;}
+        }else if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
             brush.get(), impl_->tokens, impl_->updateAvailable);
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
         graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
         style.weight = entry.item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
         style.tabularFigures = entry.item.kind == ItemKind::Clock || entry.item.kind == ItemKind::Battery;
-        auto textBounds = D2D1::RectF(entry.rect.left + (glyph ? 34.0f : 10.0f), entry.rect.top,
+        const float textInset=entry.item.kind==ItemKind::QuickControls?10.0f+static_cast<float>(entry.item.components.size())*27.0f:(glyph?34.0f:10.0f);
+        auto textBounds = D2D1::RectF(entry.rect.left + textInset, entry.rect.top,
             entry.rect.right - 10, entry.rect.bottom);
         if (!entry.item.secondaryText.empty()) {
             style.alignment = DWRITE_TEXT_ALIGNMENT_CENTER;
@@ -609,6 +594,7 @@ void TopBarWindow::Activate(int id) {
     if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
     const auto item = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& entry) { return entry.item.id == id; });
     if (item == impl_->placed.end()) return;
+    if(id==static_cast<int>(ItemKind::QuickControls)){impl_->tooltip.HideTooltip();try{QuickControlsRequested.Emit(impl_->ItemBounds(item->rect));}catch(...){impl_->ErrorTooltip(MakeError(ErrorCode::Internal,"quick controls unavailable"),id);}return;}
     if (id == static_cast<int>(ItemKind::Keyboard)) impl_->EmitRequest(KeyboardRequested);
     else if (id == static_cast<int>(ItemKind::Network)) impl_->EmitRequest(NetworkRequested);
     else if (id == static_cast<int>(ItemKind::Weather)) impl_->EmitRequest(WeatherRequested);
@@ -628,6 +614,7 @@ void TopBarWindow::Activate(int id) {
 }
 void TopBarWindow::ShowItemMenu(int id) {
     if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
+    if(id==static_cast<int>(ItemKind::QuickControls)){Activate(id);return;}
     const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& entry) {
         return entry.item.id == id;
     });

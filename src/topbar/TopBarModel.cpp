@@ -66,6 +66,23 @@ std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept {
     return (*item.level * 3 + 4) / 5;
 }
 
+Result<std::vector<DisplayItem>> GroupQuickControlItems(std::vector<DisplayItem> items) {
+    try {
+        DisplayItem group; group.id=static_cast<int>(ItemKind::QuickControls);group.kind=ItemKind::QuickControls;
+        group.actionable=true;group.tooltip=L"Quick controls";group.accessibleName=L"Quick controls";
+        for (auto& item:items) if(item.kind==ItemKind::Network||item.kind==ItemKind::Volume||item.kind==ItemKind::Battery) {
+            const auto line=item.tooltip.substr(0,item.tooltip.find(L'\n'));
+            group.tooltip+=L"\n"+line;group.accessibleName+=L" · "+line;
+            if(item.kind==ItemKind::Battery)group.text=item.text;
+            group.components.push_back(std::move(item));
+        }
+        if(group.components.empty())return items;
+        std::erase_if(items,[](const auto& item){return item.kind==ItemKind::Network||item.kind==ItemKind::Volume||item.kind==ItemKind::Battery;});
+        const auto clock=std::find_if(items.begin(),items.end(),[](const auto& item){return item.kind==ItemKind::Clock;});
+        items.insert(clock,std::move(group));return items;
+    }catch(...){return MakeError(ErrorCode::Internal,"quick control status grouping failed");}
+}
+
 Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
     const settings::TopBarSettings& config, bool weatherEnabled, std::wstring_view locale,
     TaskbarReplacementState taskbar) {
@@ -228,7 +245,7 @@ std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items, const
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }
     // At extreme widths, retain the clock before decorative/status glyphs. Never overlap targets.
-    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery, ItemKind::NotificationArea}) {
+    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery, ItemKind::NotificationArea, ItemKind::QuickControls}) {
         if (total() <= available) break;
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }

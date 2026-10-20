@@ -32,6 +32,14 @@ struct AccessibleItem {
     bool supportsInvoke = false;
     bool supportsToggle = false;
     ToggleState toggleState = ToggleState_Off;
+    // Advertise only a known finite reading. Unknown/unsupported sliders leave this false.
+    bool supportsRangeValue = false;
+    double rangeValue = 0;
+    double rangeMinimum = 0;
+    double rangeMaximum = 100;
+    double rangeSmallChange = 1;
+    double rangeLargeChange = 10;
+    bool rangeReadOnly = false;
 };
 
 // Every method is called on the HWND's COM STA thread. Keep model actions short: dispatch any
@@ -46,6 +54,9 @@ public:
     virtual Result<void> Invoke(int id) = 0;
     virtual Result<void> Toggle(int id) = 0;
     virtual Result<void> SetFocus(int id) = 0;
+    virtual Result<void> SetRangeValue(int, double) {
+        return MakeError(ErrorCode::Unsupported, "accessible item has no range-value action");
+    }
 };
 
 // One flat UIA fragment per HWND. Connect, notifications, WM_GETOBJECT and Disconnect must run on

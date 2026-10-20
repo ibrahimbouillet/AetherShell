@@ -86,6 +86,70 @@ AETHER_TEST("glyphs: the brand mark is two filled ribbons centred in the grid") 
     CHECK_FALSE(BuildBrandMarkGeometry(nullptr).ok());
 }
 
+AETHER_TEST("glyphs: Wi-Fi states and their unknown mark fit inside the shared grid") {
+    GlyphGuard guard;
+    const auto factory = Factory();
+    REQUIRE(factory);
+    auto* style = RoundStrokeStyle(factory.get());
+    REQUIRE(style != nullptr);
+    for (const auto waves : {std::optional<int>{}, std::optional<int>{0}, std::optional<int>{1},
+                            std::optional<int>{2}, std::optional<int>{3}, std::optional<int>{4}}) {
+        const auto built = BuildWiFiGlyphGeometry(factory.get(), waves);
+        REQUIRE(built.ok());
+        for (auto* geometry : {built->active.stroke.get(), built->inactiveStroke.get()}) {
+            if (!geometry) continue;
+            D2D1_RECT_F bounds{};
+            REQUIRE(SUCCEEDED(geometry->GetWidenedBounds(1.5f, style, nullptr, &bounds)));
+            CHECK(InsideGrid(bounds));
+        }
+        if (built->active.fill) {
+            D2D1_RECT_F bounds{};
+            REQUIRE(SUCCEEDED(built->active.fill->GetBounds(nullptr, &bounds)));
+            CHECK(InsideGrid(bounds));
+        }
+    }
+    CHECK_FALSE(BuildWiFiGlyphGeometry(nullptr, 1).ok());
+}
+
+AETHER_TEST("glyphs: Wi-Fi visibly gains waves and unknown never becomes invented full strength") {
+    GlyphGuard guard;
+    D2DCanvas canvas;
+    REQUIRE(canvas.Create(7 * 48, 48));
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+    REQUIRE(SUCCEEDED(canvas.Context()->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f, 1.0f), brush.put())));
+    brush->SetOpacity(0.6f);
+    const std::optional<int> states[]{std::nullopt, 0, 1, 2, 3, -1, 4};
+    canvas.Begin();
+    for (int index = 0; index < 7; ++index) {
+        const float x = static_cast<float>(index * 48);
+        PaintWiFiGlyph(canvas.Context(), D2D1::RectF(x + 8, 8, x + 40, 40), brush.get(), states[index]);
+        CHECK_NEAR(brush->GetOpacity(), 0.6, 1e-6);
+        D2D1_MATRIX_3X2_F transform{};
+        canvas.Context()->GetTransform(&transform);
+        CHECK_EQ(transform._11, 1.0f); CHECK_EQ(transform._22, 1.0f);
+        CHECK_EQ(transform._31, 0.0f); CHECK_EQ(transform._32, 0.0f);
+    }
+    REQUIRE(canvas.End());
+    int coverage[7]{};
+    int unknownDifference = 0;
+    for (UINT y = 0; y < 48; ++y) {
+        for (UINT x = 0; x < 48; ++x) {
+            const auto unknown = canvas.At(x, y);
+            unknownDifference += std::abs(unknown.a - canvas.At(48 + x, y).a);
+            CHECK_EQ(unknown.a, canvas.At(5 * 48 + x, y).a);
+            CHECK_EQ(unknown.a, canvas.At(6 * 48 + x, y).a);
+            for (UINT index = 0; index < 7; ++index) {
+                const auto pixel = canvas.At(index * 48 + x, y);
+                coverage[index] += pixel.a;
+                if (x < 8 || x >= 40 || y < 8 || y >= 40) CHECK_EQ(pixel.a, 0);
+            }
+        }
+    }
+    for (int index = 2; index <= 4; ++index) CHECK(coverage[index] > coverage[index - 1]);
+    CHECK(unknownDifference > 0); // Known zero and unavailable strength remain different states.
+    CHECK(coverage[0] < coverage[4]);
+}
+
 AETHER_TEST("glyphs: the Start mark is four rounded squares in a 2x2 arrangement") {
     const auto factory = Factory();
     REQUIRE(factory);

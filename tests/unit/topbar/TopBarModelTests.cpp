@@ -240,3 +240,34 @@ AETHER_TEST("topbar actions: notification area is runtime-only and exposes recov
     items = BuildDisplayItems({}, config, false, {}, {true, true, false});
     REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea) == nullptr);
 }
+
+AETHER_TEST("topbar grouped controls preserve true readings and one action") {
+    TopBarSnapshots state;
+    settings::TopBarSettings settings;
+    state.network.state=status::ProviderState::Available;
+    state.network.kind=status::ConnectionKind::WiFi;state.network.signalBars=std::uint8_t{2};
+    state.audio={status::ProviderState::Available,true,0.37f,true,L"Synthetic output",{}};
+    state.battery.state=status::ProviderState::Available;state.battery.batteryPresent=true;state.battery.percent=64;
+    auto plain=BuildDisplayItems(state,settings,false);REQUIRE(plain.ok());
+    auto grouped=GroupQuickControlItems(*plain);REQUIRE(grouped.ok());
+    CHECK(Find(*grouped,ItemKind::Network)==nullptr);CHECK(Find(*grouped,ItemKind::Volume)==nullptr);CHECK(Find(*grouped,ItemKind::Battery)==nullptr);
+    const auto* group=Find(*grouped,ItemKind::QuickControls);REQUIRE(group!=nullptr);
+    CHECK(group->actionable);CHECK_EQ(group->components.size(),std::size_t{3});
+    CHECK(Find(group->components,ItemKind::Network)->level==std::optional<int>{2});
+    CHECK(Find(group->components,ItemKind::Volume)->muted);
+    CHECK_EQ(group->text,std::wstring(L"64%"));
+    const auto clock=std::find_if(grouped->begin(),grouped->end(),[](const auto& item){return item.kind==ItemKind::Clock;});
+    const auto quick=std::find_if(grouped->begin(),grouped->end(),[](const auto& item){return item.kind==ItemKind::QuickControls;});
+    CHECK(quick<clock);
+}
+AETHER_TEST("topbar grouped controls retain unknowns and configured omissions") {
+    TopBarSnapshots state;settings::TopBarSettings settings;
+    settings.showNetwork=false;settings.showVolume=false;settings.hideBatteryWhenAbsent=true;
+    state.battery.state=status::ProviderState::Unavailable;
+    auto plain=BuildDisplayItems(state,settings,false);REQUIRE(plain.ok());
+    auto grouped=GroupQuickControlItems(*plain);REQUIRE(grouped.ok());CHECK(Find(*grouped,ItemKind::QuickControls)==nullptr);
+    settings.showNetwork=true;
+    plain=BuildDisplayItems(state,settings,false);REQUIRE(plain.ok());grouped=GroupQuickControlItems(*plain);REQUIRE(grouped.ok());
+    const auto* group=Find(*grouped,ItemKind::QuickControls);REQUIRE(group!=nullptr);CHECK_EQ(group->components.size(),std::size_t{1});
+    CHECK(group->components.front().unknown);CHECK_FALSE(group->components.front().level.has_value());
+}

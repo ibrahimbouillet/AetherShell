@@ -137,3 +137,15 @@ sessions), the desktop policy tables, recovery with a simulated taskbar and the 
 semantics. Real replacement, Explorer restart and sign-out qualification remain real-desktop checks
 recorded in TEST_STATUS. Automated fixtures keep replacement off or use fakes and the native access
 guard; they never hide the real taskbar or change the work area.
+
+## D26 controls and side work-area alignment (in progress)
+The app owns a transient [quick controls panel](controlcenter.md), a separate serial MTA worker for
+[system](system_controls.md)/[media and brightness](media_controls.md), and guarded explicit intents.
+Isolated native-test instances cannot execute those system routes. Shutdown disables the radio
+completion bridge, closes the panel, cancels/joins workers and releases infrastructure reservations.
+
+Two alpha-zero click-through side AppBars reserve twelve DIP for maximized-window alignment while
+replacement is active. Manually placed windows are never moved/resized. Disable/reveal/quit releases
+both; Explorer/display notifications refresh them. Top Bar preserves Shell-approved horizontal exclusions and its existing visible inset;
+side leases honor the approved vertical extents between top/bottom allocations. Native qualification remains
+pending; geometry tests alone are not evidence that Explorer honors/restores these reservations.

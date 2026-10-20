@@ -4,8 +4,8 @@
 // Original vector marks shared by every Aether surface: the brand mark, the Start mark, Task View,
 // Search, the navigation glyphs and small UI marks. All of them are geometry drawn in code on a
 // 16-DIP grid with round caps and joins; no icon font, image asset or third-party artwork is used.
-// Top Bar status glyphs (network, volume, battery...) live with the Top Bar and use the glyph tokens
-// (DesignTokens::glyph) and RoundStrokeStyle() from here.
+// Wi-Fi waves are shared here. Other Top Bar status glyphs (volume, battery...) live with the
+// Top Bar and use the glyph tokens (DesignTokens::glyph) and RoundStrokeStyle() from here.
 //
 // Geometries are built once per Direct2D factory and glyph on the calling (UI) thread and cached.
 #pragma once
@@ -13,6 +13,8 @@
 #include "core/Result.h"
 #include "graphics/Theme.h"
 #include "graphics/WinRT.h"
+
+#include <optional>
 
 namespace aether::graphics {
 
@@ -55,7 +57,15 @@ struct GlyphGeometry {
     winrt::com_ptr<ID2D1PathGeometry> fill;
 };
 
+struct WiFiGlyphGeometry {
+    GlyphGeometry active;
+    winrt::com_ptr<ID2D1PathGeometry> inactiveStroke;
+};
+
 [[nodiscard]] Result<GlyphGeometry> BuildGlyphGeometry(ID2D1Factory* factory, Glyph glyph);
+// 0..3 active wave arcs; no value or an invalid count means unknown, not full signal. The caller
+// maps its real network snapshot to that display count. Geometry includes a distinct unknown mark.
+[[nodiscard]] Result<WiFiGlyphGeometry> BuildWiFiGlyphGeometry(ID2D1Factory* factory, std::optional<int> activeWaves);
 // The two ribbons of the Aether brand mark (filled), centred in the 16-DIP grid.
 [[nodiscard]] Result<winrt::com_ptr<ID2D1PathGeometry>> BuildBrandMarkGeometry(ID2D1Factory* factory);
 // Four rounded squares in a 2x2 arrangement (filled), the Dock's Start mark.
@@ -71,6 +81,10 @@ void ReleaseGlyphResources() noexcept;
 // `strokeWidth` is in grid units (tokens.glyph.stroke), so it scales with the box.
 void PaintGlyph(ID2D1RenderTarget* target, Glyph glyph, const D2D1_RECT_F& box, ID2D1Brush* brush,
                 float strokeWidth = 1.5f);
+// Cached Wi-Fi waves on the same 16-DIP grid. Inactive arcs use 28% of the brush opacity; active
+// arcs/dot or the explicit unknown mark use its original opacity. Restores opacity and transform.
+void PaintWiFiGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                    std::optional<int> activeWaves, float strokeWidth = 1.5f);
 
 // The brand mark with the brand gradient (brandPrimary to brandSecondary); in high contrast a
 // solid textPrimary. Same geometry as the Top Bar logo.

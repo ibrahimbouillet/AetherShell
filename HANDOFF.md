@@ -18,6 +18,51 @@ updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, im
 consumers/app integration, independently reviewed them and completed the automated candidate gates.
 The published `0.1.0-alpha.1` does not include this work.
 
+### In-progress owner controls request — 2026-10-21 (D26)
+
+- D25 remains in force: local work only, no push/tag/release. Owner asks to keep the usable local
+  preview running while development continues; pause only for tests, then restore it. Private launch
+  receipt: ignored `build/manual/owner-preview.json`. Do not publish its paths. No autorun.
+- Preview uses copied S-023/S-024 binaries, not the unfinished controls below. New scope: one grouped
+  Wi-Fi/audio/battery button opening a transient media/system panel, real media playback/session
+  selection, radios, brightness/volume and honest Windows Settings routes for unsupported toggles.
+- Neutral sanded Dock/Bar glass retains blur/tint/grain with a uniform border, no directional light.
+  Owner clarified aligned side margins apply only to maximized windows; never move manually placed windows.
+- Uncommitted modules: `system_controls`, `media_controls`, `controlcenter`; Top Bar grouping;
+  neutral graphics/shared Wi-Fi glyph; UIA RangeValue. App wiring and side AppBar leases implemented; final build/native qualification in progress.
+  Backend Release /WX libraries build;15 safe backend unit cases and focused headless graphics68/68 pass. No actual device
+  controls exercised. Product/native accessibility qualification remains pending.
+- Preserve S-025 metadata investigation in AccessibleSurface.cpp and its test; RangeValue extends
+  those same files. Prior MTA discovery failure remains unresolved. See S-026 for current evidence.
+
+### S-026 completed local checkpoint — 2026-10-21
+
+- **The new controls preview is now active**, using copied current app/launcher binaries and the
+  existing private preview data; no installation/autorun. Keep it active except bounded tests, then
+  restore it. Ignored `build/manual/owner-preview.json` records the current process/root privately.
+- Full Release /W4 /WX build succeeds. Aggregate units:20/20 executables,698 cases, all pass (14.75s).
+  Registrations were cross-checked using --list because passed CTest XML output is truncated.
+  Scoped native runs pass accessibility6/controlcenter4, then Dock3/TopBar5/app2. Final Top Bar
+  correction rerun passes22 unit/5 native cases (7.67s). No real device control was automated.
+- New media/system/controlcenter modules and app bridge are implemented and independently reviewed.
+  Radio consent/worker actions use close-generation fencing and cancellation; shutdown clears pending
+  flags safely even if the owner cancels Quit after a save error. Unknown remains unavailable;
+  unsupported global toggles are clearly labelled Windows Settings actions. Artwork is not implemented.
+- Final bounded desktop gate after preserving Shell-approved Top Bar horizontal exclusions passes:
+  Windows11/150-percent work area and own pre-maximized DWM frame both [18,93,1902,969]. Normal quit
+  returns both to [0,0,1920,1080], native taskbar visible/auto-hide true. No foreign HWND was resized,
+  Explorer restarted or screenshot captured. Foreign AppBar/multi-monitor behavior remains untested.
+- Dock/Top Bar and panel dark/light own-backdrop captures were inspected. A moving radial overlay
+  appears above opaque panel content in captures; no matching radial painter exists in the call
+  graph. Native feedback is only a hypothesis. Do not claim this artifact resolved. Neutral material
+  tests pass; broader visual/hardware/screen-reader approval still requires the owner.
+- Privacy review:50 changed public files,0 new private/credential findings;80 relative links and442
+  requirement references valid. App/launcher binary privacy audits pass. No raw logs/private launch
+  receipts/owner images, private Git history or local tool state are public material.
+- All current source edits belong to this local checkpoint, including the preserved S-025 metadata
+  regression plus RangeValue. One green six-case accessibility run does not prove the historical
+  intermittent discovery/teardown issue causally fixed. S-025 negative evidence stays ignored locally.
+
 ### Git and delivery checkpoint — 2026-10-21
 
 - Official public `origin`: `https://github.com/ibrahimbouillet/AetherShell.git`.
@@ -32,8 +77,9 @@ The published `0.1.0-alpha.1` does not include this work.
   S-024 icon balance, strict UIA diagnostics and two inspected synthetic images. Both local commits
   were privacy-reviewed and fast-forwarded without push. Later documentation-only checkpoints may
   follow; inspect HEAD. Remote `origin/main` remains b87be0d.
-- The integration worktree contains **two uncommitted S-025 files** listed below. Preserve them;
-  they are an unverified accessibility investigation, not part of the 9bec731 product checkpoint.
+- Historical pre-D26 state: the integration worktree contained **two uncommitted S-025 files**. They
+  are now included with the reviewed RangeValue work in this local checkpoint; preserve the evidence.
+  Their earlier investigation was not part of the 9bec731 product checkpoint.
   Use `git worktree list` to locate that worktree; there is no pending merge. Build/log/experimental
   outputs are ignored local evidence. The ordinary `main` checkout has no pending source edits.
 - Windows CI [39505236903](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39505236903)
@@ -176,35 +222,31 @@ The published `0.1.0-alpha.1` does not include this work.
 
 ## NEXT SESSION START HERE
 
-1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify official origin,
-   local `main` versus `origin/main`, status and all worktrees. The original integration merge is
-   pushed at b87be0d; later D25/correction checkpoints are **local only**. Inspect the integration
-   worktree's pending S-025 accessibility source and experimental state before edits. Do not redo the merge
-   or discard preserved work. No push/tag/release is authorized while D25 remains active.
-2. Continue S-025: fullscreen correction passes 672-unit/123-native gates and the bounded S-023 desktop
-   restore/reflow test. Optical icon balance passes Release and own-window visual inspection; the
-   light native UIA root-type failure recurred with diagnostics. Preserve all negative receipts and
-   investigate the frozen S-025 files and the teardown hazard in TEST_STATUS. Local commits are allowed;
-   **no push/tag/release (D25)**. The optical/fullscreen milestone is saved locally as 9bec731.
-   S-022 CI covers b87be0d only.
-3. Obtain the owner's explicit current-session authorization before changing the real desktop
-   (ADR0009/T21; this was also required by the previous handoff). With an agreed recovery procedure,
-   check one visible bottom bar, maximized work-area protection, normal quit/restore and temporary
-   reveal/resume; qualify crash/double-failure and Explorer restart separately if authorized. Do not
-   restart Explorer, change actual audio/startup or start dictation in automated tests. S-021 is an
-   older e29e83e desktop receipt, not qualification of this new combined candidate. It records the
-   owner dropping Windows 10 qualification for lack of a machine, not a Windows 10 pass.
-4. Check real Chrome grouping/avatar/launch identity and voice typing in the intended editable field
-   with the owner. HWND focus admission and SendInput acceptance do not prove dictation success.
-   `topBar.openWindowsFlyouts` is persisted but has no routing consumer; fixed status routes are
-   documented honestly. T20 diagnostics export remains unverified. Q-001/Q-002/GAP-010 stay open.
-5. Respect D25 while the owner adds changes: no push/tag/release. Prepare/review changed packages
-   locally, retain unsigned manifests locally, and obtain explicit approval after the hold is lifted.
-   No V2 tag/release/install was performed
-   in this session. Never silently enable startup, read private account databases or publish logs,
-   PDBs, keys/locations, owner captures, local assistant state or private archive history.
-6. Update this canonical handoff and TEST_STATUS at every meaningful checkpoint. Use the portable
-   English prompt for the next assistant; proprietary tools/skills are optional and not continuity.
+1. Read the PUBLIC rule, this active checkpoint, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify
+   official origin, HEAD/main/origin and all worktrees; preserve partial work. D25 forbids all pushes,
+   tags and releases until the owner explicitly lifts it. Remote source remains b87be0d; later local
+   milestones are not published. The archive is private historical material, never a development target.
+2. Keep the current D26 controls preview active. Its ignored private receipt is under build/manual;
+   do not publish it. Owner authorization already covers leaving the usable preview open and bounded
+   tests/restoration. Do not introduce autorun or stop it throughout development. Rebuild before
+   copying a changed binary; never overwrite a running binary. Preserve existing private settings.
+3. Continue the owner's manual feedback: grouped media/radio/volume/brightness panel, neutral glass
+   and maximized-only side margins are implemented. Real device controls/session switching/Windows
+   routes, Chrome profile identity, voice typing, keyboard layouts and accessibility need manual
+   qualification with the owner. Do not automate actual audio/radio/brightness/playback/startup,
+   restart Explorer, capture owner windows or move manually placed windows. Media artwork is pending.
+4. Investigate the moving radial overlay in synthetic panel captures without changing global feedback
+   settings. Preserve S-025 UIA negative evidence: six native accessibility cases now pass once, but
+   earlier intermittent fallback/disconnect behavior has no proven causal fix. Keep strict assertions.
+   Foreign side AppBars, physical DPI/monitor changes/removal, reveal/resume and crash recovery need
+   separate exact-revision desktop qualification. Windows10 was not tested; an owner waiver is not a pass.
+5. T20 diagnostics export, topBar.openWindowsFlyouts preference routing, signed production update/
+   rollback, Q-001 performance, Q-002 branding and GAP-010 remain open. No current new setup package,
+   manifest signature, install or release is qualified. The eventual second delivery is Alpha2;
+   reconcile final version/package naming only after the owner approves delivery and lifts D25.
+6. Update canonical English Markdown at every checkpoint. The reusable prompt works for Claude and
+   Codex without proprietary tools. Never include private receipts, account/media data, captures,
+   keys/locations, PDB paths or old private history in commits. No publication is authorized now.
 
 ## Historical receipts — previous sessions, superseded as continuation instructions
 

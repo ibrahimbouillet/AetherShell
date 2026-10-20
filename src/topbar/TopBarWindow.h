@@ -41,6 +41,7 @@ struct TopBarContext {
     // Optional deterministic foreground classifier. With no override, allowAppBar=false also
     // disables native fullscreen observation; isolated tests never inspect another application.
     std::function<bool()> fullscreenProbe;
+    bool groupQuickControls = false; // production groups network, output and battery into one button
 };
 
 // UI-thread owned. Provider pointers are optional, unstarted and must outlive the window. Create
@@ -65,6 +66,7 @@ public:
     Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
     Signal<> ClockRequested, PowerSettingsRequested, SoundSettingsRequested;
     Signal<> VoiceTypingRequested;
+    Signal<RECT> QuickControlsRequested;
     Signal<> RevealWindowsTaskbarRequested, ResumeTaskbarReplacementRequested;
     Signal<bool> FullscreenChanged;
 

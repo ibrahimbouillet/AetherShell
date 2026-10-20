@@ -2,8 +2,9 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 //
 // Paints the Aether glass material with Direct2D: a two-layer exterior-only shadow (key and
-// ambient), the neutral tint, a top-weighted sheen with a 1-DIP rim, a subtle deterministic grain
-// and a gradient hairline border. When the compositor provides a blurred backdrop underneath, the
+// ambient), the neutral tint and a subtle deterministic grain. Dock and Bar use centered shadows
+// and a uniform edge, without directional sheen or rim. Other elevations retain their flyout sheen
+// and gradient hairline border. When the compositor provides a blurred backdrop underneath, the
 // tint stays translucent; otherwise it is made more opaque so text remains readable over any
 // wallpaper. High contrast paints an opaque system-color panel without shadow, sheen or grain.
 //
@@ -33,7 +34,7 @@ struct GlassStyle {
     bool shadow = true;          // false: no shadow whatever `elevation` says
     Elevation elevation = Elevation::Dock;
     bool noise = true;           // grain texture (never in high contrast or without transparency)
-    bool highlight = true;       // top sheen and inner rim
+    bool highlight = true;       // flyout sheen/rim; Dock and Bar always use the neutral material
 };
 
 // Effective tint alpha for a style (exposed for tests and for components that paint sub-panels).

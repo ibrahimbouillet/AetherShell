@@ -797,3 +797,57 @@ pending; S-012 still describes the only delivered alpha.
   the first failing MTA/client/provider stage using numeric/boolean-only diagnostics. Do not infer
   a causal fix from constant metadata or a passing visual capture. Rebuild the chosen source/revision
   before packaging; current cached investigation binaries and the historical b87 setup are not Alpha 2.
+
+### S-026 — grouped controls/neutral glass work in progress (2026-10-21)
+- D26 scope is approved; D25 publication hold unchanged. A copied prior qualified local preview is
+  active by explicit owner request. It is paused only for tests and restored afterward; no startup.
+- New system_controls and media_controls libraries: Release /W4 /WX build succeeds. Initial module
+  filter with comma failed configuration; correct semicolon-separated filter then passed. No actual
+  media/brightness/radio discovery or mutation run for these backend checks.
+- Graphics: focused Release /WX build and headless68/68 pass. Initial symmetry fixture failed on
+  rounded-corner raster coverage (4–6/255), then samples were corrected to central straight material/
+  shadow bands with unchanged2/255 tolerance and a directional Popup positive control. Logs retained
+  in ignored build/wf-control-visuals. No native blur or new surface visual approval implied.
+- App integration, new native controls/RangeValue and side work-area leases remain under development.
+  S-025 MTA UIA discovery failure remains unresolved; no broad passing suite or release qualification claimed.
+
+- New safe backend unit gate: private Release /WX build and 2/2 suites pass (system_controls10,
+  media_controls5). Accessibility native executable compiled only. Cases use pure mappings, invalid
+  arguments/deadlines and pre-cancelled early exits; no valid discovery/mutation path was exercised.
+- First full app link failed because WorkAreaInsets.cpp was created after the configure/source glob.
+  Reconfigure includes it and app links successfully; full/incremental final build is still running.
+  New controlcenter native fixture compiles Release /WX (4 fake-only cases); execution pending.
+- Independent review fixed radio split UIA hit bounds, monitor selection/DPI closure, keyboard range
+  accumulation/focus events, close/reopen action cancellation/generation fencing, radio consent
+  deferral/permission scoping and shutdown admission. Real controls remain unexercised.
+
+- Frozen aggregate unit gate:20/20 executables pass (14.75s). Their exact test registrations total
+  698 cases, independently enumerated with each executable's --list because CTest truncates passed
+  JUnit output. New safe provider suites are included. No fabricated count from truncated XML.
+- Native fake/read-only gate: accessibility6/6 and controlcenter4/4 pass (1.72s combined); subsequent
+  scoped surface gate Dock3/TopBar5/app2 passes (17.67s). One passing accessibility run does not
+  establish a causal fix for the earlier intermittent S-025 failure. Tests preserve strict UIA checks.
+- Copied product candidate ran in a bounded real desktop check using the owner's private preview
+  data, without device-control actions. At150-percent DPI, work area became [18,93,1902,969]; own
+  pre-maximized test HWND's DWM frame followed exactly without forced resizing. Normal candidate
+  quit restored work area [0,0,1920,1080], native taskbar visible/auto-hide true and no own bar HWNDs.
+  The prior preview was restored in finally. No screenshots, owner-window manipulation or Explorer
+  restart was performed. Logs stay ignored under build/manual.
+- Own-backdrop panel dark/light PNGs and native Dock/TopBar material captures were inspected.
+  A translucent radial overlay above the opaque slider track appears at different positions across
+  full/isolated render runs. No matching radial painter is in the call graph; native feedback is a
+  hypothesis, not a proven cause. Do not claim this artifact resolved or broad visual approval.
+- A reviewer caught the Top Bar discarding all Shell-approved horizontal exclusions. That override
+  was removed entirely to preserve foreign AppBars; current build passes /WX and a final bounded
+  side-inset check is being repeated. Primary-monitor baseline behavior is distinct from untested
+  foreign AppBar configurations and physical multi-monitor/DPI changes.
+
+- Final Top Bar correction rebuilt warning-free;22 unit/5 native cases pass (7.67s). Repeated bounded
+  own-window desktop gate still aligns [18,93,1902,969] and fully restores [0,0,1920,1080] plus visible
+  native taskbar/auto-hide true. Current copied controls preview is then activated by owner request,
+  with the existing private data and no autorun. Two runtime binaries pass environment/privacy audit.
+  Independent final source review reports no additional blocker after the Shell-allocation correction.
+- Source audit:50 changed public files;0 new private/credential findings. Two legacy documentation
+  files contain14 generic path-pattern lines unchanged from HEAD (not introduced private data).
+ 15 Markdown files/80 relative links/442 requirement references checked;0 missing/undefined targets.
+  No push/tag/release, new package/install, actual device-control test or broad visual approval claimed.

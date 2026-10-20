@@ -206,6 +206,7 @@ struct FactoryCache {
     winrt::com_ptr<ID2D1Factory> factory;
     winrt::com_ptr<ID2D1StrokeStyle> roundStroke;
     std::map<int, GlyphGeometry> glyphs;
+    std::map<int, WiFiGlyphGeometry> wifi;
     winrt::com_ptr<ID2D1PathGeometry> brand;
     winrt::com_ptr<ID2D1PathGeometry> start;
 };
@@ -280,6 +281,45 @@ Result<GlyphGeometry> BuildGlyphGeometry(ID2D1Factory* factory, Glyph glyph) {
     }
 }
 
+Result<WiFiGlyphGeometry> BuildWiFiGlyphGeometry(ID2D1Factory* factory, std::optional<int> activeWaves) {
+    if (!factory) return MakeError(ErrorCode::InvalidArgument, "no Direct2D factory");
+    try {
+        const bool known = activeWaves && *activeWaves >= 0 && *activeWaves <= 3;
+        PathBuilder active(factory), fill(factory), inactive(factory);
+        const auto arc = [&](int level, float left, float top, float right, float peak) {
+            auto& builder = known && *activeWaves >= level ? active : inactive;
+            if (auto* sink = builder.Sink()) {
+                const float span = right - left;
+                sink->BeginFigure(P(left, top), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddBezier(D2D1::BezierSegment(P(left + span * 0.28f, peak),
+                    P(right - span * 0.28f, peak), P(right, top)));
+                sink->EndFigure(D2D1_FIGURE_END_OPEN);
+            }
+        };
+        arc(3, 1.25f, 5.25f, 14.75f, 0.75f);
+        arc(2, 3.75f, 8.0f, 12.25f, 5.0f);
+        arc(1, 6.0f, 10.5f, 10.0f, 9.25f);
+        if (known && *activeWaves > 0) fill.Circle(8.0f, 13.5f, 1.3f, true);
+        else active.Circle(8.0f, 13.5f, 0.9f, false);
+        if (!known) {
+            // Unknown strength is a question mark, not a disconnected cross or invented full bars.
+            if (auto* sink = active.Sink()) {
+                sink->BeginFigure(P(11.75f, 11.25f), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddBezier(D2D1::BezierSegment(P(11.75f, 9.75f), P(14.25f, 9.75f), P(14.25f, 11.25f)));
+                sink->AddBezier(D2D1::BezierSegment(P(14.25f, 12.0f), P(13.0f, 12.0f), P(13.0f, 13.0f)));
+                sink->EndFigure(D2D1_FIGURE_END_OPEN);
+            }
+            fill.Circle(13.0f, 14.75f, 0.5f, true);
+        }
+        auto strokeGeometry = active.Finish(); if (!strokeGeometry) return strokeGeometry.error();
+        auto fillGeometry = fill.Finish(); if (!fillGeometry) return fillGeometry.error();
+        auto inactiveGeometry = inactive.Finish(); if (!inactiveGeometry) return inactiveGeometry.error();
+        return WiFiGlyphGeometry{GlyphGeometry{std::move(*strokeGeometry), std::move(*fillGeometry)}, std::move(*inactiveGeometry)};
+    } catch (...) {
+        return MakeError(ErrorCode::Internal, "Wi-Fi glyph geometry failed");
+    }
+}
+
 Result<winrt::com_ptr<ID2D1PathGeometry>> BuildBrandMarkGeometry(ID2D1Factory* factory) {
     if (!factory) return MakeError(ErrorCode::InvalidArgument, "no Direct2D factory");
     PathBuilder builder(factory);
@@ -345,6 +385,35 @@ void PaintGlyph(ID2D1RenderTarget* target, Glyph glyph, const D2D1_RECT_F& box, 
         const float width = std::isfinite(strokeWidth) && strokeWidth > 0.0f ? strokeWidth : 1.5f;
         target->DrawGeometry(found->second.stroke.get(), brush, width, RoundStrokeStyle(factory.get()));
     }
+    target->SetTransform(previous);
+}
+
+void PaintWiFiGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                    std::optional<int> activeWaves, float strokeWidth) {
+    if (!target || !brush || !UsableBox(box)) return;
+    const auto factory = FactoryOf(target);
+    auto* cache = CacheFor(factory.get());
+    if (!cache) return;
+    const int key = activeWaves && *activeWaves >= 0 && *activeWaves <= 3 ? *activeWaves : -1;
+    auto found = cache->wifi.find(key);
+    if (found == cache->wifi.end()) {
+        auto built = BuildWiFiGlyphGeometry(factory.get(), key < 0 ? std::nullopt : std::optional<int>(key));
+        if (!built) return;
+        found = cache->wifi.emplace(key, std::move(*built)).first;
+    }
+    const auto& geometry = found->second;
+    const float width = std::isfinite(strokeWidth) && strokeWidth > 0.0f ? strokeWidth : 1.5f;
+    const float opacity = brush->GetOpacity();
+    float scale = 1.0f;
+    const auto previous = PushGrid(target, box, scale);
+    auto* stroke = RoundStrokeStyle(factory.get());
+    if (geometry.inactiveStroke) {
+        brush->SetOpacity(opacity * 0.28f);
+        target->DrawGeometry(geometry.inactiveStroke.get(), brush, width, stroke);
+        brush->SetOpacity(opacity);
+    }
+    if (geometry.active.fill) target->FillGeometry(geometry.active.fill.get(), brush);
+    if (geometry.active.stroke) target->DrawGeometry(geometry.active.stroke.get(), brush, width, stroke);
     target->SetTransform(previous);
 }
 

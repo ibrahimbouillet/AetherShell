@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <new>
@@ -42,6 +43,23 @@ void BoolValue(VARIANT& value, bool flag) noexcept {
     value.boolVal = flag ? VARIANT_TRUE : VARIANT_FALSE;
 }
 
+void NumberValue(VARIANT& value, double number) noexcept {
+    value.vt = VT_R8;
+    value.dblVal = number;
+}
+
+struct RangeReadings {
+    bool supported = false;
+    double value = 0, minimum = 0, maximum = 0, smallChange = 0, largeChange = 0;
+    bool readOnly = false;
+};
+
+RangeReadings RangeOf(const AccessibleItem& item) noexcept {
+    if (!item.supportsRangeValue) return {};
+    return {true, item.rangeValue, item.rangeMinimum, item.rangeMaximum,
+            item.rangeSmallChange, item.rangeLargeChange, item.rangeReadOnly};
+}
+
 HRESULT StringValue(VARIANT& value, const std::wstring& text) noexcept {
     value.vt = VT_BSTR;
     value.bstrVal = ::SysAllocStringLen(text.data(), static_cast<UINT>(text.size()));
@@ -59,6 +77,7 @@ struct State {
     std::map<int, winrt::com_ptr<IRawElementProviderFragment>> nodes;
     // Last notified values are independent of UIA property reads.
     std::map<int, std::pair<std::wstring, std::wstring>> notified;
+    std::map<int, RangeReadings> notifiedRanges;
 
     HRESULT Check() const noexcept {
         if (!connected.load()) return UIA_E_ELEMENTNOTAVAILABLE;
@@ -75,7 +94,7 @@ struct State {
 // ProviderOptions_UseComThreading, UIA marshals calls back to the creating window's STA.
 class Node final : public IRawElementProviderSimple, public IRawElementProviderFragment,
                    public IRawElementProviderFragmentRoot,
-                   public IInvokeProvider, public IToggleProvider {
+                   public IInvokeProvider, public IToggleProvider, public IRangeValueProvider {
 public:
     Node(std::shared_ptr<State> state, int id) : state_(std::move(state)), id_(id) {}
 
@@ -92,6 +111,8 @@ public:
             *object = static_cast<IInvokeProvider*>(this);
         else if (iid == __uuidof(IToggleProvider) && id_ != 0)
             *object = static_cast<IToggleProvider*>(this);
+        else if (iid == __uuidof(IRangeValueProvider) && id_ != 0)
+            *object = static_cast<IRangeValueProvider*>(this);
         else return E_NOINTERFACE;
         AddRef();
         return S_OK;
@@ -106,7 +127,9 @@ public:
     HRESULT STDMETHODCALLTYPE get_ProviderOptions(ProviderOptions* options) noexcept override {
         if (!options) return E_POINTER;
         *options = static_cast<ProviderOptions>(ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading);
-        return state_->Check();
+        // Immutable COM metadata: no model access, thread-owned state or element-liveness check.
+        // UIA may need these capabilities while disconnecting an already invalidated element.
+        return S_OK;
     }
     HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID pattern, IUnknown** result) noexcept override {
         if (!result) return E_POINTER;
@@ -119,6 +142,8 @@ public:
                 return QueryInterface(__uuidof(IInvokeProvider), reinterpret_cast<void**>(result));
             if (pattern == UIA_TogglePatternId && item->supportsToggle)
                 return QueryInterface(__uuidof(IToggleProvider), reinterpret_cast<void**>(result));
+            if (pattern == UIA_RangeValuePatternId && item->supportsRangeValue)
+                return QueryInterface(__uuidof(IRangeValueProvider), reinterpret_cast<void**>(result));
             return S_OK;
         });
     }
@@ -150,6 +175,19 @@ public:
                 case UIA_IsContentElementPropertyId: BoolValue(*result, true); break;
                 case UIA_IsInvokePatternAvailablePropertyId: BoolValue(*result, item && item->supportsInvoke); break;
                 case UIA_IsTogglePatternAvailablePropertyId: BoolValue(*result, item && item->supportsToggle); break;
+                case UIA_IsRangeValuePatternAvailablePropertyId: BoolValue(*result, item && item->supportsRangeValue); break;
+                case UIA_RangeValueValuePropertyId:
+                    if (item && item->supportsRangeValue) NumberValue(*result, item->rangeValue); break;
+                case UIA_RangeValueMinimumPropertyId:
+                    if (item && item->supportsRangeValue) NumberValue(*result, item->rangeMinimum); break;
+                case UIA_RangeValueMaximumPropertyId:
+                    if (item && item->supportsRangeValue) NumberValue(*result, item->rangeMaximum); break;
+                case UIA_RangeValueSmallChangePropertyId:
+                    if (item && item->supportsRangeValue) NumberValue(*result, item->rangeSmallChange); break;
+                case UIA_RangeValueLargeChangePropertyId:
+                    if (item && item->supportsRangeValue) NumberValue(*result, item->rangeLargeChange); break;
+                case UIA_RangeValueIsReadOnlyPropertyId:
+                    if (item && item->supportsRangeValue) BoolValue(*result, item->rangeReadOnly); break;
                 default: break;  // VT_EMPTY asks UIA to use its default value.
             }
             return S_OK;
@@ -276,8 +314,46 @@ public:
             return S_OK;
         });
     }
+    HRESULT STDMETHODCALLTYPE SetValue(double value) noexcept override {
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsRangeValue) return UIA_E_NOTSUPPORTED;
+            if (!item->isEnabled) return UIA_E_ELEMENTNOTENABLED;
+            if (item->rangeReadOnly) return UIA_E_INVALIDOPERATION;
+            if (!std::isfinite(value) || value < item->rangeMinimum || value > item->rangeMaximum) return E_INVALIDARG;
+            return ActionResult(state_->model->SetRangeValue(id_, value));
+        });
+    }
+    HRESULT STDMETHODCALLTYPE get_Value(double* result) noexcept override { return ReadRange(result, &AccessibleItem::rangeValue); }
+    HRESULT STDMETHODCALLTYPE get_Minimum(double* result) noexcept override { return ReadRange(result, &AccessibleItem::rangeMinimum); }
+    HRESULT STDMETHODCALLTYPE get_Maximum(double* result) noexcept override { return ReadRange(result, &AccessibleItem::rangeMaximum); }
+    HRESULT STDMETHODCALLTYPE get_SmallChange(double* result) noexcept override { return ReadRange(result, &AccessibleItem::rangeSmallChange); }
+    HRESULT STDMETHODCALLTYPE get_LargeChange(double* result) noexcept override { return ReadRange(result, &AccessibleItem::rangeLargeChange); }
+    HRESULT STDMETHODCALLTYPE get_IsReadOnly(BOOL* result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = TRUE;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsRangeValue) return UIA_E_NOTSUPPORTED;
+            *result = item->rangeReadOnly ? TRUE : FALSE;
+            return S_OK;
+        });
+    }
 
 private:
+    HRESULT ReadRange(double* result, double AccessibleItem::* member) noexcept {
+        if (!result) return E_POINTER;
+        *result = 0;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsRangeValue) return UIA_E_NOTSUPPORTED;
+            *result = item->*member;
+            return S_OK;
+        });
+    }
     HRESULT Refresh() {
         const auto hr = state_->Refresh();
         if (FAILED(hr)) return hr;
@@ -315,6 +391,10 @@ HRESULT State::Refresh() {
         if (item.id <= 0 || !ids.insert(item.id).second || item.boundsPx.right < item.boundsPx.left ||
             item.boundsPx.bottom < item.boundsPx.top || item.toggleState < ToggleState_Off ||
             item.toggleState > ToggleState_Indeterminate) return E_INVALIDARG;
+        if (item.supportsRangeValue && (!std::isfinite(item.rangeValue) || !std::isfinite(item.rangeMinimum) ||
+            !std::isfinite(item.rangeMaximum) || !std::isfinite(item.rangeSmallChange) || !std::isfinite(item.rangeLargeChange) ||
+            item.rangeMinimum > item.rangeMaximum || item.rangeValue < item.rangeMinimum || item.rangeValue > item.rangeMaximum ||
+            item.rangeSmallChange < 0 || item.rangeLargeChange < 0)) return E_INVALIDARG;
         current.push_back(std::move(item));
     }
     items = std::move(current);
@@ -385,7 +465,10 @@ Result<void> AccessibleSurface::Connect(HWND hwnd, IAccessibleSurfaceModel& mode
         auto* node = new Node(state, 0);
         state->root.attach(static_cast<IRawElementProviderFragmentRoot*>(node));
         const auto ensured = impl_->EnsureNodes(); if (FAILED(ensured)) return ensured;
-        for (const auto& item : state->items) state->notified[item.id] = {item.name, item.itemStatus};
+        for (const auto& item : state->items) {
+            state->notified[item.id] = {item.name, item.itemStatus};
+            state->notifiedRanges[item.id] = RangeOf(item);
+        }
         return S_OK;
     });
     if (FAILED(hr)) Disconnect();
@@ -438,10 +521,13 @@ Result<void> AccessibleSurface::NotifyStructureChanged() {
             auto simple = it->second.as<IRawElementProviderSimple>();
             (void)::UiaDisconnectProvider(simple.get());
             state->notified.erase(it->first);
+            state->notifiedRanges.erase(it->first);
             it = state->nodes.erase(it);
         }
-        for (const auto& item : state->items)
+        for (const auto& item : state->items) {
             state->notified.try_emplace(item.id, item.name, item.itemStatus);
+            state->notifiedRanges.try_emplace(item.id, RangeOf(item));
+        }
         return ::UiaRaiseStructureChangedEvent(root.get(), StructureChangeType_ChildrenInvalidated, nullptr, 0);
     }));
 }
@@ -466,11 +552,13 @@ Result<void> AccessibleSurface::NotifyPropertyChanged(int id) {
     return FromHr(Guard([&]() -> HRESULT {
         winrt::com_ptr<IRawElementProviderSimple> node;
         const auto hr = impl_->Simple(id, node); if (FAILED(hr)) return hr;
-        auto& state = impl_->state;
+        const auto state = impl_->state;
         const auto* item = state->Find(id);
         if (!item) return E_INVALIDARG;
-        auto& old = state->notified[id];
+        const auto old = state->notified[id];
         const std::pair<std::wstring, std::wstring> updated{item->name, item->itemStatus};
+        const auto oldRange = state->notifiedRanges[id];
+        const auto newRange = RangeOf(*item);
         const auto notify = [&](PROPERTYID property, const std::wstring& before, const std::wstring& after) -> HRESULT {
             if (before == after) return S_OK;
             VARIANT a{}, b{};
@@ -482,7 +570,35 @@ Result<void> AccessibleSurface::NotifyPropertyChanged(int id) {
         };
         auto changed = notify(UIA_NamePropertyId, old.first, updated.first);
         if (SUCCEEDED(changed)) changed = notify(UIA_ItemStatusPropertyId, old.second, updated.second);
-        if (SUCCEEDED(changed)) old = updated;
+        if (SUCCEEDED(changed) && state->connected.load() && state->Find(id)) state->notified[id] = updated;
+        const auto rangeEvent = [&](PROPERTYID property, VARIANT before, VARIANT after) -> HRESULT {
+            return ::UiaRaiseAutomationPropertyChangedEvent(node.get(), property, before, after);
+        };
+        if (SUCCEEDED(changed) && oldRange.supported != newRange.supported) {
+            VARIANT before{}, after{}; BoolValue(before, oldRange.supported); BoolValue(after, newRange.supported);
+            changed = rangeEvent(UIA_IsRangeValuePatternAvailablePropertyId, before, after);
+        }
+        const auto number = [&](PROPERTYID property, double beforeValue, double afterValue) -> HRESULT {
+            if (oldRange.supported == newRange.supported && beforeValue == afterValue) return S_OK;
+            VARIANT before{}, after{};
+            if (oldRange.supported) NumberValue(before, beforeValue);
+            if (newRange.supported) NumberValue(after, afterValue);
+            return rangeEvent(property, before, after);
+        };
+        if (oldRange.supported || newRange.supported) {
+            if (SUCCEEDED(changed)) changed = number(UIA_RangeValueValuePropertyId, oldRange.value, newRange.value);
+            if (SUCCEEDED(changed)) changed = number(UIA_RangeValueMinimumPropertyId, oldRange.minimum, newRange.minimum);
+            if (SUCCEEDED(changed)) changed = number(UIA_RangeValueMaximumPropertyId, oldRange.maximum, newRange.maximum);
+            if (SUCCEEDED(changed)) changed = number(UIA_RangeValueSmallChangePropertyId, oldRange.smallChange, newRange.smallChange);
+            if (SUCCEEDED(changed)) changed = number(UIA_RangeValueLargeChangePropertyId, oldRange.largeChange, newRange.largeChange);
+            if (SUCCEEDED(changed) && (oldRange.supported != newRange.supported || oldRange.readOnly != newRange.readOnly)) {
+                VARIANT before{}, after{};
+                if (oldRange.supported) BoolValue(before, oldRange.readOnly);
+                if (newRange.supported) BoolValue(after, newRange.readOnly);
+                changed = rangeEvent(UIA_RangeValueIsReadOnlyPropertyId, before, after);
+            }
+        }
+        if (SUCCEEDED(changed) && state->connected.load() && state->Find(id)) state->notifiedRanges[id] = newRange;
         return changed;
     }));
 }

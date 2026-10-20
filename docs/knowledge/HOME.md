@@ -23,3 +23,7 @@ previous assistant claims are navigation aids; they do not establish completion.
 
 Generated material (never edited by hand, never committed): `graphify-out/` (code graph) and
 `.local/graphify-obsidian/` (Graphify's Obsidian export; open it as a separate vault).
+
+Current D26 references: [quick controls](../modules/controlcenter.md),
+[system controls](../modules/system_controls.md), [media/brightness](../modules/media_controls.md).
+Read TEST_STATUS S-026 for executed checks and open qualification; D25 still holds publication.
