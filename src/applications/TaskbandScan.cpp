@@ -13,8 +13,9 @@ namespace {
 
 // Bounds of a packaged AppUserModelID (see IsPackagedAumid): "<Name>_<PublisherId>!<AppId>" with a
 // 3..50 character name, a 13 character publisher id and a 1..64 character AppId.
-constexpr std::size_t kMinFamilyName = 3 + 1 + 13;
-constexpr std::size_t kMaxFamilyName = 50 + 1 + 13;
+constexpr std::size_t kPublisherIdLength = 13;
+constexpr std::size_t kMinFamilyName = 3 + 1 + kPublisherIdLength;
+constexpr std::size_t kMaxFamilyName = 50 + 1 + kPublisherIdLength;
 constexpr std::size_t kMaxAppId = 64;
 
 bool IsAsciiAlphanumeric(wchar_t c) noexcept {
@@ -75,9 +76,13 @@ std::optional<std::pair<std::size_t, std::size_t>> PackagedAt(
     const std::wstring& text, std::size_t bang, const std::function<bool(std::wstring_view)>& isKnown) {
     std::size_t left = 0;
     while (left < kMaxFamilyName && left < bang && IsFamilyNameChar(text[bang - 1 - left])) ++left;
+    if (left < kMinFamilyName) return std::nullopt;
+    // The family name ends with '_' and the 13 character publisher id, so a '!' without that
+    // underscore in place cannot end any candidate (cheap rejection of AUMID-like garbage).
+    if (text[bang - kPublisherIdLength - 1] != L'_') return std::nullopt;
     std::size_t right = 0;
     while (right < kMaxAppId && bang + 1 + right < text.size() && IsAppIdChar(text[bang + 1 + right])) ++right;
-    if (left < kMinFamilyName || right == 0) return std::nullopt;
+    if (right == 0) return std::nullopt;
 
     std::optional<std::pair<std::size_t, std::size_t>> best;
     const std::wstring_view view(text);

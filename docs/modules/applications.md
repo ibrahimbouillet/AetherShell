@@ -193,6 +193,7 @@ app (the route is a parameter). `OpenTaskView` (Win+Tab) and `OpenWindowsSearch`
 chord each because Windows documents only the shortcuts. Chords use the platform helper's key-up
 recovery; failures return Platform with a user-presentable message. UIPI silently drops synthesized
 input while an elevated window is in the foreground. Tests use a fake injector only.
+
 ## Identity
 
 | Form | Used for |
