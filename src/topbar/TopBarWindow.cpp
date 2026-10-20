@@ -526,6 +526,8 @@ void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
 void TopBarWindow::SetFullscreenHidden(bool hidden) {
     if (impl_->fullscreen == hidden) return;
     impl_->fullscreen = hidden;
+    // State transitions only: never log foreground identities, titles, paths or repeated probes.
+    AETHER_LOG_INFO("topbar", "fullscreen suppression {}", hidden);
     if (hidden) { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Hide(); }
     else Show(false);
     try { FullscreenChanged.Emit(hidden); }
@@ -707,11 +709,17 @@ std::optional<LRESULT> TopBarWindow::OnMessage(UINT message, WPARAM wParam, LPAR
     if (message == WM_GETOBJECT && impl_->accessibility.HandleGetObject(Handle(), wParam, lParam, result)) return result;
     if (message == kAppBarMessage) {
         if (wParam == ABN_POSCHANGED) Relayout();
-        else if (wParam == ABN_FULLSCREENAPP) SetFullscreenHidden(lParam != 0);
+        // The shell's geometric notification may include a maximized framed window while the
+        // native taskbar auto-hides. It is a trigger, never an independent suppression authority.
+        // Queue the same current-foreground classification used by the WinEvent hook; lParam may
+        // already describe an old foreground window by the time this message is dispatched.
+        else if (wParam == ABN_FULLSCREENAPP) (void)::PostMessageW(Handle(), kForegroundChanged, 0, 0);
         return 0;
     }
     if (message == kForegroundChanged) {
-        SetFullscreenHidden(platform::IsFullscreenWindow(::GetForegroundWindow(), platform::MonitorForWindow(Handle())));
+        const bool fullscreen = impl_->context.fullscreenProbe ? impl_->context.fullscreenProbe() :
+            impl_->context.allowAppBar && platform::IsFullscreenWindow(::GetForegroundWindow(), platform::MonitorForWindow(Handle()));
+        SetFullscreenHidden(fullscreen);
         return 0;
     }
     if (message == kDeferredInvoke) { Activate(static_cast<int>(wParam)); return 0; }

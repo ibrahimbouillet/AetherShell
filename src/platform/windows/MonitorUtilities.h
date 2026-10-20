@@ -27,8 +27,13 @@ struct MonitorInfo {
 [[nodiscard]] inline int Width(const RECT& r) noexcept { return r.right - r.left; }
 [[nodiscard]] inline int Height(const RECT& r) noexcept { return r.bottom - r.top; }
 
-// True when `window` is a visible, non-shell window that covers the whole monitor (borderless
-// full-screen games, video players, presentations). The desktop and Explorer shell windows never count.
+// Pure geometry/style policy. A fullscreen window covers a valid monitor without a caption or
+// resizable frame. WS_MAXIMIZE is allowed: borderless fullscreen can retain maximized state.
+// All coordinates must use the same pixel space; no HWND or desktop state is inspected here.
+[[nodiscard]] bool IsFullscreenWindowGeometry(const RECT& windowBounds, const RECT& monitorBounds, DWORD style) noexcept;
+
+// True when `window` is a visible, non-cloaked, non-shell borderless window covering the monitor.
+// Ordinary framed maximized applications do not count, even when auto-hide gives them full bounds.
 [[nodiscard]] bool IsFullscreenWindow(HWND window, const MonitorInfo& monitor) noexcept;
 
 }  // namespace aether::platform

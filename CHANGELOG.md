@@ -12,6 +12,11 @@ All notable changes to Aether Shell are documented here. The format follows
   a separate recovery helper, status/errors, and existing-instance quit/restore commands.
 - Dock bottom-margin correction and mandatory animated-footprint AppBar reservation in replacement
   mode, keeping maximized application content above the Dock.
+- Balanced Start, Search and Task View icon sizes with application icons by removing duplicate
+  padding from their Dock drawing boxes; shared status-bar glyph sizes are unchanged.
+- Framed maximized windows no longer suppress both Aether bars as fullscreen. Raw AppBar hints
+  recheck current foreground policy, and registered Dock activation/position notifications reach
+  the shell without overriding the host's temporary-reveal policy.
 - Read-only best-effort Windows pinned-shortcut import with retained launch arguments and deduplication.
 - More visible glass translucency, shadow restricted to the outside, opaque Windows-transparency-off
   and high-contrast fallback, and distinct Wi-Fi waves/Ethernet/cellular glyphs.

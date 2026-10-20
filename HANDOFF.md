@@ -28,8 +28,11 @@ The published `0.1.0-alpha.1` does not include this work.
   lifecycle `5cf6e72`, applications `1ef9d72`, visual core `4b7c8a8`. Five dirty/untracked visual
   files were copied into the candidate before fixes; their original Claude worktrees remain intact.
 - The linked integration worktree now has detached HEAD at `b87be0d`; **there is no pending merge**.
-  Its ignored build/log/package outputs are local evidence. Use `git worktree list` to locate it if
-  needed, but resume ordinary work in the official public `main` checkout after inspecting its status.
+  That is the source base for the follow-up corrections. A later **local-only documentation checkpoint
+  `6f63ef3`** records D25 and the test evidence; it was fast-forwarded into local `main`, without push.
+  Check current HEAD/status before resuming: subsequent source work remains in the linked integration
+  worktree until its local milestone commit. Use `git worktree list` to locate it. Its ignored
+  build/log/package outputs are local evidence; there is no pending merge.
 - Windows CI [39505236903](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39505236903)
   for `b87be0d` **passed**, 10m33s, including Release build/unit gate and review package upload. This does not qualify the later fullscreen correction.
 - The final local package was rebuilt with embedded source revision **`b87be0d68961`**, then passed
@@ -141,14 +144,16 @@ The published `0.1.0-alpha.1` does not include this work.
   edit and UIA diagnostics pass Release /WX and visual inspection (S-024); the targeted Dock gate
   again fails the light UIA fixture (Pane 50033, successful HRESULTs, correct own HWND). Dock unit and
   app native pass. The preceding manual binary hash does not cover these later edits. No assertion
-  was relaxed; accessibility qualification is unresolved. Current public main is still b87be0d.
+  was relaxed; accessibility qualification is unresolved. Remote `origin/main` remains b87be0d;
+  local commits are held under D25. No source or documentation was pushed after that instruction.
 
 ## NEXT SESSION START HERE
 
-1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify official origin, clean
-   `main`, HEAD/remote and all worktrees. The integration merge is committed and pushed, but the integration worktree now has the uncommitted
-   S-023 fullscreen correction and delivery notes. Continue that exact work; do not redo the merge
-   or discard preserved work. Inspect the correction/build state before any new edits.
+1. Read this active section, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify official origin,
+   local `main` versus `origin/main`, status and all worktrees. The original integration merge is
+   pushed at b87be0d; later D25/correction checkpoints are **local only**. Inspect the integration
+   worktree's pending S-023/S-024 source and experimental state before edits. Do not redo the merge
+   or discard preserved work. No push/tag/release is authorized while D25 remains active.
 2. Finish S-024: fullscreen correction passes 672-unit/123-native gates and the bounded S-023 desktop
    restore/reflow test. Optical icon balance passes Release and own-window visual inspection; the
    light native UIA root-type failure recurred with diagnostics. Preserve all negative receipts and

@@ -22,6 +22,7 @@
 #include <thread>
 #include <vector>
 #include <UIAutomation.h>
+#include <shellapi.h>
 
 using namespace aether;
 using namespace aether::topbar;
@@ -420,6 +421,47 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     REQUIRE(window.SetTaskbarReplacementState(false, false, false).ok());
     window.SetSnapshots(Synthetic()); RunFor(loop, 80);
     CHECK_EQ(window.RenderCount(), frames);  // repeated status/snapshots request no frames
+    RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
+    CHECK(::EqualRect(&before, &after) != FALSE);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
+}
+
+AETHER_TEST("topbar integration: AppBar notifications recheck current fullscreen policy without raw overrides") {
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    RECT before{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &before, 0) != FALSE);
+    bool fullscreen = false;
+    unsigned probes = 0, changes = 0;
+    bool lastHidden = false;
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false;
+    context.fullscreenProbe = [&] { ++probes; return fullscreen; }; // no foreground HWND is inspected
+    TopBarWindow window(context); REQUIRE(window.Create(RECT{80, 180, 1180, 228}).ok());
+    window.SetSettings(settings::TopBarSettings{}, false); window.SetSnapshots(Synthetic());
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    auto connection = window.FullscreenChanged.Connect([&](bool hidden) { ++changes; lastHidden = hidden; });
+    window.Show(false);
+    constexpr UINT appBarMessage = WM_APP + 101;
+    ::SendMessageW(window.Handle(), appBarMessage, ABN_FULLSCREENAPP, TRUE);
+    CHECK_EQ(probes, 0u); // callback queues reevaluation rather than treating lParam as state
+    RunFor(loop, 30);
+    CHECK(window.IsShown()); CHECK(::IsWindowVisible(window.Handle()) != FALSE); CHECK_EQ(changes, 0u);
+    fullscreen = true;
+    ::SendMessageW(window.Handle(), appBarMessage, ABN_FULLSCREENAPP, FALSE);
+    RunFor(loop, 30);
+    CHECK_FALSE(window.IsShown()); CHECK(::IsWindowVisible(window.Handle()) == FALSE);
+    CHECK_EQ(changes, 1u); CHECK(lastHidden); // stale close cannot reveal over another fullscreen
+    ::SendMessageW(window.Handle(), appBarMessage, ABN_FULLSCREENAPP, TRUE);
+    ::SendMessageW(window.Handle(), appBarMessage, ABN_FULLSCREENAPP, FALSE);
+    RunFor(loop, 30); CHECK_EQ(changes, 1u);
+    fullscreen = false;
+    ::SendMessageW(window.Handle(), appBarMessage, ABN_FULLSCREENAPP, TRUE);
+    RunFor(loop, 30);
+    CHECK(window.IsShown()); CHECK(::IsWindowVisible(window.Handle()) != FALSE);
+    CHECK_EQ(changes, 2u); CHECK_FALSE(lastHidden);
+    CHECK(probes >= 5u);
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
     CHECK(::EqualRect(&before, &after) != FALSE);
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();

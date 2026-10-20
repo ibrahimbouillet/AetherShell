@@ -12,6 +12,7 @@
 
 #include <wincodec.h>
 #include <dwmapi.h>
+#include <shellapi.h>
 
 #include <chrono>
 #include <atomic>
@@ -315,6 +316,10 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     bool accessibilityPassed = false;
     int accessibilityStage = 0;
     HRESULT accessibilityFocus = E_PENDING;
+    CONTROLTYPEID accessibilityRootType{};
+    HRESULT accessibilityRootTypeResult = E_PENDING;
+    HRESULT accessibilityRootHandleResult = E_PENDING;
+    bool accessibilityRootHandleMatches = false;
     const auto hwnd = window.Handle();
     const int beforeInvoke = searches;
     std::thread client([&] {
@@ -327,9 +332,15 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
             winrt::com_ptr<IUIAutomationElement> root;
             accessibilityStage = 2;
             check(automation->ElementFromHandle(hwnd, root.put()));
-            CONTROLTYPEID type{}; check(root->get_CurrentControlType(&type));
+            accessibilityRootTypeResult = root->get_CurrentControlType(&accessibilityRootType);
+            check(accessibilityRootTypeResult);
             accessibilityStage = 3;
-            if (type != UIA_ToolBarControlTypeId) throw std::runtime_error("Dock root type mismatch");
+            if (accessibilityRootType != UIA_ToolBarControlTypeId) {
+                UIA_HWND observedHandle{};
+                accessibilityRootHandleResult = root->get_CurrentNativeWindowHandle(&observedHandle);
+                accessibilityRootHandleMatches = SUCCEEDED(accessibilityRootHandleResult) && observedHandle == hwnd;
+                throw std::runtime_error("Dock root type mismatch");
+            }
             winrt::com_ptr<IUIAutomationCondition> all; check(automation->CreateTrueCondition(all.put()));
             accessibilityStage = 4;
             winrt::com_ptr<IUIAutomationElementArray> children; check(root->FindAll(TreeScope_Children, all.get(), children.put()));
@@ -361,6 +372,12 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     while (!accessibilityFinished.load()) RunFor(loop, 20);
     client.join(); CHECK(accessibilityPassed); CHECK_EQ(searches, beforeInvoke + 1);
     if (!accessibilityPassed) TEST_NOTE("Dock UIA failed stage " + std::to_string(accessibilityStage));
+    if (!accessibilityPassed && accessibilityStage == 3) {
+        TEST_NOTE("Dock UIA root type " + std::to_string(accessibilityRootType) +
+            "; type HRESULT " + std::to_string(accessibilityRootTypeResult) +
+            "; native handle HRESULT " + std::to_string(accessibilityRootHandleResult) +
+            "; native handle matches requested HWND " + std::to_string(accessibilityRootHandleMatches));
+    }
     if (accessibilityFocus==E_ACCESSDENIED) TEST_NOTE("background UIA focus was explicitly denied by Windows; no-activate restored");
     TEST_NOTE("saved own-window Dock " + prefix + " rest/hover PNGs; synthetic actions and idle checked");
     window.Destroy();
@@ -427,7 +444,11 @@ AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit 
     };
     ::SendMessageW(window.Handle(),WM_MOUSEMOVE,0,Point(window,geometry->items[0].icon));
     ::SendMessageW(window.Handle(),WM_TIMER,1,0);CHECK_EQ(visibleTooltips(),1);
+    ::SendMessageW(window.Handle(),WM_APP+113,ABN_FULLSCREENAPP,TRUE);
+    CHECK(window.IsShown()); // a raw shell hint cannot replace the host's combined policy
     REQUIRE(window.SetSuppressed(true).ok());
+    ::SendMessageW(window.Handle(),WM_APP+113,ABN_FULLSCREENAPP,FALSE);
+    CHECK_FALSE(window.IsShown()); // leaving fullscreen cannot cancel a native-taskbar reveal
     ::SendMessageW(window.Handle(),WM_TIMER,1,0);CHECK_EQ(visibleTooltips(),0);
     REQUIRE(window.SetSuppressed(false).ok());
     ::EnableWindow(window.Handle(),FALSE);

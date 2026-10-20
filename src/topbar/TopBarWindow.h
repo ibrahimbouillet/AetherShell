@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <optional>
+#include <functional>
 
 namespace aether::topbar {
 
@@ -37,6 +38,9 @@ struct TopBarContext {
     ui::IMenuPresenter* menu = nullptr;
     // Focus handoff seam for deterministic voice-typing tests; default uses real window operations.
     ui::IMenuWindowOps* menuWindowOps = nullptr;
+    // Optional deterministic foreground classifier. With no override, allowAppBar=false also
+    // disables native fullscreen observation; isolated tests never inspect another application.
+    std::function<bool()> fullscreenProbe;
 };
 
 // UI-thread owned. Provider pointers are optional, unstarted and must outlive the window. Create

@@ -613,8 +613,9 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
             impl_->hovered == index ? 1.0f : 0.0f, impl_->pressed == index ? 1.0f : 0.0f);
         if (impl_->dragging && text::EqualsIgnoreCase(item.id, impl_->dragId))
             graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.radii.item, impl_->tokens, 1);
-        const float inset = size * 0.18f;
-        const D2D1_RECT_F glyphBox{rect.left + inset, rect.top + inset, rect.right - inset, rect.bottom - inset};
+        // Shared glyphs already include optical padding in their 16-unit grid. Use the same
+        // animated icon slot as application bitmaps rather than shrinking fixed actions twice.
+        const auto& glyphBox = rect;
         if (item.kind == DockItemKind::Start) {
             graphics::PaintStartMark(context.d2d, glyphBox, impl_->tokens);
         } else if (item.kind == DockItemKind::Search || item.kind == DockItemKind::TaskView) {
@@ -757,7 +758,8 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
     if (message == WM_DISPLAYCHANGE || (message == WM_SETTINGCHANGE && wParam == SPI_SETWORKAREA)) { (void)Relayout(); return 0; }
     if (message == kAppBarMessage) {
         if (wParam == ABN_POSCHANGED && !impl_->updatingBar) (void)Relayout();
-        if (wParam == ABN_FULLSCREENAPP) (void)SetSuppressed(lParam != 0);
+        // The host combines foreground fullscreen with temporary native-taskbar reveal state.
+        // Raw shell fullscreen notifications must not independently undo that suppression policy.
         return 0;
     }
     if (message == WM_TIMER && (wParam == kTooltipTimer || wParam == kErrorTimer)) {
@@ -776,6 +778,14 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
     }
     if (message == WM_CONTEXTMENU) { if (!IsTransitioning()) impl_->MenuAt(impl_->focused); return 0; }
     if (message == WM_CANCELMODE) OnPointerCaptureLost();
+    if (impl_->appBar && !impl_->updatingBar && (message == WM_ACTIVATE || message == WM_WINDOWPOSCHANGED)) {
+        // Complete the registered AppBar lifecycle without recursively re-entering reservation
+        // when the shell sends notifications during this call. Preserve default window handling.
+        impl_->updatingBar = true;
+        APPBARDATA data{sizeof(data)}; data.hWnd = Handle();
+        (void)::SHAppBarMessage(message == WM_ACTIVATE ? ABM_ACTIVATE : ABM_WINDOWPOSCHANGED, &data);
+        impl_->updatingBar = false;
+    }
     return std::nullopt;
 }
 void DockWindow::OnCreated() {}

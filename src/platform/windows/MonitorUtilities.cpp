@@ -52,6 +52,16 @@ MonitorInfo MonitorForWindow(HWND hwnd) {
     return PrimaryMonitor();
 }
 
+bool IsFullscreenWindowGeometry(const RECT& windowBounds, const RECT& monitorBounds, DWORD style) noexcept {
+    if (windowBounds.right <= windowBounds.left || windowBounds.bottom <= windowBounds.top ||
+        monitorBounds.right <= monitorBounds.left || monitorBounds.bottom <= monitorBounds.top) return false;
+    // Maximized framed windows can cover rcMonitor when the native taskbar is hidden/auto-hidden.
+    // Fullscreen can still carry WS_MAXIMIZE and need not carry WS_POPUP, so neither is a discriminator.
+    if ((style & (WS_CAPTION | WS_THICKFRAME | WS_CHILD)) != 0) return false;
+    return windowBounds.left <= monitorBounds.left && windowBounds.top <= monitorBounds.top &&
+           windowBounds.right >= monitorBounds.right && windowBounds.bottom >= monitorBounds.bottom;
+}
+
 bool IsFullscreenWindow(HWND window, const MonitorInfo& monitor) noexcept {
     if (!window || !::IsWindowVisible(window) || ::IsIconic(window)) return false;
     if (window == ::GetDesktopWindow() || window == ::GetShellWindow()) return false;
@@ -63,8 +73,10 @@ bool IsFullscreenWindow(HWND window, const MonitorInfo& monitor) noexcept {
     if (IsWindowCloaked(window)) return false;
     RECT rect{};
     if (!::GetWindowRect(window, &rect)) return false;
-    return rect.left <= monitor.bounds.left && rect.top <= monitor.bounds.top && rect.right >= monitor.bounds.right &&
-           rect.bottom >= monitor.bounds.bottom;
+    ::SetLastError(ERROR_SUCCESS);
+    const auto style = static_cast<DWORD>(::GetWindowLongPtrW(window, GWL_STYLE));
+    if (style == 0 && ::GetLastError() != ERROR_SUCCESS) return false;
+    return IsFullscreenWindowGeometry(rect, monitor.bounds, style);
 }
 
 }  // namespace aether::platform
