@@ -62,7 +62,7 @@ AETHER_TEST("settings schema: new fields have the documented defaults") {
     CHECK(defaults.topBar.openWindowsFlyouts);
     CHECK_EQ(defaults.topBar.weatherPlacement, WeatherPlacement::Left);
     CHECK_EQ(defaults.topBar.keyboardIndicator, KeyboardIndicatorStyle::TwoLine);
-    CHECK(defaults.topBar.showNotificationAreaButton);
+    CHECK_FALSE(defaults.topBar.showNotificationAreaButton);  // D27 removed the trailing native-taskbar arrow
     CHECK(defaults.topBar.showBatteryPercent);
     CHECK(defaults.general.syncTaskbarPins);
     CHECK_EQ(defaults.general.themeMode, ThemePreference::System);
@@ -87,7 +87,7 @@ AETHER_TEST("settings schema: every new field survives a JSON text round trip") 
     settings.topBar.openWindowsFlyouts = false;
     settings.topBar.weatherPlacement = WeatherPlacement::Right;
     settings.topBar.keyboardIndicator = KeyboardIndicatorStyle::Compact;
-    settings.topBar.showNotificationAreaButton = false;
+    settings.topBar.showNotificationAreaButton = true;
     settings.topBar.showBatteryPercent = false;
     settings.general.syncTaskbarPins = false;
     settings.general.themeMode = ThemePreference::Dark;
@@ -108,7 +108,7 @@ AETHER_TEST("settings schema: every new field survives a JSON text round trip") 
     CHECK_FALSE(value.topBar.openWindowsFlyouts);
     CHECK_EQ(value.topBar.weatherPlacement, WeatherPlacement::Right);
     CHECK_EQ(value.topBar.keyboardIndicator, KeyboardIndicatorStyle::Compact);
-    CHECK_FALSE(value.topBar.showNotificationAreaButton);
+    CHECK(value.topBar.showNotificationAreaButton);
     CHECK_FALSE(value.topBar.showBatteryPercent);
     CHECK_FALSE(value.general.syncTaskbarPins);
     CHECK_EQ(value.general.themeMode, ThemePreference::Dark);
@@ -144,7 +144,7 @@ AETHER_TEST("settings schema: new enums use stable lower-case JSON names") {
 
 AETHER_TEST("settings schema: new boolean and marker fields use their documented JSON names") {
     // ToJson and FromJson share one name table, so a round trip cannot catch a misspelled key.
-    const auto parsed = ParseText(R"({"dock":{"metricsVersion":2,"reserveAnimationSpace":true,"explorerDefaultApplied":true,"showStartButton":false,"showTaskViewButton":false},"topBar":{"openWindowsFlyouts":false,"showNotificationAreaButton":false,"showBatteryPercent":false},"general":{"syncTaskbarPins":false}})");
+    const auto parsed = ParseText(R"({"dock":{"metricsVersion":2,"reserveAnimationSpace":true,"explorerDefaultApplied":true,"showStartButton":false,"showTaskViewButton":false},"topBar":{"openWindowsFlyouts":false,"showNotificationAreaButton":true,"showBatteryPercent":false},"general":{"syncTaskbarPins":false}})");
     CHECK(parsed.warnings.empty());
     CHECK_EQ(parsed.value.dock.metricsVersion, 2);
     CHECK(parsed.value.dock.reserveAnimationSpace);
@@ -152,7 +152,7 @@ AETHER_TEST("settings schema: new boolean and marker fields use their documented
     CHECK_FALSE(parsed.value.dock.showStartButton);
     CHECK_FALSE(parsed.value.dock.showTaskViewButton);
     CHECK_FALSE(parsed.value.topBar.openWindowsFlyouts);
-    CHECK_FALSE(parsed.value.topBar.showNotificationAreaButton);
+    CHECK(parsed.value.topBar.showNotificationAreaButton);
     CHECK_FALSE(parsed.value.topBar.showBatteryPercent);
     CHECK_FALSE(parsed.value.general.syncTaskbarPins);
 

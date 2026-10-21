@@ -377,7 +377,8 @@ AETHER_TEST("glass render: neutral transient material removes the tooltip sheen 
     GlassStyle style;style.elevation=Elevation::Tooltip;style.shadow=false;style.neutral=true;
     neutral.Begin();PaintGlassPanel(neutral.Context(),kPanel,tokens,style);REQUIRE(neutral.End());
     style.neutral=false;sheen.Begin();PaintGlassPanel(sheen.Context(),kPanel,tokens,style);REQUIRE(sheen.End());
-    CHECK(MaxChannelDifference(neutral.At(100,40),neutral.At(100,100))<=2);
-    CHECK(MaxChannelDifference(sheen.At(100,40),sheen.At(100,100))>5);
+    // Both samples lie inside kPanel (y 30..80): one under the top sheen band, one below it.
+    CHECK(MaxChannelDifference(neutral.At(100,34),neutral.At(100,74))<=2);
+    CHECK(MaxChannelDifference(sheen.At(100,34),sheen.At(100,74))>5);
     CHECK(neutral.At(100,30).a>0);
 }
