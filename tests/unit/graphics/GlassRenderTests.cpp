@@ -370,3 +370,14 @@ AETHER_TEST("glass render: icon bitmaps are drawn into their rectangle with the 
     CHECK_EQ(canvas.At(50, 26).a, 0);
     CHECK_EQ(canvas.At(5, 5).a, 0);
 }
+
+AETHER_TEST("glass render: neutral transient material removes the tooltip sheen without removing its border") {
+    CanvasGuard guard;auto tokens=Glass(ThemeMode::Dark);tokens.glass.highlight=Color::FromHex(0xffffff,0.6f);tokens.glass.noiseAlpha=0;
+    D2DCanvas neutral;D2DCanvas sheen;REQUIRE(neutral.Create(200,140));REQUIRE(sheen.Create(200,140));
+    GlassStyle style;style.elevation=Elevation::Tooltip;style.shadow=false;style.neutral=true;
+    neutral.Begin();PaintGlassPanel(neutral.Context(),kPanel,tokens,style);REQUIRE(neutral.End());
+    style.neutral=false;sheen.Begin();PaintGlassPanel(sheen.Context(),kPanel,tokens,style);REQUIRE(sheen.End());
+    CHECK(MaxChannelDifference(neutral.At(100,40),neutral.At(100,100))<=2);
+    CHECK(MaxChannelDifference(sheen.At(100,40),sheen.At(100,100))>5);
+    CHECK(neutral.At(100,30).a>0);
+}

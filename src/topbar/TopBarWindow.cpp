@@ -33,101 +33,57 @@ void CALLBACK ForegroundEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWO
     for (const HWND window : watchedWindows) (void)::PostMessageW(window, kForegroundChanged, 0, 0);
 }
 
-// All marks are original vector geometry; no icon font or third-party icon set is used.
+// Map only provider categories; graphics owns their shared proportional rounded geometry.
+graphics::NetworkGlyphKind NetworkKind(status::ConnectionKind kind) noexcept {
+    switch (kind) {
+        case status::ConnectionKind::None: return graphics::NetworkGlyphKind::None;
+        case status::ConnectionKind::WiFi: return graphics::NetworkGlyphKind::WiFi;
+        case status::ConnectionKind::Ethernet: return graphics::NetworkGlyphKind::Ethernet;
+        case status::ConnectionKind::Cellular: return graphics::NetworkGlyphKind::Cellular;
+        case status::ConnectionKind::Other: return graphics::NetworkGlyphKind::Other;
+        default: return graphics::NetworkGlyphKind::Unknown;
+    }
+}
+graphics::WeatherSymbol WeatherKind(weather::WeatherGlyph category) noexcept {
+    switch (category) {
+        case weather::WeatherGlyph::Clear: return graphics::WeatherSymbol::Clear;
+        case weather::WeatherGlyph::PartlyCloudy: return graphics::WeatherSymbol::PartlyCloudy;
+        case weather::WeatherGlyph::Cloudy: return graphics::WeatherSymbol::Cloudy;
+        case weather::WeatherGlyph::Fog: return graphics::WeatherSymbol::Fog;
+        case weather::WeatherGlyph::Drizzle: return graphics::WeatherSymbol::Drizzle;
+        case weather::WeatherGlyph::Rain: return graphics::WeatherSymbol::Rain;
+        case weather::WeatherGlyph::Snow: return graphics::WeatherSymbol::Snow;
+        case weather::WeatherGlyph::Thunder: return graphics::WeatherSymbol::Thunder;
+        default: return graphics::WeatherSymbol::Unknown;
+    }
+}
 void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
            ID2D1SolidColorBrush* brush, const graphics::DesignTokens& tokens, bool updateAvailable) {
     const float stroke = tokens.glyph.stroke;
-    winrt::com_ptr<ID2D1Factory> strokeFactory; dc->GetFactory(strokeFactory.put());
-    auto* strokeStyle = graphics::RoundStrokeStyle(strokeFactory.get());
-    const auto line = [&](float a, float b, float c, float d) {
-        dc->DrawLine(D2D1::Point2F(x + a, y + b), D2D1::Point2F(x + c, y + d), brush, stroke, strokeStyle);
-    };
-    const auto circle = [&](float a, float b, float radius) {
-        dc->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(x + a, y + b), radius, radius), brush, stroke, strokeStyle);
-    };
+    const auto box = D2D1::RectF(x,y,x+18,y+18);
     if (item.kind == ItemKind::Logo) {
-        graphics::PaintBrandMark(dc, D2D1::RectF(x, y, x + 18, y + 18), tokens);
+        graphics::PaintBrandMark(dc,box,tokens);
         if (updateAvailable) {
             brush->SetColor(tokens.glass.tint.WithAlpha(1).ToD2D());
-            dc->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x + 18, y - 2, x + 28, y + 11), 3, 3), brush);
+            dc->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x+18,y-2,x+28,y+11),3,3),brush);
             brush->SetColor(tokens.textPrimary.ToD2D());
-            graphics::PaintGlyph(dc, graphics::Glyph::ArrowUp, D2D1::RectF(x + 19, y, x + 27, y + 9), brush, stroke);
+            graphics::PaintGlyph(dc,graphics::Glyph::ArrowUp,D2D1::RectF(x+19,y,x+27,y+9),brush,stroke);
         }
-        return;
-    }
-    if (item.kind == ItemKind::NotificationArea) {
-        graphics::PaintGlyph(dc, graphics::Glyph::ChevronUp, D2D1::RectF(x + 1, y + 1, x + 17, y + 17), brush, stroke);
-        return;
-    }
-    if (item.kind == ItemKind::Network) {
-        if (item.connection == status::ConnectionKind::WiFi) {
-            graphics::PaintWiFiGlyph(dc, D2D1::RectF(x,y,x+18,y+18), brush, WiFiWaveCount(item), stroke);
-        } else if (item.connection == status::ConnectionKind::Cellular) {
-            // Signal bars are drawn only when Windows supplied a value; never synthesize full bars.
-            for (int index = 0; item.level && index < 5; ++index) {
-                const float top = 15.0f - static_cast<float>(index + 1) * 2.3f;
-                const auto rect = D2D1::RectF(x + 1 + index * 3.3f, y + top, x + 3 + index * 3.3f, y + 16);
-                if (item.level && index < *item.level) dc->FillRectangle(rect, brush);
-                else dc->DrawRectangle(rect, brush, 0.65f);
-            }
-            if (!item.level) { circle(9, 9, 6); line(6, 12, 12, 6); }
-        } else if (item.connection == status::ConnectionKind::Ethernet) {
-            dc->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x + 1, y + 2, x + 17, y + 12), 2, 2), brush, stroke);
-            line(9, 12, 9, 16); line(4, 16, 14, 16);
-        } else { circle(9, 9, 7); line(4, 14, 14, 4); }
-        if (item.connectivity == status::InternetConnectivity::Constrained ||
-            item.connectivity == status::InternetConnectivity::LocalOnly) {
-            dc->FillEllipse(D2D1::Ellipse(D2D1::Point2F(x + 16, y + 3), 3, 3), brush);
-        }
+    } else if (item.kind == ItemKind::Network) {
+        const bool limited = item.connectivity == status::InternetConnectivity::Constrained ||
+            item.connectivity == status::InternetConnectivity::LocalOnly;
+        graphics::PaintNetworkGlyph(dc,box,brush,NetworkKind(item.connection),item.level,limited,stroke);
     } else if (item.kind == ItemKind::Volume) {
-        line(1, 7, 5, 7); line(5, 7, 10, 3); line(10, 3, 10, 15); line(10, 15, 5, 11); line(5, 11, 1, 11); line(1, 11, 1, 7);
-        if (item.muted) { line(13, 6, 18, 11); line(13, 11, 18, 6); }
-        else if (item.level) {
-            const int waves = *item.level == 0 ? 0 : *item.level <= 33 ? 1 : *item.level <= 66 ? 2 : 3;
-            for (int wave = 0; wave < waves; ++wave) line(12.5f + wave * 2, 7.0f - wave, 12.5f + wave * 2, 11.0f + wave);
-        }
+        graphics::PaintVolumeGlyph(dc,box,brush,item.level,item.muted ? std::optional<bool>(true) :
+            item.unknown ? std::nullopt : std::optional<bool>(false),stroke);
     } else if (item.kind == ItemKind::Microphone) {
-        dc->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x + 6, y + 1, x + 12, y + 11), 3, 3), brush, stroke);
-        line(3, 8, 3, 11); line(3, 11, 6, 14); line(6, 14, 12, 14); line(12, 14, 15, 11); line(15, 11, 15, 8);
-        line(9, 14, 9, 18); line(5, 18, 13, 18);
-        if (item.muted) line(1, 17, 17, 1);
+        graphics::PaintMicrophoneGlyph(dc,box,brush,item.unknown ? std::nullopt : std::optional<bool>(item.muted),stroke);
     } else if (item.kind == ItemKind::Battery) {
-        if (!item.level && item.powerSource == status::PowerSource::External) {
-            line(6, 2, 6, 7); line(12, 2, 12, 7); line(4, 7, 14, 7);
-            line(4, 7, 4, 11); line(4, 11, 8, 14); line(14, 7, 14, 11); line(14, 11, 10, 14);
-            line(9, 14, 9, 18); return;
-        }
-        dc->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x, y + 4, x + 17, y + 14), 2, 2), brush, stroke);
-        line(19, 7, 19, 11);
-        if (item.level && *item.level > 0)
-            dc->FillRectangle(D2D1::RectF(x + 2, y + 6, x + 2 + 13.0f * *item.level / 100.0f, y + 12), brush);
-        if (item.charge == status::ChargeState::Charging) {
-            brush->SetColor(tokens.glass.tint.ToD2D());
-            line(10, 4, 7, 10); line(7, 10, 11, 10); line(11, 10, 8, 15);
-        }
+        graphics::PaintBatteryGlyph(dc,box,brush,tokens,item.level,item.lowOrCritical,
+            item.charge == status::ChargeState::Charging,item.powerSource == status::PowerSource::External,stroke);
     } else if (item.kind == ItemKind::Weather) {
-        const auto category = item.weatherGlyph;
-        if (category == weather::WeatherGlyph::Clear) {
-            if (item.isDay == false) { circle(9, 9, 6); line(9, 3, 6, 9); line(6, 9, 12, 14); }
-            else {
-                circle(9, 9, 4);
-                for (int ray = 0; ray < 8; ++ray) {
-                    const float angle = static_cast<float>(ray) * 0.78539816f;
-                    line(9 + std::cos(angle) * 6, 9 + std::sin(angle) * 6,
-                         9 + std::cos(angle) * 8, 9 + std::sin(angle) * 8);
-                }
-            }
-        } else if (category != weather::WeatherGlyph::Unknown) {
-            circle(6, 9, 4); circle(11, 6, 5); circle(15, 10, 3); line(4, 13, 16, 13);
-            if (category == weather::WeatherGlyph::Rain || category == weather::WeatherGlyph::Drizzle) {
-                line(6, 16, 5, 18); line(11, 16, 10, 18); line(16, 16, 15, 18);
-            } else if (category == weather::WeatherGlyph::Snow) { line(7, 16, 7, 19); line(5, 17.5f, 9, 17.5f); }
-            else if (category == weather::WeatherGlyph::Fog) { line(2, 16, 18, 16); line(4, 19, 16, 19); }
-            else if (category == weather::WeatherGlyph::Thunder) { line(11, 13, 8, 17); line(8, 17, 12, 17); line(12, 17, 9, 21); }
-        } else { circle(9, 9, 6); line(6, 12, 12, 6); }
-        if (item.cached) circle(18, 17, 2);
+        graphics::PaintWeatherGlyph(dc,box,brush,WeatherKind(item.weatherGlyph),item.isDay,item.cached,stroke);
     }
-    if (item.unknown && item.kind != ItemKind::Logo) { line(15, 15, 18, 18); line(15, 18, 18, 15); }
 }
 
 }  // namespace
@@ -526,13 +482,9 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
     for (const auto& entry : impl_->placed) {
-        if ((impl_->hover == entry.item.id && entry.item.actionable) ||
-            (impl_->focusedWindow && impl_->focused == entry.item.id)) {
-            brush->SetColor(impl_->tokens.hoverOverlay.ToD2D());
-            const auto inset = D2D1::RectF(entry.rect.left + 2, entry.rect.top + 3, entry.rect.right - 2, entry.rect.bottom - 3);
-            graphics::PaintItemHighlight(context.d2d, inset, impl_->tokens.radii.control, impl_->tokens, 1, 0);
-            if (impl_->focusedWindow && impl_->focused == entry.item.id)
-                graphics::PaintFocusRing(context.d2d, inset, 6, impl_->tokens);
+        if (impl_->focusedWindow && impl_->focused == entry.item.id) {
+            const auto inset = D2D1::RectF(entry.rect.left+2,entry.rect.top+3,entry.rect.right-2,entry.rect.bottom-3);
+            graphics::PaintFocusRing(context.d2d,inset,6,impl_->tokens);
         }
         const auto color = entry.item.unknown ? impl_->tokens.textSecondary : impl_->tokens.textPrimary;
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());

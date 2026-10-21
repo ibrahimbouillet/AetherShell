@@ -81,6 +81,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                 if (!app.relaunchIconResource.empty() && apps::ParseIconResource(app.relaunchIconResource))
                     item.application.iconResource = app.relaunchIconResource; // presentation only; never replace the pin's launch route
                 item.running = true; item.foreground = item.foreground || app.foreground;
+                item.attentionRequested = item.attentionRequested || app.attentionRequested;
                 item.windowCount += app.windows.size();
                 if (!item.runningApplication) item.runningApplication = app;
                 else item.runningApplication->windows.insert(item.runningApplication->windows.end(), app.windows.begin(), app.windows.end());
@@ -97,6 +98,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                     });
                     if (existing != items.end()) {
                         existing->foreground = existing->foreground || app.foreground;
+                        existing->attentionRequested = existing->attentionRequested || app.attentionRequested;
                         existing->windowCount += app.windows.size();
                         existing->runningApplication->foreground = existing->foreground;
                         existing->runningApplication->windows.insert(existing->runningApplication->windows.end(), app.windows.begin(), app.windows.end());
@@ -108,8 +110,17 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                 item.displayName = app.displayName.empty() ? L"Running application" : app.displayName;
                 item.application = apps::ResolveRunningPresentation(app, catalog);
                 item.runningApplication = app; item.running = true; item.foreground = app.foreground;
+                item.attentionRequested = app.attentionRequested;
                 item.windowCount = app.windows.size();
                 items.push_back(std::move(item));
+            }
+        }
+        for (auto& item : items) {
+            // A group in front has been acknowledged, even if another duplicate input requested it.
+            item.attentionRequested = item.running && !item.foreground && item.attentionRequested;
+            if (item.runningApplication) {
+                item.runningApplication->foreground = item.foreground;
+                item.runningApplication->attentionRequested = item.attentionRequested;
             }
         }
         if (!inputs.sessionOrder.empty()) {
@@ -151,7 +162,17 @@ Result<FittedDock> FitDockItems(const std::vector<DockItem>& items, const settin
         }
         if (!result.overflow.empty() && Width(result.items.size() + 1, result.iconSize, spacing, magnification) <= availableWidthDip) {
             DockItem more; more.kind = DockItemKind::Overflow; more.id = L"aether:overflow";
-            more.displayName = L"More applications"; result.items.push_back(std::move(more));
+            more.displayName = L"More applications";
+            more.attentionRequested = std::any_of(result.overflow.begin(), result.overflow.end(),
+                [](const auto& item) { return item.attentionRequested; });
+            result.items.push_back(std::move(more));
+        } else if (!result.overflow.empty()) {
+            // Extreme width exposes the same application menu from Search's context menu.
+            // Keep a visible/static cue for a real hidden request without changing any action.
+            const auto search = std::find_if(result.items.begin(), result.items.end(),
+                [](const auto& item) { return item.kind == DockItemKind::Search; });
+            if (search != result.items.end()) search->attentionRequested =
+                std::any_of(result.overflow.begin(), result.overflow.end(), [](const auto& item) { return item.attentionRequested; });
         }
         const float count = static_cast<float>(result.items.size());
         const float baseWidth = 24 + count * result.iconSize + std::max(0.0f, count - 1) * spacing;

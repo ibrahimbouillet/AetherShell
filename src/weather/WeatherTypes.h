@@ -35,6 +35,8 @@ struct WeatherConfig {
     status::TemperatureUnit unit = status::TemperatureUnit::Celsius;
     std::chrono::minutes refreshInterval = kDefaultRefreshInterval;  // kMinRefreshInterval..kMaxRefreshInterval
 
+    std::string locationUnavailableDetail; // fixed public-safe reason when automatic location cannot be read
+
     // True when both coordinates are present.
     [[nodiscard]] bool HasLocation() const noexcept { return latitude.has_value() && longitude.has_value(); }
 };

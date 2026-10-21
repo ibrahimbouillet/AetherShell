@@ -78,3 +78,18 @@ AETHER_TEST("desktop policy: stale reveal timer cannot resume a canceled or newe
     CHECK_EQ(*TaskbarRevealDelay(true,true,true,false,suspended,200,200),std::uint64_t{0});
     CHECK_EQ(*TaskbarRevealDelay(true,true,true,false,suspended,201,200),std::uint64_t{0});
 }
+
+AETHER_TEST("desktop attention: bounded Dock peek cannot reveal native bar or override suspension") {
+    CHECK_FALSE(ShouldSuppressDock(true,Update(true,false),true));
+    CHECK(ShouldSuppressDock(true,Update(true,false),false));
+    CHECK(ShouldSuppressDock(true,Update(false,false),true));
+    CHECK(ShouldSuppressDock(true,Update(false,false,true),true));
+    CHECK(ShouldSuppressDock(true,Update(true,true,true),true));
+    CHECK_FALSE(ShouldSuppressDock(false,Update(true,false),false));
+    CHECK_FALSE(AttentionPeekDelay(false,false,true,100,200));
+    CHECK_FALSE(AttentionPeekDelay(true,true,true,100,200));
+    CHECK_FALSE(AttentionPeekDelay(true,false,false,100,200));
+    CHECK(AttentionPeekDelay(true,false,true,100,200)==100);
+    CHECK(AttentionPeekDelay(true,false,true,200,200)==0);
+    CHECK(AttentionPeekDelay(true,false,true,250,200)==0);
+}

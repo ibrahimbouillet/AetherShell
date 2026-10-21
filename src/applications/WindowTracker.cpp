@@ -90,6 +90,7 @@ bool SameApplications(const std::vector<RunningApplication>& a, const std::vecto
                           return x.id == y.id && x.displayName == y.displayName &&
                                  x.executablePath == y.executablePath && x.appUserModelId == y.appUserModelId &&
                                  x.processId == y.processId && x.foreground == y.foreground &&
+                                 x.attentionRequested == y.attentionRequested &&
                                  x.relaunchIconResource == y.relaunchIconResource &&
                                  x.relaunchDisplayName == y.relaunchDisplayName && SameWindows(x.windows, y.windows);
                       });
@@ -116,7 +117,10 @@ Result<void> WindowTracker::Start(Listener listener) {
         windowClass.hInstance = ::GetModuleHandleW(nullptr);
         windowClass.lpszClassName = kWindowClass;
         if (auto registered = platform::RegisterWindowClassOnce(windowClass); !registered) return registered.error();
-        messageWindow_ = ::CreateWindowExW(0, kWindowClass, L"", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr,
+        // A hidden top-level tool HWND can receive registered Shell notifications. It is never
+        // shown or activated and owns no AppBar/work-area reservation.
+        messageWindow_ = ::CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, kWindowClass, L"", WS_POPUP,
+                                           0, 0, 0, 0, nullptr, nullptr,
                                            windowClass.hInstance, this);
         if (!messageWindow_) return platform::LastWin32Error("creating the window tracker's message window");
 
@@ -135,6 +139,11 @@ Result<void> WindowTracker::Start(Listener listener) {
 
         alive_ = std::make_shared<bool>(true);
         running_ = true;
+        // Documented Shell-specific compatibility API; absence must not break running-app tracking.
+        // https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-registershellhookwindow
+        shellHookMessage_ = ::RegisterWindowMessageW(L"SHELLHOOK");
+        shellHookRegistered_ = shellHookMessage_ && ::RegisterShellHookWindow(messageWindow_) != FALSE;
+        if (!shellHookRegistered_) AETHER_LOG_WARN(kLog, "Shell attention events unavailable; window tracking remains active");
 
         // Initial state first, then the hooks, so nothing that happens in between is missed for long:
         // any event after this point re-enumerates everything anyway. The listener is installed only
@@ -174,6 +183,7 @@ void WindowTracker::Stop() noexcept {
     // window handles may already be dead. Per-process, per-frame and display-name caches are kept;
     // they are revalidated on the next Start().
     trackedWindows_.clear();
+    attention_.Clear();
     firstSeen_.clear();
     notifyPending_ = false;
     try {
@@ -190,6 +200,9 @@ void WindowTracker::ReleaseResources() noexcept {
     }
     hooks_.clear();
     if (messageWindow_) {
+        if (shellHookRegistered_) (void)::DeregisterShellHookWindow(messageWindow_);
+        shellHookRegistered_ = false;
+        shellHookMessage_ = 0;
         if (timerArmed_) ::KillTimer(messageWindow_, kCoalesceTimerId);
         ::DestroyWindow(messageWindow_);
         messageWindow_ = nullptr;
@@ -208,6 +221,11 @@ LRESULT CALLBACK WindowTracker::WindowProc(HWND hwnd, UINT message, WPARAM wPara
         ::SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(create->lpCreateParams));
     }
     auto* self = reinterpret_cast<WindowTracker*>(::GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+    if (self && self->shellHookRegistered_ && message == self->shellHookMessage_) {
+        try { self->OnShellEvent(wParam, reinterpret_cast<HWND>(lParam)); }
+        catch (...) { AETHER_LOG_ERROR(kLog, "Shell attention event could not be processed"); }
+        return 0;
+    }
     if (message == WM_TIMER && wParam == kCoalesceTimerId && self) {
         ::KillTimer(hwnd, kCoalesceTimerId);
         self->timerArmed_ = false;
@@ -235,8 +253,11 @@ void WindowTracker::OnWinEvent(DWORD event, HWND hwnd) {
     const bool tracked = trackedWindows_.contains(hwnd);
     switch (event) {
         case EVENT_SYSTEM_FOREGROUND:
+            (void)attention_.Observe(WindowAttentionEvent::Activated, hwnd);
+            (void)attention_.Observe(WindowAttentionEvent::Activated, ::GetAncestor(hwnd, GA_ROOTOWNER));
             break;  // the foreground application may change even for windows we do not list
         case EVENT_OBJECT_DESTROY:
+            if (attention_.Observe(WindowAttentionEvent::Destroyed, hwnd)) MarkDirty();
             if (!tracked) return;  // a window we never listed cannot change the result
             break;
         default:
@@ -245,6 +266,27 @@ void WindowTracker::OnWinEvent(DWORD event, HWND hwnd) {
             break;
     }
     MarkDirty();
+}
+
+void WindowTracker::OnShellEvent(WPARAM code, HWND hwnd) {
+    if (!running_ || !hwnd) return;
+    const auto event = ClassifyShellAttentionEvent(code);
+    if (!event) return;
+    if (*event == WindowAttentionEvent::Activated || *event == WindowAttentionEvent::Destroyed ||
+        *event == WindowAttentionEvent::Created) {
+        bool changed = attention_.Observe(*event, hwnd);
+        if (*event == WindowAttentionEvent::Activated)
+            changed = attention_.Observe(*event, ::GetAncestor(hwnd, GA_ROOTOWNER)) || changed;
+        if (changed) MarkDirty();
+        return;
+    }
+    if (*event != WindowAttentionEvent::Flash || !::IsWindow(hwnd) || !IsTopLevel(hwnd)) return;
+    DWORD process = 0;
+    (void)::GetWindowThreadProcessId(hwnd, &process);
+    if (!process || process == ::GetCurrentProcessId()) return;
+    const HWND foreground = ::GetForegroundWindow();
+    const HWND root = foreground ? ::GetAncestor(foreground, GA_ROOTOWNER) : nullptr;
+    if (attention_.Observe(*event, hwnd, hwnd == foreground || hwnd == root)) MarkDirty();
 }
 
 void WindowTracker::MarkDirty() {
@@ -410,6 +452,13 @@ void WindowTracker::Refresh() {
     }
 
     // Names, and a stable order: applications keep the position of their first appearance.
+    attention_.Retain(tracked);
+    for (auto& app : applications) {
+        for (const auto& window : app.windows) {
+            if (app.foreground) (void)attention_.Observe(WindowAttentionEvent::Activated, window.handle);
+            else app.attentionRequested = app.attentionRequested || attention_.Requested(window.handle);
+        }
+    }
     std::unordered_map<std::wstring, std::uint64_t> order;
     for (std::size_t i = 0; i < applications.size(); ++i) {
         auto& app = applications[i];

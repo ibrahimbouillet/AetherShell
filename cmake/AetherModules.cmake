@@ -8,7 +8,7 @@
 
 set(AETHER_MODULE_ORDER
     core diagnostics platform net graphics accessibility ui
-    status status_audio weather applications search settings updates install
+    status status_audio weather weather_location applications search settings updates install
     dock topbar search_ui settings_ui system_controls media_controls controlcenter
     app launcher updater installer)
 
@@ -29,6 +29,7 @@ aether_declare_module(ui            src/ui                core diagnostics platf
 aether_declare_module(status        src/status            core diagnostics platform)
 aether_declare_module(status_audio  src/status/audio      core diagnostics platform)
 aether_declare_module(weather       src/weather           core diagnostics platform)
+aether_declare_module(weather_location src/weather_location core platform)
 aether_declare_module(applications  src/applications      core diagnostics platform)
 aether_declare_module(search        src/search            core diagnostics platform)
 aether_declare_module(settings      src/settings          core diagnostics platform)
@@ -42,7 +43,7 @@ aether_declare_module(system_controls src/system_controls core platform status)
 aether_declare_module(media_controls src/media_controls   core platform)
 aether_declare_module(controlcenter src/controlcenter     ui accessibility status status_audio system_controls media_controls)
 aether_declare_module(app           src/app
-    core diagnostics platform net graphics accessibility ui status status_audio weather
+    core diagnostics platform net graphics accessibility ui status status_audio weather weather_location
     applications search settings updates install dock topbar search_ui settings_ui controlcenter)
 aether_declare_module(launcher      launcher              core diagnostics platform updates install)
 aether_declare_module(updater       updater               core diagnostics platform updates install)

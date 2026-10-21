@@ -225,20 +225,12 @@ AETHER_TEST("topbar preferences: weather moves left while status targets remain 
     }
 }
 
-AETHER_TEST("topbar actions: notification area is runtime-only and exposes recovery while suspended") {
-    settings::TopBarSettings config;
-    auto items = BuildDisplayItems({}, config, false);
-    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea) == nullptr);
-    items = BuildDisplayItems({}, config, false, {}, {true, true, false});
-    REQUIRE(items.ok());
-    const auto* action = Find(items.value(), ItemKind::NotificationArea);
-    REQUIRE(action != nullptr); CHECK(action->actionable);
-    CHECK(action->tooltip.find(L"60 seconds") != std::wstring::npos);
-    items = BuildDisplayItems({}, config, false, {}, {true, false, true});
-    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea)->tooltip.find(L"Resume") != std::wstring::npos);
-    config.showNotificationAreaButton = false;
-    items = BuildDisplayItems({}, config, false, {}, {true, true, false});
-    REQUIRE(items.ok()); CHECK(Find(items.value(), ItemKind::NotificationArea) == nullptr);
+AETHER_TEST("topbar actions: minimal bar omits native-taskbar arrow even for legacy settings") {
+    settings::TopBarSettings config;config.showNotificationAreaButton=true;
+    for(const auto state:{TaskbarReplacementState{},TaskbarReplacementState{true,true,false},TaskbarReplacementState{true,false,true}}){
+        auto items=BuildDisplayItems({},config,false,{},state);REQUIRE(items.ok());
+        CHECK(Find(*items,ItemKind::NotificationArea)==nullptr);
+    }
 }
 
 AETHER_TEST("topbar grouped controls preserve true readings and one action") {
@@ -270,4 +262,14 @@ AETHER_TEST("topbar grouped controls retain unknowns and configured omissions") 
     plain=BuildDisplayItems(state,settings,false);REQUIRE(plain.ok());grouped=GroupQuickControlItems(*plain);REQUIRE(grouped.ok());
     const auto* group=Find(*grouped,ItemKind::QuickControls);REQUIRE(group!=nullptr);CHECK_EQ(group->components.size(),std::size_t{1});
     CHECK(group->components.front().unknown);CHECK_FALSE(group->components.front().level.has_value());
+}
+
+AETHER_TEST("topbar battery: real Windows low flag propagates without inventing unknown state") {
+    TopBarSnapshots state;settings::TopBarSettings config;
+    state.battery.state=status::ProviderState::Available;state.battery.batteryPresent=true;state.battery.percent=18;
+    state.battery.lowOrCritical=true;
+    auto items=BuildDisplayItems(state,config,false);REQUIRE(items.ok());REQUIRE(Find(*items,ItemKind::Battery));
+    CHECK(Find(*items,ItemKind::Battery)->lowOrCritical==true);
+    state.battery.lowOrCritical.reset();items=BuildDisplayItems(state,config,false);REQUIRE(items.ok());
+    CHECK_FALSE(Find(*items,ItemKind::Battery)->lowOrCritical.has_value());
 }

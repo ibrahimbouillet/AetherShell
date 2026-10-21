@@ -17,7 +17,7 @@ bool SameContent(const ClockSnapshot& a, const ClockSnapshot& b) noexcept {
 bool SameContent(const BatterySnapshot& a, const BatterySnapshot& b) noexcept {
     return a.state == b.state && a.batteryPresent == b.batteryPresent && a.percent == b.percent &&
            a.charge == b.charge && a.source == b.source && a.remaining == b.remaining &&
-           a.energySaverOn == b.energySaverOn && a.detail == b.detail;
+           a.energySaverOn == b.energySaverOn && a.lowOrCritical == b.lowOrCritical && a.detail == b.detail;
 }
 
 bool SameContent(const KeyboardSnapshot& a, const KeyboardSnapshot& b) noexcept {

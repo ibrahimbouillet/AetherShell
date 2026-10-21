@@ -18,8 +18,15 @@ bool ShouldObserveTaskbar(const TaskbarUpdate& update) noexcept {
     return update.active || update.scheduled;
 }
 
-bool ShouldSuppressDock(bool fullscreen, const TaskbarUpdate& update) noexcept {
-    return fullscreen || (update.suspended && !update.active);
+bool ShouldSuppressDock(bool fullscreen, const TaskbarUpdate& update, bool attentionPeek) noexcept {
+    const bool canPeek = attentionPeek && update.active && !update.suspended;
+    return (fullscreen && !canPeek) || (update.suspended && !update.active);
+}
+
+std::optional<std::uint64_t> AttentionPeekDelay(bool armed, bool closing, bool hasAttention,
+    std::uint64_t now, std::uint64_t deadline) noexcept {
+    if (!armed || closing || !hasAttention) return std::nullopt;
+    return now < deadline ? deadline - now : 0;
 }
 
 bool ShouldAutomaticallyImportPins(bool replacement, bool sync, bool imported, bool explorerApplied) noexcept {

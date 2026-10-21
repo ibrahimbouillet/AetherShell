@@ -293,7 +293,9 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context){
     winrt::com_ptr<ID2D1SolidColorBrush> brush; if(FAILED(dc->CreateSolidColorBrush(p.tokens.textPrimary.ToD2D(),brush.put()))){dc->SetTransform(old);return;}
     auto color=[&](graphics::Color value){brush->SetColor(value.ToD2D());};
     auto text=[&](std::wstring_view value,D2D1_RECT_F rect,float size=13,bool bold=false,bool center=false){graphics::TextStyle style;style.size=size*p.tokens.textScale;style.weight=bold?DWRITE_FONT_WEIGHT_SEMI_BOLD:DWRITE_FONT_WEIGHT_NORMAL;style.alignment=center?DWRITE_TEXT_ALIGNMENT_CENTER:DWRITE_TEXT_ALIGNMENT_LEADING;p.text.Draw(dc,value,rect,style,brush.get());};
-    auto line=[&](float x,float y,float a,float b,float width=1.6f){dc->DrawLine({x,y},{a,b},brush.get(),width);};
+    winrt::com_ptr<ID2D1Factory> factory;dc->GetFactory(factory.put());
+    auto* round=graphics::RoundStrokeStyle(factory.get());
+    auto line=[&](float x,float y,float a,float b,float width=1.6f){dc->DrawLine({x,y},{a,b},brush.get(),width,round);};
     const auto* session=p.Session();color(p.tokens.textSecondary);
     text(session?L"Now playing · switch source":L"Media controls",{28,16,366,42},12);
     color(p.tokens.textPrimary);text(session?(session->title.empty()?L"Untitled media":session->title):(p.state.loading?L"Reading media sessions…":L"No compatible media session"),{28,40,404,65},15,true);
@@ -308,7 +310,11 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context){
             dc->FillRoundedRectangle(D2D1::RoundedRect(target.rect,7,7),brush.get());color(p.tokens.surface.cardStroke);dc->DrawRoundedRectangle(D2D1::RoundedRect(target.rect,7,7),brush.get(),1);
             color(p.On(control)?p.tokens.accentRoles.textOnAccent:target.enabled?p.tokens.textPrimary:p.tokens.textDisabled);
             const float cx=(target.rect.left+target.rect.right)/2-(p.Radio(control)?12:0),cy=(target.rect.top+target.rect.bottom)/2;
-            if(control==SystemControl::WiFi){std::optional<int>waves;if(p.state.network.kind==status::ConnectionKind::WiFi&&p.state.network.signalBars&&*p.state.network.signalBars<=5)waves=(*p.state.network.signalBars*3+4)/5;graphics::PaintWiFiGlyph(dc,{cx-11,cy-11,cx+11,cy+11},brush.get(),waves);}
+            if(control==SystemControl::WiFi){
+                std::optional<int> bars;
+                if(p.state.network.state==status::ProviderState::Available&&p.state.network.kind==status::ConnectionKind::WiFi&&p.state.network.signalBars)bars=*p.state.network.signalBars;
+                graphics::PaintNetworkGlyph(dc,{cx-11,cy-11,cx+11,cy+11},brush.get(),graphics::NetworkGlyphKind::WiFi,bars);
+            }
             else if(control==SystemControl::Bluetooth){line(cx,cy-12,cx,cy+12);line(cx,cy-12,cx+8,cy-5);line(cx+8,cy-5,cx-7,cy+7);line(cx-7,cy-7,cx+8,cy+5);line(cx+8,cy+5,cx,cy+12);}
             else if(control==SystemControl::FlightMode){line(cx-12,cy+3,cx+12,cy-3,2.2f);line(cx,cy,cx-4,cy-11,2.2f);line(cx,cy,cx-4,cy+10,2.2f);}
             else if(control==SystemControl::EnergySaver){dc->DrawRoundedRectangle(D2D1::RoundedRect({cx-12,cy-6,cx+9,cy+6},2,2),brush.get(),1.6f);line(cx+12,cy-2,cx+12,cy+2);line(cx-4,cy+3,cx+3,cy-4,2);}
@@ -338,16 +344,19 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context){
         color(p.tokens.textSecondary);text(value?std::to_wstring(*value)+L"%":L"Unavailable",{74,r.top-17,380,r.top},11);
         if(p.focused==id&&target->enabled)graphics::PaintFocusRing(dc,r,6,p.tokens);
     }
-    color(p.tokens.textPrimary);const float sun=p.sun.Value(context.now);const float radius=2.0f+sun*2.0f;dc->DrawEllipse({{44,398},radius,radius},brush.get(),1.5f);
-    for(int ray=0;ray<8;++ray){const float angle=static_cast<float>(ray)*0.78539816f;const float a=radius+2,b=a+2+sun*4;line(44+std::cos(angle)*a,398+std::sin(angle)*a,44+std::cos(angle)*b,398+std::sin(angle)*b);}
-    line(30,447,35,447);line(35,447,42,441);line(42,441,42,459);line(42,459,35,453);line(35,453,30,453);line(30,453,30,447);
-    if(p.state.audio.muted.value_or(false)){line(47,445,54,455);line(47,455,54,445);}
-    else if(const auto volume=p.Volume();volume){const int waves=*volume==0?0:*volume<=33?1:*volume<=66?2:3;for(int i=0;i<waves;++i)line(47.0f+i*3,447.0f-i,47.0f+i*3,453.0f+i);}
+    color(p.tokens.textPrimary);const float sun=p.sun.Value(context.now),sunSize=16+sun*8;
+    graphics::PaintStatusGlyph(dc,graphics::StatusGlyph::Sun,{44-sunSize/2,398-sunSize/2,44+sunSize/2,398+sunSize/2},brush.get());
+    const bool audioKnown=p.state.audio.state==status::ProviderState::Available&&p.state.audio.deviceAvailable;
+    graphics::PaintVolumeGlyph(dc,{28,438,60,462},brush.get(),p.Volume(),audioKnown?p.state.audio.muted:std::nullopt);
     text(L"›",{384,434,416,466},20,false,true);text(L"›",{384,382,416,414},20,false,true);
     color(p.tokens.textSecondary);text(p.state.message.empty()?(p.state.loading?L"Reading Windows status…":p.state.audio.deviceName):p.state.message,{28,470,404,496},11);
     color(p.tokens.surface.divider);line(9,498,423,498,1);
     color(p.tokens.textPrimary);std::wstring battery=L"Power and battery";if(p.state.battery.percent)battery=std::to_wstring(*p.state.battery.percent)+L"% · Power and battery";
-    text(battery,{28,502,298,542},12);graphics::PaintGlyph(dc,graphics::Glyph::General,{365,512,389,536},brush.get());
+    const bool batteryKnown=p.state.battery.state==status::ProviderState::Available&&p.state.battery.batteryPresent;
+    graphics::PaintBatteryGlyph(dc,{28,512,50,534},brush.get(),p.tokens,batteryKnown?p.state.battery.percent:std::nullopt,
+        batteryKnown?p.state.battery.lowOrCritical:std::nullopt,batteryKnown&&p.state.battery.charge==status::ChargeState::Charging,
+        p.state.battery.source==status::PowerSource::External);
+    text(battery,{58,502,330,542},12);graphics::PaintGlyph(dc,graphics::Glyph::General,{365,512,389,536},brush.get());
     dc->SetTransform(old);
 }
 bool ControlCenterWindow::OnAnimate(double now){return impl_->sun.IsAnimating(now);}

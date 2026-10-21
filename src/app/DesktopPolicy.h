@@ -31,7 +31,10 @@ inline constexpr std::wstring_view kProductionInstanceName = L"AetherShell";
 // (for example after the activation attempts are exhausted), and is armed again by the next one.
 [[nodiscard]] bool ShouldObserveTaskbar(const TaskbarUpdate& update) noexcept;
 
-[[nodiscard]] bool ShouldSuppressDock(bool fullscreen, const TaskbarUpdate& update) noexcept;
+[[nodiscard]] bool ShouldSuppressDock(bool fullscreen, const TaskbarUpdate& update, bool attentionPeek = false) noexcept;
+// A queued stale timer may not expire a newer attention peek. Pure monotonic deadline policy.
+[[nodiscard]] std::optional<std::uint64_t> AttentionPeekDelay(bool armed, bool closing,
+    bool hasAttention, std::uint64_t now, std::uint64_t deadline) noexcept;
 [[nodiscard]] bool ShouldAutomaticallyImportPins(bool replacement, bool sync, bool imported,
                                                 bool explorerApplied) noexcept;
 

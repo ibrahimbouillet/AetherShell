@@ -7,6 +7,7 @@
 #include "dock/DockModel.h"
 #include "applications/KnownApplications.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -143,4 +144,39 @@ AETHER_TEST("dock presentation: a pinned profile accepts a late window avatar wi
     CHECK_EQ((*after)[1].application.iconResource,running.relaunchIconResource);
     CHECK_EQ((*after)[1].application.shortcutPath,pin.shortcutPath);CHECK_EQ((*after)[1].application.arguments,pin.arguments);
     CHECK(apps::IconSourceFingerprint((*after)[1].application)!=key);
+}
+
+AETHER_TEST("dock attention: pinned and duplicate running groups combine only real background requests") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    config.pinned={Pin(L"exe:pinned")};
+    auto pinnedA=Running(L"exe:pinned"),pinnedB=pinnedA;pinnedB.attentionRequested=true;
+    auto runningA=Running(L"exe:running"),runningB=runningA;runningB.attentionRequested=true;
+    auto model=BuildDockItems(config,{pinnedA,pinnedB,runningA,runningB});REQUIRE(model.ok());
+    REQUIRE_EQ(model->size(),3u);CHECK_FALSE((*model)[0].attentionRequested);
+    for(const std::size_t i:{1u,2u}){
+        CHECK((*model)[i].attentionRequested);REQUIRE((*model)[i].runningApplication.has_value());
+        CHECK((*model)[i].runningApplication->attentionRequested);CHECK_EQ((*model)[i].windowCount,2u);
+    }
+    pinnedA.foreground=true;runningA.foreground=true;
+    auto active=BuildDockItems(config,{pinnedA,pinnedB,runningA,runningB});REQUIRE(active.ok());
+    for(const std::size_t i:{1u,2u}){
+        CHECK_FALSE((*active)[i].attentionRequested);CHECK((*active)[i].foreground);
+        CHECK_FALSE((*active)[i].runningApplication->attentionRequested);CHECK((*active)[i].runningApplication->foreground);
+    }
+    auto stopped=BuildDockItems(config,{});REQUIRE(stopped.ok());CHECK_FALSE((*stopped)[1].attentionRequested);
+}
+
+AETHER_TEST("dock attention: profile identity and overflow preserve independent attention") {
+    settings::DockSettings config;config.showStartButton=false;config.showTaskViewButton=false;
+    config.pinned={Pin(L"aumid:Synthetic.A")};config.pinned[0].appUserModelId=L"Synthetic.A";
+    auto a=Running(L"aumid:Synthetic.A"),b=Running(L"aumid:Synthetic.B");
+    a.appUserModelId=L"Synthetic.A";b.appUserModelId=L"Synthetic.B";b.attentionRequested=true;
+    auto model=BuildDockItems(config,{a,b});REQUIRE(model.ok());REQUIRE_EQ(model->size(),3u);
+    CHECK_FALSE((*model)[1].attentionRequested);CHECK((*model)[2].attentionRequested);
+    auto fitted=FitDockItems(*model,config,56);REQUIRE(fitted.ok());
+    const auto waiting=std::find_if(fitted->overflow.begin(),fitted->overflow.end(),[&](const auto& item){return item.id==b.id;});
+    REQUIRE(waiting!=fitted->overflow.end());CHECK(waiting->attentionRequested);
+    CHECK(fitted->items.front().attentionRequested); // Search exposes hidden applications at this width.
+    auto more=FitDockItems(*model,config,160);REQUIRE(more.ok());
+    REQUIRE_EQ(more->items.back().kind,DockItemKind::Overflow);CHECK(more->items.back().attentionRequested);
 }

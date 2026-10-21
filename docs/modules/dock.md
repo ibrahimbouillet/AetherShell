@@ -19,7 +19,7 @@ narrow work areas pins can also overflow. The minimum fallback keeps search with
 Cosine hover targets use resting icon centers. Springs arrange icons from their actual animated
 sizes, on a common bottom baseline with sufficient headroom and no overlap. Hit testing uses this
 drawn geometry. The glass panel expands with the icons. Reduced motion snaps to targets and skips
-the finite launch bounce. Pointer press feedback, keyboard focus rings and running dots are drawn
+the finite launch bounce. Spring-based icon press feedback, keyboard focus rings and running dots are drawn
 with Direct2D; icons use the application icon worker and a GPU bitmap cache. No repeating idle timer
 or frame request is used.
 
@@ -46,8 +46,16 @@ Moving a pin persists only the order of existing pins through the asynchronous s
 Existing pin launch metadata is retained. Fixed entries and overflow never move. Explicit Unpin
 records `dismissedPins` so automatic Windows pin sync cannot re-add the item; explicit Pin removes
 that dismissal. A completed drag consumes its release rather than launching the moved application.
-Reordered slots spring from their currently drawn positions to their new slots; reduced motion
-snaps directly. Hit testing follows these positions during the transition.
+The captured original icon follows horizontal pointer motion with its original grab offset and is
+drawn above its neighbours. Neighbours move only when its center crosses a stable resting slot
+center, independent of magnification and animated hit rectangles. Reordering rebases each existing
+slide spring instead of restarting it, preserving both current position and velocity. Press, lift
+and release scale/offset also use the shared springs. Release settles the original icon into its
+destination; reduced motion keeps direct manipulation but snaps decorative movement. There are no
+hover/pressed tile backgrounds or pinned/running divider. Focus rings and magnification remain.
+`DockLayout::raisedItem` makes overlap hit testing agree with that paint order. Running metadata
+updates keep capture and the held identity; removal, disabled input, DPI/display changes and
+fullscreen suppression safely cancel the gesture.
 Launch errors appear in a temporary anchored tooltip. Tooltip delay is a one-shot timer.
 
 `FocusDock` enters keyboard mode, with arrows, Home/End, Enter/Space, context-menu keys and Escape.
@@ -55,6 +63,15 @@ The normal no-activate style is restored when focus leaves; a refused focus requ
 error. Escape attempts to return to the previous foreground window. UI Automation exposes a
 ToolBar with named Button children, pinned/running status, Invoke and focus/structure events.
 Invoke queues an HWND message so an overflow menu never holds an accessibility COM call open.
+
+Real background Shell attention requests carry `attentionRequested` through the application model.
+A rising request starts three soft red pulses with a small bounce, bounded to 2.4 seconds before
+motion-policy scaling. An unchanged true flag never restarts that envelope. A static attention dot
+and UIA "Needs attention" status remain until foreground/removal clears the request. Reduced motion
+and high contrast use the static cue only. Hidden requests can retain one pending cue until the host
+reveals the Dock; the Dock never reveals or activates itself, the application or another surface.
+Shell attention availability is conditional on the tracker compatibility API. Normal title changes
+do not imply attention, and there is no claimed complete notification/unread-count API.
 
 `SetSuppressed` handles full-screen hiding. Optional bottom-edge AppBar reservation uses documented
 shell messages, caches unchanged reservation rectangles and removes an existing registration before
@@ -190,3 +207,17 @@ and 3/3 native cases**. The native checks include fixed-entry requests, unknown-
 refusal, catalog/icon refresh, modal hiding, disabled launch admission and queued-tooltip rejection.
 Fresh dark-rest and light-hover public images contain only the inspected synthetic fixtures. This
 supersedes the pending checkpoint above for automated scope, not actual browser/AppBar qualification.
+
+## Captured motion and attention continuation — 2026-10-21
+
+The local D27 continuation implements continuous captured movement, interruption-preserving
+neighbour/press/lift/drop springs, the clean icon-only hover treatment and finite real attention
+presentation described above (FR-002/FR-004, NFR-002/NFR-005/NFR-007/NFR-008/NFR-011).
+New pure cases exercise stable crossing/reversal, spring rebase continuity, overlap paint/input
+priority and the finite pulse envelope. A new isolated native case samples intermediate geometry
+before/after a crossed slot and a second crossing, running-state refresh during capture, release
+settling, stationary long-hold, unchanged attention and reduced-motion cancellation. It uses fake
+launchers, temporary settings and only its own windows; no global input, work-area reservation,
+real application activation or capture is required. These new checks are pending execution; the
+S-022/S-026 receipts above do not validate this continuation. Physical pointer/refresh-rate and real
+Shell notification behavior remain separate owner qualification.

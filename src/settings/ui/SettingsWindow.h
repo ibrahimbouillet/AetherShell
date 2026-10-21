@@ -27,6 +27,8 @@ struct SettingsCallbacks {
     weather::GeocodingClient* geocoding = nullptr;
     std::function<void()> importTaskbarPins;
     std::function<std::wstring()> taskbarStatus;
+    std::function<void()> requestWindowsLocation, openLocationSettings;
+    std::function<std::wstring()> weatherLocationStatus;
 };
 
 class SettingsWindow {

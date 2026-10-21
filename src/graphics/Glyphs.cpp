@@ -45,6 +45,13 @@ public:
         empty_ = false;
     }
 
+    void Curve(D2D1_POINT_2F start, D2D1_POINT_2F first, D2D1_POINT_2F second, D2D1_POINT_2F end) {
+        if (!ok_) return;
+        sink_->BeginFigure(start, D2D1_FIGURE_BEGIN_HOLLOW);
+        sink_->AddBezier(D2D1::BezierSegment(first, second, end));
+        sink_->EndFigure(D2D1_FIGURE_END_OPEN); empty_ = false;
+    }
+
     void RoundRect(float left, float top, float right, float bottom, float radius, bool filled) {
         if (!ok_) return;
         radius = std::clamp(radius, 0.0f, std::min(right - left, bottom - top) / 2.0f);
@@ -202,11 +209,100 @@ void BuildShape(Glyph glyph, PathBuilder& stroke, PathBuilder& fill) {
     }
 }
 
+void Question(PathBuilder& stroke, PathBuilder& fill, float x = 11.0f, float y = 9.0f) {
+    stroke.Curve(P(x, y + 1), P(x, y - 1), P(x + 3, y - 1), P(x + 3, y + 1));
+    stroke.Curve(P(x + 3, y + 1), P(x + 3, y + 2), P(x + 1.5f, y + 2), P(x + 1.5f, y + 3));
+    fill.Circle(x + 1.5f, y + 5, 0.6f, true);
+}
+void Cloud(PathBuilder& stroke, float lift = 0) {
+    if (auto* sink = stroke.Sink()) {
+        sink->BeginFigure(P(4, 11 - lift), D2D1_FIGURE_BEGIN_HOLLOW);
+        sink->AddBezier(D2D1::BezierSegment(P(0.5f, 11 - lift), P(0.5f, 6 - lift), P(4.5f, 6.5f - lift)));
+        sink->AddBezier(D2D1::BezierSegment(P(5, 2 - lift), P(11, 2 - lift), P(11.5f, 7 - lift)));
+        sink->AddBezier(D2D1::BezierSegment(P(15, 6 - lift), P(15.5f, 11 - lift), P(12, 11 - lift)));
+        sink->AddLine(P(4, 11 - lift)); sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+    }
+}
+void BuildStatusShape(StatusGlyph glyph, PathBuilder& stroke, PathBuilder& fill) {
+    const auto line = [&](float a, float b, float c, float d) { stroke.Polyline({P(a,b),P(c,d)}); };
+    switch (glyph) {
+        case StatusGlyph::Speaker: case StatusGlyph::SpeakerLow: case StatusGlyph::SpeakerMedium:
+        case StatusGlyph::SpeakerHigh: case StatusGlyph::SpeakerMuted: case StatusGlyph::SpeakerUnknown:
+            stroke.Polyline({P(1.5f,6),P(4.25f,6),P(7.5f,3.25f),P(7.5f,12.75f),P(4.25f,10),P(1.5f,10),P(1.5f,6)});
+            if (glyph == StatusGlyph::SpeakerMuted) { line(10.5f,6,14,10); line(10.5f,10,14,6); }
+            else if (glyph == StatusGlyph::SpeakerUnknown) Question(stroke,fill,10,5.5f);
+            else {
+                const int count = glyph == StatusGlyph::SpeakerLow ? 1 : glyph == StatusGlyph::SpeakerMedium ? 2 : glyph == StatusGlyph::SpeakerHigh ? 3 : 0;
+                for (int i = 0; i < count; ++i) {
+                    const float x = 9.5f + static_cast<float>(i)*1.75f;
+                    const float extent = 1.5f + static_cast<float>(i)*1.25f;
+                    stroke.Curve(P(x,8-extent),P(x+1.5f,8-extent*0.4f),P(x+1.5f,8+extent*0.4f),P(x,8+extent));
+                }
+            }
+            break;
+        case StatusGlyph::Microphone: case StatusGlyph::MicrophoneMuted: case StatusGlyph::MicrophoneUnknown:
+            stroke.RoundRect(5.5f,1.5f,10.5f,10,2.5f,false);
+            stroke.Curve(P(3.25f,7.5f),P(3.25f,14),P(12.75f,14),P(12.75f,7.5f));
+            line(8,12.5f,8,14.5f); line(5.25f,14.5f,10.75f,14.5f);
+            if (glyph == StatusGlyph::MicrophoneMuted) line(2,14,14,2);
+            else if (glyph == StatusGlyph::MicrophoneUnknown) Question(stroke,fill,11,8.5f);
+            break;
+        case StatusGlyph::Battery:
+            stroke.RoundRect(1.25f,4.5f,13.25f,11.5f,1.75f,false); line(15,6.75f,15,9.25f); break;
+        case StatusGlyph::Plug:
+            line(5.5f,1.75f,5.5f,5.5f); line(10.5f,1.75f,10.5f,5.5f);
+            stroke.Polyline({P(3.5f,5.5f),P(12.5f,5.5f),P(12.5f,8),P(11,10.5f),P(8,11.5f),P(5,10.5f),P(3.5f,8),P(3.5f,5.5f)});
+            line(8,11.5f,8,14.25f); break;
+        case StatusGlyph::Ethernet:
+            stroke.RoundRect(1.75f,2.5f,14.25f,11,2,false); line(8,11,8,14); line(4.5f,14,11.5f,14); break;
+        case StatusGlyph::NetworkNone: case StatusGlyph::NetworkOther:
+            stroke.Circle(8,8,6,false);
+            stroke.Curve(P(8,2),P(3,5),P(3,11),P(8,14));
+            stroke.Curve(P(8,2),P(13,5),P(13,11),P(8,14)); line(2,8,14,8);
+            if (glyph == StatusGlyph::NetworkNone) line(2,14,14,2); break;
+        case StatusGlyph::NetworkUnknown: case StatusGlyph::Unknown:
+            Question(stroke,fill,6.5f,4.0f); break;
+        case StatusGlyph::Sun:
+            stroke.Circle(8,8,3,false);
+            for (int i = 0; i < 8; ++i) {
+                const float angle = static_cast<float>(i)*0.78539816f;
+                line(8+std::cos(angle)*5,8+std::sin(angle)*5,8+std::cos(angle)*6.5f,8+std::sin(angle)*6.5f);
+            }
+            break;
+        case StatusGlyph::Moon:
+            if (auto* sink = stroke.Sink()) {
+                sink->BeginFigure(P(10.5f,2),D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddBezier(D2D1::BezierSegment(P(2,1),P(0.5f,11),P(7.5f,13.75f)));
+                sink->AddBezier(D2D1::BezierSegment(P(10.5f,15),P(13,12.5f),P(14,10)));
+                sink->AddBezier(D2D1::BezierSegment(P(8,12),P(5,5),P(10.5f,2)));
+                sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+            }
+            break;
+        case StatusGlyph::PartlyCloudyDay: case StatusGlyph::PartlyCloudyNight:
+            if (glyph == StatusGlyph::PartlyCloudyDay) {
+                stroke.Curve(P(2.25f,6),P(1,2),P(6,1),P(7,4));
+                line(1.25f,2,2,2.75f);line(4.5f,1,4.5f,1.75f);line(7.5f,1.75f,7,2.5f);
+            } else stroke.Curve(P(7,1.5f),P(2,1.5f),P(1,6),P(3.5f,7));
+            Cloud(stroke); break;
+        case StatusGlyph::Cloud: Cloud(stroke); break;
+        case StatusGlyph::Fog: case StatusGlyph::Drizzle: case StatusGlyph::Rain:
+        case StatusGlyph::Snow: case StatusGlyph::Thunder:
+            Cloud(stroke,0.75f);
+            if (glyph == StatusGlyph::Fog) { line(2.75f,12.25f,13.25f,12.25f);line(4,14.5f,12,14.5f); }
+            else if (glyph == StatusGlyph::Drizzle) for (float x : {4.5f,8.0f,11.5f}) fill.Circle(x,13.5f,0.65f,true);
+            else if (glyph == StatusGlyph::Rain) for (float x : {4.5f,8.5f,12.5f}) line(x,12.25f,x-1,14.5f);
+            else if (glyph == StatusGlyph::Snow) for (float x : {5.5f,10.5f}) {line(x,12.25f,x,14.75f);line(x-1.1f,13.5f,x+1.1f,13.5f);}
+            else stroke.Polyline({P(9.75f,10.75f),P(7.25f,13),P(10.25f,13),P(8.25f,15)});
+            break;
+    }
+}
+
 struct FactoryCache {
     winrt::com_ptr<ID2D1Factory> factory;
     winrt::com_ptr<ID2D1StrokeStyle> roundStroke;
     std::map<int, GlyphGeometry> glyphs;
     std::map<int, WiFiGlyphGeometry> wifi;
+    std::map<int, GlyphGeometry> status;
     winrt::com_ptr<ID2D1PathGeometry> brand;
     winrt::com_ptr<ID2D1PathGeometry> start;
 };
@@ -279,6 +375,17 @@ Result<GlyphGeometry> BuildGlyphGeometry(ID2D1Factory* factory, Glyph glyph) {
     } catch (...) {
         return MakeError(ErrorCode::Internal, "glyph geometry failed");
     }
+}
+
+Result<GlyphGeometry> BuildStatusGlyphGeometry(ID2D1Factory* factory, StatusGlyph glyph) {
+    if (!factory) return MakeError(ErrorCode::InvalidArgument, "no Direct2D factory");
+    if (glyph < StatusGlyph::Speaker || glyph > StatusGlyph::Unknown) glyph = StatusGlyph::Unknown;
+    try {
+        PathBuilder stroke(factory), fill(factory); BuildStatusShape(glyph,stroke,fill);
+        auto lines = stroke.Finish(); if (!lines) return lines.error();
+        auto solids = fill.Finish(); if (!solids) return solids.error();
+        return GlyphGeometry{std::move(*lines),std::move(*solids)};
+    } catch (...) { return MakeError(ErrorCode::Internal,"status glyph geometry failed"); }
 }
 
 Result<WiFiGlyphGeometry> BuildWiFiGlyphGeometry(ID2D1Factory* factory, std::optional<int> activeWaves) {
@@ -414,6 +521,132 @@ void PaintWiFiGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brus
     }
     if (geometry.active.fill) target->FillGeometry(geometry.active.fill.get(), brush);
     if (geometry.active.stroke) target->DrawGeometry(geometry.active.stroke.get(), brush, width, stroke);
+    target->SetTransform(previous);
+}
+
+void PaintStatusGlyph(ID2D1RenderTarget* target, StatusGlyph glyph, const D2D1_RECT_F& box,
+                      ID2D1Brush* brush, float strokeWidth) {
+    if (!target || !brush || !UsableBox(box)) return;
+    if (glyph < StatusGlyph::Speaker || glyph > StatusGlyph::Unknown) glyph = StatusGlyph::Unknown;
+    const auto factory = FactoryOf(target); auto* cache = CacheFor(factory.get()); if (!cache) return;
+    auto found = cache->status.find(static_cast<int>(glyph));
+    if (found == cache->status.end()) {
+        auto geometry = BuildStatusGlyphGeometry(factory.get(),glyph); if (!geometry) return;
+        found = cache->status.emplace(static_cast<int>(glyph),std::move(*geometry)).first;
+    }
+    auto* stroke = RoundStrokeStyle(factory.get());
+    float scale = 1; const auto previous = PushGrid(target,box,scale);
+    if (found->second.fill) target->FillGeometry(found->second.fill.get(),brush);
+    if (found->second.stroke) target->DrawGeometry(found->second.stroke.get(),brush,
+        std::isfinite(strokeWidth) && strokeWidth > 0 ? strokeWidth : 1.5f,stroke);
+    target->SetTransform(previous);
+}
+
+void PaintNetworkGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                       NetworkGlyphKind kind, std::optional<int> signalBars, bool limited, float strokeWidth) {
+    if (!target || !brush || !UsableBox(box)) return;
+    if (signalBars && (*signalBars < 0 || *signalBars > 5)) signalBars.reset();
+    if (kind == NetworkGlyphKind::WiFi) PaintWiFiGlyph(target,box,brush,
+        signalBars ? std::optional<int>((*signalBars*3+4)/5) : std::nullopt,strokeWidth);
+    else if (kind != NetworkGlyphKind::Cellular) PaintStatusGlyph(target,
+        kind == NetworkGlyphKind::Ethernet ? StatusGlyph::Ethernet : kind == NetworkGlyphKind::None ? StatusGlyph::NetworkNone :
+        kind == NetworkGlyphKind::Other ? StatusGlyph::NetworkOther : StatusGlyph::NetworkUnknown,box,brush,strokeWidth);
+    const auto factory = FactoryOf(target); auto* stroke = RoundStrokeStyle(factory.get());
+    const float opacity = brush->GetOpacity(); float scale = 1; const auto previous = PushGrid(target,box,scale);
+    if (kind == NetworkGlyphKind::Cellular) {
+        for (int i = 0; i < 5; ++i) {
+            brush->SetOpacity(signalBars && i < *signalBars ? opacity : opacity*0.28f);
+            const float x = 2.0f+static_cast<float>(i)*2.9f;
+            target->DrawLine(P(x,13.75f),P(x,12.0f-static_cast<float>(i)*2.15f),brush,1.75f,stroke);
+        }
+        brush->SetOpacity(opacity);
+    }
+    if (limited) target->DrawEllipse(D2D1::Ellipse(P(13,3),1.5f,1.5f),brush,1,stroke);
+    target->SetTransform(previous);
+    if (kind == NetworkGlyphKind::Cellular && !signalBars) PaintStatusGlyph(target,StatusGlyph::Unknown,
+        D2D1::RectF(box.left,box.top,box.right,box.bottom),brush,strokeWidth);
+}
+
+void PaintVolumeGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                      std::optional<int> percent, std::optional<bool> muted, float strokeWidth) {
+    if (percent && (*percent < 0 || *percent > 100)) percent.reset();
+    const auto glyph = muted == true ? StatusGlyph::SpeakerMuted : !muted || !percent ? StatusGlyph::SpeakerUnknown :
+        *percent == 0 ? StatusGlyph::Speaker : *percent <= 33 ? StatusGlyph::SpeakerLow :
+        *percent <= 66 ? StatusGlyph::SpeakerMedium : StatusGlyph::SpeakerHigh;
+    PaintStatusGlyph(target,glyph,box,brush,strokeWidth);
+}
+
+void PaintMicrophoneGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                          std::optional<bool> muted, float strokeWidth) {
+    PaintStatusGlyph(target,!muted ? StatusGlyph::MicrophoneUnknown : *muted ? StatusGlyph::MicrophoneMuted :
+        StatusGlyph::Microphone,box,brush,strokeWidth);
+}
+
+Color BatteryStatusColor(const DesignTokens& tokens, std::optional<int> percent, std::optional<bool> lowOrCritical) noexcept {
+    if (tokens.mode == ThemeMode::HighContrast) return tokens.textPrimary;
+    if (percent && (*percent < 0 || *percent > 100)) percent.reset();
+    if (lowOrCritical == true || (percent && *percent <= 5)) return tokens.critical;
+    if (percent == 100) return tokens.success;
+    return tokens.textPrimary;
+}
+
+void PaintBatteryGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1SolidColorBrush* brush,
+                       const DesignTokens& tokens, std::optional<int> percent, std::optional<bool> lowOrCritical,
+                       bool charging, bool externalPower, float strokeWidth) {
+    if (!target || !brush || !UsableBox(box)) return;
+    if (percent && (*percent < 0 || *percent > 100)) percent.reset();
+    const auto original = brush->GetColor();
+    struct RestoreColor { ID2D1SolidColorBrush* brush; D2D1_COLOR_F color; ~RestoreColor() { brush->SetColor(color); } } restore{brush,original};
+    auto color = BatteryStatusColor(tokens,percent,lowOrCritical); color.a *= original.a;
+    // Zero has no fill to color. A critical outline keeps the real warning visible without
+    // inventing a nonzero charge; the same cue supports an independently reported Windows flag.
+    const bool critical = lowOrCritical == true || (percent && *percent <= 5);
+    if (tokens.mode == ThemeMode::HighContrast || critical) brush->SetColor(color.ToD2D());
+    if (!percent && externalPower && !charging && lowOrCritical != true) {
+        PaintStatusGlyph(target,StatusGlyph::Plug,box,brush,strokeWidth); brush->SetColor(original); return;
+    }
+    PaintStatusGlyph(target,StatusGlyph::Battery,box,brush,strokeWidth);
+    const auto factory = FactoryOf(target); auto* stroke = RoundStrokeStyle(factory.get());
+    float scale = 1; const auto previous = PushGrid(target,box,scale);
+    if (percent && *percent > 0) {
+        brush->SetColor(color.ToD2D()); const float width = 9.0f*static_cast<float>(*percent)/100;
+        target->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(2.75f,6,2.75f+width,10),std::min(0.75f,width/2),0.75f),brush);
+    }
+    if (charging) {
+        // Two tones keep a real charging mark readable across both the filled and empty portions.
+        for (const bool halo : {true,false}) {
+            brush->SetColor((halo ? tokens.glass.tint : tokens.textPrimary).WithAlpha(original.a).ToD2D());
+            const float width = halo ? 2.25f : 1.0f;
+            target->DrawLine(P(8.5f,5.5f),P(6.5f,8.5f),brush,width,stroke);
+            target->DrawLine(P(6.5f,8.5f),P(9.5f,8.5f),brush,width,stroke);
+            target->DrawLine(P(9.5f,8.5f),P(7.5f,11),brush,width,stroke);
+        }
+    }
+    brush->SetColor(original); target->SetTransform(previous);
+    if (!percent && !charging) PaintStatusGlyph(target,StatusGlyph::Unknown,
+        D2D1::RectF(box.left+2,box.top,box.right-2,box.bottom),brush,strokeWidth);
+}
+
+void PaintWeatherGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                       WeatherSymbol category, std::optional<bool> isDay, bool cached, float strokeWidth) {
+    StatusGlyph glyph = StatusGlyph::Unknown;
+    switch (category) {
+        case WeatherSymbol::Clear: if (isDay) glyph = *isDay ? StatusGlyph::Sun : StatusGlyph::Moon; break;
+        case WeatherSymbol::PartlyCloudy: if (isDay) glyph = *isDay ? StatusGlyph::PartlyCloudyDay : StatusGlyph::PartlyCloudyNight; break;
+        case WeatherSymbol::Cloudy: glyph = StatusGlyph::Cloud; break;
+        case WeatherSymbol::Fog: glyph = StatusGlyph::Fog; break;
+        case WeatherSymbol::Drizzle: glyph = StatusGlyph::Drizzle; break;
+        case WeatherSymbol::Rain: glyph = StatusGlyph::Rain; break;
+        case WeatherSymbol::Snow: glyph = StatusGlyph::Snow; break;
+        case WeatherSymbol::Thunder: glyph = StatusGlyph::Thunder; break;
+        case WeatherSymbol::Unknown: break;
+    }
+    PaintStatusGlyph(target,glyph,box,brush,strokeWidth);
+    if (!cached || !target || !brush || !UsableBox(box)) return;
+    const auto factory = FactoryOf(target); auto* stroke = RoundStrokeStyle(factory.get());
+    float scale = 1; const auto previous = PushGrid(target,box,scale);
+    target->DrawEllipse(D2D1::Ellipse(P(13.75f,13.75f),1.25f,1.25f),brush,0.75f,stroke);
+    target->DrawLine(P(13.75f,13),P(13.75f,13.75f),brush,0.6f,stroke);
     target->SetTransform(previous);
 }
 

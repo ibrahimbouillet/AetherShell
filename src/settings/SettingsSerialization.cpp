@@ -64,6 +64,8 @@ void Fields(S& s, F&& f) {
     f("weather", "longitude", s.weather.longitude);
     f("weather", "unit", s.weather.unit);
     f("weather", "refreshMinutes", s.weather.refreshMinutes);
+    f("weather", "useWindowsLocation", s.weather.useWindowsLocation);
+    f("weather", "windowsLocationConsent", s.weather.windowsLocationConsent);
     f("updates", "automaticChecks", s.updates.automaticChecks);
     f("updates", "checkIntervalHours", s.updates.checkIntervalHours);
     f("updates", "notifications", s.updates.notifications);
@@ -422,6 +424,11 @@ Result<ParsedSettings> FromJson(const json::Value& root) {
             if (badGroups.contains(group)) return;
             if (const auto* object = root.Find(group)) if (const auto* field = object->Find(key)) Read(*field, value, parsed.warnings, key);
         });
+        // Existing chosen coordinates remain manual; a legacy opt-out stays disabled. Never
+        // manufacture a previous Windows permission grant from an older settings file.
+        const auto* weather = badGroups.contains("weather") ? nullptr : root.Find("weather");
+        if(weather&&!weather->Find("useWindowsLocation")&&parsed.value.weather.latitude)
+            parsed.value.weather.useWindowsLocation=false;
         MigrateDockMetrics(parsed.value.dock, parsed.warnings);
         for (const char* group : {"dock", "topBar", "weather", "updates", "general"}) {
             std::set<std::string> known;

@@ -86,7 +86,7 @@ struct TopBarSettings {
     WeatherPlacement weatherPlacement = WeatherPlacement::Left;
     // TwoLine needs a height of at least 30 DIPs; the Top Bar falls back to Compact below that.
     KeyboardIndicatorStyle keyboardIndicator = KeyboardIndicatorStyle::TwoLine;
-    bool showNotificationAreaButton = true; // effective only while taskbar replacement is active
+    bool showNotificationAreaButton = false; // legacy schema field; trailing arrow removed by D27
     bool showBatteryPercent = true;
 };
 
@@ -97,6 +97,8 @@ struct WeatherSettings {
     std::optional<double> longitude;  // -180..180
     TemperatureUnit unit = TemperatureUnit::Celsius;
     int refreshMinutes = 30;       // 15..180
+    bool useWindowsLocation = true; // offered on first use, no OS access until explicit consent
+    bool windowsLocationConsent = false; // app opt-in after OS grant; never overrides Windows policy
 };
 
 struct UpdateSettings {

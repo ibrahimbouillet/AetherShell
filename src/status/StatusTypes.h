@@ -70,6 +70,7 @@ struct BatterySnapshot {
     std::optional<std::chrono::seconds> remaining;  // estimated time left on battery, when known
     bool energySaverOn = false;
     std::string detail;
+    std::optional<bool> lowOrCritical; // Windows low/critical battery flag, unknown is not false
 };
 
 // ---------------------------------------------------------------------------------------------

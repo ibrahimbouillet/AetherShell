@@ -96,6 +96,9 @@ BatterySnapshot MapBatteryReadings(const BatteryReadings& readings) {
 
     snapshot.state = ProviderState::Available;
     snapshot.batteryPresent = true;
+    // Only a known, agreeing Win32 battery flag can report the OS low/critical indication.
+    if (sp != nullptr && sp->batteryFlag != kUnknownByte && presentPerSystemPower.value_or(false))
+        snapshot.lowOrCritical = (sp->batteryFlag & (2u | 4u)) != 0;
 
     if (pm != nullptr && pm->remainingChargePercent) snapshot.percent = ValidPercent(*pm->remainingChargePercent);
     if (!snapshot.percent && sp != nullptr && sp->batteryLifePercent != kUnknownByte) {

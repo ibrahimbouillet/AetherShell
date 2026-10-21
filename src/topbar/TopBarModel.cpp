@@ -183,6 +183,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
                 s.battery.state == status::ProviderState::Unavailable;
             item.powerSource = powerReported ? s.battery.source : status::PowerSource::Unknown;
             item.charge = available ? s.battery.charge : status::ChargeState::Unknown;
+            item.lowOrCritical = available ? s.battery.lowOrCritical : std::nullopt;
             if (available && s.battery.percent && *s.battery.percent >= 0 && *s.battery.percent <= 100) {
                 item.level = *s.battery.percent;
                 item.text = std::to_wstring(*item.level) + L"%";
@@ -215,11 +216,8 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
         clock.tooltip += L"\nClick to open calendar and notifications";
         clock.accessibleName = clock.tooltip;
         result.push_back(std::move(clock));
-        if (config.showNotificationAreaButton && taskbar.available && (taskbar.active || taskbar.suspended)) {
-            result.push_back(Item(ItemKind::NotificationArea, L"", taskbar.suspended
-                ? L"Resume Aether taskbar replacement"
-                : L"Show the Windows taskbar and notification area for 60 seconds", true));
-        }
+        // D27 removes the trailing native-taskbar arrow. Recovery remains in Settings/menu/CLI.
+        (void)taskbar; // kept in the API for existing callers and future recovery status.
         return result;
     } catch (...) { return MakeError(ErrorCode::Internal, "top bar display model failed"); }
 }

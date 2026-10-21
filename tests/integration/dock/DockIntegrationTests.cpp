@@ -505,3 +505,101 @@ AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit 
     RECT workAfter{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&workAfter,0));CHECK(::EqualRect(&workBefore,&workAfter));
     window.Destroy();
 }
+
+AETHER_TEST("dock integration: captured drag follows continuously and neighbour drop and attention motions settle") {
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok()); ManualDispatcher dispatcher;
+    settings::SettingsService settings(test::MakeTempDirectory("dock-motion") / L"settings.json", dispatcher);
+    REQUIRE(settings.Load({}).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 5s;
+    while (!settings.Loaded() && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(settings.Loaded());
+    REQUIRE(settings.Update([](settings::Settings& value) {
+        value.dock.showStartButton = false; value.dock.showTaskViewButton = false;
+        value.dock.magnification = 1; // isolate horizontal gesture/lift continuity from hover scale
+        for (const auto* name : {L"A", L"B", L"C"}) {
+            settings::PinnedApp pin; pin.id = std::wstring(L"exe:motion-") + name;
+            pin.displayName = std::wstring(L"Synthetic ") + name; pin.parsingName = std::wstring(L"Synthetic.Motion.") + name;
+            value.dock.pinned.push_back(std::move(pin));
+        }
+    }).ok());
+    FakeLauncher launcher; FakeIcons icons;
+    RECT workBefore{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workBefore, 0));
+    const RECT area{0, 0, 1000, 600}; Backdrop backdrop(area); REQUIRE(backdrop.hwnd);
+    dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings});
+    dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
+    REQUIRE(window.Create(options).ok());
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), {}, settings.Current().dock).ok());
+    const auto filter = loop.AddMessageFilter([hwnd = window.Handle()](MSG& message) {
+        return message.hwnd == hwnd && (message.message == WM_MOUSEMOVE || message.message == WM_MOUSELEAVE);
+    });
+    window.Show(false); RunFor(loop, 350);
+    const auto geometry = [&]() { auto value = window.Geometry(); REQUIRE(value.ok()); return *value; };
+    const auto center = [](const D2D1_RECT_F& rect) { return (rect.left + rect.right) / 2; };
+    const auto at = [&](float x, float y) { return MAKELPARAM(static_cast<WORD>(std::lround(window.ToPx(x))), static_cast<WORD>(std::lround(window.ToPx(y)))); };
+    const auto start = geometry(); REQUIRE_EQ(start.items.size(), 4u);
+    const auto initialA = start.items[1].icon, initialB = start.items[2].icon, initialC = start.items[3].icon;
+    const float y = (initialA.top + initialA.bottom) / 2;
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, 0, at(center(initialA), y));
+    CHECK_EQ(::GetCapture(), window.Handle());
+    auto pressed = geometry();
+    CHECK(std::abs(pressed.items[1].icon.left - initialA.left) < 0.01f); // no instant press-scale jump
+    RunFor(loop, 35); pressed = geometry();
+    CHECK(pressed.items[1].icon.right - pressed.items[1].icon.left < initialA.right - initialA.left);
+    CHECK(pressed.items[1].icon.right - pressed.items[1].icon.left > (initialA.right - initialA.left) * 0.90f);
+    const float firstX = center(initialB) + 3;
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(firstX, y));
+    auto crossed = geometry(); REQUIRE_EQ(settings.Current().dock.pinned[0].id, L"exe:motion-B");
+    REQUIRE(crossed.raisedItem.has_value()); CHECK_EQ(*crossed.raisedItem, 2u);
+    CHECK(std::abs(center(crossed.items[2].icon) - firstX) <= 1.0f);
+    CHECK(std::abs(center(crossed.items[1].icon) - center(initialB)) < 0.05f); // neighbour does not teleport
+    const float liftStart = crossed.items[2].icon.top;
+    RunFor(loop, 35); const auto sliding = geometry();
+    CHECK(center(sliding.items[1].icon) < center(initialB));
+    CHECK(center(sliding.items[1].icon) > center(initialA));
+    CHECK(sliding.items[2].icon.top < liftStart); // lift begins over time, not at pointer-down
+    const float neighbourBefore = center(sliding.items[1].icon);
+    const float secondX = center(initialC) + 14;
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(secondX, y));
+    crossed = geometry(); REQUIRE_EQ(settings.Current().dock.pinned[2].id, L"exe:motion-A");
+    CHECK(std::abs(center(crossed.items[3].icon) - secondX) <= 1.0f);
+    CHECK(std::abs(center(crossed.items[1].icon) - neighbourBefore) < 0.05f);
+    apps::RunningApplication running; running.id = L"exe:motion-A"; running.displayName = L"Synthetic A";
+    running.windows.push_back({reinterpret_cast<HWND>(1), L"Synthetic title", false});
+    REQUIRE(window.SetRunningApplications({running}).ok()); // rebuild while original icon remains captured
+    CHECK_EQ(::GetCapture(), window.Handle());
+    CHECK(std::abs(center(geometry().items[3].icon) - secondX) <= 1.0f);
+    RunFor(loop, 30); const auto beforeRelease = geometry();
+    CHECK(center(beforeRelease.items[1].icon) < neighbourBefore); // momentum survives the second rebase
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, at(secondX, y));
+    const auto released = geometry();
+    CHECK(std::abs(center(released.items[3].icon) - center(beforeRelease.items[3].icon)) < 0.05f);
+    CHECK(std::abs(released.items[3].icon.top - beforeRelease.items[3].icon.top) < 0.05f);
+    RunFor(loop, 35); const auto settling = geometry();
+    CHECK(center(settling.items[3].icon) < center(released.items[3].icon));
+    CHECK(center(settling.items[3].icon) > center(initialC));
+    ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 1300);
+    const auto settled = geometry(); CHECK(std::abs(center(settled.items[3].icon) - center(initialC)) < 0.05f);
+    CHECK_FALSE(settled.raisedItem.has_value()); CHECK_EQ(launcher.launches, 0); CHECK_EQ(launcher.activations, 0);
+    // A stationary hold is also a drag gesture and consumes release without requiring a double click.
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, 0, Point(window, settled.items[3].icon));
+    RunFor(loop, 440); CHECK(geometry().raisedItem.has_value());
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, Point(window, settled.items[3].icon));
+    CHECK_EQ(launcher.activations, 0); RunFor(loop, 1200);
+    const auto attentionRest = geometry(); running.attentionRequested = true;
+    REQUIRE(window.SetRunningApplications({running}).ok()); RunFor(loop, 180);
+    CHECK(geometry().items[3].icon.top < attentionRest.items[3].icon.top - 0.5f);
+    RunFor(loop, 2700); const auto frames = window.RenderedFrames();
+    REQUIRE(window.SetRunningApplications({running}).ok()); RunFor(loop, 180);
+    CHECK_EQ(window.RenderedFrames(), frames); // unchanged true request does not start another pulse
+    REQUIRE(window.SetSuppressed(true).ok()); running.attentionRequested = false;
+    REQUIRE(window.SetRunningApplications({running}).ok()); running.attentionRequested = true;
+    REQUIRE(window.SetRunningApplications({running}).ok()); CHECK_FALSE(window.IsShown());
+    REQUIRE(window.SetSuppressed(false).ok());
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true}, settings.Current().dock).ok());
+    RunFor(loop, 200); const auto reduced = geometry(); RunFor(loop, 200);
+    CHECK(std::abs(geometry().items[3].icon.top - reduced.items[3].icon.top) < 0.01f);
+    RECT workAfter{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workAfter, 0)); CHECK(::EqualRect(&workBefore, &workAfter));
+    window.Destroy(); loop.RemoveMessageFilter(filter);
+}

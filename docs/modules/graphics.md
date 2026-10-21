@@ -113,8 +113,9 @@ to a stack local before removing its subscription, and callback exceptions stay 
 grain. `Elevation::Dock` and `Elevation::Bar` use sanded glass: their shadow is centered, their edge
 is uniformly subtle on every side, and they never paint the top sheen, inner rim or gradient edge.
 This keeps the real blurred backdrop visible without painting a light source onto either desktop
-surface. Popup and tooltip elevations keep their flyout treatment for separation and readability;
-their top sheen and rim still follow `GlassStyle::highlight`.
+surface. `GlassStyle::neutral` opts other surfaces into the same uniform edge without sheen or rim;
+tooltips use that opt-in. Other popup elevations keep their flyout treatment for separation and
+readability; their top sheen and rim still follow `GlassStyle::highlight`.
 
 `GlassStyle` retains `elevation` (None, Tooltip, Bar, Dock, Popup, Lift), `noise` and `highlight`;
 `shadow = false` still means no shadow. Tint strength, compositor blur, grain and the opaque
@@ -162,7 +163,28 @@ no icon font, image asset or third-party artwork:
   opacity and the target transform. `BuildWiFiGlyphGeometry` exposes its geometry for headless
   bounds checks.
 - `PaintStatusBadge`: InfoBar severity circles with a contrasting mark.
-- `RoundStrokeStyle(factory)` for the Top Bar status glyphs, which live with the Top Bar.
+- `PaintStatusGlyph`: shared original status outlines, including curved speaker waves, microphone,
+  battery, plug, Ethernet, sun/moon and a continuous cloud contour. Static paths are cached per
+  factory. Every painter scales uniformly into the shorter side of its box, preserving circular
+  proportions in wide and tall targets; caps and joins use `RoundStrokeStyle(factory)`.
+- `PaintNetworkGlyph`: takes the actual optional Windows 0..5 bar reading and the reported network
+  kind. Wi-Fi maps it to three waves, cellular to five rounded bars; missing or invalid strength
+  displays an explicit unknown mark. None, Other and Unknown remain different categories.
+- `PaintVolumeGlyph` and `PaintMicrophoneGlyph`: optional values distinguish unavailable from zero
+  or unmuted. Mute and unknown have separate marks. Speaker level uses zero to three curved waves.
+- `PaintBatteryGlyph` / `BatteryStatusColor`: only known 100% uses the success fill; known 0..5% or
+  a real Windows low/critical flag uses the critical role, including the outline so an empty 0%
+  reading still has a visible warning without inventing a fill. Other readings remain neutral. Unknown
+  percentage never becomes a fill level, and charging or external power never implies full charge.
+  High contrast uses system text; a two-tone charging mark remains readable across the filled and
+  empty portions. The painter restores the caller's brush color, opacity and transform.
+- `PaintWeatherGlyph`: maps the caller's real provider category to rounded sun/moon/cloud and
+  precipitation paths, with a cached-reading marker when requested. Unknown weather or absent
+  day/night information for Clear/PartlyCloudy uses the unknown mark rather than guessing daylight.
+
+The Top Bar and quick-controls panel consume these shared status painters. Top Bar pointer hover
+does not add a light background; keyboard focus retains its two-tone ring. The graphics API does
+not query providers, fabricate readings or perform system actions.
 
 Geometries and the stroke style are cached per factory on the calling thread
 (`ReleaseGlyphResources()`).

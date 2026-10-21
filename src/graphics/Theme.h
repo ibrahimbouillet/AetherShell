@@ -237,7 +237,7 @@ struct DesignTokens {
     // Typography
     std::wstring fontFamily = L"Segoe UI Variable Text";
     std::wstring displayFontFamily = L"Segoe UI Variable Display";
-    float fontSizeBar = 13.0f;
+    float fontSizeBar = 14.0f;
     float fontSizeSmall = 12.0f;
     float fontSizeBody = 14.0f;
     float fontSizeTitle = 16.0f;

@@ -22,6 +22,7 @@ struct DockLayout {
     float windowWidth = 0;
     float windowHeight = 0;
     std::vector<DockItemGeometry> items;
+    std::optional<std::size_t> raisedItem; // captured/drop-settling icon is painted and hit-tested last
 };
 struct DockPlacement {
     RECT windowPx{};

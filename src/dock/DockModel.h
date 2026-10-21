@@ -28,6 +28,7 @@ struct DockItem {
     bool running = false;
     bool foreground = false;
     std::size_t windowCount = 0;
+    bool attentionRequested = false; // real background Shell request; presentation never activates it
 };
 struct FittedDock {
     std::vector<DockItem> items;

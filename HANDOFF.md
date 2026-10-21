@@ -18,6 +18,22 @@ updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, im
 consumers/app integration, independently reviewed them and completed the automated candidate gates.
 The published `0.1.0-alpha.1` does not include this work.
 
+### Active new work — D27/D28 (2026-10-21)
+
+- Owner requests continuous captured Dock drag with reactive spring neighbors/drop, no hover tiles,
+  separator or trailing native-taskbar arrow; neutral material also on hover/tooltips; round status
+  icons, larger clear native type, green100-percent/red<=5-percent or OS low-critical battery.
+- Genuine background shell attention should show a finite red Dock cue. A real new alert may briefly
+  reveal only the Dock during fullscreen for6 seconds, without taking focus/raising the application.
+- Owner explicitly clarified automatic Windows weather location for general installations, no fixed
+  owner city. Use OS permission/coarse position, honest no-weather on denial/unavailability, preserve
+  existing opt-outs/manual choices. Never scrape SSIDs/raw IP or pretend to read Windows weather.
+- In progress in the integration worktree: lifecycle agent owns DockWindow/geometry/tests; visuals
+  owns shared status glyphs/TopBarWindow/ControlCenter; parity owns attention tracker/model and then
+  location adapter. Root owns status battery mapping, app policy/wiring/settings and continuity docs.
+  Current preview remains the S-026 copied build until a new candidate is built/tested/reviewed.
+  No push/tag/release. Read working diff before continuing; these changes are not yet qualified.
+
 ### Owner controls scope — 2026-10-21 (D26)
 
 One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Bar glass is neutral,

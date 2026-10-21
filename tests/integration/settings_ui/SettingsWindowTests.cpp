@@ -364,3 +364,20 @@ AETHER_TEST("settings UI: a default-on Desktop choice persists only an explicitl
     RECT after{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&after,0));
     CHECK(::EqualRect(&before,&after));  // no taskbar controller or native setting action is attached
 }
+
+AETHER_TEST("settings UI: Windows location is an explicit action and keeps real consent separate") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;settings::SettingsService service(test::MakeTempDirectory("location-consent-ui")/L"settings.json",dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    int requests=0,settingsRequests=0;settings::ui::SettingsCallbacks callbacks;
+    callbacks.requestWindowsLocation=[&]{++requests;};callbacks.openLocationSettings=[&]{++settingsRequests;};
+    settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));
+    REQUIRE(window.Show(settings::ui::SettingsPage::Weather).ok());
+    CHECK_EQ(requests,0);CHECK_FALSE(service.Current().weather.enabled);CHECK_FALSE(service.Current().weather.windowsLocationConsent);
+    REQUIRE(window.Control(320));REQUIRE(window.Control(321));
+    ::SendMessageW(window.Control(320),BM_CLICK,0,0);CHECK_EQ(requests,1);
+    ::SendMessageW(window.Control(321),BM_CLICK,0,0);CHECK_EQ(settingsRequests,1);
+    CHECK_FALSE(service.Current().weather.windowsLocationConsent); // only injected requests, no fabricated OS grant
+    window.Close();
+}

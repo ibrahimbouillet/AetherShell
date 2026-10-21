@@ -390,7 +390,7 @@ void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const
     const float radius = SafeRadius(rect, style.cornerRadius);
     const D2D1_ROUNDED_RECT shape{rect, radius, radius};
     const bool highContrast = tokens.mode == ThemeMode::HighContrast;
-    const bool neutral = style.elevation == Elevation::Dock || style.elevation == Elevation::Bar;
+    const bool neutral = style.neutral || style.elevation == Elevation::Dock || style.elevation == Elevation::Bar;
     if (style.shadow && !highContrast) PaintElevation(context, rect, radius, tokens, style.elevation);
 
     if (auto tint = Solid(context, tokens.glass.tint.WithAlpha(GlassTintAlpha(tokens, style)))) {

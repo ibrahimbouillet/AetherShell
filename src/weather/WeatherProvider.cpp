@@ -48,6 +48,7 @@ WeatherReport InitialReport(const WeatherConfig& config) {
         snapshot.state = WeatherState::Disabled;
     } else if (!config.HasLocation()) {
         snapshot.state = WeatherState::LocationNotConfigured;
+        snapshot.detail = config.locationUnavailableDetail;
     } else {
         snapshot.state = WeatherState::Loading;
     }

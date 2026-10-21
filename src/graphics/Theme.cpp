@@ -76,7 +76,7 @@ void ApplyDarkRoles(DesignTokens& t) {
     t.glyph.halo = Color::FromHex(0x1E1E1E);
 
     t.elevation.color = Color::FromHex(0x000000);
-    t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 2.0f, 0.26f}, ShadowLayer{6.0f, 0.0f, 0.16f}};
+    t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.26f}, ShadowLayer{6.0f, 0.0f, 0.16f}};
     t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.24f}, ShadowLayer{8.0f, 0.0f, 0.14f}};
     t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 0.0f, 0.30f}, ShadowLayer{10.0f, 0.0f, 0.20f}};
     t.elevation.popup = ElevationLayers{ShadowLayer{6.0f, 4.0f, 0.30f}, ShadowLayer{10.0f, 0.0f, 0.22f}};
@@ -127,7 +127,7 @@ void ApplyLightRoles(DesignTokens& t) {
     t.glyph.halo = Color::FromHex(0xF3F3F3);
 
     t.elevation.color = Color::FromHex(0x000000);
-    t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 2.0f, 0.14f}, ShadowLayer{6.0f, 0.0f, 0.08f}};
+    t.elevation.tooltip = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.14f}, ShadowLayer{6.0f, 0.0f, 0.08f}};
     t.elevation.bar = ElevationLayers{ShadowLayer{2.0f, 0.0f, 0.12f}, ShadowLayer{8.0f, 0.0f, 0.08f}};
     t.elevation.dock = ElevationLayers{ShadowLayer{5.0f, 0.0f, 0.16f}, ShadowLayer{10.0f, 0.0f, 0.10f}};
     t.elevation.popup = ElevationLayers{ShadowLayer{6.0f, 4.0f, 0.16f}, ShadowLayer{10.0f, 0.0f, 0.12f}};

@@ -25,6 +25,10 @@
 //    instead, so profile groups of one executable get distinct names.
 //  * Relaunch presentation: each group carries the relaunch icon resource and display name of its
 //    most recent window that declares them (RunningApplication). They are never logged.
+//  * Optional registered Shell notifications latch HSHELL_FLASH requests; foreground/removal clears
+//    them. Normal title changes/REDRAW never create attention. No window is raised by the tracker.
+//    RegisterShellHookWindow is a documented Shell-specific compatibility API that Microsoft may
+//    change/remove; if registration fails, attention remains unavailable and WinEvent tracking works.
 //
 // Threading: Start, Stop, Snapshot and the destructor must be called on the UI thread, which must
 // pump messages (hooks and the timer are delivered through its message loop) and should be a COM
@@ -37,6 +41,7 @@
 #include "applications/ApplicationTypes.h"
 #include "applications/WindowIdentityRules.h"
 #include "applications/WindowProperties.h"
+#include "applications/WindowAttention.h"
 #include "core/Dispatcher.h"
 #include "core/WorkerPool.h"
 
@@ -88,6 +93,7 @@ private:
                                       DWORD eventThread, DWORD eventTime);
 
     void OnWinEvent(DWORD event, HWND hwnd);
+    void OnShellEvent(WPARAM code, HWND hwnd);
     void MarkDirty();
     void Refresh();
     WindowIdentity Identify(HWND hwnd, const std::wstring& className, WindowShellProperties& properties);
@@ -105,6 +111,9 @@ private:
     bool timerArmed_ = false;
     bool notifyPending_ = false;  // the next refresh notifies even without a change (first snapshot)
     HWND messageWindow_ = nullptr;
+    UINT shellHookMessage_ = 0;
+    bool shellHookRegistered_ = false;
+    WindowAttentionState attention_;
     std::vector<HWINEVENTHOOK> hooks_;
     std::shared_ptr<bool> alive_;  // false once stopped; checked by posted name-resolution results
     std::unique_ptr<WorkerPool> namePool_;

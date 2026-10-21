@@ -29,7 +29,7 @@ constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPost
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
               kRemovePin = 313, kMovePinUp = 314, kMovePinDown = 315, kLicense = 316, kUpdateSummary = 317,
-              kDesktopStatus = 318, kImportTaskbarPins = 319;
+              kDesktopStatus = 318, kImportTaskbarPins = 319, kWindowsLocation = 320, kLocationSettings = 321;
 bool CanDownloadOrInstall(const updates::UpdateSnapshot& value) {
     return value.state != updates::UpdateState::Checking && value.state != updates::UpdateState::Downloading &&
         (value.prepared.has_value() || static_cast<bool>(value.manifest));
@@ -191,14 +191,18 @@ void SettingsWindow::Impl::BuildPage() {
         check(L"Show weather when enabled", [](const Settings& s){return s.topBar.showWeather;}, [](Settings& s,bool v){s.topBar.showWeather=v;});
         check(L"Reserve screen space above windows", [](const Settings& s){return s.topBar.reserveSpace;}, [](Settings& s,bool v){s.topBar.reserveSpace=v;});
     } else if (page == SettingsPage::Weather) {
-        check(L"Enable weather for a chosen location", [](const Settings& s){return s.weather.enabled;}, [](Settings& s,bool v){s.weather.enabled=v;});
+        check(L"Enable weather", [](const Settings& s){return s.weather.enabled;}, [](Settings& s,bool v){s.weather.enabled=v;});
         choice(L"Temperature", {L"Celsius",L"Fahrenheit"}, [](const Settings& s){return s.weather.unit;}, [](Settings& s,int v){s.weather.unit=static_cast<TemperatureUnit>(v);});
         number(L"Refresh interval (15–180 minutes)", [](const Settings& s){return s.weather.refreshMinutes;}, [](Settings& s,double v){s.weather.refreshMinutes=static_cast<int>(v);});
-        Add(L"STATIC", L"Forecast requests send your chosen coordinates to Open-Meteo.com.\r\nLocation search sends the search text only when you press Search.", 0, 218, 240, 460, 52);
-        Add(L"EDIT", current.weather.locationName, WS_TABSTOP | ES_AUTOHSCROLL, 218, 300, 330, 30, kFirstField + 70);
-        Add(L"BUTTON", L"Search", WS_TABSTOP | BS_PUSHBUTTON, 558, 300, 100, 30, kGeoSearch);
-        Add(L"LISTBOX", L"", WS_TABSTOP | WS_BORDER | LBS_NOTIFY | WS_VSCROLL, 218, 342, 440, 115, kGeoResults);
-        Add(L"STATIC", L"Weather data by Open-Meteo.com", 0, 218, 472, 440, 25);
+        check(L"Locate automatically with Windows", [](const Settings& s){return s.weather.useWindowsLocation;}, [](Settings& s,bool v){s.weather.useWindowsLocation=v;});
+        Add(L"STATIC", L"Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com for the forecast. If location is blocked, weather is unavailable.", 0, 218, 278, 460, 56);
+        Add(L"BUTTON", L"Use Windows location", WS_TABSTOP | BS_PUSHBUTTON, 218, 342, 224, 32, kWindowsLocation);
+        Add(L"BUTTON", L"Location settings", WS_TABSTOP | BS_PUSHBUTTON, 454, 342, 204, 32, kLocationSettings);
+        Add(L"STATIC", callbacks.weatherLocationStatus ? callbacks.weatherLocationStatus() : L"Choose automatic location or search for a place below.", 0, 218, 382, 440, 32);
+        Add(L"EDIT", current.weather.locationName, WS_TABSTOP | ES_AUTOHSCROLL, 218, 426, 330, 30, kFirstField + 70);
+        Add(L"BUTTON", L"Search", WS_TABSTOP | BS_PUSHBUTTON, 558, 426, 100, 30, kGeoSearch);
+        Add(L"LISTBOX", L"", WS_TABSTOP | WS_BORDER | LBS_NOTIFY | WS_VSCROLL, 218, 468, 440, 115, kGeoResults);
+        Add(L"STATIC", L"Weather data by Open-Meteo.com. Manual search sends only the text you enter.", 0, 218, 598, 440, 40);
     } else if (page == SettingsPage::Updates) {
         check(L"Check for updates automatically", [](const Settings& s){return s.updates.automaticChecks;}, [](Settings& s,bool v){s.updates.automaticChecks=v;});
         number(L"Check interval (6–168 hours)", [](const Settings& s){return s.updates.checkIntervalHours;}, [](Settings& s,double v){s.updates.checkIntervalHours=static_cast<int>(v);});
@@ -364,6 +368,7 @@ void SettingsWindow::Impl::Apply(bool explicitConsent) {
     const auto mutate = [edits = std::move(edits), location](Settings& value) {
         for (const auto& [write, input] : edits) write(value, input);
         if (location) {
+            value.weather.useWindowsLocation = false;
             value.weather.latitude = location->latitude; value.weather.longitude = location->longitude;
             value.weather.locationName = location->name + L", " + location->country;
         }
@@ -548,7 +553,11 @@ void SettingsWindow::Impl::Action(int id) {
                 else if(id==kMovePinDown && at+1<s.dock.pinned.size())std::swap(s.dock.pinned[at],s.dock.pinned[at+1]); }, pinSaved); BuildPage();
             if (!result) Message(L"Pinned applications could not be changed.");
         }
-    } else if (id == kGeoSearch) SearchLocation();
+    } else if (id == kWindowsLocation && callbacks.requestWindowsLocation) {
+        if(livePending)Apply(false);
+        callbacks.requestWindowsLocation();
+    } else if (id == kLocationSettings && callbacks.openLocationSettings) callbacks.openLocationSettings();
+    else if (id == kGeoSearch) SearchLocation();
     else if (id == kCheckUpdate && callbacks.checkForUpdates) callbacks.checkForUpdates();
     else if (id == kInstallUpdate && callbacks.downloadAndInstall) callbacks.downloadAndInstall();
     else if (id == kPostpone && callbacks.postpone) callbacks.postpone();

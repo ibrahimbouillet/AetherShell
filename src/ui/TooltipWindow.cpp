@@ -147,6 +147,7 @@ void TooltipWindow::OnRender(const RenderContext& context) {
     glass.opacity = 1.0f;
     glass.backdropBlur = false;
     glass.elevation = graphics::Elevation::Tooltip;
+    glass.neutral = true;
     graphics::PaintGlassPanel(context.d2d, bubble, tokens_, glass);
 
     winrt::com_ptr<ID2D1SolidColorBrush> brush;

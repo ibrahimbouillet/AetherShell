@@ -123,6 +123,11 @@ Result<DockPlacement> PlaceDock(const DockLayout& layout, const RECT& area, UINT
 }
 
 std::optional<std::size_t> HitTest(const DockLayout& layout, D2D1_POINT_2F point) noexcept {
+    if (layout.raisedItem && *layout.raisedItem < layout.items.size()) {
+        const auto& icon = layout.items[*layout.raisedItem].icon;
+        if (point.x >= icon.left && point.x < icon.right && point.y >= icon.top && point.y < icon.bottom)
+            return layout.raisedItem;
+    }
     // Reordering can briefly cross icon rectangles. Later items are drawn on top, so they own the
     // pointer in a crossing region, matching the visual stack rather than the old slot order.
     for (std::size_t remaining = layout.items.size(); remaining > 0; --remaining) {

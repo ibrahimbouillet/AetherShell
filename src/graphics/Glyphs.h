@@ -4,8 +4,7 @@
 // Original vector marks shared by every Aether surface: the brand mark, the Start mark, Task View,
 // Search, the navigation glyphs and small UI marks. All of them are geometry drawn in code on a
 // 16-DIP grid with round caps and joins; no icon font, image asset or third-party artwork is used.
-// Wi-Fi waves are shared here. Other Top Bar status glyphs (volume, battery...) live with the
-// Top Bar and use the glyph tokens (DesignTokens::glyph) and RoundStrokeStyle() from here.
+// Status marks share the same proportional grid and rounded stroke on the Top Bar and flyouts.
 //
 // Geometries are built once per Direct2D factory and glyph on the calling (UI) thread and cached.
 #pragma once
@@ -49,6 +48,23 @@ inline constexpr Glyph kAllGlyphs[] = {
 };
 
 enum class StatusBadge { Info, Success, Warning, Error };
+enum class NetworkGlyphKind { Unknown, None, WiFi, Ethernet, Cellular, Other };
+enum class WeatherSymbol { Unknown, Clear, PartlyCloudy, Cloudy, Fog, Drizzle, Rain, Snow, Thunder };
+enum class StatusGlyph {
+    Speaker, SpeakerLow, SpeakerMedium, SpeakerHigh, SpeakerMuted, SpeakerUnknown,
+    Microphone, MicrophoneMuted, MicrophoneUnknown, Battery, Plug,
+    Ethernet, NetworkNone, NetworkUnknown, NetworkOther,
+    Sun, Moon, PartlyCloudyDay, PartlyCloudyNight, Cloud, Fog, Drizzle, Rain, Snow, Thunder, Unknown,
+};
+inline constexpr StatusGlyph kAllStatusGlyphs[] = {
+    StatusGlyph::Speaker, StatusGlyph::SpeakerLow, StatusGlyph::SpeakerMedium, StatusGlyph::SpeakerHigh,
+    StatusGlyph::SpeakerMuted, StatusGlyph::SpeakerUnknown, StatusGlyph::Microphone,
+    StatusGlyph::MicrophoneMuted, StatusGlyph::MicrophoneUnknown, StatusGlyph::Battery, StatusGlyph::Plug,
+    StatusGlyph::Ethernet, StatusGlyph::NetworkNone, StatusGlyph::NetworkUnknown, StatusGlyph::NetworkOther,
+    StatusGlyph::Sun, StatusGlyph::Moon, StatusGlyph::PartlyCloudyDay, StatusGlyph::PartlyCloudyNight,
+    StatusGlyph::Cloud, StatusGlyph::Fog, StatusGlyph::Drizzle, StatusGlyph::Rain, StatusGlyph::Snow,
+    StatusGlyph::Thunder, StatusGlyph::Unknown,
+};
 
 // A glyph on the 16-DIP grid (origin at the top-left of the grid): `stroke` figures are drawn with
 // the stroke width and RoundStrokeStyle(), `fill` figures are filled. Either may be null.
@@ -63,6 +79,7 @@ struct WiFiGlyphGeometry {
 };
 
 [[nodiscard]] Result<GlyphGeometry> BuildGlyphGeometry(ID2D1Factory* factory, Glyph glyph);
+[[nodiscard]] Result<GlyphGeometry> BuildStatusGlyphGeometry(ID2D1Factory* factory, StatusGlyph glyph);
 // 0..3 active wave arcs; no value or an invalid count means unknown, not full signal. The caller
 // maps its real network snapshot to that display count. Geometry includes a distinct unknown mark.
 [[nodiscard]] Result<WiFiGlyphGeometry> BuildWiFiGlyphGeometry(ID2D1Factory* factory, std::optional<int> activeWaves);
@@ -85,6 +102,27 @@ void PaintGlyph(ID2D1RenderTarget* target, Glyph glyph, const D2D1_RECT_F& box, 
 // arcs/dot or the explicit unknown mark use its original opacity. Restores opacity and transform.
 void PaintWiFiGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
                     std::optional<int> activeWaves, float strokeWidth = 1.5f);
+void PaintStatusGlyph(ID2D1RenderTarget* target, StatusGlyph glyph, const D2D1_RECT_F& box,
+                      ID2D1Brush* brush, float strokeWidth = 1.5f);
+// Signal bars are Windows' actual 0..5 reading. Missing/invalid values remain visibly unknown.
+void PaintNetworkGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                       NetworkGlyphKind kind, std::optional<int> signalBars, bool limited = false,
+                       float strokeWidth = 1.5f);
+void PaintVolumeGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                      std::optional<int> percent, std::optional<bool> muted, float strokeWidth = 1.5f);
+void PaintMicrophoneGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                          std::optional<bool> muted, float strokeWidth = 1.5f);
+// Critical is a known <=5% reading or a real low/critical flag; success is a known 100% only.
+// High contrast always uses system text. No battery reading is inferred from charging/external power.
+[[nodiscard]] Color BatteryStatusColor(const DesignTokens& tokens, std::optional<int> percent,
+                                      std::optional<bool> lowOrCritical = {}) noexcept;
+void PaintBatteryGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1SolidColorBrush* brush,
+                       const DesignTokens& tokens, std::optional<int> percent,
+                       std::optional<bool> lowOrCritical = {}, bool charging = false,
+                       bool externalPower = false, float strokeWidth = 1.5f);
+void PaintWeatherGlyph(ID2D1RenderTarget* target, const D2D1_RECT_F& box, ID2D1Brush* brush,
+                       WeatherSymbol category, std::optional<bool> isDay, bool cached = false,
+                       float strokeWidth = 1.5f);
 
 // The brand mark with the brand gradient (brandPrimary to brandSecondary); in high contrast a
 // solid textPrimary. Same geometry as the Top Bar logo.

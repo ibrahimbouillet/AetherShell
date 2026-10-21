@@ -48,6 +48,7 @@ struct DisplayItem {
     status::ChargeState charge = status::ChargeState::Unknown;
     weather::WeatherGlyph weatherGlyph = weather::WeatherGlyph::Unknown;
     std::optional<bool> isDay;
+    std::optional<bool> lowOrCritical;
     std::vector<DisplayItem> components; // grouped real network/audio/battery status, no synthetic readings
     bool operator==(const DisplayItem&) const = default;
 };

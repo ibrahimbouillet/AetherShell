@@ -47,11 +47,13 @@
 #include "updates/UpdateCoordinator.h"
 #include "weather/GeocodingClient.h"
 #include "weather/WeatherProvider.h"
+#include "weather_location/WindowsLocation.h"
 
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <future>
 #include <atomic>
+#include <set>
 #include <utility>
 #include <mutex>
 #include <algorithm>
@@ -61,6 +63,8 @@ namespace {
 constexpr UINT_PTR kUpdaterPollTimer = 0xA371;
 constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
 constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
+constexpr UINT_PTR kAttentionPeekTimer = 0xA374;
+constexpr UINT_PTR kLocationRefreshTimer = 0xA375;
 struct RadioCompletionGate {
     std::mutex mutex;
     std::function<void(Result<bool>)> deliver;
@@ -83,7 +87,15 @@ struct ShellApplication::Impl {
     SystemTimeSource time;
     WorkerPool worker{{1, L"Aether application", ComApartment::SingleThreaded}};
     WorkerPool controlsWorker{{1, L"Aether quick controls", ComApartment::MultiThreaded}};
+    WorkerPool locationWorker{{1,L"Aether Windows weather location",ComApartment::MultiThreaded}};
     CancellationSource cancellation;
+    std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
+    std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
+    std::optional<weather::WindowsLocation> automaticLocation;
+    std::optional<std::pair<bool,bool>> locationMode;
+    std::uint64_t locationGeneration=0;
+    bool locationPending=false,locationConsentPending=false;
+    std::wstring locationStatus=L"Choose Windows location to enable automatic weather.";
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     std::vector<Connection> connections;
     std::unique_ptr<settings::SettingsService> settings;
@@ -132,6 +144,9 @@ struct ShellApplication::Impl {
     bool resumeTimerArmed = false;
     std::uint64_t resumeDeadline = 0;
     bool fullscreenSuppressed = false;
+    bool attentionPeekArmed = false;
+    std::uint64_t attentionDeadline = 0;
+    std::set<std::wstring> attentionApplications;
     bool taskbarReservationFailed = false;
     bool closing = false;
     bool ready = false;
@@ -143,6 +158,9 @@ struct ShellApplication::Impl {
     Result<void> StartSurfaces();
     void ApplySettings();
     void ImportTaskbarPins(bool manual = false, unsigned retry = 0);
+    void ApplyWeather();
+    void RefreshWindowsWeatherLocation();
+    void RequestWindowsWeatherLocation();
     void RefreshControls(bool full = false);
     void HandleControl(controlcenter::ControlIntent intent);
     void QueueControl(controlcenter::ControlIntent intent);
@@ -162,6 +180,27 @@ struct ShellApplication::Impl {
                 if (const auto live = weak.lock(); live && *live && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Settings could not be opened");
             });
         });
+    }
+    void ApplyDockSuppression() {
+        const bool peek=attentionPeekArmed&&!attentionApplications.empty()&&::GetTickCount64()<attentionDeadline&&!closing;
+        if(dock)(void)dock->SetSuppressed(ShouldSuppressDock(fullscreenSuppressed,desktopState,peek));
+    }
+    void OnRunningApplications(const std::vector<apps::RunningApplication>& running) {
+        if(closing)return;
+        std::set<std::wstring> current;
+        for(const auto& app:running)if(app.attentionRequested&&!app.foreground)current.insert(text::ToLower(app.id));
+        const bool fresh=std::any_of(current.begin(),current.end(),[&](const auto& id){return !attentionApplications.contains(id);});
+        attentionApplications=std::move(current);
+        if(dock)(void)dock->SetRunningApplications(running);
+        if(attentionApplications.empty()){
+            ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
+        }else if(fresh&&fullscreenSuppressed&&desktopState.active&&!desktopState.suspended){
+            attentionDeadline=::GetTickCount64()+6000;
+            attentionPeekArmed=::SetTimer(events.Handle(),kAttentionPeekTimer,6000,nullptr)!=0;
+        }
+        // A real background attention event may briefly reveal only our Dock. Never activate the
+        // application, dismiss fullscreen or reveal the Windows taskbar; interaction remains explicit.
+        ApplyDockSuppression();
     }
     void FailTaskbarReservation() {
         taskbarReservationFailed = true;
@@ -194,7 +233,7 @@ struct ShellApplication::Impl {
     }
     void OnTaskbarUpdate(const TaskbarUpdate& update) {
         desktopState = update;
-        if (dock) (void)dock->SetSuppressed(ShouldSuppressDock(fullscreenSuppressed, update));
+        ApplyDockSuppression();
         AETHER_LOG_INFO("app", "taskbar replacement {}{}: {}", update.active ? "active" : "inactive",
                         update.suspended ? " (suspended)" : "", text::Narrow(update.status));
         taskbarStatus = update.status;
@@ -311,6 +350,83 @@ struct ShellApplication::Impl {
     void ExportDiagnostics();
     void Stop() noexcept;
 };
+
+void ShellApplication::Impl::ApplyWeather() {
+    if(!weather||!settings||!settings->Loaded())return;
+    const auto& value=settings->Current().weather;
+    const bool automatic=value.enabled&&value.useWindowsLocation;
+    const bool consent=automatic&&value.windowsLocationConsent;
+    const auto mode=std::pair{automatic,consent};
+    const bool changed=locationMode!=mode;
+    if(changed){
+        locationMode=mode;++locationGeneration;locationCancellation->Cancel();
+        locationCancellation=std::make_shared<CancellationSource>();automaticLocation.reset();
+        ::KillTimer(events.Handle(),kLocationRefreshTimer);
+        if(consent&&nativeTaskbarAccess&&!closing){
+            if(!::SetTimer(events.Handle(),kLocationRefreshTimer,15*60*1000,nullptr))
+                locationStatus=L"Automatic location refresh is unavailable; retry in Weather settings.";
+        }
+    }
+    weather::WeatherConfig config;config.enabled=value.enabled;
+    config.unit=value.unit==settings::TemperatureUnit::Celsius?status::TemperatureUnit::Celsius:status::TemperatureUnit::Fahrenheit;
+    config.refreshInterval=std::chrono::minutes(value.refreshMinutes);
+    if(!value.useWindowsLocation){config.latitude=value.latitude;config.longitude=value.longitude;config.locationName=value.locationName;}
+    else{
+        config.locationName=L"Windows location";
+        if(consent&&automaticLocation){config.latitude=automaticLocation->latitude;config.longitude=automaticLocation->longitude;}
+        else config.locationUnavailableDetail=consent?text::Narrow(locationStatus):"Windows location permission is required. Choose Use Windows location in Weather settings.";
+    }
+    (void)weather->UpdateConfig(std::move(config));
+    if(changed&&consent)RefreshWindowsWeatherLocation();
+}
+
+void ShellApplication::Impl::RefreshWindowsWeatherLocation() {
+    if(closing||!nativeTaskbarAccess||!settings||!weather)return;
+    const auto& value=settings->Current().weather;
+    if(!value.enabled||!value.useWindowsLocation||!value.windowsLocationConsent)return;
+    if(locationPending)return;
+    locationPending=true;locationStatus=L"Reading approximate Windows location…";
+    const auto generation=locationGeneration;const auto cancel=locationCancellation->Token();const auto weak=std::weak_ptr<bool>(alive);
+    if(!locationWorker.Post([this,weak,generation,cancel]{
+        Result<weather::WindowsLocation> location=MakeError(ErrorCode::Unavailable,"Windows location unavailable");
+        try{location=weather::ReadWindowsLocation(true,cancel);}catch(...){location=MakeError(ErrorCode::Platform,"Windows location failed");}
+        dispatcher.Post([this,weak,generation,location=std::move(location)]()mutable{
+            const auto live=weak.lock();if(!live||!*live)return;
+            locationPending=false;if(closing)return;
+            if(generation!=locationGeneration){ApplyWeather();if(settings->Current().weather.windowsLocationConsent)RefreshWindowsWeatherLocation();return;}
+            if(location){automaticLocation=std::move(*location);locationStatus=L"Automatic weather follows approximate Windows location.";}
+            else{automaticLocation.reset();locationStatus=location.error().code==ErrorCode::AccessDenied?
+                L"Windows location access is blocked. Weather is unavailable.":L"Windows could not provide a current location. Weather is unavailable.";}
+            ApplyWeather();
+            if(settingsWindow)settingsWindow->ReportActionStatus(locationStatus);
+        });
+    })){locationPending=false;automaticLocation.reset();locationStatus=L"Location worker unavailable. Weather is unavailable.";ApplyWeather();}
+}
+
+void ShellApplication::Impl::RequestWindowsWeatherLocation() {
+    if(closing||!nativeTaskbarAccess||locationConsentPending||!settingsWindow||!settingsWindow->Handle())return;
+    locationConsentPending=true;locationStatus=L"Waiting for Windows location permission…";
+    const auto weak=std::weak_ptr<bool>(alive);const auto generation=locationGeneration;
+    {std::lock_guard lock(locationGate->mutex);locationGate->deliver=[this,weak,generation](Result<bool> granted){
+        dispatcher.Post([this,weak,generation,granted=std::move(granted)]()mutable{
+            const auto live=weak.lock();if(!live||!*live)return;
+            locationConsentPending=false;if(closing||generation!=locationGeneration)return;
+            if(granted&&*granted){
+                auto saved=settings->Update([](settings::Settings& s){s.weather.enabled=true;s.weather.useWindowsLocation=true;s.weather.windowsLocationConsent=true;});
+                if(!saved)locationStatus=L"The automatic weather choice could not be saved.";
+                else RefreshWindowsWeatherLocation();
+            }else{
+                locationStatus=L"Windows location access is unavailable or was denied. Weather is unavailable.";
+                automaticLocation.reset();
+                (void)settings->Update([](settings::Settings& s){s.weather.windowsLocationConsent=false;});
+            }
+            if(settingsWindow)settingsWindow->ReportActionStatus(locationStatus);
+        });
+    };}
+    const auto gate=locationGate;
+    auto request=weather::BeginWindowsLocationAccess([gate](Result<bool> result){std::lock_guard lock(gate->mutex);if(gate->deliver)gate->deliver(std::move(result));});
+    if(!request){locationConsentPending=false;locationStatus=L"Windows location could not request permission. Review Windows location settings.";settingsWindow->ReportActionStatus(locationStatus);}
+}
 
 // This bridge is the only path from the transient panel to real system controls. Isolated test
 // instances cannot discover media/radios, launch Settings, inject keys or change device state.
@@ -506,13 +622,7 @@ void ShellApplication::Impl::ApplySettings() {
     if (nativeTaskbarAccess && catalogReady && value.general.replaceWindowsTaskbar &&
         (syncJustEnabled || !value.general.taskbarPinsImported || !value.dock.explorerDefaultApplied)) ImportTaskbarPins();
     if (providers && providers->clock) providers->clock->SetResolution(value.topBar.showSeconds ? status::ClockResolution::Seconds : status::ClockResolution::Minutes);
-    if (weather) {
-        weather::WeatherConfig config; config.enabled = value.weather.enabled; config.latitude = value.weather.latitude;
-        config.longitude = value.weather.longitude; config.locationName = value.weather.locationName;
-        config.unit = value.weather.unit == settings::TemperatureUnit::Celsius ? status::TemperatureUnit::Celsius : status::TemperatureUnit::Fahrenheit;
-        config.refreshInterval = std::chrono::minutes(value.weather.refreshMinutes);
-        (void)weather->UpdateConfig(std::move(config));
-    }
+    ApplyWeather();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     hotkeyStatus = L"Keyboard shortcuts disabled";
     if (value.general.hotkeysEnabled && !closing) {
@@ -561,6 +671,9 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.importTaskbarPins = [this] { ImportTaskbarPins(true); };
     actions.taskbarStatus = [this] { return taskbarStatus; };
     actions.geocoding = geocoding.get();
+    actions.requestWindowsLocation=[this]{RequestWindowsWeatherLocation();};
+    actions.openLocationSettings=[this]{OpenWindowsSettings(L"ms-settings:privacy-location");};
+    actions.weatherLocationStatus=[this]{return locationStatus;};
     actions.setStartup = [this](bool enabled, std::function<void(Result<void>)> completion) {
         if (closing) { if (completion) completion(MakeError(ErrorCode::InvalidState, "application is closing")); return; }
         const auto executable = paths.executableDir.parent_path().parent_path() / L"AetherShell.exe";
@@ -640,18 +753,18 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
         if (!SetTaskbarReplacementSuspended(false) && settingsWindow) settingsWindow->ReportActionStatus(L"Taskbar replacement could not resume; Windows remains available");
     }));
-    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); (void)dock->SetSuppressed(ShouldSuppressDock(hidden, desktopState)); }));
+    connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ ApplySettings(); }));
     connections.push_back(events.DisplayChanged.Connect([this]{ if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
-    const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); if(updates)updates->NotifyClockChanged(); };
+    const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
     connections.push_back(events.ResumedFromSleep.Connect(clockChanged));
     connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
     connections.push_back(events.SettingChanged.Connect([this](UINT, const std::wstring& section){ if(section==L"intl"){providers->clock->NotifyTimeChanged();providers->keyboard->Refresh();} ApplySettings(); }));
     if (updates) connections.push_back(updates->Subscribe([this](const updates::UpdateSnapshot& snapshot){ if(settingsWindow)settingsWindow->SetUpdateSnapshot(snapshot); RefreshUpdateOffer(snapshot); }));
-    (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ if(dock)(void)dock->SetRunningApplications(running); });
+    (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ OnRunningApplications(running); });
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
     if (nativeTaskbarAccess) {
         TaskbarController::Options taskbarOptions;
@@ -815,6 +928,9 @@ void ShellApplication::Impl::InstallUpdate() {
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
     if(controls)controls->Close();
+    locationCancellation->Cancel();++locationGeneration;locationMode.reset();
+    ::KillTimer(events.Handle(),kLocationRefreshTimer);
+    ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
     ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     if (dock) ::EnableWindow(dock->Handle(), FALSE);
@@ -866,12 +982,15 @@ void ShellApplication::Impl::ExportDiagnostics() {
 void ShellApplication::Impl::Stop() noexcept {
     if (stopped) return;
     stopped = true;
-    *alive = false; cancellation.Cancel(); controlActionCancellation->Cancel(); ++*controlEpoch;
+    *alive = false; cancellation.Cancel();locationCancellation->Cancel();
+    ::KillTimer(events.Handle(),kLocationRefreshTimer); controlActionCancellation->Cancel(); ++*controlEpoch;
+    ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
+    {std::lock_guard lock(locationGate->mutex);locationGate->deliver={};}
     connections.clear(); channel.Close();
     controls.reset(); sideInsets.reset();
     if (tracker) tracker->Stop();
@@ -884,6 +1003,7 @@ void ShellApplication::Impl::Stop() noexcept {
     // AppBars synchronously; no owned AppBar may wait on this same shutdown join.
     if (taskbar) taskbar->Stop();
     taskbar.reset();
+    locationWorker.Shutdown();
     controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();
@@ -945,6 +1065,16 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         else if(action==L"search" && !impl_->closing) { if(impl_->ready && impl_->searchWindow)impl_->searchWindow->Open(); else impl_->command.action=StartupAction::OpenSearch; }
     }); !result) return result.error();
     impl_->loop.AddMessageFilter([this](MSG& message){
+        if(message.message==WM_TIMER&&message.hwnd==impl_->events.Handle()&&message.wParam==kLocationRefreshTimer){
+            impl_->RefreshWindowsWeatherLocation();return true;
+        }
+        if(message.message==WM_TIMER&&message.hwnd==impl_->events.Handle()&&message.wParam==kAttentionPeekTimer){
+            const auto delay=AttentionPeekDelay(impl_->attentionPeekArmed,impl_->closing,!impl_->attentionApplications.empty(),::GetTickCount64(),impl_->attentionDeadline);
+            ::KillTimer(impl_->events.Handle(),kAttentionPeekTimer);
+            if(delay&&*delay>0)impl_->attentionPeekArmed=::SetTimer(impl_->events.Handle(),kAttentionPeekTimer,static_cast<UINT>(std::min<std::uint64_t>(*delay,6000)),nullptr)!=0;
+            else impl_->attentionPeekArmed=false;
+            impl_->ApplyDockSuppression();return true;
+        }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarResumeTimer) {
             const auto delay = TaskbarRevealDelay(impl_->automaticResume, impl_->resumeTimerArmed,
                 impl_->settings->Current().general.replaceWindowsTaskbar, impl_->closing,
@@ -978,6 +1108,8 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         if (impl_->command.action == StartupAction::Quit) { ::PostQuitMessage(0); return; }
         if (impl_->command.action == StartupAction::RestoreTaskbar) (void)impl_->settings->Update([](settings::Settings& s) { s.general.replaceWindowsTaskbar = false; });
         if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,L"Aether Shell could not start its desktop surfaces.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
+        else if(result->status==settings::LoadStatus::Defaults&&impl_->nativeTaskbarAccess&&impl_->command.action==StartupAction::None)
+            impl_->OpenSettings(settings::ui::SettingsPage::Weather);
     }); !loading) return loading.error();
     return impl_->loop.Run();
 }

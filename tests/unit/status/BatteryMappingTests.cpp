@@ -266,3 +266,13 @@ AETHER_TEST("battery mapping: no usable source is an error, not a guess") {
     CHECK_EQ(u.state, ProviderState::Error);
     CHECK_FALSE(u.percent.has_value());
 }
+
+AETHER_TEST("battery mapping: low and critical OS flags remain real optional state") {
+    BatteryReadings readings;readings.powerManager=Pm(RawBatteryStatus::Discharging,RawPowerSupplyStatus::NotPresent,19);
+    for(const auto flag:{2u,4u,6u}){readings.systemPower=Sp(0,static_cast<std::uint8_t>(flag),19);CHECK(MapBatteryReadings(readings).lowOrCritical==true);}
+    readings.systemPower=Sp(0,1,19);CHECK(MapBatteryReadings(readings).lowOrCritical==false);
+    readings.systemPower=Sp(0,255,255);CHECK_FALSE(MapBatteryReadings(readings).lowOrCritical.has_value());
+    readings.systemPower=Sp(0,128,255);CHECK_FALSE(MapBatteryReadings(readings).lowOrCritical.has_value());
+    readings.powerManager->battery=RawBatteryStatus::NotPresent;readings.systemPower=Sp(0,4,19);
+    CHECK_FALSE(MapBatteryReadings(readings).lowOrCritical.has_value());
+}

@@ -5,6 +5,7 @@
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "dock/DockModel.h"
+#include "dock/DockMotion.h"
 #include "graphics/BitmapCache.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
@@ -50,7 +51,7 @@ bool SamePresentation(const std::vector<DockItem>& first, const std::vector<Dock
     for (std::size_t index = 0; index < first.size(); ++index) {
         const auto& a = first[index]; const auto& b = second[index];
         if (a.kind != b.kind || !text::EqualsIgnoreCase(a.id, b.id) || a.displayName != b.displayName ||
-            a.running != b.running || a.foreground != b.foreground || a.windowCount != b.windowCount ||
+            a.running != b.running || a.foreground != b.foreground || a.attentionRequested != b.attentionRequested || a.windowCount != b.windowCount ||
             apps::IconSourceFingerprint(a.application) != apps::IconSourceFingerprint(b.application)) return false;
     }
     return true;
@@ -81,7 +82,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<std::size_t> pressed;
     D2D1_POINT_2F pressPoint{};
     std::wstring dragId;
-    std::wstring lastDragTarget;
+    float dragCenter = 0;
+    float grabOffsetX = 0;
     bool dragging = false;
     bool suppressed = false;
     bool keyboard = false;
@@ -97,6 +99,12 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::uint64_t frames = 0;
     std::map<std::wstring, double> bounces;
     std::map<std::wstring, graphics::Spring> reorderOffsets;
+    std::map<std::wstring, graphics::Spring> presses;
+    std::map<std::wstring, graphics::Spring> lifts;
+    std::map<std::wstring, float> baseCenters;
+    std::map<std::wstring, double> attentionPulses;
+    std::set<std::wstring> attentionLatched;
+    std::set<std::wstring> pendingAttention;
     std::map<std::wstring, std::shared_ptr<const apps::IconImage>> images;
     std::set<std::wstring> requested;
     graphics::BitmapCache bitmaps;
@@ -106,6 +114,59 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     std::map<std::wstring, int> accessibleIds;
     int nextAccessibleId = 1;
+
+    bool AllowsDecoration() const noexcept {
+        return !motion.reduced && tokens.mode != graphics::ThemeMode::HighContrast;
+    }
+    std::optional<std::size_t> DragIndex() const {
+        for (std::size_t i = 0; i < fitted.items.size(); ++i)
+            if (text::EqualsIgnoreCase(fitted.items[i].id, dragId)) return i;
+        return std::nullopt;
+    }
+    void FinishDrag(bool settle = true) {
+        ::KillTimer(window.Handle(), kLongPressTimer);
+        if (!dragId.empty() && settle && AllowsDecoration()) {
+            if (const auto index = DragIndex(); index && baseCenters.contains(fitted.items[*index].id)) {
+                auto spring = graphics::Spring(dragCenter - baseCenters.at(fitted.items[*index].id),
+                    motion.ScaleSpring(graphics::Motion().slide));
+                spring.SetTarget(0); reorderOffsets.insert_or_assign(fitted.items[*index].id, spring);
+            }
+        }
+        pressed.reset(); dragId.clear(); dragging = false;
+        for (auto& [id, spring] : presses) { (void)id; spring.SetTarget(0); }
+        if (settle && AllowsDecoration()) {
+            for (auto& [id, spring] : lifts) { (void)id; spring.SetTarget(0); }
+            window.RequestAnimationFrame();
+        } else { lifts.clear(); presses.clear(); }
+    }
+    void BeginDrag() {
+        if (dragging || dragId.empty() || !DragIndex()) return;
+        dragging = true;
+        if (const auto press = presses.find(dragId); press != presses.end()) press->second.SetTarget(0);
+        if (AllowsDecoration()) {
+            auto& spring = lifts.try_emplace(dragId, 0.0f, motion.ScaleSpring(graphics::Motion().lift)).first->second;
+            spring.SetTarget(1); window.RequestAnimationFrame();
+        }
+        tooltip.HideTooltip(); ::KillTimer(window.Handle(), kTooltipTimer);
+    }
+    void UpdateAttention() {
+        std::set<std::wstring> requestedNow;
+        for (const auto& item : fitted.items) if (item.attentionRequested && !item.foreground) {
+            requestedNow.insert(item.id);
+            if (!attentionLatched.contains(item.id)) pendingAttention.insert(item.id);
+        }
+        attentionLatched = std::move(requestedNow);
+        std::erase_if(pendingAttention, [&](const auto& id) { return !attentionLatched.contains(id); });
+        if (!suppressed && window.IsShown()) {
+            if (AllowsDecoration()) for (const auto& id : pendingAttention)
+                attentionPulses[id] = graphics::FrameScheduler::Now();
+            pendingAttention.clear();
+        }
+        std::erase_if(attentionPulses, [&](const auto& entry) {
+            return !attentionLatched.contains(entry.first) || !AllowsDecoration() || suppressed || !window.IsShown();
+        });
+        if (!attentionPulses.empty()) window.RequestAnimationFrame();
+    }
 
     int Id(std::size_t index) const {
         return accessibleIds.at(text::ToLower(fitted.items[index].id));
@@ -182,30 +243,44 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         auto geometry = ArrangeDockLayout(fitted.iconSize, static_cast<float>(settings.iconSpacing), fitted.magnification, width, scales);
         if (!geometry) return geometry.error();
         layout = std::move(*geometry);
+        baseCenters.clear();
         const double now = graphics::FrameScheduler::Now();
         for (std::size_t index = 0; index < fitted.items.size(); ++index) {
             auto& rect = layout.items[index].icon;
+            baseCenters[fitted.items[index].id] = (rect.left + rect.right) / 2;
             if (const auto moving = reorderOffsets.find(fitted.items[index].id); moving != reorderOffsets.end()) {
                 const float shift = motion.reduced ? 0 : moving->second.Value();
                 rect.left += shift; rect.right += shift;
             }
             if (const auto bounce = bounces.find(fitted.items[index].id); bounce != bounces.end()) {
-                if (!motion.reduced) {
+                if (AllowsDecoration()) {
                     const float shift = graphics::LaunchBounce((now - bounce->second) / motion.EffectiveScale(),
                         graphics::MaxBounceHeight(fitted.iconSize));
                     rect.top -= shift; rect.bottom -= shift;
                 }
             }
-            if (dragging && text::EqualsIgnoreCase(fitted.items[index].id, dragId) && !motion.reduced) {
-                const float grow = (rect.right - rect.left) * (graphics::Motion().liftScale - 1) / 2;
-                rect.left -= grow; rect.right += grow; rect.top -= grow + graphics::Motion().liftOffset;
-                rect.bottom += grow - graphics::Motion().liftOffset;
+            if (const auto attention = attentionPulses.find(fitted.items[index].id); attention != attentionPulses.end() && AllowsDecoration()) {
+                const auto shift = DockAttentionAt((now - attention->second) / motion.EffectiveScale()).height;
+                rect.top -= shift; rect.bottom -= shift;
             }
-            if (pressed && *pressed == index && !dragging) {
-                const float inset = motion.reduced ? 0 : (rect.right - rect.left) * (1 - graphics::Motion().pressScale) / 2;
+            if (!dragId.empty() && text::EqualsIgnoreCase(fitted.items[index].id, dragId)) {
+                const float shift = dragCenter - (rect.left + rect.right) / 2;
+                rect.left += shift; rect.right += shift;
+            }
+            if (const auto lift = lifts.find(fitted.items[index].id); lift != lifts.end() && AllowsDecoration()) {
+                layout.raisedItem = index;
+                const float progress = std::clamp(lift->second.Value(), 0.0f, 1.1f);
+                const float grow = (rect.right - rect.left) * (graphics::Motion().liftScale - 1) * progress / 2;
+                rect.left -= grow; rect.right += grow; rect.top -= grow + graphics::Motion().liftOffset * progress;
+                rect.bottom += grow - graphics::Motion().liftOffset * progress;
+            }
+            if (const auto press = presses.find(fitted.items[index].id); press != presses.end() && AllowsDecoration()) {
+                const float inset = (rect.right - rect.left) * (1 - graphics::Motion().pressScale) *
+                    std::clamp(press->second.Value(), 0.0f, 1.1f) / 2;
                 rect.left += inset; rect.right -= inset; rect.top += inset; rect.bottom -= inset;
             }
         }
+        if (dragging) layout.raisedItem = DragIndex();
         std::vector<RECT> regions{Pixels(layout.panel, static_cast<float>(window.Dpi()) / 96)};
         for (const auto& item : layout.items) regions.push_back(Pixels(item.icon, static_cast<float>(window.Dpi()) / 96));
         window.SetInputRegionPx(regions);
@@ -225,12 +300,10 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         return Ok();
     }
     Result<void> Rebuild() {
-        std::map<std::wstring, float> previousPositions;
-        std::vector<std::wstring> previousOrder;
-        for (std::size_t index = 0; index < fitted.items.size(); ++index) {
-            previousOrder.push_back(fitted.items[index].id);
-            if (index < layout.items.size()) previousPositions.emplace(fitted.items[index].id, layout.items[index].icon.left);
-        }
+        const auto previousCenters = baseCenters;
+        const auto pressedId = pressed && *pressed < fitted.items.size() ? fitted.items[*pressed].id : L"";
+        const auto hoveredId = hovered && *hovered < fitted.items.size() ? fitted.items[*hovered].id : L"";
+        const auto focusedId = focused < fitted.items.size() ? fitted.items[focused].id : L"";
         const auto area = WorkArea();
         const float fullWidth = window.ToDip(static_cast<float>(area.right - area.left));
         const float margin = std::clamp(static_cast<float>(settings.sideMargin), 0.0f, std::max(0.0f, (fullWidth - 56) / 2));
@@ -247,24 +320,44 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             const auto id = text::ToLower(item.id);
             if (!accessibleIds.contains(id)) accessibleIds[id] = nextAccessibleId++;
         }
+        pressed.reset(); hovered.reset();
         focused = fitted.items.empty() ? 0 : std::min(focused, fitted.items.size() - 1);
-        pressed.reset(); hovered.reset(); reorderOffsets.clear();
-        auto result = Arrange(); if (!result) return result;
-        std::vector<std::wstring> newOrder;
-        for (const auto& item : fitted.items) newOrder.push_back(item.id);
-        if (!motion.reduced && previousOrder != newOrder) {
-            for (std::size_t index = 0; index < fitted.items.size(); ++index) {
-                const auto found = previousPositions.find(fitted.items[index].id);
-                if (found == previousPositions.end()) continue;
-                const float offset = found->second - layout.items[index].icon.left;
-                if (std::abs(offset) > 0.01f) {
-                    auto& spring = reorderOffsets.try_emplace(fitted.items[index].id, offset,
-                        motion.ScaleSpring(graphics::Motion().slide)).first->second;
-                    spring.SetTarget(0);
-                }
-            }
-            if (!reorderOffsets.empty()) { (void)Arrange(); window.RequestAnimationFrame(); }
+        for (std::size_t index = 0; index < fitted.items.size(); ++index) {
+            if (text::EqualsIgnoreCase(fitted.items[index].id, pressedId)) pressed = index;
+            if (text::EqualsIgnoreCase(fitted.items[index].id, hoveredId)) hovered = index;
+            if (text::EqualsIgnoreCase(fitted.items[index].id, focusedId)) focused = index;
         }
+        if (!dragId.empty() && !DragIndex()) {
+            FinishDrag(false);
+            if (::GetCapture() == window.Handle()) ::ReleaseCapture();
+        }
+        std::erase_if(reorderOffsets, [&](const auto& entry) {
+            return std::none_of(fitted.items.begin(), fitted.items.end(), [&](const auto& item) { return item.id == entry.first; });
+        });
+        std::erase_if(presses, [&](const auto& entry) {
+            return std::none_of(fitted.items.begin(), fitted.items.end(), [&](const auto& item) { return item.id == entry.first; });
+        });
+        std::erase_if(lifts, [&](const auto& entry) {
+            return std::none_of(fitted.items.begin(), fitted.items.end(), [&](const auto& item) { return item.id == entry.first; });
+        });
+        auto result = Arrange(); if (!result) return result;
+        if (!AllowsDecoration()) reorderOffsets.clear();
+        else for (const auto& item : fitted.items) {
+            const auto before = previousCenters.find(item.id);
+            if (before == previousCenters.end()) continue;
+            const float shift = before->second - baseCenters.at(item.id);
+            auto moving = reorderOffsets.find(item.id);
+            if (moving == reorderOffsets.end() && std::abs(shift) > 0.01f)
+                moving = reorderOffsets.try_emplace(item.id, 0.0f, motion.ScaleSpring(graphics::Motion().slide)).first;
+            if (moving != reorderOffsets.end()) {
+                // Rebase the spring rather than restart it: the drawn center and velocity survive
+                // another crossed slot or a running-status/catalog refresh mid-gesture.
+                moving->second.ShiftBy(shift); moving->second.SetTarget(0);
+                moving->second.SetParameters(motion.ScaleSpring(graphics::Motion().slide));
+            }
+        }
+        (void)Arrange(); UpdateAttention();
+        if (!reorderOffsets.empty()) window.RequestAnimationFrame();
         const auto placement = PlaceDock(layout, area, window.Dpi(), fitted.iconSize,
             fitted.magnification, static_cast<float>(settings.bottomMargin), motion.reduced);
         if (!placement) return placement.error();
@@ -287,13 +380,39 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         if (motion.reduced) { (void)Arrange(); window.Invalidate(); }
         else window.RequestAnimationFrame();
     }
+    void MoveDrag(float pointerX) {
+        const auto source = DragIndex();
+        if (!source || !std::isfinite(pointerX)) return;
+        const float half = fitted.iconSize * fitted.magnification * graphics::Motion().liftScale / 2;
+        dragCenter = std::clamp(pointerX - grabOffsetX, kDockShadowMargin + half,
+            std::max(kDockShadowMargin + half, width - kDockShadowMargin - half));
+        std::vector<float> centers;
+        std::vector<std::size_t> slots;
+        const float baseWidth = static_cast<float>(fitted.items.size()) * fitted.iconSize +
+            static_cast<float>(fitted.items.empty() ? 0 : fitted.items.size() - 1) * static_cast<float>(settings.iconSpacing);
+        const float start = (width - baseWidth) / 2;
+        std::size_t current = 0;
+        for (std::size_t index = 0; index < fitted.items.size(); ++index) if (IsReorderable(fitted.items[index].kind)) {
+            if (index == *source) current = centers.size();
+            centers.push_back(start + static_cast<float>(index) * (fitted.iconSize + static_cast<float>(settings.iconSpacing)) + fitted.iconSize / 2);
+            slots.push_back(index);
+        }
+        const auto destination = CrossedDockSlot(centers, current, dragCenter);
+        if (!destination || *destination == current) return;
+        auto moved = ReorderDockItems(DockModelInputs{context.settings.Current().dock, running, sessionOrder, &catalog},
+            dragId, fitted.items[slots[*destination]].id);
+        if (!moved) { ErrorTooltip(moved.error(), *source); return; }
+        sessionOrder = std::move(moved->sessionOrder);
+        if (moved->pinsChanged) SavePins(std::move(moved->pins));
+        else (void)window.Relayout();
+    }
     RECT Anchor(std::size_t index) const {
         auto rect = Pixels(layout.items[index].icon, static_cast<float>(window.Dpi()) / 96);
         const auto bounds = window.BoundsPx(); ::OffsetRect(&rect, bounds.left, bounds.top); return rect;
     }
     void ErrorTooltip(const Error& error, std::size_t index) {
         // A launch completion can arrive after fullscreen suppression or shutdown has closed input.
-        if (!window.Handle() || suppressed || !window.IsShown() || window.IsTransitioning() ||
+        if (!window.Handle() || suppressed || dragging || !window.IsShown() || window.IsTransitioning() ||
             !::IsWindowEnabled(window.Handle()) || index >= layout.items.size()) return;
         tooltip.ShowFor(text::Widen(error.message), Anchor(index), ui::TooltipPlacement::Above);
         ::SetTimer(window.Handle(), kErrorTimer, 3000, nullptr);
@@ -446,6 +565,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         result.isEnabled = !result.isOffscreen && !window.IsTransitioning() && ::IsWindowEnabled(window.Handle());
         if (item.kind == DockItemKind::Pinned) result.itemStatus = L"Pinned";
         if (item.running) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Running"; }
+        if (item.attentionRequested) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Needs attention"; }
         return result;
     }
     Result<void> Invoke(int id) override {
@@ -537,6 +657,9 @@ Result<void> DockWindow::SetTheme(const graphics::DesignTokens& tokens, const gr
         if (!order) return order.error();
         impl_->sessionOrder = std::move(*order);
         impl_->tokens = tokens; impl_->motion = motion; impl_->settings = std::move(normalized.dock);
+        for (auto& [id, spring] : impl_->lifts) { (void)id; spring.SetParameters(motion.ScaleSpring(graphics::Motion().lift)); }
+        for (auto& [id, spring] : impl_->presses) { (void)id; spring.SetParameters(motion.ScaleSpring(graphics::Motion().press)); }
+        if (!impl_->AllowsDecoration()) { impl_->lifts.clear(); impl_->presses.clear(); impl_->bounces.clear(); impl_->attentionPulses.clear(); }
         impl_->tooltip.SetTheme(tokens, motion);
         if (impl_->menus) impl_->menus->SetTheme(tokens);
         if (IsShown() && IsTransitioning() && (motion.reduced || tokens.mode == graphics::ThemeMode::HighContrast))
@@ -555,10 +678,11 @@ Result<void> DockWindow::SetSuppressed(bool suppressed) {
         impl_->suppressed = suppressed;
         if (suppressed) {
             ::KillTimer(Handle(), kTooltipTimer); ::KillTimer(Handle(), kLongPressTimer);
-            impl_->pointer.reset(); impl_->hovered.reset(); impl_->pressed.reset();
-            impl_->dragId.clear(); impl_->lastDragTarget.clear(); impl_->dragging = false;
+            impl_->FinishDrag(false);
+            if (::GetCapture() == Handle()) ::ReleaseCapture();
+            impl_->pointer.reset(); impl_->hovered.reset(); impl_->attentionPulses.clear();
             Hide(); impl_->tooltip.HideTooltip(); impl_->SetTargets();
-        } else Show(false);
+        } else { Show(false); impl_->UpdateAttention(); }
         return Ok();
     });
 }
@@ -601,18 +725,24 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
     style.cornerRadius = graphics::DockCornerRadius(impl_->tokens, impl_->layout.panel.bottom - impl_->layout.panel.top);
     style.opacity = static_cast<float>(impl_->settings.opacity); style.backdropBlur = BackdropBlurActive();
     graphics::PaintGlassPanel(context.d2d, impl_->layout.panel, impl_->tokens, style);
-    winrt::com_ptr<ID2D1SolidColorBrush> primary, accent, indicator;
+    winrt::com_ptr<ID2D1SolidColorBrush> primary, attention;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), primary.put())) ||
-        FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.accent.ToD2D(), accent.put())) ||
-        FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.runningIndicator.ToD2D(), indicator.put()))) return;
-    for (std::size_t index = 0; index < impl_->fitted.items.size(); ++index) {
+        FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.critical.ToD2D(), attention.put()))) return;
+    const auto drawItem = [&](std::size_t index) {
         const auto& item = impl_->fitted.items[index];
         const auto rect = impl_->layout.items[index].icon;
         const float size = rect.right - rect.left;
-        graphics::PaintItemHighlight(context.d2d, rect, impl_->tokens.radii.item, impl_->tokens,
-            impl_->hovered == index ? 1.0f : 0.0f, impl_->pressed == index ? 1.0f : 0.0f);
-        if (impl_->dragging && text::EqualsIgnoreCase(item.id, impl_->dragId))
-            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.radii.item, impl_->tokens, 1);
+        if (const auto lift = impl_->lifts.find(item.id); lift != impl_->lifts.end() && impl_->AllowsDecoration())
+            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.radii.item, impl_->tokens, std::clamp(lift->second.Value(), 0.0f, 1.0f));
+        if (const auto pulse = impl_->attentionPulses.find(item.id); pulse != impl_->attentionPulses.end() && impl_->AllowsDecoration()) {
+            const float opacity = DockAttentionAt((graphics::FrameScheduler::Now() - pulse->second) / impl_->motion.EffectiveScale()).opacity;
+            const D2D1_POINT_2F center{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2};
+            for (int layer = 3; layer >= 1; --layer) {
+                attention->SetOpacity(opacity * 0.07f);
+                const float radius = size / 2 + static_cast<float>(layer) * 3;
+                context.d2d->FillEllipse({center, radius, radius}, attention.get());
+            }
+        }
         // Shared glyphs already include optical padding in their 16-unit grid. Use the same
         // animated icon slot as application bitmaps rather than shrinking fixed actions twice.
         const auto& glyphBox = rect;
@@ -642,12 +772,16 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
                 center + half, impl_->layout.panel.bottom - 8}, impl_->tokens,
                 item.foreground ? graphics::IndicatorState::Active : graphics::IndicatorState::Running);
         }
-        if (impl_->keyboard && index == impl_->focused) graphics::PaintFocusRing(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens);
-        if (index > 0 && item.kind == DockItemKind::Running && impl_->fitted.items[index - 1].kind == DockItemKind::Pinned) {
-            const float x = rect.left - static_cast<float>(impl_->settings.iconSpacing) / 2;
-            context.d2d->DrawLine({x, impl_->layout.panel.top + 14}, {x, impl_->layout.panel.bottom - 14}, indicator.get(), 1);
+        if (item.attentionRequested && !item.foreground) {
+            attention->SetColor(impl_->tokens.mode == graphics::ThemeMode::HighContrast ? impl_->tokens.textPrimary.ToD2D() : impl_->tokens.critical.ToD2D());
+            attention->SetOpacity(1);
+            context.d2d->FillEllipse({{(rect.left + rect.right) / 2, impl_->layout.panel.bottom - 9.5f}, 3, 2}, attention.get());
         }
-    }
+        if (impl_->keyboard && index == impl_->focused) graphics::PaintFocusRing(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens);
+    };
+    for (std::size_t index = 0; index < impl_->fitted.items.size(); ++index)
+        if (impl_->layout.raisedItem != index) drawItem(index);
+    if (impl_->layout.raisedItem) drawItem(*impl_->layout.raisedItem);
 }
 bool DockWindow::OnAnimate(double now) {
     const double dt = impl_->lastFrame == 0 ? Scheduler().RefreshInterval() : now - impl_->lastFrame;
@@ -655,35 +789,39 @@ bool DockWindow::OnAnimate(double now) {
     bool moving = false;
     for (auto& spring : impl_->springs) { spring.Step(dt); if (!spring.IsSettled()) moving = true; }
     for (auto& [id, spring] : impl_->reorderOffsets) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }
+    for (auto& [id, spring] : impl_->presses) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }
+    std::erase_if(impl_->presses, [](const auto& entry) { return entry.second.Target() == 0 && entry.second.IsSettled(); });
+    for (auto& [id, spring] : impl_->lifts) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }
+    std::erase_if(impl_->lifts, [](const auto& entry) { return entry.second.Target() == 0 && entry.second.IsSettled(); });
     std::erase_if(impl_->reorderOffsets, [](const auto& pair) { return pair.second.IsSettled(); });
     std::erase_if(impl_->bounces, [&](const auto& bounce) {
-        return impl_->motion.reduced || now - bounce.second >= graphics::LaunchBounceDuration() * impl_->motion.EffectiveScale();
+        return !impl_->AllowsDecoration() || now - bounce.second >= graphics::LaunchBounceDuration() * impl_->motion.EffectiveScale();
     });
     moving = moving || !impl_->bounces.empty();
+    std::erase_if(impl_->attentionPulses, [&](const auto& pulse) {
+        return !impl_->AllowsDecoration() || impl_->suppressed || !IsShown() ||
+            now - pulse.second >= kDockAttentionDuration * impl_->motion.EffectiveScale();
+    });
+    moving = moving || !impl_->attentionPulses.empty();
     (void)impl_->Arrange(); if (!moving) impl_->lastFrame = 0; return moving;
 }
-void DockWindow::OnDpiChanged(UINT, const RECT&) { (void)Relayout(); }
+void DockWindow::OnDpiChanged(UINT, const RECT&) {
+    impl_->FinishDrag(false);
+    if (::GetCapture() == Handle()) ::ReleaseCapture();
+    impl_->reorderOffsets.clear(); impl_->baseCenters.clear();
+    (void)Relayout();
+}
 void DockWindow::OnPointerMove(D2D1_POINT_2F point) {
-    if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) return;
+    if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle()) ||
+        !std::isfinite(point.x) || !std::isfinite(point.y)) return;
     impl_->pointer = point;
-    if (impl_->pressed && !impl_->dragId.empty() && std::hypot(point.x - impl_->pressPoint.x, point.y - impl_->pressPoint.y) >= 6) impl_->dragging = true;
-    auto hit = HitTest(impl_->layout, point);
-    if (hit && text::EqualsIgnoreCase(impl_->fitted.items[*hit].id, impl_->dragId)) impl_->lastDragTarget.clear();
-    if (impl_->dragging && hit && IsReorderable(impl_->fitted.items[*hit].kind) &&
-        !text::EqualsIgnoreCase(impl_->fitted.items[*hit].id, impl_->dragId) &&
-        !text::EqualsIgnoreCase(impl_->fitted.items[*hit].id, impl_->lastDragTarget)) {
-        const auto targetId = impl_->fitted.items[*hit].id;
-        auto moved = ReorderDockItems(DockModelInputs{impl_->context.settings.Current().dock, impl_->running,
-            impl_->sessionOrder, &impl_->catalog},
-            impl_->dragId, impl_->fitted.items[*hit].id);
-        if (moved) {
-            impl_->lastDragTarget = targetId;
-            impl_->sessionOrder = std::move(moved->sessionOrder);
-            if (moved->pinsChanged) impl_->SavePins(std::move(moved->pins));
-            else (void)Relayout();
-        } else impl_->ErrorTooltip(moved.error(), *hit);
-        hit = HitTest(impl_->layout, point);
+    if (impl_->pressed && !impl_->dragId.empty() && std::hypot(point.x - impl_->pressPoint.x, point.y - impl_->pressPoint.y) >= 6)
+        impl_->BeginDrag();
+    if (impl_->dragging) {
+        impl_->MoveDrag(point.x); impl_->SetTargets();
+        (void)impl_->Arrange(); Invalidate(); return;
     }
+    auto hit = HitTest(impl_->layout, point);
     if (hit != impl_->hovered) {
         impl_->hovered = hit; impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer);
         if (hit) ::SetTimer(Handle(), kTooltipTimer, static_cast<UINT>(std::max(1.0, impl_->tokens.tooltipDelay * 1000)), nullptr);
@@ -691,33 +829,43 @@ void DockWindow::OnPointerMove(D2D1_POINT_2F point) {
     impl_->SetTargets();
 }
 void DockWindow::OnPointerLeave() {
+    if (impl_->dragging && ::GetCapture() == Handle()) return;
     impl_->pointer.reset(); impl_->hovered.reset(); impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer); impl_->SetTargets();
 }
 void DockWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
     if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) return;
     const auto hit = HitTest(impl_->layout, point);
     if (button != ui::PointerButton::Left || !hit) return;
-    impl_->pressed = hit; impl_->pressPoint = point; impl_->dragging = false; impl_->lastDragTarget.clear();
+    impl_->FinishDrag();
+    impl_->pressed = hit; impl_->pressPoint = point; impl_->pointer = point;
     const auto kind = impl_->fitted.items[*hit].kind;
     impl_->dragId = IsReorderable(kind) ? impl_->fitted.items[*hit].id : L"";
+    if (impl_->AllowsDecoration()) {
+        auto& spring = impl_->presses.try_emplace(impl_->fitted.items[*hit].id, 0.0f,
+            impl_->motion.ScaleSpring(graphics::Motion().press)).first->second;
+        spring.SetTarget(1); RequestAnimationFrame();
+    }
+    const auto& rect = impl_->layout.items[*hit].icon;
+    impl_->dragCenter = (rect.left + rect.right) / 2; impl_->grabOffsetX = point.x - impl_->dragCenter;
     if (!impl_->dragId.empty()) ::SetTimer(Handle(), kLongPressTimer,
         static_cast<UINT>(graphics::Motion().longPress * 1000), nullptr);
     (void)impl_->Arrange(); Invalidate();
 }
 void DockWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
-    if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) return;
+    if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) {
+        impl_->FinishDrag(false); return;
+    }
     const auto hit = HitTest(impl_->layout, point);
     ::KillTimer(Handle(), kLongPressTimer);
     const bool click = button != ui::PointerButton::Left || (impl_->pressed && hit == impl_->pressed && !impl_->dragging);
-    impl_->pressed.reset(); impl_->dragId.clear(); impl_->lastDragTarget.clear(); impl_->dragging = false;
+    impl_->FinishDrag();
     (void)impl_->Arrange(); Invalidate();
     if (!click || !hit) return;
     if (button == ui::PointerButton::Right) impl_->MenuAt(*hit);
     else { const auto item = impl_->fitted.items[*hit]; (void)impl_->ActivateItem(item, button == ui::PointerButton::Middle, *hit); }
 }
 void DockWindow::OnPointerCaptureLost() {
-    ::KillTimer(Handle(), kLongPressTimer);
-    impl_->pressed.reset(); impl_->dragId.clear(); impl_->lastDragTarget.clear(); impl_->dragging = false;
+    impl_->FinishDrag();
     (void)impl_->Arrange(); Invalidate();
 }
 bool DockWindow::OnKeyDown(UINT key) {
@@ -755,7 +903,16 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
         return 0;
     }
     if (message == impl_->explorerMessage) { (void)OnExplorerRestarted(); return 0; }
-    if (message == WM_DISPLAYCHANGE || (message == WM_SETTINGCHANGE && wParam == SPI_SETWORKAREA)) { (void)Relayout(); return 0; }
+    if (message == WM_DISPLAYCHANGE || (message == WM_SETTINGCHANGE && wParam == SPI_SETWORKAREA)) {
+        impl_->FinishDrag(false);
+        if (::GetCapture() == Handle()) ::ReleaseCapture();
+        (void)Relayout(); return 0;
+    }
+    if (message == WM_ENABLE && !wParam) {
+        impl_->FinishDrag(false); impl_->tooltip.HideTooltip();
+        if (::GetCapture() == Handle()) ::ReleaseCapture();
+        (void)impl_->Arrange();
+    }
     if (message == kAppBarMessage) {
         if (wParam == ABN_POSCHANGED && !impl_->updatingBar) (void)Relayout();
         // The host combines foreground fullscreen with temporary native-taskbar reveal state.
@@ -765,7 +922,7 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
     if (message == WM_TIMER && (wParam == kTooltipTimer || wParam == kErrorTimer)) {
         ::KillTimer(Handle(), wParam);
         if (wParam == kErrorTimer) impl_->tooltip.HideTooltip();
-        else if (Handle() && IsShown() && !impl_->suppressed && !IsTransitioning() && ::IsWindowEnabled(Handle()) &&
+        else if (Handle() && IsShown() && !impl_->suppressed && !impl_->dragging && !IsTransitioning() && ::IsWindowEnabled(Handle()) &&
             impl_->hovered && *impl_->hovered < impl_->fitted.items.size() && *impl_->hovered < impl_->layout.items.size())
             impl_->tooltip.ShowFor(impl_->fitted.items[*impl_->hovered].displayName,
             impl_->Anchor(*impl_->hovered), ui::TooltipPlacement::Above);
@@ -773,7 +930,10 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
     }
     if (message == WM_TIMER && wParam == kLongPressTimer) {
         ::KillTimer(Handle(), kLongPressTimer);
-        if (impl_->pressed && !impl_->dragId.empty()) { impl_->dragging = true; (void)impl_->Arrange(); Invalidate(); }
+        if (Handle() && IsShown() && !impl_->suppressed && !IsTransitioning() && ::IsWindowEnabled(Handle()) &&
+            ::GetCapture() == Handle() && impl_->pressed && !impl_->dragId.empty()) {
+            impl_->BeginDrag(); (void)impl_->Arrange(); Invalidate();
+        }
         return 0;
     }
     if (message == WM_CONTEXTMENU) { if (!IsTransitioning()) impl_->MenuAt(impl_->focused); return 0; }

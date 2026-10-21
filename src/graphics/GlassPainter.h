@@ -34,6 +34,7 @@ struct GlassStyle {
     bool shadow = true;          // false: no shadow whatever `elevation` says
     Elevation elevation = Elevation::Dock;
     bool noise = true;           // grain texture (never in high contrast or without transparency)
+    bool neutral = false;       // opt-in for transient surfaces: uniform edge without directional sheen
     bool highlight = true;       // flyout sheen/rim; Dock and Bar always use the neutral material
 };
 

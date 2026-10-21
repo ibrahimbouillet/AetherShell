@@ -563,3 +563,14 @@ AETHER_TEST("settings startup: invalid or missing launcher paths never write reg
     // Constructing the adapter with injectable paths performs no registry access.
     CHECK(MakeWindowsStartupRegistry({L"Software\\AetherShellTests\\Run", L"Software\\AetherShellTests\\Approval"}).ok());
 }
+
+AETHER_TEST("weather location settings: preserve legacy manual coordinates and disabled consent") {
+    auto root=json::Parse(R"({"schemaVersion":1,"weather":{"enabled":false,"latitude":10,"longitude":20}})");REQUIRE(root.ok());
+    auto parsed=FromJson(*root);REQUIRE(parsed.ok());
+    CHECK_FALSE(parsed->value.weather.enabled);CHECK_FALSE(parsed->value.weather.useWindowsLocation);
+    CHECK_FALSE(parsed->value.weather.windowsLocationConsent);
+    Settings automatic;automatic.weather.enabled=true;automatic.weather.useWindowsLocation=true;automatic.weather.windowsLocationConsent=true;
+    auto encoded=ToJson(automatic);REQUIRE(encoded.ok());auto roundtrip=FromJson(*encoded);REQUIRE(roundtrip.ok());
+    CHECK(roundtrip->value.weather.useWindowsLocation);CHECK(roundtrip->value.weather.windowsLocationConsent);
+    CHECK_FALSE(roundtrip->value.weather.latitude.has_value());
+}

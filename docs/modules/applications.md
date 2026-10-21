@@ -2,6 +2,29 @@
 
 ## Purpose
 
+Background attention uses an optional, hidden nonactivating Shell-notification HWND. Only a real
+`HSHELL_FLASH` request latches `RunningApplication::attentionRequested`; title/name/ordinary redraw
+or creation events never establish attention. Foreground acknowledgement clears the whole group;
+destroyed/ineligible windows and Stop clear their requests. Repeated flash notices coalesce through
+the existing refresh timer, with at most 4096 retained HWND requests. No application is activated by
+tracking. Dock model merges pinned/duplicate groups and preserves attention in overflow, with
+foreground groups always clear. The renderer owns bounded motion and reduced-motion/high-contrast
+presentation; the host owns fullscreen visibility policy.
+
+[RegisterShellHookWindow](https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-registershellhookwindow)
+is documented for Shell applications but Microsoft warns it can change or become unavailable.
+Registration failure leaves running-window tracking active with attention unavailable. Ordinary
+registered `HSHELL_REDRAW` supplies no reliable explicit-stop state; requests remain latched until
+foreground/removal, rather than inventing a clear from title changes. Windows app-specific badges,
+notifications that do not request a Shell flash, other desktops and delivery while the native
+taskbar is hidden require separate compatibility qualification. No DLL is injected and no window
+content is polled for attention. See Microsoft's [FlashWindowEx](https://learn.microsoft.com/windows/win32/api/winuser/nf-winuser-flashwindowex)
+and [ShellProc](https://learn.microsoft.com/windows/win32/winmsg/shellproc) contracts.
+
+New pure attention/model regressions and an own-window `FlashWindowEx` Shell-message fixture are
+present; current compilation/execution evidence must be recorded separately. Automated attention
+checks never flash, activate or inspect an owner's application, and never capture the desktop.
+
 `aether_applications` implements the application contracts of `ApplicationTypes.h` (owned by the lead)
 for the Dock, Search and Settings:
 

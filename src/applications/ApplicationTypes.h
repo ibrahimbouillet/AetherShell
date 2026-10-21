@@ -65,6 +65,9 @@ struct RunningApplication {
     // to test output. Empty when unknown.
     std::wstring relaunchIconResource;
     std::wstring relaunchDisplayName;
+    // Genuine Shell flash request from a background member window. Never inferred from its title.
+    // Cleared when this group is foreground or its requesting windows are removed.
+    bool attentionRequested = false;
 };
 
 // Enumerates installed applications. Blocking; call from a worker thread.

@@ -278,3 +278,142 @@ AETHER_TEST("glyphs: status badges fill with the status roles and draw a contras
     // The error mark crosses the centre in a contrasting color (white on the light critical red).
     CHECK(test::Near(canvas.At(52, 16), 255, 255, 255, 255, 30));
 }
+
+AETHER_TEST("glyphs: every status outline fits the proportional grid with round caps and joins") {
+    GlyphGuard guard; const auto factory = Factory(); REQUIRE(factory);
+    auto* style = RoundStrokeStyle(factory.get()); REQUIRE(style != nullptr);
+    CHECK(style->GetStartCap() == D2D1_CAP_STYLE_ROUND); CHECK(style->GetEndCap() == D2D1_CAP_STYLE_ROUND);
+    CHECK(style->GetLineJoin() == D2D1_LINE_JOIN_ROUND);
+    for (const auto glyph : kAllStatusGlyphs) {
+        const auto geometry = BuildStatusGlyphGeometry(factory.get(),glyph); REQUIRE(geometry.ok());
+        REQUIRE(geometry->stroke || geometry->fill);
+        if (geometry->stroke) {
+            for (const float width : {1.5f,2.0f}) {
+                D2D1_RECT_F bounds{}; REQUIRE(SUCCEEDED(geometry->stroke->GetWidenedBounds(width,style,nullptr,&bounds)));
+                if (!InsideGrid(bounds)) TEST_NOTE("status outline outside grid: " + std::to_string(static_cast<int>(glyph)));
+                CHECK(InsideGrid(bounds));
+            }
+        }
+        if (geometry->fill) {
+            D2D1_RECT_F bounds{}; REQUIRE(SUCCEEDED(geometry->fill->GetBounds(nullptr,&bounds))); CHECK(InsideGrid(bounds));
+        }
+    }
+    CHECK_FALSE(BuildStatusGlyphGeometry(nullptr,StatusGlyph::Speaker).ok());
+}
+
+AETHER_TEST("glyphs: wide and tall status boxes preserve the same circular proportions") {
+    GlyphGuard guard; D2DCanvas canvas; REQUIRE(canvas.Create(112,112));
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+    REQUIRE(SUCCEEDED(canvas.Context()->CreateSolidColorBrush(D2D1::ColorF(1,1,1,1),brush.put())));
+    for (const auto glyph : kAllStatusGlyphs) {
+        canvas.Begin();
+        PaintStatusGlyph(canvas.Context(),glyph,{4,4,36,36},brush.get());
+        PaintStatusGlyph(canvas.Context(),glyph,{44,4,108,36},brush.get());
+        PaintStatusGlyph(canvas.Context(),glyph,{4,44,36,108},brush.get());
+        REQUIRE(canvas.End());
+        int coverage = 0, difference = 0, outside = 0;
+        for (UINT y = 0; y < 32; ++y) for (UINT x = 0; x < 32; ++x) {
+            const auto base = canvas.At(4+x,4+y); coverage += base.a;
+            difference += std::abs(base.a-canvas.At(60+x,4+y).a)+std::abs(base.a-canvas.At(4+x,60+y).a);
+        }
+        for (UINT y = 0; y < 112; ++y) for (UINT x = 0; x < 112; ++x) {
+            const bool painted = (x>=4&&x<36&&y>=4&&y<36)||(x>=60&&x<92&&y>=4&&y<36)||(x>=4&&x<36&&y>=60&&y<92);
+            if (!painted) outside += canvas.At(x,y).a;
+        }
+        CHECK(coverage > 0); CHECK_EQ(difference,0); CHECK_EQ(outside,0);
+    }
+}
+
+AETHER_TEST("glyphs: battery warning and full colors require known readings and obey high contrast") {
+    const auto dark = MakeDesignTokens(ThemeMode::Dark);
+    const auto same = [](Color a,Color b) { return a.r==b.r&&a.g==b.g&&a.b==b.b&&a.a==b.a; };
+    CHECK(same(BatteryStatusColor(dark,100),dark.success));
+    for (const auto percent : {std::optional<int>{},std::optional<int>{6},std::optional<int>{99},std::optional<int>{101},std::optional<int>{-1}})
+        CHECK(same(BatteryStatusColor(dark,percent),dark.textPrimary));
+    for (const int percent : {0,1,5}) CHECK(same(BatteryStatusColor(dark,percent),dark.critical));
+    CHECK(same(BatteryStatusColor(dark,42,true),dark.critical));
+    CHECK(same(BatteryStatusColor(dark,std::nullopt,true),dark.critical));
+    CHECK(same(BatteryStatusColor(dark,100,true),dark.critical));
+    auto contrast = MakeDesignTokens(ThemeMode::HighContrast);
+    contrast.success = {0,1,0,1}; contrast.critical = {1,0,0,1};
+    for (const auto percent : {std::optional<int>{},std::optional<int>{0},std::optional<int>{5},std::optional<int>{100}})
+        CHECK(same(BatteryStatusColor(contrast,percent,true),contrast.textPrimary));
+
+    GlyphGuard guard; D2DCanvas canvas; REQUIRE(canvas.Create(200,40));
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+    REQUIRE(SUCCEEDED(canvas.Context()->CreateSolidColorBrush(dark.textPrimary.ToD2D(),brush.put())));
+    canvas.Begin();
+    PaintBatteryGlyph(canvas.Context(),{0,0,32,32},brush.get(),dark,100);
+    PaintBatteryGlyph(canvas.Context(),{40,0,72,32},brush.get(),dark,99);
+    PaintBatteryGlyph(canvas.Context(),{80,0,112,32},brush.get(),dark,42,true);
+    PaintBatteryGlyph(canvas.Context(),{120,0,152,32},brush.get(),contrast,100);
+    PaintBatteryGlyph(canvas.Context(),{160,0,192,32},brush.get(),dark,0);
+    REQUIRE(canvas.End());
+    const auto pixel = [&](UINT x,Color color) { CHECK(test::Near(canvas.At(x,16),Channel(color.r),Channel(color.g),Channel(color.b),255,2)); };
+    pixel(12,dark.success); pixel(52,dark.textPrimary); pixel(88,dark.critical); pixel(132,contrast.textPrimary);
+    CHECK(test::Near(canvas.At(176,9),Channel(dark.critical.r),Channel(dark.critical.g),Channel(dark.critical.b),255,2));
+    CHECK_EQ(canvas.At(176,16).a,0); // zero remains empty, with a visible critical outline
+}
+
+AETHER_TEST("glyphs: audio and network unknown states differ from known zero and preserve paint state") {
+    GlyphGuard guard; D2DCanvas canvas; REQUIRE(canvas.Create(12*40,40));
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+    const auto color = D2D1::ColorF(0.7f,0.8f,0.9f,0.85f);
+    REQUIRE(SUCCEEDED(canvas.Context()->CreateSolidColorBrush(color,brush.put()))); brush->SetOpacity(0.6f);
+    canvas.Begin();
+    for (int i = 0; i < 5; ++i) PaintVolumeGlyph(canvas.Context(),{static_cast<float>(i*40+4),4,static_cast<float>(i*40+36),36},
+        brush.get(),i==0?std::nullopt:std::optional<int>((i-1)*33),false);
+    PaintVolumeGlyph(canvas.Context(),{204,4,236,36},brush.get(),std::nullopt,true);
+    PaintMicrophoneGlyph(canvas.Context(),{244,4,276,36},brush.get(),std::nullopt);
+    PaintMicrophoneGlyph(canvas.Context(),{284,4,316,36},brush.get(),false);
+    PaintNetworkGlyph(canvas.Context(),{324,4,356,36},brush.get(),NetworkGlyphKind::Cellular,0);
+    PaintNetworkGlyph(canvas.Context(),{364,4,396,36},brush.get(),NetworkGlyphKind::Cellular,5);
+    PaintNetworkGlyph(canvas.Context(),{404,4,436,36},brush.get(),NetworkGlyphKind::Cellular,std::nullopt);
+    PaintBatteryGlyph(canvas.Context(),{444,4,476,36},brush.get(),MakeDesignTokens(ThemeMode::Dark),100);
+    CHECK_NEAR(brush->GetOpacity(),0.6f,1e-6);
+    const auto restored = brush->GetColor(); CHECK_EQ(restored.r,color.r); CHECK_EQ(restored.g,color.g); CHECK_EQ(restored.b,color.b); CHECK_EQ(restored.a,color.a);
+    D2D1_MATRIX_3X2_F transform{};canvas.Context()->GetTransform(&transform);
+    CHECK_EQ(transform._11,1.0f);CHECK_EQ(transform._22,1.0f);CHECK_EQ(transform._31,0.0f);CHECK_EQ(transform._32,0.0f);
+    REQUIRE(canvas.End());
+    int coverage[12]{};int volumeUnknown=0,micUnknown=0,cellUnknown=0;
+    for (UINT y=0;y<40;++y) for (UINT x=0;x<40;++x) {
+        for (UINT i=0;i<12;++i) {const auto pixel=canvas.At(i*40+x,y);coverage[i]+=pixel.a;if(x<4||x>=36||y<4||y>=36)CHECK_EQ(pixel.a,0);}
+        volumeUnknown+=std::abs(canvas.At(x,y).a-canvas.At(40+x,y).a);
+        micUnknown+=std::abs(canvas.At(240+x,y).a-canvas.At(280+x,y).a);
+        cellUnknown+=std::abs(canvas.At(400+x,y).a-canvas.At(320+x,y).a);
+    }
+    CHECK(coverage[2]>coverage[1]);CHECK(coverage[3]>coverage[2]);CHECK(coverage[4]>coverage[3]);
+    CHECK(coverage[9]>coverage[8]);CHECK(volumeUnknown>0);CHECK(micUnknown>0);CHECK(cellUnknown>0);
+    canvas.Begin();
+    const auto nested = D2D1::Matrix3x2F::Scale(0.75f,0.75f)*D2D1::Matrix3x2F::Translation(3,2);
+    canvas.Context()->SetTransform(nested);
+    PaintNetworkGlyph(canvas.Context(),{4,4,36,36},brush.get(),NetworkGlyphKind::Cellular,3,true);
+    PaintBatteryGlyph(canvas.Context(),{44,4,76,36},brush.get(),MakeDesignTokens(ThemeMode::Dark),42,{},true);
+    PaintWeatherGlyph(canvas.Context(),{84,4,116,36},brush.get(),WeatherSymbol::Rain,true,true);
+    canvas.Context()->GetTransform(&transform);
+    CHECK_EQ(transform._11,nested._11);CHECK_EQ(transform._12,nested._12);CHECK_EQ(transform._21,nested._21);
+    CHECK_EQ(transform._22,nested._22);CHECK_EQ(transform._31,nested._31);CHECK_EQ(transform._32,nested._32);
+    CHECK_NEAR(brush->GetOpacity(),0.6f,1e-6);CHECK_EQ(brush->GetColor().r,color.r);CHECK_EQ(brush->GetColor().a,color.a);
+    REQUIRE(canvas.End());
+}
+
+AETHER_TEST("glyphs: weather categories remain distinct and absent daylight does not invent sun") {
+    GlyphGuard guard;D2DCanvas canvas;REQUIRE(canvas.Create(6*40,40));
+    winrt::com_ptr<ID2D1SolidColorBrush> brush;
+    REQUIRE(SUCCEEDED(canvas.Context()->CreateSolidColorBrush(D2D1::ColorF(1,1,1,1),brush.put())));
+    canvas.Begin();
+    PaintWeatherGlyph(canvas.Context(),{4,4,36,36},brush.get(),WeatherSymbol::Clear,true);
+    PaintWeatherGlyph(canvas.Context(),{44,4,76,36},brush.get(),WeatherSymbol::Clear,false);
+    PaintWeatherGlyph(canvas.Context(),{84,4,116,36},brush.get(),WeatherSymbol::Rain,true);
+    PaintWeatherGlyph(canvas.Context(),{124,4,156,36},brush.get(),WeatherSymbol::Snow,true);
+    PaintWeatherGlyph(canvas.Context(),{164,4,196,36},brush.get(),WeatherSymbol::Clear,std::nullopt);
+    PaintWeatherGlyph(canvas.Context(),{204,4,236,36},brush.get(),WeatherSymbol::Unknown,true);
+    REQUIRE(canvas.End());int dayNight=0,rainSnow=0,unknown=0,unknownSun=0;
+    for(UINT y=0;y<40;++y)for(UINT x=0;x<40;++x){
+        dayNight+=std::abs(canvas.At(x,y).a-canvas.At(40+x,y).a);
+        rainSnow+=std::abs(canvas.At(80+x,y).a-canvas.At(120+x,y).a);
+        unknown+=std::abs(canvas.At(160+x,y).a-canvas.At(200+x,y).a);
+        unknownSun+=std::abs(canvas.At(160+x,y).a-canvas.At(x,y).a);
+    }
+    CHECK(dayNight>0);CHECK(rainSnow>0);CHECK_EQ(unknown,0);CHECK(unknownSun>0);
+}
