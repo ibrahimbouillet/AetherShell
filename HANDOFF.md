@@ -4,7 +4,9 @@
 > personal addresses/accounts/paths, machine names, unrelated app content or captures outside the
 > project's own isolated test windows. Public owner attribution: Ibrahim Bouillet. See AGENTS.md.
 
-## Active continuation — Codex, 2026-10-20–21 (Europe/Paris)
+## Active continuation — Codex, 2026-10-22 (Europe/Paris)
+
+Last updated: 2026-10-22 07:17 Europe/Paris.
 
 > **OWNER DELIVERY HOLD — 2026-10-21 (D25).** Local commits are permitted, but do not push,
 > create a tag or publish a GitHub Release until the owner explicitly lifts this hold. More owner
@@ -14,11 +16,12 @@
 
 Long-term objective: a native C++20 Windows Dock and Top Status Bar alongside Explorer, with real
 status, accessible interaction, durable settings, safe per-user installation and authenticated
-updates. This session recovered Claude's interrupted `0.2.0-alpha.1` batches, implemented their
-consumers/app integration, independently reviewed them and completed the automated candidate gates.
-The published `0.1.0-alpha.1` does not include this work.
+updates. Earlier continuation sessions recovered Claude's interrupted `0.2.0-alpha.1` batches and
+completed the S-026 local controls preview. This turn qualified the Release build, unit suite and
+focused native integration gates for D27/D28; manual owner/device acceptance remains. The published
+`0.1.0-alpha.1` does not include the local V2 work.
 
-### Active new work — D27/D28 (2026-10-21)
+### Current local checkpoint — D27/D28 (2026-10-22)
 
 - Owner requests continuous captured Dock drag with reactive spring neighbors/drop, no hover tiles,
   separator or trailing native-taskbar arrow; neutral material also on hover/tooltips; round status
@@ -28,11 +31,42 @@ The published `0.1.0-alpha.1` does not include this work.
 - Owner explicitly clarified automatic Windows weather location for general installations, no fixed
   owner city. Use OS permission/coarse position, honest no-weather on denial/unavailability, preserve
   existing opt-outs/manual choices. Never scrape SSIDs/raw IP or pretend to read Windows weather.
-- In progress in the integration worktree: lifecycle agent owns DockWindow/geometry/tests; visuals
-  owns shared status glyphs/TopBarWindow/ControlCenter; parity owns attention tracker/model and then
-  location adapter. Root owns status battery mapping, app policy/wiring/settings and continuity docs.
-  Current preview remains the S-026 copied build until a new candidate is built/tested/reviewed.
-  No push/tag/release. Read working diff before continuing; these changes are not yet qualified.
+- The prior source snapshot is committed as `8595f14`, with a test/schema follow-up at `73900bc`.
+  S-027 continued in the official-origin worktree on `wip/d27-d28`, based on `73900bc`; local `main`
+  has not been advanced. This session added consent-generation fencing, accurate weather
+  disclosure/reference text, and integration expectations for the D27 arrow-free menu and animated
+  Dock settling. The S-027 change set is committed locally on `wip/d27-d28`; after that commit the
+  working tree is clean and local `main` is unchanged. Earlier agents are no longer running. Check
+  `git status` and `git log` before editing.
+- A complete Release build of all modules and targets passed with MSVC `/W4 /WX` and zero warnings.
+  The final CTest unit gate passed **21/21 executables**. Focused own-window integration tests for
+  applications, Dock, Top Bar, Settings UI, Control Center and app passed **6/6 executables** after
+  two obsolete assertions were updated. The exact commands, earlier Search benchmark flake, and
+  limitations are recorded in S-027 in `docs/knowledge/TEST_STATUS.md`.
+- Review found a stale-consent race: a Windows permission response could arrive after a manual
+  location or weather mode changed. `ShellApplication.cpp` now fences permission against the full
+  location choice (enabled/mode/consent/manual coordinates/name), while unit and interval edits do
+  not invalidate it. Weather refresh is documented at the host's 15-minute cadence. Both changes
+  are covered by the passing S-027 gates.
+- The installed `0.2.0-alpha.1` application was paused for bounded tests and restored with its
+  original executable/data directory. After the passing gates, the freshly built worktree candidate
+  was launched and verified visible as **Aether Shell Dock** from the Release build. It runs with a
+  separate local preview profile copied from current settings; weather is disabled and Windows
+  location consent is false in that copy. The installed files/profile were not overwritten, and no
+  installer or startup registration was changed. No real location prompt/read, forecast request,
+  media/audio/radio/brightness mutation, Explorer restart or owner-window capture occurred.
+- D27/D28 are tested, not fully accepted: direct visual review of Dock motion/glyphs, reduced motion,
+  real shell attention/fullscreen behavior, real Windows location consent and live weather, physical
+  DPI/multi-monitor behavior, and complete taskbar/Explorer recovery remain owner/device checks.
+  No package, push, tag or release was created; D25 remains active.
+
+### Earlier unqualified work — D27/D28 source snapshot (2026-10-21)
+
+Implementation details and prior session ownership are preserved in commit `8595f14`; it added the
+continuous Dock drag/spring behavior, shared status glyphs, Windows shell attention propagation and
+the consent-gated Windows location backend. Those files were committed as a recovery snapshot, not a
+verified milestone when written. The later S-027 Release build, unit and focused own-window results
+are recorded above; owner/device acceptance remains.
 
 ### Owner controls scope — 2026-10-21 (D26)
 
@@ -236,31 +270,27 @@ restore it; no autorun. D25 still forbids push/tag/release. Current implementati
 
 ## NEXT SESSION START HERE
 
-1. Read the PUBLIC rule, this active checkpoint, AGENTS and `docs/SESSION_START_PROMPT.md`. Verify
-   official origin, HEAD/main/origin and all worktrees; preserve partial work. D25 forbids all pushes,
-   tags and releases until the owner explicitly lifts it. Remote source remains b87be0d; later local
-   milestones are not published. The archive is private historical material, never a development target.
-2. Keep the current D26 controls preview active. Its ignored private receipt is under build/manual;
-   do not publish it. Owner authorization already covers leaving the usable preview open and bounded
-   tests/restoration. Do not introduce autorun or stop it throughout development. Rebuild before
-   copying a changed binary; never overwrite a running binary. Preserve existing private settings.
-3. Continue the owner's manual feedback: grouped media/radio/volume/brightness panel, neutral glass
-   and maximized-only side margins are implemented. Real device controls/session switching/Windows
-   routes, Chrome profile identity, voice typing, keyboard layouts and accessibility need manual
-   qualification with the owner. Do not automate actual audio/radio/brightness/playback/startup,
-   restart Explorer, capture owner windows or move manually placed windows. Media artwork is pending.
-4. Investigate the moving radial overlay in synthetic panel captures without changing global feedback
-   settings. Preserve S-025 UIA negative evidence: six native accessibility cases now pass once, but
-   earlier intermittent fallback/disconnect behavior has no proven causal fix. Keep strict assertions.
-   Foreign side AppBars, physical DPI/monitor changes/removal, reveal/resume and crash recovery need
-   separate exact-revision desktop qualification. Windows10 was not tested; an owner waiver is not a pass.
-5. T20 diagnostics export, topBar.openWindowsFlyouts preference routing, signed production update/
-   rollback, Q-001 performance, Q-002 branding and GAP-010 remain open. No current new setup package,
-   manifest signature, install or release is qualified. The eventual second delivery is Alpha2;
-   reconcile final version/package naming only after the owner approves delivery and lifts D25.
-6. Update canonical English Markdown at every checkpoint. The reusable prompt works for Claude and
-   Codex without proprietary tools. Never include private receipts, account/media data, captures,
-   keys/locations, PDB paths or old private history in commits. No publication is authorized now.
+1. Read this PUBLIC rule and S-027, then `AGENTS.md`, the linked D27/D28 sections of `PROJECT_SPEC.md`,
+   `TASKS.md`, and D25/D27/D28 in `DECISIONS.md`. Verify `origin`, current branch/HEAD (descended from
+   `73900bc`), local `main`, worktrees and `git status` before editing. Never use the private archive.
+2. The complete `/W4 /WX` build, 21/21 unit executables, and six targeted integration executables
+   already pass. Do not repeat them without a source change or a reproducible defect. The final
+   tree-level acceptance still needs the owner's visual and real-device review listed above.
+3. The newest candidate is already visible from the isolated Release build, using a separate local
+   profile with weather disabled and no Windows location consent. Keep it active except during bounded
+   tests; do not overwrite the installed Alpha 1 or its profile. Never enable weather/request location
+   on the owner's behalf. Leave the candidate running for owner review; no startup/autorun.
+4. The owner should review the weather permission flow, live forecast only after consent, Dock drag
+   and settling, proportional icons/battery colors, attention cues, reduced motion, and maximized
+   margins. Actual Windows location reads, network forecast, physical DPI/multi-monitor, screen reader
+   and Explorer/taskbar recovery remain separate acceptance evidence. Do not manipulate audio, radios,
+   brightness or media; restart Explorer; capture owner windows; or move manually placed apps.
+5. Update docs and HANDOFF with exact results. D25 still forbids push, tag, package or GitHub Release.
+   Alpha 2 version/package naming stays unresolved until later explicit delivery authorization.
+6. Review the complete diff, privacy scan, Markdown links and commit identity before any new local
+   commit. Do not fast-forward or push other branches without explicit instruction. Never include
+   private preview receipts, machine/user paths, test logs, local config or unrelated captures in
+   public Git.
 
 ## Historical receipts — previous sessions, superseded as continuation instructions
 

@@ -284,8 +284,8 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, Point(window, beforeDrag->items[2].icon));
     REQUIRE_EQ(settings.Current().dock.pinned.size(), 2u);
     CHECK_EQ(settings.Current().dock.pinned[0].displayName, L"Synthetic B");
-    const auto duringDrag = window.Geometry(); REQUIRE(duringDrag.ok());
-    CHECK(duringDrag->items[1].icon.left > duringDrag->items[2].icon.left);
+    // The captured-drag integration below checks live neighbour displacement and settling. This
+    // synthetic message sequence checks the committed order and eventual slot geometry.
     ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 1200);
     const auto afterDrag = window.Geometry(); REQUIRE(afterDrag.ok());
     CHECK(afterDrag->items[1].icon.left < afterDrag->items[2].icon.left);

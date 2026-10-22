@@ -92,7 +92,7 @@ struct TopBarSettings {
 
 struct WeatherSettings {
     bool enabled = false;          // off by default: weather needs network requests (privacy)
-    std::wstring locationName;     // display name chosen by the user, e.g. "Paris, France"
+    std::wstring locationName;     // display name chosen by the user
     std::optional<double> latitude;   // -90..90
     std::optional<double> longitude;  // -180..180
     TemperatureUnit unit = TemperatureUnit::Celsius;

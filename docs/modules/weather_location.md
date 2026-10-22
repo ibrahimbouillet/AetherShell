@@ -15,9 +15,11 @@ the actual read remains subject to OS permission. No worker/startup path request
 0.1-degree rounded coordinates. It requests a cache age of 30 minutes and independently validates
 the returned timestamp, since Windows can exceed the requested cache age depending on accuracy.
 Future/stale/invalid readings remain unavailable. Country stays unknown: no city/country, coordinates
-or fallback place is invented. There is no IP/SSID lookup, reverse geocoder, logging or persistence.
+or fallback place is invented. The weather provider keeps its normal local forecast cache, whose
+location key contains the rounded coordinates; those automatic coordinates are not written to the
+settings file. There is no IP/SSID lookup, reverse geocoder or coordinate logging.
 Cancellation/deadline waits own a shared completion event and cancel on the worker; no late callback
-captures the caller's stack or host. The host may refresh on resume and at a bounded 30-minute interval.
+captures the caller's stack or host. The host refreshes on resume and on a bounded 15-minute interval.
 
 Microsoft documents unpackaged use without a location manifest capability, while packaged apps need
 the location capability. Actual availability still depends on Windows privacy policy, location

@@ -79,6 +79,19 @@ An alpha is implemented and installed; full Version 1 platform/manual acceptance
 | app | native Release executable and isolated full lifecycle/health/channel/shutdown case pass |
 | CI/public delivery | clean history pushed; Windows Release CI green; manual alpha published; exact receipts in HANDOFF / TEST_STATUS S-012 |
 
+## Current local development state (2026-10-22)
+D27/D28 source work adds animated Dock reordering and attention cues, proportional status glyphs,
+low-battery coloring, and consent-gated Windows location for automatic weather. S-027 passed a full
+Release `/W4 /WX` build, all 21 unit CTest executables, and six focused own-window integration
+executables (Dock, Top Bar, settings, application discovery, app attention and Control Center).
+Earlier Search microbenchmark runs were intermittent; the final complete unit run passed. These
+automated results do not replace owner review of real Windows location permission/forecast, shell
+attention, reduced motion, physical DPI or Explorer/taskbar recovery. See S-027 in
+`docs/knowledge/TEST_STATUS.md` and the current `HANDOFF.md`. The worktree-built Release candidate is
+currently visible in a separate local preview profile with weather disabled; the installed Alpha 1
+was not overwritten. D25 keeps the candidate local: no Alpha 2 push, tag, package or GitHub Release
+is authorized yet.
+
 ## Known issues, limitations, risks (summary — details in `docs/knowledge/KNOWN_ISSUES.md`)
 - Blur only on Windows 11; Windows 10 untested. Multi-monitor, DPI change and Explorer restart untested.
 - No code-signing certificate: Authenticode cannot be enforced; SmartScreen will warn.

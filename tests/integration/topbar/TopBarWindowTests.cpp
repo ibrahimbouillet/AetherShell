@@ -387,9 +387,14 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     menu.previousForeground = nullptr;
     click(ItemKind::Microphone, true); CHECK_EQ(voice, 1);
     REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
-    click(ItemKind::NotificationArea); CHECK_EQ(reveal, 1);
+    CHECK(std::none_of(window.Items().begin(), window.Items().end(), [](const auto& item) {
+        return item.item.kind == ItemKind::NotificationArea;
+    })); // D27 removes the visible Windows-taskbar arrow.
+    menu.next = BarCommand::RevealWindowsTaskbar;
+    click(ItemKind::Logo, true); CHECK_EQ(reveal, 1); // recovery remains in the Top Bar menu
     REQUIRE(window.SetTaskbarReplacementState(true, false, true).ok());
-    click(ItemKind::NotificationArea); CHECK_EQ(resume, 1);
+    menu.next = BarCommand::ResumeReplacement;
+    click(ItemKind::Logo, true); CHECK_EQ(resume, 1);
     REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
     menu.next = BarCommand::RevealWindowsTaskbar;
     menu.duringShow = [&] { REQUIRE(window.SetTaskbarReplacementState(false, false, false).ok()); };

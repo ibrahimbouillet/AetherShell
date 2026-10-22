@@ -89,6 +89,13 @@ copy. Apply also retries a failed save. Draft numeric values must be complete be
 Weather searches run on a worker only after Search; selecting a returned candidate saves it.
 About includes the complete MIT license and public attribution.
 
+The Weather page offers manual search or **Locate automatically with Windows**. A separate
+**Use Windows location** action requests the OS permission in the foreground; fresh defaults alone
+never request or infer consent. The page discloses that coarse coordinates go to Open-Meteo and a
+rounded location key is cached locally. A denied or unavailable reading leaves weather unavailable.
+Existing settings with manual coordinates and saved weather opt-outs remain manual/off during
+migration. Real Windows permission and location behavior still require owner-driven qualification.
+
 The startup checkbox is excluded from automatic saves. Apply is the explicit consent action, with
 controls disabled before calling the asynchronous registry seam. Repeated Apply cannot enqueue
 duplicate startup changes. Reset confirmation explicitly includes disabling startup, and the
@@ -145,6 +152,10 @@ All new members are additive; 0.1 ignores them with a warning, so rolling back i
   `showBatteryPercent` (true).
 - `general`: `syncTaskbarPins` (true), `themeMode` (`system`/`light`/`dark`), `accentSource`
   (`windows`/`aether`), `animationSpeed` (1.0, 0.5..1.5).
+- `weather`: `useWindowsLocation` (true as the first-use offer, with no implicit OS request),
+  `windowsLocationConsent` (false until an allowed Windows permission result). An older file with
+  saved coordinates and no location-mode key migrates to manual mode; automatic coordinates are
+  held in memory and are never written to these settings fields.
 - Dock size defaults are 40/4. `dock.metricsVersion` is an internal marker: a file whose dock group
   has no marker was written by 0.1 (version 1), and there an absent `iconSize` or `bottomMargin`
   means 48 or 10. If the effective size is exactly 48/10 it moves once to 40/4 with a migration

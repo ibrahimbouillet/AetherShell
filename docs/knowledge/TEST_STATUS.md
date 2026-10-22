@@ -859,3 +859,60 @@ pending; S-012 still describes the only delivered alpha.
 - Final staged byte audit flagged14 unchanged legacy lines: relative ./scripts commands and literal
   keyboard-navigation descriptions. Each was inspected as a generic-pattern false positive;0 private or
   newly introduced findings remain. App/launcher binaries separately pass the unmodified strict audit.
+
+### S-027 — D27/D28 build and focused surface qualification (Codex, 2026-10-22)
+
+The tested source tree was based on `wip/d27-d28` at `73900bc`, including the preceding D27/D28
+implementation commits. This turn added a stale-consent generation fence to `ShellApplication`, made
+the Weather settings disclosure and module references match the actual permission/cache behavior,
+and corrected two integration expectations that still described the removed taskbar arrow and
+pre-D27 Dock drag timing. No product requirement or visual direction changed.
+
+Full Release build of all configured modules/targets passed with `/W4 /WX` and zero warnings:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-codex-d27d28 -Modules all -Jobs 6 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON'
+```
+
+The final complete unit gate passed **21/21 CTest executables** (26.21 s total):
+
+```powershell
+ctest --test-dir build/wf-codex-d27d28 -L unit --output-on-failure
+```
+
+The focused native integration gate passed **6/6 executables** (65.16 s total), covering application
+discovery, captured Dock drag/neighbour settling, Top Bar menus/status, Settings UI, Control Center,
+and app attention/lifecycle (68.26 s total):
+
+```powershell
+ctest --test-dir build/wf-codex-d27d28 -R `
+  'aether_(dock|topbar|controlcenter|settings_ui|applications|app)_integration_tests' `
+  --output-on-failure
+```
+
+The first aggregate native run had two expected failures in stale checks: the Dock fixture demanded
+that a single synthetic pointer message expose the crossed slot immediately after release, while the
+separate captured-input test already verifies continuous drag, neighbor reaction and settling; the
+Top Bar fixture clicked the removed `NotificationArea` arrow instead of testing recovery through the
+logo menu. Those fixtures now check settled Dock geometry and arrow-free menu recovery. The focused
+Dock/Top Bar rerun passed 2/2, then the full six-executable gate passed 6/6. These fixture
+expectations were updated; the dedicated captured-input Dock case still checks live movement and
+settling, and the new Top Bar check confirms recovery remains available from the menu.
+
+Two earlier whole-unit reruns intermittently failed only the Search microbenchmark's single-sample
+`times[33] < 2.0 ms` check; an isolated Search rerun passed, and the final complete 21-executable
+unit run passed without changing its threshold. Keep this timing flake visible if it recurs; do not
+reinterpret it as a product Search defect without repeated measured evidence.
+
+The installed `0.2.0-alpha.1` process was paused for bounded tests and restored using its original
+binary and data directory; its executable path/arguments were checked after relaunch. After tests,
+the Release candidate was started directly from the worktree and verified visible with an isolated
+local profile; its copy has weather disabled and Windows location consent false. The installed files
+and profile were not overwritten. No location permission prompt/read, live forecast request,
+audio/radio/brightness/media action, Explorer restart, real settings mutation or owner-window capture
+occurred.
+Physical DPI/multi-monitor, actual shell attention/fullscreen behavior, Windows location consent,
+live weather, reduced-motion visual quality, and taskbar/Explorer recovery still need owner/device
+acceptance. This run is test evidence, not release acceptance; D25 still forbids package, push, tag,
+and GitHub Release.

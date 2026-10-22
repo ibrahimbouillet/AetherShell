@@ -195,7 +195,7 @@ void SettingsWindow::Impl::BuildPage() {
         choice(L"Temperature", {L"Celsius",L"Fahrenheit"}, [](const Settings& s){return s.weather.unit;}, [](Settings& s,int v){s.weather.unit=static_cast<TemperatureUnit>(v);});
         number(L"Refresh interval (15–180 minutes)", [](const Settings& s){return s.weather.refreshMinutes;}, [](Settings& s,double v){s.weather.refreshMinutes=static_cast<int>(v);});
         check(L"Locate automatically with Windows", [](const Settings& s){return s.weather.useWindowsLocation;}, [](Settings& s,bool v){s.weather.useWindowsLocation=v;});
-        Add(L"STATIC", L"Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com for the forecast. If location is blocked, weather is unavailable.", 0, 218, 278, 460, 56);
+        Add(L"STATIC", L"Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com; a coarse location key is cached locally. If location is blocked, weather is unavailable.", 0, 218, 278, 460, 56);
         Add(L"BUTTON", L"Use Windows location", WS_TABSTOP | BS_PUSHBUTTON, 218, 342, 224, 32, kWindowsLocation);
         Add(L"BUTTON", L"Location settings", WS_TABSTOP | BS_PUSHBUTTON, 454, 342, 204, 32, kLocationSettings);
         Add(L"STATIC", callbacks.weatherLocationStatus ? callbacks.weatherLocationStatus() : L"Choose automatic location or search for a place below.", 0, 218, 382, 440, 32);

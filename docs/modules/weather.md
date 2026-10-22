@@ -4,11 +4,13 @@
 
 ## Purpose
 
-Optional current weather for the Top Status Bar and the location search behind the Settings
-"Weather" page. Data comes from [Open-Meteo](https://open-meteo.com/) over HTTPS without an API key.
-The weather provider is **off by default**; it sends no forecast requests until the user enables it
-and picks a location. The separate geocoding client sends search text only when `Search()` is called;
-the Settings UI that initiates that search is not implemented yet.
+Optional current weather for the Top Status Bar and the Settings "Weather" page. Data comes from
+[Open-Meteo](https://open-meteo.com/) over HTTPS without an API key. Weather is **off by default**;
+forecast requests start only after the user enables weather and chooses either a manual place or
+Windows location. Automatic location is explicitly requested from Windows in the foreground, remains
+subject to the current OS privacy policy, and uses rounded in-memory coordinates. A denied or missing
+reading leaves weather unavailable. Existing manual locations and explicit weather opt-outs are
+preserved. The separate geocoding client sends only the text the user enters when `Search()` is called.
 
 Dependencies: `aether_core`, `aether_diagnostics`, `aether_platform`. The module includes
 `status/StatusTypes.h` for the `WeatherSnapshot` contract but does not link `aether_status`. HTTP goes
@@ -31,8 +33,8 @@ Wiring in the application (sketch):
 ```cpp
 weather::WeatherConfig config;                 // mapped from settings::WeatherSettings
 config.enabled = settings.weather.enabled;
-config.latitude = settings.weather.latitude;
-config.longitude = settings.weather.longitude;
+config.latitude = resolvedLocation.latitude;   // manual settings or the current coarse Windows sample
+config.longitude = resolvedLocation.longitude;
 config.locationName = settings.weather.locationName;
 config.unit = settings.weather.unit;           // status::TemperatureUnit
 config.refreshInterval = std::chrono::minutes{settings.weather.refreshMinutes};
@@ -210,11 +212,12 @@ Exception messages from transports and listeners are omitted because they can co
   does not forward `ResumedFromSleep`/`TimeChanged`, catching up can take up to 10 minutes.
 - Disabling weather stops all traffic but does not delete `weather.json` (which holds the rounded
   coordinates of the last location).
-- Coordinates are sent with 4 decimals (about 11 m). Locations picked through the geocoding search are
-  place centres, not the user's position.
+- Forecast URLs format coordinates with four decimals; that formatting does not express the accuracy
+  of the source. Automatic Windows fixes are rounded to 0.1 degree (roughly a 10 km scale), while
+  manual search results are place centres, not the user's position.
 - Commercial use of Open-Meteo requires an API key and a different host; not supported.
-- No network test: protocol and provider behavior are tested with an in-memory `IHttpClient`;
-  actual Open-Meteo transport and end-to-end UI wiring remain unverified.
+- No live forecast test: protocol and provider behavior use an in-memory `IHttpClient`; real Windows
+  location permission/read, live Open-Meteo transport and end-to-end UI wiring remain unverified.
 
 ## Tests
 

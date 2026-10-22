@@ -57,6 +57,8 @@
 #include <utility>
 #include <mutex>
 #include <algorithm>
+#include <optional>
+#include <tuple>
 
 namespace aether::app {
 namespace {
@@ -92,7 +94,7 @@ struct ShellApplication::Impl {
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
     std::optional<weather::WindowsLocation> automaticLocation;
-    std::optional<std::pair<bool,bool>> locationMode;
+    std::optional<std::tuple<bool, bool, bool, std::optional<double>, std::optional<double>, std::wstring>> locationPolicy;
     std::uint64_t locationGeneration=0;
     bool locationPending=false,locationConsentPending=false;
     std::wstring locationStatus=L"Choose Windows location to enable automatic weather.";
@@ -356,10 +358,14 @@ void ShellApplication::Impl::ApplyWeather() {
     const auto& value=settings->Current().weather;
     const bool automatic=value.enabled&&value.useWindowsLocation;
     const bool consent=automatic&&value.windowsLocationConsent;
-    const auto mode=std::pair{automatic,consent};
-    const bool changed=locationMode!=mode;
+    // Fence a pending OS consent result against every location-selection change, including a
+    // manual place chosen while the Windows permission prompt is open. Unrelated weather units
+    // and refresh intervals do not invalidate the consent request.
+    const auto policy = std::tuple{value.enabled, value.useWindowsLocation, value.windowsLocationConsent,
+        value.latitude, value.longitude, value.locationName};
+    const bool changed = locationPolicy != policy;
     if(changed){
-        locationMode=mode;++locationGeneration;locationCancellation->Cancel();
+        locationPolicy=policy;++locationGeneration;locationCancellation->Cancel();
         locationCancellation=std::make_shared<CancellationSource>();automaticLocation.reset();
         ::KillTimer(events.Handle(),kLocationRefreshTimer);
         if(consent&&nativeTaskbarAccess&&!closing){
@@ -928,7 +934,7 @@ void ShellApplication::Impl::InstallUpdate() {
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
     if(controls)controls->Close();
-    locationCancellation->Cancel();++locationGeneration;locationMode.reset();
+    locationCancellation->Cancel();++locationGeneration;locationPolicy.reset();
     ::KillTimer(events.Handle(),kLocationRefreshTimer);
     ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
     ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;

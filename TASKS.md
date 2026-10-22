@@ -9,12 +9,10 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 **Owner delivery hold (2026-10-21, D25): local commits allowed; no push, new tag or GitHub Release.**
 The next public delivery is Alpha 2 after the owner's additional changes and explicit go-ahead.
 
-**2026-10-20 continuation: finish the interrupted batches (Codex, after Claude's quota stop).**
-Recovery started at `d5ccbd6`; latest source checkpoint is local-only `d7e17c4` (D25/D26). Three saved
-streams are integrated in a candidate in a linked public
-worktree without changing their original worktrees: lifecycle `5cf6e72`, applications `1ef9d72`,
-visual core `4b7c8a8`, plus the visual stream's five preserved dirty/untracked files. Follow the
-current HANDOFF, not the older incomplete continuation instructions or an agent's completion claim.
+**Current checkpoint (2026-10-22):** D27/D28 pass Release `/W4 /WX`, all 21 unit executables, and
+six focused own-window integration executables (S-027). The tree is tested, not fully accepted;
+owner visual review and real Windows location/attention/taskbar checks remain. Continue from the
+current HANDOFF; preserve local work and the D25 no-publication hold.
 
 | Task | Requirement links | Current boundary |
 |---|---|---|
@@ -27,10 +25,10 @@ current HANDOFF, not the older incomplete continuation instructions or an agent'
 | T28 — Grouped quick controls | FR-026; FR-007–FR-010, FR-015; NFR-002–NFR-008 | Implemented/reviewed modules, production grouping and guarded app bridge. Release /WX698 unit cases pass; native controls4/accessibility6 and Dock3/TopBar5/app2 scoped gates pass (S-026). New local preview active; real device controls/artwork/manual qualification remain open. D25 holds publication. |
 | T29 — Neutral bar glass | FR-004, FR-011; NFR-011 | Uniform border/centered shadow and real/unknown Wi-Fi glyph implemented; graphics68/68 passes. Own-window Dock/TopBar dark/light captures inspected. Moving radial overlay above panel content remains unexplained; broad visual approval pending (S-026). |
 | T30 — Aligned maximized-window margins | FR-027; FR-001; NFR-003, NFR-006 | Owner clarified maximized only. Side leases and5 geometry cases pass; final bounded150-percent desktop gate aligns work area/own pre-maximized frame and restores native state on quit. Shell-approved horizontal exclusions preserved. Foreign AppBar/physical multi-monitor qualification remains open (S-026). |
-| T31 — Living Dock gestures and neutral minimal chrome | FR-002, FR-004, FR-011; NFR-007, NFR-011; D27 | In progress: continuous pointer-follow/lift/press/drop, stable-slot neighbor springs, remove hover tiles/separator/trailing arrow, neutral tooltips. Current usable preview remains active until a qualified replacement is ready. |
-| T32 — Rounded status/weather icons and battery thresholds | FR-006, FR-008, FR-010, FR-011; D27 | Shared proportional glyphs and real optional low-critical flag in progress; no invented strength/weather. Larger native variable bar type, unknown/HC states preserved. |
-| T33 — Genuine application attention | FR-028; D27 | Optional documented shell-flash observation, reset/model propagation and bounded cue/peek in progress; no forced foreground or title-derived alerts. |
-| T34 — Automatic Windows weather location | FR-010, FR-026; D28 | Owner clarified general OS-based automatic detection, not an owner city. Permission/onboarding, bounded worker coarse location and denial handling to implement; preserve opt-outs/manual configuration; no private coordinates/SSID/IP in source/logs. |
+| T31 — Living Dock gestures and neutral minimal chrome | FR-002, FR-004, FR-011; NFR-007, NFR-011; D27 | Implemented and tested in S-027: Release `/W4 /WX`, 21/21 unit executables, and Dock-own-window drag/settling integration pass. Captured pointer-follow, neighbor displacement and final settling are covered. Owner review of actual appearance, hover neutrality and reduced motion remains. |
+| T32 — Rounded status/weather icons and battery thresholds | FR-006, FR-008, FR-010, FR-011; D27 | Implemented and tested in S-027: proportional glyph/battery unit coverage, Top Bar and Control Center native integration, all pass. Unknown/high-contrast behavior remains explicit. Owner review at physical DPI and live provider conditions remains. |
+| T33 — Genuine application attention | FR-028; D27 | Implemented and tested in S-027: app/Dock unit and own-window lifecycle/attention integrations pass. No forced foreground or title-derived alerts. Real shell attention and fullscreen-peek behavior remain owner/device acceptance. |
+| T34 — Automatic Windows weather location | FR-010, FR-026; D28 | Implemented and tested in S-027: coarse consent-gated location policy, settings and fake UI/integration cases pass; stale consent callbacks are fenced against changed location policy. No real OS location consent/read or forecast request was made. Owner opt-in, Windows permission and live forecast remain unverified. |
 
 **T16 — V2 (0.2.0-alpha.1), owner-requested, in progress.** Replace the duplicated taskbar layout
 with a consented reversible visual replacement, protected Dock reservation and lower placement;
@@ -49,9 +47,12 @@ Settings and per-user setup. Continue the manual/platform acceptance gaps below;
 mark complete Version 1 acceptance.
 
 ## Current continuation priority
-The owner explicitly resumed implementation through the Dock, Top Bar, runnable app, installer,
-public handoff and delivery. Build the product first; publish only a reviewed clean snapshot with
-independent Git history, retaining the existing development history locally (D18).
+The D27/D28 source and automated gates are complete for this slice. The visible worktree candidate is
+ready for owner review of Dock motion, status glyphs, attention, reduced motion and the Windows
+weather permission flow. Continue from the owner's feedback and the remaining manual acceptance gaps
+in `HANDOFF.md`; keep the preview active between bounded tests. D25 holds all pushes, tags and GitHub
+Releases; Alpha 2 remains for a later owner-approved delivery. Preserve the independent public Git
+history (D18).
 
 ## T5 Phase A — current scope
 Module gates are narrower than complete product acceptance. Exact executed evidence is in
