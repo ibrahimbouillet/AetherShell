@@ -863,10 +863,12 @@ pending; S-012 still describes the only delivered alpha.
 ### S-027 — D27/D28 build and focused surface qualification (Codex, 2026-10-22)
 
 The tested source tree was based on `wip/d27-d28` at `73900bc`, including the preceding D27/D28
-implementation commits. This turn added a stale-consent generation fence to `ShellApplication`, made
-the Weather settings disclosure and module references match the actual permission/cache behavior,
-and corrected two integration expectations that still described the removed taskbar arrow and
-pre-D27 Dock drag timing. No product requirement or visual direction changed.
+implementation commits; the S-027 source/test checkpoint was committed locally as `4b8d000`, with a
+documentation-only repository-state follow-up afterward. This turn added a stale-consent generation
+fence to `ShellApplication`, made the Weather settings disclosure and module references match the
+actual permission/cache behavior, and corrected two integration expectations that still described
+the removed taskbar arrow and pre-D27 Dock drag timing. No product requirement or visual direction
+changed.
 
 Full Release build of all configured modules/targets passed with `/W4 /WX` and zero warnings:
 

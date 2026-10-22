@@ -6,7 +6,7 @@
 
 ## Active continuation — Codex, 2026-10-22 (Europe/Paris)
 
-Last updated: 2026-10-22 07:17 Europe/Paris.
+Last updated: 2026-10-22 07:19 Europe/Paris.
 
 > **OWNER DELIVERY HOLD — 2026-10-21 (D25).** Local commits are permitted, but do not push,
 > create a tag or publish a GitHub Release until the owner explicitly lifts this hold. More owner
@@ -33,11 +33,12 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
   existing opt-outs/manual choices. Never scrape SSIDs/raw IP or pretend to read Windows weather.
 - The prior source snapshot is committed as `8595f14`, with a test/schema follow-up at `73900bc`.
   S-027 continued in the official-origin worktree on `wip/d27-d28`, based on `73900bc`; local `main`
-  has not been advanced. This session added consent-generation fencing, accurate weather
-  disclosure/reference text, and integration expectations for the D27 arrow-free menu and animated
-  Dock settling. The S-027 change set is committed locally on `wip/d27-d28`; after that commit the
-  working tree is clean and local `main` is unchanged. Earlier agents are no longer running. Check
-  `git status` and `git log` before editing.
+  has not been advanced. The tested source/test checkpoint is local commit `4b8d000`; this handoff
+  records the later repository-state update. This session added consent-generation fencing, accurate
+  weather disclosure/reference text, and integration expectations for the D27 arrow-free menu and
+  animated Dock settling. The worktree is clean after the local S-027 commits. The separate public
+  `main` checkout remains clean at `a01fa9d`, five commits ahead of `origin/main`; do not push it
+  under D25. Earlier agents are no longer running. Check `git status` and `git log` before editing.
 - A complete Release build of all modules and targets passed with MSVC `/W4 /WX` and zero warnings.
   The final CTest unit gate passed **21/21 executables**. Focused own-window integration tests for
   applications, Dock, Top Bar, Settings UI, Control Center and app passed **6/6 executables** after
@@ -271,8 +272,9 @@ restore it; no autorun. D25 still forbids push/tag/release. Current implementati
 ## NEXT SESSION START HERE
 
 1. Read this PUBLIC rule and S-027, then `AGENTS.md`, the linked D27/D28 sections of `PROJECT_SPEC.md`,
-   `TASKS.md`, and D25/D27/D28 in `DECISIONS.md`. Verify `origin`, current branch/HEAD (descended from
-   `73900bc`), local `main`, worktrees and `git status` before editing. Never use the private archive.
+   `TASKS.md`, and D25/D27/D28 in `DECISIONS.md`. Verify `origin`, current branch/HEAD, source commit
+   `4b8d000` plus its documentation-only handoff follow-up, local `main` (`a01fa9d`, five commits
+   ahead of origin), worktrees and `git status` before editing. Never use the private archive.
 2. The complete `/W4 /WX` build, 21/21 unit executables, and six targeted integration executables
    already pass. Do not repeat them without a source change or a reproducible defect. The final
    tree-level acceptance still needs the owner's visual and real-device review listed above.
