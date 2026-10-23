@@ -13,6 +13,8 @@
   <img alt="Windows x64" src="https://img.shields.io/badge/platform-Windows%20x64-0078D4.svg">
 </p>
 
+![Aether Shell Demo](./resources/branding/gif/AetherShell.gif)
+
 # Aether Shell
 
 A native Windows desktop interface by **Ibrahim Bouillet**. Aether Shell pairs a floating Dock with
