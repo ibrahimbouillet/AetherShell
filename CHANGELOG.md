@@ -6,7 +6,20 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-### 0.2.0-alpha.1 candidate — V2
+## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
+
+Second public alpha, including the previously local V2 candidate below.
+
+- Fresh setup discloses sign-in startup with an opt-out; existing choices and Task Manager disables
+  remain respected. The stable installed launcher retries at most three abnormal exits.
+- Observed audio changes reach an open Quick Controls slider immediately, without waiting for the
+  periodic media refresh or issuing new audio commands.
+- Native reusable capture/review tools retain strict local privacy boundaries. Fresh presentation
+  media remains pending and is not bundled with the installer.
+- Exact-revision Windows CI, Release `/W4 /WX`, package audit and scoped actual installed
+  startup/recovery checks are recorded in HANDOFF and TEST_STATUS S-034.
+
+### V2 changes
 
 - Reversible visual taskbar replacement enabled by default (D23), preserving explicit opt-out, with Desktop Apply controls,
   a separate recovery helper, status/errors, and existing-instance quit/restore commands.

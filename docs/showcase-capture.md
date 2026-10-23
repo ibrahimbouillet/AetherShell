@@ -10,6 +10,11 @@ The later owner-approved Alpha 2 presentation baseline also uses reusable deskto
 scenarios described below. Those source-faithful recordings are separate from the D33 authored film;
 they do not inherit a whole-film quality score. A successful synthetic test is not a real gallery run.
 
+**Current delivery:** Alpha 2 is published (D37/S-034) and the installed shell is active. New T38
+gallery media is still pending: the latest owner-ready no-volume take stopped on a native control
+access failure (`0x80070005`) before export. Identify the exact action before another take; D36
+requires a new ready reply. Publication did not convert any pending capture/quality check into a pass.
+
 The owner requires the complete final film to score **100/100** under the project-specific 60-check
 rubric, with every blocking gate passed. See the [production brief](../video_production/README.md),
 [creative direction](../video_production/02_CREATIVE_DIRECTION.md), and

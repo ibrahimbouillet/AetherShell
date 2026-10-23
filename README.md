@@ -71,7 +71,7 @@ limitations](KNOWN_LIMITATIONS.md).
 ## Visual preview
 
 Fresh screenshots and recordings of Alpha 2 will be added to the [versioned gallery](docs/media/README.md)
-after capture and privacy review. The installer is the current delivery priority. Earlier component
+after capture and privacy review. Alpha 2 is available from the release linked above. Earlier component
 fixtures are not presented as this version's appearance.
 
 ## Build and test

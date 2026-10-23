@@ -11,6 +11,43 @@
 
 Last updated: 2026-10-23 (Europe/Paris).
 
+### Delivered — Alpha 2, 2026-10-23
+
+**Published:** [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
+at 14:47:05 UTC. Tag `v0.2.0-alpha.2` points exactly to source
+`ad77019efbaed5aa59f96494da9e086e9006a4c2`, pushed to the official repository.
+[Windows CI 39971203823](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39971203823)
+passed for that exact revision. Subsequent documentation receipts do not change the release tag.
+
+- The full Release `/W4 /WX` build and 22/22 unit executables pass (32.72 s). The final rebuilt
+  app own-window integration executable passes (3.74 s), including three new live-audio regressions.
+- Exact-revision packaging passes setup/embedded-payload privacy and freshness audit. Published
+  assets are only the x64 setup (5,268,992 bytes; SHA-256
+  `bdaa27f67f3e3caa215f05cb47dceffe95275255a157376670f21e490bbc82ba`) and checksums
+  (110 bytes; SHA-256 `5ea049bfa70551b177d248118ffc6ebf57a74a56c171b5785bc847ffb3e70a26`).
+  GitHub asset digests match the local files. No unsigned manifest or raw media was uploaded.
+- Actual per-user upgrade from `0.2.0-alpha.1` committed successfully. Current preferences/pins were
+  privately backed up and migrated to the default profile. Owner-authorized startup and taskbar
+  replacement are enabled; HKCU Run targets the stable installed launcher with `--autostart`.
+  No Task Manager disable was present or overwritten. Automatic pin import remains as previously
+  configured. The installed Alpha 2 is running independently of a temporary command host.
+- A controlled own-child exit with `0xC0000005` was followed by a new installed child after 1,143 ms.
+  This measures process relaunch, not full visual readiness. Intentional Quit then stayed stopped
+  and the native Windows taskbar was observed visible. The installed shell was relaunched and its
+  hidden-taskbar preflight passed. No reboot/sign-in timing or universal recovery guarantee is claimed.
+- **Media remains unfinished (T38).** D37 explicitly allowed publication first. The latest owner-ready
+  no-volume gallery attempt also stopped with `a real Aether presentation control is unavailable`
+  (`0x80070005`); the exact failing action is not yet identified. No usable fresh gallery/export was
+  produced or published. Do not reuse rejected old media. D36 requires a fresh ready reply before
+  every later real attempt. The earlier T36 film still has no complete 100/100 acceptance.
+- Local-only evidence is in the newest `Showcase/alpha2-delivery-<id>/` receipts and default app logs.
+  `installed-alpha2.local.json`, `installed-recovery.local.json` and `installed-quit.local.json` are
+  current; older preview receipts identify stopped processes. Never commit those files or their paths.
+
+**Next:** preserve the running installation. Continue T38 by diagnosing the precise native action
+failure, then capture/review fresh stills and optionally MP4 for the versioned gallery. Do not repeat
+publication, move the tag, publish an unsigned manifest, or release Alpha 3 without new authorization.
+
 > **OWNER AUTHORIZATION — 2026-10-22 (D29).** The owner lifted the D25 delivery hold for the second
 > public release only: commit and push the reviewed public `main`, tag `v0.2.0-alpha.2`, and publish
 > the matching GitHub Release. This does not authorize unrelated repository/account changes or a
@@ -41,7 +78,7 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
   release remains a manual-install preview unless a valid signed manifest is produced with the
   owner's signing setup; never publish an unsigned manifest or expose key material/location.
 
-### Alpha 2 publication continuation — D34/D35 (2026-10-23)
+### Historical preparation — D34–D37 (superseded by the delivered receipt above)
 
 - **Latest owner priority, D37:** publish the verified Alpha 2 installer now; fresh screenshots and
   optional video may follow. The failed gallery is no longer a publication blocker. Keep all raw
@@ -482,21 +519,22 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-1. Read this public rule, the D34–D36 publication continuation above, `AGENTS.md`, `PROJECT_SPEC.md`,
-   `TASKS.md`, and D29–D36 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
+1. Read this public rule, the delivered Alpha 2 receipt above, `AGENTS.md`, `PROJECT_SPEC.md`,
+   `TASKS.md`, and D29–D37 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
    worktrees, tags and working-tree state. Work only in the clean public-origin checkout; never
    develop in the private history archive.
-2. Continue T37/T38 and Alpha 2 publication under D34/D35. Inspect current processes/status before
+2. Alpha 2 is published. Continue T38; do not repeat completed release or installation work. Inspect current processes/status before
    launching anything. Preserve the owner's current pins and preferences; private capture profiles
-   never register startup. Finish the fresh Release build, unit/native gates, actual installed
-   startup/recovery checks, and new full-gallery capture. An earlier build failure or a started
+   never register startup. The installed startup/recovery gate has the scoped passing receipt above;
+   reboot timing remains unverified. Diagnose the latest native action failure before another
+   full-gallery capture. An earlier build failure or a started
    command is not a pass. Check the latest S-034 entry when available for exact receipts.
    For the historical T36 film, read S-033 and the production QC docs; full normal-speed playback,
    listening and the 60-check/ten-gate score remain unverified. D35 permits proceeding to Alpha 2
    without turning those pending checks into passes. Preserve D33 and do not claim 100/100.
    User-started closure remains authorized, including termination after orderly close fails; attempt
    relaunch on normal cleanup and disclose forced-termination/unsaved-state limitations.
-3. After reaching a coherent tested checkpoint, check D29/D34/D35 receipts before any Alpha 2 push,
+3. After reaching a coherent tested checkpoint, check D29/D34–D37 receipts before any Alpha 2 push,
    tag or release work. D29 authorizes only `0.2.0-alpha.2`; do not duplicate completed publication
    actions and never publish an unsigned update manifest.
 4. The owner prepared the current desktop and explicitly rejected old imagery. Capture a fresh

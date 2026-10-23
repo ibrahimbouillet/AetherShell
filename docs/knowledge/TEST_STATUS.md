@@ -1304,3 +1304,44 @@ proved. New best-effort private receipts separately record acknowledgement and s
 They never publish device identifiers, and invalid read samples are represented as unknown.
 The owner explicitly prioritizes Alpha 2 publication before optional new media (D37). No successful
 new gallery, normal-speed video acceptance or 100/100 score is claimed.
+
+**Alpha 2 delivery — executed:** source `ad77019efbaed5aa59f96494da9e086e9006a4c2` is pushed;
+[Windows CI 39971203823](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39971203823)
+passes for that exact revision. A metadata-only Release `/W4 /WX` setup rebuild embeds
+`ad77019efbae` / `0.2.0-alpha.2`. Packaging succeeds with:
+
+```powershell
+./scripts/package.ps1 -BuildDir build/alpha2-release -OutputDir dist/alpha2-ad77019 -SkipBuild
+```
+
+The signing-key environment variable was removed only from the temporary packaging process; no
+signing key was read. Setup/embedded-payload privacy and source freshness pass. Only these two assets
+were uploaded; GitHub's reported digests match the local SHA-256 values:
+
+| Asset | Bytes | SHA-256 |
+| --- | ---: | --- |
+| AetherShell-0.2.0-alpha.2-win-x64-setup.exe | 5268992 | `bdaa27f67f3e3caa215f05cb47dceffe95275255a157376670f21e490bbc82ba` |
+| AetherShell-0.2.0-alpha.2-checksums.txt | 110 | `5ea049bfa70551b177d248118ffc6ebf57a74a56c171b5785bc847ffb3e70a26` |
+
+Actual setup ran with `--silent --start-with-windows --no-launch`, exit 0. The install journal
+committed the upgrade from `0.2.0-alpha.1` to `0.2.0-alpha.2`. Current settings/pins were privately
+backed up and migrated; startup/replacement are true. HKCU Run matches the stable installed launcher
+with `--autostart`; no StartupApproved disable value was present or overwritten. The native app
+launcher reported no targetable window because the shell uses tool surfaces; process/path/hash and
+hidden-taskbar preflight independently confirm the installed binary is running. Its bytes match
+the exact build. This is not reboot/sign-in timing proof.
+
+One retained installed child was deliberately terminated with `0xC0000005`; a new installed child
+was observed after 1143 ms. This is process creation latency, not visual-ready latency or proof of
+every crash path. Stable-launcher `--quit` then stayed stopped and a read-only native-taskbar check
+observed Windows' taskbar visible. The installed shell was relaunched independently and the scene
+preflight passed. Local evidence stays in ignored installed-alpha2/recovery/quit receipts.
+
+The subsequent owner-ready no-volume gallery failed with `a real Aether presentation control is
+unavailable`, HRESULT `0x80070005`. Its exact action is unproven; no usable fresh media or volume
+mutation occurred in that scenario. Further takes need another D36 ready reply. T38 remains open.
+
+[Alpha 2 prerelease](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
+was published at **2026-10-23 14:47:05 UTC**. Read-only release/tag checks confirm draft false,
+prerelease true, the exact two assets above, and tag `v0.2.0-alpha.2` at `ad77019efbaed5aa59f96494da9e086e9006a4c2`.
+No unsigned manifest, raw capture, private receipt, or later version was published.

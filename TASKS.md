@@ -6,9 +6,10 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
-**Latest ordering (D37):** publish the verified Alpha 2 source and installer first. Fresh gallery
-screenshots and optional video may follow; failed capture attempts no longer block this release.
-Privacy review and D36 readiness still apply. No new gallery/export is claimed.
+**Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
+is published from `ad77019`, with exact-revision Windows CI, audited setup/checksums and a scoped
+installed startup/recovery gate. The installed shell is active. Continue T38's native action diagnosis
+and fresh gallery afterward; D36 readiness/privacy still apply. No new gallery/export is claimed.
 
 **Owner continuation (2026-10-23, D34/D35):** proceed to Alpha 2 build/install/publication. Add
 disclosed installed sign-in startup and bounded abnormal-crash recovery while preserving Quit,
@@ -52,7 +53,7 @@ D29/current instructions before Alpha 2 delivery; do not publish a later version
 
 | Task | Requirement links | Current boundary |
 |---|---|---|
-| T37 — Installed Alpha 2 session lifecycle | FR-016, FR-017, FR-020, FR-024; NFR-002–NFR-005; D34 | In progress: disclose fresh-wizard startup default with opt-out, preserve existing choices and Task Manager disable, supervise only bounded abnormal crashes, retain normal Quit/update/uninstall/recovery behavior. No OS launch-order or immortal-process promise. |
+| T37 — Installed Alpha 2 session lifecycle | FR-016, FR-017, FR-020, FR-024; NFR-002–NFR-005; D34 | Implemented/tested and delivered in Alpha 2. Actual per-user upgrade, stable-launcher startup registration, controlled abnormal-child relaunch, intentional Quit/native-taskbar restoration and final relaunch verified (S-034). Reboot timing and broader hardware/platform recovery remain unverified; no immortal-process promise. |
 | T38 — Versioned product media and reusable capture scenarios | FR-029, FR-030; NFR-004, NFR-008, NFR-012; D35 | In progress: genuine desktop, grouped quick controls, settings and owner-authorized volume demonstration; safe close/restore lifecycle, PNG/MP4, every-frame privacy review and versioned gallery for Alpha 3 comparisons. |
 | T22 — Review/fix/integrate batch 1 | FR-003, FR-012–FR-017, FR-020, FR-024; NFR-002–NFR-011 | Three independent source reviews completed. Fixes address default-on consent fixtures/D23 docs, unknown-profile relaunch, declared-icon reparse ancestors, owner-drawn menu data, Search visual/hit geometry and mid-transition accessibility policy. Combined Release /WX, 669 unit and 122 isolated integration cases pass (S-022). Integration merge b87be0d committed/pushed; real desktop remains separate. |
 | T23 — Dock and Top Bar consumers | FR-001–FR-011, FR-014, FR-024; NFR-006, NFR-007, NFR-011 | Shared roles/glyphs/menus/motion, fixed Start/Search/Task View entries, profile presentation and session-only running-item reorder, settings-driven layout and runtime Windows taskbar access implemented. Review fixes cover empty input regions, stale modal actions, shutdown admission and late avatars. Combined Dock31 unit/3 native and Top Bar20 unit/4 native pass, Release /WX (S-022); real desktop/profile checks remain open. |
