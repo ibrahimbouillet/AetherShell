@@ -135,4 +135,3 @@ it is not proof that product controls or a V3 showcase work. V3 remains open aft
 - [Windows AppBar allocation](https://learn.microsoft.com/en-us/windows/win32/shell/application-desktop-toolbars)
 - [Windows signal-bar observation](https://learn.microsoft.com/en-us/uwp/api/windows.networking.connectivity.connectionprofile.getsignalbars)
 - [Windows 11 rounding policies](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/ui/apply-rounded-corners)
-
