@@ -61,6 +61,18 @@ A proposal from any assistant stays "proposed" until the owner approves it.
 | D36 | Coordinate every assistant-operated desktop recording with the owner | owner asks for a readiness question before each recording so the computer remains usable during preparation, 2026-10-23 | surprise takeover while the owner works; treating prior blanket capture permission as the current readiness signal | finish preparation first, ask whether the owner is ready, wait for an explicit ready reply, then start that one capture attempt. Ask again before another attempt. Read-only preflight/code/build work can continue without recording or closing apps. The user-started CLI itself still needs no second in-program confirmation | approved; supersedes earlier no-warning permission for assistant-operated takes; ongoing coordination requirement |
 | D37 | Publish Alpha 2 before optional presentation work | owner prioritizes the new release before the remaining usage quota, 2026-10-23 | delaying the release for repeated capture attempts or an optional video; publishing unreviewed media | complete the verified Alpha 2 source/package and publish the authorized release first; fresh screenshots/video may be added afterward. Preserve D36 readiness and every-frame privacy review for any later take. Do not expand testing beyond the changed behavior and required delivery checks | approved; supersedes the fresh-gallery-before-publication ordering, not privacy or package requirements |
 
+### D38 — Alpha 2 accepted; begin the broader V3 design and interaction track
+
+Owner-approved, 2026-10-23. Prioritize documenting the full request for alternating assistants,
+given the remaining usage limit, and start the empty-margin input correction. Requirements are
+FR-031–FR-036; detailed scope is [the V3 work order](docs/specs/v3-design-and-interaction.md).
+The first batch does not complete V3. Preserve the usable installed Alpha 2 and its release/tag.
+No V3 release number, tag or publication is approved yet. Native Quick Settings is preferred when
+supported, with honest fallback; external-window animation/corner feasibility must be investigated
+without injection, unsafe shell changes or unsupported universal promises. D36 capture readiness
+and all public/private boundaries remain binding. T38 media work remains open but is no longer the
+next priority ahead of this explicit V3 request.
+
 ## Open questions and implementation discrepancies
 
 These are not approved new requirements or decisions. Keep their IDs stable; disposition is tracked

@@ -2,6 +2,12 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # Dock
 
+V3 source follow-up (D38/T39, S-035): the native HWND region now uses only the panel and current
+animated-icon input rectangles. The shadow-expanded visual override is removed because
+HTTRANSPARENT cannot guarantee cross-process input delivery. Outer shadow/entrance decoration is
+clipped; physical visual approval, rounded-corner input and separate-process verification remain.
+AppBar reservation and default size are unchanged. This patch is not installed over Alpha 2.
+
 The native bottom Dock implements the application surface in FR-001 through FR-004: search,
 pinned applications and optional unpinned running applications. It contains no status data.
 The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.

@@ -1345,3 +1345,39 @@ mutation occurred in that scenario. Further takes need another D36 ready reply. 
 was published at **2026-10-23 14:47:05 UTC**. Read-only release/tag checks confirm draft false,
 prerelease true, the exact two assets above, and tag `v0.2.0-alpha.2` at `ad77019efbaed5aa59f96494da9e086e9006a4c2`.
 No unsigned manifest, raw capture, private receipt, or later version was published.
+
+### S-035 — V3 requirements and initial native input-region correction (Codex, 2026-10-23)
+
+Scope: owner acceptance of Alpha 2 and D38's next development track, FR-031–FR-036 / T39–T44.
+The full owner request is captured in the English V3 work order, authoritative requirements, tasks
+and continuation prompt. No V3 version/tag/release has been approved or produced.
+
+**Inspected:** Dock and Top Bar supplied shadow-expanded native window regions while returning
+HTTRANSPARENT outside their narrower input rectangles. Microsoft's same-thread forwarding contract
+does not guarantee delivery to another process. The initial source correction clears these visual
+overrides, leaving panel/current animated-icon rectangles as the native HWND region. This deliberately
+clips outer shadows/entrance decoration. It does not change work-area reservation, default size,
+saved owner settings or the installed Alpha 2.
+
+**Executed focused gate:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -Target @('aether_dock_integration_tests','aether_topbar_integration_tests') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^(aether_dock|aether_topbar)_integration_tests$' -TestExclude '' `
+  -JUnitFile build/alpha2-release/v3-input-region-results.xml
+```
+
+Warning-free build passes; **2/2 executables pass, total 23.07 seconds** (Dock 15.07 s,
+Top Bar 7.66 s). Added own-window GetWindowRgn/PtInRegion checks exclude points in former shadow
+padding while including panel interior. Existing hover/drag/attention and Top Bar native cases run
+in these executables. No input is injected by the added assertions; no real device/startup/work-area
+mutation or owner-window control occurs. Own-pattern test captures remain local.
+
+**Still unverified:** actual separate-process input receipt, transparent rounded-corner pixels,
+physical visual quality of clipped shadows/entrance, and a complete DPI matrix. No installed V3
+preview or owner acceptance is claimed. Compact defaults, AppBar policy, native Quick Settings,
+signal-only refresh, icons, indicators, hover previews/media actions and external-window motion/
+corners remain requested/unimplemented. The existing Windows signal reading and route source were
+inspected; neither is a new real-device qualification. No current screenshot/video was recorded.

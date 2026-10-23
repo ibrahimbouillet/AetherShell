@@ -221,6 +221,15 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     REQUIRE(window.SetRunningApplications({running}).ok());
     window.Show(false); ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 300);
     auto restGeometry = window.Geometry(); REQUIRE(restGeometry.ok()); REQUIRE_EQ(restGeometry->items.size(), 4u);
+    // Native exclusion is required for cross-process click-through; HTTRANSPARENT is insufficient.
+    const int nativePanelLeft = static_cast<int>(std::floor(window.ToPx(restGeometry->panel.left)));
+    const int nativePanelY = static_cast<int>(std::floor(window.ToPx((restGeometry->panel.top + restGeometry->panel.bottom) / 2)));
+    REQUIRE(nativePanelLeft > 0); // This point was inside the former shadow-expanded native region.
+    HRGN restRegion = ::CreateRectRgn(0, 0, 0, 0); REQUIRE(restRegion != nullptr);
+    CHECK(::GetWindowRgn(window.Handle(), restRegion) != ERROR);
+    CHECK_FALSE(::PtInRegion(restRegion, nativePanelLeft - 1, nativePanelY));
+    CHECK(::PtInRegion(restRegion, nativePanelLeft + 1, nativePanelY));
+    ::DeleteObject(restRegion);
     const double panelBottom = window.BoundsPx().top + window.ToPx(restGeometry->panel.bottom);
     CHECK(std::abs(panelBottom - (area.bottom - window.ToPx(static_cast<float>(settings.Current().dock.bottomMargin)))) <= 1.0);
     const auto rest = CaptureOwn(backdrop.hwnd, window.Handle(), window.BoundsPx());

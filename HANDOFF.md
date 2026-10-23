@@ -11,6 +11,29 @@
 
 Last updated: 2026-10-23 (Europe/Paris).
 
+### Current continuation — V3 accepted for development (D38)
+
+The owner accepted the published Alpha 2 and requested a broader V3 design/interaction overhaul.
+The remaining-usage instruction prioritizes an English, traceable handoff, plus an initial input
+correction. Read [the complete V3 work order](docs/specs/v3-design-and-interaction.md), requirements
+FR-031–FR-036 and tasks T39–T44. [English prompt for the next assistant](docs/V3_CONTINUATION_PROMPT.md).
+This first batch does not finish V3. No V3 release/tag or new semantic version has been approved.
+
+Initial source work removes Dock/Top Bar shadow-expanded native window regions: actual input panels
+and currently animated icons now define the HWND region. This avoids relying on same-thread-only
+`HTTRANSPARENT` for another process. Outer shadows/entrance decoration are deliberately clipped;
+rounded-corner input, full cross-process interaction and visual refinement remain. Focused native
+regressions pass: focused Release `/W4 /WX`, 2/2 executables, 23.07 seconds (S-035).
+AppBar reservation and the
+requested 4–5-pixel size reduction are separate and unchanged. The installed Alpha 2 remains intact.
+
+The rest is requested/unimplemented: compact defaults and symmetric free edges; trustworthy signal
+freshness and native Quick Settings routing; rounded icon redesign; continuous dot/pill feedback;
+real hover previews with selected-window close and supported media controls; icon-anchored window
+motion and rounded corners. External/maximized window capabilities must be verified, not promised.
+T38's gallery failure remains open and is deferred behind the new V3 priority. Never publish the
+owner's supplied reference screenshot, which contains unrelated application content.
+
 ### Delivered — Alpha 2, 2026-10-23
 
 **Published:** [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
@@ -44,7 +67,7 @@ passed for that exact revision. Subsequent documentation receipts do not change 
   `installed-alpha2.local.json`, `installed-recovery.local.json` and `installed-quit.local.json` are
   current; older preview receipts identify stopped processes. Never commit those files or their paths.
 
-**Next:** preserve the running installation. Continue T38 by diagnosing the precise native action
+**Previous next step (superseded by D38):** preserve the running installation. Continue T38 by diagnosing the precise native action
 failure, then capture/review fresh stills and optionally MP4 for the versioned gallery. Do not repeat
 publication, move the tag, publish an unsigned manifest, or release Alpha 3 without new authorization.
 
@@ -519,15 +542,17 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-1. Read this public rule, the delivered Alpha 2 receipt above, `AGENTS.md`, `PROJECT_SPEC.md`,
-   `TASKS.md`, and D29–D37 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
+1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
+   `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
+   `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,
    worktrees, tags and working-tree state. Work only in the clean public-origin checkout; never
    develop in the private history archive.
-2. Alpha 2 is published. Continue T38; do not repeat completed release or installation work. Inspect current processes/status before
+2. Alpha 2 is published and owner-accepted. Continue T39–T44; do not repeat completed release or installation work. Inspect current processes/status before
    launching anything. Preserve the owner's current pins and preferences; private capture profiles
    never register startup. The installed startup/recovery gate has the scoped passing receipt above;
-   reboot timing remains unverified. Diagnose the latest native action failure before another
-   full-gallery capture. An earlier build failure or a started
+   reboot timing remains unverified. Check S-035's source/test boundary, finish input/geometry
+   qualification and continue the documented V3 sequence. Diagnose T38's native action failure
+   before any later gallery capture. An earlier build failure or a started
    command is not a pass. Check the latest S-034 entry when available for exact receipts.
    For the historical T36 film, read S-033 and the production QC docs; full normal-speed playback,
    listening and the 60-check/ten-gate score remain unverified. D35 permits proceeding to Alpha 2

@@ -6,6 +6,20 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
+**V3 starts here (D38):** the owner accepted Alpha 2. Continue FR-031–FR-036 using
+[the V3 work order](docs/specs/v3-design-and-interaction.md) and
+[the English continuation prompt](docs/V3_CONTINUATION_PROMPT.md). This is a broader design/motion
+overhaul, not a finished release after one batch. Preserve the installed Alpha 2; no V3 publication yet.
+
+| Task | Requirement links | Current boundary |
+| --- | --- | --- |
+| T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Initial source patch removes expanded Dock/Top Bar visual HWND regions; outer shadows/entrance decoration are clipped. Focused native-region tests added; final results in S-035. Separate-process input delivery, rounded-corner pixels and physical visual acceptance remain. Not installed into the owner's Alpha 2. |
+| T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Requested; size reduction/default migration and work-area prototype unstarted. Preserve bottom gap/custom size and maximize-only automatic placement. Rectangular AppBar reservation is separate from input interception. |
+| T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Requested; source confirms existing OS signal bars and action routes, not owner interaction qualification. Native Quick Settings route/freshness/icon redesign unstarted. |
+| T42 — Living dot/pill indicators | FR-033; D38 | Requested; continuous hover/foreground/launch retargeting unstarted. |
+| T43 — Live hover cards and selected-window actions | FR-034; D38 | Requested; thumbnails, normal X close and confidently attributed media controls unstarted. |
+| T44 — Window choreography and corners | FR-036; D38 | Desired behavior recorded; documented-API feasibility and own-window prototype unstarted, especially external/maximized windows. |
+
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
 is published from `ad77019`, with exact-revision Windows CI, audited setup/checksums and a scoped
 installed startup/recovery gate. The installed shell is active. Continue T38's native action diagnosis
@@ -87,7 +101,7 @@ Do not infer V2 publication or full desktop qualification from these scoped chec
 Settings and per-user setup. Continue the manual/platform acceptance gaps below; an alpha does not
 mark complete Version 1 acceptance.
 
-## Current continuation priority
+## Historical D27/D28 continuation priority — superseded by D38 above
 The D27/D28 source and automated gates are complete for this slice. The visible worktree candidate is
 ready for owner review of Dock motion, status glyphs, attention, reduced motion and the Windows
 weather permission flow. Continue from the owner's feedback and the remaining manual acceptance gaps

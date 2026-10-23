@@ -173,6 +173,17 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
         auto tokens = graphics::MakeDesignTokens(mode); tokens.transparencyEnabled = true;
         window.SetTheme(tokens, graphics::MotionPolicy{true, 1});
         window.Show(false); RunFor(loop, 350);
+        // Probe only this test HWND. The former shadow margin must be outside its native region.
+        const auto nativeBounds = window.BoundsPx();
+        const int panelLeft = barBounds.left - nativeBounds.left;
+        const int panelTop = barBounds.top - nativeBounds.top;
+        REQUIRE(panelLeft > 0); REQUIRE(panelTop > 0);
+        HRGN nativeRegion = ::CreateRectRgn(0, 0, 0, 0); REQUIRE(nativeRegion != nullptr);
+        CHECK(::GetWindowRgn(window.Handle(), nativeRegion) != ERROR);
+        CHECK_FALSE(::PtInRegion(nativeRegion, panelLeft - 1, panelTop + 1));
+        CHECK_FALSE(::PtInRegion(nativeRegion, panelLeft + 1, panelTop - 1));
+        CHECK(::PtInRegion(nativeRegion, panelLeft + 1, panelTop + 1));
+        ::DeleteObject(nativeRegion);
         // Reassert that the private backdrop covers every captured pixel before capture.
         REQUIRE(::IsWindowVisible(backdrop.hwnd));
         ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);

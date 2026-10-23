@@ -466,9 +466,9 @@ void TopBarWindow::Relayout() {
     impl_->panel = D2D1::RectF(ToDip(static_cast<float>(panel.left)), ToDip(static_cast<float>(panel.top)),
         ToDip(static_cast<float>(panel.right)), ToDip(static_cast<float>(panel.bottom)));
     SetInputRegionPx(std::span<const RECT>(&panel, 1));
-    const RECT visual{0, 0, placed->windowBoundsPx.right - placed->windowBoundsPx.left,
-        placed->windowBoundsPx.bottom - placed->windowBoundsPx.top};
-    SetVisualRegionPx(std::span<const RECT>(&visual, 1));
+    // HTTRANSPARENT forwards only within one thread. Keep empty margins outside the native
+    // HWND region so other processes receive clicks; the outer shadow is deliberately clipped.
+    SetVisualRegionPx({});
     impl_->layoutDirty = true;
     impl_->relayouting = false;
     Rebuild();

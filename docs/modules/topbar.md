@@ -2,6 +2,11 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # topbar — native floating system status surface
 
+V3 source follow-up (D38/T39, S-035): native input/window region is the visible panel rectangle,
+with no expanded outer shadow region. This avoids relying on same-thread-only HTTRANSPARENT
+outside the panel; outer shadow decoration is clipped. Work-area allocation, physical visual
+acceptance and exact rounded-corner input remain separate. Installed Alpha 2 is unchanged.
+
 `src/topbar`, target `aether_topbar`, implements the Top Status Bar described by FR-005–FR-011,
 NFR-002/NFR-007 and ADR 0003. It is a separate custom-drawn Win32/Composition surface alongside the
 Dock. System status never moves into the Dock.

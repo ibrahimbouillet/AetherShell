@@ -284,17 +284,9 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         std::vector<RECT> regions{Pixels(layout.panel, static_cast<float>(window.Dpi()) / 96)};
         for (const auto& item : layout.items) regions.push_back(Pixels(item.icon, static_cast<float>(window.Dpi()) / 96));
         window.SetInputRegionPx(regions);
-        // Preserve the shadow/entry only near actual content. A full monitor-wide HWND region
-        // could intercept other processes' clicks in otherwise empty side/headroom margins.
-        const float shadow = tokens.mode == graphics::ThemeMode::HighContrast ? 0 : kDockShadowMargin;
-        std::vector<RECT> visual;
-        const auto expand = [&](const D2D1_RECT_F& rect, float extent) {
-            return Pixels({rect.left - extent, rect.top - extent, rect.right + extent,
-                rect.bottom + extent + kDockEntranceOffset}, static_cast<float>(window.Dpi()) / 96);
-        };
-        visual.push_back(expand(layout.panel, shadow));
-        for (const auto& item : layout.items) visual.push_back(expand(item.icon, shadow));
-        window.SetVisualRegionPx(visual);
+        // HTTRANSPARENT forwards only within one thread. Keep empty margins outside the native
+        // HWND region so other processes receive clicks; outer shadows/entrance pixels are clipped.
+        window.SetVisualRegionPx({});
         window.SetBackdropPanel(layout.panel, graphics::DockCornerRadius(tokens, layout.panel.bottom - layout.panel.top),
             tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast, tokens.glass.backdropOpacity);
         return Ok();
