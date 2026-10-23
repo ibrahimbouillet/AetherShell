@@ -10,6 +10,7 @@
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "status/ClockProvider.h"
+#include "status/audio/EndpointReading.h"
 #include "topbar/TopBarMenu.h"
 #include "ui/ThemedMenu.h"
 #include "ui/TooltipWindow.h"
@@ -287,8 +288,7 @@ Result<void> TopBarWindow::Create(std::optional<RECT> testBoundsPx) {
                         if (origin == status::audio::ChangeOrigin::External ||
                             (state.pendingVolume && snapshot.volume && std::abs(*state.pendingVolume - *snapshot.volume) < 0.001f))
                             state.pendingVolume.reset();
-                        state.snapshots.audio = snapshot;
-                        alive->owner->Rebuild();
+                        alive->owner->ApplyObservedAudio(snapshot);
                     }
                 });
             });
@@ -338,7 +338,23 @@ void TopBarWindow::SetSettings(const settings::TopBarSettings& settings, bool we
     Relayout(); Rebuild();
 }
 void TopBarWindow::SetSnapshots(TopBarSnapshots snapshots) {
-    impl_->pendingVolume.reset(); impl_->snapshots = std::move(snapshots); Rebuild();
+    if (!impl_->context.dispatcher.IsUiThread() || impl_->destroyed) return;
+    auto audio = std::move(snapshots.audio);
+    // Keep the previous observed output value for the shared change comparison below.
+    snapshots.audio = std::move(impl_->snapshots.audio);
+    impl_->pendingVolume.reset(); impl_->snapshots = std::move(snapshots);
+    ApplyObservedAudio(std::move(audio));
+}
+void TopBarWindow::ApplyObservedAudio(status::AudioSnapshot snapshot) {
+    if (!impl_->context.dispatcher.IsUiThread() || impl_->destroyed) return;
+    const bool changed = !status::audio::SameSnapshot(impl_->snapshots.audio, snapshot);
+    impl_->snapshots.audio = std::move(snapshot);
+    Rebuild();
+    // Outbound signals may synchronously destroy this window. Touch no member afterward.
+    if (changed) {
+        try { AudioObservedChanged.Emit(); }
+        catch (...) { AETHER_LOG_ERROR("topbar", "observed audio listener threw an exception"); }
+    }
 }
 Result<void> TopBarWindow::SetUpdateAvailable(bool available) {
     if (!impl_->context.dispatcher.IsUiThread()) return MakeError(ErrorCode::InvalidState, "top bar requires UI thread");

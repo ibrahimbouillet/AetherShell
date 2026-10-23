@@ -17,6 +17,7 @@
 #include "showcase/PngWriter.h"
 #include "showcase/ConcurrentRecorder.h"
 #include "showcase/ExplorerPinIdentity.h"
+#include "showcase/ShellCursorCompatibility.h"
 
 #include <Windows.h>
 #include <Ole2.h>
@@ -105,7 +106,7 @@ struct WindowByClass final {
     HWND result = nullptr;
 };
 
-struct TaskbarVisibility final { bool visible = false; };
+struct TaskbarVisibility final { bool visible = false; HWND window = nullptr; };
 
 BOOL CALLBACK FindVisibleTaskbar(HWND window, LPARAM parameter) noexcept {
     auto& result = *reinterpret_cast<TaskbarVisibility*>(parameter);
@@ -115,14 +116,16 @@ BOOL CALLBACK FindVisibleTaskbar(HWND window, LPARAM parameter) noexcept {
     const std::wstring_view actual(className.data(), length > 0 ? static_cast<std::size_t>(length) : 0U);
     if (actual == L"Shell_TrayWnd" || actual == L"Shell_SecondaryTrayWnd") {
         result.visible = true;
+        result.window = window;
         return FALSE;
     }
     return TRUE;
 }
 
-bool NativeTaskbarIsHidden() noexcept {
+bool NativeTaskbarIsHidden(HWND* visibleWindow = nullptr) noexcept {
     TaskbarVisibility state;
     (void)::EnumWindows(&FindVisibleTaskbar, reinterpret_cast<LPARAM>(&state));
+    if (visibleWindow) *visibleWindow = state.window;
     return !state.visible;
 }
 
@@ -191,6 +194,85 @@ Result<AetherSceneIdentity> CaptureAetherSceneIdentity(HWND dock, HWND topbar) n
     if (!identity.process || !identity.Matches(dock, topbar))
         return MakeError(ErrorCode::Unavailable, "the Aether presentation anchors changed or have different owners");
     return identity;
+}
+
+struct ShellSceneIdentity final {
+    HWND desktopWindow = nullptr;
+    DWORD processId = 0;
+    HANDLE process = nullptr;
+    bool imageVerified = false;
+    ShellSceneIdentity() noexcept = default;
+    ShellSceneIdentity(const ShellSceneIdentity&) = delete;
+    ShellSceneIdentity& operator=(const ShellSceneIdentity&) = delete;
+    ShellSceneIdentity(ShellSceneIdentity&& other) noexcept
+        : desktopWindow(other.desktopWindow), processId(other.processId),
+          process(std::exchange(other.process, nullptr)), imageVerified(other.imageVerified) {}
+    ~ShellSceneIdentity() { if (process) (void)::CloseHandle(process); }
+    [[nodiscard]] bool Alive() const noexcept {
+        return process && ::WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+    }
+    [[nodiscard]] bool Matches() const noexcept {
+        DWORD currentProcess = 0;
+        const HWND current = ::GetShellWindow();
+        return imageVerified && Alive() && desktopWindow && current == desktopWindow && ::IsWindow(current) &&
+            ::GetWindowThreadProcessId(current, &currentProcess) && currentProcess == processId;
+    }
+};
+
+Result<ShellSceneIdentity> CaptureShellSceneIdentity() {
+    ShellSceneIdentity identity;
+    identity.desktopWindow = ::GetShellWindow();
+    if (!identity.desktopWindow || !::GetWindowThreadProcessId(identity.desktopWindow, &identity.processId) || !identity.processId)
+        return MakeError(ErrorCode::Unavailable, "the original desktop shell identity is unavailable");
+    identity.process = ::OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, identity.processId);
+    if (!identity.process) return MakeError(ErrorCode::Unavailable, "the original desktop shell could not be retained");
+    std::array<wchar_t, 32'768> image{}, windowsDirectory{};
+    DWORD length = static_cast<DWORD>(image.size());
+    const UINT directoryLength = ::GetWindowsDirectoryW(windowsDirectory.data(), static_cast<UINT>(windowsDirectory.size()));
+    if (!::QueryFullProcessImageNameW(identity.process, 0, image.data(), &length) ||
+        !directoryLength || directoryLength >= windowsDirectory.size())
+        return MakeError(ErrorCode::Unavailable, "the trusted desktop shell image could not be verified");
+    std::wstring expected(windowsDirectory.data(), directoryLength);
+    if (expected.back() != L'\\') expected.push_back(L'\\');
+    expected += L"explorer.exe";
+    identity.imageVerified = ::CompareStringOrdinal(image.data(), static_cast<int>(length), expected.data(),
+        static_cast<int>(expected.size()), TRUE) == CSTR_EQUAL;
+    if (!identity.Matches()) return MakeError(ErrorCode::Unavailable, "the trusted desktop shell changed or is unsupported");
+    return identity;
+}
+
+aether::showcase::ShellCursorSnapshot ReadShellCursorSnapshot(HWND window, std::wstring_view type,
+    DWORD processId, const RECT& bounds, const ShellSceneIdentity& shell) noexcept {
+    aether::showcase::ShellCursorSnapshot snapshot;
+    snapshot.windowClass = type;
+    snapshot.processId = processId; snapshot.expectedShellProcessId = shell.processId;
+    snapshot.shellImageVerified = shell.imageVerified; snapshot.shellProcessAlive = shell.Alive();
+    snapshot.shellIsCurrent = shell.Matches(); snapshot.boundsKnown = true;
+    snapshot.bounds = {bounds.left, bounds.top, bounds.right, bounds.bottom};
+    RECT frame{};
+    snapshot.frameBoundsKnown = SUCCEEDED(::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &frame, sizeof(frame)));
+    snapshot.frameBounds = {frame.left, frame.top, frame.right, frame.bottom};
+    ::SetLastError(ERROR_SUCCESS);
+    snapshot.style = static_cast<std::uint32_t>(::GetWindowLongPtrW(window, GWL_STYLE));
+    snapshot.styleKnown = snapshot.style != 0 || ::GetLastError() == ERROR_SUCCESS;
+    ::SetLastError(ERROR_SUCCESS);
+    snapshot.extendedStyle = static_cast<std::uint32_t>(::GetWindowLongPtrW(window, GWL_EXSTYLE));
+    snapshot.extendedStyleKnown = snapshot.extendedStyle != 0 || ::GetLastError() == ERROR_SUCCESS;
+    ::SetLastError(ERROR_SUCCESS);
+    snapshot.classStyle = static_cast<std::uint32_t>(::GetClassLongPtrW(window, GCL_STYLE));
+    snapshot.classStyleKnown = snapshot.classStyle != 0 || ::GetLastError() == ERROR_SUCCESS;
+    COLORREF key = 0; BYTE alpha = 255; DWORD flags = 0;
+    snapshot.layeredAttributesKnown = ::GetLayeredWindowAttributes(window, &key, &alpha, &flags) != FALSE;
+    snapshot.alpha = alpha; snapshot.layeredFlags = flags;
+    DWORD finalProcessId = 0;
+    std::array<wchar_t, 64> finalClass{};
+    const int classLength = ::GetClassNameW(window, finalClass.data(), static_cast<int>(finalClass.size()));
+    if (!::IsWindow(window) || !::GetWindowThreadProcessId(window, &finalProcessId) || finalProcessId != processId ||
+        classLength <= 0 || std::wstring_view(finalClass.data(), static_cast<std::size_t>(classLength)) != type) {
+        snapshot.shellIsCurrent = false;
+        snapshot.boundsKnown = false;
+    }
+    return snapshot;
 }
 
 Result<RECT> FindDockCodeIcon(HWND dockWindow) noexcept {
@@ -532,18 +614,28 @@ private:
     HWND icons_ = nullptr;
 };
 
-bool CleanSceneVisible(const AetherSceneIdentity& identity, HWND dock, HWND topbar,
+bool CleanSceneVisible(const AetherSceneIdentity& identity, const ShellSceneIdentity& shellIdentity, HWND dock, HWND topbar,
                        const RECT& monitor, std::wstring& blockingClass,
-                       bool allowCode = false, bool allowPresentation = false) noexcept {
+                       bool allowCode = false, bool allowPresentation = false,
+                       HWND* blockingWindow = nullptr) noexcept {
     blockingClass.clear();
+    if (blockingWindow) *blockingWindow = nullptr;
     if (!identity.Matches(dock, topbar)) {
         blockingClass = L"aether-anchor-changed";
+        if (blockingWindow) *blockingWindow = identity.MatchesAnchor(dock, L"AetherShell.Dock") ? topbar : dock;
+        return false;
+    }
+    if (!shellIdentity.Matches()) {
+        blockingClass = L"shell-identity-changed";
+        if (blockingWindow) *blockingWindow = shellIdentity.desktopWindow;
         return false;
     }
     struct Scene {
         HWND dock; HWND topbar; RECT monitor; std::wstring& blockingClass;
-        const AetherSceneIdentity& identity; bool allowCode; bool allowPresentation; bool clean = true;
-    } scene{dock, topbar, monitor, blockingClass, identity, allowCode, allowPresentation};
+        const AetherSceneIdentity& identity; const ShellSceneIdentity& shellIdentity;
+        bool allowCode; bool allowPresentation; HWND* blockingWindow; bool clean = true;
+        std::size_t compatibleShellHelpers = 0;
+    } scene{dock, topbar, monitor, blockingClass, identity, shellIdentity, allowCode, allowPresentation, blockingWindow};
     const BOOL enumerated = ::EnumWindows([](HWND window, LPARAM parameter) -> BOOL {
         auto& state = *reinterpret_cast<Scene*>(parameter);
         if (!::IsWindowVisible(window) || ::IsIconic(window)) return TRUE;
@@ -551,12 +643,17 @@ bool CleanSceneVisible(const AetherSceneIdentity& identity, HWND dock, HWND topb
             if (state.identity.MatchesAnchor(window, window == state.dock ? L"AetherShell.Dock" : L"AetherShell.TopBar"))
                 return TRUE;
             state.blockingClass = L"aether-anchor-changed";
+            if (state.blockingWindow) *state.blockingWindow = window;
             state.clean = false;
             return FALSE;
         }
+        std::array<wchar_t, 64> name{};
+        (void)::GetClassNameW(window, name.data(), static_cast<int>(name.size()));
+        const std::wstring_view type(name.data());
+        const bool shellCursorClass = type == L"UIHubMouseHiderWindowClass";
         if ((::GetWindowLongPtrW(window, GWL_EXSTYLE) & WS_EX_LAYERED) != 0) {
             COLORREF key = 0; BYTE alpha = 255; DWORD flags = 0;
-            if (::GetLayeredWindowAttributes(window, &key, &alpha, &flags) && (flags & LWA_ALPHA) && alpha == 0)
+            if (!shellCursorClass && ::GetLayeredWindowAttributes(window, &key, &alpha, &flags) && (flags & LWA_ALPHA) && alpha == 0)
                 return TRUE;  // verified zero-alpha infrastructure has no desktop pixels
         }
         DWORD cloaked = 0;
@@ -567,17 +664,36 @@ bool CleanSceneVisible(const AetherSceneIdentity& identity, HWND dock, HWND topb
             // window has no captured pixels; an uninspectable live surface still fails closed.
             if (!::IsWindow(window) || !::IsWindowVisible(window)) return TRUE;
             state.blockingClass = L"uninspectable-live-window";
+            if (state.blockingWindow) *state.blockingWindow = window;
             state.clean = false;
             return FALSE;
         }
-        if (!::IntersectRect(&intersection, &bounds, &state.monitor) ||
-            intersection.right - intersection.left < 2 || intersection.bottom - intersection.top < 2) return TRUE;
-        std::array<wchar_t, 64> name{};
-        (void)::GetClassNameW(window, name.data(), static_cast<int>(name.size()));
-        const std::wstring_view type(name.data());
-        if (type == L"Progman" || type == L"WorkerW") return TRUE;
+        if (!::IntersectRect(&intersection, &bounds, &state.monitor)) return TRUE;
+        if (!shellCursorClass &&
+            (intersection.right - intersection.left < 2 || intersection.bottom - intersection.top < 2)) return TRUE;
         DWORD processId = 0;
         (void)::GetWindowThreadProcessId(window, &processId);
+        if (type == L"Progman" || type == L"WorkerW") {
+            std::array<wchar_t, 64> finalClass{};
+            const int length = ::GetClassNameW(window, finalClass.data(), static_cast<int>(finalClass.size()));
+            DWORD finalProcessId = 0;
+            if (processId != 0 && processId == state.shellIdentity.processId && state.shellIdentity.Matches() &&
+                ::IsWindow(window) && ::GetWindowThreadProcessId(window, &finalProcessId) && finalProcessId == processId &&
+                length > 0 && std::wstring_view(finalClass.data(), static_cast<std::size_t>(length)) == type &&
+                state.shellIdentity.Matches()) return TRUE;
+            try { state.blockingClass = type; } catch (...) {}
+            if (state.blockingWindow) *state.blockingWindow = window;
+            state.clean = false;
+            return FALSE;
+        }
+        if (shellCursorClass) {
+            const auto snapshot = ReadShellCursorSnapshot(window, type, processId, bounds, state.shellIdentity);
+            auto compatible = aether::showcase::IsCompatibleShellCursorHelper(snapshot, state.compatibleShellHelpers);
+            if (compatible && *compatible) {
+                ++state.compatibleShellHelpers;
+                return TRUE; // Bounded nonzero-opacity compatibility, not an invisibility claim.
+            }
+        }
         if (type == L"AetherShell.Tooltip" && processId != 0 && processId == state.identity.processId)
             return TRUE;  // The genuine Dock's own hover surface is part of the product.
         if (state.allowPresentation && processId != 0 && processId == state.identity.processId &&
@@ -602,11 +718,18 @@ bool CleanSceneVisible(const AetherSceneIdentity& identity, HWND dock, HWND topb
         }
         if (!::IsWindow(window) || !::IsWindowVisible(window)) return TRUE;
         try { state.blockingClass = type; } catch (...) {}
+        if (state.blockingWindow) *state.blockingWindow = window;
         state.clean = false;
         return FALSE;
     }, reinterpret_cast<LPARAM>(&scene));
     if (!identity.Matches(dock, topbar)) {
         blockingClass = L"aether-anchor-changed";
+        if (blockingWindow) *blockingWindow = identity.MatchesAnchor(dock, L"AetherShell.Dock") ? topbar : dock;
+        return false;
+    }
+    if (!shellIdentity.Matches()) {
+        blockingClass = L"shell-identity-changed";
+        if (blockingWindow) *blockingWindow = shellIdentity.desktopWindow;
         return false;
     }
     return enumerated != FALSE && scene.clean;
@@ -772,6 +895,81 @@ bool WriteLocalQualityReceipt(const CaptureReport& report, std::uint32_t width, 
     }
 }
 
+void WriteLocalSceneRejection(HWND window, std::wstring_view blockingClass,
+    std::string_view phase = "read-only-preflight", std::string_view reason = "observed-infrastructure",
+    double elapsedSeconds = -1) noexcept {
+    try {
+        auto local = KnownFolder(FOLDERID_LocalAppData);
+        if (!local) return;
+        const auto directory = *local / L"AetherShell" / L"Showcase";
+        std::filesystem::create_directories(directory);
+        std::ofstream receipt(directory / L"last-scene-rejection.private.txt", std::ios::binary | std::ios::trunc);
+        receipt << "diagnostic_only=1\nprivacy=local-process-metadata-do-not-publish\nsampled_tick_ms="
+                << ::GetTickCount64() << "\nphase=" << phase << "\nreason=" << reason;
+        if (std::isfinite(elapsedSeconds) && elapsedSeconds >= 0)
+            receipt << "\nelapsed_seconds=" << std::setprecision(9) << elapsedSeconds;
+        receipt << "\nclass=";
+        const auto writeAscii = [&](std::wstring_view text) {
+            for (const wchar_t character : text) receipt.put(character >= 32 && character < 127 ? static_cast<char>(character) : '?');
+        };
+        writeAscii(blockingClass);
+        DWORD processId = 0;
+        (void)::GetWindowThreadProcessId(window, &processId);
+        receipt << "\nhwnd=0x" << std::hex << reinterpret_cast<std::uintptr_t>(window) << std::dec
+                << "\npid=" << processId << "\nwindow_valid=" << (::IsWindow(window) != FALSE)
+                << "\nvisible=" << (::IsWindowVisible(window) != FALSE) << "\niconic=" << (::IsIconic(window) != FALSE);
+        std::array<wchar_t, 32'768> image{};
+        DWORD imageLength = static_cast<DWORD>(image.size());
+        HANDLE process = processId ? ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId) : nullptr;
+        const bool imageKnown = process && ::QueryFullProcessImageNameW(process, 0, image.data(), &imageLength);
+        if (process) (void)::CloseHandle(process);
+        receipt << "\nimage_basename_known=" << imageKnown << "\nimage_basename=";
+        if (imageKnown) {
+            const std::wstring_view path(image.data(), imageLength);
+            const auto separator = path.find_last_of(L"\\/");
+            writeAscii(path.substr(separator == std::wstring_view::npos ? 0U : separator + 1U));
+        }
+        const auto writeRect = [&](const char* label, const RECT& rect) {
+            receipt << '\n' << label << '=' << rect.left << ',' << rect.top << ',' << rect.right << ',' << rect.bottom;
+        };
+        RECT bounds{}, frame{}, regionBounds{};
+        receipt << "\nbounds_known=" << (::GetWindowRect(window, &bounds) != FALSE);
+        writeRect("bounds", bounds);
+        const auto style = static_cast<std::uint32_t>(::GetWindowLongPtrW(window, GWL_STYLE));
+        const auto extendedStyle = static_cast<std::uint32_t>(::GetWindowLongPtrW(window, GWL_EXSTYLE));
+        ::SetLastError(ERROR_SUCCESS);
+        const auto classStyle = static_cast<std::uint32_t>(::GetClassLongPtrW(window, GCL_STYLE));
+        const bool classStyleKnown = classStyle != 0 || ::GetLastError() == ERROR_SUCCESS;
+        receipt << "\nstyle=0x" << std::hex << style << "\nexstyle=0x" << extendedStyle
+                << "\nclass_style=0x" << classStyle << std::dec << "\nclass_style_known=" << classStyleKnown;
+        DWORD cloaked = 0;
+        const HRESULT cloakStatus = ::DwmGetWindowAttribute(window, DWMWA_CLOAKED, &cloaked, sizeof(cloaked));
+        const HRESULT frameStatus = ::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &frame, sizeof(frame));
+        receipt << "\ndwm_cloak_status=" << cloakStatus << "\ndwm_cloaked=" << cloaked
+                << "\ndwm_frame_status=" << frameStatus;
+        writeRect("dwm_frame_bounds", frame);
+        int regionType = ERROR, regionBoxType = ERROR;
+        const HRGN region = ::CreateRectRgn(0, 0, 0, 0);
+        if (region) {
+            regionType = ::GetWindowRgn(window, region);
+            if (regionType != ERROR) regionBoxType = ::GetRgnBox(region, &regionBounds);
+            (void)::DeleteObject(region);
+        }
+        // ERROR means no explicit region or a query failure; only NULLREGION means empty.
+        receipt << "\nregion_allocated=" << (region != nullptr) << "\nregion_type=" << regionType
+                << "\nregion_box_type=" << regionBoxType;
+        writeRect("region_bounds", regionBounds);
+        COLORREF colorKey = 0; BYTE alpha = 255; DWORD layeredFlags = 0;
+        const BOOL layeredKnown = ::GetLayeredWindowAttributes(window, &colorKey, &alpha, &layeredFlags);
+        receipt << "\nlayered_attributes_known=" << (layeredKnown != FALSE) << "\nlayered_alpha=" << static_cast<unsigned>(alpha)
+                << "\nlayered_flags=0x" << std::hex << layeredFlags << "\nlayered_color_key=0x" << colorKey << std::dec;
+        DWORD finalProcessId = 0;
+        (void)::GetWindowThreadProcessId(window, &finalProcessId);
+        receipt << "\nfinal_pid=" << finalProcessId << "\npid_still_matches="
+                << (::IsWindow(window) && processId != 0 && finalProcessId == processId) << '\n';
+    } catch (...) {}
+}
+
 void WriteLocalRunStatus(std::string_view phase, const aether::Error* error = nullptr) noexcept {
     try {
         auto local = KnownFolder(FOLDERID_LocalAppData);
@@ -850,6 +1048,9 @@ Result<std::wstring> LoadSceneExplorerName(const RunnerOptions& options,
 Result<std::size_t> ValidatePreflight(const RunnerOptions& options) {
     ScopedCom apartment;
     if (!apartment.Usable()) return MakeError(ErrorCode::Unavailable, "showcase preflight could not initialize Windows UI automation");
+    // Attribute-only diagnostics remain available while Aether is absent or its surfaces are hidden.
+    const HWND infrastructure = FindAetherWindow(L"UIHubMouseHiderWindowClass");
+    WriteLocalSceneRejection(infrastructure, L"UIHubMouseHiderWindowClass");
     if (!NativeTaskbarIsHidden())
         return MakeError(ErrorCode::Unavailable, "the Windows taskbar is still visible; enable Aether taskbar replacement first");
     const HWND dock = FindAetherWindow(L"AetherShell.Dock");
@@ -857,6 +1058,8 @@ Result<std::size_t> ValidatePreflight(const RunnerOptions& options) {
     if (!dock || !topbar) return MakeError(ErrorCode::Unavailable, "Aether Dock and Top Status Bar must already be running");
     auto aetherIdentity = CaptureAetherSceneIdentity(dock, topbar);
     if (!aetherIdentity) return aetherIdentity.error();
+    auto shellIdentity = CaptureShellSceneIdentity();
+    if (!shellIdentity) return shellIdentity.error();
     if (options.scenario.empty() && options.actionPlan.empty()) {
         auto codeIcon = FindDockCodeIcon(dock);
         if (!codeIcon) return codeIcon.error();
@@ -892,6 +1095,8 @@ Result<std::size_t> ValidatePreflight(const RunnerOptions& options) {
     }
     if (!aetherIdentity->Matches(dock, topbar))
         return MakeError(ErrorCode::Unavailable, "the Aether presentation anchors changed during preflight");
+    if (!shellIdentity->Matches())
+        return MakeError(ErrorCode::Unavailable, "the desktop shell changed during preflight");
     return selected.size();
 }
 
@@ -1177,6 +1382,8 @@ Result<CaptureReport> RunPresentation(const RunnerOptions& options) {
     if (!dock || !topbar) return MakeError(ErrorCode::Unavailable, "Aether Dock and Top Status Bar must be running");
     auto aetherIdentity = CaptureAetherSceneIdentity(dock, topbar);
     if (!aetherIdentity) return aetherIdentity.error();
+    auto shellIdentity = CaptureShellSceneIdentity();
+    if (!shellIdentity) return shellIdentity.error();
     MONITORINFO monitor{sizeof(monitor)};
     if (!::GetMonitorInfoW(::MonitorFromWindow(dock, MONITOR_DEFAULTTONEAREST), &monitor))
         return MakeError(ErrorCode::Unavailable, "the Aether monitor is unavailable");
@@ -1230,18 +1437,42 @@ Result<CaptureReport> RunPresentation(const RunnerOptions& options) {
     (void)MoveRealPointer({bounds.left + width * 0.3, bounds.top + height * 0.55});
     ::Sleep(650);
     std::wstring blockingClass;
-    if (!CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, blockingClass))
-        return MakeError(ErrorCode::AccessDenied, "an unexpected visible surface prevents presentation capture");
+    HWND blockingWindow = nullptr;
+    if (!CleanSceneVisible(*aetherIdentity, *shellIdentity, dock, topbar, bounds, blockingClass, false, false, &blockingWindow)) {
+        WriteLocalSceneRejection(blockingWindow, blockingClass, "initial-scene", "scene-rejected");
+        std::string diagnostic;
+        for (const wchar_t character : blockingClass)
+            if (character >= 32 && character < 127) diagnostic.push_back(static_cast<char>(character));
+        return MakeError(ErrorCode::AccessDenied, "an unexpected visible surface (class " + diagnostic +
+            ") prevents presentation capture");
+    }
     WriteLocalRunStatus("capturing-presentation");
+    const auto validateAcquisitionScene = [&](std::string_view phase, double timestamp) -> Result<void> {
+        HWND taskbar = nullptr;
+        if (!NativeTaskbarIsHidden(&taskbar)) {
+            std::array<wchar_t, 64> taskbarClass{};
+            const int length = ::GetClassNameW(taskbar, taskbarClass.data(), static_cast<int>(taskbarClass.size()));
+            WriteLocalSceneRejection(taskbar, std::wstring_view(taskbarClass.data(),
+                length > 0 ? static_cast<std::size_t>(length) : 0U), phase, "native-taskbar-visible", timestamp);
+            return MakeError(ErrorCode::AccessDenied, "a visible native taskbar interrupted presentation capture");
+        }
+        std::wstring blockedClass;
+        HWND blockedWindow = nullptr;
+        if (!CleanSceneVisible(*aetherIdentity, *shellIdentity, dock, topbar, bounds, blockedClass, false, true, &blockedWindow)) {
+            const std::string_view reason = blockedClass == L"aether-anchor-changed" ? "aether-anchor-changed" :
+                blockedClass == L"shell-identity-changed" ? "shell-identity-changed" : "unexpected-visible-surface";
+            WriteLocalSceneRejection(blockedWindow, blockedClass, phase, reason, timestamp);
+            return MakeError(ErrorCode::AccessDenied, "an unexpected visible surface interrupted presentation capture");
+        }
+        return aether::Ok();
+    };
     // Dedicated acquisition must keep advancing while a UIA provider or action sleeps. DXGI and
     // CaptureBuffer have exactly one caller from this point until Finish joins the MTA worker.
     auto recorder = aether::showcase::ConcurrentRecorder::Start(plan->durationSeconds, fps,
         [&](double timestamp) -> Result<void> {
         if ((::GetAsyncKeyState(VK_ESCAPE) & 0x8000) != 0)
             return MakeError(ErrorCode::Cancelled, "presentation cancelled; restoration was attempted");
-        std::wstring acquisitionBlockingClass;
-        if (!NativeTaskbarIsHidden() || !CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, acquisitionBlockingClass, false, true))
-            return MakeError(ErrorCode::AccessDenied, "an unexpected visible surface interrupted presentation capture");
+        if (auto scene = validateAcquisitionScene("before-acquisition", timestamp); !scene) return scene.error();
         auto frame = capture->Capture(true);
         if (!frame) return frame.error();
         if (buffer->FrameCount() == 0) {
@@ -1255,8 +1486,7 @@ Result<CaptureReport> RunPresentation(const RunnerOptions& options) {
                 }
             if (!hasBackdrop) return MakeError(ErrorCode::Unavailable, "the scenic desktop backdrop is black; no presentation was finalized");
         }
-        if (!CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, acquisitionBlockingClass, false, true))
-            return MakeError(ErrorCode::AccessDenied, "presentation pixels were rejected after a surface change");
+        if (auto scene = validateAcquisitionScene("after-acquisition", timestamp); !scene) return scene.error();
         if (auto stored = buffer->Append(timestamp, *frame); !stored) return stored.error();
         return aether::Ok();
     });
@@ -1387,6 +1617,8 @@ Result<CaptureReport> RunShowcase(const RunnerOptions& options) {
     if (!dock || !topbar) return MakeError(ErrorCode::Unavailable, "Aether Dock and Top Status Bar must already be running");
     auto aetherIdentity = CaptureAetherSceneIdentity(dock, topbar);
     if (!aetherIdentity) return aetherIdentity.error();
+    auto shellIdentity = CaptureShellSceneIdentity();
+    if (!shellIdentity) return shellIdentity.error();
     if (auto codePin = FindDockCodeIcon(dock); !codePin) return codePin.error();
 
     MONITORINFO monitor{sizeof(monitor)};
@@ -1476,7 +1708,7 @@ Result<CaptureReport> RunShowcase(const RunnerOptions& options) {
     (void)::SetCursorPos(bounds.left + static_cast<int>(width / 4U), bounds.top + static_cast<int>(height / 2U));
     ::Sleep(650);
     std::wstring blockingClass;
-    if (!CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, blockingClass)) {
+    if (!CleanSceneVisible(*aetherIdentity, *shellIdentity, dock, topbar, bounds, blockingClass)) {
         std::string diagnostic;
         for (const wchar_t character : blockingClass)
             if (character >= 32 && character < 127) diagnostic.push_back(static_cast<char>(character));
@@ -1577,7 +1809,7 @@ Result<CaptureReport> RunShowcase(const RunnerOptions& options) {
         }
         if (closeSent && !codeWindowClosedAt && elapsed - closeRequestedAt > 6.0)
             return MakeError(ErrorCode::Timeout, "the showcase application did not finish closing");
-        if (!CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, blockingClass, clickSent && !codeWindowClosedAt)) {
+        if (!CleanSceneVisible(*aetherIdentity, *shellIdentity, dock, topbar, bounds, blockingClass, clickSent && !codeWindowClosedAt)) {
             if (WaitForTaskbarOwner(blockingClass)) continue;
             std::string surface;
             for (const auto character : blockingClass)
@@ -1606,7 +1838,7 @@ Result<CaptureReport> RunShowcase(const RunnerOptions& options) {
             if (!hasBackdrop)
                 return MakeError(ErrorCode::Unavailable, "the scenic desktop backdrop is black; restore its image before capture");
         }
-        if (!CleanSceneVisible(*aetherIdentity, dock, topbar, bounds, blockingClass, clickSent && !codeWindowClosedAt)) {
+        if (!CleanSceneVisible(*aetherIdentity, *shellIdentity, dock, topbar, bounds, blockingClass, clickSent && !codeWindowClosedAt)) {
             if (WaitForTaskbarOwner(blockingClass)) continue;
             std::string surface;
             for (const auto character : blockingClass)

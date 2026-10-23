@@ -70,10 +70,9 @@ limitations](KNOWN_LIMITATIONS.md).
 
 ## Visual preview
 
-A current, owner-approved desktop showcase is being prepared. The older component-test images are
-intentionally not used here because they show synthetic icons and an earlier visual version. A
-desktop recording will be added only after the current Alpha 2 UI can be captured cleanly and
-privacy-reviewed.
+Fresh screenshots and recordings of Alpha 2 will be added to the [versioned gallery](docs/media/README.md)
+after capture and privacy review. The installer is the current delivery priority. Earlier component
+fixtures are not presented as this version's appearance.
 
 ## Build and test
 

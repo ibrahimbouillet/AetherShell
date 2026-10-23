@@ -28,6 +28,12 @@ provider. Sun-ray length animates with brightness and snaps for reduced motion. 
 unavailable, not zero. Signal waves use the existing Windows-reported network bars; unknown remains
 distinct from known zero. There are no SSIDs or device identifiers in public fixtures.
 
+The application also republishes current audio observations immediately to an open panel through
+the Top Bar's UI-thread `AudioObservedChanged` signal. External endpoint changes no longer wait for
+the 1.5-second media/status refresh before reaching the slider and UIA RangeValue. The event does
+not issue audio commands, discover devices or schedule work for a hidden panel. S-034 records the
+isolated regression and separately coordinated real-capture boundary.
+
 UIA RangeValue and keyboard controls share real enabled/range semantics. Closed/deactivated/DPI-changed
 panels reject queued actions; split-radio UIA bounds do not overlap. Refresh is on demand while shown;
 closed panels schedule no polling. Source presence is not qualification: see TEST_STATUS S-026,

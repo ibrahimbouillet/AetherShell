@@ -1246,3 +1246,61 @@ python ./scripts/release/audit_package.py build/alpha2-release/modules/installer
 Final capture runner rebuilt with frozen original-process/anchor checks:80/80 focused cases pass,
 CTest9.27s; SHA-256 `46ffb1785cfb3cde3dc22d4be5044c8c580d619f22b32f7e4e29e44e531932ec`.
 No real capture or new installed startup mutation has occurred at this point.
+
+**Source continuity and real preparation:** checkpoint
+`b9b3f3de9657776127e73faec6c66336c220f06b` is committed and pushed to the official public `main`.
+[Windows CI 39964752759](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39964752759)
+passed for that exact revision. No Alpha 2 tag or release exists yet.
+
+The old preview was stopped through its Quit command. A fresh private capture profile preserves
+the five genuine pins; background pin synchronization is now explicitly disabled only in the clone.
+Executed preparation checks confirm source settings hash/pin JSON unchanged, startup false,
+replacement true and five pins. A loose build-directory preview initially lacked its colocated
+recovery launcher; adding the matching built helper restores the intended installed-layout contract.
+Short-lived local command hosts did not retain the GUI child after returning. A retained preview
+host is now live; a subsequent read-only preflight passes with its native taskbar hidden.
+This is not installed sign-in or crash-supervision proof.
+
+One real attempt was interrupted by the owner; later attempts were rejected by the initial
+scene guard before acquisition. **No usable new gallery media exists.** Local attribute-only
+preflight identifies `UIHubMouseHiderWindowClass`, owned by the Windows Explorer shell:5×5px,
+successful `LWA_ALPHA` query, alpha1/255. Region query returns ERROR, which does not establish an
+empty region. This is nonzero opacity. An independently reviewed narrow compatibility rule is
+being implemented, preserving all other scene guards; no image editing or Explorer mutation.
+The owner now requires D36 readiness coordination before every further assistant-operated real
+capture. Do not infer readiness from earlier blanket approval, the elapsed time or read-only probes.
+
+**Narrow helper compatibility and capture follow-up:** six pure snapshot tests cover retained shell
+identity, bounded positive geometry with overflow protection, DWM-frame containment, known exact
+styles, no class drop shadow, alpha-only opacity at most 1/255, and a one-helper limit. Release
+`/W4 /WX` passes **86/86 cases**, CTest 3.99 seconds (total 4.04 seconds). Diagnostic runner SHA-256:
+`9577804a7914618fc222314eea6af292664c225f612ee671f2692a3aee90a375`.
+Root's read-only preflight passed; fresh local attributes match the policy, including known class
+style `0x3`. This is a measured undocumented compatibility allowance, not an invisibility claim.
+
+After the owner explicitly answered ready, one real take passed the initial clean-scene guard but
+stopped immediately at the acquisition guard (`an unexpected visible surface interrupted presentation
+capture`). No usable export was produced. The current guard error combines native-taskbar visibility
+and scene checks; fail-only local diagnostics are being added to distinguish the next observation.
+The preview remains live. No further app closure or recording is authorized before a new D36 reply.
+
+**Offline review helper:** `tools/showcase/Review-Presentation.py` passes 12 synthetic checks,
+including complete-frame contacts/PTS/hash/luma evidence, variable frame spacing, selected full-size
+stills, rejected public output paths and preservation of existing output directories. Python
+compilation and whitespace checks pass; synthetic contact sheets were inspected. This does not
+establish review of actual owner media, source acquisition cadence, normal-speed playback or audio.
+
+**D37 source follow-up:** the full canonical Release `/W4 /WX` build passes. All 22 unit
+executables pass in 32.72 seconds. The app integration target was rebuilt after the final test-only
+cleanup and passes in 3.74 seconds; its three new own-window audio-observation cases use synthetic
+snapshots and real own-window UIA without any actual device changes. Independent source review found
+no major audio-bridge/lifetime defect. The review helper now passes 16 synthetic checks, including
+default/explicit junction containment and forced local MOV/MP4 decoding with a protocol whitelist.
+
+The latest owner-ready capture passed the scene check but failed volume acknowledgement. Source
+inspection identified the missing live audio-to-panel bridge; it is now corrected and covered above.
+That failed take had no numeric restoration receipt, so exact scalar restoration is not retroactively
+proved. New best-effort private receipts separately record acknowledgement and stable restoration.
+They never publish device identifiers, and invalid read samples are represented as unknown.
+The owner explicitly prioritizes Alpha 2 publication before optional new media (D37). No successful
+new gallery, normal-speed video acceptance or 100/100 score is claimed.

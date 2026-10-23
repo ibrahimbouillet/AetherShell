@@ -23,6 +23,11 @@ The signals are `SearchRequested`, `SettingsRequested`, `CheckForUpdatesRequeste
 for forwarding to the Dock. `Relayout`,
 `OnExplorerRestarted`, `SetTheme(tokens, motion)` and `SetFullscreenHidden` support app/system wiring.
 `SetSnapshots`, `SetSettings`, `Items` and `RenderCount` support deterministic own-window tests.
+`AudioObservedChanged` reports an actual observed output-snapshot change on the UI thread, after
+the Top Bar update. The application uses it to republish the provider's current state to an open
+Quick Controls panel without polling or issuing a device intent. Duplicate audio observations are
+deduplicated; injected `SetSnapshots` values share this path for isolated regression tests. Outbound
+listeners may destroy the surface synchronously, so emission is the final member operation.
 `Create(testBoundsPx)` requires `context.allowAppBar = false`.
 `SetTaskbarReplacementState(available, active, suspended)` supplies runtime state without writing
 preferences. The optional externally owned `context.menu` presenter lets isolated tests return a

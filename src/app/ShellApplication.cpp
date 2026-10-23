@@ -713,6 +713,11 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         controlActionCancellation=std::make_shared<CancellationSource>();nextControlAction.reset();
     }));
     connections.push_back(controls->RefreshRequested.Connect([this] { RefreshControls(); }));
+    connections.push_back(topbar->AudioObservedChanged.Connect([this] {
+        // Read the provider's actual current state; an observation never queues an audio intent.
+        // The media/radio refresh timer remains independent, and hidden panels request no frames.
+        if (!closing && controls && controls->IsShown()) PublishControls();
+    }));
     connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
         if (closing || !controls) return;
         PublishControls();

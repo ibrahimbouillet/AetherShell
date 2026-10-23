@@ -6,6 +6,10 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
+**Latest ordering (D37):** publish the verified Alpha 2 source and installer first. Fresh gallery
+screenshots and optional video may follow; failed capture attempts no longer block this release.
+Privacy review and D36 readiness still apply. No new gallery/export is claimed.
+
 **Owner continuation (2026-10-23, D34/D35):** proceed to Alpha 2 build/install/publication. Add
 disclosed installed sign-in startup and bounded abnormal-crash recovery while preserving Quit,
 opt-outs, Task Manager disable and reversible native-taskbar recovery. Generalize capture scenarios,
@@ -13,6 +17,13 @@ review desktop/quick-controls/settings/volume media and retain a versioned Alpha
 Fresh release build, tests, package/privacy audit and exact-revision CI precede publication. Source
 work and gallery are in progress; no new startup/release qualification is claimed yet. The previous
 T36 score remains explicitly unverified and is no longer the sole continuation priority.
+
+**Capture coordination (D36):** the owner uses the computer during preparation. Ask a readiness
+question and wait for an explicit ready reply before each assistant-operated real recording attempt.
+No successful new gallery export exists yet. The narrow shell-helper policy passes read-only
+preflight; the latest owner-ready take reached the real-volume acknowledgement check and failed.
+A missing live audio-to-panel bridge is being corrected and tested. Keep scene/privacy guards strict.
+Code/build/read-only preflight may continue.
 
 **Delivery authorization (2026-10-22, D29):** the owner lifted D25 for the second public release,
 `0.2.0-alpha.2`, and authorized the reviewed push, tag and GitHub Release. Exact receipts are in

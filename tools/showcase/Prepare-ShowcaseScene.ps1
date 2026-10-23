@@ -221,6 +221,9 @@ try {
     Set-SceneProperty $codePin 'arguments' $arguments
     }
     Set-SceneProperty $general 'replaceWindowsTaskbar' $true
+    # Freeze the owner's selected pins in this private scene. Background taskbar imports must not
+    # append other applications after the scene snapshot has been reviewed.
+    Set-SceneProperty $general 'syncTaskbarPins' $false
     if ($null -ne $general.PSObject.Properties['startWithWindows']) {
         Set-SceneProperty $general 'startWithWindows' $false
     }

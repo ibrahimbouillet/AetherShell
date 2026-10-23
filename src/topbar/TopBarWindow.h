@@ -66,6 +66,9 @@ public:
     Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
     Signal<> ClockRequested, PowerSettingsRequested, SoundSettingsRequested;
     Signal<> VoiceTypingRequested;
+    // Observed output state changed on the UI thread; never an instruction to change a device.
+    // Emitted after the Top Bar model/render update, allowing listeners to destroy the surface.
+    Signal<> AudioObservedChanged;
     Signal<RECT> QuickControlsRequested;
     Signal<> RevealWindowsTaskbarRequested, ResumeTaskbarReplacementRequested;
     Signal<bool> FullscreenChanged;
@@ -89,6 +92,7 @@ private:
     void Rebuild();
     void Activate(int id);
     void ShowItemMenu(int id);
+    void ApplyObservedAudio(status::AudioSnapshot snapshot);
 };
 
 }  // namespace aether::topbar

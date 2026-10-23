@@ -43,6 +43,44 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
 
 ### Alpha 2 publication continuation — D34/D35 (2026-10-23)
 
+- **Latest owner priority, D37:** publish the verified Alpha 2 installer now; fresh screenshots and
+  optional video may follow. The failed gallery is no longer a publication blocker. Keep all raw
+  media private and preserve D36 readiness for every later attempt. Do not claim a finished gallery.
+- **Current owner coordination, D36:** ask whether the owner is ready immediately before every real
+  assistant-operated capture attempt and wait for an explicit ready reply. Earlier blanket
+  no-warning permission is superseded. Code/build and read-only preflight work can continue while
+  the owner uses the computer. Do not close/hide apps for another take before that reply.
+- Source checkpoint `b9b3f3de9657776127e73faec6c66336c220f06b` is committed locally on `main`;
+  it is now pushed to the official public `main`; [Windows CI 39964752759](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39964752759)
+  passed for that exact revision. No tag/release yet. Original mixed index was privately backed up before the reviewed worktree
+  was staged. The active capture-preview receipt is under the newest ignored local
+  `Showcase/alpha2-delivery-<id>/gallery-preview.local.json`, beside settings backups and scene/run
+  receipts. The older normal-preview receipt identifies a stopped process; do not assume it is live.
+  The current preview is held by a long-running local execution session; short-lived tool command
+  hosts did not keep its child alive. Verify processes before changing anything. Final installed
+  lifecycle/independent sign-in launch are still pending.
+- Real recording has not succeeded: an owner-interrupted attempt and subsequent initial scene
+  rejection produced no usable media. The blocker is `UIHubMouseHiderWindowClass`; keep guards strict
+  while inspecting its effective visibility with local diagnostics. Read-only inspection observes
+  an Explorer-owned 5 × 5 px layered helper at alpha 1/255, not a zero-pixel window. A narrow,
+  independently tested compatibility policy now passes 86 focused Release `/W4 /WX` cases. A fresh
+  read-only preflight passed; the observed class style is `0x3`, without `CS_DROPSHADOW`. Do not
+  blanket-allow class names or low-opacity apps. After an explicit D36 ready reply, the next take
+  passed the initial scene check but stopped immediately at the acquisition guard, with no usable
+  export. Its error did not yet distinguish taskbar visibility from a scene change; fail-only local
+  diagnostics are being added before another owner-coordinated take.
+  The rebuilt fail-only diagnostic runner then passed a subsequent owner-ready initial scene and
+  reached volume interaction, but stopped with `the real volume change was not acknowledged`.
+  Source review found that external endpoint observations reached Top Bar immediately while Quick
+  Controls could wait for its 1.5-second refresh, beyond the 600-ms acknowledgement deadline. The
+  live observation bridge and own-window regression are now being built. No precise restoration
+  receipt existed for that failed take; do not retroactively claim its scalar was proved restored.
+  New private numeric acknowledgement/restoration receipts distinguish original, observed and
+  restored values without names or identifiers. A current private runtime copy keeps Aether usable
+  while the root build is unlocked for compilation; consult the newest ignored preview receipt.
+  Old media remains rejected for
+  the new README. Private scene preparation now freezes genuine pins by disabling background import
+  only in the clone. A loose build app needs the matching recovery launcher alongside its executable.
 - T37 source is implemented and independently reviewed: visible fresh-wizard startup default,
   explicit opt-out/silent flags, prior-choice/Task Manager preservation, stable-launcher startup,
   three abnormal-exception retries (1/2/4 seconds), installation-scoped cancellation and safe
@@ -51,24 +89,26 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
 - Focused Release `/W4 /WX` passes settings54 + install16 cases, 2/2 executables; independent rerun
   passes in 2.36 s. Release scripts pass 33 Python tests after rejecting stale signature carryover.
   These are source/fake/isolated-kernel checks, not actual sign-in or installed recovery proof.
-- T38's first reusable scenarios pass 76 cases (Release `/W4 /WX`, 6.92 s): concurrent MTA acquisition
+- T38's reusable scenarios pass 80 cases (Release `/W4 /WX`): concurrent MTA acquisition
   remains independent of blocking UIA, joins before every restore/flush, and volume actions verify
-  endpoint acknowledgement and restore the precise scalar. Extended full-gallery scenes are being
-  added for Search, Dock context, Top Bar menu and the second quick-controls page. They still need
-  their focused rerun and a fresh owner-authorized capture/complete privacy review.
+  endpoint acknowledgement and restore the precise scalar. Full-gallery scenes include Search,
+  Dock context, Top Bar menu and the second quick-controls page. Fresh owner-coordinated capture
+  and complete privacy review are still pending. The diagnostic runner that passed read-only
+  preflight was SHA-256 `9577804a7914618fc222314eea6af292664c225f612ee671f2692a3aee90a375`;
+  recheck the next rebuilt runner's exact hash and local receipt before another take.
 - The fresh all-module Release `/W4 /WX` build passed in `build/alpha2-release`. The final incremental
   canonical unit gate passes 22/22 executables, 812 cases, 0 failed, 47.94 s (S-034). Sixteen isolated/
-  read-only native integration gate finished15/16 in157.02s: Dock's final unchanged-attention frame
-  count failed185 versus182; all others, including the new media-presence regression, passed.
-  The unchanged Dock binary subsequently passed4/4; exact residual-frame cause remains unproven.
+  read-only native integration gate finished 15/16 in 157.02 s: Dock's final unchanged-attention frame
+  count failed 185 versus 182; all others, including the new media-presence regression, passed.
+  The unchanged Dock binary subsequently passed 4/4; exact residual-frame cause remains unproven.
   A test-only bounded observed-idle precondition preserves the strict unchanged-snapshot assertion;
-  root rebuilt it and4/4 pass, CTest18.10s. No Dock product code changed. Retain the first failure and
-  scoped rerun distinctly; combined native coverage is136 cases, not a retroactive first-run pass.
-  The usable old preview remains active. No real install, startup
-  mutation, capture, new main commit, push, tag or release has occurred in this D34/D35 continuation.
-- The owner has now closed unrelated apps and explicitly prepared the current desktop/pins. Read
-  the ignored current normal-preview launch receipt for its active settings path; use that settings
-  file, not a stale installed/profile copy, when preparing the private scene. Current wallpaper and
+  root rebuilt it and 4/4 pass, CTest 18.10 s. No Dock product code changed. Retain the first failure and
+  scoped rerun distinctly; combined native coverage is 136 cases, not a retroactive first-run pass.
+  The retained current capture preview remains usable. No real install, startup mutation, usable
+  gallery export, tag or release has occurred in this D34/D35 continuation.
+- The owner prepared the current desktop/pins but now wants to use the machine between takes (D36).
+  Read the current ignored delivery/gallery-preview receipt for its active settings path, not the
+  stopped old normal-preview or stale installed/profile copy. Current wallpaper and
   five pin identities were checked locally. Preserve their current configuration with private
   backups when upgrading the installed instance. Do not reuse older media for this new gallery.
 - Remaining publication gates: finish full Release build/tests, package freshness/privacy and
@@ -76,6 +116,13 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
   stills and every-frame video privacy review; versioned gallery/README; coherent public commit,
   exact-revision Windows CI, audited installer/checksums, then `v0.2.0-alpha.2` prerelease. No unsigned
   manifest or raw capture/process metadata may be published. Actual reboot timing is unverified.
+
+Latest source follow-up passes a full Release `/W4 /WX` build and 22/22 unit executables in
+32.72 seconds. The final own-window app integration executable passes in 3.74 seconds, including
+three audio-observation regressions. Independent source review found no major bridge/lifetime
+defect. The media review helper passes 16 synthetic checks, including resolved-output junction
+containment and forced local MP4 decoding. Exact source commit, package, installation, CI and
+release receipts remain to be appended during the D37 delivery.
 
 ### Earlier T36 cinematic checkpoint
 
@@ -435,8 +482,8 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-1. Read this public rule, the D34/D35 publication continuation above, `AGENTS.md`, `PROJECT_SPEC.md`,
-   `TASKS.md`, and D29–D35 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
+1. Read this public rule, the D34–D36 publication continuation above, `AGENTS.md`, `PROJECT_SPEC.md`,
+   `TASKS.md`, and D29–D36 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
    worktrees, tags and working-tree state. Work only in the clean public-origin checkout; never
    develop in the private history archive.
 2. Continue T37/T38 and Alpha 2 publication under D34/D35. Inspect current processes/status before

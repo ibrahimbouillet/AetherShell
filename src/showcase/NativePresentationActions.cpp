@@ -5,10 +5,14 @@
 #include <UIAutomation.h>
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
+#include <ShlObj.h>
 #include <wrl/client.h>
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -48,6 +52,43 @@ struct NativePresentationActions::Impl {
     bool volumePrepared = false, volumeChanged = false, ownsQuick = false, ownsSettings = false, ownsMenu = false, ownsSearch = false;
     bool volumePending = false;
     std::optional<int> acknowledgedRange;
+    std::optional<int> lastTarget;
+    std::optional<float> lastEndpointScalar;
+    std::optional<float> lastRestoredScalar;
+    std::optional<double> lastDisplayedRange;
+    HRESULT lastEndpointStatus = E_PENDING, lastDisplayStatus = E_PENDING;
+    HRESULT lastRestoreStatus = E_PENDING;
+    ULONGLONG volumePreparedTick = 0;
+    bool volumeTouched = false, restorationVerified = false;
+    int restoredStableSamples = 0;
+    void WriteVolumeReceipt(std::string_view phase) const noexcept {
+        // Failure/restoration evidence is private and numeric only. Never include device names,
+        // endpoint identifiers, window titles or paths, and never write a per-frame log.
+        try {
+            wchar_t* raw = nullptr;
+            const HRESULT status = ::SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &raw);
+            std::unique_ptr<wchar_t, decltype(&::CoTaskMemFree)> folder(raw, &::CoTaskMemFree);
+            if (FAILED(status) || !raw) return;
+            std::filesystem::path directory(raw);
+            directory /= L"AetherShell"; directory /= L"Showcase";
+            std::filesystem::create_directories(directory);
+            std::ofstream receipt(directory / L"last-volume-restoration.private.txt", std::ios::binary | std::ios::trunc);
+            receipt << std::setprecision(9)
+                << "privacy=local-only-numeric-device-evidence-do-not-publish\nphase=" << phase
+                << "\nprepared_tick_ms=" << volumePreparedTick << "\nsampled_tick_ms=" << ::GetTickCount64()
+                << "\nprocess_id=" << ::GetCurrentProcessId()
+                << "\noriginal_scalar=" << originalScalar << "\noriginal_display_range=" << originalRange
+                << "\nvolume_write_attempted=" << volumeTouched << "\nrestoration_verified=" << restorationVerified
+                << "\nrestored_stable_samples=" << restoredStableSamples
+                << "\nendpoint_read_hresult=" << lastEndpointStatus << "\ndisplay_read_hresult=" << lastDisplayStatus
+                << "\nrestore_hresult=" << lastRestoreStatus;
+            receipt << "\nlast_target="; if (lastTarget) receipt << *lastTarget; else receipt << "unknown";
+            receipt << "\nlast_endpoint_scalar="; if (lastEndpointScalar) receipt << *lastEndpointScalar; else receipt << "unknown";
+            receipt << "\nlast_display_range="; if (lastDisplayedRange) receipt << *lastDisplayedRange; else receipt << "unknown";
+            receipt << "\nlast_restored_scalar="; if (lastRestoredScalar) receipt << *lastRestoredScalar; else receipt << "unknown";
+            receipt << '\n';
+        } catch (...) { /* A failed diagnostic must not prevent device cleanup. */ }
+    }
     Result<ComPtr<IUIAutomationElement>> Find(HWND window, PROPERTYID property, const wchar_t* text, bool unique = false) {
         DWORD pid = 0;
         (void)::GetWindowThreadProcessId(window,&pid);
@@ -183,46 +224,69 @@ struct NativePresentationActions::Impl {
         const int target=static_cast<int>(std::lround(std::clamp(value,0.0,100.0)));
         if(!volumePending && acknowledgedRange==target)return Ok();
         auto range=Volume();if(!range)return range.error();
-        volumeChanged=true;volumePending=true;
+        volumeChanged=true;volumePending=true;volumeTouched=true;restorationVerified=false;
+        lastTarget=target;lastEndpointScalar.reset();lastDisplayedRange.reset();
+        lastEndpointStatus=lastDisplayStatus=E_PENDING;
         // Bind the authorized write to the retained endpoint, never to an asynchronously retargeted
         // application request. The real Aether slider is observed through UIA, not fabricated.
         const HRESULT status=endpoint->SetMasterVolumeLevelScalar(static_cast<float>(target)/100,nullptr);
-        if(FAILED(status))return ActionError(status);
+        if(FAILED(status)){WriteVolumeReceipt("write-failed");return ActionError(status);}
         // Every distinct target is observed on both the endpoint and real UI before the next write.
         for(int retry=0;retry<60;++retry){
-            if(!CurrentEndpointMatches())return MakeError(ErrorCode::Unavailable,"the audio endpoint changed during the presentation");
+            if(!CurrentEndpointMatches()){
+                WriteVolumeReceipt("default-endpoint-changed");
+                return MakeError(ErrorCode::Unavailable,"the audio endpoint changed during the presentation");
+            }
             float actual=0;double displayed=0;
-            if(SUCCEEDED(endpoint->GetMasterVolumeLevelScalar(&actual)) &&
+            lastEndpointScalar.reset();lastDisplayedRange.reset();
+            lastEndpointStatus=endpoint->GetMasterVolumeLevelScalar(&actual);
+            lastDisplayStatus=(*range)->get_CurrentValue(&displayed);
+            if(SUCCEEDED(lastEndpointStatus)&&std::isfinite(actual))lastEndpointScalar=actual;
+            if(SUCCEEDED(lastDisplayStatus)&&std::isfinite(displayed))lastDisplayedRange=displayed;
+            if(SUCCEEDED(lastEndpointStatus) &&
                 std::abs(actual-static_cast<float>(target)/100)<0.000001f &&
-                SUCCEEDED((*range)->get_CurrentValue(&displayed))&&std::abs(displayed-target)<0.001){
+                SUCCEEDED(lastDisplayStatus)&&std::abs(displayed-target)<0.001){
                 acknowledgedRange=target;volumePending=false;return Ok();
             }
             ::Sleep(10);
         }
+        WriteVolumeReceipt("acknowledgement-failed");
         return MakeError(ErrorCode::Timeout,"the real volume change was not acknowledged");
     }
     Result<void> RestoreVolume() noexcept {
         if (!volumeChanged) return Ok();
         try {
+            restoredStableSamples=0;lastRestoredScalar.reset();
             // All writes were bound directly to this retained endpoint. No asynchronous Aether
             // volume request remains that can later redirect or overwrite this restoration.
             const HRESULT status=endpoint->SetMasterVolumeLevelScalar(originalScalar,nullptr);
-            if (FAILED(status)) return ActionError(status);
+            lastRestoreStatus=status;
+            if (FAILED(status)) {WriteVolumeReceipt("restore-write-failed");return ActionError(status);}
             int stable=0;
             for(int retry=0;retry<20;++retry){
                 ::Sleep(10);
                 float actual=0;
-                if(FAILED(endpoint->GetMasterVolumeLevelScalar(&actual)))return ActionError(E_FAIL);
+                lastRestoredScalar.reset();
+                lastRestoreStatus=endpoint->GetMasterVolumeLevelScalar(&actual);
+                if(FAILED(lastRestoreStatus)){WriteVolumeReceipt("restore-read-failed");return ActionError(lastRestoreStatus);}
+                if(std::isfinite(actual))lastRestoredScalar=actual;
                 if(std::abs(actual-originalScalar)<0.000001f)++stable;
                 else {
                     stable=0;
-                    if(FAILED(endpoint->SetMasterVolumeLevelScalar(originalScalar,nullptr)))return ActionError(E_FAIL);
+                    const HRESULT repeated=endpoint->SetMasterVolumeLevelScalar(originalScalar,nullptr);
+                    lastRestoreStatus=repeated;
+                    if(FAILED(repeated)){WriteVolumeReceipt("restore-retry-failed");return ActionError(repeated);}
                 }
-                if(stable>=3){volumeChanged=false;volumePending=false;return Ok();}
+                restoredStableSamples=stable;
+                if(stable>=3){
+                    volumeChanged=false;volumePending=false;restorationVerified=true;
+                    WriteVolumeReceipt("restored");return Ok();
+                }
             }
             // Keep cleanup armed until the original scalar is actually verified as stable.
+            WriteVolumeReceipt("restoration-uncertain");
             return MakeError(ErrorCode::Timeout,"the retained audio endpoint restoration is uncertain");
-        }catch(...){return MakeError(ErrorCode::Internal,"the original volume could not be restored");}
+        }catch(...){WriteVolumeReceipt("restoration-exception");return MakeError(ErrorCode::Internal,"the original volume could not be restored");}
     }
     void ClosePanels() noexcept {
         if(ownsMenu&&menuOwner)(void)::PostMessageW(menuOwner,WM_CANCELMODE,0,0);
@@ -291,8 +355,16 @@ Result<void> NativePresentationActions::Prepare(bool changesVolume) {
         reinterpret_cast<void**>(impl_->endpoint.GetAddressOf()));
     if(SUCCEEDED(status))status=impl_->endpoint->GetMasterVolumeLevelScalar(&impl_->originalScalar);
     if(FAILED(status))return ActionError(status);
+    if(!std::isfinite(impl_->originalScalar)||impl_->originalScalar<0||impl_->originalScalar>1)
+        return MakeError(ErrorCode::Unavailable,"the original volume could not be measured reliably");
     impl_->originalRange=std::round(impl_->originalScalar*100);
     impl_->volumePrepared=true;
+    impl_->volumePreparedTick=::GetTickCount64();
+    impl_->volumeTouched=false;impl_->restorationVerified=false;impl_->restoredStableSamples=0;
+    impl_->lastTarget.reset();impl_->lastEndpointScalar=impl_->originalScalar;impl_->lastDisplayedRange.reset();
+    impl_->lastRestoredScalar.reset();impl_->lastRestoreStatus=E_PENDING;
+    impl_->lastEndpointStatus=status;impl_->lastDisplayStatus=E_PENDING;
+    impl_->WriteVolumeReceipt("prepared");
     return Ok();
 }
 Result<void> NativePresentationActions::Apply(const PresentationAction& action) {

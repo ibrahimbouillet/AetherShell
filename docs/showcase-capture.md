@@ -79,6 +79,10 @@ scale from live layout/DPI rather than hard-coded output pixels.
   tooltips, desktop shell and, after launch, a process with the exact `Code.exe` basename. Unexpected
   surfaces abort before finalization/rendering. This guard does not eliminate window-change races or
   inspect the contents of an allowed application; every captured frame still requires privacy review.
+- `ShellCursorCompatibility.*` defines the narrowly bounded, observed Explorer cursor-helper
+  compatibility rule below. The runner freezes both the Aether anchor identity and original desktop
+  shell process, and checks fresh helper attributes before and after acquisition. It does not hide or
+  modify Explorer, remove captured pixels or treat a class-name match as sufficient evidence.
 - `CodeReadinessObserver.*` polls enabled onscreen English workbench UIA markers on a separate COM
   worker with configured connection/transaction timeouts. It retains the verified HWND and process
   creation identity for the scenario close. Capture-thread polling makes no UIA provider calls.
@@ -190,7 +194,8 @@ Generated media and private runtime metadata stay under a local per-user output 
 default, outside the repository. Only manually selected, frame-by-frame reviewed showcase media may
 be copied into public README assets. Public media may show only the selected wallpaper, Aether's two
 surfaces, pinned application logos and the app opened by the scenario; no unrelated app content,
-personal documents, private paths, machine identifiers or credentials.
+personal documents, private paths, machine identifiers or credentials. The real system pointer and
+the tightly bounded native shell helper described below are part of the captured desktop infrastructure.
 
 Raw archives and scene data stay under `%LOCALAPPDATA%\AetherShell\Showcase`; MP4/GIF output uses the
 Windows Videos known folder's `Aether Shell` directory. Local progress is
@@ -198,6 +203,45 @@ Windows Videos known folder's `Aether Shell` directory. Local progress is
 cadence/composition measurements. No process inventory belongs in these receipts. The opening and
 per-frame scene checks are safeguards, not a privacy guarantee: a surface may change between checks,
 and allowed application content may itself be private. Inspect every frame before sharing.
+
+## Observed shell cursor-helper compatibility
+
+The Windows desktop may expose an Explorer-owned `UIHubMouseHiderWindowClass` surface with tiny
+nonzero opacity. Its class is an **observed compatibility rule, not a documented Windows contract**.
+The runner permits at most one such helper per scene check only when every condition holds:
+
+- Its PID belongs to the original desktop shell returned by
+  [`GetShellWindow`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getshellwindow).
+  The retained original process must remain alive, the desktop shell identity must remain current,
+  and its full executable identity must match the Windows-directory Explorer image. Runtime paths
+  remain private; a matching basename alone is insufficient.
+- Its positive window bounds are at most 5×5 physical pixels. Width/height subtraction uses widened
+  integers. Successfully queried DWM extended-frame bounds must also be positive, at most 5×5 and
+  contained inside the window bounds. Unknown or contradictory bounds fail closed.
+- Window style is exactly `0x94000000` and extended style exactly `0x08080088`; a successful class-style
+  query must show no `CS_DROPSHADOW`. These restrictive observed values are not generalized to other
+  classes, arbitrary shell windows or future Windows versions.
+- [`GetLayeredWindowAttributes`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getlayeredwindowattributes)
+  succeeds with only `LWA_ALPHA` and alpha no greater than 1. Alpha 1 is **nonzero opacity (1/255)**,
+  so this is never described as an invisible or zero-pixel surface. Query failures, other flags,
+  greater opacity, changed identity, enlargement or a second compatible helper reject the scene.
+
+The rule admits genuine native pixels without editing the recording or changing the shell. It does
+not establish complete privacy or visual acceptance; every output frame still needs inspection.
+In particular, a region-query `ERROR` is not evidence of an empty region:
+[`GetWindowRgn`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrgn)
+uses `NULLREGION` for an explicitly empty region.
+
+Read-only preflight refreshes a diagnostic for the already-observed exact helper class. An initial
+presentation rejection also records its exact first blocking HWND. The separate local-only file
+`%LOCALAPPDATA%\AetherShell\Showcase\last-scene-rejection.private.txt` contains a single surface's
+PID/basename, bounds, styles, DWM/region/layered query results and freshness information, never titles
+or executable paths. Acquisition failures also refresh this file with the exact sampled blocking
+HWND, before/after-acquisition phase, elapsed capture time and a reason that distinguishes a visible
+native taskbar, changed Aether/shell identity and another unexpected surface. This diagnostic performs
+disk writes only on rejection during acquisition; no rejected pixels are appended. It is private
+troubleshooting metadata, not a media receipt or a publishable asset. Preflight does not hide windows,
+open controls, close apps, capture pixels or change devices.
 
 ## Prepare and run a private scene
 
@@ -270,10 +314,17 @@ AetherShowcaseRunner.exe --scenario gallery-volume --allow-device-changes --quie
 Starting a capture authorizes the documented clean-session app closure. It does not make subsequent
 automatic tests eligible to close applications or change devices. `--allow-device-changes` is an
 explicit run option for the owner-authorized volume demonstration, not another confirmation dialog.
+For assistant-operated captures, D36 additionally requires a readiness question and an explicit
+ready reply before each real attempt. Prepare/build first; do not take over the desktop while the
+owner is using it. This external coordination does not add a second prompt to a user-started CLI.
 No radio, network, microphone, brightness, startup or saved Settings value is changed by these plans.
 Capture profiles continue to have startup disabled, independently of installed-application policy.
 For these non-launching scenarios, `Prepare-ShowcaseScene.ps1 -DesktopOnly` clones the actual pins
 without requiring Code or creating another application profile. It returns null Code-related paths.
+Private scene preparation disables background taskbar-pin synchronization so the selected genuine
+pins stay fixed during capture; the owner's source settings are unchanged. A loose build-directory
+app needs the matching `AetherShell.exe` recovery helper beside `AetherShellApp.exe`, as in the
+installed version layout. Missing helper activation fails safely with the Windows taskbar visible.
 
 Named plans are `desktop`, `quick-controls`, `settings`, `volume`, `gallery` and `gallery-volume`.
 Desktop/controls/settings last five seconds; volume lasts seven. Gallery lasts seventeen seconds:
@@ -290,6 +341,11 @@ change, the runner retains its precise scalar and identity in memory. Each disti
 must be observed on both that endpoint and the real Aether UIA RangeValue before another write;
 duplicate targets are skipped. Endpoint switches fail the take. Cleanup restores the original scalar
 and requires repeated stable readback before disarming recovery; failure leaves recovery armed.
+Preparation, acknowledgement failure and restoration write a best-effort private numeric receipt
+under the local Showcase directory. It separates original/last-acknowledgement/last-restored values,
+current read HRESULTs and the stable-restore count; invalid samples remain unknown. It includes no
+device names or endpoint identifiers and is not written on successful frame steps. Missing evidence
+is not proof of restoration, and this receipt must never be copied into public source or media.
 Action failures remain failures even when best-effort restoration succeeds. Ordinary cleanup closes only
 panels opened by the scenario. A changed/removed endpoint, provider failure, forced termination
 or power loss can prevent restoration and must not be described as guaranteed recovery. Existing

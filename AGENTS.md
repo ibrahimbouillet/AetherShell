@@ -36,6 +36,10 @@ showcase-launched app window may appear. Keep raw output local until every frame
 private content; never commit a process inventory, private app content, or an unreviewed capture.
 When in doubt, leave it out and ask the owner.
 
+For assistant-operated real desktop captures, D36 requires a readiness question and an explicit
+ready reply before each attempt. Earlier blanket no-warning permission is superseded. Do not close
+or hide the owner's apps for another take until that reply; read-only preflight and builds may continue.
+
 ## Non-negotiable constraints
 - C++20, Win32, Direct2D/DirectWrite, Windows.UI.Composition. No Electron, no new third-party libraries
   without a recorded decision in `DECISIONS.md`.
