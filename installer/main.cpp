@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/Install.h"
+#include "install/LifecyclePolicy.h"
 #include "core/Dispatcher.h"
 #include "core/Strings.h"
 #include "core/FileSystem.h"
@@ -15,6 +16,7 @@
 #include "platform/windows/MessageLoop.h"
 #include "platform/windows/WindowUtilities.h"
 #include "settings/SettingsStore.h"
+#include "settings/SettingsSerialization.h"
 #include "settings/StartupRegistration.h"
 
 #include <commctrl.h>
@@ -37,6 +39,7 @@ using namespace aether;
 struct Options {
     std::filesystem::path root, data, log;
     bool silent=false, noLaunch=false, noShortcuts=false, startup=false, repair=false, uninstall=false, removeData=false, desktopShortcut=false, allowDowngrade=false;
+    bool startupExplicit=false;
     std::uintptr_t maintenanceParent=0;
     std::string maintenanceToken;
 #ifdef AETHER_SETUP_TEST_MODE
@@ -53,7 +56,11 @@ Result<Options> Parse() {
         if(value==L"--silent")options.silent=true;
         else if(value==L"--no-launch")options.noLaunch=true;
         else if(value==L"--no-shortcuts")options.noShortcuts=true;
-        else if(value==L"--start-with-windows")options.startup=true;
+        else if(value==L"--start-with-windows" || value==L"--no-start-with-windows") {
+            const bool enabled=value==L"--start-with-windows";
+            if(options.startupExplicit && options.startup!=enabled)return MakeError(ErrorCode::InvalidArgument,"conflicting startup choices");
+            options.startup=enabled;options.startupExplicit=true;
+        }
         else if(value==L"--repair")options.repair=true;
         else if(value==L"--allow-downgrade")options.allowDowngrade=true;
         else if(value==L"--uninstall")options.uninstall=true;
@@ -122,6 +129,7 @@ Result<bool> RelocateMaintenance(const Options& options) {
     if(!::UpdateProcThreadAttribute(attributes,0,PROC_THREAD_ATTRIBUTE_HANDLE_LIST,&handle,sizeof(handle),nullptr,nullptr)){::DeleteProcThreadAttributeList(attributes);cleanup();return MakeError(ErrorCode::Platform,"cannot prepare maintenance handoff",::GetLastError());}
     std::vector<std::wstring> args{L"--install-root",options.root.native(),L"--data-dir",options.data.native(),L"--log",options.log.native(),L"--maintenance-parent",std::to_wstring(reinterpret_cast<std::uintptr_t>(parent.Get())),L"--maintenance-token",text::Widen(*token)};
     if(options.silent)args.emplace_back(L"--silent");if(options.noLaunch)args.emplace_back(L"--no-launch");if(options.noShortcuts)args.emplace_back(L"--no-shortcuts");if(options.startup)args.emplace_back(L"--start-with-windows");if(options.repair)args.emplace_back(L"--repair");if(options.uninstall)args.emplace_back(L"--uninstall");if(options.removeData)args.emplace_back(L"--remove-user-data");if(options.allowDowngrade)args.emplace_back(L"--allow-downgrade");
+    if(options.startupExplicit && !options.startup)args.emplace_back(L"--no-start-with-windows");
 #ifdef AETHER_SETUP_TEST_MODE
     if(options.testNoRegistration)args.emplace_back(L"--test-no-registration");
     if(!options.testShortcutDir.empty()){args.emplace_back(L"--test-shortcut-dir");args.emplace_back(options.testShortcutDir.native());}
@@ -147,6 +155,25 @@ Result<void> Resolve(Options& options) {
     if(options.data.empty()) { auto local=platform::KnownFolder(FOLDERID_LocalAppData); if(!local)return local.error(); options.data=*local/L"AetherShell"; }
     if(options.log.empty()) options.log=options.data/L"logs"/L"setup.log";
     if(!options.root.is_absolute() || !options.data.is_absolute())return MakeError(ErrorCode::InvalidArgument,"setup directories must be absolute");
+#ifdef AETHER_SETUP_TEST_MODE
+    if(options.testNoRegistration)return Ok();  // never inspect the owner's startup keys in fixtures
+#endif
+    if(!options.startupExplicit && !options.silent && !options.uninstall) {
+        auto layout=install::InstallLayout::Create(options.root);if(!layout)return layout.error();
+        auto registry=settings::MakeWindowsStartupRegistry();if(!registry)return registry.error();
+        auto state=settings::StartupRegistration(*registry).IsEnabled(layout->Launcher());if(!state)return state.error();
+        std::optional<bool> savedChoice;std::error_code error;
+        const auto settingsPath=options.data/L"config"/L"settings.json";
+        const bool hasSettings=std::filesystem::exists(settingsPath,error);if(error)return MakeError(ErrorCode::Io,"cannot inspect existing settings",error.value());
+        if(hasSettings) {
+            // Opening/cancelling setup must never recover, rename or prune existing settings.
+            auto bytes=fs::ReadFile(settingsPath,1024*1024);if(!bytes)return bytes.error();
+            auto json=json::Parse(*bytes);if(!json)savedChoice=false;
+            else {auto parsed=settings::FromJson(*json);savedChoice=parsed?parsed->value.general.startWithWindows:false;}
+        }
+        const bool installed=std::filesystem::exists(layout->Journal(),error);if(error)return MakeError(ErrorCode::Io,"cannot inspect existing installation",error.value());
+        options.startup=install::SetupStartupDefault(true,installed || options.repair,savedChoice,*state);
+    }
     return Ok();
 }
 
@@ -223,14 +250,27 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
     const auto package=platform::CurrentExecutablePath();
     std::shared_ptr<settings::IStartupRegistry> startupRegistry;
     std::optional<std::wstring> previousRun;
-    if(policy.startWithWindows) {
+    bool applyStartup=options.startupExplicit && !options.uninstall;
+    bool preserveStartupRun=false;
+#ifdef AETHER_SETUP_TEST_MODE
+    if(options.testNoRegistration)applyStartup=false;
+#endif
+    std::string taskbarNote;
+    if(applyStartup) {
         auto registry=settings::MakeWindowsStartupRegistry({policy.registry.run,policy.registry.startupApproval});if(!registry)return registry.error();startupRegistry=registry.value();
         auto previous=startupRegistry->ReadRun();if(!previous)return previous.error();previousRun=std::move(previous.value());
+        if(policy.startWithWindows) {
+            auto state=settings::StartupRegistration(startupRegistry).IsEnabled(layout->Launcher());if(!state)return state.error();
+            if(*state==settings::StartupState::DisabledByUser || *state==settings::StartupState::UnknownApproval) {
+                policy.startWithWindows=false;
+                preserveStartupRun=true;
+                taskbarNote="Windows startup approval was kept off. Enable Aether Shell in Task Manager before enabling startup.\n";
+            }
+        }
     }
     // D21: repair and uninstall restore a taskbar that Aether Shell left hidden when both the app and its
     // recovery helper failed. Only a saved baseline triggers this, so settings and other installs are untouched.
     // A running instance and its helper own the taskbar; the operation's exit request makes them restore it.
-    std::string taskbarNote;
     if((options.repair || options.uninstall) && !platform::InstanceChannel::FindListenerProcessId(L"AetherShell")) {
         auto recovered=platform::RecoverTaskbars(platform::TaskbarBaselineFile(options.data/L"config"),false);
         if(!recovered)taskbarNote="The Windows taskbar could not be restored automatically; restart Windows Explorer from Task Manager.\n";
@@ -238,10 +278,14 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
     }
     auto result=options.uninstall ? install::Uninstall(*layout,options.data,options.removeData,policy) :
         options.repair ? install::RepairPackage(package,*layout,policy) : install::InstallPackage(package,*layout,policy);
-    if(result && policy.startWithWindows && !options.uninstall) {
+    if(result && applyStartup) {
+        if(!policy.startWithWindows && !preserveStartupRun) {
+            auto disabled=settings::StartupRegistration(startupRegistry).DisableIfOwned(layout->Launcher());
+            if(!disabled)return disabled;
+        }
         auto store=settings::MakeFileSettingsStore(options.data/L"config"/L"settings.json");
         Result<void> saved=store?Ok():Result<void>(store.error());
-        if(store) {auto loaded=store.value()->Load();if(!loaded)saved=loaded.error();else {loaded->value.general.startWithWindows=true;saved=store.value()->Save(loaded->value,false);}}
+        if(store) {auto loaded=store.value()->Load();if(!loaded)saved=loaded.error();else {loaded->value.general.startWithWindows=policy.startWithWindows;saved=store.value()->Save(loaded->value,false);}}
         if(!saved) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;}
     }
     // The committed installation stays usable without the shortcut, so a failure is only logged.
@@ -261,7 +305,7 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
 #ifdef AETHER_SETUP_TEST_MODE
     if(options.testNoRegistration)launch=false;
 #endif
-    if(launch) { auto launched=install::LaunchActiveVersion(*layout,{L"--data-dir",options.data.native()}); if(!launched)return launched.error(); }
+    if(launch) { auto launched=install::LaunchInstalledShell(*layout,{L"--data-dir",options.data.native()}); if(!launched)return launched.error(); }
     return Ok();
 }
 
@@ -347,7 +391,7 @@ private:
         Add(L"STATIC",L"Aether Shell  "+std::wstring(build::kVersionW),0,28,24,600,32);
         if(page_==0) {
             Add(L"STATIC",L"A native Dock and Top Status Bar for Windows",0,28,82,600,34);
-            Add(L"STATIC",L"While Aether Shell runs, its Dock replaces the Windows taskbar.\r\nQuit Aether Shell, turn this off in Settings > Desktop, or open\r\n\"Restore Windows taskbar\" in the Start menu to get it back.\r\nInstalls for your account without administrator rights.\r\n\r\nProgram files are installed in the folder you choose.\r\nShortcuts are optional; setup registers an Installed apps entry.\r\nStartup stays off unless you explicitly enable it.",0,28,132,600,190);
+            Add(L"STATIC",L"While Aether Shell runs, its Dock replaces the Windows taskbar.\r\nQuit Aether Shell, turn this off in Settings > Desktop, or open\r\n\"Restore Windows taskbar\" in the Start menu to get it back.\r\nInstalls for your account without administrator rights.\r\n\r\nNew installations start at sign-in by default. You can clear that\r\nchoice before installing, or turn it off later in Settings.\r\nExisting startup choices and Task Manager disables are preserved.",0,28,132,600,190);
             Add(L"STATIC",options_.uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":options_.repair?L"Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.":L"Installing over an existing version keeps your settings.\r\nAn older package is rejected unless you explicitly permit a downgrade.",0,28,335,600,75);
             Add(L"BUTTON",L"Next",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,1);
         } else if(page_==1) {
@@ -368,9 +412,9 @@ private:
                 ::SendMessageW(shortcut_,BM_SETCHECK,options_.noShortcuts?BST_UNCHECKED:BST_CHECKED,0);
                 desktop_=Add(L"BUTTON",L"Create a desktop shortcut",WS_TABSTOP|BS_AUTOCHECKBOX,28,210,600,28,25);
                 ::SendMessageW(desktop_,BM_SETCHECK,options_.desktopShortcut?BST_CHECKED:BST_UNCHECKED,0);
-                startup_=Add(L"BUTTON",L"Start Aether Shell when I sign in (optional)",WS_TABSTOP|BS_AUTOCHECKBOX,28,250,600,28,21);
+                startup_=Add(L"BUTTON",L"Start Aether Shell when I sign in (recommended)",WS_TABSTOP|BS_AUTOCHECKBOX,28,250,600,28,21);
                 ::SendMessageW(startup_,BM_SETCHECK,options_.startup?BST_CHECKED:BST_UNCHECKED,0);
-                Add(L"STATIC",L"Startup registration changes only after your explicit selection.\r\nWhile Aether Shell runs, its Dock replaces the Windows taskbar; you can\r\nturn this off at any time in Settings > Desktop. Weather is off by default.\r\nUnsigned binaries may trigger a Windows SmartScreen warning.",0,28,300,600,100);
+                Add(L"STATIC",L"Installing accepts the startup choice above. Clear it to opt out.\r\nThe launcher can restart Aether after a crash, with a bounded retry limit.\r\nQuit and Restore Windows taskbar remain available. Weather is off by default.\r\nUnsigned binaries may trigger a Windows SmartScreen warning.",0,28,300,600,100);
             }
             Add(L"BUTTON",L"Back",WS_TABSTOP,360,468,125,32,8);
             Add(L"BUTTON",options_.uninstall?L"Uninstall":options_.repair?L"Repair":L"Install",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,2);
@@ -400,7 +444,7 @@ private:
         std::wstring path(static_cast<std::size_t>(::GetWindowTextLengthW(folder_))+1,L'\0');::GetWindowTextW(folder_,path.data(),static_cast<int>(path.size()));path.resize(path.size()-1);
         options_.root=path;
         if(options_.uninstall)options_.removeData=::SendMessageW(removeData_,BM_GETCHECK,0,0)==BST_CHECKED;
-        else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;}
+        else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.startupExplicit=true;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;}
         if(!options_.root.is_absolute()){::MessageBoxW(window_,L"Choose an absolute install folder.",L"Aether Shell",MB_OK|MB_ICONWARNING);return;}
         page_=3;Build();const auto weak=std::weak_ptr<bool>(alive_);auto operation=options_;operation.noLaunch=true;
         worker_.Post([this,weak,operation]{auto result=Perform(operation,cancellation_.Token());dispatcher_.Post([this,weak,result=std::move(result)]{if(auto live=weak.lock();live&&*live){success_=result.ok();if(!result)error_=text::Widen(ToString(result.error().code));page_=4;Build();}});});
@@ -411,7 +455,7 @@ private:
 #endif
         if(success_ && !options_.uninstall && launch_ && ::SendMessageW(launch_,BM_GETCHECK,0,0)==BST_CHECKED) {
             ::EnableWindow(window_,FALSE);const auto root=options_.root;
-            const auto data=options_.data;worker_.Post([this,root,data]{auto layout=install::InstallLayout::Create(root);if(layout)(void)install::LaunchActiveVersion(*layout,{L"--data-dir",data.native()});dispatcher_.Post([]{::PostQuitMessage(0);});});
+            const auto data=options_.data;worker_.Post([this,root,data]{auto layout=install::InstallLayout::Create(root);if(layout)(void)install::LaunchInstalledShell(*layout,{L"--data-dir",data.native()});dispatcher_.Post([]{::PostQuitMessage(0);});});
         } else ::PostQuitMessage(success_?0:1);
     }
     static LRESULT CALLBACK Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {

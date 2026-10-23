@@ -15,7 +15,7 @@ Aether Shell: a native Windows 10 (2004+)/11 desktop interface with exactly two 
 Version 1 — a floating **bottom Dock** (application icons, launch, search entry, pinning, running
 indicators, animations) and a floating **Top Status Bar** (clock/date, battery, input language,
 network, volume, microphone, optional weather). It runs beside Explorer and never replaces it.
-The owner-approved V2 iteration (`0.2.0-alpha.1`, D19/D23/ADR 0009) adds reversible visual replacement
+The owner-approved V2 iteration (`0.2.0-alpha.2`, D19/D23/ADR 0009) adds reversible visual replacement
 of the Windows taskbar. It starts enabled unless the user has saved an explicit opt-out (D23);
 Settings → Desktop requires Apply to change that choice. Quit and `--restore-taskbar` restore the
 native taskbar. It does not replace the native Windows Settings taskbar page.
@@ -27,9 +27,14 @@ Everything committed here will be published in the public GitHub repository. Nev
 information into code, comments, tests, fixtures, logs, documentation or commit messages: no
 credentials, tokens, API keys or private keys (or their file locations), no personal data (e-mail
 addresses, phone numbers, account names other than the public owner name "Ibrahim Bouillet"), no
-user-specific absolute paths (use `%LOCALAPPDATA%`, `%USERPROFILE%`, `<repo>`), no machine names, no
-screenshots or captures that show anything other than the project's own test windows, and no content
-from the owner's other files or applications. When in doubt, leave it out and ask the owner.
+user-specific absolute paths (use `%LOCALAPPDATA%`, `%USERPROFILE%`, `<repo>`), no machine names, and
+no content from the owner's other files or applications. Automated tests may capture only the
+project's own test windows over a private test-pattern backdrop. Narrow owner-approved exception
+(D30/FR-029): curated README showcase media may show the real desktop only after the user-started
+clean-session workflow, and only the wallpaper, Aether surfaces, pinned application logos, and the
+showcase-launched app window may appear. Keep raw output local until every frame is reviewed for
+private content; never commit a process inventory, private app content, or an unreviewed capture.
+When in doubt, leave it out and ask the owner.
 
 ## Non-negotiable constraints
 - C++20, Win32, Direct2D/DirectWrite, Windows.UI.Composition. No Electron, no new third-party libraries
@@ -80,10 +85,12 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - Pushing verified milestones to the official repository is covered by the owner's instructions once
   the repository exists; publishing a GitHub Release or changing repository settings needs the owner's
   explicit approval.
-- **Current owner hold (2026-10-21, D25): local commits are allowed, but no push, new tag or GitHub
-  Release until the owner explicitly lifts the hold.** The next public delivery is Alpha 2, after
-  additional owner changes. This supersedes the earlier standing push authorization while active.
-- D26: keep the usable local preview running except bounded tests, then restore it; no autorun.
+- **D25 delivery hold was lifted by the owner on 2026-10-22 only for Alpha 2 (D29):** the reviewed
+  public `main`, tag `v0.2.0-alpha.2`, and its GitHub Release are authorized. Do not infer approval for
+  unrelated repository/account settings or a later release; consult `HANDOFF.md` for exact receipts.
+- D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
+  D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
+  private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.
   See HANDOFF for its ignored private receipt. Never publish the receipt paths/content. Maximized
   side margins do not authorize moving/resizing manually placed owner windows.
 - Never commit: secrets, keys (`*.pem` etc.), build output (`build/`, `dist/`), generated graphs

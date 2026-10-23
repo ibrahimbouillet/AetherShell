@@ -4,7 +4,7 @@
 # Project-wide build options. Every value here can be overridden on the CMake
 # command line (for example by CI when producing a release build).
 
-set(AETHER_VERSION_PRERELEASE "alpha.1" CACHE STRING
+set(AETHER_VERSION_PRERELEASE "alpha.2" CACHE STRING
     "SemVer 2.0.0 prerelease identifier appended to the project version (empty for a stable build)")
 if(AETHER_VERSION_PRERELEASE)
     set(AETHER_VERSION_FULL "${PROJECT_VERSION}-${AETHER_VERSION_PRERELEASE}")
@@ -24,6 +24,7 @@ set_property(CACHE AETHER_UPDATE_CHANNEL PROPERTY STRINGS stable prerelease)
 set(AETHER_MODULES "all" CACHE STRING
     "Semicolon-separated list of modules to configure; dependencies are added automatically. 'all' configures everything.")
 option(AETHER_BUILD_TESTS "Build the automated test executables" ON)
+option(AETHER_BUILD_SHOWCASE_RUNNER "Build the owner-started local cinematic capture runner" OFF)
 option(AETHER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (enabled in CI)" OFF)
 
 set(AETHER_SOURCE_REVISION "" CACHE STRING "Source revision embedded in the binaries (defaults to the git HEAD)")

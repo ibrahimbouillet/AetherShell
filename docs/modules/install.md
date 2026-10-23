@@ -42,8 +42,21 @@ The root installer wrapper is documented and verified separately by its owner.
 ## Launch and update trust
 
 The stable launcher reads/reconciles the journal, then starts the selected version with a correctly
-quoted argument vector and the version directory as working directory. Corrupt/missing state shows
-a native Repair message. Launcher/updater executables embed the project icon and VERSIONINFO.
+quoted argument vector and the version directory as working directory. Normal launch/Run/setup
+sessions retain the exact child handle and observe the app's surface-readiness signal. At most
+three abnormal Windows exception exits are retried, after 1, 2 and 4 seconds; the budget never resets
+during that launcher session. Ordinary exit codes, Quit, recovery commands and the usual Task
+Manager exit code 1 do not restart. A live hung app is never killed or repeatedly relaunched.
+
+Each retry checks the journal SHA-256 under the nonblocking install lock; changed/missing state,
+maintenance lock contention or launch failure stops recovery. Quit, recovery and maintenance cancel
+backoff through installation-scoped session kernel objects and wait at most three seconds for the
+supervisor lease. If an initial child is not yet addressable through IPC, its supervisor keeps the
+lease until that child is addressable or exits; maintenance fails safely on timeout instead of
+leaving an unaddressable child able to start afterward. Stable-image sharing failures get at most
+one second of bounded retry after normal shutdown. Corrupt/missing state on a manual launch shows
+a native Repair message; maintenance-busy and autostart errors exit without a modal dialog.
+Launcher/updater executables embed the project icon and VERSIONINFO.
 
 The updater independently verifies the exact manifest bytes with the compiled-in release verifier,
 then validates official repository metadata, architecture/minimum OS, package size/SHA-256 and embedded
@@ -51,7 +64,7 @@ payload version/architecture. A read handle denies package replacement through v
 No downloaded package is executed for extraction. The public updater has no unsigned/test bypass.
 
 After activation the updater starts `AetherShellApp.exe` directly so it owns the actual health-checked
-process rather than the short-lived launcher. It forwards both health token and the selected data
+process rather than the supervising launcher. It forwards both health token and the selected data
 directory; rollback forwards the same data directory. A healthy version is committed before refreshing
 maintenance files. A maintenance refresh error preserves the healthy application and records
 `MaintenanceRefreshFailed`. Failed health rolls back and restarts the previous version.
@@ -72,12 +85,27 @@ executable remains in `%TEMP%`. A successful relocation returns handoff exit cod
 records the final operation result. Setup startup consent also persists the setting through the
 settings store and restores the previous Run value if persistence fails.
 
+The wizard discloses default-on sign-in startup for fresh interactive installs with opt-out (D34).
+Settings/portable defaults remain off. Existing saved disables, Task Manager StartupApproved data
+and unrelated Run targets are preserved; silent setup only changes startup with an explicit flag.
+Windows schedules per-user Run entries and may delay them; registration cannot guarantee startup
+ordering or hide Explorer's taskbar before Aether's guarded replacement becomes active. No service,
+Winlogon change, elevation, priority boost or startup-delay override is installed.
+
 The setup wizard clamps to the monitor work area and uses horizontal/vertical native scrollbars,
 wheel scrolling and focus visibility for smaller viewports. DPI rebuilds preserve folder and checkbox
 choices; focus notifications cannot advance pages or trigger installation. The test-mode policy is
 reapplied at operation/finish time so UI controls cannot enable real startup, shortcuts or app launch.
 
 ## Verification and limits
+
+D34 lifecycle changes compile in Release `/W4 /WX`, including the stable launcher and setup source.
+The focused `build/wf-alpha2-lifecycle` suites pass 16 install and 54 settings cases. Their new
+coverage uses pure policies, injected registry and installation-scoped own kernel objects: bounded
+exception retries, preserved startup disables, owned opt-out, changed journal rejection, stop during
+backoff and nonblocking control/launch lock ordering. No test starts, stops or crashes a real app,
+changes the owner's startup registration or qualifies Windows sign-in scheduling. Actual installed
+crash recovery, maintenance during a real crash and physical sign-in remain separate device gates.
 
 The initial Debug `/W4 /WX` library, launcher and updater build passed 2/2 CTest executables in
 `build/wf-install2`. A later case-alias regression exposed rejection of an otherwise valid trailing

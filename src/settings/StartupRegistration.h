@@ -35,11 +35,13 @@ Result<std::shared_ptr<IStartupRegistry>> MakeWindowsStartupRegistry(StartupRegi
 class StartupRegistration {
 public:
     explicit StartupRegistration(std::shared_ptr<IStartupRegistry> registry);
-    // Blocking: call on a worker. Enable is only for a direct user consent action. No method enables
-    // startup automatically, and unknown StartupApproved formats make Enable fail Unsupported.
+    // Blocking: call on a worker. Enable follows an accepted disclosed setup choice or direct
+    // Settings Apply. Unknown StartupApproved formats make Enable fail Unsupported.
     Result<StartupState> IsEnabled(const std::filesystem::path& expectedPath);
     Result<void> Enable(const std::filesystem::path& launcherPath);
     Result<void> Disable();
+    // Setup opt-out must not remove another installation's startup target or change approval.
+    Result<void> DisableIfOwned(const std::filesystem::path& launcherPath);
 
 private:
     std::shared_ptr<IStartupRegistry> registry_;

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/InstallInternal.h"
+#include "install/LauncherSupervisor.h"
 #include "core/FileSystem.h"
 #include "core/Strings.h"
 #include "platform/windows/OsVersion.h"
@@ -61,6 +62,7 @@ Result<void> detail::ApplyVerifiedUpdate(const std::filesystem::path& package,co
         auto old=updates::SemanticVersion::Parse(state.activeVersion); if(!old || version<=old.value()) return MakeError(ErrorCode::Validation,"automatic update must be newer than active version");
         auto staged=StagePackage(package,layout,state); if(!staged) return staged;
         if(state.transaction->toVersion!=version.ToString()) return MakeError(ErrorCode::Integrity,"staged update differs from verified version");
+        auto supervisor=StopLauncherSupervisor(layout);if(!supervisor)return supervisor;
         auto stopped=processes->RequestExit(std::chrono::seconds(30)); if(!stopped) return stopped;
         auto active=ActivateVersion(layout,state); if(!active) return active;
         const auto restore=[&](Error error,std::optional<DWORD> child={}) -> Result<void> {

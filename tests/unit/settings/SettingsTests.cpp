@@ -564,6 +564,16 @@ AETHER_TEST("settings startup: invalid or missing launcher paths never write reg
     CHECK(MakeWindowsStartupRegistry({L"Software\\AetherShellTests\\Run", L"Software\\AetherShellTests\\Approval"}).ok());
 }
 
+AETHER_TEST("settings startup: setup opt-out removes only its owned Run target and preserves approval") {
+    const auto file=NewFile().parent_path()/L"launcher.exe";
+    auto registry=std::make_shared<MemoryRegistry>();StartupRegistration startup(registry);
+    registry->approval={3,0,0,0};registry->run=L"preserve-other-installation";
+    REQUIRE(startup.DisableIfOwned(file).ok());CHECK_EQ(*registry->run,std::wstring(L"preserve-other-installation"));
+    registry->run=L"\""+file.native()+L"\" --autostart";
+    REQUIRE(startup.DisableIfOwned(file).ok());CHECK_FALSE(registry->run.has_value());
+    CHECK_EQ(registry->approval[0],3);CHECK_EQ(registry->writes,0);
+}
+
 AETHER_TEST("weather location settings: preserve legacy manual coordinates and disabled consent") {
     auto root=json::Parse(R"({"schemaVersion":1,"weather":{"enabled":false,"latitude":10,"longitude":20}})");REQUIRE(root.ok());
     auto parsed=FromJson(*root);REQUIRE(parsed.ok());

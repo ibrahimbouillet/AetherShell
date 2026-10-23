@@ -7,7 +7,7 @@
 # in dependencies automatically, which keeps focused builds fast and isolated.
 
 set(AETHER_MODULE_ORDER
-    core diagnostics platform net graphics accessibility ui
+    core diagnostics platform net graphics accessibility ui showcase
     status status_audio weather weather_location applications search settings updates install
     dock topbar search_ui settings_ui system_controls media_controls controlcenter
     app launcher updater installer)
@@ -24,6 +24,7 @@ aether_declare_module(net           src/platform/net      core diagnostics platf
 aether_declare_module(graphics      src/graphics          core diagnostics platform)
 aether_declare_module(accessibility src/ui/accessibility  core diagnostics platform)
 aether_declare_module(ui            src/ui                core diagnostics platform graphics)
+aether_declare_module(showcase      src/showcase          core graphics)
 # status_audio, weather and search use only the shared contract headers of
 # status/applications (StatusTypes.h, ApplicationTypes.h), not their libraries.
 aether_declare_module(status        src/status            core diagnostics platform)

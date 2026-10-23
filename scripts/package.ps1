@@ -42,15 +42,19 @@ try {
         Copy-Item -LiteralPath $inputSetup -Destination $setup
     } finally { $lockedSetup.Dispose() }
     $packageStage = 'manifest generation'
+    $manifest = Join-Path $outputPath "AetherShell-$version-manifest.json"
+    # A reused output directory may contain a signature for the previous setup's manifest.
+    # Invalidate it before replacing any manifest bytes, including when signing later fails.
+    $signature = "$manifest.sig"
+    if (Test-Path -LiteralPath $signature) { Remove-Item -LiteralPath $signature -Force }
     & python ./scripts/release/make_manifest.py --version $version --channel $channel $setup
     if ($LASTEXITCODE -ne 0) { throw 'Manifest generation failed.' }
-    $manifest = Join-Path $outputPath "AetherShell-$version-manifest.json"
     $files = @($setup)
     if ([Environment]::GetEnvironmentVariable('AETHER_RELEASE_SIGNING_KEY_FILE')) {
         $packageStage = 'manifest signing'
         & python ./scripts/release/sign_manifest.py $manifest
         if ($LASTEXITCODE -ne 0) { throw 'Manifest signing or trust-anchor verification failed.' }
-        $files += @($manifest,"$manifest.sig")
+        $files += @($manifest,$signature)
         Write-Host 'Manifest signature verified against the compiled public trust anchor.'
     } else {
         Write-Warning 'UNSIGNED MANIFEST: keep the manifest local. Do not publish it or enable automatic updates until it is signed with the trusted release key.'

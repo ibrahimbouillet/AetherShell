@@ -2,9 +2,9 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The current V2 candidate is `0.2.0-alpha.1`; earlier `0.1.0-alpha.1` delivery receipts do not qualify
-this candidate. Its full build, package, CI and publication gates are recorded only when executed.
-The owner currently holds all push/tag/release operations (D25); local work and commits remain allowed.
+The current V2 release is `0.2.0-alpha.2`; the earlier `0.1.0-alpha.1` delivery does not qualify this
+version. Build, package and CI
+receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
 
 - The corrected Dock light native fixture intermittently exposes its own HWND as UIA Pane rather
   than the required Toolbar (S-024); root-type/invoke assertions remain strict. Synchronous provider
@@ -21,6 +21,18 @@ The owner currently holds all push/tag/release operations (D25); local work and 
 - The initial visual identity is an original proposal for alpha, pending owner direction.
 - Product-wide startup/memory/idle CPU release budgets remain open (Q-001). Search latency has a
   separate measured engineering target.
+- D34 adds disclosed installed sign-in startup and bounded abnormal Windows-exception relaunch.
+  Windows controls startup scheduling; Aether cannot guarantee being first, hiding the native bar
+  before its own surfaces are ready, or surviving every failure. Intentional Quit, ordinary errors,
+  Task Manager disable, exhausted retry budgets and uninstall remain stop paths. Native recovery
+  may briefly restore the Windows taskbar during a crash/restart. No realtime/OS-critical priority
+  or memory pinning is used. Actual reboot timing requires a separate observed sign-in test.
+  A child stuck before its IPC listener is ready can make maintenance/stop fail with a bounded
+  timeout; maintenance preserves the installation rather than deleting files under that live child.
+  Advanced custom `--data-dir` sign-in startup is not qualified: the Run entry launches with the
+  normal data directory. Use the standard data directory for installed sign-in startup. Multiple
+  installations also share the current per-user application IPC namespace; cross-install shutdown
+  isolation is not qualified.
 - Temporary-root installer cancellation, repair and maintenance self-uninstall tests pass. Broader
   real-user upgrade/recovery and interrupted-install qualification remain open.
 - Full-screen activity and foreign topmost overlays can interrupt interactive fixtures. Capture guards

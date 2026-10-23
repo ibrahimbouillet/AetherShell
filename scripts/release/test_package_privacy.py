@@ -96,6 +96,9 @@ class PackagePrivacyTests(unittest.TestCase):
             (build / "generated" / "aether" / "BuildInfo.h").write_text('kVersion = "1.2.0";\nkTargetArchitecture = "x64";\n')
             setup = build / "modules" / "installer" / "AetherShellSetup.exe"
             setup.write_bytes(b"MZ synthetic package for privacy only\0" + codeview("AetherShell.pdb"))
+            output.mkdir()
+            stale_signature = output / "AetherShell-1.2.0-manifest.json.sig"
+            stale_signature.write_text("synthetic signature for a previous package\n")
             # Deterministic freshness fixture while unrelated product development continues.
             future = time.time_ns() + 3_600_000_000_000
             os.utime(setup, ns=(future, future))
@@ -111,6 +114,34 @@ class PackagePrivacyTests(unittest.TestCase):
             self.assertIn("AetherShell-1.2.0-win-x64-setup.exe", checksums)
             self.assertNotIn("manifest", checksums)
             self.assertFalse((output / "AetherShell-1.2.0-manifest.json.sig").exists())
+            self.assertNotIn(str(root), result.stdout + result.stderr)
+
+    @unittest.skipIf(POWERSHELL is None, "PowerShell is unavailable")
+    def test_failed_signing_does_not_leave_a_previous_manifest_signature(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="aether-package-stale-signature-") as temporary:
+            root = Path(temporary)
+            build, output = root / "synthetic-build", root / "public-assets"
+            (build / "generated" / "aether").mkdir(parents=True)
+            (build / "modules" / "installer").mkdir(parents=True)
+            (build / "CMakeCache.txt").write_text("CMAKE_BUILD_TYPE:STRING=Release\n")
+            (build / "generated" / "aether" / "BuildInfo.h").write_text(
+                'kVersion = "1.2.0";\nkTargetArchitecture = "x64";\n')
+            setup = build / "modules" / "installer" / "AetherShellSetup.exe"
+            setup.write_bytes(b"MZ synthetic package only\0" + codeview("AetherShell.pdb"))
+            future = time.time_ns() + 3_600_000_000_000
+            os.utime(setup, ns=(future, future))
+            output.mkdir()
+            signature = output / "AetherShell-1.2.0-manifest.json.sig"
+            signature.write_text("synthetic stale signature\n")
+            environment = dict(os.environ)
+            environment["AETHER_RELEASE_SIGNING_KEY_FILE"] = str(root / "unavailable-test-key.pem")
+            environment.pop("AETHER_RELEASE_SIGNING_KEY_PASSPHRASE", None)
+            result = subprocess.run([POWERSHELL, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                                     "-File", str(HERE.parent / "package.ps1"), "-SkipBuild",
+                                     "-BuildDir", str(build), "-OutputDir", str(output)],
+                                    capture_output=True, text=True, check=False, env=environment)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse(signature.exists())
             self.assertNotIn(str(root), result.stdout + result.stderr)
 
     @unittest.skipIf(POWERSHELL is None, "PowerShell is unavailable")

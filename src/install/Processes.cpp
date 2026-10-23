@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/InstallInternal.h"
+#include "install/LauncherSupervisor.h"
 #include "core/Strings.h"
 #include "platform/windows/SingleInstance.h"
 
 #include <bcrypt.h>
 #include <array>
+#include <algorithm>
 #include <map>
 
 namespace aether::install {
@@ -16,13 +18,15 @@ Result<DWORD> WaitMilliseconds(std::chrono::milliseconds timeout) {
     return static_cast<DWORD>(timeout.count());
 }
 Result<DWORD> Launch(const std::filesystem::path& executable,const std::vector<std::wstring>& arguments,
-                     std::map<DWORD,platform::UniqueHandle>* children) {
+                     std::map<DWORD,platform::UniqueHandle>* children,
+                     platform::UniqueHandle* observed = nullptr) {
     if(!executable.is_absolute() || !std::filesystem::is_regular_file(executable)) return MakeError(ErrorCode::NotFound,"application executable is missing");
     std::wstring command=QuoteArgument(executable.native()); for(const auto& arg:arguments) { command+=L' '; command+=QuoteArgument(arg); }
     STARTUPINFOW startup{}; startup.cb=sizeof(startup); PROCESS_INFORMATION process{};
     if(!::CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,FALSE,0,nullptr,executable.parent_path().c_str(),&startup,&process)) return MakeError(ErrorCode::Platform,"cannot start application",::GetLastError());
     platform::UniqueHandle thread(process.hThread), handle(process.hProcess);
-    if(children) children->emplace(process.dwProcessId,std::move(handle));
+    if(observed) *observed=std::move(handle);
+    else if(children) children->emplace(process.dwProcessId,std::move(handle));
     return process.dwProcessId;
 }
 class Processes final:public IProcessOperations {
@@ -89,12 +93,38 @@ std::wstring QuoteArgument(std::wstring_view argument) {
     }
     result.append(slashes*2,L'\\'); result+=L'"'; return result;
 }
-Result<DWORD> LaunchActiveVersion(const InstallLayout& layout,const std::vector<std::wstring>& arguments) {
+Result<ActiveVersionProcess> LaunchActiveVersionProcess(const InstallLayout& layout,
+    const std::vector<std::wstring>& arguments,std::optional<updates::Sha256Digest> expectedState) {
     try {
         auto lock=detail::InstallLock::Acquire(layout);if(!lock)return lock.error();
+        if(expectedState) {
+            auto current=updates::Sha256::HashFile(layout.Journal());if(!current)return current.error();
+            if(*current!=*expectedState)return MakeError(ErrorCode::Unavailable,"active installation changed; crash recovery stopped");
+        }
         auto recovered=RecoverInterrupted(layout);if(!recovered)return recovered.error();
         auto state=LoadState(layout); if(!state) return state.error(); auto version=layout.Version(state->activeVersion); if(!version) return version.error();
-        return Launch(version.value()/L"AetherShellApp.exe",arguments,nullptr);
+        auto digest=updates::Sha256::HashFile(layout.Journal());if(!digest)return digest.error();
+        if(expectedState && *expectedState!=*digest)return MakeError(ErrorCode::Unavailable,"active installation changed; crash recovery stopped");
+        ActiveVersionProcess result;result.stateDigest=*digest;
+        auto launched=Launch(version.value()/L"AetherShellApp.exe",arguments,nullptr,&result.process);
+        if(!launched)return launched.error();result.processId=*launched;return result;
     } catch(...) { return MakeError(ErrorCode::Platform,"cannot launch installed application"); }
+}
+Result<DWORD> LaunchActiveVersion(const InstallLayout& layout,const std::vector<std::wstring>& arguments) {
+    auto child=LaunchActiveVersionProcess(layout,arguments);if(!child)return child.error();return child->processId;
+}
+Result<DWORD> LaunchInstalledShell(const InstallLayout& layout,const std::vector<std::wstring>& arguments) {
+    try { return Launch(layout.Launcher(),arguments,nullptr); }
+    catch(...) { return MakeError(ErrorCode::Platform,"cannot launch installed shell"); }
+}
+Result<DWORD> LaunchControlCommand(const InstallLayout& layout,const std::vector<std::wstring>& arguments) {
+    try {
+        const bool control=std::find(arguments.begin(),arguments.end(),L"--quit")!=arguments.end() ||
+            std::find(arguments.begin(),arguments.end(),L"--restore-taskbar")!=arguments.end();
+        if(!control)return MakeError(ErrorCode::InvalidArgument,"launcher control command is required");
+        auto lock=detail::InstallLock::Acquire(layout);if(!lock)return lock.error();
+        auto stopped=StopLauncherSupervisor(layout);if(!stopped)return stopped.error();
+        return LaunchActiveVersion(layout,arguments);
+    } catch(...) { return MakeError(ErrorCode::Internal,"cannot dispatch launcher control command"); }
 }
 }  // namespace aether::install

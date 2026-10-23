@@ -918,3 +918,331 @@ Physical DPI/multi-monitor, actual shell attention/fullscreen behavior, Windows 
 live weather, reduced-motion visual quality, and taskbar/Explorer recovery still need owner/device
 acceptance. This run is test evidence, not release acceptance; D25 still forbids package, push, tag,
 and GitHub Release.
+
+### S-029 — cinematic showcase camera and clean-session coordinator (Codex, 2026-10-22)
+
+Focused Windows Release build with warnings as errors and the showcase unit suite:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-showcase-codex -Modules showcase -Jobs 4 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestRegex '^aether_showcase_tests$'
+```
+
+The build passed `/W4 /WX`; CTest passed the focused executable **1/1**, and its `--list` output
+confirmed **13 cases** (7 deterministic camera tests, 6 fake clean-session tests). Coverage includes
+the stable composition hold, cursor path, Dock framing and tracking, VS Code launch/reveal gates,
+resolution scaling, invalid input, filtering/deduplication of app candidates, all-app restart
+preflight before closure, orderly close with authorized termination fallback, rollback after a close
+failure, sanitized relaunch errors and destructor restoration. The first run found one mistaken test
+fixture with a valid process creation time; the fixture was corrected and the same gate passed.
+
+Follow-up on the same date, against HEAD `322594b1b3486f319c9bf7144bd683d7890e44b5` with a dirty
+worktree (the D29 Alpha 2 candidate is staged; T36 is local and uncommitted): the default camera
+profile was changed to quintic smootherstep, which settles position, velocity and acceleration at
+each endpoint. The same Release `/WX` build command passed again after adding finite-difference speed
+and acceleration checks at choreography boundaries and the observed-window reveal, a custom cubic
+art-direction override with zero-velocity endpoint validation, and bounded 8-sample shutter timestamp
+planning. One intermediate test run rejected the custom-curve endpoint check at a 1-ms finite-difference
+step; tightening the measurement interval to 0.1 ms confirmed the endpoints are at rest, and the final
+rerun passed. CTest passed **1/1**, and the executable listed **18 cases** (**12 camera/timeline, 6 fake
+clean-session**). No real application process or desktop was touched. `git diff --check` also passed.
+This still does not verify rendered motion, native capture, output cadence, motion blur, MP4/GIF export
+or the desktop.
+
+This is a focused static library and fake-backend suite, not a runnable showcase application. No real
+process/window backend, screen capture, native high-resolution Dock renderer, MP4/GIF encoder or
+preview exists. No user process was closed and no desktop capture was made. The complete Alpha 2
+build/release gate and the real desktop showcase are not covered by this result.
+
+### S-030 — reference frame compositor and whole-film motion acceptance (Codex, 2026-10-22)
+
+The user supplied a motion-design standard, which was read in full, and raised the target from the
+generic 92-point recommendation to 100/100 for the complete final film. D32 records that stricter
+owner decision. The public project-specific rubric adapts all 60 binary checks and ten blocking gates
+in `video_production/06_SCORECARD.md`; no score may be claimed from source tests or a still frame.
+
+The T36 CPU reference compositor now consumes frames from an injectable time-indexed source, evaluates
+the camera at each shutter timestamp, resamples RGBA pixels with Catmull-Rom cubic reconstruction,
+blends temporal samples in premultiplied-alpha space, and reports sample count plus measured CPU time.
+The desktop base pose now scales the full source into the output composition. Four fake-source tests
+cover exact identity pixels and destination padding, eight-sample temporal averaging, desktop fit at a
+different output size, and malformed source/output rejection. No test touches real apps or the desktop.
+
+Focused verification used the S-029 Release `/W4 /WX` command and build directory. The suite passed
+CTest **1/1**; the executable lists **22 cases** (12 camera/timeline, 6 fake clean-session, 4 fake
+compositor). Two intermediate attempts exposed an unnecessary identity blur in the first resampler
+choice and a mistaken out-of-bounds test index; both were corrected, and the final rerun passed. This
+is correctness evidence only: no benchmark, real capture provider, GPU path, MP4/GIF writer, visual
+preview, or measured 60-FPS output exists. The whole-film score remains unscored, with all checks and
+gates pending because there is no export.
+
+### S-031 — H.264 writer smoke test and compositor checkpoint (Codex, 2026-10-22)
+
+The existing T36 timeline, fake clean-session coordinator, and CPU reference compositor remain
+unchanged in intent. A Windows Media Foundation H.264 sink writer was added to the showcase module.
+It validates dimensions/rate/bitrate and RGBA frame memory, refuses an existing final path, encodes to
+a unique temporary sibling, and publishes the completed output without replacement. Temporary output
+is removed on failure or empty finalization. The new runtime test writes three synthetic 64×64 color
+frames, verifies the resulting file is nonempty and that Media Foundation's Source Reader opens its
+H.264 stream and observes three samples, then deletes the temporary file. A collision control confirms
+existing sentinel bytes remain unchanged. This is container/stream smoke evidence only; it does not
+decode and visually inspect the frames or represent Aether product footage.
+
+Focused verification used the S-029 Release `/W4 /WX` workflow and build directory:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-showcase-codex -Modules showcase -Jobs 4 `
+  -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestRegex '^aether_showcase_tests$'
+```
+
+The final build passed and CTest passed **1/1** in 2.72 seconds. The test executable lists **26 cases**:
+12 timeline/camera, six fake-session, six compositor, and two MP4-writer cases. An earlier version
+failed to compile because an inline default constructor instantiated deletion of the writer's
+incomplete implementation type; the constructor was moved out of line. A first Source Reader check
+also requested decoded RGB32, which failed on this host; the final test instead checks the actual
+native H.264 stream and sample count and makes no decoded-image claim.
+
+No desktop capture provider, native process/window backend, capture orchestration, live Dock render,
+real app launch/observation, GIF, audio, measured frame cadence, or reviewable project video exists.
+No user process was closed; no user-facing video was created. All 60 checks and ten gates in the
+project scorecard remain pending; no whole-film score is available.
+
+### S-032 — native showcase implementation and rejected-export audit (Codex, 2026-10-23)
+
+This supersedes S-029–S-031's library-only continuation boundary. The native runner now closes and
+attempts to reopen owner-authorized user applications, protects controller ancestry and Windows
+shell/security processes, isolates Code's profile, captures authentic DXGI pixels/cursor, buffers
+lossless changed tiles in bounded RAM, and saves a validated numeric recipe for offline rendering.
+The GPU compositor evaluates eight shutter-time camera poses and reuses immutable source frames.
+Media Foundation writes interleaved H.264/AAC; WIC produces the looping GIF. Automated checks use
+synthetic images/fake lifecycle operations or read-only process checks, never real app closure.
+
+Canonical focused command:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-showcase-runner -Modules showcase -Jobs 4 `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_BUILD_SHOWCASE_RUNNER=ON') `
+  -Test -TestRegex '^aether_showcase_tests$'
+```
+
+The WIC correction checkpoint passed **64 cases**, **1/1 CTest executable**, in **2.34 seconds**,
+without warnings under Release `/W4 /WX`. Tests include lossless tile round trips/capacity failures,
+archive validation/reopening, frame-ID cache reuse, real native H.264/AAC decoding, an NV12 top/bottom
+orientation and padded-row regression, palette/delay/loop/color checks, and an end-to-end RGBA resize
+to GIF decode. Later cursor/framing and visual-close refinements require the next exact receipt.
+
+Executed real takes exposed defects which unit/container checks alone had missed:
+
+| Take | Observed result | Disposition / correction |
+|---|---|---|
+| Initial GDI take | Approximately 17.94 capture samples/s; black scenic backdrop | Rejected; no public use |
+| Early DXGI take | 12.44 samples/s; 5.95-second gap; unrelated private content in its final source frame | Rejected locally; before/after frame scene guards added; no public use |
+| Buffered take | Backdrop restored; 34.63 samples/s, no >100-ms gaps; cursor missing, MP4 inverted, GIF channels swapped | Rejected; explicit actual Windows cursor composition, native RGB32 bottom-up encoding and explicit WIC RGBA conversion added |
+| First exact-sequence take | Real pointer and genuine empty Code workbench; technically correct master, but test-setup toast, clipped close-up footer, persistent hover ending and about 2.85 visually empty seconds | Rejected for polish; fresh empty extensions directory without a disabling flag, padded framing, cursor return, click-position preservation and photographed-backdrop closure check added |
+
+The last audited intermediate MP4 was
+`Aether-Shell-Showcase-AABA77A7EC324CF18729CAAD9414E0D1.mp4`, SHA-256
+`9c8410a30883a30773d3d1244d1134ff5ce7caf19e180b89d676f6d4513acd2f`.
+All **964** H.264 frames decoded; delivery was **1920×1080, 60 FPS, 16.0667 seconds**, progressive
+SDR BT.709, with AAC-LC stereo 48 kHz. All PTS intervals matched 1/60 second within 10 microseconds.
+Its **931** source samples averaged **57.95/s**; the archive's 95th-percentile interval was **31.35
+ms**, maximum **118.20 ms**. During Dock traversal the 95th percentile was **27.36 ms**, maximum
+**45.88 ms**. These are sampling intervals, not proof that every sample contains a new desktop image:
+the separate DXGI receipt counted **243** desktop presents and **309** acquisitions, with cached
+images retained for genuine static holds. The lossless capture buffer used about **144 MB**.
+
+Audio measurements on that exact intermediate were **−22.6 LUFS integrated**, **−10.5 dBFS true
+peak**, zero full-scale/non-finite decoded samples. The corrected GIF had **322 frames**, **960×540**,
+50-ms delays and an infinite loop. Independent frame reviews covered all raw and exported frames
+through contact sheets plus full-resolution critical images; only the permitted desktop/Aether and
+fresh empty Code workbench were observed in that inspection scope. This is not a normal-speed
+playback/listening claim or a guarantee against every possible privacy issue.
+
+D33 now requires two seconds on the empty scenic desktop with a visible real pointer, curved left
+approach, full Dock traversal/zoom, one-second Code focus, real click and loaded-workbench readiness,
+three seconds total after readiness, actual close, then three **visually** empty seconds. Restoration
+must follow capture completion. The closing event now waits for the Code window to be absent and
+two consecutive captured backdrop matches, accounting for the DWM fade. Every replacement export
+must be audited again; intermediate measurements cannot be transferred to a new hash.
+
+The owner reported a black desktop during work. The referenced wallpaper source was unavailable;
+the existing cached wallpaper was reapplied, and the owner confirmed restoration. No color/security
+setting was intentionally changed. Raw footage, process state and local QC media were not committed
+or published. A final accepted export, full playback/listening, all 60 checks and ten gates remain
+separate from these source and technical receipts. No 100/100 score is claimed.
+
+### S-033 — complete genuine export, technical QC and scoped image review (Codex, 2026-10-23)
+
+This advances S-032's rejected/intermediate boundary. The latest native run completed capture,
+reported successful relaunch attempts, flushed its lossless buffer and exported MP4/GIF. Capture
+is no longer running. Source snapshot: local `codex/t36-showcase-checkpoint`, commit
+`bf853e23d60df4ac190c01f4e0ac6d565e92d3ad`. The checked-out `main` remains
+`322594b1b3486f319c9bf7144bd683d7890e44b5`; the original mixed index was preserved byte-for-byte
+through a separate-index recovery commit. Later documentation-only checkpoint commits may advance
+that local branch. No push, tag, release, installed payload replacement or autorun was performed.
+
+**Executed source gates:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-showcase-runner -Modules showcase -Jobs 4 `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_BUILD_SHOWCASE_RUNNER=ON') `
+  -Test -TestRegex '^aether_showcase_tests$'
+./build/wf-showcase-runner/modules/showcase/aether_showcase_integration_tests.exe
+```
+
+Final focused gate: **66 passed, zero failed**, 2,113 ms inside the test harness, 2.15 s CTest
+executable time and 2.17 s aggregate CTest time, with zero build warnings under Release `/W4 /WX`.
+The own-window integration executable passed **two cases**, zero failed, in **105 ms**: opaque
+RGBA capture of its requested private test-pattern window and invalid-bound rejection. These tests
+did not close user apps, launch a scenario app or capture the owner's desktop. The separate real
+showcase run was explicitly owner-authorized, not an integration-test action.
+
+**Exact local artifacts:**
+
+| Artifact | Receipt |
+|---|---|
+| MP4 | `Aether-Shell-Showcase-C5FF64A3E03848EFA7FCD18A0F236221.mp4`; 51,139,749 bytes; SHA-256 `6839bf39c247896265d31cc37278e3eb16fa5a06c2eb6e6a8e55cb189c2cf7a2` |
+| Local delivery copy | `Aether-Shell-Showcase-1080p60.mp4`; byte-identical SHA-256 checked after copying; outside public Git |
+| GIF | Same candidate stem; 98,379,380 bytes; SHA-256 `7e90507c33f1d266b987e8fc3449fff315a488276bd1d65c5eab9a46162dd143` |
+| Source/recipe | Take `D6B936B041634529BFF9B521281DDF85`; 985 samples; numeric `AETHER_RECIPE_2`; raw and metadata remain local |
+
+All **1,030 MP4 frames** decode without errors. Delivery is **1920×1080**, H.264 progressive
+limited-range SDR BT.709, **60 FPS**; all PTS intervals are 16.666–16.667 ms, within 10 µs of the
+target cadence. Last picture PTS is 17.150 s; frame-count duration is 17.166667 s. No >99%-black
+frame was detected. Two exact adjacent duplicates at 0.650/0.667 s occur in the deliberate opening
+hold. Maximum adjacent global mean-luma change is 0.0408914; none exceeds 0.05. This aggregate
+measurement is not a complete temporal photosensitivity/comfort assessment.
+
+The **985 source samples** average **57.3721/s**. Independent interval analysis gives P95
+**29.91659 ms**, **106** intervals above 25 ms, **10** above 50 ms and **one** above 100 ms,
+maximum **108.0744 ms**. The native percentile implementation reports 29.973 ms; both results
+are retained with their methods. Native counters are **236 desktop presents**, **316 DXGI
+acquisitions**, 147,157,168 committed / 147,153,152 stored buffer bytes. These are distinct
+populations: cached static images are genuine but are not new UI updates. Offline shutter-time
+camera composition produces regular output PTS, not constant-60-FPS source capture. Offline render
+cost was 19.7638-ms mean, 31.903-ms P95, 61.9417% above 16.667 ms on the hardware path; this
+wall-clock cost is not playback jitter or a real-time composition pass.
+
+Audio is original procedural AAC-LC, 48-kHz stereo, 192 kb/s. Complete PCM and loudness decode
+passed: **−22.6 LUFS integrated**, **1.3 LU loudness range**, **−10.5 dBFS true peak** as printed
+by FFmpeg's true-peak analysis, **zero clipped/non-finite samples**. No private application or
+microphone sound was recorded. Audio has been measured, not listened to or accepted for sync/comfort.
+The GIF decodes as **344 frames**, **960×540**, **50 ms** per frame, infinite loop, **17.2 s**.
+Selected decoded GIF keys have correct orientation/channel ordering. Its 98.38-MB weight needs
+optimization before README embedding.
+
+**Image/privacy scope:** two independent reviewers covered all 985 raw and all 1,030 exported
+frames through contact sheets, plus full-resolution critical images/cursor alerts. Root also
+inspected the 7-s focus/footer, 13-s clean Code and final empty frame at full resolution. Only the
+permitted scenic wallpaper, genuine Aether surfaces/pins, actual system pointer and isolated empty
+Code workbench were observed. No unrelated window, personal path/account/document, native taskbar,
+extensions toast or premature restoration appeared within that scope. The footer fits, the click
+has no recenter jump and the pointer returns to its neutral start with no ending hover/tooltip.
+Contact coverage is not every-pixel full-resolution inspection or an absolute privacy guarantee.
+The genuine Code background settles to a darker shade near 12.37 s and remains stable; controls,
+logo and pointer stay intact. Review found no blocking export fault from that native appearance change.
+
+**D33 events:** loaded workbench at **10.7441257 s**; close requested three seconds later;
+visually clear event at **14.1604877 s**; configured ending at **17.1604877 s**. Independent
+source analysis finds **3.0238984 s** continuously matching the final empty central region
+(`x=300:1600, y=100:900`, every fourth pixel), including the final sample at 17.1687406 s.
+A second check using the scene's opening body/backdrop samples finds 3.0082529 s clear after the
+recorded event. Neither is equality of all full-frame pixels. Restoration occurs after capture,
+before archive flush/render; successful relaunch attempts do not prove recovery of unsaved work.
+
+The normal usable Alpha 2 preview was restored with a fresh private clone of the prior normal
+profile: original Code launch route, replacement enabled, startup off. Original installed/prior
+preview settings hashes are unchanged. Read-only native probes confirm a live preview, visible
+preview windows, hidden native taskbar and zero capture workers. Four specifically rejected raw
+spools were removed locally, reclaiming 14,681,102,304 bytes; their local QC receipts remain. Current
+source, recipes and final media are retained privately. No captured media was committed/published.
+
+**Not yet verified:** normal-speed complete playback and listening, moving-detail/comfort/audio-sync
+acceptance, all 60 scorecard checks and ten gates, optimized web GIF, owner media selection and any
+Alpha 2 package/CI/publication gates. Therefore **no 100/100 score or complete cinematic acceptance
+is claimed**. See the [correction log](../../video_production/05_CORRECTIONS.md),
+[scorecard](../../video_production/06_SCORECARD.md), [QC report](../../video_production/07_QC_REPORT.md)
+and [asset register](../../video_production/03_ASSET_REGISTER.md). Every changed export needs its
+own exact-file review; the above receipts cannot be transferred to new bytes.
+
+### S-034 — installed lifecycle and fresh versioned gallery continuation (Codex, 2026-10-23)
+
+Scope: FR-016/FR-017/FR-020/FR-024/FR-029/FR-030; D29/D34/D35; T37/T38. The owner renewed
+Alpha 2 installation, sign-in startup and publication authorization, prepared the desktop/pins,
+and requested new full-screen media. Historical T36 film acceptance remains separate and unverified.
+
+**Implemented and focused-tested:**
+
+- Lifecycle policy, owned startup removal, stable launcher supervision, cancellation and bounded
+  maintenance ordering: Release `/W4 /WX`, settings54 + install16 cases. Independent rerun of
+  `ctest --test-dir build/wf-alpha2-lifecycle --output-on-failure --no-tests=error -R '^aether_(install|settings)_tests$'`
+  passes 2/2 executables, 70 cases, 0 failed, 2.36 seconds. Fake registry/child policy and isolated
+  kernel objects only; no real startup, app crash or installation was exercised by those tests.
+- Release tooling: 33 Python tests pass. A stale same-version manifest signature is removed before
+  replacing manifest bytes, so unsigned/failing-sign operations cannot retain the old signature.
+- Reusable capture scenarios: 80 focused cases pass in `build/wf-alpha2-media`, Release `/W4 /WX`,
+  CTest 7.22 seconds. Full gallery is 24.5 seconds: controls pages, fixed Explorer Search/context,
+  Top Bar menu and eight Settings pages. Acquisition is independent of synchronous UIA calls;
+  incomplete actions or insufficient settled still intervals reject the take.
+- Independent review identified and corrected media-presence ambiguity, early volume-cleanup
+  disarming, queued writes retargeting an audio endpoint, dynamic anchor PID adoption and planned
+  rather than observed still timestamps. Volume writes now bind to the retained endpoint and
+  observe the real UI slider; restoration requires stable precise-scalar readback. The session
+  control explicitly exposes active/no-media state regardless of disabled transport capabilities.
+
+**Fresh full gate in progress:** `build/alpha2-release`, Release `/W4 /WX`, all modules. An initial
+build failed on a UIA `SetValue` string-literal/BSTR type mismatch while the scenario extension was
+being completed; the source was corrected and the build restarted. A started/restarted build is
+not a passing receipt. Final all-module, native integration, installed lifecycle, capture/privacy,
+exact-source package/CI and publication results must be appended below as they are executed.
+
+At this checkpoint no new real startup mutation, installation, capture or Alpha 2 publication has
+been performed. Current settings were privately backed up without modifying the active profile.
+No media-quality score, reboot/sign-in timing or complete platform qualification is claimed.
+
+**Fresh full source gate:** the restarted all-module Release `/W4 /WX` build completed with exit0.
+After the final scenario changes, the incremental canonical command below rebuilt current inputs
+and passed **22/22 unit executables, 812 cases, 0 failed, 47.94 seconds**. Full raw case counts were
+read from the retained local CTest log; JUnit truncates long test output and is not a case-count source.
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestExclude 'network|integration' -JUnitFile build/alpha2-release/unit-results.xml
+```
+
+This worktree still has base revision `322594b1b3486f319c9bf7144bd683d7890e44b5`; candidate commit
+and exact-HEAD package/CI receipts are pending. Sixteen isolated/read-only native integration
+executables are running separately. No passing integration receipt is implied until they finish.
+
+**First native full gate:** `ctest --test-dir build/alpha2-release --output-on-failure --no-tests=error -L integration -LE network --output-junit integration-results.xml`
+completed in 157.02 seconds: **15/16 executables passed; Dock failed**. The captured-drag/attention
+case's final unchanged-attention assertion observed `RenderedFrames`185 versus182 after2700ms;
+the other three Dock cases passed. All remaining native executables passed, including the new
+single-disabled-media-session presence regression. The failure is retained locally in
+`build/alpha2-release/native-first-ctest.log`; investigation is pending. Do not describe the full
+native gate or Alpha 2 publication qualification as passing until resolved or explicitly bounded.
+
+**Dock follow-up:** the unchanged binary passed the isolated attention case, then4/4 full Dock
+cases in16.444s. Source inspection shows unchanged presentation snapshots return before invalidation;
+the original three extra frames remain unattributed. The test now requires two consecutive150ms
+idle intervals within a bounded1.2s settling loop after its existing2700ms wait, then retains its
+strict180ms unchanged-snapshot no-new-frames assertion. Continuous rendering still fails the idle
+precondition. No Dock production source changed. Root rebuilt the target under the same Release
+`/W4 /WX` cache and ran the corrected executable: **4/4 cases pass, CTest18.10s**. Together with the
+15 unchanged passing native executables this covers136 native cases; it is not a retroactive green
+result for the first full invocation (135 passed,1 failed).
+
+**Independent public audit:**614 current UTF-8 text files plus156 changed historical text blobs and
+nine outgoing commit messages:0 real private-data findings. All37 reachable commits use the public
+owner identity/noreply; fixture matches are deliberate synthetic values. Existing binary assets and
+new media need separate inspection. Raw setup+embedded payload byte privacy/freshness audit passes:
+
+```powershell
+python ./scripts/release/audit_package.py build/alpha2-release/modules/installer/AetherShellSetup.exe `
+  --source-root . --check-freshness --version 0.2.0-alpha.2
+```
+
+Final capture runner rebuilt with frozen original-process/anchor checks:80/80 focused cases pass,
+CTest9.27s; SHA-256 `46ffb1785cfb3cde3dc22d4be5044c8c580d619f22b32f7e4e29e44e531932ec`.
+No real capture or new installed startup mutation has occurred at this point.

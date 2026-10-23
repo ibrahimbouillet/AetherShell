@@ -31,7 +31,10 @@ audio/startup change or real work-area mutation is claimed by the isolated modul
 Dock replaces the Windows taskbar. A settings file without the key, or with a non-boolean value
 (warning), means true. Every save writes the key, so an explicit off (Settings > Desktop,
 `--restore-taskbar`) persists. `ResetToDefaults` keeps the current value and resets everything
-else. Startup at sign-in stays opt-in (`startWithWindows` false; the setup box is unchecked).
+else. The settings/portable default remains `startWithWindows=false`. The historical D23 installer
+kept its startup box unchecked; D34 supersedes that default for fresh interactive setup, which
+visibly selects sign-in startup and offers an opt-out before Install. Accepting setup saves the
+choice. Existing saved choices and Task Manager disables remain respected.
 
 **Native access guard.** `ShellApplication::Run(command, paths, instanceName, nativeTaskbarAccess)`
 may reach the real taskbar only when `nativeTaskbarAccess` is true and the instance name is the

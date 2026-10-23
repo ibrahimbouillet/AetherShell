@@ -153,4 +153,14 @@ Result<void> StartupRegistration::Disable() {
     } catch (...) { return MakeError(ErrorCode::Internal, "startup registration could not be disabled"); }
 }
 
+Result<void> StartupRegistration::DisableIfOwned(const std::filesystem::path& launcherPath) {
+    try {
+        if(!registry_)return MakeError(ErrorCode::InvalidState,"startup registry adapter is missing");
+        auto expected=Command(launcherPath,false);if(!expected)return expected.error();
+        auto value=registry_->ReadRun();if(!value)return value.error();
+        if(*value && ::_wcsicmp((**value).c_str(),expected->c_str())==0)return registry_->DeleteRun();
+        return Ok();
+    } catch(...) { return MakeError(ErrorCode::Internal,"owned startup registration could not be disabled"); }
+}
+
 }  // namespace aether::settings

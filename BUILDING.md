@@ -67,7 +67,7 @@ ctest --preset debug
 | `AETHER_MODULES` | `all` | semicolon list of modules; dependencies are added automatically |
 | `AETHER_BUILD_TESTS` | `ON` | build test executables |
 | `AETHER_WARNINGS_AS_ERRORS` | `OFF` | `/WX` (ON in CI) |
-| `AETHER_VERSION_PRERELEASE` | `alpha.1` | SemVer prerelease suffix; empty for stable builds |
+| `AETHER_VERSION_PRERELEASE` | `alpha.2` | SemVer prerelease suffix; empty for stable builds |
 | `AETHER_UPDATE_REPO_OWNER` / `_NAME` | `ibrahimbouillet` / `AetherShell` | trusted release repository |
 | `AETHER_SOURCE_REVISION` | git HEAD | revision embedded in the binaries |
 

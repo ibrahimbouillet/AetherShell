@@ -686,7 +686,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         const auto weak = std::weak_ptr<bool>(alive);
         worker.Post([this, weak, executable, enabled, completion = std::move(completion)]() mutable {
             auto registry = settings::MakeWindowsStartupRegistry();
-            Result<void> result = registry ? (enabled ? settings::StartupRegistration(*registry).Enable(executable) : settings::StartupRegistration(*registry).Disable()) : Result<void>(registry.error());
+            Result<void> result = registry ? (enabled ? settings::StartupRegistration(*registry).Enable(executable) : settings::StartupRegistration(*registry).DisableIfOwned(executable)) : Result<void>(registry.error());
             dispatcher.Post([weak, completion = std::move(completion), result = std::move(result)]() mutable { if (auto live = weak.lock(); live && *live && completion) completion(std::move(result)); });
         });
     };

@@ -87,9 +87,26 @@ Another assistant's statement that something is done is not evidence. For the wo
 ## Step 4 — Continue the work where it stopped
 - Take the next step named in `HANDOFF.md`; otherwise the highest-priority unfinished task in
   `TASKS.md`. A new instruction from the owner in this session takes priority: record it.
-- Respect D25: do not push, tag or publish until the owner explicitly lifts the hold. Keep the
-  owner's usable local preview active (D26), pausing only for tests and restoring afterward. Read
-  HANDOFF for the ignored private launch receipt; never publish its paths or contents.
+- Check D25/D29 and the latest `HANDOFF.md` before any publication. D25 was lifted only for the
+  specified Alpha 2 delivery; do not infer approval for a later release or repository settings.
+  Keep a usable current instance active (D26/D34), pausing for tests/captures and restoring afterward.
+  D34 authorizes disclosed installed sign-in startup with opt-out and bounded abnormal-crash
+  relaunch; respect explicit Quit, Task Manager disable and recovery. Private capture profiles must
+  not register startup. Do not promise Windows launch order or an immortal/OS-critical process.
+  Read HANDOFF for the ignored private launch receipt; never publish its paths or contents.
+- D30/FR-029 is the owner's approved exception for a user-started cinematic showcase: it may close
+  visible user applications and attempt to reopen them, but exact unsaved-document/tab restoration
+  cannot be guaranteed. Never exercise this closure path in automated tests. Keep raw media local
+  until every frame passes the narrow showcase privacy review in AGENTS.md and
+  `docs/showcase-capture.md`.
+- D31/D32/FR-029 sets the owner's strict whole-film motion-design bar: authored continuous motion,
+  purposeful holds and eased transitions, with the default quintic profile settling position, velocity
+  and acceleration. Custom cubic overrides must start and end at zero velocity. The owner requires
+  all 60 checks in `video_production/06_SCORECARD.md` and all blocking gates to pass on the exact final
+  export (100/100). This is a project rubric, not an industry certification or Adobe dependency. The
+  CPU compositor and Media Foundation H.264 writer have focused runtime tests using synthetic frames;
+  live capture, the capture-to-export runner, GIF export and visual inspection remain outstanding. Do
+  not claim the score from source tests alone.
 - Work in small, complete, testable slices: implementation, error handling, tests, build integration
   and documentation together.
 - Stay within the objective and the requirements. Never silently change a requirement, the

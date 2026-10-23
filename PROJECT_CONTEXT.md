@@ -8,8 +8,9 @@ Status details: `TASKS.md`; executed evidence: `docs/knowledge/TEST_STATUS.md`; 
 A reliable, beautiful, modular native Windows application ("Aether Shell") with two desktop surfaces
 (Dock, Top Status Bar), supporting search/settings/update UI, a per-user installer, signed GitHub
 Releases updates with rollback, reproducible builds and honest documentation. Current product version
-string: `0.2.0-alpha.1` (V2 development candidate; its delivery gate is pending). The prior
-`0.1.0-alpha.1` manual-install alpha is public; exact historical receipts remain in HANDOFF.
+string: `0.2.0-alpha.2` (second public alpha; exact build, package and publication receipts are in
+HANDOFF and `docs/knowledge/TEST_STATUS.md`). The prior `0.1.0-alpha.1` manual-install alpha remains
+available in Releases.
 
 ## Architecture
 ```
@@ -32,8 +33,8 @@ launcher/, updater/, installer/                 separate executables [implemente
 - **Windows integration [A, ADR 0003]:** top bar = top AppBar reserving its height (optional); Dock
   floating, topmost, no-activate, not an AppBar by default; both hide for full-screen apps; Explorer
   restart handled via `TaskbarCreated`; hotkeys Ctrl+Alt+Space (search), Ctrl+Alt+D (Dock focus).
-- **V2 taskbar mode [implemented, D19/ADR 0009; live qualification pending]:** explicit Desktop Apply
-  consent enables visual replacement. A launcher recovery process temporarily auto-hides/hides the
+- **V2 taskbar mode [implemented, D19/ADR 0009; live qualification pending]:** enabled by default
+  unless the user saved an explicit opt-out. A launcher recovery process temporarily auto-hides/hides the
   native taskbar, watches the parent and restores state on exit; the parent observes helper failure.
   The Dock reserves its full animated footprint in this mode. Explorer and native Windows Settings
   remain separate system components; no Winlogon or administrator change occurs.
@@ -64,7 +65,8 @@ No third-party C++ dependencies. Python stdlib scripts for releases. GitHub Acti
 
 ## Implementation status (2026-10-18)
 The following table preserves the `0.1.0-alpha.1` baseline. Current V2 evidence is in module references
-and the latest TEST_STATUS; the complete V2 Release/publication gate remains pending.
+and the latest TEST_STATUS. Alpha 2 publication is authorized and in progress; exact delivery
+receipts belong in HANDOFF and TEST_STATUS. Full Version 1 platform/manual acceptance remains open.
 An alpha is implemented and installed; full Version 1 platform/manual acceptance remains open.
 
 | Area | Current executed scope |
@@ -89,8 +91,9 @@ automated results do not replace owner review of real Windows location permissio
 attention, reduced motion, physical DPI or Explorer/taskbar recovery. See S-027 in
 `docs/knowledge/TEST_STATUS.md` and the current `HANDOFF.md`. The worktree-built Release candidate is
 currently visible in a separate local preview profile with weather disabled; the installed Alpha 1
-was not overwritten. D25 keeps the candidate local: no Alpha 2 push, tag, package or GitHub Release
-is authorized yet.
+was not overwritten. D29 authorizes the second-release publication. See the latest handoff for the
+exact published commit and remaining owner/device qualification; automated gates do not imply full
+Version 1 acceptance.
 
 ## Known issues, limitations, risks (summary — details in `docs/knowledge/KNOWN_ISSUES.md`)
 - Blur only on Windows 11; Windows 10 untested. Multi-monitor, DPI change and Explorer restart untested.

@@ -206,6 +206,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     ui::accessibility::AccessibleItem Item(std::size_t index) const override {
         const auto& target=targets.at(index);ui::accessibility::AccessibleItem item;
         item.id=target.id;item.name=target.name;item.isEnabled=Admitted()&&target.enabled;item.isFocusable=true;
+        if(target.id==kSession)item.helpText=Session()?L"Media session active":L"No media session";
         item.isOffscreen=!owner.IsShown();item.hasKeyboardFocus=focused==target.id;
         item.controlType=target.slider?UIA_SliderControlTypeId:UIA_ButtonControlTypeId;
         item.supportsInvoke=!target.slider;item.supportsRangeValue=target.slider&&target.value.has_value();

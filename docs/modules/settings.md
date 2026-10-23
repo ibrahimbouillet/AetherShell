@@ -179,7 +179,10 @@ All new members are additive; 0.1 ignores them with a warning, so rolling back i
 - A corrupt file falls back to defaults, which now means replacement on; the earlier explicit off is
   lost, although the corrupt file is preserved. Downgrading to 0.1 drops the key, so re-upgrading
   turns the mode on again.
-- `startWithWindows` stays false by default (start at sign-in remains opt-in).
+- The settings/portable default stays `startWithWindows=false`. D34 supersedes the earlier installer
+  default: fresh interactive setup visibly selects sign-in startup with an opt-out, then saves the
+  accepted choice. Existing saved choices and Task Manager disables are preserved; a settings
+  default does not itself register startup.
 
 Unit coverage (`TaskbarSettingsTests`, `SettingsSchemaTests`): legacy files without the key read
 true; Settings{} has replacement on and startup off and writes the key; an explicit false survives

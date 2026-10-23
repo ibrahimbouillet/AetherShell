@@ -1,66 +1,107 @@
-![Aether Shell](resources/branding/png/readme-banner.png)
+![Aether Shell — a modular native desktop interface for Windows](resources/branding/png/readme-banner.png)
 
-A native Windows desktop interface by **Ibrahim Bouillet**: a floating application Dock and a
-separate Top Status Bar, running alongside Windows Explorer. Built with C++20, Win32,
-Direct2D/DirectWrite and Windows.UI.Composition. MIT licensed.
+<p align="center">
+  <a href="https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2">Download Alpha 2</a>
+  · <a href="USER_GUIDE.md">User guide</a>
+  · <a href="KNOWN_LIMITATIONS.md">Known limitations</a>
+  · <a href="docs/knowledge/TEST_STATUS.md">Test evidence</a>
+</p>
 
-**V2 development candidate: `0.2.0-alpha.1`.** The changes below are being qualified; no V2 release
-or CI result is claimed yet. The [published 0.1.0-alpha.1](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1)
-is the earlier manual-install alpha, with its own [passing Windows CI receipt](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917).
-See [known limitations](KNOWN_LIMITATIONS.md) and [executed evidence](docs/knowledge/TEST_STATUS.md)
-for the scoped tests and remaining Version 1 qualification. Automatic updates are unavailable for
-this alpha; no unsigned manifest is published.
+<p align="center">
+  <a href="https://github.com/ibrahimbouillet/AetherShell/actions/workflows/ci.yml"><img alt="Windows CI" src="https://github.com/ibrahimbouillet/AetherShell/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-2ea44f.svg"></a>
+  <img alt="Windows x64" src="https://img.shields.io/badge/platform-Windows%20x64-0078D4.svg">
+</p>
 
-- Dock: pinned and running applications, icons, search, keyboard navigation and motion preferences.
-- Top Bar: real clock/date, battery when present, input language, network, audio and microphone state.
-- Search: application catalogue matching, accent-insensitive ranking and keyboard selection.
-- Settings: Dock, Top Bar, Appearance, opt-in weather, updates, shortcuts, startup consent and diagnostics.
-- Delivery: per-user setup, versioned installation, repair, uninstall and authenticated update design.
+# Aether Shell
 
-V2 replaces the native taskbar on launch by default, preserving an explicit saved opt-out (D23).
-Change it through **Settings → Desktop → Replace the Windows taskbar → Apply**. It hides the native taskbar while Aether Shell runs, reserves the Dock's space below
-maximized windows, and restores Windows on disable/exit with a separate recovery helper. Available
-Windows pinned shortcuts can be imported without modifying the native pins. Glass now reveals the
-backdrop more clearly, and Wi-Fi uses curved waves instead of cellular bars.
-The combined candidate adds drag ordering, profile-aware icon metadata, one-time File Explorer
-initialization, status menus and Windows voice typing; current qualification is recorded in the handoff.
+A native Windows desktop interface by **Ibrahim Bouillet**. Aether Shell pairs a floating Dock with
+a compact Top Status Bar, using a softly blurred, translucent material. It is built in C++20 with
+Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under the MIT License.
 
-Windows Settings keeps its native taskbar page; configure Aether Shell in its own Desktop page.
-Pin coverage/order and recovery across all Windows/Explorer failures remain limited. Read the
-[mode and recovery guide](USER_GUIDE.md) and [known limitations](KNOWN_LIMITATIONS.md) before using it.
+> **Alpha software:** 0.2.0-alpha.2 is an early public preview. It is not a fully qualified Windows
+> shell replacement. Save your work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
 
-Windows 10 2004+ and Windows 11, x64. Windows 10 and ARM64 remain unqualified. The native
-Windows taskbar stays visible with the published 0.1 alpha or an explicit V2 opt-out. Explorer keeps running in either
-mode. Weather is disabled by default; enabling it sends the selected
-coordinates to Open-Meteo. No location detection or Wi-Fi network names are used.
+## What it does
 
-Read the [user guide](USER_GUIDE.md), [installation guide](INSTALLATION.md), and
-[update and rollback guide](UPDATE_AND_ROLLBACK.md).
+- **Dock:** launch and switch between applications, keep favorites, reorder pinned icons, see running
+  apps, open Search, and reach Start and Task View.
+- **Top Status Bar:** show Windows-provided clock, input language, network, audio and battery status,
+  with supported system actions and a grouped quick-controls panel.
+- **Weather:** optionally use Windows location permission for a coarse position and a forecast. If
+  location or the network is unavailable, weather remains unavailable rather than guessing.
+- **Motion and appearance:** animated Dock interactions, dark/light appearance, keyboard navigation,
+  reduced-motion support and a translucent Windows composition surface.
+- **Recovery:** a per-user installer, a separate recovery helper, repair/uninstall support and a
+  Windows-taskbar restore command.
 
-These dark-theme previews come from isolated rendering tests. Application names, status values and
-the search error are synthetic fixtures; the images contain only the project's own test windows.
+## Replacing the Windows taskbar
 
-![Dock rendering fixture](resources/screenshots/dock-dark-rest.png)
-![Top Bar rendering fixture](resources/screenshots/topbar-dark.png)
-![Search rendering fixture](resources/screenshots/search-dark.png)
+The V2 experience hides the Windows taskbar when Aether Shell starts, then displays the Aether Dock
+in its place. This behavior is enabled by default and can be switched off in **Aether Shell Settings
+→ Desktop**. Explorer continues running; Aether Shell does not replace `explorer.exe`, change the
+Winlogon shell, or register itself as the native taskbar in Windows Settings. The recovery helper
+restores the Windows taskbar when Aether Shell exits. Read the [recovery guide](USER_GUIDE.md) before
+trying the alpha.
 
-Light-theme fixtures: [Dock](resources/screenshots/dock-light-hover.png),
-[Top Bar](resources/screenshots/topbar-light.png), [Search](resources/screenshots/search-light.png).
+## Download and install
 
-Build on Windows with Visual Studio C++ Build Tools, a Windows SDK, CMake and Ninja:
+Download the **x64 setup executable** from the [0.2.0-alpha.2 GitHub Release](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
+and compare its SHA-256 with the release's checksums file. Run setup as your regular Windows user.
+The installer explains the taskbar behavior and does not require administrator rights. Fresh setup
+visibly selects **start at sign-in**; you can clear that option before accepting. Existing saved
+choices and Task Manager startup disables are respected. The installed launcher can retry a limited
+number of abnormal crashes; Quit, recovery and uninstall remain available. Windows controls startup
+timing, so Aether cannot guarantee that its interface appears before the native taskbar at sign-in.
+
+This alpha is distributed for manual installation. Automatic updates require a signed release
+manifest; no unsigned manifest is published. The setup binary is not Authenticode-signed, so Windows
+may show a SmartScreen warning. See [installation and verification](INSTALLATION.md).
+
+## Compatibility
+
+- Windows 11, x64: current development target.
+- Windows 10 2004+ x64: supported by the design, but not runtime-qualified in this release.
+- ARM64: not runtime-qualified.
+
+Windows 10 backdrop blur uses a simpler tint. The Dock does not reproduce every native taskbar
+feature, and Windows Settings continues to manage the Windows taskbar. See the full [known
+limitations](KNOWN_LIMITATIONS.md).
+
+## Visual preview
+
+A current, owner-approved desktop showcase is being prepared. The older component-test images are
+intentionally not used here because they show synthetic icons and an earlier visual version. A
+desktop recording will be added only after the current Alpha 2 UI can be captured cleanly and
+privacy-reviewed.
+
+## Build and test
+
+Build on Windows with Visual Studio C++ Build Tools, a Windows SDK, CMake, Ninja and Python:
 
 ```powershell
-./scripts/build.ps1 -Config release -BuildDir build/release -Test -TestExclude 'network|integration'
-./scripts/package.ps1 -BuildDir build/release -SkipBuild
+./scripts/build.ps1 -Config release -BuildDir build/release -Test -TestExclude 'network|integration' `
+    -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON'
 ```
 
-See [BUILDING](BUILDING.md) for focused modules and interactive tests. Python is needed for release
-packaging/branding tools, not to run the app. No third-party C++ runtime library is bundled.
-See [ARCHITECTURE](ARCHITECTURE.md) for module and trust boundaries and [TESTING](TESTING.md) for
-test isolation, performance and manual desktop qualification.
+To build the per-user installer and run its package privacy/freshness audit:
 
-For contributors and coding assistants: start with [AGENTS](AGENTS.md), [HANDOFF](HANDOFF.md),
-[PROJECT_SPEC](PROJECT_SPEC.md) and [TASKS](TASKS.md). The Markdown/source files are portable;
-Obsidian and Graphify are optional local development tools. Never commit personal information,
-credentials, build output or local tool state. Read [CONTRIBUTING](CONTRIBUTING.md),
-[SECURITY](SECURITY.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+```powershell
+./scripts/package.ps1 -BuildDir build/release
+```
+
+See [BUILDING.md](BUILDING.md) for focused module tests, [TESTING.md](TESTING.md) for test isolation
+and manual qualification, and [the executed test record](docs/knowledge/TEST_STATUS.md) for exact
+results. A successful build or test suite does not by itself qualify every Windows version or device.
+
+## Project documents
+
+- [Architecture](ARCHITECTURE.md) · [Project specification](PROJECT_SPEC.md) · [Task status](TASKS.md)
+- [User guide](USER_GUIDE.md) · [Installation](INSTALLATION.md) · [Update and rollback](UPDATE_AND_ROLLBACK.md)
+- [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+
+For contributors and coding assistants, start with [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).

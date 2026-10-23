@@ -6,31 +6,60 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
-**Owner delivery hold (2026-10-21, D25): local commits allowed; no push, new tag or GitHub Release.**
-The next public delivery is Alpha 2 after the owner's additional changes and explicit go-ahead.
+**Owner continuation (2026-10-23, D34/D35):** proceed to Alpha 2 build/install/publication. Add
+disclosed installed sign-in startup and bounded abnormal-crash recovery while preserving Quit,
+opt-outs, Task Manager disable and reversible native-taskbar recovery. Generalize capture scenarios,
+review desktop/quick-controls/settings/volume media and retain a versioned Alpha 2 comparison gallery.
+Fresh release build, tests, package/privacy audit and exact-revision CI precede publication. Source
+work and gallery are in progress; no new startup/release qualification is claimed yet. The previous
+T36 score remains explicitly unverified and is no longer the sole continuation priority.
 
-**Current checkpoint (2026-10-22):** D27/D28 pass Release `/W4 /WX`, all 21 unit executables, and
-six focused own-window integration executables (S-027). The tree is tested, not fully accepted;
-owner visual review and real Windows location/attention/taskbar checks remain. Continue from the
-current HANDOFF; preserve local work and the D25 no-publication hold.
+**Delivery authorization (2026-10-22, D29):** the owner lifted D25 for the second public release,
+`0.2.0-alpha.2`, and authorized the reviewed push, tag and GitHub Release. Exact receipts are in
+HANDOFF and S-028.
+
+**Earlier T36 checkpoint (2026-10-23; continuation priority superseded by D34/D35):** The native pipeline
+implements protected clean-session closure/relaunch, isolated real pins/Code profile, nonblocking
+DXGI/cursor capture, a 512-MiB bounded lossless tile buffer, validated archive/offline recipes, frame-ID
+GPU caching, H.264/AAC and WIC GIF. D33 fixes the exact sequence: two-second opening with pointer,
+left approach and full Dock travel, one-second Code hover, actual loaded workbench, three seconds
+total after readiness (reveal included), observed close and two captured body/backdrop matches before
+three visually empty seconds, then old-app restoration and disk flush/render. Return the pointer to
+its neutral start during reveal. The focused Release `/W4 /WX` suite passes 66 cases (2.17 seconds),
+and own-window integration passes two cases (105 ms). S-033 records a real 1,030-frame 1080p60 MP4
+with complete successful decode and scoped every-frame contact/privacy review. Cursor, toast,
+orientation, GIF channels, footer framing and the full empty ending are corrected. Source samples
+average 57.3721/s with variable intervals; the uniform 60-FPS camera export does not invent source
+UI updates. Normal-speed playback/listening and full 60-check/ten-gate acceptance remain unverified;
+no 100/100 score is claimed. The current worker is finished and the normal preview is restored.
+Inspect live state/artifacts before restarting; prefer offline rerendering to another app closure.
+Official `origin`
+and HEAD `322594b1b3486f319c9bf7144bd683d7890e44b5` were rechecked; existing mixed staged/unstaged work
+is preserved. Local recovery branch `codex/t36-showcase-checkpoint` contains the source/docs snapshot
+and follow-ups without changing `main` or its mixed index. No push, tag or release was made. Recheck
+D29/current instructions before Alpha 2 delivery; do not publish a later version.
 
 | Task | Requirement links | Current boundary |
 |---|---|---|
+| T37 — Installed Alpha 2 session lifecycle | FR-016, FR-017, FR-020, FR-024; NFR-002–NFR-005; D34 | In progress: disclose fresh-wizard startup default with opt-out, preserve existing choices and Task Manager disable, supervise only bounded abnormal crashes, retain normal Quit/update/uninstall/recovery behavior. No OS launch-order or immortal-process promise. |
+| T38 — Versioned product media and reusable capture scenarios | FR-029, FR-030; NFR-004, NFR-008, NFR-012; D35 | In progress: genuine desktop, grouped quick controls, settings and owner-authorized volume demonstration; safe close/restore lifecycle, PNG/MP4, every-frame privacy review and versioned gallery for Alpha 3 comparisons. |
 | T22 — Review/fix/integrate batch 1 | FR-003, FR-012–FR-017, FR-020, FR-024; NFR-002–NFR-011 | Three independent source reviews completed. Fixes address default-on consent fixtures/D23 docs, unknown-profile relaunch, declared-icon reparse ancestors, owner-drawn menu data, Search visual/hit geometry and mid-transition accessibility policy. Combined Release /WX, 669 unit and 122 isolated integration cases pass (S-022). Integration merge b87be0d committed/pushed; real desktop remains separate. |
 | T23 — Dock and Top Bar consumers | FR-001–FR-011, FR-014, FR-024; NFR-006, NFR-007, NFR-011 | Shared roles/glyphs/menus/motion, fixed Start/Search/Task View entries, profile presentation and session-only running-item reorder, settings-driven layout and runtime Windows taskbar access implemented. Review fixes cover empty input regions, stale modal actions, shutdown admission and late avatars. Combined Dock31 unit/3 native and Top Bar20 unit/4 native pass, Release /WX (S-022); real desktop/profile checks remain open. |
 | T24 — App/settings integration and delivery gate | FR-014–FR-025; NFR-002–NFR-010 | Appearance, guarded worker pin sync, shell actions, focus-guarded Windows voice typing (D24) and timed suspend/resume wired; policy/native regressions added. Release /WX, 669 unit/122 native/32 release-tool cases pass (S-022); setup payload/freshness privacy audit clear. Source b87be0d pushed; Windows CI passed for b87be0d; authorized desktop gate found the S-023 framed-fullscreen defect, now under correction. Flyout preference routing and manual desktop/voice qualification remain open. No V2 publication or install claimed. |
 | T25 — Framed fullscreen/native ownership follow-up | FR-001, FR-002, FR-011, FR-024; NFR-005–NFR-008 | Style-aware classifier and single suppression authority pass zero-warning Release /WX, 672 unit and 123 native cases (S-023). Corrected bounded desktop launch keeps both bars visible, reflows an own pre-maximized window and restores exact native state. Explorer pin confirmed. Subsequent Dock lifecycle gate has an intermittent UIA root-type failure followed by unchanged-binary pass; both retained. Running-icon pixels and reveal/resume remain open. |
-| T26 — Dock optical icon balance | FR-002; NFR-002, NFR-007, NFR-011 | Removed duplicate 18-percent drawing inset from fixed glyphs; layout/hit/hover geometry and Top Bar unchanged. Release /WX and own synthetic dark/light visual inspection pass (S-024); Dock31 unit/app2 native pass. Light native UIA root-type failure recurred (Pane 50033, own HWND); qualification remains open. Owner screenshot stays private. D25 prohibits push/tag/release. |
+| T26 — Dock optical icon balance | FR-002; NFR-002, NFR-007, NFR-011 | Removed duplicate 18-percent drawing inset from fixed glyphs; layout/hit/hover geometry and Top Bar unchanged. Release /WX and own synthetic dark/light visual inspection pass (S-024); Dock31 unit/app2 native pass. Light native UIA root-type failure recurred (Pane 50033, own HWND); qualification remains open. |
 | T27 — Native UIA discovery/teardown investigation | FR-015; NFR-004, NFR-008, NFR-010 | Local milestone9bec731 retains strict failure diagnostics. Preserved S-025 metadata investigation is now committed with RangeValue in d7e17c4. All6 accessibility native cases pass in S-026, but earlier intermittent MTA discovery failures remain unexplained. Repeated-disconnect experiment is inconclusive and preserved outside the default suite. Measure first cleanup HRESULT and first failing provider/client stage before choosing a correction. No causal fix or release qualification claimed. |
-| T28 — Grouped quick controls | FR-026; FR-007–FR-010, FR-015; NFR-002–NFR-008 | Implemented/reviewed modules, production grouping and guarded app bridge. Release /WX698 unit cases pass; native controls4/accessibility6 and Dock3/TopBar5/app2 scoped gates pass (S-026). New local preview active; real device controls/artwork/manual qualification remain open. D25 holds publication. |
+| T28 — Grouped quick controls | FR-026; FR-007–FR-010, FR-015; NFR-002–NFR-008 | Implemented/reviewed modules, production grouping and guarded app bridge. Release /WX698 unit cases pass; native controls4/accessibility6 and Dock3/TopBar5/app2 scoped gates pass (S-026). Real device controls/artwork/manual qualification remain open. |
 | T29 — Neutral bar glass | FR-004, FR-011; NFR-011 | Uniform border/centered shadow and real/unknown Wi-Fi glyph implemented; graphics68/68 passes. Own-window Dock/TopBar dark/light captures inspected. Moving radial overlay above panel content remains unexplained; broad visual approval pending (S-026). |
 | T30 — Aligned maximized-window margins | FR-027; FR-001; NFR-003, NFR-006 | Owner clarified maximized only. Side leases and5 geometry cases pass; final bounded150-percent desktop gate aligns work area/own pre-maximized frame and restores native state on quit. Shell-approved horizontal exclusions preserved. Foreign AppBar/physical multi-monitor qualification remains open (S-026). |
 | T31 — Living Dock gestures and neutral minimal chrome | FR-002, FR-004, FR-011; NFR-007, NFR-011; D27 | Implemented and tested in S-027: Release `/W4 /WX`, 21/21 unit executables, and Dock-own-window drag/settling integration pass. Captured pointer-follow, neighbor displacement and final settling are covered. Owner review of actual appearance, hover neutrality and reduced motion remains. |
 | T32 — Rounded status/weather icons and battery thresholds | FR-006, FR-008, FR-010, FR-011; D27 | Implemented and tested in S-027: proportional glyph/battery unit coverage, Top Bar and Control Center native integration, all pass. Unknown/high-contrast behavior remains explicit. Owner review at physical DPI and live provider conditions remains. |
 | T33 — Genuine application attention | FR-028; D27 | Implemented and tested in S-027: app/Dock unit and own-window lifecycle/attention integrations pass. No forced foreground or title-derived alerts. Real shell attention and fullscreen-peek behavior remain owner/device acceptance. |
 | T34 — Automatic Windows weather location | FR-010, FR-026; D28 | Implemented and tested in S-027: coarse consent-gated location policy, settings and fake UI/integration cases pass; stale consent callbacks are fenced against changed location policy. No real OS location consent/read or forecast request was made. Owner opt-in, Windows permission and live forecast remain unverified. |
+| T35 — Alpha 2 README showcase | FR-022–FR-023; NFR-004, NFR-007, NFR-012 | README text and release links updated. T36 now provides a genuine locally reviewable 1080p60 MP4/GIF and scoped frame-contact privacy evidence (S-033). Whole-film acceptance, selected README imagery, a smaller GIF and publication are still pending. Never reuse rejected fixtures/takes. Exact application state restoration is not guaranteed. |
+| T36 — Native cinematic showcase engine | FR-029; NFR-001, NFR-004, NFR-005, NFR-009, NFR-011–NFR-012; D30–D33 | **Implemented/tested; whole-film acceptance in progress.** Native lifecycle, isolated real pins, nonblocking DXGI/cursor, bounded tile RAM, validated archive/recipe, shutter-sampled GPU composition, H.264/AAC/GIF are runnable. S-033: 66 focused Release `/W4 /WX` cases plus two own-window cases pass. Exact C5FF64A3 export: 1,030 frames, 1080p60, full decode and scoped every-frame contact review; observed clear central ending 3.0239 seconds. Toast/hover/footer/orientation/channel defects corrected. Source intervals remain variable; no native constant-60 claim. Normal-speed playback/listening and complete 60-check/ten-gate acceptance remain unverified; no 100/100 claim. Preserve the exact D33 sequence. Forced-termination and unsaved-state recovery remain limited. |
 
-**T16 — V2 (0.2.0-alpha.1), owner-requested, in progress.** Replace the duplicated taskbar layout
+**T16 — V2 (0.2.0-alpha.2), owner-requested, in progress.** Replace the duplicated taskbar layout
 with a consented reversible visual replacement, protected Dock reservation and lower placement;
 import available pinned shortcuts, correct Wi-Fi identity and restore visible glass. Requirement
 links: FR-001, FR-002, FR-008, FR-015, FR-024; NFR-002–NFR-008, NFR-011. D19/ADR0009 records
@@ -50,9 +79,8 @@ mark complete Version 1 acceptance.
 The D27/D28 source and automated gates are complete for this slice. The visible worktree candidate is
 ready for owner review of Dock motion, status glyphs, attention, reduced motion and the Windows
 weather permission flow. Continue from the owner's feedback and the remaining manual acceptance gaps
-in `HANDOFF.md`; keep the preview active between bounded tests. D25 holds all pushes, tags and GitHub
-Releases; Alpha 2 remains for a later owner-approved delivery. Preserve the independent public Git
-history (D18).
+in `HANDOFF.md`; keep the preview active between bounded tests. Check D25/D29 before any later
+publication; D29 authorizes only the 0.2.0-alpha.2 release. Preserve the independent public Git history (D18).
 
 ## T5 Phase A — current scope
 Module gates are narrower than complete product acceptance. Exact executed evidence is in

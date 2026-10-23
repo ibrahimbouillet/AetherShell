@@ -1,18 +1,20 @@
 # Handoff
 
 > **PUBLIC REPOSITORY — READ THIS FIRST.** Never commit credentials, private keys or their locations,
-> personal addresses/accounts/paths, machine names, unrelated app content or captures outside the
-> project's own isolated test windows. Public owner attribution: Ibrahim Bouillet. See AGENTS.md.
+> personal addresses/accounts/paths, machine names, or unrelated app content. Automated captures are
+> limited to isolated project test windows. Narrow D30 exception: owner-approved showcase media may
+> show only the clean desktop, Aether surfaces, pinned app logos and the app opened by the scenario;
+> keep raw output local until every frame passes privacy review. See AGENTS.md and
+> [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — Codex, 2026-10-22 (Europe/Paris)
+## Active continuation — Codex, 2026-10-23 (Europe/Paris)
 
-Last updated: 2026-10-22 07:19 Europe/Paris.
+Last updated: 2026-10-23 (Europe/Paris).
 
-> **OWNER DELIVERY HOLD — 2026-10-21 (D25).** Local commits are permitted, but do not push,
-> create a tag or publish a GitHub Release until the owner explicitly lifts this hold. More owner
-> changes are expected. The next public delivery is **Alpha 2**, the project's second release.
-> Existing `b87be0d` push/CI receipts below predate this instruction. The working candidate still
-> reports `0.2.0-alpha.1`; align its final version/package naming with Alpha 2 before any later delivery.
+> **OWNER AUTHORIZATION — 2026-10-22 (D29).** The owner lifted the D25 delivery hold for the second
+> public release only: commit and push the reviewed public `main`, tag `v0.2.0-alpha.2`, and publish
+> the matching GitHub Release. This does not authorize unrelated repository/account changes or a
+> later release. Recheck the current receipts below before continuing.
 
 Long-term objective: a native C++20 Windows Dock and Top Status Bar alongside Explorer, with real
 status, accessible interaction, durable settings, safe per-user installation and authenticated
@@ -21,7 +23,166 @@ completed the S-026 local controls preview. This turn qualified the Release buil
 focused native integration gates for D27/D28; manual owner/device acceptance remains. The published
 `0.1.0-alpha.1` does not include the local V2 work.
 
-### Current local checkpoint — D27/D28 (2026-10-22)
+### Alpha 2 publication baseline (2026-10-22)
+
+- The owner confirmed the second public version as `0.2.0-alpha.2` and authorized its commit, push,
+  tag and release on `https://github.com/ibrahimbouillet/AetherShell`. The verified source branch
+  `wip/d27-d28` was fast-forwarded into the clean public `main` checkout. The Alpha 2 version and
+  end-user docs are being prepared on that branch; exact build/package/privacy/CI/tag/release receipts
+  must be added here before another assistant treats publication as complete.
+- The owner rejected the existing synthetic/older component-test images for README presentation and
+  requested fresh captures of the current Dock with the machine's pinned application logos plus a
+  short animated recording. At this initial publication checkpoint the native capture capability
+  was unavailable; the later T36 continuation below supersedes that boundary with real media.
+  Do not present old fixtures as current product imagery or fabricate a recording. The README still
+  omits rejected imagery; complete the exact-export acceptance and media selection before adding
+  the new local captures to the public repository.
+- In the meantime, the reviewed README text identifies the public alpha and taskbar behavior. The
+  release remains a manual-install preview unless a valid signed manifest is produced with the
+  owner's signing setup; never publish an unsigned manifest or expose key material/location.
+
+### Alpha 2 publication continuation — D34/D35 (2026-10-23)
+
+- T37 source is implemented and independently reviewed: visible fresh-wizard startup default,
+  explicit opt-out/silent flags, prior-choice/Task Manager preservation, stable-launcher startup,
+  three abnormal-exception retries (1/2/4 seconds), installation-scoped cancellation and safe
+  maintenance ordering. Settings disable now removes only this installation's owned startup entry.
+  A hung pre-IPC child causes bounded maintenance refusal; no force-kill or realtime priority.
+- Focused Release `/W4 /WX` passes settings54 + install16 cases, 2/2 executables; independent rerun
+  passes in 2.36 s. Release scripts pass 33 Python tests after rejecting stale signature carryover.
+  These are source/fake/isolated-kernel checks, not actual sign-in or installed recovery proof.
+- T38's first reusable scenarios pass 76 cases (Release `/W4 /WX`, 6.92 s): concurrent MTA acquisition
+  remains independent of blocking UIA, joins before every restore/flush, and volume actions verify
+  endpoint acknowledgement and restore the precise scalar. Extended full-gallery scenes are being
+  added for Search, Dock context, Top Bar menu and the second quick-controls page. They still need
+  their focused rerun and a fresh owner-authorized capture/complete privacy review.
+- The fresh all-module Release `/W4 /WX` build passed in `build/alpha2-release`. The final incremental
+  canonical unit gate passes 22/22 executables, 812 cases, 0 failed, 47.94 s (S-034). Sixteen isolated/
+  read-only native integration gate finished15/16 in157.02s: Dock's final unchanged-attention frame
+  count failed185 versus182; all others, including the new media-presence regression, passed.
+  The unchanged Dock binary subsequently passed4/4; exact residual-frame cause remains unproven.
+  A test-only bounded observed-idle precondition preserves the strict unchanged-snapshot assertion;
+  root rebuilt it and4/4 pass, CTest18.10s. No Dock product code changed. Retain the first failure and
+  scoped rerun distinctly; combined native coverage is136 cases, not a retroactive first-run pass.
+  The usable old preview remains active. No real install, startup
+  mutation, capture, new main commit, push, tag or release has occurred in this D34/D35 continuation.
+- The owner has now closed unrelated apps and explicitly prepared the current desktop/pins. Read
+  the ignored current normal-preview launch receipt for its active settings path; use that settings
+  file, not a stale installed/profile copy, when preparing the private scene. Current wallpaper and
+  five pin identities were checked locally. Preserve their current configuration with private
+  backups when upgrading the installed instance. Do not reuse older media for this new gallery.
+- Remaining publication gates: finish full Release build/tests, package freshness/privacy and
+  native installer/recovery checks; real installed preview/startup registration; new full-resolution
+  stills and every-frame video privacy review; versioned gallery/README; coherent public commit,
+  exact-revision Windows CI, audited installer/checksums, then `v0.2.0-alpha.2` prerelease. No unsigned
+  manifest or raw capture/process metadata may be published. Actual reboot timing is unverified.
+
+### Earlier T36 cinematic checkpoint
+
+**Superseding owner priority, 2026-10-23 (D34/D35):** the owner accepted proceeding to Alpha 2
+delivery and explicitly renewed permission to commit/push/publish `0.2.0-alpha.2`. Implement and
+verify disclosed installed sign-in startup, bounded abnormal-crash relaunch and reliable reversible
+taskbar hiding; do not claim Windows guarantees launch order, immortality or OS-critical priority.
+Keep explicit Quit, opt-out, Task Manager disable and recovery working. The owner authorizes actual
+installation/startup on this machine. Extend the capture tool to reusable clean-desktop/control/
+settings/volume scenarios and preserve reviewed media by release for Alpha 3 comparisons. Real
+user-app closure/termination followed by best-effort relaunch is authorized again, including browser
+windows. Do not exercise closure or device mutations in automated tests. The earlier film's D32
+score remains unverified; proceeding does not turn it into a 100/100 claim. Publication still needs
+fresh source/build/package/privacy/CI receipts and reviewed public media.
+
+- **Previous T36 boundary (priority superseded by D34/D35):** D32 acceptance of the local film
+  remains open; the owner now proceeds to Alpha 2 publication and a documentary gallery.
+  A reviewable export exists: `Aether-Shell-Showcase-C5FF64A3E03848EFA7FCD18A0F236221.mp4`,
+  SHA-256 `6839bf39c247896265d31cc37278e3eb16fa5a06c2eb6e6a8e55cb189c2cf7a2`.
+  All 1,030 frames decode, with uniform 60-FPS PTS, 1920×1080 progressive SDR BT.709 and AAC stereo.
+  Frame-contact review and critical full-resolution images found only the permitted scene; this is
+  not full-resolution every-pixel review. Normal-speed playback/listening and the complete 60-check,
+  ten-gate score are still unverified. No 100/100 score is claimed. See S-033 and production QC.
+- **Owner's exact sequence (D33):** show the empty scenic desktop and visible pointer for two seconds;
+  take a curved detour toward the left of the Dock, zoom and traverse the entire genuine Dock, hover
+  Code for one second, click, and wait for its loaded English workbench. Hold the app for **three
+  seconds total after readiness**, including the 1.6-second camera reveal and 1.4-second stable hold.
+  During reveal, return the pointer to its neutral starting location. Send the scenario window
+  `WM_CLOSE`; require the window to be absent and two consecutive captured body/backdrop samples to
+  match the original clean scene before starting the three-second empty interval. This accounts for
+  DWM's closing fade. Only after capture stops may old applications be restored; flush the lossless buffer and
+  render afterward. A first blank Code window is not readiness.
+- Implemented native modules include `Win32CleanSessionBackend`, fakeable `CleanSession`, DXGI desktop
+  duplication, `CaptureBuffer`, validated/reopenable `FrameArchive`, CPU/GPU compositors, Media
+  Foundation H.264/AAC, WIC GIF and an original procedural soundtrack. The runner lives in
+  `tools/showcase/ShowcaseRunner.cpp`; `Prepare-ShowcaseScene.ps1` preserves actual pins in a private
+  cloned Aether profile and opens Code through a separate empty profile without editing the originals.
+- `CaptureBuffer` stores a full first image and changed tiles in bounded RAM (512 MiB by default).
+  Acquisition performs no spool-file writes; after capture and restoration, it reconstructs exactly
+  into the archive. Capacity/error paths fail explicitly instead of silently dropping frames. DXGI
+  acquisition is nonblocking and the actual Windows cursor is composed explicitly from
+  `GetCursorInfo`. Immutable frame IDs avoid repeated archive reads/texture uploads during the
+  eight-sample shutter composition. These mechanisms require measured real-take evidence, not a
+  presumed 60-FPS source claim.
+- `CodeReadinessObserver` checks enabled, onscreen English workbench markers on a separate COM/UIA
+  worker, retaining the verified HWND and process creation identity. UIA connection/transaction
+  timeouts are configured; no provider calls run on the capture thread. This observes workbench
+  readiness, not document/network completion or a universal hard deadline for faulty providers.
+- Native controller ancestry and explicit `--keep-pid` infrastructure are protected; retained control
+  windows are put aside temporarily. Per-frame before/after capture checks abort on unexpected visible
+  surfaces before finalization/rendering. Allowed app content and between-check races can still be
+  private: every frame must be reviewed. Ordinary failure/ESC cleanup attempts relaunch; forced worker
+  termination or power loss bypasses in-process cleanup. Unsaved work, tabs and arrangement cannot
+  be promised restored. Automated tests never close real apps or capture the owner's desktop.
+- Root's latest focused Release `/W4 /WX` suite passed 66 cases in 2.17 seconds; the own-window
+  integration executable then passed two cases in 105 ms. Exact commands and results are in
+  `docs/knowledge/TEST_STATUS.md` S-033. Native NV12 orientation and
+  end-to-end WIC resized-frame channel checks now pass. Source tests remain distinct from full-film,
+  privacy and sound review.
+- Three prior takes are rejected. Earlier black-wallpaper attempts had roughly 17 and 12.44 capture
+  samples/second; the latter had a 5.95-second gap and unrelated private final-frame content. A later
+  restored-background take measured about 34.6 samples/second but lacked the pointer and produced
+  inverted MP4/swapped-channel GIF output. Do not reuse these as public assets. The wallpaper's
+  referenced source was missing; a cached wallpaper was restored and the owner confirmed seeing it.
+  The latest take shows the restored scenic composition; its motion remains subject to D32 review.
+- A later 964-frame candidate corrected the earlier technical defects but remains unaccepted: a
+  setup warning toast intruded, visually clear ending coverage was only about 2.85 seconds, and hover
+  behavior needed refinement. The isolated scene now uses a fresh empty extensions directory without
+  the warning-producing `--disable-extensions` flag; no owner extensions or security settings change.
+  The empty-ending gate now requires captured scene return, and the cursor returns during reveal.
+- The latest take has 985 source samples averaging 57.3721/s; the independent interval P95 is
+  29.92 ms and maximum 108.07 ms. There were 236 DXGI desktop presents and 316 acquisitions, with
+  cached static images reused. These are not 985 distinct UI updates or a native constant-60-FPS
+  capture claim. The 60-FPS camera export is authored offline. Its measured composition cost
+  (19.76-ms mean, 31.90-ms P95) is offline throughput, not delivery PTS jitter.
+  Ready was observed at 10.7441257 s and the settled closing event at 14.1604877 s; the source
+  central-backdrop check found 3.0238984 continuously clear seconds after the closing fade.
+  The real pointer is visible, the close-up footer fits, the extensions toast is absent, and the
+  ending has no tooltip or magnified Dock. A small stable Code background change near 12.37 s is
+  genuine app behavior, retained in the export; it is not a fabricated UI or black frame.
+- The MP4 is 51,139,749 bytes; its matching GIF has 344 frames, 960×540, 50-ms delays and is
+  98,379,380 bytes. The GIF needs size optimization before README embedding. Audio measurements
+  are −22.6 LUFS integrated, −10.5 dBFS true peak and zero clipped/non-finite decoded samples;
+  these are measurements, not listening approval. All media, raw archives and private QC remain
+  outside public Git. Four specifically identified rejected raw spools were removed (14.68 GB);
+  their review receipts/previews remain local. Do not try to rerender those removed sources.
+- The capture worker is finished. The normal usable Alpha 2 preview is active again from the
+  existing Release app build, using a fresh private clone of the prior normal preview settings.
+  The ordinary Code pin route is restored; taskbar replacement is requested and startup is off.
+  Original installed settings and the prior preview settings were hash-checked unchanged. The
+  ignored local launch receipt is under the per-user showcase data root. No installed payload,
+  original profile or autorun was replaced.
+- Inspect the actual live process/status and local artifacts before starting another run; an observation timeout alone
+  does not mean it stopped. Prefer offline rendering of a valid capture recipe to closing apps again.
+  Recipes are numeric, local, bounded and validated against source coverage; keep them and all media
+  private until review. See `docs/showcase-capture.md` and `video_production/04_TIMELINE.md`.
+- Git rechecked: official `origin` is `https://github.com/ibrahimbouillet/AetherShell.git`; `main` HEAD
+  remains `322594b1b3486f319c9bf7144bd683d7890e44b5`. Existing mixed staged/unstaged Alpha 2 and T36 work
+  is preserved. A separate-index recovery snapshot was committed on local
+  `codex/t36-showcase-checkpoint` at `bf853e23d60df4ac190c01f4e0ac6d565e92d3ad`; later documentation
+  follow-ups may advance that local branch. The checked-out `main` and its original mixed index were
+  not changed. The snapshot also includes the already-prepared Alpha 2 working-tree docs; inspect
+  its tree before any integration and do not blindly cherry-pick or reset `main` to it. No push, tag
+  or release was made. Recheck D29 receipts and current instructions before Alpha 2 delivery;
+  no later release is authorized.
+
+### D27/D28 implementation checkpoint (2026-10-22)
 
 - Owner requests continuous captured Dock drag with reactive spring neighbors/drop, no hover tiles,
   separator or trailing native-taskbar arrow; neutral material also on hover/tooltips; round status
@@ -37,8 +198,9 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
   records the later repository-state update. This session added consent-generation fencing, accurate
   weather disclosure/reference text, and integration expectations for the D27 arrow-free menu and
   animated Dock settling. The worktree is clean after the local S-027 commits. The separate public
-  `main` checkout remains clean at `a01fa9d`, five commits ahead of `origin/main`; do not push it
-  under D25. Earlier agents are no longer running. Check `git status` and `git log` before editing.
+  public `main` checkout was clean at `a01fa9d`, five commits ahead of `origin/main`; it has since been
+  fast-forwarded to the S-027 checkpoint under D29. Earlier agents are no longer running. Check
+  `git status` and `git log` before editing.
 - A complete Release build of all modules and targets passed with MSVC `/W4 /WX` and zero warnings.
   The final CTest unit gate passed **21/21 executables**. Focused own-window integration tests for
   applications, Dock, Top Bar, Settings UI, Control Center and app passed **6/6 executables** after
@@ -59,7 +221,9 @@ focused native integration gates for D27/D28; manual owner/device acceptance rem
 - D27/D28 are tested, not fully accepted: direct visual review of Dock motion/glyphs, reduced motion,
   real shell attention/fullscreen behavior, real Windows location consent and live weather, physical
   DPI/multi-monitor behavior, and complete taskbar/Explorer recovery remain owner/device checks.
-  No package, push, tag or release was created; D25 remains active.
+  At the time of S-027 no package/push/tag/release existed; D29 subsequently authorized the Alpha 2
+  delivery. The release-specific build, package and publication receipts are recorded later in this
+  handoff.
 
 ### Earlier unqualified work — D27/D28 source snapshot (2026-10-21)
 
@@ -72,9 +236,9 @@ are recorded above; owner/device acceptance remains.
 ### Owner controls scope — 2026-10-21 (D26)
 
 One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Bar glass is neutral,
-with grain, blur/tint and a uniform border. Side margins apply only to maximized windows; never move
-manually placed owner windows. Keep the usable local preview active except bounded tests, then
-restore it; no autorun. D25 still forbids push/tag/release. Current implementation/evidence follows.
+  with grain, blur/tint and a uniform border. Side margins apply only to maximized windows; never move
+  manually placed owner windows. Keep the usable local preview active except bounded tests, then
+  restore it; no autorun. D29 authorizes only the Alpha 2 publication. Current implementation/evidence follows.
 
 ### S-026 completed local checkpoint — 2026-10-21
 
@@ -271,28 +435,38 @@ restore it; no autorun. D25 still forbids push/tag/release. Current implementati
 
 ## NEXT SESSION START HERE
 
-1. Read this PUBLIC rule and S-027, then `AGENTS.md`, the linked D27/D28 sections of `PROJECT_SPEC.md`,
-   `TASKS.md`, and D25/D27/D28 in `DECISIONS.md`. Verify `origin`, current branch/HEAD, source commit
-   `4b8d000` plus its documentation-only handoff follow-up, local `main` (`a01fa9d`, five commits
-   ahead of origin), worktrees and `git status` before editing. Never use the private archive.
-2. The complete `/W4 /WX` build, 21/21 unit executables, and six targeted integration executables
-   already pass. Do not repeat them without a source change or a reproducible defect. The final
-   tree-level acceptance still needs the owner's visual and real-device review listed above.
-3. The newest candidate is already visible from the isolated Release build, using a separate local
-   profile with weather disabled and no Windows location consent. Keep it active except during bounded
-   tests; do not overwrite the installed Alpha 1 or its profile. Never enable weather/request location
-   on the owner's behalf. Leave the candidate running for owner review; no startup/autorun.
-4. The owner should review the weather permission flow, live forecast only after consent, Dock drag
-   and settling, proportional icons/battery colors, attention cues, reduced motion, and maximized
-   margins. Actual Windows location reads, network forecast, physical DPI/multi-monitor, screen reader
-   and Explorer/taskbar recovery remain separate acceptance evidence. Do not manipulate audio, radios,
-   brightness or media; restart Explorer; capture owner windows; or move manually placed apps.
-5. Update docs and HANDOFF with exact results. D25 still forbids push, tag, package or GitHub Release.
-   Alpha 2 version/package naming stays unresolved until later explicit delivery authorization.
-6. Review the complete diff, privacy scan, Markdown links and commit identity before any new local
-   commit. Do not fast-forward or push other branches without explicit instruction. Never include
-   private preview receipts, machine/user paths, test logs, local config or unrelated captures in
-   public Git.
+1. Read this public rule, the D34/D35 publication continuation above, `AGENTS.md`, `PROJECT_SPEC.md`,
+   `TASKS.md`, and D29–D35 in `DECISIONS.md`. Verify official `origin`, branch/HEAD,
+   worktrees, tags and working-tree state. Work only in the clean public-origin checkout; never
+   develop in the private history archive.
+2. Continue T37/T38 and Alpha 2 publication under D34/D35. Inspect current processes/status before
+   launching anything. Preserve the owner's current pins and preferences; private capture profiles
+   never register startup. Finish the fresh Release build, unit/native gates, actual installed
+   startup/recovery checks, and new full-gallery capture. An earlier build failure or a started
+   command is not a pass. Check the latest S-034 entry when available for exact receipts.
+   For the historical T36 film, read S-033 and the production QC docs; full normal-speed playback,
+   listening and the 60-check/ten-gate score remain unverified. D35 permits proceeding to Alpha 2
+   without turning those pending checks into passes. Preserve D33 and do not claim 100/100.
+   User-started closure remains authorized, including termination after orderly close fails; attempt
+   relaunch on normal cleanup and disclose forced-termination/unsaved-state limitations.
+3. After reaching a coherent tested checkpoint, check D29/D34/D35 receipts before any Alpha 2 push,
+   tag or release work. D29 authorizes only `0.2.0-alpha.2`; do not duplicate completed publication
+   actions and never publish an unsigned update manifest.
+4. The owner prepared the current desktop and explicitly rejected old imagery. Capture a fresh
+   versioned gallery and MP4 using the owner-approved desktop composition: wallpaper, Aether's top and bottom
+   surfaces, pinned icons and only the app launched by the scenario. Keep raw media local and inspect
+   every frame for private content before public use. Include the grouped controls, settings,
+   Search and Dock context where safely supported. Restore exact observed volume after an authorized
+   volume demonstration; reject uncertain restoration or missing/late scenes. Do not use old
+   captures or fabricated UI. Keep approved Alpha 2 media by version for later Alpha 3 comparison.
+5. The owner still wants direct review of Dock movement and current pinned icons. Preserve separate
+   evidence for real Windows location permission/forecast, shell attention/fullscreen behavior,
+   reduced-motion quality, DPI/multi-monitor behavior, accessibility and taskbar/Explorer recovery.
+   Do not claim these were proven by unit tests or a GIF.
+6. Keep the preview/recovery instructions current. Update `HANDOFF.md`, `TASKS.md`, and
+   `docs/knowledge/TEST_STATUS.md` with exact revisions, commands, results and remaining gaps. Never
+   include private preview receipts, keys/locations, user paths, test logs, local config or unrelated
+   captures in public Git.
 
 ## Historical receipts — previous sessions, superseded as continuation instructions
 

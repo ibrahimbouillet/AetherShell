@@ -254,6 +254,32 @@ AETHER_TEST("controlcenter integration: UIA discovers synthetic children and rou
     CHECK_FALSE(fixture.wrongThread);
 }
 
+AETHER_TEST("controlcenter integration: media presence is distinct from transport capabilities") {
+    auto state = Synthetic();
+    state.media.sessions.resize(1);
+    state.media.sessions[0].canTogglePlayPause = false;
+    state.media.sessions[0].canPrevious = false;
+    state.media.sessions[0].canNext = false;
+    Fixture fixture; fixture.Initialize(std::move(state));
+    const auto verify = [&](const wchar_t* expected) {
+        Client(fixture, [&](IUIAutomation& automation, HWND hwnd) {
+            auto root = Root(automation, hwnd);
+            for (const int id : {400, 401, 402, 403}) {
+                auto item = Item(automation, *root, id); BOOL enabled = TRUE;
+                Hr(item->get_CurrentIsEnabled(&enabled)); Need(!enabled);
+            }
+            auto source = Item(automation, *root, 403); BSTR help = nullptr;
+            Hr(source->get_CurrentHelpText(&help));
+            const std::wstring observed(help ? help : L""); ::SysFreeString(help);
+            Need(observed == expected);
+        });
+    };
+    verify(L"Media session active");
+    fixture.window->SetState(ControlCenterState{});
+    verify(L"No media session");
+    CHECK(fixture.intents.empty()); CHECK_FALSE(fixture.wrongThread);
+}
+
 AETHER_TEST("controlcenter integration: split radio arrows have separate accessible hit bounds") {
     Fixture fixture; fixture.Initialize(); RECT wifi{}, wifiArrow{}, bluetooth{}, bluetoothArrow{};
     Client(fixture, [&](IUIAutomation& automation, HWND hwnd) {

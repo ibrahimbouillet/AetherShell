@@ -32,10 +32,22 @@ records it with the manual Explorer-restart instruction.
 
 **Default-on replacement (D23).** The Welcome page says that the Dock replaces the Windows taskbar
 while Aether Shell runs and how to get it back (quit, Settings > Desktop, or the Start menu entry
-"Restore Windows taskbar"). The Options page repeats it next to the startup choice, which stays
-unchecked: starting at sign-in remains opt-in. Setup does not override an existing replacement
+"Restore Windows taskbar"). The Options page repeats it next to the startup choice, which defaults
+checked for a fresh interactive installation (D34), with a visible opt-out before Install. Existing
+settings and Task Manager disables take precedence. Silent setup preserves startup unless
+`--start-with-windows` or `--no-start-with-windows` is supplied. Setup does not override an existing replacement
 choice. Saving startup consent can create settings with the replacement default, while repair
 preserves an existing explicit opt-out.
+
+Opening or cancelling the wizard only reads the bounded settings JSON; it never invokes settings
+recovery or prunes backups. An accepted startup opt-out removes only this installation's Run target.
+The StartupApproved value stays read-only, and unsupported approval data is preserved. Accepted
+startup choices are saved in settings; a failed save restores the previous Run entry. Test-mode
+setup bypasses real startup registry inspection as well as writes and application launches.
+
+Normal setup/Finish launches use the stable launcher so the installed session is supervised. The
+updater's transaction health-check child remains a directly owned process, as documented in
+[Installation, launcher and updater](install.md).
 
 **"Restore Windows taskbar" shortcut.** With Start menu shortcuts selected (the default), install
 and repair create a per-user `Restore Windows taskbar.lnk` in the Start menu Programs folder. It

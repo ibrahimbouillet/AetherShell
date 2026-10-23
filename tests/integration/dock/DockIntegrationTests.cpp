@@ -590,7 +590,21 @@ AETHER_TEST("dock integration: captured drag follows continuously and neighbour 
     const auto attentionRest = geometry(); running.attentionRequested = true;
     REQUIRE(window.SetRunningApplications({running}).ok()); RunFor(loop, 180);
     CHECK(geometry().items[3].icon.top < attentionRest.items[3].icon.top - 0.5f);
-    RunFor(loop, 2700); const auto frames = window.RenderedFrames();
+    RunFor(loop, 2700);
+    // The pulse's elapsed-time budget is over, but a final native region update can still queue
+    // WM_PAINT. Establish an observed idle baseline before attributing any new frame to the
+    // unchanged notification. Continuous rendering must fail this bounded settling precondition.
+    const auto settleDeadline = std::chrono::steady_clock::now() + 1200ms;
+    auto previousFrames = window.RenderedFrames();
+    int idleIntervals = 0;
+    while (idleIntervals < 2 && std::chrono::steady_clock::now() < settleDeadline) {
+        RunFor(loop, 150);
+        const auto currentFrames = window.RenderedFrames();
+        idleIntervals = currentFrames == previousFrames ? idleIntervals + 1 : 0;
+        previousFrames = currentFrames;
+    }
+    REQUIRE_EQ(idleIntervals, 2);
+    const auto frames = window.RenderedFrames();
     REQUIRE(window.SetRunningApplications({running}).ok()); RunFor(loop, 180);
     CHECK_EQ(window.RenderedFrames(), frames); // unchanged true request does not start another pulse
     REQUIRE(window.SetSuppressed(true).ok()); running.attentionRequested = false;

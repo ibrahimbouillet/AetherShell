@@ -38,4 +38,13 @@ endif()
 
 aether_add_modules()
 
+if(AETHER_BUILD_SHOWCASE_RUNNER)
+    if(NOT TARGET aether_showcase)
+        message(FATAL_ERROR "AETHER_BUILD_SHOWCASE_RUNNER requires the showcase module in AETHER_MODULES")
+    endif()
+    aether_add_executable(AetherShowcaseRunner WIN32 SOURCES tools/showcase/ShowcaseRunner.cpp
+        LINK aether_showcase ole32 oleaut32 shell32 shlwapi uiautomationcore)
+    aether_add_version_resource(AetherShowcaseRunner DESCRIPTION "Aether Shell cinematic showcase capture" INTERNAL_NAME "AetherShowcaseRunner")
+endif()
+
 message(STATUS "Aether Shell ${AETHER_VERSION_FULL} (${AETHER_TARGET_ARCH}) modules: ${AETHER_ENABLED_MODULES}")

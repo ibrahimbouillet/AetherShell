@@ -2,8 +2,8 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # ADR 0009 — Reversible visual taskbar replacement
 
-- Status: owner-approved scope change (2026-10-18), launch default amended by D23 (recorded 2026-10-20); platform qualification remains open.
-- Decisions: D19, D21–D23; requirements FR-001, FR-002, FR-017, FR-024, NFR-003 and NFR-008.
+- Status: owner-approved scope change (2026-10-18), launch default amended by D23 (recorded 2026-10-20), installer startup default amended by D34 (2026-10-23); platform qualification remains open.
+- Decisions: D19, D21–D23, D34; requirements FR-001, FR-002, FR-016, FR-017, FR-024, NFR-003 and NFR-008.
 - Supersedes: ADR 0003's blanket no-hide policy and non-AppBar Dock rule only in this mode.
 
 ## Context and approval
@@ -25,7 +25,8 @@ configure Windows. Aether Shell's Desktop page owns its own mode and pin import 
 2. Add `general.replaceWindowsTaskbar` as an additive schema-v1 field. Originally default false;
    D23 changes the launch default to **true**, preserving a saved explicit false. The Desktop
    checkbox requires **Apply** to change either direction; live autosave/navigation/close cannot
-   apply a draft. Reset preserves this choice. Startup at sign-in remains a separate opt-in.
+   apply a draft. Reset preserves this choice. Startup at sign-in remains a separate opt-in under
+   the historical D23 policy; the D34 amendment below supersedes the fresh-installer default.
 3. Use the documented taskbar auto-hide state through
    [ABM_SETSTATE](https://learn.microsoft.com/en-us/windows/win32/shell/abm-setstate), preserving
    the captured baseline. Hide only Explorer-owned `Shell_TrayWnd` / `Shell_SecondaryTrayWnd`
@@ -130,3 +131,17 @@ condition in decision 2; it does not authorize Explorer replacement or permanent
 
 The batch-1 implementation and documentation are being integrated. Current build/test evidence and
 remaining qualification belong in TEST_STATUS and HANDOFF, not in the approval statement.
+
+## Amendment: D34 (owner-approved installed startup, 2026-10-23)
+
+D34 supersedes only the historical unchecked installer startup default. Fresh interactive setup
+visibly selects **Start Aether Shell when I sign in**, discloses it before installation and lets the
+user clear it to opt out. Existing saved choices and Task Manager disables remain respected. The
+settings/portable default remains `startWithWindows=false`; an accepted setup choice or explicit
+Settings Apply enables registration. Silent setup changes startup only through an explicit flag.
+
+This amendment does not authorize hidden autoruns, services, elevation, Winlogon changes, OS-critical
+priority or overriding Windows startup approval. Windows controls sign-in launch order and delay.
+D19/D21 recovery, persistent replacement opt-out and intentional Quit remain mandatory. D34's
+implementation and executed device checks are tracked separately in the current handoff and test
+record; the owner decision itself is not proof of runtime qualification.

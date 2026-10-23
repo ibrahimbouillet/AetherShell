@@ -18,21 +18,31 @@ The Top Bar displays snapshots from documented Windows APIs. Unknown status rema
 A desktop PC without a battery can hide the battery item. A microphone-in-use indicator is
 unsupported; device availability/mute information is separate. Click available audio controls to
 change output volume or mute only when you intend to do so. Network details never show an SSID.
-The current V2 candidate adds input-language switching through Win+Space from the keyboard item,
-access to Windows network settings from the network item, and access to Weather settings from its
-visible weather item. These new routes are being qualified in T17. Microphone click controls endpoint
+Alpha 2 adds input-language switching through Win+Space from the keyboard item and Weather settings
+from its visible weather item. The grouped network/audio/battery action opens Aether's quick controls,
+including media transport when Windows provides an active session, volume, supported brightness and
+system-action tiles. Unsupported toggles open the relevant Windows controls rather than pretending
+to change a device. Live device qualification remains limited. Microphone click controls endpoint
 mute; its right-click menu offers privacy settings and **Start Windows voice typing (Win+H)**.
 The voice action returns focus to the previous application before asking Windows to open dictation
 in its active field. Windows controls dictation availability, microphone permission and processing;
 Aether Shell does not capture or store speech. Automated tests do not invoke real dictation.
 
-Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop and Appearance pages. Weather starts disabled.
-Choose a location explicitly before enabling it; searching sends only the entered place name to
-Open-Meteo, and forecasts send the chosen coordinates. Cached forecasts disappear after six hours.
+Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop and Appearance pages. Weather
+starts disabled. Choose automatic Windows location with consent or a manual location before enabling
+it. Windows may deny location, in which case no location/weather is invented. Manual place search
+sends the entered place name to Open-Meteo; forecasts send the chosen coarse coordinates. It does
+not infer location from a Wi-Fi name or raw IP. Cached forecasts disappear after six hours.
 Data attribution: Open-Meteo.com, CC BY 4.0.
 
-General contains startup consent, motion preferences and shortcut editing. Startup is per-user
-and optional. Task Manager can independently disable it. High contrast and reduced motion follow
+General contains startup consent, motion preferences and shortcut editing. Fresh interactive Alpha 2
+setup visibly selects sign-in startup; clear that option before installation to opt out. Existing
+choices are preserved. Silent setup requires the explicit startup flag. Startup is per-user and
+optional; Settings → General → Apply can change it, and Task Manager can independently disable it.
+Windows controls the launch order and delay after sign-in; it may show the native desktop/taskbar
+before Aether is ready. The installed stable launcher retries a bounded number of abnormal Windows
+exception crashes. Intentional Quit/update/uninstall and ordinary errors stop it; no process can be
+guaranteed to run through every failure. High contrast and reduced motion follow
 Windows where supported. The About page contains the MIT license and project attribution.
 
 In the V2 candidate, Desktop contains **Replace the Windows taskbar**, enabled by default (D23).
@@ -54,11 +64,10 @@ order; dragging a running-only icon changes this session's order without pinning
 per-window profile icon metadata can distinguish Chrome profiles; missing metadata remains generic.
 Dock context menus offer applicable window/new-instance/pin actions without guessing a profile.
 
-Top Bar menus expose clock, power, sound and network settings. Its notification-area control
-temporarily shows the Windows taskbar and hides the Aether Dock after restoration completes.
-Replacement resumes after 60 seconds, or immediately through Resume in the Top Bar menu. This delay
-does not detect user activity. These combined candidate interactions await the gates in TEST_STATUS
-S-022; earlier alpha screenshots and test results do not qualify this build.
+Top Bar menus expose clock, power, sound and network settings. The visible trailing native-taskbar
+arrow was removed for Alpha 2. Recovery remains available through Desktop settings, Quit and the
+standalone recovery command. The compatibility suspend/resume path remains internal; it is not a
+replacement for the Windows notification area.
 
 To restore the native bar, disable the Desktop option or choose Quit from the Top Bar menu.
 

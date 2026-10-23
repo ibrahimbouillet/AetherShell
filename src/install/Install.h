@@ -76,7 +76,7 @@ struct InstallOptions {
     bool registerInstallation = true;
     bool startMenuShortcut = true;
     bool desktopShortcut = false;
-    bool startWithWindows = false;  // direct explicit consent only
+    bool startWithWindows = false;  // accepted setup choice or explicit CLI consent; no API auto-enable
     bool allowDowngrade = false;
     RegistryPaths registry;
     IProcessOperations* processes = nullptr;  // tests inject fakes; production defaults to the instance channel
@@ -103,8 +103,26 @@ private:
     platform::UniqueHandle event_;
 };
 [[nodiscard]] std::wstring QuoteArgument(std::wstring_view argument);
+struct ActiveVersionProcess {
+    DWORD processId = 0;
+    platform::UniqueHandle process;
+    updates::Sha256Digest stateDigest{};
+};
+// Retains the exact child handle. An expected journal digest makes a crash retry fail closed if
+// maintenance changed/removed the active installation; the check and launch share its lifecycle lock.
+[[nodiscard]] Result<ActiveVersionProcess> LaunchActiveVersionProcess(const InstallLayout& layout,
+    const std::vector<std::wstring>& arguments = {},
+    std::optional<updates::Sha256Digest> expectedState = std::nullopt);
 [[nodiscard]] Result<DWORD> LaunchActiveVersion(const InstallLayout& layout,
     const std::vector<std::wstring>& arguments = {});
+// Normal installer launches go through the stable supervisor; update health-check children remain
+// direct versioned launches while their updater holds the transaction lock.
+[[nodiscard]] Result<DWORD> LaunchInstalledShell(const InstallLayout& layout,
+    const std::vector<std::wstring>& arguments = {});
+// Nonblocking lifecycle lock first, then cancel supervision, then dispatch Quit/recovery. The
+// supervisor's own launch uses the same nonblocking lock, so it cannot respawn across this command.
+[[nodiscard]] Result<DWORD> LaunchControlCommand(const InstallLayout& layout,
+    const std::vector<std::wstring>& arguments);
 
 class IProcessOperations {
 public:

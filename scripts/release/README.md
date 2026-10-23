@@ -14,7 +14,7 @@ python scripts/release/make_manifest.py --version 1.2.0 --channel stable `
 
 # 2. Signature over the exact manifest bytes with the offline release key.
 #    The key never leaves the signing machine and is never printed.
-$env:AETHER_RELEASE_SIGNING_KEY_FILE = 'D:\offline\aether-release.pem'
+# Set AETHER_RELEASE_SIGNING_KEY_FILE locally to the offline key; never record its value here.
 python scripts/release/sign_manifest.py dist/AetherShell-1.2.0-manifest.json
 
 # 3. sha256sum-compatible checksums for people who verify downloads by hand.
@@ -27,6 +27,21 @@ and `AetherShell-<version>-checksums.txt` to the GitHub release whose tag is `v<
 release as a prerelease exactly when the manifest channel is `prerelease` (a version with prerelease
 identifiers, such as `2.0.0-beta.1`, must use that channel; a plain version may use either). Do not
 edit the manifest after signing: the application verifies its exact bytes.
+
+For a manual-install alpha without the trusted offline signing key, `scripts/package.ps1` keeps the
+unsigned manifest local and writes checksums for the setup executable only. Upload exactly the
+versioned setup executable and its checksums file; never upload an unsigned manifest or use a broad
+`dist/*` upload. This is the policy for `v0.2.0-alpha.2`; automatic updates remain unavailable.
+A plain checksum checks integrity and does not authenticate the publisher. Before manifest generation,
+packaging invalidates any same-version signature left in a reused output directory so a prior
+signature cannot accompany newly generated unsigned bytes or survive a failed signing attempt.
+
+Package from a fresh, tested Release `/W4 /WX` build of the intended revision. Confirm the generated
+`kVersion` is the intended version, since an existing CMake cache can retain a prerelease override.
+Use an empty version-specific output directory and review its exact file list. The packaging privacy
+audit checks the setup and all uncompressed embedded app/launcher/updater payload bytes without
+executing them, including source/PDB paths and source freshness. It is a scoped byte audit, not a
+guarantee that arbitrary secrets or runtime behavior have been reviewed.
 
 `make_manifest.py` applies the application's own rules to its inputs, so a manifest it writes is one
 the application can accept: `--release-notes-url` must be a page of the repository on

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/InstallInternal.h"
+#include "install/LauncherSupervisor.h"
 #include "core/FileSystem.h"
 
 #include <algorithm>
@@ -17,7 +18,14 @@ Result<void> CompletePayload(const PayloadManifest& manifest) {
 Result<void> detail::CopyStable(const std::filesystem::path& package,const InstallLayout& layout,const InstallState& state) {
     auto version=layout.Version(state.activeVersion); if(!version) return version.error();
     auto safe=detail::Safe(layout,layout.Launcher()); if(!safe) return safe;
-    auto copied=detail::CopyAtomic(version.value()/L"AetherShell.exe",layout.Launcher()); if(!copied) return copied;
+    auto copied=detail::CopyAtomic(version.value()/L"AetherShell.exe",layout.Launcher());
+    // The supervisor released its lease immediately before exiting. Its image mapping may take a
+    // few more scheduler turns to close; retry only sharing/access errors, for at most one second.
+    for(unsigned retry=0;!copied && retry<40 &&
+        (copied.error().platformCode==ERROR_SHARING_VIOLATION || copied.error().platformCode==ERROR_ACCESS_DENIED);++retry) {
+        ::Sleep(25);copied=detail::CopyAtomic(version.value()/L"AetherShell.exe",layout.Launcher());
+    }
+    if(!copied)return copied;
     safe=detail::Safe(layout,layout.Maintenance()); if(!safe) return safe;
     std::error_code error; if(std::filesystem::equivalent(package,layout.Maintenance(),error) && !error) return Ok();
     if(state.transaction && state.transaction->state!=TransactionState::Committed && std::filesystem::exists(layout.Maintenance())) {
@@ -57,6 +65,7 @@ Result<void> Install(const std::filesystem::path& package,const InstallLayout& l
         }
         return staged?MakeError(ErrorCode::Cancelled,"installation cancelled before activation"):staged.error();
     }
+    auto supervisor=StopLauncherSupervisor(layout);if(!supervisor)return supervisor;
     auto stopped=processes->RequestExit(std::chrono::seconds(30)); if(!stopped) return stopped;
     if(options.cancellation.IsCancelled()) {
         auto ignored=detail::Remove(layout,detail::Staging(layout,*state.transaction)); (void)ignored;
@@ -87,11 +96,17 @@ Result<void> Uninstall(const InstallLayout& layout,const std::filesystem::path& 
         }
         auto ownedProcesses=options.processes?nullptr:detail::WindowsProcesses();
         auto* processes=options.processes?options.processes:ownedProcesses.get();
+        auto supervisor=StopLauncherSupervisor(layout);if(!supervisor)return supervisor;
         auto stopped=processes->RequestExit(std::chrono::seconds(30)); if(!stopped) return stopped;
         auto cleanupOptions=options;
         if(options.registerInstallation) {cleanupOptions.startMenuShortcut=true;cleanupOptions.desktopShortcut=true;}
         auto registration=RemoveRegistration(layout,cleanupOptions); if(!registration) return registration;
-        auto removed=detail::Remove(layout,layout.root); if(!removed) return removed;
+        auto removed=detail::Remove(layout,layout.root);
+        for(unsigned retry=0;!removed && retry<40 &&
+            (removed.error().platformCode==ERROR_SHARING_VIOLATION || removed.error().platformCode==ERROR_ACCESS_DENIED);++retry) {
+            ::Sleep(25);removed=detail::Remove(layout,layout.root);
+        }
+        if(!removed)return removed;
         if(data) return detail::Remove(*data,data->root);
         return Ok();
     } catch(...) { return MakeError(ErrorCode::Io,"uninstall failed"); }
