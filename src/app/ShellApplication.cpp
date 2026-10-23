@@ -720,6 +720,18 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
         if (closing || !controls) return;
+        if (nativeTaskbarAccess && settings->Current().topBar.openWindowsFlyouts && platform::IsWindows11OrGreater()) {
+            controls->Close();
+            auto requested = apps::OpenWindowsQuickSettings();
+            if (!requested) {
+                AETHER_LOG_WARN("app", "Windows Quick Settings request failed");
+                if (settingsWindow) settingsWindow->ReportActionStatus(
+                    L"Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.");
+            }
+            // SendInput has no shell acknowledgement (including silent UIPI filtering). Never
+            // retry/toggle it again or open a second panel after an uncertain request.
+            return;
+        }
         PublishControls();
         if (auto opened = controls->Toggle(anchor); opened && controls->IsShown()) RefreshControls(true);
     }));

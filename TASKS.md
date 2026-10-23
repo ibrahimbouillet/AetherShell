@@ -14,11 +14,11 @@ overhaul, not a finished release after one batch. Preserve the installed Alpha 2
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Initial source patch removes expanded Dock/Top Bar visual HWND regions; outer shadows/entrance decoration are clipped. Focused native-region tests added; final results in S-035. Separate-process input delivery, rounded-corner pixels and physical visual acceptance remain. Not installed into the owner's Alpha 2. |
-| T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Requested; size reduction/default migration and work-area prototype unstarted. Preserve bottom gap/custom size and maximize-only automatic placement. Rectangular AppBar reservation is separate from input interception. |
-| T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Requested; source confirms existing OS signal bars and action routes, not owner interaction qualification. Native Quick Settings route/freshness/icon redesign unstarted. |
+| T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Compact panel implemented: top padding 12→9 DIPs, default height 70→67, unchanged icons/custom sizes/bottom gap; 96/144/192-DPI geometry checks pass (S-036). No settings migration or installed change. Symmetric work-area prototype and physical visual acceptance remain. |
+| T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Guarded native Windows 11 Quick Settings request and visible fallback preference implemented; fake injection/OS/partial-release and own-window preference tests pass (S-036). Native opening/placement under replacement, signal freshness and icon redesign remain unverified/unstarted. |
 | T42 — Living dot/pill indicators | FR-033; D38 | Requested; continuous hover/foreground/launch retargeting unstarted. |
 | T43 — Live hover cards and selected-window actions | FR-034; D38 | Requested; thumbnails, normal X close and confidently attributed media controls unstarted. |
-| T44 — Window choreography and corners | FR-036; D38 | Desired behavior recorded; documented-API feasibility and own-window prototype unstarted, especially external/maximized windows. |
+| T44 — Window choreography and corners | FR-036; D38 | Source/primary-document investigation completed: work-area insets do not change true maximized rounding; Windows excludes maximized/snapped windows from automatic corners. [Owned-window prototype plan](docs/specs/window-corner-investigation.md) recorded; implementation/external compatibility/visual qualification remain open. |
 
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
 is published from `ad77019`, with exact-revision Windows CI, audited setup/checksums and a scoped

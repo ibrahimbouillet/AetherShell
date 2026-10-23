@@ -381,3 +381,24 @@ AETHER_TEST("settings UI: Windows location is an explicit action and keeps real 
     CHECK_FALSE(service.Current().weather.windowsLocationConsent); // only injected requests, no fabricated OS grant
     window.Close();
 }
+
+AETHER_TEST("settings UI: native Quick Settings preference can be turned off and persists without system actions") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto file=test::MakeTempDirectory("native-quick-preference")/L"settings.json";
+    settings::SettingsService service(file,dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    settings::ui::SettingsWindow window(service,dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::TopBar).ok());
+    HWND checkbox=nullptr;
+    for(HWND child=::GetWindow(window.Handle(),GW_CHILD);child;child=::GetWindow(child,GW_HWNDNEXT)) {
+        if(ControlText(child)==L"Use Windows Quick Settings (Windows 11)"){checkbox=child;break;}
+    }
+    REQUIRE(checkbox!=nullptr);CHECK_EQ(::SendMessageW(checkbox,BM_GETCHECK,0,0),LRESULT{BST_CHECKED});
+    ::SendMessageW(checkbox,BM_CLICK,0,0); // this fixture's own checkbox, no keyboard/system injection
+    REQUIRE(Pump(dispatcher,[&]{return !service.Current().topBar.openWindowsFlyouts&&!service.Dirty();}));
+    CHECK_FALSE(service.Current().general.startWithWindows);window.Close();
+    settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));CHECK_FALSE(reloaded.Current().topBar.openWindowsFlyouts);
+}

@@ -24,13 +24,23 @@ and currently animated icons now define the HWND region. This avoids relying on 
 `HTTRANSPARENT` for another process. Outer shadows/entrance decoration are deliberately clipped;
 rounded-corner input, full cross-process interaction and visual refinement remain. Focused native
 regressions pass: focused Release `/W4 /WX`, 2/2 executables, 23.07 seconds (S-035).
-AppBar reservation and the
-requested 4–5-pixel size reduction are separate and unchanged. The installed Alpha 2 remains intact.
+AppBar reservation remains separate. T40 now reduces top interior padding from 12 to 9 DIPs:
+the default panel is 67 instead of 70 DIPs, about 4–5 physical pixels shorter at 150% DPI. Icons,
+saved sizes, baseline and visible bottom gap are unchanged. The installed Alpha 2 remains intact.
 
-The rest is requested/unimplemented: compact defaults and symmetric free edges; trustworthy signal
-freshness and native Quick Settings routing; rounded icon redesign; continuous dot/pill feedback;
+T41 now has a guarded Windows 11 Win+A route for the grouped status action when the existing
+flyout preference is enabled, plus a Top Bar checkbox for the Aether fallback. Isolated sessions,
+older Windows and opt-out retain the custom panel. Submission is not a native-panel acknowledgement;
+do not retry an uncertain chord or open a competing panel. S-036 records passing scoped build/fake
+tests and own-window preference persistence. Actual hidden-taskbar/native-panel behavior is unverified.
+
+The rest is requested/unimplemented: symmetric free edges; trustworthy signal freshness;
+rounded icon redesign; continuous dot/pill feedback;
 real hover previews with selected-window close and supported media controls; icon-anchored window
-motion and rounded corners. External/maximized window capabilities must be verified, not promised.
+motion and rounded corners. The owner repeated the maximized-square-corner problem; read the
+[corner investigation](docs/specs/window-corner-investigation.md). Native maximized rounding is
+excluded by Windows policy; a simple DWM hint is not a fix. Start an owned Settings-window prototype
+without silently changing maximized state or manipulating foreign windows.
 T38's gallery failure remains open and is deferred behind the new V3 priority. Never publish the
 owner's supplied reference screenshot, which contains unrelated application content.
 

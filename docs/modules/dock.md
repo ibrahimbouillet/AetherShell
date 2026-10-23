@@ -6,7 +6,9 @@ V3 source follow-up (D38/T39, S-035): the native HWND region now uses only the p
 animated-icon input rectangles. The shadow-expanded visual override is removed because
 HTTRANSPARENT cannot guarantee cross-process input delivery. Outer shadow/entrance decoration is
 clipped; physical visual approval, rounded-corner input and separate-process verification remain.
-AppBar reservation and default size are unchanged. This patch is not installed over Alpha 2.
+AppBar policy is unchanged. T40 subsequently reduces panel top padding from 12 to 9 DIPs (default
+height 70→67), preserving icons, baseline and bottom gap. Checks cover 96/144/192 DPI and custom sizes
+(S-036). These patches are not installed over Alpha 2.
 
 The native bottom Dock implements the application surface in FR-001 through FR-004: search,
 pinned applications and optional unpinned running applications. It contains no status data.

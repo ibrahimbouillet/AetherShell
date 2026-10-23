@@ -16,6 +16,10 @@ for another application's process. Work-area reservation is a separate rectangul
 Then continue the compact Dock/default spacing, genuine native Quick Settings/system actions and
 rounded icons, real Wi-Fi strength/freshness, dot-to-pill motion, live hover previews with close and
 supported media actions, and safe window-motion/corner feasibility in the documented order.
+The compact panel and guarded native Quick Settings request now have a first source implementation;
+read S-036 before repeating checks. Read docs/specs/window-corner-investigation.md for maximized
+corners: insets plus DWMWCP_ROUND do not solve Windows' maximized-window policy. Do not silently
+restore/resize foreign windows to disguise it. Start with the owned Settings-window prototype.
 
 Keep observed Windows data truthful and unsupported behavior explicit. No process injection,
 Explorer replacement, silent elevation, private logs/assets in Git, or invented preview pixels.

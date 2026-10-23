@@ -4,6 +4,14 @@ Requirements FR-026/FR-015 and D26. `controlcenter` is a transient accessible pa
 persistent desktop surface. Production Top Bar groups network, sound and battery into one action;
 individual preferences still determine which status components are displayed.
 
+V3 source follow-up (T41/S-036): on Windows 11 the grouped action requests Windows Quick Settings
+with one documented Win+A chord when the saved flyout preference is enabled. The Top Bar page exposes
+**Use Windows Quick Settings (Windows 11)**; clearing it uses Aether controls. Older/unknown Windows
+and isolated tests keep the custom panel. The app closes only its own panel before requesting Windows.
+A submitted chord does not acknowledge shell opening; UIPI can silently filter it. No blind retry or
+competing popup follows uncertainty. Native placement with taskbar replacement is still unverified.
+Installed Alpha 2 is unchanged.
+
 The panel receives immutable real snapshots and emits explicit intents. It never discovers devices,
 opens Settings, changes audio/radios/brightness or injects input itself. The app bridge admits actual
 controls only for the production native-access instance, queues blocking work on a dedicated serial

@@ -1381,3 +1381,54 @@ preview or owner acceptance is claimed. Compact defaults, AppBar policy, native 
 signal-only refresh, icons, indicators, hover previews/media actions and external-window motion/
 corners remain requested/unimplemented. The existing Windows signal reading and route source were
 inspected; neither is a new real-device qualification. No current screenshot/video was recorded.
+
+### S-036 — compact Dock and native Quick Settings request (Codex, 2026-10-23)
+
+Scope: D38, FR-031/FR-035/FR-036, T40/T41/T44; source base `54c825f` plus the following patch.
+The owner explicitly requested continued implementation and coherent commits before interruption.
+
+**Implemented:** Dock top interior padding is 9 instead of 12 DIPs. The default visible panel height
+is 67 instead of 70 DIPs: 3 physical pixels less at 96 DPI, about 4–5 at 144 DPI, 6 at 192 DPI. Baseline,
+bottom gap, icon/hit geometry, saved sizes and magnification are retained; no settings migration.
+
+The production grouped status click now requests Windows 11 Quick Settings with one Win+A chord
+when native access and the saved flyout preference permit it. Unknown/older Windows, opt-out and
+isolated tests keep Aether controls. The owned custom panel closes first. A request is not an
+acknowledgement; no uncertain retry or second popup follows. The Top Bar settings page now exposes
+the existing preference as **Use Windows Quick Settings (Windows 11)**.
+
+**Executed Release `/W4 /WX` checks:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -Target @('aether_dock_tests','aether_applications_tests','aether_app_integration_tests','AetherShellApp','AetherShell') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^(aether_dock_tests|aether_applications_tests|aether_app_integration_tests)$' `
+  -TestExclude '' -JUnitFile build/alpha2-release/v3-compact-native-controls-results.xml
+
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -Target @('aether_settings_ui_integration_tests','AetherShellApp') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_settings_ui_integration_tests$' -TestExclude '' `
+  -JUnitFile build/alpha2-release/v3-quick-preference-results.xml
+```
+
+Both warning-free builds pass. First gate: **3/3 executables pass, 5.99 s** (applications 1.73 s,
+Dock 0.09 s, app native 3.86 s). Second gate: **1/1 passes, 5.83 s** (settings native 5.71 s).
+Added tests cover 96/144/192-DPI/custom-size geometry, unknown/old-OS rejection before input,
+single Win+A ordering, partial-input key-up recovery, and the real own-window checkbox's saved opt-out
+through a private temporary settings file. All keyboard injection is fake; no real Windows panel,
+audio/radio/device, startup entry or owner application is modified. Independent source review found
+no major request-gating/lifetime issue.
+
+**Corners investigated, not fixed:** WorkAreaInsets reserves primary-monitor side bands; it does
+not alter third-party frames or maximized state. Microsoft excludes native maximized/snapped
+windows from automatic rounding. The [owned-window prototype plan](../specs/window-corner-investigation.md)
+rejects a one-line DWM hint or silently restoring foreign windows as a universal fix. No corner
+attribute, region or placement of another application was changed.
+
+**Still open:** physical compact-Dock/shadow acceptance; native Quick Settings opening/position with
+the taskbar hidden and UIPI filtering; complete signal freshness/icon redesign; rounded maximize
+prototype and external compatibility. The installed/published Alpha 2 is unchanged and remains usable.
+These are unreleased V3 source changes; the local executable still carries the existing Alpha 2
+base version, not a newly approved V3 release. No real capture or V3 publication occurred.

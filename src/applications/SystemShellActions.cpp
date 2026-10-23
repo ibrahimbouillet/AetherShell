@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "applications/SystemShellActions.h"
+#include "platform/windows/OsVersion.h"
 
 namespace aether::apps {
 namespace {
@@ -45,5 +46,17 @@ Result<void> OpenWindowsSearch(platform::IKeyboardInjector& injector) {
 }
 
 Result<void> OpenWindowsSearch() { return OpenWindowsSearch(platform::SystemKeyboardInjector()); }
+
+Result<void> OpenWindowsQuickSettings(platform::IKeyboardInjector& injector, unsigned windowsBuild) {
+    if (windowsBuild < 22000)
+        return MakeError(ErrorCode::Unsupported, "Windows Quick Settings requires Windows 11");
+    return WithMessage(platform::SendKeyChord(injector, {static_cast<WORD>(VK_LWIN), static_cast<WORD>('A')}),
+                       "Windows Quick Settings could not be requested");
+}
+
+Result<void> OpenWindowsQuickSettings() {
+    return OpenWindowsQuickSettings(platform::SystemKeyboardInjector(),
+        platform::IsWindows11OrGreater() ? 22000u : 0u);
+}
 
 }  // namespace aether::apps

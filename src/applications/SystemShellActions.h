@@ -45,4 +45,10 @@ enum class StartMenuRoute {
 [[nodiscard]] Result<void> OpenWindowsSearch(platform::IKeyboardInjector& injector);
 [[nodiscard]] Result<void> OpenWindowsSearch();
 
+// Windows 11 Quick Settings, Win+A. Success means the chord was submitted, not that Windows
+// acknowledged opening its surface. Unknown/older builds fail without input; never blindly retry.
+[[nodiscard]] Result<void> OpenWindowsQuickSettings(platform::IKeyboardInjector& injector,
+                                                    unsigned windowsBuild);
+[[nodiscard]] Result<void> OpenWindowsQuickSettings();
+
 }  // namespace aether::apps

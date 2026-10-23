@@ -59,7 +59,7 @@ Result<DockLayout> ArrangeDockLayout(float iconSize, float spacing, float magnif
             graphics::Motion().liftOffset + 6 + kDockShadowMargin + baselineGap);
         const float baseline = layout.windowHeight - baselineGap;
         float x = (width - content) / 2;
-        layout.panel = {x - 12, baseline - iconSize - 12, x + content + 12, baseline + 18};
+        layout.panel = {x - 12, baseline - iconSize - kDockPanelTopPaddingDip, x + content + 12, baseline + 18};
         for (const auto scale : scales) {
             const float size = iconSize * scale;
             layout.items.push_back({{x, baseline - size, x + size, baseline}, scale});

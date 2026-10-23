@@ -15,6 +15,8 @@ namespace aether::dock {
 // Default ambient shadow reaches 3 * 10 + 1 = 31 DIPs; round up on the 4-DIP grid.
 inline constexpr float kDockShadowMargin = 32.0f;
 inline constexpr float kDockEntranceOffset = 24.0f;
+// Compact panel by 3 DIPs (4.5 physical pixels at 150% DPI), without moving icons or its bottom edge.
+inline constexpr float kDockPanelTopPaddingDip = 9.0f;
 
 struct DockItemGeometry { D2D1_RECT_F icon{}; float scale = 1; };
 struct DockLayout {

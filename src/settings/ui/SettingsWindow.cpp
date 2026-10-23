@@ -190,6 +190,7 @@ void SettingsWindow::Impl::BuildPage() {
         check(L"Show microphone", [](const Settings& s){return s.topBar.showMicrophone;}, [](Settings& s,bool v){s.topBar.showMicrophone=v;});
         check(L"Show weather when enabled", [](const Settings& s){return s.topBar.showWeather;}, [](Settings& s,bool v){s.topBar.showWeather=v;});
         check(L"Reserve screen space above windows", [](const Settings& s){return s.topBar.reserveSpace;}, [](Settings& s,bool v){s.topBar.reserveSpace=v;});
+        check(L"Use Windows Quick Settings (Windows 11)", [](const Settings& s){return s.topBar.openWindowsFlyouts;}, [](Settings& s,bool v){s.topBar.openWindowsFlyouts=v;});
     } else if (page == SettingsPage::Weather) {
         check(L"Enable weather", [](const Settings& s){return s.weather.enabled;}, [](Settings& s,bool v){s.weather.enabled=v;});
         choice(L"Temperature", {L"Celsius",L"Fahrenheit"}, [](const Settings& s){return s.weather.unit;}, [](Settings& s,int v){s.weather.unit=static_cast<TemperatureUnit>(v);});

@@ -6,6 +6,15 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
+### V3 development
+
+- Narrow Dock/Top Bar native input regions to their panels/current icons so decorative outer
+  margins do not rely on same-thread-only input forwarding; external shadows are currently clipped.
+- Reduce Dock panel top padding by 3 DIPs while preserving icon sizes and the visible bottom gap.
+- Request native Windows 11 Quick Settings from the grouped status action when enabled; provide
+  an explicit Top Bar preference to retain Aether controls. Native opening still needs device review.
+- Record the V3 design/motion requirements and the unresolved maximized-corner prototype plan.
+
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 
 Second public alpha, including the previously local V2 candidate below.

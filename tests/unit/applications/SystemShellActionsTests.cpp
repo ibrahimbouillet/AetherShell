@@ -78,6 +78,38 @@ AETHER_TEST("shell actions: Windows Search is Win+S in one call") {
     CheckChord(injector.calls[0], {static_cast<WORD>(VK_LWIN), static_cast<WORD>('S')});
 }
 
+AETHER_TEST("shell actions: Quick Settings rejects older or unknown Windows without input") {
+    for (const unsigned build : {0u, 19041u, 21999u}) {
+        FakeInjector injector;
+        const auto result = OpenWindowsQuickSettings(injector, build);
+        REQUIRE_FALSE(result.ok());
+        CHECK_EQ(result.error().code, ErrorCode::Unsupported);
+        CHECK(injector.calls.empty());
+    }
+}
+
+AETHER_TEST("shell actions: Quick Settings submits one Win+A chord on Windows 11") {
+    for (const unsigned build : {22000u, 22621u, 26100u}) {
+        FakeInjector injector;
+        REQUIRE(OpenWindowsQuickSettings(injector, build).ok());
+        REQUIRE_EQ(injector.calls.size(), std::size_t{1});
+        CheckChord(injector.calls[0], {static_cast<WORD>(VK_LWIN), static_cast<WORD>('A')});
+    }
+}
+
+AETHER_TEST("shell actions: Quick Settings partial input cleans up without retrying the action") {
+    FakeInjector injector;
+    injector.results = {1};
+    const auto result = OpenWindowsQuickSettings(injector, 26100);
+    REQUIRE_FALSE(result.ok());
+    CHECK_EQ(result.error().code, ErrorCode::Platform);
+    REQUIRE_EQ(injector.calls.size(), std::size_t{2});
+    const auto recovery = Keys(injector.calls[1]);
+    REQUIRE_EQ(recovery.size(), std::size_t{1});
+    CHECK_EQ(recovery[0].virtualKey, WORD{VK_LWIN});
+    CHECK(recovery[0].up);
+}
+
 AETHER_TEST("shell actions: Start falls back to the Windows key without a usable window") {
     FakeInjector byRoute;
     REQUIRE(OpenStartMenu(nullptr, byRoute, StartMenuRoute::WindowsKey).ok());

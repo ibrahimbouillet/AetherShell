@@ -207,6 +207,33 @@ AETHER_TEST("dock placement: visible bottom gap is not doubled by transparent wi
         }
     }
 }
+AETHER_TEST("dock placement: compact panel height preserves bottom gap and explicit icon sizes across DPI") {
+    struct Expected { float iconSize; double panelHeightDip; };
+    const RECT area{0, 0, 1920, 1080};
+    // Product geometry fixtures: the default 40-DIP icon now has a 67-DIP panel, previously 70.
+    // Explicit Small/Large/custom sizes retain their icon and hit-target dimensions.
+    for (const Expected expected : {Expected{32, 59}, Expected{40, 67}, Expected{48, 75}, Expected{96, 123}}) {
+        auto layout = ArrangeDockLayout(expected.iconSize, 8, 1.45f, 800, std::vector<float>{1, 1});
+        REQUIRE(layout.ok()); REQUIRE_EQ(layout->items.size(), 2u);
+        CHECK(std::abs((layout->panel.bottom - layout->panel.top) - expected.panelHeightDip) < 0.001);
+        for (const auto& item : layout->items) {
+            CHECK_EQ(item.icon.right - item.icon.left, expected.iconSize);
+            CHECK_EQ(item.icon.bottom - item.icon.top, expected.iconSize);
+            CHECK_EQ(layout->panel.bottom - item.icon.bottom, 18.0f);
+        }
+        CHECK_EQ(HitTest(*layout, {(layout->items[0].icon.left + layout->items[0].icon.right) / 2,
+            (layout->items[0].icon.top + layout->items[0].icon.bottom) / 2}), std::optional<std::size_t>(0));
+        for (const UINT dpi : {96u, 144u, 192u}) {
+            auto placed = PlaceDock(*layout, area, dpi, expected.iconSize, 1.45f, 6, false);
+            REQUIRE(placed.ok());
+            const double scale = static_cast<double>(dpi) / 96;
+            const double panelBottom = placed->windowPx.top + layout->panel.bottom * scale;
+            CHECK(std::abs(panelBottom - (area.bottom - std::ceil(6 * scale))) <= 1.0);
+            const double coveredHeight = std::ceil(layout->panel.bottom * scale) - std::floor(layout->panel.top * scale);
+            CHECK_EQ(coveredHeight, std::ceil(expected.panelHeightDip * scale));
+        }
+    }
+}
 AETHER_TEST("dock placement: reservation contains every magnified bouncing icon and the panel shadow") {
     const RECT area{-1920, -200, 0, 1080};
     for (const float size : {32.0f, 48.0f, 96.0f}) {
