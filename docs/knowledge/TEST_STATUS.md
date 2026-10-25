@@ -1555,3 +1555,67 @@ Warning-free `/W4 /WX` build, 84/84 steps; `aether_dock_tests` passed (0.14 s);
 `aether_dock_integration_tests` passed (15.06 s, own windows only). The installed Alpha 2 process,
 program folder, settings, pins and startup entry were not touched. Not established: Codex's
 independent review of the consolidation.
+
+### S-041 — hover emphasis, genuine window previews and calmer marker motion (Claude, 2026-10-25)
+
+Scope: D38 / FR-033 / FR-034 / T42 / T43, local source on top of `671faad` (shared checkout, D39).
+Running binary at the start: the installed **Alpha 2** (`0.2.0-alpha.2`, built 2026-10-23); the V3
+source was never installed over it and was not installed by this batch.
+
+**Implemented:** dedicated `graphics::Motion().marker` spring (stiffness 100, damping ratio 0.92;
+simulated 0.16 s to 50 %, 0.35 s to 90 %, 0.52 s to within 0.1 DIP, overshoot 0.003 DIP; the former
+magnify-driven marker reached 90 % in 0.17 s). Pure `DockHoverSession`: immediate emphasis of a
+running icon, 0.6 s dwell, 0.12 s warm switch, 0.35 s icon↔card crossing grace, 0.8 s activation
+hold, suppression until leave, keyboard mode. `DockPreviewWindow`: landscape neutral-glass card
+(host-backdrop blur, Dock opacity preference, HWND exactly the card), one DWM thumbnail per live
+window (aspect fit in 240×150 DIPs, no upscaling, invisible-border crop, honest placeholders),
+header title and close button, UIA list, keyboard navigation, compositor fade with DWM opacity
+following it. Identity-validated tile activation through `IApplicationLauncher::Activate` and
+`WM_SYSCOMMAND/SC_CLOSE` close requests with a pending/timeout state; no termination.
+
+**Executed focused Release `/W4 /WX` gate (final source):**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/v3-release -Jobs 6 `
+  -Target @('aether_dock_tests','aether_dock_integration_tests','aether_graphics_tests','AetherShellApp') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_(dock|graphics)_tests$|^aether_dock_integration_tests$' -TestExclude '' `
+  -JUnitFile build/v3-release/t42-t43-results.xml
+```
+
+Warning-free build including the integrated `AetherShellApp`; **3/3 executables pass, 38.24 s**:
+`aether_graphics_tests` 74 cases (0.49 s), `aether_dock_tests` **61 cases** (0.10 s; 18 new: ten
+hover-session, six layout/identity, two marker timing/continuity), `aether_dock_integration_tests`
+**8 cases** (37.51 s; three new own-window cases plus one opt-in frame recorder that is skipped
+unless `AETHER_DOCK_PREVIEW_FRAMES` is set). The earlier four Dock native cases still pass.
+
+New own-window native evidence (test windows created by the test; sources stay behind a private
+topmost backdrop so only their DWM thumbnails can appear): hover never activates and leaves
+`GetForegroundWindow` unchanged; B's marker is mid-growth after 110 ms while A stays 12 DIPs; after
+settling both are exactly 12 DIPs; the card lists both windows in tracker order with two live
+thumbnails; thumbnail aspect matches each window's extended frame within 0.03; captured thumbnail
+pixels are >50 % each source's own colour and <5 % the other's; the card HWND has no extra region,
+sits above the icon row and contains every close button; Dock and card both reach zero frame
+demand; icon→card crossing and close-button hover keep the card and emphasis beyond the grace;
+leaving both dismisses, releases every thumbnail and contracts B to 5 DIPs; ten rapid observed
+foreground alternations stay within 5–12 DIPs with <3 DIPs per 45 ms sample. Icon activation calls
+the launcher once and the observed transfer keeps B at exactly 12 DIPs for every sample while A
+decreases; a tile click activates only that window; X posts a close to the selected window only
+(the accepting window is destroyed, its sibling untouched, nothing activated); a refusing window
+stays open, its X shows pending, a second click sends nothing, and the button recovers after the
+timeout; a destroyed-but-still-listed window gets no request and its tile is dropped; keyboard Up /
+Enter / Escape and the UIA list (List root, `Synthetic window 1` + `Close Synthetic window 1`,
+Invoke pattern) work; destruction during the dwell shows no card; reduced motion and high contrast
+snap the marker and show/hide the card without a fade; a minimized source showed DWM's retained
+content at its restored aspect without activation; suppression releases the card at once.
+
+**Visually inspected (own windows only):** a 115-frame normal-speed own-window sequence and
+zoomed marker strips confirm smooth continuous growth, contraction after the grace, concurrent
+A-contraction/B-held transfer, card fade-in/out and the translucent card material. One temporary,
+reverted experiment painted glass over the thumbnail rectangles: thumbnails stayed visible, which
+established DWM's above-content stacking on this Windows 11 build. Frames stay local.
+
+**Not established:** behaviour with the owner's real applications (for example ChatGPT/Chrome) on
+the real desktop at normal speed, physical multi-monitor DPI changes while a card is shown,
+Windows 10 stacking, protected-content appearance, elevated-window UIPI refusal and owner
+acceptance. No real desktop capture, installation, startup change, push, tag or release occurred.

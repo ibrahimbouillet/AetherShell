@@ -7,9 +7,9 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — Codex, 2026-10-25 (Europe/Paris)
+## Active continuation — Claude (D39/T45 consolidation, T42/T43), 2026-10-25 (Europe/Paris)
 
-Last updated: 2026-10-25 (Europe/Paris).
+Last updated: 2026-10-25 around 11:00 (Europe/Paris), by Claude. Codex reviews next.
 
 ### Current continuation — V3 accepted for development (D38)
 
@@ -30,14 +30,32 @@ Branches `codex/t36-showcase-checkpoint` (not in `main`), `wip/d27-d28` and `wf/
 and unpushed. Receipt: S-040. Codex reviews this consolidation; the recovery location/inventory is
 private and deliberately not recorded here. Installed Alpha 2 was not touched.
 
-**Owner-directed next batch, 2026-10-25:** Claude implements T42/T43; Codex subsequently reviews.
-Use [the focused Claude implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Prioritize a running
-background app's marker growing to the active marker's width, an actual window preview replacing
-the name tooltip, a selected-window normal-close X, pointer continuity into the preview, and calmer,
-visibly slower marker transitions. On genuine activation, the old/new markers retarget together.
-Do not expand this batch into the corner prototype, other V3 streams or publication. Source base
-`35746c8` remains separate from the unchanged installed Alpha 2; no product code changed for this
-prompt. The owner has not accepted the current motion's visual quality.
+**T42/T43 implemented by Claude, 2026-10-25 — ready for Codex review (S-041).** Brief:
+[docs/CLAUDE_V3_HOVER_PROMPT.md](docs/CLAUDE_V3_HOVER_PROMPT.md). Local commits only; the running
+shell is still the installed Alpha 2 (`0.2.0-alpha.2`), which does **not** contain this work.
+
+- *Implemented:* hovering a running background app expands its dot to exactly the foreground
+  marker's width (`kDockMarkerPillWidth`, 12 DIPs) with no activation and no active colour; the
+  dedicated `Motion().marker` spring is about twice as calm (≈0.35 s to 90 %, 0.52 s to 0.1 DIP).
+  After a 0.6 s dwell a landscape neutral-glass card (`DockPreviewWindow`) replaces the name tooltip
+  with genuine DWM thumbnails, one tile per live window, each with a title and a close button at
+  its upper right. Icon↔card travel keeps card and emphasis (0.35 s grace); leaving both dismisses
+  the card and contracts the marker. Clicking the icon or a tile activates through the existing
+  launcher; a short emphasis hold lets the observed transfer keep B wide while A contracts. X posts
+  `SC_CLOSE` to that identity-validated window only; refusals/cancelled prompts leave it open.
+  Keyboard: focused Dock → Up opens the card, arrows/Tab, Enter/Space, Delete, Escape/Down. UIA list.
+- *Tested:* focused Release `/W4 /WX` incl. `AetherShellApp`; dock unit 61 cases, graphics 74, dock
+  native 8 (three new own-window preview cases; one opt-in recorder). Details in S-041.
+- *Observed at runtime:* only own-window fixtures (synthetic windows, private backdrop): a 115-frame
+  normal-speed sequence was inspected; DWM draws thumbnails above the card's visuals on this
+  Windows 11 build (temporary reverted experiment). Frames are local and not committed.
+- *Not done/unverified:* real applications on the owner's desktop, multi-monitor DPI change while
+  shown, Windows 10, protected/elevated windows, media play/pause (later T43 step), owner acceptance.
+- *Implementation choices to review (reversible):* timing constants in `DockHoverTiming`; 240×150-DIP
+  thumbnail box; X in the tile header (DWM covers anything drawn over a thumbnail); a window already
+  in front is left alone on tile click instead of being minimized; the card uses the Dock opacity
+  preference with host-backdrop blur; marker colour switches instantly on the observed transfer
+  while the width animates.
 
 The owner accepted the published Alpha 2 and requested a broader V3 design/interaction overhaul.
 The remaining-usage instruction prioritizes an English, traceable handoff, plus an initial input
@@ -591,6 +609,21 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
+0. **Codex: independently review two Claude batches, 2026-10-25.** (a) D39/T45 consolidation
+   (`d833239`, `671faad`, S-040): confirm `git worktree list` shows only this folder, `origin`
+   is official, and all branches/tags are present; the owner holds the private recovery location.
+   (b) T42/T43 (S-041): review `src/dock/DockHover.*`, `DockPreview.*`, `DockPreviewWindow.*`,
+   `DockMotion.*`, the `DockWindow.cpp` wiring and `Motion().marker`, then rerun the S-041 command
+   from this folder. Optional own-window motion frames (synthetic windows only, local output):
+   `$env:AETHER_DOCK_PREVIEW_FRAMES='<local folder>'; build/v3-release/modules/dock/aether_dock_integration_tests.exe frames`.
+   Real-desktop preview needs the owner's explicit ready reply (D36) because it swaps instances:
+   with consent, quit the installed shell (its own Quit command, or
+   `%LOCALAPPDATA%\Programs\AetherShell\versions\0.2.0-alpha.2\AetherShellApp.exe --quit`), run `build/v3-release/modules/app/AetherShellApp.exe --data-dir <private temp folder>` (no
+   startup registration happens unless chosen in its Settings), hover a background app with a
+   foreground app present, dwell, cross into the card, leave, re-hover, click, then close a
+   disposable window through X. Never capture the owner's apps without consent; afterwards quit the
+   candidate (`build/v3-release/modules/app/AetherShellApp.exe --quit`) and relaunch the installed
+   Alpha 2 from its Start-menu shortcut, confirming the native-taskbar state returns to what it was.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
    `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,

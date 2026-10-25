@@ -11,6 +11,12 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   teardown is under investigation and its relationship to this failure is unproven. Passing earlier
   runs and visual captures do not close this accessibility qualification gap.
 
+- V3 Dock window previews (T43, local source only, not in Alpha 2) show what DWM composes for each
+  window. Protected/DRM content may appear black, and some minimized windows offer only their
+  caption, shown as an explicit placeholder. An elevated window can refuse the close request (UIPI);
+  the card reports the refusal and keeps the window. DWM's above-content thumbnail stacking was
+  verified on Windows 11 only. Media play/pause on the card is not implemented yet, and the owner's
+  real-desktop acceptance of the preview card and the calmer marker motion is pending.
 - Windows 10 and ARM64 have not been runtime-tested in this continuation.
 - Multi-monitor DPI/removal, Explorer restart, full-screen suppression and AppBar interactions need
   broader real-desktop qualification. Automated window tests never alter the real work area.

@@ -18,6 +18,10 @@ All notable changes to Aether Shell are documented here. The format follows
   springs, preserved active-state identity and immediate reduced-motion/high-contrast feedback.
 - Add an unwired owned-window corner prototype with DPI clipping, true-maximize preservation,
   region/identity ownership and conditional restore; visible/external qualification remains open.
+- Hovering a running background app expands its marker to exactly the active marker's width with a
+  dedicated, calmer marker spring; after a deliberate dwell a rounded glass card shows genuine DWM
+  previews of its windows, each with a close button that requests a normal close of that window
+  only. Pointer travel into the card keeps it open; activation continues the expanded marker.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 

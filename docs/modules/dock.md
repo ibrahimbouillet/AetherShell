@@ -19,6 +19,53 @@ request no further frames. Removal/overflow discards marker state; a later reapp
 new dot. Pure state tests and existing native Dock checks pass; physical visual acceptance and
 complete window-origin/layout motion remain unqualified.
 
+### Hover emphasis and window previews — T42/T43 (Claude, 2026-10-25, S-041)
+
+`DockHoverSession` (`DockHover.h`) is the pure hover/preview state. A running icon under the pointer
+is *emphasized* at once: its marker retargets to `kDockMarkerPillWidth`, exactly the foreground
+marker's width, while only the observed foreground keeps the active colour. Emphasis never
+activates anything. After a 0.6 s dwell (deliberately longer than the 0.45 s name tooltip) the
+name tooltip is replaced by `DockPreviewWindow`, a landscape card above the icon. The icon and the
+card are one interaction: leaving the icon while a card is shown starts a 0.35 s crossing grace;
+entering the card or returning to the icon keeps both the card and the emphasis; leaving both
+dismisses the card and the marker contracts. A shown card switches to another running icon after
+0.12 s; a non-previewable entry closes it. A click on the icon or a tile closes the card and keeps the
+emphasis for 0.8 s, so an observed foreground transfer continues the already expanded width instead
+of contracting and regrowing; a refused activation drops that hold. Closed pins, Search, Start and
+running groups without a live window keep the name tooltip and never get a card.
+
+Marker motion uses the dedicated `graphics::Motion().marker` spring (stiffness 100, damping ratio
+0.92): about 0.35 s to 90 % of a change and 0.52 s to within 0.1 DIP at normal speed (the previous
+magnify spring took 0.17 s); overshoot is below 0.01 DIP. Width and velocity survive reversals,
+rapid foreground alternation and reorders; the icon magnification is unchanged. Reduced motion and
+high contrast snap the marker and show/hide the card at once.
+
+The card has one tile per live window of the group (tracker order, most recent first; as many as fit
+the monitor, then an honest `+N` column). Each tile shows a documented DWM thumbnail of that exact
+window (`DwmRegisterThumbnail`), fitted inside a 240×150-DIP box without stretching or cropping and
+without enlarging a small window beyond one source pixel per device pixel; DWM's invisible resize
+borders are cropped via `DWMWA_EXTENDED_FRAME_BOUNDS` when both measurements agree. A window whose
+thumbnail cannot be registered, or whose minimized source is only a caption, shows an explicit
+placeholder. The header holds the app icon, the window title and the close button at the tile's
+upper right. DWM composes thumbnails above the window's own visuals (verified with own windows), so
+nothing is drawn over a thumbnail and its opacity follows the compositor fade through DWM. The card
+uses the Dock's neutral glass with the host-backdrop blur and the Dock's opacity preference; its HWND
+is exactly the card (no shadow margin, no invisible strip over other applications).
+
+Actions revalidate identity first (`DockPreview.h`): the tile's captured HWND must still belong to the
+same process and thread and still be listed by the tracker for the group. A tile click activates
+exactly that window through the existing `IApplicationLauncher::Activate` path (a window already in
+front is left alone rather than minimized). The close button posts `WM_SYSCOMMAND/SC_CLOSE` to that
+window only (`AllowSetForegroundWindow` lets its own save prompt come forward); nothing is killed and
+no sibling is touched. The button shows a pending state until the tracker removes the window; after
+2.5 s a still-open window counts as refused or waiting on its prompt and the button recovers.
+Keyboard: with the Dock focused, Up on a running item opens its card; Left/Right/Tab move between
+tiles and close buttons, Enter/Space invoke, Delete closes, Escape or Down return to the Dock. The card
+exposes a UIA list (`"<app> windows"`) with an invokable button per window and a `Close <title>`
+button. Titles and pixels are transient: never logged or stored. Dismissal, refresh, suppression,
+DPI/display changes, disabled input and shutdown release every thumbnail. Media play/pause remains a
+later T43 step. Own-window tests cover the above; the owner's real-desktop acceptance is pending.
+
 The native bottom Dock implements the application surface in FR-001 through FR-004: search,
 pinned applications and optional unpinned running applications. It contains no status data.
 The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.
