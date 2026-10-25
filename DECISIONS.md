@@ -83,6 +83,25 @@ excessive empty height and width. Fit the panel around the existing miniature, r
 without reducing the thumbnail itself or the usable close button. This accepts the basic interaction,
 not the final card spacing, all of T43 or a V3 release.
 
+### D41 — Unify the appearance of all Aether-owned interfaces
+
+Owner-requested direction, 2026-10-25 (FR-037/T47): the logo menu, Settings and the application's
+supporting interfaces must share the existing neutral frosted-grain glass identity, restrained
+light rim, refined glyphs/typography and deliberate fluid motion. A palette-only pass over the
+current stock white Settings form or opaque owner-drawn menu is insufficient. Audit every owned
+surface/state, implement shared presentation components and verify actual composed appearance.
+Use the [Claude implementation brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md).
+
+The owner assigns implementation to Claude and subsequent independent review to Codex. This is
+the next V3 development priority, not completion/publication of V3. Preserve the usable private
+prototype, installed Alpha 2, taskbar/material recovery, pin identity, compact previews and exact
+input bounds. NFR-007's standard-control/native input and accessibility requirements remain:
+styling does not authorize replacing text editing/IME/keyboard/UIA with painted placeholders.
+Record and qualify any necessary compatible custom-control strategy before substituting it.
+Windows-owned and pre-renderer emergency UI retain honest documented native exceptions. No
+directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
+from this visual direction. Implementation and owner visual acceptance are still pending.
+
 ### D40 — Reversible corners for eligible maximized windows
 
 Owner-requested outcome, 2026-10-25 (FR-036/T44): retain true maximization and add rounded visible

@@ -11,7 +11,14 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 [the English continuation prompt](docs/V3_CONTINUATION_PROMPT.md). This is a broader design/motion
 overhaul, not a finished release after one batch. Preserve the installed Alpha 2; no V3 publication yet.
 
-**Immediate owner priority, 2026-10-25:** Claude implements the focused T42/T43 hover-preview and
+**Next owner priority, 2026-10-25 — T47:** Claude implements the coherent visual redesign across
+the logo menu, every Settings page/control and all Aether-owned supporting interfaces. Follow
+[the full English implementation brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md), FR-037/D41.
+Reuse the neutral glass identity while preserving native input/accessibility, real actions,
+consent/save behavior and the current private trial. Codex independently reviews afterward.
+The brief and requirements are recorded; this redesign is **unstarted**, not an implemented theme.
+
+**Earlier owner priority, 2026-10-25:** Claude implements the focused T42/T43 hover-preview and
 slower marker-motion batch; Codex independently reviews afterward. See
 [the exact implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Other V3 tasks remain open but
 are outside that first Claude batch. Claude implemented it locally on 2026-10-25 (S-041, T42/T43
@@ -32,6 +39,7 @@ The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
+| T47 — Coherent Settings, menus and supporting UI | FR-037, FR-011, FR-015, FR-022, FR-026, FR-034; NFR-001–NFR-011; D41 | Owner direction and detailed English Claude brief recorded; source gaps independently inspected: Settings lacks shared theme/motion routing and uses stock controls, HMENU owner-drawing remains opaque. Implement the full owned-surface inventory with native behavior/accessibility and true supported glass; functional/pixel/motion/runtime/owner gates remain unstarted. Preserve S-046/S-047 and the active private trial. |
 | T45 — One active shared working folder | NFR-004, NFR-008, NFR-010; D18, D39 | Executed by Claude (S-040). Codex confirmed the official origin, single worktree, local lineage and a fresh successful build (S-042); an unexpected byte-identical launcher folder move was reversed without content edits. Private recovery/archive restore verification remains Claude's receipt. [Addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md). |
 | T46 — Attach executable-only windows to their unique desktop pin | FR-002, FR-003, FR-004, FR-034; NFR-004, NFR-008 | Implemented (S-044): same validated full executable path, argument-free desktop AUMID pin, no conflicting catalog/running identities or ambiguous pins. Explicit profiles remain separate; pin ID/launch route retained. 65 Dock unit cases and one own-window merged-pin preview/activation/close regression pass. Updated runtime is active; owner confirmation pending. |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Source patch removes expanded Dock/Top Bar visual HWND regions (S-035). S-047 additionally disables Dock panel/lift shadows that were clipped into square patches at raised icon slots; dark/light composed white-backdrop probes pass without expanding input regions or changing magnification. Separate-process input delivery, rounded-corner input and physical visual acceptance remain. Not installed into the owner's Alpha 2. |

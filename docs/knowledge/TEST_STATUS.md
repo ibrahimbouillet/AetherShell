@@ -1894,3 +1894,18 @@ confirms genuine maximize, a complex region, the correct owned property and `DWM
 window title, document content or desktop image is captured. The active host attempts installed
 Alpha 2 restoration after candidate exit. Private receipts remain ignored. Owner visual acceptance
 is pending; no unrelated app closure, installation, push, tag or release.
+
+### S-048 — Claude visual-redesign brief and source inspection (Codex, 2026-10-25)
+
+Documentation-only checkpoint for FR-037 / D41 / T47. Official origin and clean starting tree at
+`a442b2e` checked. The owner's private Settings screenshot was inspected and remains outside Git.
+Root and an independent read-only reviewer inspected SettingsWindow, app theme routing, TopBarMenu,
+ThemedMenu and existing shared material/motion/accessibility contracts. Settings currently creates
+stock children on COLOR_WINDOW and receives no shared DesignTokens/MotionPolicy; HMENU owner-draw
+uses a solid brush/DC alpha-ignore path. Those are inspected code facts, not new runtime tests.
+
+The detailed English Claude brief records full surface/state scope, design/motion direction,
+native input/UIA constraints, consent/draft/save/update preservation, real backdrop evidence,
+focused Release gates, safe local prototype launch and review/handoff duties. Requirements/task/
+decision links updated. The redesign is unstarted. No C++ code, running instance, settings,
+installation or release changed; no new build/test or owner visual acceptance is claimed.

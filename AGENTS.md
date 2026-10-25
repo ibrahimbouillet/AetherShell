@@ -35,6 +35,9 @@ Owner/author: Ibrahim Bouillet. License: MIT. Official repository: `github.com/i
 D38 starts the owner-approved V3 design/interaction development track (FR-031–FR-036, T39–T44).
 Read `docs/specs/v3-design-and-interaction.md` and the latest handoff; the installed Alpha 2 stays
 usable. This first batch does not finish V3, and no V3 tag/release/version number is authorized yet.
+D41/FR-037/T47 subsequently prioritizes visual coherence across Settings, the logo menu and all
+Aether-owned supporting UI. Follow `docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md` for the next Claude
+implementation batch; preserve native input/accessibility and the current private prototype.
 
 ## This repository is PUBLIC
 Everything committed here will be published in the public GitHub repository. Never write private

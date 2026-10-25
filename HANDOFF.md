@@ -7,9 +7,22 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — transparent corners and Dock decoration, 2026-10-25 (Europe/Paris)
+## Active continuation — next Claude visual redesign brief, 2026-10-25 (Europe/Paris)
 
-Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
+Last updated: 2026-10-25, by Codex. This prompt-preparation turn is documentation only. Claude is
+the next implementation writer for T47 when the owner starts the brief; Codex reviews afterward.
+No source edit, background build or test was started by this documentation turn. The private
+runtime/recovery host remains active and is not a competing source writer.
+
+**Next owner priority — complete Aether visual coherence (FR-037 / D41 / T47).** The owner rejects
+the stock white/grey Settings form and requests a professional English implementation brief for
+Claude. The entire Aether-owned journey, beginning with the logo menu and including Settings,
+updates, confirmations and supporting surfaces, must use the neutral translucent fine-grain
+material, restrained rim, refined icons/type and deliberate fluid motion. Follow
+[the full Claude brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md). Claude implements next;
+Codex reviews afterward. This turn records the prompt/requirements only; no runtime/source change
+or new build/visual acceptance is claimed. Settings currently lacks shared theme/motion routing;
+the existing HMENU DC owner-draw path remains opaque. Preserve native editor/UIA/consent behavior.
 
 **Current runtime — both corrections active, 13:51 CET.** Source
 `661a4cd46fbd0e57e75291e8f56dc0c4b8e5629e` was rebuilt after its local commit and launched in a
@@ -735,6 +748,11 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
   before preparing a package. The old b87be0d setup is historical and must not be presented as Alpha 2.
 
 ## NEXT SESSION START HERE
+
+**New owner priority:** read [the Claude visual-unification brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md)
+and FR-037/D41/T47 before choosing new work. It supersedes the older hover-only batch as the next
+implementation assignment. Preserve the active trial described below/above and all recent fixes;
+the visual redesign itself is not implemented. Codex's current turn was documentation only.
 
 0. **Read S-042/S-043 and the current runtime receipt before changing a running shell.** Codex completed
    the focused source review, repaired the byte-identical launcher move, reproduced and corrected
