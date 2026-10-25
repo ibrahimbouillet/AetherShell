@@ -34,6 +34,21 @@ Prepare a private settings clone and an adjacent recovery helper; preserve the i
 files and startup registration. The runtime receipt will identify which binary is actually running.
 No V3 installation, push, tag or release is authorized by this review.
 
+**Runtime — local hover prototype active, 2026-10-25 11:32 CET.** Candidate source is
+`f692b9fc8f1e12f7c00f7cf486d2af2bee3f22d3`, rebuilt after its local commit. The installed instance
+was quit normally; its app, supervisor and guard exited and its baseline file was cleared before
+starting the candidate app directly. Independent process/path/hash checks confirm that candidate
+and one adjacent recovery guard are running, with no installed Alpha 2 process remaining. The
+candidate logged both surfaces started and taskbar replacement active. All five genuine pins were
+kept in a private settings clone; default settings hash, installed app hash and HKCU startup value
+are unchanged. No other user application was closed or hidden and no desktop capture was made.
+The prototype is left running for owner evaluation; visual acceptance has been requested, not
+received. It retains Alpha 2 version metadata and is **not** an installed/released Alpha 3.
+An ignored local session host waits for candidate exit and attempts to relaunch installed Alpha 2
+after app/guard shutdown; that return path has not yet been exercised in this trial. Its script and
+runtime receipts are under `.local/hover-preview/`, never public. Startup still targets installed
+Alpha 2. Do not overwrite the private trial's settings or interrupt it without checking current state.
+
 ### Current continuation — V3 accepted for development (D38)
 
 **D39/T45 executed by Claude, 2026-10-25 — ONE shared working folder.** Claude and Codex now both
@@ -53,7 +68,7 @@ Branches `codex/t36-showcase-checkpoint` (not in `main`), `wip/d27-d28` and `wf/
 and unpushed. Receipt: S-040. Codex reviews this consolidation; the recovery location/inventory is
 private and deliberately not recorded here. Installed Alpha 2 was not touched.
 
-**T42/T43 implemented by Claude, 2026-10-25 — ready for Codex review (S-041).** Brief:
+**Historical Claude checkpoint, before the Codex review above (S-041).** Brief:
 [docs/CLAUDE_V3_HOVER_PROMPT.md](docs/CLAUDE_V3_HOVER_PROMPT.md). Local commits only; the running
 shell is still the installed Alpha 2 (`0.2.0-alpha.2`), which does **not** contain this work.
 
@@ -632,22 +647,23 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-0. **Codex: independently review two Claude batches, 2026-10-25.** (a) D39/T45 consolidation
-   (`d833239`, `671faad`, S-040): confirm `git worktree list` shows only this folder, `origin`
-   is official, and all branches/tags are present; the owner holds the private recovery location.
-   (b) T42/T43 (S-041): review `src/dock/DockHover.*`, `DockPreview.*`, `DockPreviewWindow.*`,
-   `DockMotion.*`, the `DockWindow.cpp` wiring and `Motion().marker`, then rerun the S-041 command
-   from this folder. Optional own-window motion frames (synthetic windows only, local output):
-   `$env:AETHER_DOCK_PREVIEW_FRAMES='<local folder>'; build/v3-release/modules/dock/aether_dock_integration_tests.exe frames`.
-   The owner has directly requested a local prototype launch after review (see authorization above).
-   Recording still requires a fresh D36 ready reply. For a bounded instance swap, quit the installed
-   shell (its own Quit command, or
-   `%LOCALAPPDATA%\Programs\AetherShell\versions\0.2.0-alpha.2\AetherShellApp.exe --quit`), run `build/v3-release/modules/app/AetherShellApp.exe --data-dir <private temp folder>` (no
-   startup registration happens unless chosen in its Settings), hover a background app with a
-   foreground app present, dwell, cross into the card, leave, re-hover, click, then close a
-   disposable window through X. Never capture the owner's apps without consent; when ending the trial,
-   quit the candidate (its own binary with `--quit --data-dir <private temp folder>`) and relaunch the installed
-   Alpha 2 from its Start-menu shortcut, confirming the native-taskbar state returns to what it was.
+0. **Read S-042 and the current runtime receipt before changing a running shell.** Codex completed
+   the focused source review, repaired the byte-identical launcher move, reproduced and corrected
+   three input defects, and passed the scoped Release gate. Do not repeat the old failed configure
+   in `build/v3-release`; the working review build is `build/wf-codex-hover-review`.
+   The owner requested a reviewed local prototype launch; this is separate from D36 recording
+   readiness. Inspect the ignored `.local/hover-preview/` runtime receipts and actual executable
+   identities to establish whether the candidate or installed Alpha 2 is running. Preserve an
+   active owner trial. A private candidate needs `AetherShellApp.exe` and adjacent `AetherShell.exe`
+   (recovery guard); run the app directly with `--data-dir <private folder>`, never the copied
+   launcher normally. Clone only settings, suppress clone-only pin import/startup/update checks,
+   and wait for each previous app/guard/supervisor to exit before another session starts.
+   Pending owner review: hover a background app while another app is foreground, dwell, cross into
+   its card, leave/re-hover, then click to observe simultaneous marker transfer. Close only a
+   disposable window if testing X. End a trial with that candidate's own `--quit --data-dir` and
+   confirm guard restoration before relaunching installed Alpha 2. No new recording without a
+   fresh ready reply. Next source work: card anchor on model reflow, source-only resize geometry,
+   then remaining T43 media/physical-DPI qualification. T44 corners remain unwired.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
    `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,

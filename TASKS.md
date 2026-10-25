@@ -17,6 +17,8 @@ slower marker-motion batch; Codex independently reviews afterward. See
 are outside that first Claude batch. Claude implemented it locally on 2026-10-25 (S-041, T42/T43
 rows below). Codex's focused independent review and corrections pass S-042. The owner requested a
 local prototype launch; its runtime receipt and the owner's visual acceptance are separate gates.
+The reviewed `f692b9f` prototype is now active in a private profile (HANDOFF/S-042); owner visual
+acceptance is pending. The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
@@ -30,7 +32,7 @@ local prototype launch; its runtime receipt and the owner's visual acceptance ar
 
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
 is published from `ad77019`, with exact-revision Windows CI, audited setup/checksums and a scoped
-installed startup/recovery gate. The installed shell is active. Continue T38's native action diagnosis
+installed startup/recovery gate. Alpha 2 remains installed; see HANDOFF for the active local trial. Continue T38's native action diagnosis
 and fresh gallery afterward; D36 readiness/privacy still apply. No new gallery/export is claimed.
 
 **Owner continuation (2026-10-23, D34/D35):** proceed to Alpha 2 build/install/publication. Add

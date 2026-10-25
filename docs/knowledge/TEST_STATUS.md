@@ -1667,3 +1667,15 @@ HWND/process/thread checks are not a universal window-generation identifier. Phy
 external/protected/elevated applications, media actions and normal-speed owner acceptance remain.
 The owner directly requested a reviewed local prototype launch; its runtime receipt is separate
 from these automated checks. No push, tag or release is part of this review.
+
+**Separate authorized runtime trial, 11:32 CET:** rebuilt app/guard from the committed source
+`f692b9fc8f1e12f7c00f7cf486d2af2bee3f22d3`. Normal installed Quit completed; all old installed
+processes exited and their baseline file was removed before the private candidate started. A second
+process/path/hash check confirmed the candidate app and its adjacent guard, with no installed
+process left. Logs acknowledged both desktop surfaces and active taskbar replacement. The private
+settings clone retains five genuine pins while disabling clone-only startup, pin reimport and
+automatic update checks. Installed app/settings hashes and startup registry value match the
+pre-swap observations. No unrelated app closure, desktop recording, installation or startup write.
+The candidate is left running for owner review; actual hover appearance/acceptance is still pending.
+The private waiting host attempts return to installed Alpha 2 after candidate Quit; that restoration
+branch has not been exercised in this trial. Runtime metadata stays ignored in `.local/hover-preview/`.
