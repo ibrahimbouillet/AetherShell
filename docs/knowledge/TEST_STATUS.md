@@ -1862,3 +1862,23 @@ with targets `aether_app_tests,aether_app_integration_tests,AetherShellApp,Aethe
 and `-JUnitFile build/wf-codex-hover-review/corner-backdrop-final-results.xml`.
 Raw build/failure evidence remains ignored in `build/corner-*.log`. No universal OS/DPI or
 antialiasing claim. Owner visual acceptance remains pending; no publication or installation.
+
+### S-047 — remove clipped rectangular Dock shadow fragments (Codex, 2026-10-25)
+
+Scope: D38 / T39 / NFR-011 / FR-004. The owner supplied a private crop showing grey square shadows
+around raised icons against a white application. `DockWindow::OnRender` painted the panel's wide
+exterior elevation shadow, then T39's exact native region clipped it into the rectangular icon
+slots. Disable only this Dock panel shadow and its lifted-icon shadow; keep native regions,
+bitmaps, magnification, reorder/lift springs and neutral glass/grain/border unchanged.
+
+The existing own-window dark/light Probe now switches its guarded opaque private backdrop to
+white and samples a known-transparent 3x3 bitmap corner above the glass panel. This is actual
+composed RGB, not a style-flag assertion. Before the production fix, both cases fail (minimum
+white channel **233 dark / 244 light**, required >=250). Afterward both read **255** and the two
+native probes pass, **7.015 s**, retaining the existing magnification, fake-action and idle checks.
+The initial test edit had a `/WX` C4456 local-name conflict, corrected before the pixel baseline;
+the final targeted Release `/W4 /WX` build is clean. Tests capture only their own guarded fixture;
+no owner app is closed/captured and no work area, real setting or launcher is modified.
+
+This is a scoped Dock rendering correction, not new owner visual acceptance, installation or
+publication. The combined private prototype still needs its separately recorded runtime check.

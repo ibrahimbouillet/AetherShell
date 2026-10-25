@@ -7,9 +7,18 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — pinned windows and guarded corners, 2026-10-25 (Europe/Paris)
+## Active continuation — transparent corners and Dock decoration, 2026-10-25 (Europe/Paris)
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
+
+**Latest owner feedback — rectangular Dock shadows (S-047).** The owner reported grey rectangular
+patches around raised logos on a white app background, permitting either a natural shadow or its
+removal. The Dock's exterior panel shadow was clipped into T39's rectangular icon slots. The focused
+fix disables that panel shadow and the lifted-icon shadow without expanding native regions or
+changing icon bitmaps, magnification, springs, neutral glass, grain or border. Two own-window dark/
+light probes reproduce the defect (white channels 233/244) and pass after the fix (255/255), with
+Release `/W4 /WX`. The supplied image remains private. A combined corrected prototype launch is
+next; neither these tests nor an earlier withdrawn reply constitute owner visual acceptance.
 
 **Owner correction — corner appearance rejected, 2026-10-25.** The apparent reply accepting both
 fixes was explicitly withdrawn: the owner was absent and did not provide that validation. Do not

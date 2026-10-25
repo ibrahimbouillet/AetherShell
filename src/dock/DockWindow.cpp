@@ -934,6 +934,9 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
     graphics::GlassStyle style;
     style.cornerRadius = graphics::DockCornerRadius(impl_->tokens, impl_->layout.panel.bottom - impl_->layout.panel.top);
     style.opacity = static_cast<float>(impl_->settings.opacity); style.backdropBlur = BackdropBlurActive();
+    // Exact native hit regions clip exterior shadows into the rectangular slots of raised icons.
+    // Keep those transparent bitmap corners clear instead of painting square shadow fragments.
+    style.shadow = false;
     graphics::PaintGlassPanel(context.d2d, impl_->layout.panel, impl_->tokens, style);
     winrt::com_ptr<ID2D1SolidColorBrush> primary, attention;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), primary.put())) ||
@@ -942,8 +945,6 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
         const auto& item = impl_->fitted.items[index];
         const auto rect = impl_->layout.items[index].icon;
         const float size = rect.right - rect.left;
-        if (const auto lift = impl_->lifts.find(item.id); lift != impl_->lifts.end() && impl_->AllowsDecoration())
-            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.radii.item, impl_->tokens, std::clamp(lift->second.Value(), 0.0f, 1.0f));
         if (const auto pulse = impl_->attentionPulses.find(item.id); pulse != impl_->attentionPulses.end() && impl_->AllowsDecoration()) {
             const float opacity = DockAttentionAt((graphics::FrameScheduler::Now() - pulse->second) / impl_->motion.EffectiveScale()).opacity;
             const D2D1_POINT_2F center{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2};

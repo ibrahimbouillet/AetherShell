@@ -10,6 +10,14 @@ AppBar policy is unchanged. T40 subsequently reduces panel top padding from 12 t
 height 70→67), preserving icons, baseline and bottom gap. Checks cover 96/144/192 DPI and custom sizes
 (S-036). These patches are not installed over Alpha 2.
 
+Owner correction S-047 (2026-10-25): the wide panel elevation shadow leaked into the raised icons'
+rectangular native slots and appeared as grey squares over light windows. The Dock now sets
+`GlassStyle::shadow = false` and omits the dragged-icon lift shadow. Native regions remain exact;
+do not expand them to recover decorative falloff. Icon bitmaps, magnification/reorder/lift motion,
+glass tint/blur/grain and hairline stay unchanged. Dark/light own-window probes require known
+transparent bitmap corners above the panel to show the private white backdrop (255 after fix;
+233/244 before). Owner appearance acceptance remains separate from that pixel check.
+
 T42 adds per-case-normalized application identity marker springs (S-037). Only an observed running
 application has a marker: its 5-DIP background dot expands to a 12-DIP pill while hovered or actually
 foreground. Hover leaves foreground identity and active color unchanged. Retargeting keeps current

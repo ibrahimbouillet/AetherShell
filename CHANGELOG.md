@@ -8,6 +8,9 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ### V3 development
 
+- Remove Dock shadow fragments that formed grey rectangles around raised icons on light windows,
+  retaining the exact input footprint and magnification animation.
+
 - Remove residual rectangular system material behind rounded maximized-window cutouts, with an
   independently restored material lease and composed-pixel regression coverage.
 

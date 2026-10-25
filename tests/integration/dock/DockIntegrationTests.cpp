@@ -67,6 +67,10 @@ public:
 LRESULT CALLBACK BackdropProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message != WM_PAINT) return ::DefWindowProcW(hwnd, message, wParam, lParam);
     PAINTSTRUCT paint{}; HDC dc = ::BeginPaint(hwnd, &paint); RECT client{}; ::GetClientRect(hwnd, &client);
+    if (::GetWindowLongPtrW(hwnd, GWLP_USERDATA) == 1) {
+        ::FillRect(dc, &client, static_cast<HBRUSH>(::GetStockObject(WHITE_BRUSH)));
+        ::EndPaint(hwnd, &paint); return 0;
+    }
     for (LONG x = 0; x < client.right; x += 32) {
         const int index = x / 32;
         HBRUSH brush = ::CreateSolidBrush(RGB(28 + index % 5 * 13, 42 + index % 4 * 14, 72 + index % 6 * 12));
@@ -251,6 +255,31 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     const auto span = [](const D2D1_RECT_F& icon) { return icon.right - icon.left; };
     CHECK(span(hoverGeometry->items[1].icon) > span(restGeometry->items[1].icon) * 1.25f);
     CHECK(BluePixels(hover) > BluePixels(rest));
+
+    // The exact native input region includes each raised icon's rectangular slot. Exterior panel
+    // shadows must not leak into transparent bitmap corners and become square grey patches there.
+    // Sample only our synthetic icon's known-transparent upper-left pixels, above the glass panel,
+    // over a solid private white backdrop; genuine magnification and native hit regions stay intact.
+    ::SetWindowLongPtrW(backdrop.hwnd, GWLP_USERDATA, 1);
+    ::InvalidateRect(backdrop.hwnd, nullptr, TRUE); ::UpdateWindow(backdrop.hwnd);
+    RunFor(loop, 50);
+    const auto whiteHover = CaptureOwn(backdrop.hwnd, window.Handle(), window.BoundsPx());
+    const auto& raised = hoverGeometry->items[1].icon;
+    const int clearLeft = static_cast<int>(std::ceil(window.ToPx(raised.left))) + 2;
+    const int clearTop = static_cast<int>(std::ceil(window.ToPx(raised.top))) + 2;
+    REQUIRE(clearTop + 2 < static_cast<int>(std::floor(window.ToPx(hoverGeometry->panel.top))) - 2);
+    int worstClearChannel = 255;
+    for (int sampleY = clearTop; sampleY < clearTop + 3; ++sampleY)
+        for (int sampleX = clearLeft; sampleX < clearLeft + 3; ++sampleX) {
+        REQUIRE(sampleX >= 0 && sampleX < whiteHover.width && sampleY >= 0 && sampleY < whiteHover.height);
+        const auto at = (static_cast<std::size_t>(sampleY) * whiteHover.width + sampleX) * 4;
+        for (std::size_t channel = 0; channel < 3; ++channel)
+            worstClearChannel = std::min(worstClearChannel, static_cast<int>(whiteHover.pixels[at + channel]));
+    }
+    TEST_NOTE("raised-icon transparent corner minimum white channel: " + std::to_string(worstClearChannel));
+    CHECK(worstClearChannel >= 250);
+    ::SetWindowLongPtrW(backdrop.hwnd, GWLP_USERDATA, 0);
+    ::InvalidateRect(backdrop.hwnd, nullptr, TRUE); ::UpdateWindow(backdrop.hwnd);
 
     // Motion disabled makes deterministic clicks use exactly the drawn geometry. All actions route
     // to fakes: this test never launches or activates another application.
