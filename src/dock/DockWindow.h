@@ -5,6 +5,7 @@
 #include "applications/ApplicationTypes.h"
 #include "core/Dispatcher.h"
 #include "core/Signal.h"
+#include "dock/DockHover.h"
 #include "dock/DockLayout.h"
 #include "graphics/Animation.h"
 #include "graphics/Theme.h"
@@ -33,7 +34,11 @@ struct DockWindowOptions {
     HWND owner = nullptr;
     // The application owns reversible native-taskbar visibility; the Dock owns its reserved area.
     bool replacementTaskbarMode = false;
+    // Own-window tests shorten the preview dwell/grace; production uses DockHoverTiming defaults.
+    std::optional<DockHoverTiming> hoverTiming;
 };
+
+class DockPreviewWindow;
 
 class DockWindow final : public ui::SurfaceWindow {
 public:
@@ -52,6 +57,11 @@ public:
                           const settings::DockSettings& settings);
     [[nodiscard]] Result<DockLayout> Geometry() const;
     [[nodiscard]] std::uint64_t RenderedFrames() const noexcept;
+    // Own-window test diagnostics: the drawn running-marker width (0 without a marker), the
+    // application whose marker the hover session emphasizes, and the preview card.
+    [[nodiscard]] float MarkerWidth(std::wstring_view applicationId) const;
+    [[nodiscard]] std::wstring EmphasizedApplication() const;
+    [[nodiscard]] const DockPreviewWindow* PreviewWindow() const noexcept;
     Signal<> SearchRequested;
     Signal<> SettingsRequested;
     Signal<> ImportWindowsPinsRequested;

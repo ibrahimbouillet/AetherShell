@@ -145,6 +145,10 @@ struct MotionTable {
     Spring::Parameters press;     // press feedback: stiffness 900, damping ratio 0.75
     Spring::Parameters lift;      // drag lift: stiffness 600, damping ratio 0.8
     Spring::Parameters slide;     // neighbours making room and drop settle: stiffness 380, damping ratio 0.85
+    // Running-marker width (Dock dot <-> pill): deliberately calmer than magnification, stiffness 100,
+    // damping ratio 0.92 (overshoot below 0.01 DIP). About 0.35 s to 90 % of a change and 0.52 s to
+    // within a tenth of a DIP at normal speed (magnify: 0.17 s); it keeps velocity through reversals.
+    Spring::Parameters marker;
     Seconds longPress = 0.350;    // a press held this long lifts the icon for dragging
     float liftOffset = 8.0f;      // a lifted icon rises by this many DIPs...
     float liftScale = 1.08f;      // ...and grows by this factor

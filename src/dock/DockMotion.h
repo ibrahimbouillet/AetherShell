@@ -21,14 +21,22 @@ struct DockAttentionVisual { float opacity = 0; float height = 0; };
 // by the window; no timer repeats the request after this envelope finishes.
 [[nodiscard]] DockAttentionVisual DockAttentionAt(double elapsed) noexcept;
 
+// A background running dot and the expanded marker. A hovered/previewed background application
+// expands to exactly the foreground marker's width; only the foreground keeps active styling.
+inline constexpr float kDockMarkerDotWidth = 5.0f;
+inline constexpr float kDockMarkerPillWidth = 12.0f;
+
 // The marker belongs to an observed running application, never to a pending launch. Retargets
-// preserve both width and velocity. Its center follows the existing animated icon geometry.
+// preserve both width and velocity, using the dedicated graphics::Motion().marker spring. Its
+// center follows the existing animated icon geometry.
 class DockIndicatorMotion {
 public:
-    void Retarget(bool running, bool foreground, bool hovered,
+    // `emphasized`: the pointer or keyboard is on this application's icon or its preview card.
+    void Retarget(bool running, bool foreground, bool emphasized,
         const graphics::MotionPolicy& policy) noexcept;
     void Step(double elapsed) noexcept { width_.Step(elapsed); }
     [[nodiscard]] float Width() const noexcept { return width_.Value(); }
+    [[nodiscard]] float Target() const noexcept { return width_.Target(); }
     [[nodiscard]] bool IsAnimating() const noexcept { return !width_.IsSettled(); }
 
 private:

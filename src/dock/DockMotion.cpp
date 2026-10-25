@@ -30,7 +30,7 @@ DockAttentionVisual DockAttentionAt(double elapsed) noexcept {
     return {pulse * 0.65f, pulse * 6.0f};
 }
 
-void DockIndicatorMotion::Retarget(bool running, bool foreground, bool hovered,
+void DockIndicatorMotion::Retarget(bool running, bool foreground, bool emphasized,
     const graphics::MotionPolicy& policy) noexcept {
     if (!running) {
         // A closed pin must not keep a fading marker or acquire one from hover alone.
@@ -38,10 +38,11 @@ void DockIndicatorMotion::Retarget(bool running, bool foreground, bool hovered,
         width_.SnapTo(0);
         return;
     }
-    if (!running_) width_.SnapTo(5);
+    if (!running_) width_.SnapTo(kDockMarkerDotWidth);
     running_ = true;
-    width_.SetParameters(policy.ScaleSpring(graphics::Motion().magnify));
-    const float target = foreground || hovered ? 12.0f : 5.0f;
+    width_.SetParameters(policy.ScaleSpring(graphics::Motion().marker));
+    // An already expanded hover marker keeps its target on an observed activation: no restart.
+    const float target = foreground || emphasized ? kDockMarkerPillWidth : kDockMarkerDotWidth;
     if (policy.reduced) width_.SnapTo(target);
     else width_.SetTarget(target);
 }

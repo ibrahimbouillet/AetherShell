@@ -26,6 +26,10 @@ MotionTable MakeMotionTable() noexcept {
     table.press = SpringFromDampingRatio(900.0f, 0.75f);
     table.lift = SpringFromDampingRatio(600.0f, 0.8f);
     table.slide = SpringFromDampingRatio(380.0f, 0.85f);
+    table.marker = SpringFromDampingRatio(100.0f, 0.92f);
+    // Widths are DIPs: settle once the remaining change is far below a physical pixel.
+    table.marker.restDelta = 0.01f;
+    table.marker.restVelocity = 0.05f;
     return table;
 }
 

@@ -6,6 +6,8 @@
 #include "diagnostics/Logger.h"
 #include "dock/DockModel.h"
 #include "dock/DockMotion.h"
+#include "dock/DockPreview.h"
+#include "dock/DockPreviewWindow.h"
 #include "graphics/BitmapCache.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
@@ -33,6 +35,7 @@ constexpr UINT kDeferredInvoke = WM_APP + 114;
 constexpr UINT_PTR kTooltipTimer = 1;
 constexpr UINT_PTR kErrorTimer = 2;
 constexpr UINT_PTR kLongPressTimer = 3;
+constexpr UINT_PTR kHoverTimer = 4;
 
 template <class F> Result<void> Guard(F&& function) {
     try { return function(); }
@@ -62,7 +65,7 @@ bool SamePresentation(const std::vector<DockItem>& first, const std::vector<Dock
 struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     Impl(DockWindow& surface, DockWindowContext dependencies)
         : window(surface), context(dependencies), bitmaps(dependencies.graphics),
-          tooltip(dependencies.graphics, dependencies.scheduler) {}
+          tooltip(dependencies.graphics, dependencies.scheduler), preview(dependencies.graphics, dependencies.scheduler) {}
 
     DockWindow& window;
     DockWindowContext context;
@@ -110,6 +113,11 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::set<std::wstring> requested;
     graphics::BitmapCache bitmaps;
     ui::TooltipWindow tooltip;
+    DockPreviewWindow preview;
+    DockHoverSession hover;
+    std::optional<double> armedHover;
+    RECT previewAnchor{};
+    bool applyingHover = false;
     ui::accessibility::AccessibleSurface accessible;
     Connection settingsChanged;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
@@ -132,7 +140,9 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             current.insert(id);
             auto& marker = indicators[id];
             const float before = marker.Width();
-            marker.Retarget(true, item.foreground, hovered == index, policy);
+            // Emphasis covers the icon, its card and the crossing between them. It never changes the
+            // observed foreground: only item.foreground selects the active styling when drawn.
+            marker.Retarget(true, item.foreground, hover.Emphasizes(item.id), policy);
             changed = changed || before != marker.Width();
             moving = moving || marker.IsAnimating();
         }
@@ -170,6 +180,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             spring.SetTarget(1); window.RequestAnimationFrame();
         }
         tooltip.HideTooltip(); ::KillTimer(window.Handle(), kTooltipTimer);
+        ResetHover();
     }
     void UpdateAttention() {
         std::set<std::wstring> requestedNow;
@@ -435,6 +446,162 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     void Emit(Signal<>& signal) {
         try { signal.Emit(); } catch (...) { AETHER_LOG_ERROR("dock", "Dock action listener threw an exception"); }
     }
+
+    // --- Hover emphasis and window previews (T42/T43) ---
+    std::optional<std::size_t> IndexOf(std::wstring_view id) const {
+        if (id.empty()) return std::nullopt;
+        for (std::size_t index = 0; index < fitted.items.size(); ++index)
+            if (text::EqualsIgnoreCase(fitted.items[index].id, id)) return index;
+        return std::nullopt;
+    }
+    // A card can only represent a live window the tracker currently lists for this group.
+    static bool Previewable(const DockItem& item) {
+        if (!IsApplicationItem(item.kind) || !item.running || !item.runningApplication) return false;
+        return std::any_of(item.runningApplication->windows.begin(), item.runningApplication->windows.end(),
+            [](const auto& entry) { return CaptureWindowIdentity(entry.handle).has_value(); });
+    }
+    bool HoverAllowed() const {
+        return window.Handle() && !suppressed && !dragging && window.IsShown() && !window.IsTransitioning() &&
+            ::IsWindowEnabled(window.Handle());
+    }
+    DockPreviewContent PreviewContent(const DockItem& item) const {
+        DockPreviewContent content;
+        content.applicationId = item.id;
+        content.applicationName = item.displayName;
+        if (item.runningApplication) content.windows = item.runningApplication->windows;
+        if (const auto image = images.find(ImageKey(item)); image != images.end()) content.icon = image->second;
+        return content;
+    }
+    void PointerHover(std::optional<std::size_t> hit) {
+        const double now = graphics::FrameScheduler::Now();
+        if (hit && *hit < fitted.items.size()) {
+            const auto& item = fitted.items[*hit];
+            const bool application = IsApplicationItem(item.kind);
+            hover.PointerOnItem(item.id, application && item.running, application && Previewable(item), now);
+        } else {
+            hover.PointerOnItem({}, false, false, now);
+        }
+        ApplyHover();
+    }
+    void ArmHoverTimer() {
+        const auto deadline = hover.Deadline();
+        if (deadline == armedHover || !window.Handle()) return;
+        armedHover = deadline;
+        if (!deadline) { ::KillTimer(window.Handle(), kHoverTimer); return; }
+        const double delay = std::max(0.0, *deadline - graphics::FrameScheduler::Now());
+        ::SetTimer(window.Handle(), kHoverTimer, static_cast<UINT>(std::ceil(delay * 1000)) + 1, nullptr);
+    }
+    // Brings markers and the card in line with the session. Presenting happens only when the
+    // previewed application changes; tracker refreshes go through RefreshPreview.
+    void ApplyHover() {
+        if (applyingHover) return;
+        applyingHover = true;
+        const std::wstring wanted = hover.Previewed();
+        if (wanted.empty()) {
+            if (preview.IsPresenting()) preview.Dismiss();
+        } else if (!HoverAllowed()) {
+            hover.PreviewUnavailable(wanted);
+            preview.Dismiss(true);
+        } else if (!preview.IsPresenting() || !text::EqualsIgnoreCase(preview.ApplicationId(), wanted)) {
+            const auto index = IndexOf(wanted);
+            bool shown = false;
+            if (index && *index < layout.items.size() && Previewable(fitted.items[*index])) {
+                previewAnchor = Anchor(*index);
+                shown = preview.Present(PreviewContent(fitted.items[*index]), previewAnchor);
+            }
+            if (shown) {
+                tooltip.HideTooltip(); ::KillTimer(window.Handle(), kTooltipTimer);
+            } else {
+                hover.PreviewUnavailable(wanted);
+                preview.Dismiss(true);
+                // Honest fallback: the name tooltip, never an invented preview.
+                if (index && *index < layout.items.size() && text::EqualsIgnoreCase(hover.ItemUnderPointer(), wanted))
+                    tooltip.ShowFor(fitted.items[*index].displayName, Anchor(*index), ui::TooltipPlacement::Above);
+            }
+        }
+        UpdateIndicators();
+        ArmHoverTimer();
+        applyingHover = false;
+    }
+    // The tracker changed: the card drops destroyed windows and adds new ones in place, and the item
+    // under the pointer may have gained or lost its last live window.
+    void RefreshPreview() {
+        if (hovered && *hovered < fitted.items.size() && pointer) {
+            const auto& item = fitted.items[*hovered];
+            const bool application = IsApplicationItem(item.kind);
+            hover.PointerOnItem(item.id, application && item.running, application && Previewable(item),
+                graphics::FrameScheduler::Now());
+        }
+        if (preview.IsPresenting()) {
+            const std::wstring id = preview.ApplicationId();
+            const auto index = IndexOf(id);
+            if (!index || !Previewable(fitted.items[*index]) || !preview.Present(PreviewContent(fitted.items[*index]), previewAnchor)) {
+                hover.PreviewUnavailable(id);
+                preview.Dismiss();
+            }
+        }
+        ApplyHover();
+    }
+    void ResetHover() {
+        hover.Reset();
+        armedHover.reset();
+        if (window.Handle()) ::KillTimer(window.Handle(), kHoverTimer);
+        preview.Dismiss(true);
+        UpdateIndicators();
+    }
+    bool OpenKeyboardPreview() {
+        if (focused >= fitted.items.size() || !Previewable(fitted.items[focused])) return false;
+        hover.OpenForKeyboard(fitted.items[focused].id);
+        ApplyHover();
+        if (!preview.IsPresenting()) return false;
+        preview.BeginKeyboard();
+        return true;
+    }
+    void CloseKeyboardPreview() {
+        const std::wstring id = hover.Previewed();
+        hover.PreviewUnavailable(id);
+        preview.EndKeyboard();
+        preview.Dismiss();
+        ApplyHover();
+    }
+    // A tile was clicked or invoked: activate exactly that window through the existing launcher path.
+    void ActivateFromPreview(const PreviewWindowIdentity& identity) {
+        const std::wstring id = preview.ApplicationId();
+        const auto index = IndexOf(id);
+        if (!index || !fitted.items[*index].runningApplication ||
+            !IsCurrentPreviewWindow(identity, fitted.items[*index].runningApplication->windows)) {
+            RefreshPreview();  // stale tile: never act on a replacement handle or a sibling
+            return;
+        }
+        if (!window.Handle() || suppressed || !window.IsShown() || !::IsWindowEnabled(window.Handle())) return;
+        const double now = graphics::FrameScheduler::Now();
+        const HWND foreground = ::GetForegroundWindow();
+        if (foreground && (identity.handle == foreground || identity.handle == ::GetAncestor(foreground, GA_ROOTOWNER))) {
+            hover.Activated(id, now);  // already in front: nothing to switch, and never minimize it
+            ApplyHover();
+            return;
+        }
+        apps::RunningApplication target = *fitted.items[*index].runningApplication;
+        std::erase_if(target.windows, [&](const auto& entry) { return entry.handle != identity.handle; });
+        hover.Activated(id, now);
+        auto result = context.launcher.Activate(target);
+        if (!result) { hover.ActivationFailed(); ErrorTooltip(result.error(), *index); }
+        ApplyHover();
+    }
+    // The tile's close button: a normal close request for that selected window only.
+    void CloseFromPreview(const PreviewWindowIdentity& identity) {
+        const std::wstring id = preview.ApplicationId();
+        const auto index = IndexOf(id);
+        if (!index || !fitted.items[*index].runningApplication ||
+            !IsCurrentPreviewWindow(identity, fitted.items[*index].runningApplication->windows)) {
+            RefreshPreview();
+            return;
+        }
+        auto result = RequestNormalClose(identity);
+        if (result) preview.MarkCloseRequested(identity.handle);
+        else if (result.error().code == ErrorCode::NotFound) RefreshPreview();
+        else ErrorTooltip(result.error(), *index);
+    }
     Result<void> ActivateItem(const DockItem& item, bool forceNew, std::size_t anchor) {
         if (!window.Handle() || suppressed || !window.IsShown() || window.IsTransitioning() || !::IsWindowEnabled(window.Handle()))
             return MakeError(ErrorCode::Unavailable, "Dock is not available for actions");
@@ -444,9 +611,16 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         if (item.kind == DockItemKind::TaskView) { Emit(window.TaskViewRequested); return Ok(); }
         if (!IsApplicationItem(item.kind)) return MakeError(ErrorCode::Unsupported, "this Dock entry is not available yet");
         if (!forceNew && item.runningApplication) {
+            // The card closes; an observed activation then continues the expanded marker.
+            hover.Activated(item.id, graphics::FrameScheduler::Now());
             auto result = context.launcher.Activate(*item.runningApplication);
-            if (!result) ErrorTooltip(result.error(), anchor);
+            if (!result) { hover.ActivationFailed(); ErrorTooltip(result.error(), anchor); }
+            ApplyHover();
             return result;
+        }
+        if (const std::wstring shown = hover.Previewed(); !shown.empty()) {
+            hover.PreviewUnavailable(shown);  // a launch closes an open card without emphasizing anything
+            ApplyHover();
         }
         if (!apps::HasLaunchRoute(item.application)) {
             auto error = MakeError(ErrorCode::Unsupported, "This application can be activated but has no trusted launch route.");
@@ -581,6 +755,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         if (item.kind == DockItemKind::Pinned) result.itemStatus = L"Pinned";
         if (item.running) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Running"; }
         if (item.attentionRequested) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Needs attention"; }
+        if (Previewable(item)) result.helpText = L"Up arrow shows window previews";
         return result;
     }
     Result<void> Invoke(int id) override {
@@ -616,6 +791,14 @@ Result<void> DockWindow::Create(DockWindowOptions options) {
         if (auto created = SurfaceWindow::Create(native, {work.left, work.bottom - 160, work.right, work.bottom}); !created) return created;
         if (auto tip = impl_->tooltip.Initialize(); !tip) return tip;
         impl_->tooltip.SetTheme(impl_->tokens, impl_->motion);
+        if (options.hoverTiming) impl_->hover.SetTiming(*options.hoverTiming);
+        DockPreviewWindow::Callbacks callbacks;
+        callbacks.pointerEntered = [this] { impl_->hover.PointerOnPreview(graphics::FrameScheduler::Now()); impl_->ApplyHover(); };
+        callbacks.pointerLeft = [this] { impl_->hover.PointerOffPreview(graphics::FrameScheduler::Now()); impl_->ApplyHover(); };
+        callbacks.activate = [this](const PreviewWindowIdentity& identity) { impl_->ActivateFromPreview(identity); };
+        callbacks.close = [this](const PreviewWindowIdentity& identity) { impl_->CloseFromPreview(identity); };
+        if (auto card = impl_->preview.Initialize(Handle(), std::move(callbacks)); !card) return card;
+        impl_->preview.SetTheme(impl_->tokens, impl_->motion, static_cast<float>(impl_->settings.opacity));
         if (auto connected = impl_->accessible.Connect(Handle(), *impl_); !connected) return connected;
         impl_->settingsChanged = impl_->context.settings.Changed().Connect([this](const settings::Settings& value) {
             (void)SetTheme(impl_->tokens, impl_->motion, value.dock);
@@ -651,9 +834,13 @@ Result<void> DockWindow::SetRunningApplications(std::vector<apps::RunningApplica
                     }
                 }
             };
-            update(impl_->fitted.items); update(impl_->fitted.overflow); return Ok();
+            update(impl_->fitted.items); update(impl_->fitted.overflow);
+            impl_->RefreshPreview();
+            return Ok();
         }
-        return Relayout();
+        auto result = Relayout();
+        impl_->RefreshPreview();
+        return result;
     });
 }
 Result<void> DockWindow::SetApplicationCatalog(std::vector<apps::ApplicationInfo> applications) {
@@ -676,6 +863,7 @@ Result<void> DockWindow::SetTheme(const graphics::DesignTokens& tokens, const gr
         for (auto& [id, spring] : impl_->presses) { (void)id; spring.SetParameters(motion.ScaleSpring(graphics::Motion().press)); }
         if (!impl_->AllowsDecoration()) { impl_->lifts.clear(); impl_->presses.clear(); impl_->bounces.clear(); impl_->attentionPulses.clear(); }
         impl_->tooltip.SetTheme(tokens, motion);
+        impl_->preview.SetTheme(tokens, motion, static_cast<float>(impl_->settings.opacity));
         if (impl_->menus) impl_->menus->SetTheme(tokens);
         if (IsShown() && IsTransitioning() && (motion.reduced || tokens.mode == graphics::ThemeMode::HighContrast))
             SurfaceWindow::Show(false); // cancel decorative motion immediately when policy changes
@@ -696,6 +884,7 @@ Result<void> DockWindow::SetSuppressed(bool suppressed) {
             impl_->FinishDrag(false);
             if (::GetCapture() == Handle()) ::ReleaseCapture();
             impl_->pointer.reset(); impl_->hovered.reset(); impl_->attentionPulses.clear();
+            impl_->ResetHover();
             Hide(); impl_->tooltip.HideTooltip(); impl_->SetTargets();
         } else { Show(false); impl_->UpdateAttention(); }
         return Ok();
@@ -733,6 +922,12 @@ Result<DockLayout> DockWindow::Geometry() const {
     try { return impl_->layout; } catch (...) { return MakeError(ErrorCode::Internal, "Dock geometry could not be copied"); }
 }
 std::uint64_t DockWindow::RenderedFrames() const noexcept { return impl_->frames; }
+float DockWindow::MarkerWidth(std::wstring_view applicationId) const {
+    const auto marker = impl_->indicators.find(text::ToLower(applicationId));
+    return marker == impl_->indicators.end() ? 0.0f : marker->second.Width();
+}
+std::wstring DockWindow::EmphasizedApplication() const { return impl_->hover.Emphasized(); }
+const DockPreviewWindow* DockWindow::PreviewWindow() const noexcept { return &impl_->preview; }
 
 void DockWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
@@ -823,6 +1018,7 @@ bool DockWindow::OnAnimate(double now) {
     (void)impl_->Arrange(); if (!moving) impl_->lastFrame = 0; return moving;
 }
 void DockWindow::OnDpiChanged(UINT, const RECT&) {
+    impl_->ResetHover();  // the card and its thumbnails are rebuilt by the next deliberate hover
     impl_->FinishDrag(false);
     if (::GetCapture() == Handle()) ::ReleaseCapture();
     impl_->reorderOffsets.clear(); impl_->baseCenters.clear();
@@ -841,13 +1037,18 @@ void DockWindow::OnPointerMove(D2D1_POINT_2F point) {
     auto hit = HitTest(impl_->layout, point);
     if (hit != impl_->hovered) {
         impl_->hovered = hit; impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer);
-        if (hit) ::SetTimer(Handle(), kTooltipTimer, static_cast<UINT>(std::max(1.0, impl_->tokens.tooltipDelay * 1000)), nullptr);
+        // A running application with a live window shows its preview card after the dwell instead.
+        if (hit && !(*hit < impl_->fitted.items.size() && Impl::Previewable(impl_->fitted.items[*hit])))
+            ::SetTimer(Handle(), kTooltipTimer, static_cast<UINT>(std::max(1.0, impl_->tokens.tooltipDelay * 1000)), nullptr);
     }
+    impl_->PointerHover(hit);
     impl_->SetTargets();
 }
 void DockWindow::OnPointerLeave() {
     if (impl_->dragging && ::GetCapture() == Handle()) return;
-    impl_->pointer.reset(); impl_->hovered.reset(); impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer); impl_->SetTargets();
+    impl_->pointer.reset(); impl_->hovered.reset(); impl_->tooltip.HideTooltip(); ::KillTimer(Handle(), kTooltipTimer);
+    impl_->hover.PointerOffDock(graphics::FrameScheduler::Now()); impl_->ApplyHover();
+    impl_->SetTargets();
 }
 void DockWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
     if (!Handle() || impl_->suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) return;
@@ -887,6 +1088,12 @@ void DockWindow::OnPointerCaptureLost() {
 }
 bool DockWindow::OnKeyDown(UINT key) {
     if (impl_->fitted.items.empty()) return false;
+    if (impl_->preview.KeyboardActive()) {
+        // The Dock keeps keyboard focus; the open card receives navigation and invocation keys.
+        if (key == VK_ESCAPE || key == VK_DOWN) { impl_->CloseKeyboardPreview(); return true; }
+        return impl_->preview.HandleKey(key);
+    }
+    if (key == VK_UP && impl_->keyboard && impl_->OpenKeyboardPreview()) return true;
     if (key == VK_APPS || (key == VK_F10 && (::GetKeyState(VK_SHIFT) & 0x8000))) { impl_->MenuAt(impl_->focused); return true; }
     if (key == VK_RETURN || key == VK_SPACE) { const auto item = impl_->fitted.items[impl_->focused]; (void)impl_->ActivateItem(item, false, impl_->focused); return true; }
     if (key == VK_ESCAPE) {
@@ -903,6 +1110,7 @@ bool DockWindow::OnKeyDown(UINT key) {
 }
 void DockWindow::OnFocusChanged(bool focused) {
     if (!focused) {
+        if (impl_->preview.KeyboardActive()) impl_->CloseKeyboardPreview();
         impl_->keyboard = false;
         ::SetWindowLongPtrW(Handle(), GWL_EXSTYLE, ::GetWindowLongPtrW(Handle(), GWL_EXSTYLE) | WS_EX_NOACTIVATE);
     }
@@ -921,11 +1129,13 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
     }
     if (message == impl_->explorerMessage) { (void)OnExplorerRestarted(); return 0; }
     if (message == WM_DISPLAYCHANGE || (message == WM_SETTINGCHANGE && wParam == SPI_SETWORKAREA)) {
+        impl_->ResetHover();
         impl_->FinishDrag(false);
         if (::GetCapture() == Handle()) ::ReleaseCapture();
         (void)Relayout(); return 0;
     }
     if (message == WM_ENABLE && !wParam) {
+        impl_->ResetHover();
         impl_->FinishDrag(false); impl_->tooltip.HideTooltip();
         if (::GetCapture() == Handle()) ::ReleaseCapture();
         (void)impl_->Arrange();
@@ -940,9 +1150,17 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
         ::KillTimer(Handle(), wParam);
         if (wParam == kErrorTimer) impl_->tooltip.HideTooltip();
         else if (Handle() && IsShown() && !impl_->suppressed && !impl_->dragging && !IsTransitioning() && ::IsWindowEnabled(Handle()) &&
+            !impl_->preview.IsPresenting() &&
             impl_->hovered && *impl_->hovered < impl_->fitted.items.size() && *impl_->hovered < impl_->layout.items.size())
             impl_->tooltip.ShowFor(impl_->fitted.items[*impl_->hovered].displayName,
             impl_->Anchor(*impl_->hovered), ui::TooltipPlacement::Above);
+        return 0;
+    }
+    if (message == WM_TIMER && wParam == kHoverTimer) {
+        ::KillTimer(Handle(), kHoverTimer);
+        impl_->armedHover.reset();
+        impl_->hover.Advance(graphics::FrameScheduler::Now());
+        impl_->ApplyHover();
         return 0;
     }
     if (message == WM_TIMER && wParam == kLongPressTimer) {
@@ -968,7 +1186,8 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
 void DockWindow::OnCreated() {}
 void DockWindow::OnDestroying() {
     ::KillTimer(Handle(), kTooltipTimer); ::KillTimer(Handle(), kErrorTimer); ::KillTimer(Handle(), kLongPressTimer);
-    impl_->accessible.Disconnect(); impl_->tooltip.Destroy();
+    ::KillTimer(Handle(), kHoverTimer); impl_->hover.Reset(); impl_->armedHover.reset();
+    impl_->accessible.Disconnect(); impl_->tooltip.Destroy(); impl_->preview.Destroy();
     const bool registered = impl_->appBar;
     impl_->options.allowWorkAreaReservation = false;
     impl_->appBar = false; impl_->appBarPositioned = false;

@@ -157,3 +157,57 @@ AETHER_TEST("dock indicator: repeated observations preserve the curve at differe
         CHECK_FALSE(first.IsAnimating());
     }
 }
+
+AETHER_TEST("dock indicator: hover expands to exactly the foreground width at a calm, readable pace") {
+    DockIndicatorMotion background, foreground;
+    const aether::graphics::MotionPolicy policy;
+    foreground.Retarget(true, true, false, policy);
+    background.Retarget(true, false, false, policy);
+    CHECK_EQ(foreground.Width(), kDockMarkerDotWidth);  // first observation starts as a dot...
+    SettleIndicator(foreground);
+    CHECK_EQ(foreground.Width(), kDockMarkerPillWidth);
+    background.Retarget(true, false, true, policy);
+    double elapsed = 0, half = -1, ninety = -1;
+    while (background.IsAnimating() && elapsed < 2) {
+        background.Step(1.0 / 120); elapsed += 1.0 / 120;
+        const float progress = (background.Width() - kDockMarkerDotWidth) / (kDockMarkerPillWidth - kDockMarkerDotWidth);
+        if (half < 0 && progress >= 0.5f) half = elapsed;
+        if (ninety < 0 && progress >= 0.9f) ninety = elapsed;
+        CHECK(background.Width() <= kDockMarkerPillWidth + 0.01f);  // no visible overshoot
+    }
+    CHECK(half > 0.12); CHECK(half < 0.22);
+    CHECK(ninety > 0.30); CHECK(ninety < 0.45);  // the owner's 300-450 ms proposal, at normal speed
+    CHECK(elapsed < 1.0);  // and frame demand still ends
+    CHECK_EQ(background.Width(), foreground.Width());
+    aether::graphics::MotionPolicy slower; slower.durationScale = 1.5f;
+    DockIndicatorMotion scaled; scaled.Retarget(true, false, false, slower); scaled.Retarget(true, false, true, slower);
+    scaled.Step(half);
+    CHECK((scaled.Width() - kDockMarkerDotWidth) / (kDockMarkerPillWidth - kDockMarkerDotWidth) < 0.5f);
+}
+
+AETHER_TEST("dock indicator: observed activation of a hovered marker continues without a restart") {
+    DockIndicatorMotion previous, hovered;
+    const aether::graphics::MotionPolicy policy;
+    previous.Retarget(true, true, false, policy); SettleIndicator(previous);
+    hovered.Retarget(true, false, false, policy);
+    hovered.Retarget(true, false, true, policy); SettleIndicator(hovered);
+    // Foreground moves from the old application to the hovered one in the same observation.
+    previous.Retarget(true, false, false, policy);
+    hovered.Retarget(true, true, true, policy);
+    CHECK(previous.IsAnimating());
+    CHECK_FALSE(hovered.IsAnimating());
+    float last = previous.Width();
+    for (int frame = 0; frame < 12; ++frame) {
+        previous.Step(1.0 / 60); hovered.Step(1.0 / 60);
+        CHECK(previous.Width() < last); last = previous.Width();
+        CHECK_EQ(hovered.Width(), kDockMarkerPillWidth);
+    }
+    // A partially expanded hover marker keeps its width and velocity through the same transfer.
+    DockIndicatorMotion partial; partial.Retarget(true, false, false, policy); partial.Retarget(true, false, true, policy);
+    partial.Step(0.1);
+    const float before = partial.Width();
+    partial.Retarget(true, true, false, policy);
+    CHECK_EQ(partial.Width(), before);
+    partial.Step(1.0 / 60);
+    CHECK(partial.Width() > before);
+}
