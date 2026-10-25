@@ -4,7 +4,7 @@ You are continuing an existing native Windows application. Implement this focuse
 
 ## Establish the actual starting point
 
-Work only in the clean checkout whose origin is https://github.com/ibrahimbouillet/AetherShell. The original development checkout is an archive. Verify origin, HEAD, staged/unstaged/untracked work before editing; preserve existing work.
+Work only in the one shared `AetherShell` checkout whose origin is https://github.com/ibrahimbouillet/AetherShell (D39). The old private development history is a recovery archive, not a working folder. Verify origin, HEAD, staged/unstaged/untracked work before editing; preserve existing work.
 
 Read AGENTS.md, HANDOFF.md including NEXT SESSION START HERE, PROJECT_SPEC.md FR-033/FR-034, TASKS.md T42/T43, D38 in DECISIONS.md, docs/specs/v3-design-and-interaction.md, docs/modules/dock.md, and TEST_STATUS S-037/S-038.
 

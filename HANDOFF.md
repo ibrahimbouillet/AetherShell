@@ -13,12 +13,22 @@ Last updated: 2026-10-25 (Europe/Paris).
 
 ### Current continuation — V3 accepted for development (D38)
 
-**Additional owner instruction, 2026-10-25 (D39/T45):** consolidate into ONE active shared project
-folder rather than original/public/assistant-specific working folders. Claude performs the migration;
-Codex reviews afterward. Read [the consolidation addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md).
-This is requested, not executed: preserve all local work and private recovery history before any
-move/removal. Retain the public Git lineage; do not merge or push the old private history. The
-current verified development location remains the official-origin checkout until migration passes.
+**D39/T45 executed by Claude, 2026-10-25 — ONE shared working folder.** Claude and Codex now both
+work in the single checkout named `AetherShell` (official `origin`, branch `main`; on the owner's
+machine `%USERPROFILE%\Documents\AetherShell`). `git worktree list` shows only that folder. Do not
+create another clone or assistant worktree. The canonical public Git lineage was moved there
+unchanged (main `57427f0` and every local branch, tag and checkpoint ref preserved; verified
+identical). The old private-history checkout, ten retired linked worktrees (Codex integration and
+nine old Claude workflow trees, all HEADs already contained in `main`) and one hidden Codex worktree
+of the private history were moved — not deleted — into a verified local recovery archive outside the
+project, with Git bundles test-restored (fsck clean, refs identical). One retired workflow tree held
+old uncommitted visual-core edits; they are preserved there as files and as a verified patch, not
+applied (newer versions exist in `main`). Local tool state (`.claude/`, `.codex/`, `docs/.obsidian/`,
+the owner's canvas) was restored into the shared folder and stays git-ignored. The previous build
+tree was retired because its CMake caches named the old path: use fresh `build/<name>` folders.
+Branches `codex/t36-showcase-checkpoint` (not in `main`), `wip/d27-d28` and `wf/b1-*` remain local
+and unpushed. Receipt: S-040. Codex reviews this consolidation; the recovery location/inventory is
+private and deliberately not recorded here. Installed Alpha 2 was not touched.
 
 **Owner-directed next batch, 2026-10-25:** Claude implements T42/T43; Codex subsequently reviews.
 Use [the focused Claude implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Prioritize a running
@@ -584,8 +594,8 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
    `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,
-   worktrees, tags and working-tree state. Work only in the clean public-origin checkout; never
-   develop in the private history archive.
+   worktrees, tags and working-tree state. D39: work only in the one shared `AetherShell` checkout
+   (no new clones/worktrees); the private history is recovery data, never a working folder.
 2. Alpha 2 is published and owner-accepted. Continue T39–T44; do not repeat completed release or installation work. Inspect current processes/status before
    launching anything. Preserve the owner's current pins and preferences; private capture profiles
    never register startup. The installed startup/recovery gate has the scoped passing receipt above;
@@ -801,9 +811,9 @@ No live signed-update execution or complete Version 1 acceptance is claimed.
 ## Standing handover rules (from the 0.1.0-alpha.1 session; still valid)
 1. Read AGENTS, PROJECT_SPEC, TASKS and TEST_STATUS S-011. Code and executed evidence win over old
    work orders. Do not restart already implemented modules from historical "not started" notes.
-2. Inspect Git status and remotes. **D18: original development checkout/history stays local.** Public
-   development uses the separate `AetherShell-public` clean checkout with independent history and
-   public GitHub noreply identity. Never push the original history or copy its .git, build/logs/PDBs,
+2. Inspect Git status and remotes. **D18: original development history stays local.** Since D39,
+   all development uses the one shared `AetherShell` checkout with the independent public history and
+   public GitHub noreply identity; the old private history is only a local recovery archive. Never push the original history or copy its .git, build/logs/PDBs,
    .local/.claude/.obsidian/graphs or owner `docs/Untitled.canvas`. The canvas remains untouched.
 3. Inspect the published alpha and S-012 receipts, then continue outstanding qualification or
    owner-requested features. The first alpha is manual-install only. Future release publication

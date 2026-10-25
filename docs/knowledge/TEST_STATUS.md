@@ -1518,3 +1518,40 @@ close, and pointer continuity; Claude implements and Codex subsequently reviews.
 No product source, tests, settings, runtime windows or presentation assets were modified. No tests
 were rerun for this documentation-only change; S-037/S-038 retain their exact historical boundaries.
 The prompt requires focused build/native checks and actual visual inspection for the later code.
+
+### S-040 — single shared working folder consolidation (Claude, 2026-10-25)
+
+Scope: D39 / T45. Organization only; no product source changed. Starting state inspected first:
+canonical public checkout clean at `57427f0` (main ahead of `origin/main` by 4), ten linked
+worktrees on that lineage, plus the separate private-history checkout and one hidden Codex
+worktree of it. Every linked-worktree HEAD was verified to be an ancestor of `main`; one retired
+workflow tree had uncommitted edits (3 modified, 2 untracked files), preserved as files and as a
+patch whose reverse-apply check passed on that tree. Branch `codex/t36-showcase-checkpoint` is not
+in `main` and remains a local branch.
+
+**Executed checks (private paths omitted):**
+- `git bundle create --all` for both histories; `git bundle verify` reports complete histories;
+  mirror clones of both bundles pass `git fsck --full` with no errors; their refs are byte-identical
+  to the source repositories (`for-each-ref` diff empty).
+- Retired worktrees moved into the recovery archive, then `git worktree prune -v` removed exactly
+  the ten stale administrative entries; `git worktree list` shows only the shared folder.
+- The private-history checkout was moved (no deletion); afterwards `git fsck --full` passes
+  (two pre-existing dangling trees only), HEAD/status are unchanged and refs equal the bundle.
+- Canonical repository after the move: `git status` clean, `origin` unchanged, `main...origin/main
+  [ahead 4]`, `git fsck` clean, local refs identical to its pre-move bundle. Restored local tool
+  files are hash-identical to their sources; `.codex/` is now git-ignored.
+- Focused gate from the final folder (fresh build directory; the old one was retired because its
+  CMake cache named the previous path):
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/v3-release -Jobs 6 `
+  -Target @('aether_dock_tests','aether_dock_integration_tests') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_dock_tests$' -TestExclude ''
+ctest -R '^aether_dock_integration_tests$'   # from build/v3-release
+```
+
+Warning-free `/W4 /WX` build, 84/84 steps; `aether_dock_tests` passed (0.14 s);
+`aether_dock_integration_tests` passed (15.06 s, own windows only). The installed Alpha 2 process,
+program folder, settings, pins and startup entry were not touched. Not established: Codex's
+independent review of the consolidation.

@@ -50,10 +50,12 @@ honest documentation. The goal is a reliable, beautiful, lightweight and accessi
 the Version 1 definition of done in `PROJECT_SPEC.md`: real software, not a prototype or a mockup.
 
 ## Step 1 — Make sure you are in the right place
-- The official repository is public: https://github.com/ibrahimbouillet/AetherShell. Work only in the
-  local checkout whose `origin` remote is that repository (`git remote -v`). If your working copy has
-  no remote or a different one (for example an older local archive copy), stop and tell the owner
-  before you change anything.
+- The official repository is public: https://github.com/ibrahimbouillet/AetherShell. Claude, Codex
+  and every other assistant share ONE local working folder, named `AetherShell`, whose `origin`
+  remote is that repository (`git remote -v`). Work there; do not create another clone, copy or
+  assistant-specific worktree unless the owner explicitly asks. If your working copy has no remote or
+  a different one (for example an old recovery copy), stop and tell the owner before you change
+  anything. `git worktree list` should show only that folder.
 - Run `git status`, `git log --oneline -10` and `git branch -vv`, and note every uncommitted change.
   Uncommitted work was most likely left by the previous assistant: never discard, reset, overwrite or
   "clean up" it. If files changed in the last few minutes, another session may still be running; ask

@@ -52,6 +52,7 @@ secrets/
 # Local AI-assistant tooling (graphify knowledge graph, machine-local Claude Code config)
 graphify-out/
 .claude/
+.codex/
 # Regenerable exports (Graphify -> Obsidian) and local Obsidian vault state
 .local/
 .obsidian/

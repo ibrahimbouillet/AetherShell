@@ -91,7 +91,10 @@ additional active project folders. Never merge/push private history, assume a pu
 can be private, or use Gitignore to conceal already tracked history. Untested/incomplete work stays
 local between assistants. No consolidation push/tag/release is authorized by this instruction.
 Record final location/entry-point changes and focused build receipts before declaring completion.
-See [the Claude addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md); migration is requested, not executed.
+See [the Claude addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md). Migration executed by Claude on
+2026-10-25 (T45, TEST_STATUS S-040), pending Codex's independent review: the shared folder is the
+`AetherShell` checkout with the official origin; D18's separate-folder arrangement is superseded,
+its private/public history separation is retained.
 
 ## Open questions and implementation discrepancies
 
