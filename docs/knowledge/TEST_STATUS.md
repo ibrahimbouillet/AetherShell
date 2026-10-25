@@ -1882,3 +1882,15 @@ no owner app is closed/captured and no work area, real setting or launcher is mo
 
 This is a scoped Dock rendering correction, not new owner visual acceptance, installation or
 publication. The combined private prototype still needs its separately recorded runtime check.
+
+**Combined authorized runtime — S-046/S-047, 13:51 CET:** source
+`661a4cd46fbd0e57e75291e8f56dc0c4b8e5629e` rebuilt after its commit and started in a fresh private
+profile. The previous region-only trial quit normally and its waiting host returned installed
+Alpha 2 before the new bounded swap. A separate process/path/hash check confirms one primary app,
+one taskbar helper and one corner child with the correct parent. Logs acknowledge both native
+surfaces, active replacement and corner-guard readiness. Five genuine pins, default settings,
+installed binary and startup registration are unchanged. A read-only real-editor attribute check
+confirms genuine maximize, a complex region, the correct owned property and `DWMSBT_NONE`; no
+window title, document content or desktop image is captured. The active host attempts installed
+Alpha 2 restoration after candidate exit. Private receipts remain ignored. Owner visual acceptance
+is pending; no unrelated app closure, installation, push, tag or release.

@@ -11,14 +11,26 @@
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
 
+**Current runtime — both corrections active, 13:51 CET.** Source
+`661a4cd46fbd0e57e75291e8f56dc0c4b8e5629e` was rebuilt after its local commit and launched in a
+fresh private profile. The old region-only prototype quit normally, its recovery host returned
+installed Alpha 2, and the next bounded swap started this combined candidate. Independent process/
+path/hash checks confirm one primary app, its taskbar helper and one correctly parented corner
+child; both surfaces, taskbar replacement and corner readiness are acknowledged. Five genuine pins,
+default settings, installed binary and startup value are preserved. A read-only check of the real
+maximized editor confirms genuine maximize, a complex region, an owned lease and `DWMSBT_NONE`.
+This is runtime state verification, not an owner-content capture or visual acceptance. No unrelated
+app was closed, no installation or publication occurred. The waiting recovery host and private
+receipts remain ignored under `.local/hover-preview/`. Leave this usable trial active.
+
 **Latest owner feedback — rectangular Dock shadows (S-047).** The owner reported grey rectangular
 patches around raised logos on a white app background, permitting either a natural shadow or its
 removal. The Dock's exterior panel shadow was clipped into T39's rectangular icon slots. The focused
 fix disables that panel shadow and the lifted-icon shadow without expanding native regions or
 changing icon bitmaps, magnification, springs, neutral glass, grain or border. Two own-window dark/
 light probes reproduce the defect (white channels 233/244) and pass after the fix (255/255), with
-Release `/W4 /WX`. The supplied image remains private. A combined corrected prototype launch is
-next; neither these tests nor an earlier withdrawn reply constitute owner visual acceptance.
+Release `/W4 /WX`. The supplied image remains private. The combined corrected prototype above is
+active; neither these tests nor an earlier withdrawn reply constitute owner visual acceptance.
 
 **Owner correction — corner appearance rejected, 2026-10-25.** The apparent reply accepting both
 fixes was explicitly withdrawn: the owner was absent and did not provide that validation. Do not
@@ -35,9 +47,8 @@ retains partial-application recovery state. A real composition body remains visi
 excluded corner pixels match both private backdrop phases. Final Release `/W4 /WX`: **58 app unit
 and 12 app native cases pass** (2/2 executables, 17.02 s), including standard/custom/Mica frames,
 exact material recovery and independent app replacements. The standard fixture settles its own
-initial native frame before guard acquisition and waits for an actual complex region. The old
-runtime receipt below still identifies `eae2684` until the separate corrected trial is launched;
-do not treat these tests as owner acceptance or publication.
+initial native frame before guard acquisition and waits for an actual complex region. The current
+trial above supersedes the old `eae2684` runtime; do not treat tests as owner acceptance or publication.
 
 **Current work — pinned/running association and real maximized corners (S-044 / D40).** The owner
 reported a duplicate pinned/running editor icon and repeated the square maximized-corner defect.
@@ -58,7 +69,7 @@ region preservation and a real fixture-process death without a stop signal. No o
 modified by tests. This is eligible-maximized-window raster clipping,
 not universal antialiasing: hung targets may delay recovery and a killed guard loses its snapshots.
 
-**Current runtime — pin/corner prototype active, 12:39 CET.** Source
+**Previous runtime — superseded region-only pin/corner prototype, 12:39 CET.** Source
 `eae2684027b03ab7ac3ec0b6a0e9cf3f98f22e04` was rebuilt after its local commit and launched through
 the existing bounded private-profile swap. The old compact app/guard exited, installed Alpha 2
 returned, and that installed session was then quit normally before the new app started. A separate
@@ -742,8 +753,9 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
    confirm guard restoration before relaunching installed Alpha 2. No new recording without a
    fresh ready reply. Next source work: card anchor on model reflow, source-only resize geometry,
    then remaining T43 media/physical-DPI qualification. The owner rejected the T44 region-only
-   corner appearance (D40/S-045); finish S-046 composed-pixel/material recovery qualification and
-   establish the actual corrected runtime. The apparent acceptance reply was explicitly withdrawn.
+   corner appearance (D40/S-045); S-046's composed-pixel/material gate and S-047's white-backdrop
+   Dock gate now pass, and the combined `661a4cd` trial above is active. Read its actual runtime
+   receipt before any swap. The apparent acceptance reply was explicitly withdrawn.
    Obtain genuine owner visual acceptance before expanding eligibility.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and

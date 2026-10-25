@@ -19,14 +19,15 @@ rows below). Codex's focused independent review and corrections pass S-042. The 
 local prototype launch; its runtime receipt and the owner's visual acceptance are separate gates.
 The owner accepted the reviewed `f692b9f` prototype's basic interaction and requested tighter card
 spacing. The compact `fdc2691` prototype preserved image/X size (S-043). The subsequent pin/corner
-prototype `eae2684` is now active in a private profile (S-044/S-045), with app/taskbar/corner-helper
+prototype `eae2684` was reviewed in a private profile (S-044/S-045), with app/taskbar/corner-helper
 readiness checked. The owner withdrew an apparent acceptance reply and rejected the dark remainder
 around the rounded corner; no acceptance of either fix may be inferred from that reply. S-046
 corrects the full-window material and passes the composed-pixel/cleanup gate (58 unit, 12 native).
-Corrected runtime launch and owner visual verification are separate; single-icon verification is pending.
+The combined corrected `661a4cd` trial is now active with independent process/hash/readiness checks;
+owner visual verification, including the single-icon scenario, remains pending.
 The owner then reported rectangular grey patches around magnified Dock icons on white backgrounds.
-S-047 removes the clipped panel/lift shadows; two dark/light own-window pixel probes pass. Include
-both corrections in the next private runtime, preserving the exact input footprint.
+S-047 removes the clipped panel/lift shadows; two dark/light own-window pixel probes pass. Both
+corrections are in that active private runtime, preserving the exact input footprint.
 The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
