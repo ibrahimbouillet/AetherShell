@@ -78,6 +78,21 @@ reviews it. Prioritize true hover previews with selected-window normal-close X, 
 equal-width hover/foreground pills and slower continuous marker motion. Other V3 streams and
 publication remain outside this batch. See [the implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md).
 
+### D39 — One shared active checkout; retain private history as recovery data
+
+Owner-approved organization change, 2026-10-25. Claude and Codex should alternate in one canonical
+active project folder, preferably named AetherShell, without creating a new checkout per assistant
+or session. This supersedes D18's multiple-folder working arrangement after a verified migration,
+but preserves its independent public Git lineage and exclusion of old private history.
+
+Inspect all trees/worktrees and preserve unique commits, staged/unstaged/untracked work and needed
+ignored files before moving or retiring anything. Verify local recovery backups; they are not
+additional active project folders. Never merge/push private history, assume a public branch/commit
+can be private, or use Gitignore to conceal already tracked history. Untested/incomplete work stays
+local between assistants. No consolidation push/tag/release is authorized by this instruction.
+Record final location/entry-point changes and focused build receipts before declaring completion.
+See [the Claude addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md); migration is requested, not executed.
+
 ## Open questions and implementation discrepancies
 
 These are not approved new requirements or decisions. Keep their IDs stable; disposition is tracked

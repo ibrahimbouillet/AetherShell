@@ -13,6 +13,13 @@ Last updated: 2026-10-25 (Europe/Paris).
 
 ### Current continuation — V3 accepted for development (D38)
 
+**Additional owner instruction, 2026-10-25 (D39/T45):** consolidate into ONE active shared project
+folder rather than original/public/assistant-specific working folders. Claude performs the migration;
+Codex reviews afterward. Read [the consolidation addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md).
+This is requested, not executed: preserve all local work and private recovery history before any
+move/removal. Retain the public Git lineage; do not merge or push the old private history. The
+current verified development location remains the official-origin checkout until migration passes.
+
 **Owner-directed next batch, 2026-10-25:** Claude implements T42/T43; Codex subsequently reviews.
 Use [the focused Claude implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Prioritize a running
 background app's marker growing to the active marker's width, an actual window preview replacing
