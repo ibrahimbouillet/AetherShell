@@ -179,10 +179,128 @@ struct GlyphTokens {
     float haloWidth = 1.5f;  // extra width of the knockout around a mark
 };
 
+// Native application windows (Settings, setup, confirmations): one material, spacing rhythm, type
+// scale and motion vocabulary shared by every Aether-owned form. Metrics are DIPs on the 4-DIP
+// grid; durations are seconds before MotionPolicy scaling. Colors follow the mode; high contrast
+// maps them to system colors and forms then use native system-colored painting.
+struct FormTokens {
+    // Material. The window tint is painted over the DWM system backdrop (Windows 11 Acrylic) with
+    // windowTintAlpha; without a backdrop the window is filled with the opaque windowSolid instead.
+    Color windowTint;
+    float windowTintAlpha = 0.44f;
+    Color windowSolid;
+    Color footerTint;          // translucent band behind the status/action footer
+    Color cardFill;            // grouped settings card over glass (translucent)
+    Color cardFillSolid;       // the card in an opaque window
+    Color cardStroke;          // uniform hairline rim, identical on every side
+    Color rowHover;            // overlay on a hovered row inside a card
+    Color rowPressed;
+    Color divider;             // hairline between the rows of a card
+    // Text fields, lists and documents are opaque: native editors (caret, IME, selection) render
+    // inside them on their own opaque surface, so fill and editor background must match exactly.
+    Color fieldFill;
+    Color fieldFillDisabled;
+    Color fieldStroke;
+    Color fieldText;
+    Color buttonFill;          // secondary buttons and closed dropdowns over glass (translucent)
+    Color buttonFillHover;
+    Color buttonFillPressed;
+    Color buttonStroke;
+    Color switchOffStroke;     // switch track outline and knob while off
+    Color sliderTrack;         // unfilled part of a slider track
+    Color sliderThumb;         // opaque thumb ring around the accent dot
+    Color scrollThumb;         // overlay scroll indicator
+    Color scrollThumbHover;
+    Color navSelected;         // selected navigation row pill
+    Color navHover;
+
+    // Rhythm and geometry
+    float outer = 24.0f;            // window edge to content
+    float paneGap = 16.0f;          // navigation pane to content
+    float sectionGap = 24.0f;       // between sections
+    float sectionTitleGap = 8.0f;   // section title to its card
+    float relatedGap = 8.0f;        // related controls in one row or stack
+    float cardPaddingX = 16.0f;
+    float rowPaddingY = 10.0f;
+    float rowMinHeight = 48.0f;
+    float labelGap = 2.0f;          // label to helper text
+    float controlGap = 12.0f;       // row text to its control
+    float controlHeight = 32.0f;    // buttons, dropdowns and fields inside rows
+    float buttonPaddingX = 16.0f;
+    float buttonMinWidth = 96.0f;
+    float comboMinWidth = 168.0f;
+    float valueFieldWidth = 72.0f;  // numeric value next to a slider
+    float sliderWidth = 176.0f;
+    float sliderThumbSize = 18.0f;
+    float sliderTrackHeight = 4.0f;
+    float switchWidth = 40.0f;
+    float switchHeight = 20.0f;
+    float switchKnob = 12.0f;       // grows slightly while hovered, stretches while pressed
+    float checkSize = 18.0f;
+    float glyphSize = 16.0f;
+    float fieldPaddingX = 10.0f;    // field edge to the native editor inside it
+    float navWidth = 232.0f;
+    float navRailWidth = 56.0f;     // icon-only navigation in narrow windows
+    float navItemHeight = 36.0f;
+    float navIndicatorWidth = 3.0f;
+    float navIndicatorHeight = 16.0f;
+    float footerHeight = 60.0f;
+    float scrollbarWidth = 4.0f;    // idle overlay indicator...
+    float scrollbarHoverWidth = 8.0f;  // ...widened while hovered or dragged
+    float scrollbarInset = 3.0f;
+    float focusMargin = 3.0f;       // focus ring space reserved around buttons, dropdowns and sliders
+    float contentMaxWidth = 840.0f;
+    float narrowWidth = 680.0f;     // below this window width the navigation becomes a rail
+    float stackWidth = 440.0f;      // below this content width row controls stack under their text
+    float cardRadius = 10.0f;
+    float controlRadius = 6.0f;     // nested inside cardRadius with the card padding
+    float fieldRadius = 6.0f;
+
+    // Type scale (DIPs before the Windows text scale)
+    float titleSize = 24.0f;        // page title, semibold display family
+    float sectionSize = 14.0f;      // section title, semibold
+    float bodySize = 14.0f;         // labels, buttons, field text
+    float helperSize = 12.0f;       // helper and caption text, secondary color
+    float statusSize = 13.0f;       // footer status
+
+    // Motion (seconds before MotionPolicy scaling)
+    double feedback = 0.16;         // hover, press, switch knob, focus
+    double indicator = 0.26;        // navigation indicator and selection travel
+    double page = 0.24;             // content fade after a page change
+    double scroll = 0.16;           // animated wheel/keyboard scrolling
+    double progressCycle = 1.6;     // one sweep of an indeterminate progress bar
+};
+
+// Glass popup menus (logo menu, Dock menus, dropdowns): DIPs, durations in seconds.
+struct MenuTokens {
+    float radius = 12.0f;
+    float padding = 6.0f;           // panel edge to the first/last row
+    float itemHeight = 32.0f;
+    float separatorHeight = 9.0f;
+    float iconColumn = 20.0f;       // glyph or check column
+    float paddingX = 10.0f;         // row edge to content
+    float columnGap = 10.0f;
+    float acceleratorGap = 28.0f;
+    float submenuColumn = 16.0f;
+    float minWidth = 200.0f;
+    float maxWidth = 440.0f;
+    float anchorGap = 6.0f;         // distance from the anchor item
+    float edgeMargin = 8.0f;        // kept free at the work-area edge
+    float rowRadius = 6.0f;
+    float enterOffset = 6.0f;       // the panel settles this far towards its anchor
+    float enterScale = 0.97f;
+    double open = 0.22;
+    double close = 0.14;
+    double hover = 0.12;
+    double submenuDelay = 0.30;     // hover time before a submenu opens
+};
+
 struct DesignTokens {
     ThemeMode mode = ThemeMode::Dark;
     bool transparencyEnabled = true;  // honors Windows accessibility/personalization preference
     GlassTokens glass;
+    FormTokens form;
+    MenuTokens menu;
 
     Color textPrimary;
     Color textSecondary;

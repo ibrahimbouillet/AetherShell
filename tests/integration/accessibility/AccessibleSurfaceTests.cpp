@@ -36,6 +36,7 @@ struct Model final : IAccessibleSurfaceModel {
     int toggled = 0;
     int rangeCalls = 0;
     int rangeId = 0;
+    bool selection = false;
     void ThreadCheck() const { if (::GetCurrentThreadId() != owner) wrongThread.store(true); }
     std::wstring RootName() const override { ThreadCheck(); return L"Aether accessibility test"; }
     CONTROLTYPEID RootControlType() const override { ThreadCheck(); return UIA_ToolBarControlTypeId; }
@@ -61,6 +62,22 @@ struct Model final : IAccessibleSurfaceModel {
         ++rangeCalls; rangeId = id;
         for (auto& item : items) if (item.id == id) { item.rangeValue = value; return Ok(); }
         return MakeError(ErrorCode::NotFound, "test range item unavailable");
+    }
+    bool SupportsSelection() const override { ThreadCheck(); return selection; }
+    bool SelectionRequired() const override { ThreadCheck(); return selection; }
+    Result<void> SetExpanded(int id, bool expanded) override {
+        ThreadCheck();
+        for (auto& item : items) if (item.id == id) {
+            const auto before = item.expandCollapseState;
+            item.expandCollapseState = expanded ? ExpandCollapseState_Expanded : ExpandCollapseState_Collapsed;
+            return surface->NotifyExpandCollapseChanged(id, before);
+        }
+        return MakeError(ErrorCode::NotFound, "test submenu unavailable");
+    }
+    Result<void> SelectItem(int id) override {
+        ThreadCheck();
+        for (auto& item : items) if (item.supportsSelectionItem) item.isSelected = item.id == id;
+        return Ok();
     }
 };
 
@@ -503,6 +520,81 @@ AETHER_TEST("accessibility integration: range values expose known metadata and g
     CHECK_EQ(range->get_Value(&reading), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
     CHECK_EQ(range->SetValue(20), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
     CHECK_EQ(window.model.rangeCalls, 1);
+}
+
+AETHER_TEST("accessibility integration: optional submenu and selection patterns guard actions and lifetime") {
+    Apartment apartment(COINIT_APARTMENTTHREADED);
+    REQUIRE(SUCCEEDED(apartment.hr));
+    Window window;
+    REQUIRE(window.Create());
+    window.model.selection = true;
+    auto& submenu = window.model.items[0];
+    submenu.supportsExpandCollapse = true;
+    submenu.expandCollapseState = ExpandCollapseState_Collapsed;
+    for (std::size_t index = 1; index < window.model.items.size(); ++index) {
+        window.model.items[index].supportsSelectionItem = true;
+        window.model.items[index].isSelected = index == 1;
+    }
+    const auto submenuProvider = window.surface.ItemProvider(11);
+    const auto radioProvider = window.surface.ItemProvider(33);
+    const auto rootProvider = window.surface.RootProvider();
+    REQUIRE(submenuProvider.ok());
+    REQUIRE(radioProvider.ok());
+    REQUIRE(rootProvider.ok());
+    winrt::com_ptr<IUnknown> pattern;
+    REQUIRE(SUCCEEDED((*submenuProvider)->GetPatternProvider(UIA_ExpandCollapsePatternId, pattern.put())));
+    REQUIRE(pattern != nullptr);
+    auto expand = pattern.as<IExpandCollapseProvider>();
+    REQUIRE(SUCCEEDED(expand->Expand()));
+    ExpandCollapseState state = ExpandCollapseState_LeafNode;
+    REQUIRE(SUCCEEDED(expand->get_ExpandCollapseState(&state)));
+    CHECK_EQ(state, ExpandCollapseState_Expanded);
+    REQUIRE(SUCCEEDED(expand->Collapse()));
+    CHECK_EQ(submenu.expandCollapseState, ExpandCollapseState_Collapsed);
+    submenu.isEnabled = false;
+    CHECK_EQ(expand->Expand(), static_cast<HRESULT>(UIA_E_ELEMENTNOTENABLED));
+    submenu.isEnabled = true;
+    pattern = nullptr;
+    REQUIRE(SUCCEEDED((*radioProvider)->GetPatternProvider(UIA_SelectionItemPatternId, pattern.put())));
+    REQUIRE(pattern != nullptr);
+    auto radio = pattern.as<ISelectionItemProvider>();
+    CHECK_EQ(radio->AddToSelection(), static_cast<HRESULT>(UIA_E_INVALIDOPERATION));
+    CHECK(window.model.items[1].isSelected);
+    REQUIRE(SUCCEEDED(radio->Select()));
+    CHECK_EQ(radio->AddToSelection(), static_cast<HRESULT>(S_OK));  // adding the selected item is idempotent
+    BOOL selected = FALSE;
+    REQUIRE(SUCCEEDED(radio->get_IsSelected(&selected)));
+    CHECK(selected != FALSE);
+    winrt::com_ptr<IRawElementProviderSimple> container;
+    REQUIRE(SUCCEEDED(radio->get_SelectionContainer(container.put())));
+    REQUIRE(container != nullptr);
+    pattern = nullptr;
+    REQUIRE(SUCCEEDED(container->GetPatternProvider(UIA_SelectionPatternId, pattern.put())));
+    REQUIRE(pattern != nullptr);
+    auto selection = pattern.as<ISelectionProvider>();
+    SAFEARRAY* selectedItems = nullptr;
+    REQUIRE(SUCCEEDED(selection->GetSelection(&selectedItems)));
+    REQUIRE(selectedItems != nullptr);
+    LONG first = 0, last = -1;
+    REQUIRE(SUCCEEDED(::SafeArrayGetLBound(selectedItems, 1, &first)));
+    REQUIRE(SUCCEEDED(::SafeArrayGetUBound(selectedItems, 1, &last)));
+    CHECK_EQ(last - first + 1, 1);
+    ::SafeArrayDestroy(selectedItems);
+    CHECK(FAILED(radio->RemoveFromSelection()));
+    HRESULT wrongExpand = S_OK, wrongSelect = S_OK;
+    std::thread wrongThread([&] {
+        Apartment mta(COINIT_MULTITHREADED);
+        wrongExpand = expand->Expand();
+        wrongSelect = radio->Select();
+    });
+    wrongThread.join();
+    CHECK_EQ(wrongExpand, static_cast<HRESULT>(RPC_E_WRONG_THREAD));
+    CHECK_EQ(wrongSelect, static_cast<HRESULT>(RPC_E_WRONG_THREAD));
+    CHECK_FALSE(window.model.wrongThread.load());
+    window.surface.Disconnect();
+    CHECK_EQ(expand->Expand(), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(radio->Select(), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
+    CHECK_EQ(selection->get_IsSelectionRequired(&selected), static_cast<HRESULT>(UIA_E_ELEMENTNOTAVAILABLE));
 }
 
 AETHER_TEST("accessibility integration: malformed range models and removed range references fail closed") {

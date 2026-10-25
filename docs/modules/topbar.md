@@ -262,3 +262,13 @@ running-icon display or temporary reveal/resume. No screenshots, owner-applicati
 Explorer restart, audio/dictation or startup mutation occurred. Real Chrome, framed-fullscreen
 variants, exclusive-mode games, Windows 10 and physical monitor/DPI workflows remain unqualified,
 as do actual voice typing and audio controls.
+
+## Glass logo menu (T47 / FR-037 / D42)
+
+The logo menu and the item menus use one persistent `GlassMenuPresenter` per Top Bar (an injected
+`TopBarContext::menu` still wins, as in the isolated tests). The menu model keeps every command id,
+label, order and availability rule, including "Show Windows notification area for 60 seconds"; the
+logo entries gain icons (Search, Settings, Taskbar, Download, Updates, About, Power). Menus opened from
+the keyboard (Applications key, Shift+F10, Enter/Space on the logo) start with their first entry
+selected; an open menu is cancelled when the bar hides for full screen or is destroyed. The stale
+command revalidation after the modal loop is unchanged.

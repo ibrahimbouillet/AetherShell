@@ -1,0 +1,100 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Copyright (c) 2026 Ibrahim Bouillet -->
+# ui_form — the Aether presentation for application windows
+
+`src/ui/form`, target `aether_ui_form`, gives normal, activatable application windows with native
+child controls (Settings, the setup wizard, the updater window and confirmations) the same neutral
+frosted material, rhythm, type scale and motion as the Dock and Top Bar (FR-037 / D41 / T47). It
+depends only on core, diagnostics, platform and [graphics](graphics.md); it never uses the
+compositor or the shell surfaces, so setup can use it on a machine where Aether is not installed.
+
+## Material
+
+`FormSurface::Attach(window, tokens, motion, scheduler)` decides the material with the pure rule
+`ResolveFormMaterial`:
+
+| Material | When | How |
+|---|---|---|
+| Acrylic | Windows 11 22H2+ (build 22621) and transparency effects on | `DWMWA_SYSTEMBACKDROP_TYPE = DWMSBT_TRANSIENTWINDOW`, frame extended over the client; the client paints `form.windowTint` at `form.windowTintAlpha` plus grain in premultiplied alpha |
+| Solid | no system backdrop (Windows 10, 21H2) or transparency off | opaque `form.windowSolid`; the same layout |
+| Native | high contrast, or no renderer | no custom painting: registered controls keep stock system-colored rendering; owner-drawn labels and lists are drawn with GDI in system colors |
+
+Windows draws an inactive window's Acrylic as its flat fallback; this is the documented system
+behavior and is not overridden. `SetTheme` switches materials in place (including to and from
+Native) without recreating controls, so text, selection, focus, drafts and scroll positions survive.
+
+## Painting model
+
+The form keeps `WS_CLIPCHILDREN`. Whichever window repaints a region — the form, a registered
+control, or a container — renders that region of one scene (window background, `FormCard`s,
+`FormDivider`s, the owner's decorator, control visuals, focus rings) through a buffered-paint DIB and
+one Direct2D DC render target with premultiplied alpha. Drawing always happens in the form's client
+DIPs, so the grain bitmap brush is anchored to the form origin and child windows never show seams.
+
+Native input stays native: push buttons, check boxes (switch rows), combo boxes, track bars,
+progress bars and list boxes keep their window classes, messages, keyboard behavior and system UI
+Automation providers; only their painting is replaced. EDIT and HOTKEY controls, inset lists and
+documents become opaque layered children (`WS_EX_LAYERED`, alpha 255) inside a drawn rounded field,
+so caret, IME, selection and clipboard behave exactly as in any edit control. The HOTKEY control
+ignores `WM_CTLCOLOR*`, so the surface paints its field colors and the same localized key names
+(`GetKeyNameTextW`) while the control's own input and caret stay untouched. Unthemed progress bars
+lose their classic static edge while styled (their range and position are carried across that style
+change) and their now-invisible native animation timers are stopped.
+
+Combo boxes retain the native dropdown for mouse, keyboard and programmatic/UIA expansion, with
+shared field/list colors. A MenuItem popup cannot replace the combo's native Selection and
+ExpandCollapse semantics without an equivalent provider; the incomplete interception was removed
+during independent review. Native list/navigation rows grow with text scaling, and multiline native
+buttons wrap in the shared painter as well as in the fallback path.
+Containers forward `WM_COMMAND`, `WM_NOTIFY` and control-originated `WM_HSCROLL`/`WM_VSCROLL` to the
+form window, so owners see notifications exactly as from direct children.
+
+## Motion
+
+Hover, press, switch knob, navigation indicator and the page `FadeIn` use elapsed-time tweens with
+`form.feedback`, `form.indicator` and `form.page`, scaled by `MotionPolicy` (reduced motion is
+instant). Frames come from the optional `FrameScheduler`, otherwise a 16 ms timer that is killed as
+soon as everything settles; `Animating()` stays true until the final settled repaint. A state change
+that does not move (reduced motion) repaints once without starting frames. Indeterminate progress
+and the busy status ring animate only while visible and the window is not minimized.
+Progress preserves the actual accent and adjusts only its opaque track when needed to retain at
+least 3:1 segment/track contrast, including neutral Windows accents. Rendered dark/light regressions
+cover determinate, moving activity and reduced-motion activity without changing progress geometry.
+
+## FormScrollView
+
+A viewport (fixed, clips) and a canvas (content height, moves) as registered containers, plus an
+overlay indicator child at the trailing edge (`GutterPx()` must be kept free of controls). Scrolling
+moves the canvas without copying bits; wheel, `WM_VSCROLL` codes (`HandleScrollCode`, including the
+thumb position), `EnsureVisible`/`RevealFocus` and short animated scrolls are supported. The
+viewport answers `WM_GETOBJECT` with a UI Automation provider exposing the Scroll pattern merged with
+its native HWND provider.
+
+## ConfirmDialog
+
+`ShowConfirmation(request, tokens, motion, scheduler)` is the shared modal confirmation: status badge,
+title, message, detail and up to three native buttons (Primary/Danger, Secondary, Cancel). The owner
+is disabled while it is open and re-enabled before the dialog is destroyed. It activates only when
+this process owns the foreground; an inactive dialog sets its initial focus when the user activates
+it, so it never takes activation from another application. Enter/Escape/close box follow the
+documented mapping and `WM_QUIT` is re-posted. If the dialog cannot be created, the same question is
+asked with `MessageBoxW` (`FallbackMessageBoxFlags`/`ChoiceFromMessageBox`).
+
+Long/enlarged confirmation content scrolls inside the monitor work area; the action footer remains
+visible, and measured multiline buttons stack when needed. Reduced-motion or high-contrast policy
+changes finish active feedback, page fades and scroll motion immediately. Explicit accessible names
+and helper text can be assigned to native fields whose neighbouring labels are insufficient.
+
+## Evidence and limits
+
+Unit tests (`tests/unit/ui_form`) cover the material rule, the MessageBox fallback mapping and pure
+painters. Integration tests (`tests/integration/ui_form`) use only their own windows over a private
+two-phase backdrop: client translucency over the glass and opaque fields (offscreen premultiplied
+render), field/HOTKEY interiors identical across backdrop phases, Solid identical across phases,
+scene authority (screen equals offscreen render for every scene-painted control), notifications
+through containers, dropdown handler, theme round trips preserving state, idle (no form timers after
+settling, native progress timers never recur), scheduler-driven frames, scroll/UIA, and the
+confirmation dialog's keyboard, buttons, owner, quit and no-activation behavior. Live see-through of
+Acrylic is sampled only while the test form is active; the window-level material itself is DWM's.
+Remaining: physical multi-monitor DPI transitions, screen-reader walkthroughs and owner visual
+acceptance.

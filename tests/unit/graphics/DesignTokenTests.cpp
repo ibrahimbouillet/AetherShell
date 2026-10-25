@@ -243,3 +243,62 @@ AETHER_TEST("design tokens: the Start mark is Windows blue by default and follow
     const auto contrast = MakeDesignTokens(ThemeMode::HighContrast);
     CHECK(Same(StartMarkColor(contrast), contrast.textPrimary));
 }
+
+AETHER_TEST("form tokens: spacing and control metrics follow the shared 4-DIP rhythm") {
+    const auto form = MakeDesignTokens(ThemeMode::Dark).form;
+    const float metrics[] = {form.outer, form.paneGap, form.sectionGap, form.sectionTitleGap, form.relatedGap,
+                             form.cardPaddingX, form.rowMinHeight, form.controlGap, form.controlHeight,
+                             form.buttonPaddingX, form.buttonMinWidth, form.comboMinWidth, form.valueFieldWidth,
+                             form.sliderWidth, form.switchWidth, form.switchHeight, form.switchKnob, form.glyphSize,
+                             form.navWidth, form.navRailWidth, form.navItemHeight, form.navIndicatorHeight,
+                             form.footerHeight, form.scrollbarWidth, form.scrollbarHoverWidth, form.contentMaxWidth};
+    for (const float value : metrics) CHECK_EQ(std::fmod(value, 4.0f), 0.0f);
+    // Nested radii: controls sit inside cards with smaller corners; the window body has no own corner.
+    CHECK(form.controlRadius < form.cardRadius);
+    CHECK(form.fieldRadius <= form.cardRadius);
+    CHECK(form.titleSize > form.sectionSize);
+    CHECK(form.helperSize < form.bodySize);
+    // Motion vocabulary: small feedback < popups/indicators < page change, all finite and short.
+    CHECK(form.feedback < form.indicator);
+    CHECK(form.page <= 0.36);
+    CHECK(form.feedback >= 0.12);
+}
+
+AETHER_TEST("form tokens: native editors sit on opaque fields with readable text in every mode") {
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light, ThemeMode::HighContrast}) {
+        const auto tokens = MakeDesignTokens(mode);
+        const auto& form = tokens.form;
+        // The native EDIT/HOTKEY/LISTBOX background must equal the drawn field exactly, so it is opaque.
+        CHECK_EQ(form.fieldFill.a, 1.0f);
+        CHECK_EQ(form.fieldFillDisabled.a, 1.0f);
+        CHECK_EQ(form.windowSolid.a, 1.0f);
+        CHECK_EQ(form.cardFillSolid.a, 1.0f);
+        CHECK(ContrastRatio(form.fieldText, form.fieldFill) >= 4.5f);
+        // Opaque fallback window: primary and helper text on cards and on the window itself.
+        const Color card = CompositeOver(form.cardFillSolid, form.windowSolid);
+        CHECK(ContrastRatio(tokens.textPrimary, card) >= 4.5f);
+        CHECK(ContrastRatio(tokens.textPrimary, form.windowSolid) >= 4.5f);
+        if (mode != ThemeMode::HighContrast) {
+            CHECK(ContrastRatio(tokens.textSecondary, card) >= 4.5f);
+            // A switch that is off stays distinguishable from its card (WCAG non-text 3:1).
+            CHECK(ContrastRatio(form.switchOffStroke, card) >= 3.0f);
+            // Translucent layers stay translucent; the window tint keeps the backdrop visible.
+            CHECK(form.cardFill.a < 1.0f);
+            CHECK(form.buttonFill.a < 1.0f);
+            CHECK(form.windowTintAlpha > 0.0f);
+            CHECK(form.windowTintAlpha < 1.0f);
+        }
+    }
+}
+
+AETHER_TEST("menu tokens: compact rows, a modest entrance and a quicker exit") {
+    const auto menu = MakeDesignTokens(ThemeMode::Light).menu;
+    CHECK(menu.itemHeight >= 28.0f);
+    CHECK(menu.itemHeight <= 40.0f);
+    CHECK(menu.minWidth < menu.maxWidth);
+    CHECK(menu.rowRadius < menu.radius);
+    CHECK(menu.enterScale > 0.9f);
+    CHECK(menu.enterScale < 1.0f);
+    CHECK(menu.close < menu.open);
+    CHECK(menu.open <= 0.30);
+}

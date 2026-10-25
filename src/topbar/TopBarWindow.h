@@ -92,6 +92,7 @@ private:
     void Rebuild();
     void Activate(int id);
     void ShowItemMenu(int id);
+    void ShowItemMenu(int id, bool keyboard);
     void ApplyObservedAudio(status::AudioSnapshot snapshot);
 };
 

@@ -77,8 +77,11 @@ struct ShadowEntry {
     std::uint64_t lastUse = 0;
 };
 
-// Device-dependent resources of the UI thread. Every Aether surface shares the GraphicsDevice's
-// Direct2D device, so one device is cached; a different device (after device loss) clears it.
+// Device-dependent resources of the UI thread, per Direct2D device. Composition surfaces share the
+// GraphicsDevice's device; native forms paint through their own DC render target on the same
+// thread. A few devices are kept so alternating between them never discards the other's baked
+// shadows; the least recently used one goes first (a replaced device simply ages out).
+constexpr std::size_t kMaxCachedDevices = 4;
 struct DeviceCache {
     winrt::com_ptr<ID2D1Device> device;
     std::vector<ShadowEntry> shadows;
@@ -87,19 +90,32 @@ struct DeviceCache {
     float noiseDpi = 0.0f;
     float noiseAlpha = -1.0f;
     std::uint64_t clock = 0;
+    std::uint64_t lastUse = 0;
 };
 
-thread_local DeviceCache threadCache;
+thread_local std::vector<DeviceCache> threadCaches;
+thread_local std::uint64_t threadCacheClock = 0;
 
 DeviceCache* CacheFor(ID2D1DeviceContext* context) {
     winrt::com_ptr<ID2D1Device> device;
     context->GetDevice(device.put());
     if (!device) return nullptr;
-    if (threadCache.device.get() != device.get()) {
-        threadCache = DeviceCache{};
-        threadCache.device = device;
+    ++threadCacheClock;
+    for (auto& cache : threadCaches) {
+        if (cache.device.get() == device.get()) {
+            cache.lastUse = threadCacheClock;
+            return &cache;
+        }
     }
-    return &threadCache;
+    if (threadCaches.size() >= kMaxCachedDevices) {
+        threadCaches.erase(std::min_element(threadCaches.begin(), threadCaches.end(),
+            [](const DeviceCache& a, const DeviceCache& b) { return a.lastUse < b.lastUse; }));
+    }
+    DeviceCache cache;
+    cache.device = device;
+    cache.lastUse = threadCacheClock;
+    threadCaches.push_back(std::move(cache));
+    return &threadCaches.back();
 }
 
 // Bakes on a private device context of the same Direct2D device, so the caller's target, transform,
@@ -249,7 +265,7 @@ void StrokeRing(ID2D1RenderTarget* target, const D2D1_RECT_F& rect, float corner
 
 }  // namespace
 
-void ReleaseGlassResources() noexcept { threadCache = DeviceCache{}; }
+void ReleaseGlassResources() noexcept { threadCaches.clear(); }
 
 float GlassTintAlpha(const DesignTokens& tokens, const GlassStyle& style) noexcept {
     const float opacity = std::clamp(style.opacity, 0.3f, 1.0f);
@@ -420,6 +436,7 @@ void PaintGlassPanel(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const
         }
     }
 
+    if (!style.border) return;
     // Hairline border inset by half a DIP so it stays inside the panel.
     const D2D1_ROUNDED_RECT borderShape{Inflate(rect, -0.5f, -0.5f), std::max(0.0f, radius - 0.5f),
                                         std::max(0.0f, radius - 0.5f)};

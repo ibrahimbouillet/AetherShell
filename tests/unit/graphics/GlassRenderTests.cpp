@@ -382,3 +382,50 @@ AETHER_TEST("glass render: neutral transient material removes the tooltip sheen 
     CHECK(MaxChannelDifference(sheen.At(100,34),sheen.At(100,74))>5);
     CHECK(neutral.At(100,30).a>0);
 }
+
+AETHER_TEST("glass render: a borderless body paints tint and grain but no hairline edge") {
+    CanvasGuard guard;
+    const auto tokens = Glass(ThemeMode::Light);
+    GlassStyle style;
+    style.cornerRadius = 0.0f;
+    style.shadow = false;
+    style.elevation = Elevation::None;
+    style.neutral = true;
+    style.noise = false;
+    D2DCanvas bordered;
+    D2DCanvas borderless;
+    REQUIRE(bordered.Create(200, 140));
+    REQUIRE(borderless.Create(200, 140));
+    bordered.Begin();
+    PaintGlassPanel(bordered.Context(), kPanel, tokens, style);
+    REQUIRE(bordered.End());
+    style.border = false;
+    borderless.Begin();
+    PaintGlassPanel(borderless.Context(), kPanel, tokens, style);
+    REQUIRE(borderless.End());
+    // The edge row differs only when the border is drawn; the interior is identical.
+    CHECK(MaxChannelDifference(bordered.At(100, 30), borderless.At(100, 30)) > 0);
+    CHECK_EQ(MaxChannelDifference(borderless.At(100, 30), borderless.At(100, 55)), 0);
+    CHECK_EQ(MaxChannelDifference(bordered.At(100, 55), borderless.At(100, 55)), 0);
+}
+
+AETHER_TEST("glass render: alternating between two devices keeps both shadow caches usable") {
+    CanvasGuard guard;
+    const auto tokens = Glass(ThemeMode::Dark);
+    D2DCanvas first;
+    D2DCanvas second;
+    REQUIRE(first.Create(200, 140));
+    REQUIRE(second.Create(200, 140));
+    // Each device bakes its own shadow; drawing on the other device in between must not drop it.
+    for (int round = 0; round < 3; ++round) {
+        first.Begin();
+        PaintGlassPanel(first.Context(), kPanel, tokens, Style(true));
+        REQUIRE(first.End());
+        second.Begin();
+        PaintGlassPanel(second.Context(), kPanel, tokens, Style(true));
+        REQUIRE(second.End());
+    }
+    CHECK(first.At(100, 86).a > 0);   // shadow below the panel on both targets
+    CHECK(second.At(100, 86).a > 0);
+    CHECK_EQ(MaxChannelDifference(first.At(100, 86), second.At(100, 86)), 0);
+}

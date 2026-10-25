@@ -223,8 +223,23 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     apps::RunningApplication running; running.id = L"exe:synthetic-c"; running.displayName = L"Synthetic C";
     running.foreground = true; running.windows.push_back({reinterpret_cast<HWND>(1), L"Synthetic window", false});
     REQUIRE(window.SetRunningApplications({running}).ok());
-    window.Show(false); ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 300);
+    window.Show(false); ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0);
+    // Composition completion is asynchronous: the elapsed duration alone does not prove that
+    // the entrance callback was delivered. Input is deliberately ignored until that happens.
+    const auto entranceStart = std::chrono::steady_clock::now();
+    const auto entranceDeadline = entranceStart + 3s;
+    do { RunFor(loop, 25); }
+    while ((!window.IsShown() || window.IsTransitioning()) && std::chrono::steady_clock::now() < entranceDeadline);
+    TEST_NOTE("entrance readiness wait (ms): " + std::to_string(
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - entranceStart).count()));
+    REQUIRE(window.IsShown());
+    REQUIRE_FALSE(window.IsTransitioning());
     auto restGeometry = window.Geometry(); REQUIRE(restGeometry.ok()); REQUIRE_EQ(restGeometry->items.size(), 4u);
+    TEST_NOTE("rest state: shown=" + std::to_string(window.IsShown()) +
+              " transitioning=" + std::to_string(window.IsTransitioning()) +
+              " enabled=" + std::to_string(::IsWindowEnabled(window.Handle())) +
+              " magnification=" + std::to_string(settings.Current().dock.magnification) +
+              " item1 span=" + std::to_string(restGeometry->items[1].icon.right - restGeometry->items[1].icon.left));
     // Native exclusion is required for cross-process click-through; HTTRANSPARENT is insufficient.
     const int nativePanelLeft = static_cast<int>(std::floor(window.ToPx(restGeometry->panel.left)));
     const int nativePanelY = static_cast<int>(std::floor(window.ToPx((restGeometry->panel.top + restGeometry->panel.bottom) / 2)));
@@ -241,6 +256,11 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     std::filesystem::create_directories(output);
     SavePng(rest, output / ("dock-" + prefix + "-rest.png"));
     CHECK(BluePixels(rest) > 300);
+    TEST_NOTE("hover injection state: transitioning=" + std::to_string(window.IsTransitioning()) +
+              " shown=" + std::to_string(window.IsShown()) +
+              " enabled=" + std::to_string(::IsWindowEnabled(window.Handle())));
+    REQUIRE(window.IsShown());
+    REQUIRE_FALSE(window.IsTransitioning());
     ::SendMessageW(window.Handle(), WM_MOUSEMOVE, 0, Point(window, restGeometry->items[1].icon));
     // TrackMouseEvent consults the real cursor, which tests must never move. Cancel only this test
     // window's tracking and remove a leave message already queued for that stationary real cursor.
@@ -253,6 +273,11 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     const auto hover = CaptureOwn(backdrop.hwnd, window.Handle(), window.BoundsPx());
     SavePng(hover, output / ("dock-" + prefix + "-hover.png"));
     const auto span = [](const D2D1_RECT_F& icon) { return icon.right - icon.left; };
+    TEST_NOTE("hover result: transitioning=" + std::to_string(window.IsTransitioning()) +
+              " rest span=" + std::to_string(span(restGeometry->items[1].icon)) +
+              " hover span=" + std::to_string(span(hoverGeometry->items[1].icon)) +
+              " rest blue=" + std::to_string(BluePixels(rest)) +
+              " hover blue=" + std::to_string(BluePixels(hover)));
     CHECK(span(hoverGeometry->items[1].icon) > span(restGeometry->items[1].icon) * 1.25f);
     CHECK(BluePixels(hover) > BluePixels(rest));
 

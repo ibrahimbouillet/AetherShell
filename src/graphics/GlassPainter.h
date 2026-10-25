@@ -10,8 +10,8 @@
 //
 // Shadows are baked once per (device, size class, radius, elevation, DPI, color) into a small
 // bitmap and drawn as nine slices, so a panel that changes width every frame (Dock magnification)
-// costs nine bitmap draws instead of an effect graph per frame. The cache lives on the UI thread and
-// is dropped when the Direct2D device changes.
+// costs nine bitmap draws instead of an effect graph per frame. The cache lives on the UI thread, per
+// Direct2D device (a few at most: composition surfaces and native forms' DC render targets).
 #pragma once
 
 #include "graphics/Theme.h"
@@ -36,6 +36,7 @@ struct GlassStyle {
     bool noise = true;           // grain texture (never in high contrast or without transparency)
     bool neutral = false;       // opt-in for transient surfaces: uniform edge without directional sheen
     bool highlight = true;       // flyout sheen/rim; Dock and Bar always use the neutral material
+    bool border = true;          // false: no hairline edge (a window body whose frame DWM already draws)
 };
 
 // Effective tint alpha for a style (exposed for tests and for components that paint sub-panels).

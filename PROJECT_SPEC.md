@@ -259,6 +259,14 @@ whole; per-requirement evidence is in the traceability tables below.
 | Distribution | installer built; fresh install, upgrade, repair and uninstall tested; shell intact; no developer tools needed | FR-016, FR-020; NFR-003 |
 | Release | documentation matches the implementation; limitations recorded; test evidence available; assets and integrity metadata generated; release candidate validated; stable eligibility reviewed | FR-022, FR-023, FR-025; NFR-009 |
 
+The T47 visual-unification implementation (FR-037/D41/D42) and Codex's interrupted-session
+continuation are tracked in [S-049](docs/knowledge/TEST_STATUS.md) and the
+[owned-surface inventory](docs/specs/v3-visual-unification-inventory.md). Native forms, ordinary
+confirmations, popup menus, Settings, setup and updater share the presentation primitives. Native
+combo dropdowns preserve their accessibility semantics as an explicit exception. Automated evidence,
+own-window visual inspection, actual prototype identity and owner acceptance are separate gates;
+this does not declare V3 or whole-product acceptance complete.
+
 The following is the **0.1.0-alpha.1 baseline traceability** (2026-10-18), retained as historical
 evidence rather than a passing V2 gate. **H** means historical recorded evidence in TEST_STATUS, not a new
 execution or independent re-verification. **S** means this session's scoped evidence there. No entire

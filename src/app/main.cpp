@@ -20,6 +20,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
         if (!guard) return 2;
         if (guard->has_value()) return **guard;
         auto command = app::ParseCommandLine(arguments);
+        // Documented native fallbacks: these run before any window or renderer exists.
         if (!command) { ::MessageBoxW(nullptr,L"Unrecognized or invalid Aether Shell command line.",L"Aether Shell",MB_OK|MB_ICONERROR); return 2; }
         if (command->showVersion) { ::MessageBoxW(nullptr, (L"Aether Shell " + std::wstring(build::kVersionW)).c_str(), L"Aether Shell", MB_OK); return 0; }
         // Bootstrap IO completes before the UI exists; it still executes on a background worker.

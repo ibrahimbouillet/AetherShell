@@ -34,6 +34,16 @@ public:
         empty_ = false;
     }
 
+    // A closed hollow polygon (its corners take the round line join when stroked).
+    void Polygon(std::initializer_list<D2D1_POINT_2F> points) {
+        if (!ok_ || points.size() < 3) return;
+        auto it = points.begin();
+        sink_->BeginFigure(*it, D2D1_FIGURE_BEGIN_HOLLOW);
+        for (++it; it != points.end(); ++it) sink_->AddLine(*it);
+        sink_->EndFigure(D2D1_FIGURE_END_CLOSED);
+        empty_ = false;
+    }
+
     void Circle(float cx, float cy, float radius, bool filled) {
         if (!ok_) return;
         sink_->BeginFigure(P(cx + radius, cy), filled ? D2D1_FIGURE_BEGIN_FILLED : D2D1_FIGURE_BEGIN_HOLLOW);
@@ -206,6 +216,116 @@ void BuildShape(Glyph glyph, PathBuilder& stroke, PathBuilder& fill) {
             stroke.Polyline({P(2.5f, 8.0f), P(13.25f, 8.0f)});
             stroke.Polyline({P(9.0f, 3.75f), P(13.25f, 8.0f), P(9.0f, 12.25f)});
             break;
+        case Glyph::Settings: {
+            // Eight rounded teeth around a hub: flat tooth tops on the outer radius, arcs between them.
+            constexpr float kOuter = 6.5f;
+            constexpr float kInner = 4.9f;
+            constexpr float kDegrees = 3.14159265f / 180.0f;
+            const auto at = [](float radius, float degrees) {
+                return P(8.0f + radius * std::cos(degrees * kDegrees), 8.0f + radius * std::sin(degrees * kDegrees));
+            };
+            if (auto* sink = stroke.Sink()) {
+                sink->BeginFigure(at(kInner, -90.0f - 16.0f), D2D1_FIGURE_BEGIN_HOLLOW);
+                for (int tooth = 0; tooth < 8; ++tooth) {
+                    const float centre = -90.0f + 45.0f * static_cast<float>(tooth);
+                    sink->AddLine(at(kOuter, centre - 9.0f));
+                    sink->AddLine(at(kOuter, centre + 9.0f));
+                    sink->AddLine(at(kInner, centre + 16.0f));
+                    sink->AddArc(D2D1::ArcSegment(at(kInner, centre + 45.0f - 16.0f), D2D1::SizeF(kInner, kInner), 0.0f,
+                                                  D2D1_SWEEP_DIRECTION_CLOCKWISE, D2D1_ARC_SIZE_SMALL));
+                }
+                sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+            }
+            stroke.Circle(8.0f, 8.0f, 2.25f, false);
+            break;
+        }
+        case Glyph::Appearance:
+            stroke.Circle(8.0f, 8.0f, 6.25f, false);
+            if (auto* sink = fill.Sink()) {
+                sink->BeginFigure(P(8.0f, 1.75f), D2D1_FIGURE_BEGIN_FILLED);
+                sink->AddArc(D2D1::ArcSegment(P(8.0f, 14.25f), D2D1::SizeF(6.25f, 6.25f), 0.0f,
+                                              D2D1_SWEEP_DIRECTION_COUNTER_CLOCKWISE, D2D1_ARC_SIZE_SMALL));
+                sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+            }
+            break;
+        case Glyph::Power:
+            if (auto* sink = stroke.Sink()) {
+                // An open ring with its gap at the top, and the switch line through the gap.
+                sink->BeginFigure(P(8.0f + 5.75f * 0.5f, 8.0f - 5.75f * 0.8660254f), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddArc(D2D1::ArcSegment(P(8.0f - 5.75f * 0.5f, 8.0f - 5.75f * 0.8660254f), D2D1::SizeF(5.75f, 5.75f),
+                                              0.0f, D2D1_SWEEP_DIRECTION_CLOCKWISE, D2D1_ARC_SIZE_LARGE));
+                sink->EndFigure(D2D1_FIGURE_END_OPEN);
+            }
+            stroke.Polyline({P(8.0f, 1.75f), P(8.0f, 7.25f)});
+            break;
+        case Glyph::Taskbar:
+            stroke.RoundRect(1.75f, 2.75f, 14.25f, 13.25f, 1.5f, false);
+            stroke.Polyline({P(1.75f, 10.25f), P(14.25f, 10.25f)});
+            fill.RoundRect(4.0f, 11.25f, 5.5f, 12.25f, 0.5f, true);
+            break;
+        case Glyph::Plus:
+            stroke.Polyline({P(8.0f, 3.0f), P(8.0f, 13.0f)});
+            stroke.Polyline({P(3.0f, 8.0f), P(13.0f, 8.0f)});
+            break;
+        case Glyph::Minus: stroke.Polyline({P(3.0f, 8.0f), P(13.0f, 8.0f)}); break;
+        case Glyph::Folder:
+            stroke.Polygon({P(1.75f, 4.0f), P(6.25f, 4.0f), P(7.75f, 5.5f), P(14.25f, 5.5f), P(14.25f, 12.75f),
+                            P(1.75f, 12.75f)});
+            break;
+        case Glyph::Download:
+            stroke.Polyline({P(8.0f, 1.75f), P(8.0f, 10.25f)});
+            stroke.Polyline({P(4.5f, 6.75f), P(8.0f, 10.25f), P(11.5f, 6.75f)});
+            stroke.Polyline({P(2.25f, 10.75f), P(2.25f, 13.75f), P(13.75f, 13.75f), P(13.75f, 10.75f)});
+            break;
+        case Glyph::Shield:
+            if (auto* sink = stroke.Sink()) {
+                sink->BeginFigure(P(8.0f, 1.75f), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddLine(P(13.25f, 3.75f));
+                sink->AddLine(P(13.25f, 7.75f));
+                sink->AddBezier(D2D1::BezierSegment(P(13.25f, 11.0f), P(10.75f, 13.25f), P(8.0f, 14.25f)));
+                sink->AddBezier(D2D1::BezierSegment(P(5.25f, 13.25f), P(2.75f, 11.0f), P(2.75f, 7.75f)));
+                sink->AddLine(P(2.75f, 3.75f));
+                sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+            }
+            stroke.Polyline({P(5.5f, 8.0f), P(7.25f, 9.75f), P(10.5f, 6.5f)});
+            break;
+        case Glyph::Warning:
+            stroke.Polygon({P(8.0f, 2.0f), P(14.5f, 13.25f), P(1.5f, 13.25f)});
+            stroke.Polyline({P(8.0f, 6.25f), P(8.0f, 9.25f)});
+            fill.Circle(8.0f, 11.25f, 0.85f, true);
+            break;
+        case Glyph::Location:
+            if (auto* sink = stroke.Sink()) {
+                sink->BeginFigure(P(8.0f, 14.25f), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddBezier(D2D1::BezierSegment(P(5.0f, 10.75f), P(3.25f, 8.5f), P(3.25f, 6.5f)));
+                sink->AddArc(D2D1::ArcSegment(P(12.75f, 6.5f), D2D1::SizeF(4.75f, 4.75f), 0.0f,
+                                              D2D1_SWEEP_DIRECTION_CLOCKWISE, D2D1_ARC_SIZE_SMALL));
+                sink->AddBezier(D2D1::BezierSegment(P(12.75f, 8.5f), P(11.0f, 10.75f), P(8.0f, 14.25f)));
+                sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+            }
+            stroke.Circle(8.0f, 6.5f, 1.75f, false);
+            break;
+        case Glyph::OpenExternal:
+            stroke.Polyline({P(12.75f, 9.25f), P(12.75f, 13.25f), P(2.75f, 13.25f), P(2.75f, 3.25f), P(6.75f, 3.25f)});
+            stroke.Polyline({P(9.25f, 2.75f), P(13.25f, 2.75f), P(13.25f, 6.75f)});
+            stroke.Polyline({P(13.25f, 2.75f), P(7.5f, 8.5f)});
+            break;
+        case Glyph::Reset: {
+            // The Updates arrow mirrored: counter-clockwise, with its head on the left.
+            constexpr float kRadius = 5.25f;
+            const float startX = 8.0f - kRadius * std::cos(-0.5236f);
+            const float startY = 8.0f + kRadius * std::sin(-0.5236f);
+            const float endX = 8.0f - kRadius * std::cos(0.5236f);
+            const float endY = 8.0f + kRadius * std::sin(0.5236f);
+            if (auto* sink = stroke.Sink()) {
+                sink->BeginFigure(P(startX, startY), D2D1_FIGURE_BEGIN_HOLLOW);
+                sink->AddArc(D2D1::ArcSegment(P(endX, endY), D2D1::SizeF(kRadius, kRadius), 0.0f,
+                                              D2D1_SWEEP_DIRECTION_CLOCKWISE, D2D1_ARC_SIZE_LARGE));
+                sink->EndFigure(D2D1_FIGURE_END_OPEN);
+            }
+            stroke.Polyline({P(startX + 2.75f, startY), P(startX, startY), P(startX, startY - 2.75f)});
+            break;
+        }
     }
 }
 

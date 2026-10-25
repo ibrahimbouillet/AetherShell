@@ -7,7 +7,7 @@
 # in dependencies automatically, which keeps focused builds fast and isolated.
 
 set(AETHER_MODULE_ORDER
-    core diagnostics platform net graphics accessibility ui showcase
+    core diagnostics platform net graphics accessibility ui ui_form showcase
     status status_audio weather weather_location applications search settings updates install
     dock topbar search_ui settings_ui system_controls media_controls controlcenter
     app launcher updater installer)
@@ -23,7 +23,8 @@ aether_declare_module(platform      src/platform/windows  core diagnostics)
 aether_declare_module(net           src/platform/net      core diagnostics platform)
 aether_declare_module(graphics      src/graphics          core diagnostics platform)
 aether_declare_module(accessibility src/ui/accessibility  core diagnostics platform)
-aether_declare_module(ui            src/ui                core diagnostics platform graphics)
+aether_declare_module(ui            src/ui                core diagnostics platform graphics accessibility)
+aether_declare_module(ui_form       src/ui/form           core diagnostics platform graphics)
 aether_declare_module(showcase      src/showcase          core graphics)
 # status_audio, weather and search use only the shared contract headers of
 # status/applications (StatusTypes.h, ApplicationTypes.h), not their libraries.
@@ -39,16 +40,16 @@ aether_declare_module(install       src/install           core diagnostics platf
 aether_declare_module(dock          src/dock              ui accessibility applications settings)
 aether_declare_module(topbar        src/topbar            ui accessibility status status_audio weather settings)
 aether_declare_module(search_ui     src/search/ui         ui accessibility search applications)
-aether_declare_module(settings_ui   src/settings/ui       ui settings updates applications weather)
+aether_declare_module(settings_ui   src/settings/ui       ui ui_form settings updates applications weather)
 aether_declare_module(system_controls src/system_controls core platform status)
 aether_declare_module(media_controls src/media_controls   core platform)
 aether_declare_module(controlcenter src/controlcenter     ui accessibility status status_audio system_controls media_controls)
 aether_declare_module(app           src/app
-    core diagnostics platform net graphics accessibility ui status status_audio weather weather_location
+    core diagnostics platform net graphics accessibility ui ui_form status status_audio weather weather_location
     applications search settings updates install dock topbar search_ui settings_ui controlcenter)
 aether_declare_module(launcher      launcher              core diagnostics platform updates install)
-aether_declare_module(updater       updater               core diagnostics platform updates install)
-aether_declare_module(installer     installer             core diagnostics platform graphics updates install settings app launcher updater)
+aether_declare_module(updater       updater               core diagnostics platform graphics ui_form updates install)
+aether_declare_module(installer     installer             core diagnostics platform graphics ui_form updates install settings app launcher updater)
 
 function(aether_resolve_modules out_var)
     if(AETHER_MODULES STREQUAL "" OR AETHER_MODULES STREQUAL "all")

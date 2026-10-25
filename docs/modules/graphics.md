@@ -229,3 +229,14 @@ interactive menu behavior were not requalified for this material change.
 - Acrylic saturation ("vibrancy") through a composition effect brush is deferred; the grain and tint
   stand in for it.
 - Windows 10 has no host blur (unchanged fallback) and is untested for 0.2.0-alpha.1.
+
+## Form and menu tokens, glyph additions (T47 / FR-037 / D42)
+
+`DesignTokens::form` (`FormTokens`) holds the material colors, 4-DIP rhythm, type scale and motion
+durations shared by every native form; `DesignTokens::menu` (`MenuTokens`) the glass menu metrics and
+timings. Text fields, lists and documents are opaque by design (native editors render on their own
+opaque surfaces); cards, buttons and the window tint stay translucent. New glyphs: Settings,
+Appearance, Power, Taskbar, Plus, Minus, Folder, Download, Shield, Warning, Location, OpenExternal and
+Reset, all inside the 16-DIP grid with the round stroke. `GlassStyle::border` allows a borderless body
+whose frame DWM already draws. The glass painter's caches are kept per Direct2D device (up to four per
+thread) so native forms' DC render targets and the composition device do not evict each other.

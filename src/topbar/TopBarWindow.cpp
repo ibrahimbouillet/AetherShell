@@ -12,7 +12,7 @@
 #include "status/ClockProvider.h"
 #include "status/audio/EndpointReading.h"
 #include "topbar/TopBarMenu.h"
-#include "ui/ThemedMenu.h"
+#include "ui/GlassMenu.h"
 #include "ui/TooltipWindow.h"
 #include "ui/accessibility/AccessibleSurface.h"
 
@@ -99,6 +99,10 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     TopBarContext context;
     graphics::DesignTokens tokens = graphics::MakeDesignTokens(graphics::ThemeMode::Dark);
     graphics::MotionPolicy motion;
+    // The logo and item menus share one glass presenter for the window's lifetime (shared so a
+    // menu callback that destroys the window cannot destroy the presenter under its own Show).
+    std::shared_ptr<ui::GlassMenuPresenter> menus;
+    bool keyboardMenu = false;
     graphics::TextCache textCache;
     ui::TooltipWindow tooltip;
     ui::accessibility::AccessibleSurface accessibility;
@@ -365,6 +369,7 @@ Result<void> TopBarWindow::SetUpdateAvailable(bool available) {
 }
 void TopBarWindow::SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion) {
     impl_->tokens = tokens; impl_->motion = motion; impl_->tooltip.SetTheme(tokens, motion);
+    if (impl_->menus) impl_->menus->SetTheme(tokens, motion);
     impl_->layoutDirty = true;
     Relayout();
 }
@@ -480,7 +485,7 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
     impl_->fullscreen = hidden;
     // State transitions only: never log foreground identities, titles, paths or repeated probes.
     AETHER_LOG_INFO("topbar", "fullscreen suppression {}", hidden);
-    if (hidden) { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Hide(); }
+    if (hidden) { impl_->hover.reset(); impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
     else Show(false);
     try { FullscreenChanged.Emit(hidden); }
     catch (...) { AETHER_LOG_ERROR("topbar", "fullscreen listener threw an exception"); }
@@ -580,7 +585,8 @@ void TopBarWindow::Activate(int id) {
         else if (impl_->taskbar.active) impl_->EmitRequest(RevealWindowsTaskbarRequested);
     } else if (id == static_cast<int>(ItemKind::Logo)) ShowItemMenu(id);
 }
-void TopBarWindow::ShowItemMenu(int id) {
+void TopBarWindow::ShowItemMenu(int id) { ShowItemMenu(id, impl_->keyboardMenu); }
+void TopBarWindow::ShowItemMenu(int id, bool keyboard) {
     if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
     if(id==static_cast<int>(ItemKind::QuickControls)){Activate(id);return;}
     const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [id](const auto& entry) {
@@ -592,8 +598,11 @@ void TopBarWindow::ShowItemMenu(int id) {
     const auto bound = impl_->ItemBounds(found->rect);
     ui::MenuRequest request; request.owner = Handle(); request.anchor = bound;
     request.placement = ui::MenuPlacement::BelowAnchor; request.restore = ui::ForegroundRestore::Always;
-    ui::ThemedMenuPresenter themed(impl_->tokens);
-    auto* presenter = impl_->context.menu ? impl_->context.menu : &themed;
+    request.keyboard = keyboard;
+    if (!impl_->context.menu && !impl_->menus)
+        impl_->menus = std::make_shared<ui::GlassMenuPresenter>(impl_->context.device, impl_->context.scheduler, impl_->tokens, impl_->motion);
+    const auto presenterOwner = impl_->menus;  // modal reentrancy must not destroy the active presenter
+    ui::IMenuPresenter* presenter = impl_->context.menu ? impl_->context.menu : presenterOwner.get();
     std::weak_ptr<Impl::Gate> weak = impl_->gate;
     impl_->tooltip.HideTooltip();
     const auto selected = presenter->Show(entries, request);
@@ -635,13 +644,21 @@ void TopBarWindow::ShowItemMenu(int id) {
 bool TopBarWindow::OnKeyDown(UINT key) {
     if ((key == VK_APPS || (key == VK_F10 && (::GetKeyState(VK_SHIFT) & 0x8000))) &&
         impl_->focused) {
-        ShowItemMenu(*impl_->focused); return true;
+        ShowItemMenu(*impl_->focused, true); return true;
     }
     std::vector<int> actions;
     for (const auto& item : impl_->placed) if (item.item.actionable) actions.push_back(item.item.id);
     if (actions.empty()) return false;
     if (key == VK_ESCAPE) { impl_->focused.reset(); ::SetFocus(nullptr); impl_->tooltip.HideTooltip(); Invalidate(); return true; }
-    if (key == VK_RETURN || key == VK_SPACE) { if (impl_->focused) Activate(*impl_->focused); return true; }
+    if (key == VK_RETURN || key == VK_SPACE) {
+        if (impl_->focused) {
+            // A menu opened from the keyboard (the logo) starts with its first entry selected.
+            impl_->keyboardMenu = true;
+            Activate(*impl_->focused);
+            impl_->keyboardMenu = false;
+        }
+        return true;
+    }
     if (key != VK_LEFT && key != VK_RIGHT && key != VK_TAB && key != VK_HOME && key != VK_END) return false;
     auto found = std::find(actions.begin(), actions.end(), impl_->focused.value_or(0));
     int index = found == actions.end() ? 0 : static_cast<int>(found - actions.begin());
@@ -689,6 +706,7 @@ std::optional<LRESULT> TopBarWindow::OnMessage(UINT message, WPARAM wParam, LPAR
 void TopBarWindow::OnDestroying() {
     if (impl_->destroyed) return;
     impl_->destroyed = true; impl_->gate->owner = nullptr;
+    if (impl_->menus) impl_->menus->Cancel();
     impl_->settingsChanged.Disconnect();
     if (impl_->foregroundHook) { ::UnhookWinEvent(impl_->foregroundHook); impl_->foregroundHook = nullptr; }
     std::erase(watchedWindows, Handle());

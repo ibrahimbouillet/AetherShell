@@ -71,6 +71,33 @@ void ApplyDarkRoles(DesignTokens& t) {
     s.selectedText = t.textPrimary;
     s.popupBackground = Color::FromHex(0x2C2C2C);
 
+    auto& f = t.form;
+    f.windowTint = Color::FromHex(0x1C1C1C);
+    f.windowTintAlpha = 0.44f;
+    f.windowSolid = Color::FromHex(0x202020);
+    f.footerTint = Color::FromHex(0x000000, 0.10f);
+    f.cardFill = Color::FromHex(0xFFFFFF, 0.045f);
+    f.cardFillSolid = Color::FromHex(0x2B2B2B);
+    f.cardStroke = Color::FromHex(0xFFFFFF, 0.08f);
+    f.rowHover = Color::FromHex(0xFFFFFF, 0.04f);
+    f.rowPressed = Color::FromHex(0xFFFFFF, 0.025f);
+    f.divider = Color::FromHex(0xFFFFFF, 0.07f);
+    f.fieldFill = Color::FromHex(0x2C2C2C);
+    f.fieldFillDisabled = Color::FromHex(0x262626);
+    f.fieldStroke = Color::FromHex(0xFFFFFF, 0.12f);
+    f.fieldText = t.textPrimary;
+    f.buttonFill = Color::FromHex(0xFFFFFF, 0.07f);
+    f.buttonFillHover = Color::FromHex(0xFFFFFF, 0.10f);
+    f.buttonFillPressed = Color::FromHex(0xFFFFFF, 0.05f);
+    f.buttonStroke = Color::FromHex(0xFFFFFF, 0.09f);
+    f.switchOffStroke = Color::FromHex(0xC5C5C5);
+    f.sliderTrack = Color::FromHex(0xFFFFFF, 0.24f);
+    f.sliderThumb = Color::FromHex(0x454545);
+    f.scrollThumb = Color::FromHex(0xFFFFFF, 0.30f);
+    f.scrollThumbHover = Color::FromHex(0xFFFFFF, 0.50f);
+    f.navSelected = Color::FromHex(0xFFFFFF, 0.07f);
+    f.navHover = Color::FromHex(0xFFFFFF, 0.045f);
+
     t.focus.outer = Color::FromHex(0xFFFFFF);
     t.focus.inner = Color::FromHex(0x000000, 0.70f);
     t.glyph.halo = Color::FromHex(0x1E1E1E);
@@ -121,6 +148,33 @@ void ApplyLightRoles(DesignTokens& t) {
     s.selectedFill = Color::FromHex(0xF0F0F0);
     s.selectedText = t.textPrimary;
     s.popupBackground = Color::FromHex(0xF9F9F9);
+
+    auto& f = t.form;
+    f.windowTint = Color::FromHex(0xF3F3F3);
+    f.windowTintAlpha = 0.50f;
+    f.windowSolid = Color::FromHex(0xF3F3F3);
+    f.footerTint = Color::FromHex(0xFFFFFF, 0.30f);
+    f.cardFill = Color::FromHex(0xFFFFFF, 0.55f);
+    f.cardFillSolid = Color::FromHex(0xFBFBFB);
+    f.cardStroke = Color::FromHex(0x000000, 0.06f);
+    f.rowHover = Color::FromHex(0x000000, 0.03f);
+    f.rowPressed = Color::FromHex(0x000000, 0.02f);
+    f.divider = Color::FromHex(0x000000, 0.07f);
+    f.fieldFill = Color::FromHex(0xFDFDFD);
+    f.fieldFillDisabled = Color::FromHex(0xF5F5F5);
+    f.fieldStroke = Color::FromHex(0x000000, 0.12f);
+    f.fieldText = t.textPrimary;
+    f.buttonFill = Color::FromHex(0xFFFFFF, 0.70f);
+    f.buttonFillHover = Color::FromHex(0xFFFFFF, 0.50f);
+    f.buttonFillPressed = Color::FromHex(0xFFFFFF, 0.30f);
+    f.buttonStroke = Color::FromHex(0x000000, 0.08f);
+    f.switchOffStroke = Color::FromHex(0x616161);
+    f.sliderTrack = Color::FromHex(0x000000, 0.26f);
+    f.sliderThumb = Color::FromHex(0xFFFFFF);
+    f.scrollThumb = Color::FromHex(0x000000, 0.30f);
+    f.scrollThumbHover = Color::FromHex(0x000000, 0.45f);
+    f.navSelected = Color::FromHex(0x000000, 0.055f);
+    f.navHover = Color::FromHex(0x000000, 0.035f);
 
     t.focus.outer = Color::FromHex(0x000000, 0.90f);
     t.focus.inner = Color::FromHex(0xFFFFFF, 0.70f);
@@ -184,6 +238,34 @@ void ApplyHighContrastRoles(DesignTokens& t) {
     s.selectedFill = highlight;
     s.selectedText = highlightText;
     s.popupBackground = menu;
+
+    // Forms use native system-colored painting in high contrast; these keep any custom paint opaque.
+    auto& f = t.form;
+    f.windowTint = window;
+    f.windowTintAlpha = 1.0f;
+    f.windowSolid = window;
+    f.footerTint = window;
+    f.cardFill = window;
+    f.cardFillSolid = window;
+    f.cardStroke = windowText;
+    f.rowHover = highlight.WithAlpha(0.35f);
+    f.rowPressed = highlight.WithAlpha(0.6f);
+    f.divider = windowText;
+    f.fieldFill = window;
+    f.fieldFillDisabled = window;
+    f.fieldStroke = windowText;
+    f.fieldText = windowText;
+    f.buttonFill = buttonFace;
+    f.buttonFillHover = buttonFace;
+    f.buttonFillPressed = buttonFace;
+    f.buttonStroke = buttonText;
+    f.switchOffStroke = windowText;
+    f.sliderTrack = windowText;
+    f.sliderThumb = buttonFace;
+    f.scrollThumb = windowText;
+    f.scrollThumbHover = highlight;
+    f.navSelected = highlight;
+    f.navHover = highlight.WithAlpha(0.35f);
 
     t.accentRoles.fill = highlight;
     t.accentRoles.fillHover = highlight;

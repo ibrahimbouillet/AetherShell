@@ -111,3 +111,8 @@ explicit layout settlement within two seconds of the resize request, then retain
 at-most-two-frames assertion during its 300 ms idle sample. The final ten-case rerun passes; the
 earlier crash and premature-idle failure remain part of the session evidence. Physical DPI/monitor
 changes, Windows 10, actual IME/screen-reader use and cross-process margin behavior remain open.
+
+## Neutral material (T47 / FR-037)
+
+The Search panel uses the neutral glass material (`GlassStyle::neutral`, no highlight): the earlier
+top-weighted sheen is removed so every Aether surface shares one non-directional material.

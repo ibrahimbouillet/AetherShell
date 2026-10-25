@@ -44,6 +44,9 @@ public:
     [[nodiscard]] static double Now() noexcept;
     // Display refresh interval reported by DWM (falls back to 60 Hz).
     [[nodiscard]] double RefreshInterval() const noexcept { return refreshInterval_; }
+    // The loop servicing the frame timer (null before Initialize). Nested modal loops (glass menus)
+    // use MessageLoop::RunNested on it so frames keep ticking while they run.
+    [[nodiscard]] platform::MessageLoop* Loop() const noexcept { return loop_; }
 
 private:
     void Arm();

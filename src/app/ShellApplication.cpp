@@ -45,6 +45,7 @@
 #include "status/audio/AudioProvider.h"
 #include "status/audio/MicrophoneProvider.h"
 #include "topbar/TopBarWindow.h"
+#include "ui/form/ConfirmDialog.h"
 #include "updates/UpdateCoordinator.h"
 #include "weather/GeocodingClient.h"
 #include "weather/WeatherProvider.h"
@@ -110,6 +111,8 @@ struct ShellApplication::Impl {
     std::unique_ptr<search::SearchService> search;
     std::unique_ptr<search::ui::SearchWindow> searchWindow;
     std::unique_ptr<settings::ui::SettingsWindow> settingsWindow;
+    graphics::DesignTokens appTokens;  // the Settings window is an application window (app light/dark mode)
+    graphics::MotionPolicy appMotion;
     std::unique_ptr<status::StatusProviders> providers;
     std::unique_ptr<status::audio::AudioProvider> audio;
     std::unique_ptr<status::audio::MicrophoneProvider> microphone;
@@ -161,6 +164,7 @@ struct ShellApplication::Impl {
 
     Result<void> StartSurfaces();
     void ApplySettings();
+    bool ConfirmQuitWithoutSaving();
     void ImportTaskbarPins(bool manual = false, unsigned retry = 0);
     void ApplyWeather();
     void RefreshWindowsWeatherLocation();
@@ -613,6 +617,10 @@ void ShellApplication::Impl::ApplySettings() {
     if (topbar) { topbar->SetTheme(tokens, motion); topbar->SetSettings(value.topBar, value.weather.enabled); }
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
     if (controls) controls->SetTheme(tokens, motion);
+    // Settings follows the Windows app mode (AppsUseLightTheme), the shell surfaces the system mode.
+    appTokens = graphics::MakeAppDesignTokens(appearance);
+    appMotion = motion;
+    if (settingsWindow) settingsWindow->SetTheme(appTokens, appMotion);
     if (taskbar && taskbarRequested != value.general.replaceWindowsTaskbar) {
         taskbarRequested = value.general.replaceWindowsTaskbar;
         taskbarReservationFailed = false;
@@ -686,6 +694,11 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.weatherLocationStatus=[this]{return locationStatus;};
     actions.setStartup = [this](bool enabled, std::function<void(Result<void>)> completion) {
         if (closing) { if (completion) completion(MakeError(ErrorCode::InvalidState, "application is closing")); return; }
+        // Development/test profiles never register a private candidate for sign-in startup.
+        if (command.dataDirectory) {
+            if (completion) completion(MakeError(ErrorCode::Unsupported, "Sign-in startup is unavailable in a private data profile."));
+            return;
+        }
         const auto executable = paths.executableDir.parent_path().parent_path() / L"AetherShell.exe";
         const auto weak = std::weak_ptr<bool>(alive);
         worker.Post([this, weak, executable, enabled, completion = std::move(completion)]() mutable {
@@ -696,6 +709,8 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     };
     actions.openLogFolder = [this] { const auto folder = paths.logDir; worker.Post([folder]{ ::ShellExecuteW(nullptr,L"open",folder.c_str(),nullptr,nullptr,SW_SHOWNORMAL); }); };
     actions.exportDiagnostics = [this] { ExportDiagnostics(); };
+    appTokens = graphics::MakeAppDesignTokens(graphics::AppearanceOptions{});
+    actions.scheduler = &scheduler;
     settingsWindow = std::make_unique<settings::ui::SettingsWindow>(*settings, dispatcher, std::move(actions));
     searchWindow = std::make_unique<search::ui::SearchWindow>(graphics, scheduler, *search, *launcher, *icons);
     if (auto result = searchWindow->Initialize(); !result) return result;
@@ -979,7 +994,7 @@ void ShellApplication::Impl::RequestQuit() {
             // deferred Dock/UIA actions) before the final FIFO persistence barrier is queued.
             if (!settings->SetChangesEnabled(false)) { resume(); return; }
             const auto flushed = settings->FlushAsync([this, resume](Result<void> result) {
-                if (!result && ::MessageBoxW(nullptr, L"Settings could not be saved. Quit without saving the latest changes?", L"Aether Shell", MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING) != IDYES) { resume(); return; }
+                if (!result && !ConfirmQuitWithoutSaving()) { resume(); return; }
                 ::PostQuitMessage(0);
             });
             if (flushed) return;
@@ -990,6 +1005,22 @@ void ShellApplication::Impl::RequestQuit() {
     if (settingsWindow) {
         if (auto prepared = settingsWindow->PrepareToClose(finish); !prepared) { resume(); AETHER_LOG_WARN("app", "settings editor could not settle for shutdown"); }
     } else finish();
+}
+
+// The shared glass confirmation (MessageBoxW only if it cannot be presented). True quits.
+bool ShellApplication::Impl::ConfirmQuitWithoutSaving() {
+    ui::form::ConfirmRequest request;
+    request.owner = settingsWindow && settingsWindow->Handle() && ::IsWindowVisible(settingsWindow->Handle()) ? settingsWindow->Handle() : nullptr;
+    request.title = L"Settings could not be saved";
+    request.message = L"Quit without saving the latest changes?";
+    request.detail = L"Your previous settings file is kept. Keep Aether Shell open to try saving again.";
+    request.severity = ui::form::Severity::Warning;
+    request.primary = L"&Quit without saving";
+    request.dangerousPrimary = true;
+    request.cancel = L"&Keep Aether Shell open";
+    request.defaultChoice = ui::form::ConfirmChoice::Cancel;
+    const auto choice = ui::form::ShowConfirmation(request, appTokens, appMotion, &scheduler);
+    return choice && *choice == ui::form::ConfirmChoice::Primary;
 }
 
 void ShellApplication::Impl::ExportDiagnostics() {
@@ -1004,7 +1035,15 @@ void ShellApplication::Impl::ExportDiagnostics() {
     const auto os = platform::GetOsVersion();
     const auto report = std::string("Aether Shell ") + std::string(build::kVersion) + "\nWindows build: " + std::to_string(os.build) +
                         "\nArchitecture: " + std::string(build::kTargetArchitecture) + "\nExport scope: basic diagnostics only; logs and personal data excluded.\n";
-    worker.Post([path, report]{ (void)fs::WriteFileAtomic(path, report); });
+    const auto weak = std::weak_ptr<bool>(alive);
+    worker.Post([this, weak, path, report] {
+        const bool written = static_cast<bool>(fs::WriteFileAtomic(path, report));
+        dispatcher.Post([this, weak, written] {
+            if (const auto live = weak.lock(); !live || !*live || !settingsWindow) return;
+            if (written) settingsWindow->ReportActionStatus(L"Diagnostics exported.", settings::ui::StatusTone::Success);
+            else settingsWindow->ReportActionStatus(L"Diagnostics could not be saved to the chosen file.", settings::ui::StatusTone::Error);
+        });
+    });
 }
 
 void ShellApplication::Impl::Stop() noexcept {
@@ -1076,6 +1115,7 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         auto recovered = future.get();
         recovery.Shutdown();
         if (!recovered) AETHER_LOG_ERROR("app", "taskbar recovery failed ({})", ToString(recovered.error().code));
+        // Documented native fallback: the --restore-taskbar command runs without any renderer.
         ::MessageBoxW(nullptr, DescribeTaskbarRecovery(recovered).c_str(), L"Aether Shell",
                       MB_OK | (recovered ? MB_ICONINFORMATION : MB_ICONERROR));
         return recovered ? 0 : 1;
@@ -1134,9 +1174,11 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
     });
     impl_->settings = std::make_unique<settings::SettingsService>(impl_->paths.configDir / L"settings.json", impl_->dispatcher);
     if (auto loading = impl_->settings->Load([this](Result<settings::LoadReport> result){
+        // Documented native fallback: no surface or renderer exists before settings load.
         if(!result) { ::MessageBoxW(nullptr,L"Settings could not be read safely. The existing file was preserved.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); return; }
         if (impl_->command.action == StartupAction::Quit) { ::PostQuitMessage(0); return; }
         if (impl_->command.action == StartupAction::RestoreTaskbar) (void)impl_->settings->Update([](settings::Settings& s) { s.general.replaceWindowsTaskbar = false; });
+        // Documented native fallback: the surfaces (and so the shared presentation) failed to start.
         if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,L"Aether Shell could not start its desktop surfaces.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
         else if(result->status==settings::LoadStatus::Defaults&&impl_->nativeTaskbarAccess&&impl_->command.action==StartupAction::None)
             impl_->OpenSettings(settings::ui::SettingsPage::Weather);

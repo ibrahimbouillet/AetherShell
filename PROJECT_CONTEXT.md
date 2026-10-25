@@ -15,6 +15,7 @@ available in Releases.
 ## Architecture
 ```
 app (lifecycle, wiring)                         src/app          [implemented] lifecycle smoke pending
+ ├─ ui/form                                    native form presentation [implemented] S-049
  ├─ dock, topbar, search/ui, settings/ui        UI modules        [implemented] module gates below
  ├─ applications, search, status, status/audio,
  │  weather, settings, updates, install         services/providers

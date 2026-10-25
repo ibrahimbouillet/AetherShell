@@ -5,25 +5,28 @@
 namespace aether::topbar {
 
 std::vector<ui::MenuEntry> BuildTopBarMenu(ItemKind item, TaskbarReplacementState taskbar, bool updateAvailable) {
-    const auto command = [](BarCommand id, const wchar_t* label) {
-        return ui::MenuEntry::Command(static_cast<std::uint32_t>(id), label);
+    const auto command = [](BarCommand id, const wchar_t* label, std::optional<graphics::Glyph> glyph = std::nullopt) {
+        auto entry = ui::MenuEntry::Command(static_cast<std::uint32_t>(id), label);
+        entry.glyph = glyph;  // glass menus draw it in their icon column; HMENU presenters ignore it
+        return entry;
     };
     std::vector<ui::MenuEntry> entries;
     const auto notification = [&] {
         if (!taskbar.available) return;
-        if (taskbar.suspended) entries.push_back(command(BarCommand::ResumeReplacement, L"&Resume taskbar replacement"));
+        if (taskbar.suspended) entries.push_back(command(BarCommand::ResumeReplacement, L"&Resume taskbar replacement", graphics::Glyph::Taskbar));
         else if (taskbar.active) entries.push_back(command(BarCommand::RevealWindowsTaskbar,
-            L"Show Windows &notification area for 60 seconds"));
+            L"Show Windows &notification area for 60 seconds", graphics::Glyph::Taskbar));
     };
     switch (item) {
         case ItemKind::Logo:
-            entries = {command(BarCommand::Search, L"&Search…"), command(BarCommand::Settings, L"&Settings…")};
+            entries = {command(BarCommand::Search, L"&Search…", graphics::Glyph::Search),
+                       command(BarCommand::Settings, L"&Settings…", graphics::Glyph::Settings)};
             notification();
-            if (updateAvailable) entries.push_back(command(BarCommand::ViewUpdate, L"View available &update…"));
-            entries.push_back(command(BarCommand::CheckUpdates, L"&Check for updates…"));
+            if (updateAvailable) entries.push_back(command(BarCommand::ViewUpdate, L"View available &update…", graphics::Glyph::Download));
+            entries.push_back(command(BarCommand::CheckUpdates, L"&Check for updates…", graphics::Glyph::Updates));
             entries.push_back(ui::MenuEntry::Separator());
-            entries.push_back(command(BarCommand::About, L"&About Aether Shell"));
-            entries.push_back(command(BarCommand::Quit, L"&Quit Aether Shell"));
+            entries.push_back(command(BarCommand::About, L"&About Aether Shell", graphics::Glyph::About));
+            entries.push_back(command(BarCommand::Quit, L"&Quit Aether Shell", graphics::Glyph::Power));
             break;
         case ItemKind::Keyboard: entries.push_back(command(BarCommand::Keyboard, L"Switch &input language\tWin+Space")); break;
         case ItemKind::Network: entries.push_back(command(BarCommand::Network, L"Open &network controls…")); break;

@@ -83,6 +83,38 @@ AETHER_TEST("platform: message loop runs wait callbacks and exits on WM_QUIT") {
     ::CloseHandle(event);
 }
 
+AETHER_TEST("platform: nested loop keeps servicing waits, intercepts first and re-posts WM_QUIT") {
+    MessageLoop loop;
+    PumpPendingMessages();
+    HANDLE event = ::CreateEventW(nullptr, FALSE, TRUE, nullptr);
+    REQUIRE(event != nullptr);
+    int fired = 0;
+    bool done = false;
+    // Windows reports queued input before a signalled handle; the nested loop must still reach it.
+    loop.AddWaitHandle(event, [&] { ++fired; done = true; });
+    int filtered = 0;
+    loop.AddMessageFilter([&](MSG& message) { if (message.message == WM_APP + 9) ++filtered; return false; });
+    int intercepted = 0;
+    ::PostThreadMessageW(::GetCurrentThreadId(), WM_APP + 9, 0, 0);
+    const bool ended = loop.RunNested([&] { return done; }, [&](MSG& message) {
+        if (message.message == WM_APP + 9) { ++intercepted; return true; }  // consumed: filters skipped
+        return false;
+    });
+    CHECK(ended);
+    CHECK_EQ(fired, 1);        // the signalled wait handle ran inside the nested loop and ended it
+    CHECK_EQ(intercepted, 1);
+    CHECK_EQ(filtered, 0);
+    // Without an interceptor the filters run; WM_QUIT ends the nested loop and is re-posted.
+    ::PostThreadMessageW(::GetCurrentThreadId(), WM_APP + 9, 0, 0);
+    ::PostQuitMessage(5);
+    CHECK_FALSE(loop.RunNested([] { return false; }));
+    CHECK_EQ(filtered, 1);
+    MSG quit{};
+    REQUIRE(::PeekMessageW(&quit, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE));
+    CHECK_EQ(quit.wParam, WPARAM{5});
+    ::CloseHandle(event);
+}
+
 AETHER_TEST("platform: single instance lock detects a second owner") {
     auto first = SingleInstanceLock::Acquire(L"AetherShell.Tests.SingleInstance");
     REQUIRE(first.ok());

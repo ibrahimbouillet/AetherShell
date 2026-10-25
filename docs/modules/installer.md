@@ -59,3 +59,34 @@ is only noted in the setup log. The test executable accepts `--test-shortcut-dir
 together with its isolation flag, so the integration suite checks creation (target and argument),
 the foreign-file rule and removal on uninstall in a temporary folder; the user's Start menu is never
 touched by tests, and the production binary has no such switch.
+
+## Redesigned wizard and updater window (T47 / FR-037 / D42)
+
+Codex's continuation repairs malformed licence/newline literals and gives each install attempt a
+fresh cancellation source with its own captured token: cancellation cannot silently cancel every
+later retry. The deterministic retry fixture uses only temporary installation/data roots and the
+test target's existing registration/process isolation. Theme, contrast and text changes restyle
+existing controls without losing the destination or checkbox choices. Catastrophic form attachment
+failure reports a native initialization error instead of leaving a blank, unusable wizard.
+
+The updater's status area measures and wraps text inside a scrolling region while Close remains
+visible. Its presentation-only fixture excludes the updater entry point and never invokes package
+application, installation registration or real process handoff. Guarded setup captures verify actual
+backdrop/guard/capture containment before and after copying. Final executed evidence is S-049;
+source presence alone does not establish all setup states, normal-speed motion or owner acceptance.
+
+The setup wizard keeps every non-UI path (`Parse`, `Resolve`, `RelocateMaintenance`, `Perform`, the
+restore-taskbar shortcut, silent mode, exit codes, isolation switches) and every control id the
+fixtures use (1, 2, 3, 4, 8, 9, 20-25, 30). Its presentation moved to [ui_form](ui_form.md): a fixed
+header with the brand mark, title, version and a five-step indicator (with an accessible
+"Step n of 5" caption), a scrolling page region, and a fixed footer with the toned status and
+Back/primary/Cancel. Pages: Welcome (three feature cards: reversible taskbar replacement, sign-in
+startup as an explicit choice, per-user install), Licence (full MIT text), Options (folder field and
+Browse, Start menu/desktop shortcut and startup switches with the real default or existing choice, or
+the uninstall data choice), Install (indeterminate progress, honest text, Cancel before activation)
+and Done (toned outcome, recovery guidance, launch switch, the log path on failure, Back to Options
+after a failure). Inline validation replaced the folder message box and closing during an operation
+shows an inline note. `--test-theme light|dark` (test binary only) makes fixture renders deterministic;
+`WM_APP+73` (test binary only) reports the content scroll position. If the presentation cannot attach,
+the same controls are created with stock painting. The updater's verify-and-apply window uses the
+same material, brand mark, indeterminate progress and toned outcome; its behavior is unchanged.

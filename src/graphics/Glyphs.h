@@ -39,12 +39,29 @@ enum class Glyph {
     ArrowDown,
     ArrowLeft,
     ArrowRight,
+    // Menus, forms and setup
+    Settings,      // gear
+    Appearance,    // half-filled circle (color mode)
+    Power,         // quit
+    Taskbar,       // a screen with its taskbar (Windows taskbar / notification area)
+    Plus,
+    Minus,
+    Folder,
+    Download,
+    Shield,        // verified update
+    Warning,       // triangle with an exclamation mark
+    Location,
+    OpenExternal,  // a box with an outgoing arrow (opens the browser)
+    Reset,         // counter-clockwise arrow (restore defaults)
 };
 inline constexpr Glyph kAllGlyphs[] = {
     Glyph::Search,      Glyph::TaskView,     Glyph::Dock,        Glyph::TopBar,       Glyph::Desktop,
     Glyph::Weather,     Glyph::Updates,      Glyph::General,     Glyph::About,        Glyph::ChevronDown,
     Glyph::ChevronUp,   Glyph::ChevronLeft,  Glyph::ChevronRight, Glyph::Check,       Glyph::Close,
-    Glyph::ArrowUp,     Glyph::ArrowDown,    Glyph::ArrowLeft,   Glyph::ArrowRight,
+    Glyph::ArrowUp,     Glyph::ArrowDown,    Glyph::ArrowLeft,   Glyph::ArrowRight,   Glyph::Settings,
+    Glyph::Appearance,  Glyph::Power,        Glyph::Taskbar,     Glyph::Plus,         Glyph::Minus,
+    Glyph::Folder,      Glyph::Download,     Glyph::Shield,      Glyph::Warning,      Glyph::Location,
+    Glyph::OpenExternal, Glyph::Reset,
 };
 
 enum class StatusBadge { Info, Success, Warning, Error };

@@ -233,3 +233,49 @@ of this candidate remains pending in TEST_STATUS S-022.
 Combined candidate verification (2026-10-20, S-022): **52 settings unit and 10 native editor cases
 pass**, Release /W4 /WX. Appearance persistence/custom size, explicit opt-out, bounded newest dismissal
 and profile route preservation are now executed evidence. No real startup/taskbar setting changed.
+
+## Visual redesign on the shared form presentation (T47 / FR-037 / D42)
+
+`SettingsWindow` is rebuilt on [ui_form](ui_form.md): a normal resizable window (default about 960 x 700
+DIPs, minimum 380 x 340) with the Acrylic/opaque/native material, a glyph navigation pane that becomes
+an icon rail below `form.narrowWidth`, a scrolling content region (`FormScrollView`) with a page title,
+section titles and cards, and a fixed footer with the toned status, "Reset defaults..." and Apply.
+Rows are layout elements over existing controls, so `SetTheme`, resize and DPI changes relayout without
+recreating anything: drafts, staged consent switches, focus, selection and scroll position survive.
+
+Contracts are unchanged: page order and the navigation list (100), Apply/Reset/status (101-103), binding
+ids `200 + index` in the same order and kinds, the action/list/status ids 270-272 and 301-321 (plus 322
+progress and 323 headline on Updates), the 350 ms live apply (timer 19), consent-only startup and
+taskbar replacement, validation/correction messages, asynchronous saves, `PrepareToClose`, pins,
+geocoding and the D23 reset rule. Numbers are formatted for people (`SettingsFormat`): an opacity of
+0.80 shows "80" with "%", factors such as 1.45 show with "x", whole pixels without decimals, while
+parsing returns the exact stored value. Each number has an auxiliary slider (id `400 + index`) kept in
+sync with its value field; invalid text marks the field and explains the range. A staged consent
+switch says "Press Apply to confirm this change." until Apply. Updates are presented in place from
+the coordinator's snapshot (headline, toned summary, determinate progress only for a known total,
+actions enabled per state, Later/Skip only for an offered release, the verified state worded from the
+signed manifest) without rebuilding the page. Reset asks through `SettingsCallbacks::confirm` or the
+shared glass confirmation; `scheduler` paces motion. Combo boxes retain their native dropdown and
+Selection/ExpandCollapse accessibility semantics, using the shared field/list colors. This is a
+documented native popup exception until a custom glass list has equivalent accessibility patterns.
+Ctrl+Tab / Ctrl+Shift+Tab / Ctrl+PageDown / Ctrl+PageUp switch pages. Before the application's first
+`SetTheme` the window uses deterministic tokens for the Windows light/dark mode (no WinRT palette read,
+because standalone callers may tear down COM apartments around each window).
+
+Compact layouts stack fields, pin actions and long buttons; measured multiline button/control/footer
+heights grow with text scaling. Layout tests preserve horizontal bounds before checking containment
+and inspect scrolled positions, so viewport clipping cannot hide a horizontally overflowing control.
+Navigation retains page-local invalid/unfinished input, text selection, consent drafts, focus and
+scroll, restoring them over the current settings model. Ordinary live edits drain through the
+existing validation path before navigation; consent remains Apply-only on its owning page. Reopening
+the active page does not rebuild it. Closing discards unapplied drafts, preserving the existing
+close/consent contract. Native numeric, combo and hotkey controls publish their setting labels and
+helper text explicitly for assistive technology.
+The application's development/test `--data-dir` profile rejects startup registration before any
+registry access, so a private prototype cannot replace the installed sign-in entry through Settings.
+
+Evidence: `tests/integration/settings_ui` (12 original behavioral
+cases adapted only in mechanics: `ScrollMetrics` instead of the window scroll bar, a descendant search
+for the Quick Settings switch, a 2-pixel DPI tolerance at fractional scales), redesigned page/layout/
+input/state checks and
+`tests/unit/settings_ui` (formatting and slider mapping). See TEST_STATUS S-049.

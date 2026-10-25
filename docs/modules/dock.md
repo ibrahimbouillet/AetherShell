@@ -319,3 +319,10 @@ launchers, temporary settings and only its own windows; no global input, work-ar
 real application activation or capture is required. These new checks are pending execution; the
 S-022/S-026 receipts above do not validate this continuation. Physical pointer/refresh-rate and real
 Shell notification behavior remain separate owner qualification.
+
+## Glass context menus (T47 / FR-037 / D42)
+
+Item, overflow and background menus use a shared `GlassMenuPresenter` (the reentrancy guard that keeps
+the presenter alive across its own modal loop is unchanged; an injected `menuPresenter` still wins).
+An open menu is cancelled when the Dock is suppressed or destroyed. Layout, magnification, previews,
+shadows and input regions are unchanged.

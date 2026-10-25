@@ -319,6 +319,8 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     style.cornerRadius = tokens_.radii.popup;
     style.backdropBlur = BackdropBlurActive();
     style.elevation = graphics::Elevation::Popup;
+    style.neutral = true;      // FR-037: one neutral material; no directional sheen on any side
+    style.highlight = false;
     graphics::PaintGlassPanel(dc, panel, tokens_, style);
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     dc->CreateSolidColorBrush(tokens_.textPrimary.ToD2D(), brush.put());

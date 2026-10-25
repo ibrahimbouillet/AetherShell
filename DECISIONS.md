@@ -108,6 +108,33 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D42 — Native forms on one scene with opaque native editors; glass popups behind IMenuPresenter
+
+Implementation decision under D41 (Claude, continued/reviewed by Codex, 2026-10-25,
+[ADR 0011](docs/decisions/0011-native-form-presentation.md)); implementation review completed,
+owner visual acceptance pending, not a new owner-approved objective. Application windows that keep native
+child controls (Settings, setup, the updater, confirmations) use the new `ui_form` module instead of
+`SurfaceWindow`: a normal redirected, activatable window with DWM's system Acrylic
+(`DWMSBT_TRANSIENTWINDOW`, frame extended over the client) where Windows 11 22H2+ and transparency
+allow it, an opaque fallback elsewhere, and stock system-colored painting in high contrast or without
+a renderer. All client pixels come from one premultiplied scene rendered per window through buffered
+paint and a Direct2D DC render target; native buttons, check boxes, combo boxes, track bars, progress
+bars and list boxes keep their classes, messages and system UI Automation providers and only change
+their painting. Text editors stay native EDIT/HOTKEY controls on opaque layered child surfaces inside
+drawn fields, so caret, IME, selection and clipboard are untouched (NFR-007 is preserved; no control
+was replaced by painted text). Popup menus use a composition `GlassMenuPresenter`
+implementing the existing `IMenuPresenter` contract with TrackPopupMenu semantics (modal, same ids,
+foreground rule, thread keyboard taken by its own `MessageLoop::RunNested` loop, mouse capture for
+outside clicks) and fall back to the owner-drawn/native HMENU presenters in high contrast or on
+failure. Rejected: compositor-only Settings with GDI children (airspace/redirection problems with
+`WS_EX_NOREDIRECTIONBITMAP`), recoloring the stock controls (does not reveal the backdrop), and custom
+text editing (violates NFR-007). Consequences: Windows draws an inactive window's Acrylic as its flat
+fallback; combo boxes keep their native dropdown with shared field/list colors so Selection and
+ExpandCollapse remain available. A glass MenuItem list without equivalent combo semantics was
+rejected during review; layout is
+DIP-based with fractional-scale rounding; setup now links the graphics/ui_form libraries but still
+runs before Aether is installed.
+
 ### D40 — Reversible corners for eligible maximized windows
 
 Owner-requested outcome, 2026-10-25 (FR-036/T44): retain true maximization and add rounded visible

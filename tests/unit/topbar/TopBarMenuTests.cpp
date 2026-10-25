@@ -3,6 +3,10 @@
 #include "AetherTest.h"
 #include "topbar/TopBarMenu.h"
 
+#include <algorithm>
+#include <utility>
+#include <vector>
+
 using namespace aether;
 using namespace aether::topbar;
 
@@ -117,4 +121,31 @@ AETHER_TEST("topbar geometry: malformed inputs cannot produce invalid HWND bound
     CHECK_FALSE(ComputeTopBarPlacement(area, 96, 49, 6, 24).ok());
     CHECK_FALSE(ComputeTopBarPlacement(area, 96, 32, -1, 24).ok());
     CHECK_FALSE(ComputeTopBarPlacement(RECT{0, 0, 20, 100}, 96, 32, 0, 24).ok());
+}
+
+AETHER_TEST("topbar menus: the logo menu keeps its commands, order and labels and gains its glass icons") {
+    const auto menu = BuildTopBarMenu(ItemKind::Logo, {true, true, false}, true);
+    const std::vector<std::pair<BarCommand, graphics::Glyph>> expected{
+        {BarCommand::Search, graphics::Glyph::Search},       {BarCommand::Settings, graphics::Glyph::Settings},
+        {BarCommand::RevealWindowsTaskbar, graphics::Glyph::Taskbar}, {BarCommand::ViewUpdate, graphics::Glyph::Download},
+        {BarCommand::CheckUpdates, graphics::Glyph::Updates}, {BarCommand::About, graphics::Glyph::About},
+        {BarCommand::Quit, graphics::Glyph::Power}};
+    std::vector<const ui::MenuEntry*> commands;
+    for (const auto& entry : menu) if (!entry.separator) commands.push_back(&entry);
+    REQUIRE_EQ(commands.size(), expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK_EQ(commands[i]->id, static_cast<std::uint32_t>(expected[i].first));
+        REQUIRE(commands[i]->glyph.has_value());
+        CHECK(*commands[i]->glyph == expected[i].second);
+        CHECK(commands[i]->enabled);
+    }
+    // The exact recovery wording and timeout are policy, not decoration.
+    CHECK_EQ(Find(menu, BarCommand::RevealWindowsTaskbar)->text, std::wstring(L"Show Windows &notification area for 60 seconds"));
+    CHECK_EQ(Find(menu, BarCommand::Quit)->text, std::wstring(L"&Quit Aether Shell"));
+    // A separator still divides the commands from About/Quit; item menus stay icon-free.
+    CHECK(std::any_of(menu.begin(), menu.end(), [](const ui::MenuEntry& entry) { return entry.separator; }));
+    for (const auto& entry : BuildTopBarMenu(ItemKind::Volume, {}, false)) CHECK_FALSE(entry.glyph.has_value());
+    const auto resume = BuildTopBarMenu(ItemKind::Logo, {true, false, true}, false);
+    REQUIRE(Find(resume, BarCommand::ResumeReplacement) != nullptr);
+    CHECK(Find(resume, BarCommand::ResumeReplacement)->glyph == graphics::Glyph::Taskbar);
 }

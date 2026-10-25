@@ -234,7 +234,8 @@ AETHER_TEST("settings UI: DPI messages rescale permanent controls and font while
     ::SendMessageW(window.Handle(),WM_DPICHANGED,MAKEWPARAM(initialDpi*2,initialDpi*2),reinterpret_cast<LPARAM>(&bounds));
     RECT applyAfter{};::GetWindowRect(window.Control(101),&applyAfter);
     LOGFONTW fontAfter{};::GetObjectW(reinterpret_cast<HFONT>(::SendMessageW(window.Control(101),WM_GETFONT,0,0)),sizeof(fontAfter),&fontAfter);
-    CHECK(std::abs((applyAfter.right-applyAfter.left)-2*(applyBefore.right-applyBefore.left))<=1);
+    // Fractional display scales (150%) round the control and its focus margins separately.
+    CHECK(std::abs((applyAfter.right-applyAfter.left)-2*(applyBefore.right-applyBefore.left))<=2);
     CHECK(std::abs(fontAfter.lfHeight-2*fontBefore.lfHeight)<=1);
     wchar_t draft[16]{};::GetWindowTextW(window.Control(200),draft,16);CHECK_EQ(std::wstring(draft),L"7.");
     REQUIRE(window.Show(settings::ui::SettingsPage::About).ok());
@@ -243,10 +244,13 @@ AETHER_TEST("settings UI: DPI messages rescale permanent controls and font while
     CHECK(license.find(L"Permission is hereby granted")!=std::wstring::npos);
     CHECK(license.find(L"SOFTWARE IS PROVIDED")!=std::wstring::npos);
     ::SetWindowPos(window.Handle(),nullptr,0,0,420,360,SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE);
-    SCROLLINFO scroll{sizeof(scroll),SIF_ALL};REQUIRE(::GetScrollInfo(window.Handle(),SB_VERT,&scroll));
-    CHECK(scroll.nMax>=static_cast<int>(scroll.nPage));
+    // The content scrolls inside the window; the footer with Reset/Apply stays fixed.
+    const auto scroll=window.ScrollMetrics();
+    TEST_NOTE("content scroll range "+std::to_string(scroll.range)+", page "+std::to_string(scroll.page));
+    CHECK(scroll.range>0);CHECK(scroll.page>0);
     ::SendMessageW(window.Handle(),WM_VSCROLL,SB_BOTTOM,0);
-    ::SendMessageW(window.Handle(),WM_HSCROLL,SB_RIGHT,0);
+    CHECK_EQ(window.ScrollMetrics().position,window.ScrollMetrics().range);
+    ::SendMessageW(window.Handle(),WM_HSCROLL,SB_RIGHT,0);  // no horizontal scrolling: the content reflows
     ::SetFocus(window.Control(102));
     MSG next{};next.hwnd=window.Control(102);next.message=WM_KEYDOWN;next.wParam=VK_TAB;
     REQUIRE(window.PreTranslate(next));CHECK_EQ(::GetFocus(),window.Control(101));
@@ -255,6 +259,16 @@ AETHER_TEST("settings UI: DPI messages rescale permanent controls and font while
     TEST_NOTE("viewport Apply rect "+std::to_string(reachable.left)+","+std::to_string(reachable.top)+","+std::to_string(reachable.right)+","+std::to_string(reachable.bottom)+"; client "+std::to_string(client.right)+","+std::to_string(client.bottom));
     CHECK(reachable.top>=0);CHECK(reachable.bottom<=client.bottom);
     CHECK(reachable.left>=0);CHECK(reachable.right<=client.right);
+    // Only keyboard input reveals the focus: with a field near the top of a long page focused, a scroll
+    // to the end survives a mouse move routed through PreTranslate (IsDialogMessage claims every message).
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    ::SetFocus(window.Control(200));
+    {MSG queued{};while(::PeekMessageW(&queued,nullptr,0,0,PM_REMOVE)){::TranslateMessage(&queued);::DispatchMessageW(&queued);}}
+    ::SendMessageW(window.Handle(),WM_VSCROLL,SB_BOTTOM,0);
+    const int end=window.ScrollMetrics().range;CHECK(end>0);CHECK_EQ(window.ScrollMetrics().position,end);
+    MSG moved{};moved.hwnd=window.Handle();moved.message=WM_MOUSEMOVE;moved.lParam=MAKELPARAM(20,120);
+    (void)window.PreTranslate(moved);
+    CHECK_EQ(window.ScrollMetrics().position,end);
 }
 
 AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh preserves consent drafts") {
@@ -391,10 +405,13 @@ AETHER_TEST("settings UI: native Quick Settings preference can be turned off and
     REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
     settings::ui::SettingsWindow window(service,dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::TopBar).ok());
-    HWND checkbox=nullptr;
-    for(HWND child=::GetWindow(window.Handle(),GW_CHILD);child;child=::GetWindow(child,GW_HWNDNEXT)) {
-        if(ControlText(child)==L"Use Windows Quick Settings (Windows 11)"){checkbox=child;break;}
-    }
+    // Controls live inside the scrolling content region: search every descendant by its text.
+    struct Search { HWND found=nullptr; } search;
+    ::EnumChildWindows(window.Handle(),[](HWND child,LPARAM parameter)->BOOL {
+        if(ControlText(child)!=L"Use Windows Quick Settings (Windows 11)")return TRUE;
+        reinterpret_cast<Search*>(parameter)->found=child;return FALSE;
+    },reinterpret_cast<LPARAM>(&search));
+    HWND checkbox=search.found;
     REQUIRE(checkbox!=nullptr);CHECK_EQ(::SendMessageW(checkbox,BM_GETCHECK,0,0),LRESULT{BST_CHECKED});
     ::SendMessageW(checkbox,BM_CLICK,0,0); // this fixture's own checkbox, no keyboard/system injection
     REQUIRE(Pump(dispatcher,[&]{return !service.Current().topBar.openWindowsFlyouts&&!service.Dirty();}));

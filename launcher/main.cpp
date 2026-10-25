@@ -95,6 +95,7 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
             const bool busy=launched.error().code==aether::ErrorCode::Unavailable;
             if(busy)return 3;  // release this image promptly while setup owns the lifecycle lock
             for(const auto& value:arguments)if(value==L"--autostart")return 4;
+            // Documented native fallback: the launcher has no renderer and the app did not start.
             ::MessageBoxW(nullptr,L"Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.",L"Aether Shell",MB_OK|MB_ICONERROR);return 4;
         }
         aether::install::CrashRestartPolicy restarts;

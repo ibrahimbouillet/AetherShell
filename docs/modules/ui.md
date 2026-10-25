@@ -107,3 +107,24 @@ tooltip motion synchronously. Own-backdrop mean RGB deltas are 17.872 (dark host
 no-blur fallback) and 0.000 (high contrast). The three newly generated PNGs were visually inspected:
 only the synthetic probe, its own tooltip and its opaque private pattern are present. This does not
 establish cross-process visual-margin forwarding, physical monitor/DPI changes or Windows 10.
+
+## GlassMenuPresenter (T47 / FR-037 / D42)
+
+`GlassMenu.h` implements `IMenuPresenter` on composition glass: one `SurfaceWindow` level per menu
+level (never activated), neutral panel with an unclipped popup shadow, icon/check column from
+`MenuEntry::glyph`, mnemonic underlines when keyboard cues apply, right-aligned accelerators,
+submenu chevrons, hairline separators and an animated neutral selection pill. Semantics follow
+`TrackPopupMenu`: modal `Show` on the calling thread, `ValidateMenu` first, the same command ids and
+states, the foreground rule and `ForegroundRestore`, keyboard handled by the presenter's
+`MessageLoop::RunNested` loop (arrows, Home/End, Page keys, Enter/Space, Right/Left for submenus,
+Escape, Alt/F10, mnemonics), mouse captured so a click outside every level dismisses without reaching
+the window underneath, and dismissal on loss of activation/capture, display/DPI change or `Cancel()`.
+Placement anchors above/below or at a point, flips and clamps to the work area; tall menus scroll.
+Opening settles with a compositor transition (`tokens.menu`), closing fades after `Show` returned;
+reduced motion and high contrast are instant. Leaves expose UIA Invoke, checked commands expose
+Toggle, submenu items expose ExpandCollapse and linked child fragments, and radio commands expose
+SelectionItem with the menu's Selection provider. These capabilities are optional on the shared
+accessibility model, leaving other surfaces unchanged. High
+contrast uses `ThemedMenuPresenter` (system-colored native menu); creation failures fall back to the
+themed and then the native presenter. `MenuRequest::minimumWidthPx` and `keyboard` are glass-only
+additions. Tests: `tests/unit/ui/GlassMenuTests.cpp`, `tests/integration/ui/GlassMenuTests.cpp`.

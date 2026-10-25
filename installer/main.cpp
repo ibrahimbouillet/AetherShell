@@ -18,6 +18,10 @@
 #include "settings/SettingsStore.h"
 #include "settings/SettingsSerialization.h"
 #include "settings/StartupRegistration.h"
+#include "graphics/Glyphs.h"
+#include "graphics/SystemPalette.h"
+#include "ui/form/FormScrollView.h"
+#include "ui/form/FormSurface.h"
 
 #include <commctrl.h>
 #include <shlobj.h>
@@ -29,7 +33,7 @@
 #include <memory>
 #include <charconv>
 #include <array>
-#include <array>
+#include <optional>
 #include <cstddef>
 #include <algorithm>
 #include <climits>
@@ -40,11 +44,13 @@ struct Options {
     std::filesystem::path root, data, log;
     bool silent=false, noLaunch=false, noShortcuts=false, startup=false, repair=false, uninstall=false, removeData=false, desktopShortcut=false, allowDowngrade=false;
     bool startupExplicit=false;
+    bool existingInstall=false;  // presentation only: the startup choice shown comes from an existing installation
     std::uintptr_t maintenanceParent=0;
     std::string maintenanceToken;
 #ifdef AETHER_SETUP_TEST_MODE
     bool testNoRegistration=false;
     std::filesystem::path testShortcutDir;  // replaces the Start menu folder for the restore shortcut
+    int testTheme=0;  // 0 follows Windows, 1 light, 2 dark: deterministic wizard renders in fixtures
 #endif
 };
 Result<Options> Parse() {
@@ -68,6 +74,10 @@ Result<Options> Parse() {
         else if(value==L"--keep-user-data")options.removeData=false;
 #ifdef AETHER_SETUP_TEST_MODE
         else if(value==L"--test-no-registration")options.testNoRegistration=true;
+        else if(value==L"--test-theme") {
+            if(++i>=values.size() || (values[i]!=L"light" && values[i]!=L"dark"))return MakeError(ErrorCode::InvalidArgument,"test theme is missing");
+            options.testTheme=values[i]==L"light"?1:2;
+        }
         else if(value==L"--test-shortcut-dir") {
             if(++i>=values.size())return MakeError(ErrorCode::InvalidArgument,"test shortcut folder is missing");
             options.testShortcutDir=values[i];
@@ -173,6 +183,7 @@ Result<void> Resolve(Options& options) {
         }
         const bool installed=std::filesystem::exists(layout->Journal(),error);if(error)return MakeError(ErrorCode::Io,"cannot inspect existing installation",error.value());
         options.startup=install::SetupStartupDefault(true,installed || options.repair,savedChoice,*state);
+        options.existingInstall=installed || options.repair;
     }
     return Ok();
 }
@@ -331,26 +342,145 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.)MIT";
 
+// The setup wizard on the shared Aether form presentation (ui/form): one window with a fixed brand
+// header and step indicator, a scrolling page area and a fixed footer for status and navigation.
+// Every native control keeps its id, class and messages, so keyboard, screen readers and the
+// isolated viewport fixtures drive the same buttons and check boxes as before. When the
+// presentation cannot attach (no renderer at all), the same controls are shown with stock painting.
+namespace form = aether::ui::form;
+
 class Wizard {
 public:
     explicit Wizard(Options options):options_(std::move(options)),worker_({1,L"Aether setup",ComApartment::SingleThreaded}){}
-    ~Wizard(){*alive_=false;worker_.Shutdown();if(window_)::DestroyWindow(window_);if(font_)::DeleteObject(font_);dispatcher_.Shutdown();}
+    ~Wizard(){*alive_=false;worker_.Shutdown();if(window_)::DestroyWindow(window_);dispatcher_.Shutdown();}
     int Run() {
         if(!dispatcher_.Initialize())return 1;
-        WNDCLASSEXW wc{sizeof(wc)};wc.lpfnWndProc=&Proc;wc.hInstance=::GetModuleHandleW(nullptr);wc.hCursor=::LoadCursorW(nullptr,IDC_ARROW);wc.hbrBackground=reinterpret_cast<HBRUSH>(COLOR_WINDOW+1);wc.lpszClassName=L"AetherShell.Setup";
+        WNDCLASSEXW wc{sizeof(wc)};wc.lpfnWndProc=&Proc;wc.hInstance=::GetModuleHandleW(nullptr);wc.hCursor=::LoadCursorW(nullptr,IDC_ARROW);wc.lpszClassName=L"AetherShell.Setup";
         wc.hIcon=::LoadIconW(wc.hInstance,L"IDI_AETHER");
         if(!platform::RegisterWindowClassOnce(wc))return 1;
-        dpi_=::GetDpiForSystem();UpdateFont();
-        window_=::CreateWindowExW(WS_EX_CONTROLPARENT,wc.lpszClassName,L"Aether Shell Setup",WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX|WS_VSCROLL|WS_HSCROLL,CW_USEDEFAULT,CW_USEDEFAULT,Px(680),Px(570),nullptr,nullptr,wc.hInstance,this);
-        if(!window_)return 1;platform::ApplyImmersiveDarkMode(window_,platform::SystemPrefersDarkApps());
-        dpi_=::GetDpiForWindow(window_);if(!dpi_)dpi_=96;UpdateFont();
+        RefreshTheme();
+        const UINT systemDpi=::GetDpiForSystem();
+        window_=::CreateWindowExW(WS_EX_CONTROLPARENT,wc.lpszClassName,L"Aether Shell Setup",WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,
+            ::MulDiv(kWidth,static_cast<int>(systemDpi),96),::MulDiv(kHeight,static_cast<int>(systemDpi),96),nullptr,nullptr,wc.hInstance,this);
+        if(!window_)return 1;
+        if(auto attached=surface_.Attach(window_,tokens_,motion_);attached) {
+            styled_=true;
+            surface_.SetDecorator([this](ID2D1DeviceContext* target,const D2D1_RECT_F&,const graphics::DesignTokens& tokens){PaintHeader(target,tokens);});
+            if(!scroll_.Create(surface_,window_,kScrollId)){surface_.Detach();styled_=false;}
+        }
+        // A renderer-free FormSurface already supplies the supported opaque native fallback.
+        // A failed attachment/scroll host is an initialization failure, not a usable wizard.
+        if(!styled_){::MessageBoxW(window_,L"Setup could not create its interface. Close it and try again, or use the documented silent setup options.",L"Aether Shell Setup",MB_OK|MB_ICONERROR);return 1;}
+        CreateFrame();
         RECT initial{};::GetWindowRect(window_,&initial);Constrain(initial);Build();::ShowWindow(window_,SW_SHOWNORMAL);
-        loop_.AddMessageFilter([this](MSG& msg){const bool handled=::IsDialogMessageW(window_,&msg)!=FALSE;EnsureFocusVisible();return handled;});
+        // IsDialogMessage claims every message of the window; only keyboard input may move the page to
+        // the focus, so a wheel or scroll-bar position survives the next mouse move.
+        loop_.AddMessageFilter([this](MSG& msg){const bool handled=::IsDialogMessageW(window_,&msg)!=FALSE;if(handled && (msg.message==WM_KEYDOWN || msg.message==WM_SYSKEYDOWN))EnsureFocusVisible();return handled;});
         return loop_.Run();
     }
 private:
-    int Px(int v)const{return ::MulDiv(v,static_cast<int>(dpi_),96);}
-    void UpdateFont(){if(font_)::DeleteObject(font_);font_=::CreateFontW(-Px(14),0,0,0,FW_NORMAL,FALSE,FALSE,FALSE,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,DEFAULT_PITCH,L"Segoe UI");}
+    static constexpr int kWidth=720,kHeight=580;
+    static constexpr int kScrollId=40,kTitleId=41,kStepId=42,kStatusId=43;
+    static constexpr int kPages=5;
+
+    void RefreshTheme() {
+        graphics::AppearanceOptions appearance;
+#ifdef AETHER_SETUP_TEST_MODE
+        if(options_.testTheme==1)appearance.theme=graphics::ThemePreference::Light;
+        if(options_.testTheme==2)appearance.theme=graphics::ThemePreference::Dark;
+#endif
+        tokens_=graphics::MakeAppDesignTokens(appearance);
+        motion_.reduced=tokens_.mode==graphics::ThemeMode::HighContrast || !platform::SystemAnimationsEnabled();
+        if(styled_)surface_.SetTheme(tokens_,motion_);
+    }
+
+    // --- geometry ---
+    [[nodiscard]] UINT Dpi()const{return styled_?surface_.Dpi():(window_?platform::DpiForWindow(window_):96);}
+    [[nodiscard]] int Px(float dip)const{return static_cast<int>(std::lround(dip*static_cast<float>(Dpi())/96.0f));}
+    [[nodiscard]] float Dip(int px)const{return static_cast<float>(px)*96.0f/static_cast<float>(Dpi());}
+    void Place(HWND control,float left,float top,float right,float bottom) {
+        if(!control)return;
+        const RECT r{Px(left),Px(top),Px(std::max(left+1.0f,right)),Px(std::max(top+1.0f,bottom))};
+        if(styled_ && surface_.Spec(control))surface_.SetFrame(control,r);
+        else ::SetWindowPos(control,nullptr,r.left,r.top,r.right-r.left,r.bottom-r.top,SWP_NOZORDER|SWP_NOACTIVATE);
+    }
+    [[nodiscard]] float TextHeight(HWND control,form::TextRole role,float width)const {
+        if(!control)return 0.0f;
+        std::wstring text(static_cast<std::size_t>(::GetWindowTextLengthW(control))+1,L'\0');
+        text.resize(static_cast<std::size_t>(::GetWindowTextW(control,text.data(),static_cast<int>(text.size()))));
+        if(text.empty())return 0.0f;
+        if(!styled_)return 20.0f*static_cast<float>(1+text.size()/72);
+        return std::ceil(surface_.MeasureText(text,role,std::max(1.0f,width),true).height);
+    }
+    [[nodiscard]] float Preferred(HWND control)const{return styled_?surface_.PreferredWidth(control):120.0f;}
+    [[nodiscard]] HWND Parent()const{return styled_?scroll_.Canvas():window_;}
+
+    // --- controls ---
+    HWND Make(HWND parent,const wchar_t* cls,const std::wstring& text,DWORD style,int id=0,DWORD ex=0) {
+        if(cls==std::wstring_view(L"BUTTON"))style|=BS_NOTIFY;
+        if(!styled_ && cls==std::wstring_view(L"EDIT"))ex|=WS_EX_CLIENTEDGE;
+        HWND hwnd=::CreateWindowExW(ex,cls,text.c_str(),WS_CHILD|WS_VISIBLE|style,0,0,1,1,parent,reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),::GetModuleHandleW(nullptr),nullptr);
+        if(!hwnd)return nullptr;
+        if(!styled_)::SendMessageW(hwnd,WM_SETFONT,reinterpret_cast<WPARAM>(::GetStockObject(DEFAULT_GUI_FONT)),TRUE);
+        if(collecting_)pageControls_.push_back(hwnd);  // page content and footer buttons are rebuilt per page
+        return hwnd;
+    }
+    void Style(HWND hwnd,form::ControlSpec spec){if(styled_ && hwnd)(void)surface_.Register(hwnd,spec);}
+    HWND Label(HWND parent,const std::wstring& text,form::TextRole role,int id=0,form::Severity severity=form::Severity::None,std::optional<graphics::Glyph> glyph={}) {
+        HWND label=Make(parent,L"STATIC",text,(styled_?SS_OWNERDRAW:0u)|SS_NOPREFIX,id);
+        form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=role;spec.severity=severity;spec.glyph=glyph;
+        Style(label,spec);return label;
+    }
+    HWND Button(HWND parent,const std::wstring& text,int id,form::ButtonStyle style,std::optional<graphics::Glyph> glyph={},DWORD extra=0) {
+        HWND button=Make(parent,L"BUTTON",text,WS_TABSTOP|BS_PUSHBUTTON|extra,id);
+        form::ControlSpec spec;spec.role=form::ControlRole::Button;spec.button=style;spec.glyph=glyph;Style(button,spec);return button;
+    }
+    HWND Switch(HWND parent,const std::wstring& text,const std::wstring& description,int id,bool checked,bool check=false) {
+        HWND box=Make(parent,L"BUTTON",text,WS_TABSTOP|BS_AUTOCHECKBOX,id);
+        ::SendMessageW(box,BM_SETCHECK,checked?BST_CHECKED:BST_UNCHECKED,0);
+        form::ControlSpec spec;spec.role=check?form::ControlRole::Check:form::ControlRole::Switch;spec.description=description;Style(box,spec);
+        return box;
+    }
+
+    // --- frame: header, footer and the status line stay across pages ---
+    void CreateFrame() {
+        title_=Label(window_,L"Aether Shell",form::TextRole::Title,kTitleId);
+        version_=Label(window_,L"Version "+std::wstring(build::kVersionW),form::TextRole::Caption);
+        step_=Label(window_,L"",form::TextRole::Caption,kStepId);
+        status_=Label(window_,L"",form::TextRole::Status,kStatusId);
+    }
+    // A multiline EDIT breaks lines only at CR LF; the embedded licence is stored with LF line ends.
+    [[nodiscard]] static std::wstring MultilineText(std::wstring_view text) {
+        std::wstring result;result.reserve(text.size()+text.size()/32);
+        for(const wchar_t c:text){if(c==L'\n' && (result.empty() || result.back()!=L'\r'))result.push_back(L'\r');result.push_back(c);}
+        return result;
+    }
+    [[nodiscard]] static const wchar_t* StepName(int page) {
+        switch(page){case 0:return L"Welcome";case 1:return L"Licence";case 2:return L"Options";case 3:return L"Install";default:return L"Done";}
+    }
+    void PaintHeader(ID2D1DeviceContext* target,const graphics::DesignTokens& tokens) {
+        graphics::PaintBrandMark(target,brandMark_,tokens);
+        // Step indicator: a dot per step joined by a hairline; done and current steps take the accent.
+        if(stepDots_.right<=stepDots_.left)return;
+        winrt::com_ptr<ID2D1SolidColorBrush> brush;
+        if(FAILED(target->CreateSolidColorBrush(tokens.form.divider.ToD2D(),brush.put())))return;
+        const float spacing=(stepDots_.right-stepDots_.left)/static_cast<float>(kPages-1);
+        const float y=(stepDots_.top+stepDots_.bottom)/2.0f;
+        target->DrawLine(D2D1::Point2F(stepDots_.left,y),D2D1::Point2F(stepDots_.right,y),brush.get(),1.0f);
+        for(int i=0;i<kPages;++i) {
+            const bool reached=i<=page_;
+            brush->SetColor((reached?tokens.accentRoles.fill:tokens.form.switchOffStroke).ToD2D());
+            const float radius=i==page_?5.0f:3.5f;
+            target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(stepDots_.left+spacing*static_cast<float>(i),y),radius,radius),brush.get());
+        }
+    }
+    void SetStatus(const std::wstring& text,form::Severity severity=form::Severity::None) {
+        ::SetWindowTextW(status_,text.c_str());
+        if(styled_){form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=form::TextRole::Status;spec.severity=severity;surface_.SetSpec(status_,spec);}
+        ::InvalidateRect(status_,nullptr,FALSE);
+        Layout();
+    }
+
     void Constrain(RECT requested) {
         MONITORINFO monitor{sizeof(monitor)};if(!::GetMonitorInfoW(::MonitorFromRect(&requested,MONITOR_DEFAULTTONEAREST),&monitor))return;
         const auto& work=monitor.rcWork;const int margin=Px(8);
@@ -359,20 +489,7 @@ private:
         const int left=std::clamp(requested.left,work.left+margin,work.right-margin-width),top=std::clamp(requested.top,work.top+margin,work.bottom-margin-height);
         ::SetWindowPos(window_,nullptr,left,top,width,height,SWP_NOZORDER|SWP_NOACTIVATE);
     }
-    void ScrollTo(int position,int horizontal=-1) {
-        RECT client{};::GetClientRect(window_,&client);const int maximum=std::max(0,Px(530)-static_cast<int>(client.bottom));
-        scroll_=std::clamp(position,0,maximum);SCROLLINFO info{sizeof(info),SIF_RANGE|SIF_PAGE|SIF_POS};info.nMin=0;info.nMax=Px(530)-1;info.nPage=static_cast<UINT>(std::max(0L,client.bottom));info.nPos=scroll_;::SetScrollInfo(window_,SB_VERT,&info,TRUE);
-        scrollX_=std::clamp(horizontal<0?scrollX_:horizontal,0,std::max(0,Px(644)-static_cast<int>(client.right)));info.nMax=Px(644)-1;info.nPage=static_cast<UINT>(std::max(0L,client.right));info.nPos=scrollX_;::SetScrollInfo(window_,SB_HORZ,&info,TRUE);
-        for(std::size_t i=0;i<children_.size();++i){const auto& r=locations_[i];::SetWindowPos(children_[i],nullptr,Px(r.left)-scrollX_,Px(r.top)-scroll_,Px(r.right-r.left),Px(r.bottom-r.top),SWP_NOZORDER|SWP_NOACTIVATE);}
-    }
-    void EnsureFocusVisible() {
-        const HWND focus=::GetFocus();if(!focus || !::IsChild(window_,focus))return;
-        RECT target{},client{};::GetWindowRect(focus,&target);::MapWindowPoints(nullptr,window_,reinterpret_cast<POINT*>(&target),2);::GetClientRect(window_,&client);
-        int vertical=scroll_,horizontal=scrollX_;
-        if(target.top<Px(8))vertical+=target.top-Px(8);else if(target.bottom>client.bottom-Px(8))vertical+=target.bottom-client.bottom+Px(8);
-        if(target.left<Px(8))horizontal+=target.left-Px(8);else if(target.right>client.right-Px(8))horizontal+=target.right-client.right+Px(8);
-        if(vertical!=scroll_ || horizontal!=scrollX_)ScrollTo(vertical,horizontal);
-    }
+    void EnsureFocusVisible(){if(styled_)scroll_.RevealFocus(Px(12.0f));}
     void CaptureControls() {
         if(folder_ && ::IsWindow(folder_)){std::wstring path(static_cast<std::size_t>(::GetWindowTextLengthW(folder_))+1,L'\0');::GetWindowTextW(folder_,path.data(),static_cast<int>(path.size()));path.resize(path.size()-1);options_.root=path;}
         if(startup_ && ::IsWindow(startup_))options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;
@@ -381,57 +498,206 @@ private:
         if(removeData_ && ::IsWindow(removeData_))options_.removeData=::SendMessageW(removeData_,BM_GETCHECK,0,0)==BST_CHECKED;
         if(launch_ && ::IsWindow(launch_))options_.noLaunch=::SendMessageW(launch_,BM_GETCHECK,0,0)!=BST_CHECKED;
     }
-    HWND Add(const wchar_t* cls,const std::wstring& value,DWORD style,int x,int y,int w,int h,int id=0) {
-        if(cls==std::wstring_view(L"BUTTON"))style|=BS_NOTIFY;
-        HWND hwnd=::CreateWindowExW(cls==std::wstring_view(L"EDIT")?WS_EX_CLIENTEDGE:0,cls,value.c_str(),WS_CHILD|WS_VISIBLE|style,Px(x),Px(y),Px(w),Px(h),window_,reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)),::GetModuleHandleW(nullptr),nullptr);
-        ::SendMessageW(hwnd,WM_SETFONT,reinterpret_cast<WPARAM>(font_),TRUE);children_.push_back(hwnd);locations_.push_back({x,y,x+w,y+h});return hwnd;
-    }
+
+    // --- pages ---
+    struct Item { enum Kind{Text,Card,Control,Buttons,Document,Field,Progress} kind=Text; HWND first=nullptr; HWND second=nullptr; form::TextRole role=form::TextRole::Body; float height=0.0f; bool cardStart=false; bool cardEnd=false; };
     void Build() {
-        for(auto child:children_)::DestroyWindow(child);children_.clear();locations_.clear();folder_=startup_=launch_=shortcut_=desktop_=removeData_=nullptr;
-        Add(L"STATIC",L"Aether Shell  "+std::wstring(build::kVersionW),0,28,24,600,32);
+        for(HWND child:pageControls_)if(::IsWindow(child))::DestroyWindow(child);
+        pageControls_.clear();items_.clear();
+        collecting_=true;
+        struct StopCollecting{bool& flag;~StopCollecting(){flag=false;}} stop{collecting_};
+        folder_=startup_=launch_=shortcut_=desktop_=removeData_=nullptr;primary_=back_=cancel_=nullptr;folderError_=nullptr;
+        const HWND parent=Parent();
+        const auto text=[&](const std::wstring& value,form::TextRole role,form::Severity severity=form::Severity::None,std::optional<graphics::Glyph> glyph={}) {
+            items_.push_back(Item{Item::Text,Label(parent,value,role,0,severity,glyph),nullptr,role});
+        };
+        const auto card=[&](graphics::Glyph glyph,const std::wstring& heading,const std::wstring& body) {
+            Item item{Item::Card,Label(parent,heading,form::TextRole::Strong,0,form::Severity::None,glyph),Label(parent,body,form::TextRole::Helper)};
+            items_.push_back(item);
+        };
+        const auto control=[&](HWND hwnd){items_.push_back(Item{Item::Control,hwnd});};
+        const bool repair=options_.repair,uninstall=options_.uninstall;
         if(page_==0) {
-            Add(L"STATIC",L"A native Dock and Top Status Bar for Windows",0,28,82,600,34);
-            Add(L"STATIC",L"While Aether Shell runs, its Dock replaces the Windows taskbar.\r\nQuit Aether Shell, turn this off in Settings > Desktop, or open\r\n\"Restore Windows taskbar\" in the Start menu to get it back.\r\nInstalls for your account without administrator rights.\r\n\r\nNew installations start at sign-in by default. You can clear that\r\nchoice before installing, or turn it off later in Settings.\r\nExisting startup choices and Task Manager disables are preserved.",0,28,132,600,190);
-            Add(L"STATIC",options_.uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":options_.repair?L"Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.":L"Installing over an existing version keeps your settings.\r\nAn older package is rejected unless you explicitly permit a downgrade.",0,28,335,600,75);
-            Add(L"BUTTON",L"Next",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,1);
+            text(uninstall?L"Remove Aether Shell":repair?L"Repair Aether Shell":L"Welcome",form::TextRole::Section);
+            text(L"A native Dock and Top Status Bar for Windows, running alongside Explorer.",form::TextRole::Body);
+            card(graphics::Glyph::Taskbar,L"Replaces the Windows taskbar while it runs",
+                 L"Quit Aether Shell, turn this off in Settings > Desktop, or open \"Restore Windows taskbar\" in the Start menu to get the Windows taskbar back.");
+            card(graphics::Glyph::Power,L"Starts when you sign in - your choice",
+                 L"New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.");
+            card(graphics::Glyph::Shield,L"Installs for your account",
+                 L"No administrator rights are needed. Your settings and data stay in your user profile.");
+            text(uninstall?L"Uninstall keeps your settings and data unless you choose to remove them.":
+                 repair?L"Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.":
+                 L"Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.",form::TextRole::Helper);
         } else if(page_==1) {
-            Add(L"STATIC",L"MIT License",0,28,82,600,26);
-            Add(L"EDIT",kLicense,WS_TABSTOP|WS_VSCROLL|ES_MULTILINE|ES_READONLY,28,118,600,320);
-            Add(L"BUTTON",L"Back",WS_TABSTOP,360,468,125,32,8);
-            Add(L"BUTTON",L"Continue",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,1);
+            text(L"MIT License",form::TextRole::Section);
+            HWND license=Make(parent,L"EDIT",MultilineText(kLicense),WS_TABSTOP|WS_VSCROLL|ES_MULTILINE|ES_READONLY);
+            {form::ControlSpec spec;spec.role=form::ControlRole::Document;Style(license,spec);}
+            items_.push_back(Item{Item::Document,license,nullptr,form::TextRole::Body,260.0f});
+            text(L"The licence is also installed as LICENSE next to Aether Shell.",form::TextRole::Helper);
         } else if(page_==2) {
-            Add(L"STATIC",L"Install folder",0,28,84,600,25);
-            folder_=Add(L"EDIT",options_.root.wstring(),WS_TABSTOP|ES_AUTOHSCROLL,28,114,480,32,20);
-            Add(L"BUTTON",L"Browse…",WS_TABSTOP,520,114,108,32,9);
-            if(options_.uninstall) {
-                removeData_=Add(L"BUTTON",L"Also remove my settings, cache and logs (cannot be undone)",WS_TABSTOP|BS_AUTOCHECKBOX,28,180,600,34,24);
-                ::SendMessageW(removeData_,BM_SETCHECK,options_.removeData?BST_CHECKED:BST_UNCHECKED,0);
-                Add(L"STATIC",L"Setup will close Aether Shell gracefully and remove its installed files,\r\nshortcuts, startup entry and Installed apps registration.\r\nOther applications and Windows settings are left alone.",0,28,245,600,90);
+            text(uninstall?L"Remove this installation":L"Install location",form::TextRole::Section);
+            folder_=Make(parent,L"EDIT",options_.root.wstring(),WS_TABSTOP|ES_AUTOHSCROLL,20);
+            {form::ControlSpec spec;spec.role=form::ControlRole::Field;Style(folder_,spec);}
+            items_.push_back(Item{Item::Field,folder_,Button(parent,L"&Browse...",9,form::ButtonStyle::Secondary,graphics::Glyph::Folder)});
+            folderError_=Label(parent,L"",form::TextRole::Status,0,form::Severity::Error);
+            items_.push_back(Item{Item::Text,folderError_,nullptr,form::TextRole::Status});
+            if(uninstall) {
+                removeData_=Switch(parent,L"Also remove my settings, cache and logs",L"This cannot be undone.",24,options_.removeData,true);
+                control(removeData_);
+                text(L"Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.",form::TextRole::Helper);
             } else {
-                shortcut_=Add(L"BUTTON",L"Create Start menu shortcuts (Aether Shell and Restore Windows taskbar)",WS_TABSTOP|BS_AUTOCHECKBOX,28,170,600,28,23);
-                ::SendMessageW(shortcut_,BM_SETCHECK,options_.noShortcuts?BST_UNCHECKED:BST_CHECKED,0);
-                desktop_=Add(L"BUTTON",L"Create a desktop shortcut",WS_TABSTOP|BS_AUTOCHECKBOX,28,210,600,28,25);
-                ::SendMessageW(desktop_,BM_SETCHECK,options_.desktopShortcut?BST_CHECKED:BST_UNCHECKED,0);
-                startup_=Add(L"BUTTON",L"Start Aether Shell when I sign in (recommended)",WS_TABSTOP|BS_AUTOCHECKBOX,28,250,600,28,21);
-                ::SendMessageW(startup_,BM_SETCHECK,options_.startup?BST_CHECKED:BST_UNCHECKED,0);
-                Add(L"STATIC",L"Installing accepts the startup choice above. Clear it to opt out.\r\nThe launcher can restart Aether after a crash, with a bounded retry limit.\r\nQuit and Restore Windows taskbar remain available. Weather is off by default.\r\nUnsigned binaries may trigger a Windows SmartScreen warning.",0,28,300,600,100);
+                text(L"Shortcuts and startup",form::TextRole::Section);
+                shortcut_=Switch(parent,L"Create Start menu shortcuts",L"Aether Shell and Restore Windows taskbar.",23,!options_.noShortcuts);control(shortcut_);
+                desktop_=Switch(parent,L"Create a desktop shortcut",L"",25,options_.desktopShortcut);control(desktop_);
+                startup_=Switch(parent,L"Start Aether Shell when I sign in",
+                    std::wstring(options_.existingInstall?L"Shows your current choice. ":L"Recommended. ")+L"Clear it to opt out; Task Manager disables are respected.",21,options_.startup);
+                control(startup_);
+                text(L"Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.",form::TextRole::Helper);
             }
-            Add(L"BUTTON",L"Back",WS_TABSTOP,360,468,125,32,8);
-            Add(L"BUTTON",options_.uninstall?L"Uninstall":options_.repair?L"Repair":L"Install",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,2);
         } else if(page_==3) {
-            Add(L"STATIC",options_.uninstall?L"Removing this installation…":L"Verifying and installing payload files…",0,28,110,600,60);
-            Add(PROGRESS_CLASSW,L"",PBS_MARQUEE,28,200,600,24,30);::SendMessageW(children_.back(),PBM_SETMARQUEE,TRUE,30);
-            Add(L"STATIC",L"Please wait while the active operation completes.\r\nCancel is available before activation; then setup finishes safely.",0,28,265,600,80);
-            if(!options_.uninstall)Add(L"BUTTON",L"Cancel",WS_TABSTOP,500,468,125,32,4);
+            text(uninstall?L"Removing this installation...":repair?L"Repairing Aether Shell...":L"Installing Aether Shell...",form::TextRole::Section);
+            HWND progress=Make(parent,PROGRESS_CLASSW,L"",PBS_MARQUEE,30);
+            {form::ControlSpec spec;spec.role=form::ControlRole::Progress;Style(progress,spec);}
+            if(styled_)surface_.SetProgress(progress,std::nullopt);else ::SendMessageW(progress,PBM_SETMARQUEE,motion_.reduced?FALSE:TRUE,30);
+            items_.push_back(Item{Item::Progress,progress});
+            text(uninstall?L"Closing Aether Shell and removing its files.":L"Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.",form::TextRole::Body);
+            text(uninstall?L"Please wait while the removal completes.":L"Cancel is available until the new version is activated; then setup finishes safely.",form::TextRole::Helper);
         } else {
-            Add(L"STATIC",success_?(options_.uninstall?L"Aether Shell was uninstalled.":L"Aether Shell is ready."):L"Setup could not complete.",0,28,100,600,55);
-            Add(L"STATIC",success_?(options_.uninstall?L"Your data was kept unless you explicitly chose its removal.":L"You can repair or uninstall from Windows Installed apps."):L"Setup stopped safely. Retry after checking file access and disk space.\r\nError category: "+error_,0,28,175,600,90);
-            if(!success_) Add(L"EDIT",options_.log.wstring(),WS_TABSTOP|ES_AUTOHSCROLL|ES_READONLY,28,280,600,32);
-            if(success_ && !options_.uninstall) {launch_=Add(L"BUTTON",L"Launch Aether Shell",WS_TABSTOP|BS_AUTOCHECKBOX,28,285,600,32,22);::SendMessageW(launch_,BM_SETCHECK,options_.noLaunch?BST_UNCHECKED:BST_CHECKED,0);}
-            Add(L"BUTTON",L"Close",WS_TABSTOP|BS_DEFPUSHBUTTON,500,468,125,32,3);
+            const bool cancelled=!success_ && errorCode_==ErrorCode::Cancelled;
+            const auto severity=success_?form::Severity::Success:cancelled?form::Severity::None:form::Severity::Error;
+            items_.push_back(Item{Item::Text,Label(parent,success_?(uninstall?L"Aether Shell was uninstalled.":L"Aether Shell is ready."):cancelled?L"Setup was cancelled.":L"Setup could not complete.",form::TextRole::Status,0,severity),nullptr,form::TextRole::Status});
+            text(success_?(uninstall?L"Your data was kept unless you explicitly chose to remove it.":L"You can repair or uninstall it from Windows Settings > Apps > Installed apps."):
+                  cancelled?L"The operation was cancelled before activation. Go back to Options to try again.":
+                  L"Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: "+error_,form::TextRole::Body);
+            if(!success_) {
+                text(L"Setup log",form::TextRole::Strong);
+                HWND log=Make(parent,L"EDIT",options_.log.wstring(),WS_TABSTOP|ES_AUTOHSCROLL|ES_READONLY);
+                {form::ControlSpec spec;spec.role=form::ControlRole::Field;Style(log,spec);}
+                items_.push_back(Item{Item::Field,log,nullptr});
+            }
+            if(success_ && !uninstall){launch_=Switch(parent,L"Launch Aether Shell",L"",22,!options_.noLaunch);control(launch_);}
         }
-        ScrollTo(scroll_);
+        // Footer navigation. Ids are stable: 1 Next/Continue, 2 Install, 3 Close, 4 Cancel, 8 Back.
+        if(page_==1 || page_==2 || (page_==4 && !success_))back_=Button(window_,L"&Back",8,form::ButtonStyle::Secondary);
+        if(page_==0)primary_=Button(window_,L"&Next",1,form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
+        else if(page_==1)primary_=Button(window_,L"&Continue",1,form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
+        else if(page_==2)primary_=Button(window_,uninstall?L"&Uninstall":repair?L"&Repair":L"&Install",2,uninstall?form::ButtonStyle::Danger:form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
+        else if(page_==3){if(!uninstall)cancel_=Button(window_,L"Cancel",4,form::ButtonStyle::Secondary);}
+        else primary_=Button(window_,L"&Close",3,form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
+        ::SetWindowTextW(step_,(L"Step "+std::to_wstring(page_+1)+L" of "+std::to_wstring(kPages)+L": "+StepName(page_)).c_str());
+        SetStatus(L"");
+        if(styled_){scroll_.ScrollTo(0);Layout();surface_.FadeIn(scroll_.Viewport());}
+        else Layout();
+        if(primary_)::SetFocus(primary_);else if(cancel_)::SetFocus(cancel_);
+        ::InvalidateRect(window_,nullptr,FALSE);
     }
+
+    void Layout() {
+        if(!window_)return;
+        RECT client{};::GetClientRect(window_,&client);
+        const float width=Dip(client.right),height=Dip(client.bottom);
+        const auto& f=tokens_.form;
+        const float outer=f.outer;
+        // Header
+        brandMark_=D2D1::RectF(outer,20.0f,outer+40.0f,60.0f);
+        Place(title_,outer+52.0f,16.0f,width-outer,46.0f);
+        Place(version_,outer+52.0f,46.0f,std::min(width-outer,outer+52.0f+160.0f),64.0f);
+        const float dotsWidth=std::min(160.0f,std::max(80.0f,width-outer*2.0f-52.0f-180.0f));
+        stepDots_=D2D1::RectF(width-outer-dotsWidth,30.0f,width-outer,40.0f);
+        Place(step_,width-outer-std::max(dotsWidth,150.0f),44.0f,width-outer,62.0f);
+        const float headerBottom=76.0f;
+        // Footer
+        const float footerTop=std::max(headerBottom+60.0f,height-f.footerHeight);
+        const float buttonTop=footerTop+(f.footerHeight-f.controlHeight)/2.0f;
+        float right=width-outer;
+        for(HWND button:{primary_,cancel_,back_}) {
+            if(!button)continue;
+            const float w=Preferred(button);
+            Place(button,right-w,buttonTop,right,buttonTop+f.controlHeight);
+            right-=w+f.relatedGap+2.0f*f.focusMargin;
+        }
+        const float statusHeight=std::clamp(TextHeight(status_,form::TextRole::Status,std::max(40.0f,right-outer-28.0f)),18.0f,f.footerHeight-12.0f);
+        Place(status_,outer,footerTop+(f.footerHeight-statusHeight)/2.0f,std::max(outer+40.0f,right-f.controlGap),footerTop+(f.footerHeight+statusHeight)/2.0f);
+        std::vector<form::FormDivider> dividers{form::FormDivider{RECT{0,Px(footerTop),client.right,Px(footerTop)+1},nullptr},
+                                                 form::FormDivider{RECT{0,Px(headerBottom),client.right,Px(headerBottom)+1},nullptr}};
+        // Page content
+        std::vector<form::FormCard> cards;
+        if(styled_) {
+            scroll_.SetFrame(RECT{0,Px(headerBottom)+1,client.right,Px(footerTop)});
+            const float contentWidth=std::min(Dip(client.right-scroll_.GutterPx())-outer*2.0f+8.0f,620.0f);
+            const float left=outer;
+            float y=f.sectionGap;
+            const Item* previous=nullptr;
+            for(auto& item:items_) {
+                // Consecutive switch rows share one card, separated by hairlines.
+                const bool joined=previous && previous->kind==Item::Control && item.kind==Item::Control && !IsCheck(item) && !IsCheck(*previous);
+                if(previous && !joined)y+=item.role==form::TextRole::Section?f.sectionGap:f.relatedGap;
+                if(joined)dividers.push_back(form::FormDivider{RECT{Px(left+f.cardPaddingX),Px(y),Px(left+contentWidth-f.cardPaddingX),Px(y)+1},scroll_.Canvas()});
+                y+=LayoutItem(item,left,y,contentWidth,cards,joined);
+                previous=&item;
+            }
+            scroll_.SetContentHeight(Px(y+f.sectionGap));
+            surface_.SetCards(std::move(cards));
+            surface_.SetDividers(std::move(dividers));
+        } else {
+            float y=headerBottom+12.0f;
+            for(auto& item:items_) y+=LayoutItem(item,outer,y,width-outer*2.0f,cards,false)+8.0f;
+        }
+        ::InvalidateRect(window_,nullptr,FALSE);
+    }
+    [[nodiscard]] bool IsCheck(const Item& item)const{const auto* spec=styled_?surface_.Spec(item.first):nullptr;return spec && spec->role==form::ControlRole::Check;}
+    float LayoutItem(Item& item,float left,float top,float width,std::vector<form::FormCard>& cards,bool joined) {
+        const auto& f=tokens_.form;
+        const HWND canvas=styled_?scroll_.Canvas():nullptr;
+        switch(item.kind) {
+            case Item::Text: {
+                const float h=std::max(item.role==form::TextRole::Section?22.0f:18.0f,TextHeight(item.first,item.role,width));
+                if(item.first==folderError_ && h<=18.0f && ::GetWindowTextLengthW(item.first)==0){::ShowWindow(item.first,SW_HIDE);return -f.relatedGap;}
+                ::ShowWindow(item.first,SW_SHOWNA);
+                Place(item.first,left,top,left+width,top+h);
+                return h;
+            }
+            case Item::Card: {
+                const float inner=width-2.0f*f.cardPaddingX-28.0f;
+                const float headingHeight=std::max(20.0f,TextHeight(item.first,form::TextRole::Strong,inner+28.0f));
+                const float bodyHeight=TextHeight(item.second,form::TextRole::Helper,inner);
+                const float h=f.rowPaddingY*2.0f+headingHeight+f.labelGap+bodyHeight;
+                Place(item.first,left+f.cardPaddingX,top+f.rowPaddingY,left+width-f.cardPaddingX,top+f.rowPaddingY+headingHeight);
+                Place(item.second,left+f.cardPaddingX+28.0f,top+f.rowPaddingY+headingHeight+f.labelGap,left+width-f.cardPaddingX,top+h-f.rowPaddingY);
+                if(canvas)cards.push_back(form::FormCard{RECT{Px(left),Px(top),Px(left+width),Px(top+h)},canvas,false});
+                return h;
+            }
+            case Item::Control: {
+                const auto* spec=styled_?surface_.Spec(item.first):nullptr;
+                float h=std::max(f.rowMinHeight,TextHeight(item.first,form::TextRole::Body,width-f.switchWidth-f.cardPaddingX*2.0f)+2.0f*f.rowPaddingY);
+                if(spec && !spec->description.empty())h=std::max(h,2.0f*f.rowPaddingY+20.0f+f.labelGap+std::ceil(surface_.MeasureText(spec->description,form::TextRole::Helper,width-f.switchWidth-f.cardPaddingX*2.0f-f.controlGap,true).height));
+                const bool check=spec && spec->role==form::ControlRole::Check;
+                Place(item.first,left+(check?f.cardPaddingX:0.0f),top,left+width,top+h);
+                if(canvas && !check) {
+                    if(joined && !cards.empty())cards.back().px.bottom=Px(top+h);
+                    else cards.push_back(form::FormCard{RECT{Px(left),Px(top),Px(left+width),Px(top+h)},canvas,false});
+                }
+                return h;
+            }
+            case Item::Field: {
+                const float buttonWidth=item.second?Preferred(item.second):0.0f;
+                const float fieldRight=left+width-(item.second?buttonWidth+f.relatedGap+2.0f*f.focusMargin:0.0f);
+                Place(item.first,left,top,fieldRight,top+f.controlHeight);
+                if(item.second)Place(item.second,fieldRight+f.relatedGap+f.focusMargin,top,fieldRight+f.relatedGap+f.focusMargin+buttonWidth,top+f.controlHeight);
+                return f.controlHeight;
+            }
+            case Item::Document:
+                Place(item.first,left,top,left+width,top+item.height);
+                return item.height;
+            case Item::Progress:
+                Place(item.first,left,top+8.0f,left+width,top+16.0f);
+                return 20.0f;
+            default:
+                return 0.0f;
+        }
+    }
+
     void Browse() {
         winrt::com_ptr<IFileOpenDialog> dialog;
         if(FAILED(::CoCreateInstance(CLSID_FileOpenDialog,nullptr,CLSCTX_INPROC_SERVER,IID_PPV_ARGS(dialog.put()))))return;
@@ -445,9 +711,27 @@ private:
         options_.root=path;
         if(options_.uninstall)options_.removeData=::SendMessageW(removeData_,BM_GETCHECK,0,0)==BST_CHECKED;
         else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.startupExplicit=true;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;}
-        if(!options_.root.is_absolute()){::MessageBoxW(window_,L"Choose an absolute install folder.",L"Aether Shell",MB_OK|MB_ICONWARNING);return;}
+        if(!options_.root.is_absolute()) {
+            // Inline validation: the field is marked and the message stays next to it.
+            ::SetWindowTextW(folderError_,L"Choose a complete folder path, for example one that starts with a drive letter.");
+            if(styled_)surface_.SetError(folder_,true);
+            SetStatus(L"The install folder must be an absolute path.",form::Severity::Error);
+            ::SetFocus(folder_);
+            return;
+        }
+        cancellation_=CancellationSource{};
+        const auto cancellation=cancellation_.Token();
         page_=3;Build();const auto weak=std::weak_ptr<bool>(alive_);auto operation=options_;operation.noLaunch=true;
-        worker_.Post([this,weak,operation]{auto result=Perform(operation,cancellation_.Token());dispatcher_.Post([this,weak,result=std::move(result)]{if(auto live=weak.lock();live&&*live){success_=result.ok();if(!result)error_=text::Widen(ToString(result.error().code));page_=4;Build();}});});
+#ifdef AETHER_SETUP_TEST_MODE
+        const HANDLE gate=options_.testNoRegistration?testOperationGate_.Get():nullptr;
+        worker_.Post([this,weak,operation,cancellation,gate]{
+            // The isolated retry regression holds its own worker before staging, then Cancel
+            // releases it. This seam cannot appear in a production setup executable.
+            if(gate){auto release=cancellation.OnCancel([gate]{::SetEvent(gate);});(void)::WaitForSingleObject(gate,10000);}
+#else
+        worker_.Post([this,weak,operation,cancellation]{
+#endif
+            auto result=Perform(operation,cancellation);dispatcher_.Post([this,weak,result=std::move(result)]{if(auto live=weak.lock();live&&*live){success_=result.ok();if(!result){errorCode_=result.error().code;error_=text::Widen(ToString(errorCode_));}page_=4;Build();}});});
     }
     void Finish() {
 #ifdef AETHER_SETUP_TEST_MODE
@@ -462,27 +746,49 @@ private:
         auto* self=reinterpret_cast<Wizard*>(::GetWindowLongPtrW(hwnd,GWLP_USERDATA));
         if(msg==WM_NCCREATE){self=static_cast<Wizard*>(reinterpret_cast<CREATESTRUCTW*>(lParam)->lpCreateParams);self->window_=hwnd;::SetWindowLongPtrW(hwnd,GWLP_USERDATA,reinterpret_cast<LONG_PTR>(self));}
         if(self){try{
+            if(self->styled_){if(auto handled=self->surface_.HandleMessage(msg,wParam,lParam))return *handled;}
 #ifdef AETHER_SETUP_TEST_MODE
             // These private messages manipulate only this test executable's own window. No
             // global display/input state is changed by the viewport integration fixture.
-            if(msg==WM_APP+71 && self->options_.testNoRegistration){const UINT dpi=static_cast<UINT>(wParam);if(dpi<96 || dpi>384)return 0;RECT r{};::GetWindowRect(hwnd,&r);r.right=r.left+::MulDiv(680,static_cast<int>(dpi),96);r.bottom=r.top+::MulDiv(570,static_cast<int>(dpi),96);::SendMessageW(hwnd,WM_DPICHANGED,MAKEWPARAM(dpi,dpi),reinterpret_cast<LPARAM>(&r));return 0;}
-            if(msg==WM_APP+72 && self->options_.testNoRegistration){::SetFocus(::GetDlgItem(hwnd,static_cast<int>(wParam)));self->EnsureFocusVisible();return 0;}
+            if(msg==WM_APP+71 && self->options_.testNoRegistration){const UINT dpi=static_cast<UINT>(wParam);if(dpi<96 || dpi>384)return 0;RECT r{};::GetWindowRect(hwnd,&r);r.right=r.left+::MulDiv(kWidth,static_cast<int>(dpi),96);r.bottom=r.top+::MulDiv(kHeight,static_cast<int>(dpi),96);::SendMessageW(hwnd,WM_DPICHANGED,MAKEWPARAM(dpi,dpi),reinterpret_cast<LPARAM>(&r));return 0;}
+            if(msg==WM_APP+72 && self->options_.testNoRegistration){self->FocusById(static_cast<int>(wParam));self->EnsureFocusVisible();return 0;}
+            if(msg==WM_APP+73 && self->options_.testNoRegistration)return self->styled_?self->scroll_.Position():0;
+            if(msg==WM_APP+74 && self->options_.testNoRegistration && self->page_==2){self->testOperationGate_.Reset(::CreateEventW(nullptr,TRUE,FALSE,nullptr));return self->testOperationGate_?1:0;}
+            if(msg==WM_APP+75 && self->options_.testNoRegistration && self->page_==3 && self->testOperationGate_)return ::SetEvent(self->testOperationGate_.Get());
 #endif
-            if(msg==WM_COMMAND){if(HIWORD(wParam)==BN_SETFOCUS || HIWORD(wParam)==EN_SETFOCUS){self->EnsureFocusVisible();return 0;}if(HIWORD(wParam)!=BN_CLICKED)return 0;switch(LOWORD(wParam)){case 1:self->CaptureControls();self->scroll_=self->scrollX_=0;++self->page_;self->Build();return 0;case 2:self->Install();return 0;case 3:self->Finish();return 0;case 4:self->cancellation_.Cancel();::EnableWindow(::GetDlgItem(hwnd,4),FALSE);return 0;case 8:self->CaptureControls();self->scroll_=self->scrollX_=0;--self->page_;self->Build();return 0;case 9:self->Browse();return 0;}}
-            if(msg==WM_DPICHANGED){self->CaptureControls();const int oldDpi=static_cast<int>(self->dpi_);self->dpi_=HIWORD(wParam);if(!self->dpi_)self->dpi_=96;self->scroll_=::MulDiv(self->scroll_,static_cast<int>(self->dpi_),oldDpi);self->scrollX_=::MulDiv(self->scrollX_,static_cast<int>(self->dpi_),oldDpi);const auto& r=*reinterpret_cast<RECT*>(lParam);self->Constrain(r);self->UpdateFont();self->Build();return 0;}
-            if(msg==WM_SIZE){self->ScrollTo(self->scroll_);return 0;}
-            if(msg==WM_MOUSEWHEEL){self->ScrollTo(self->scroll_-static_cast<short>(HIWORD(wParam))*self->Px(48)/WHEEL_DELTA);return 0;}
-            if(msg==WM_VSCROLL){SCROLLINFO info{sizeof(info),SIF_TRACKPOS};::GetScrollInfo(hwnd,SB_VERT,&info);RECT client{};::GetClientRect(hwnd,&client);int next=self->scroll_;switch(LOWORD(wParam)){case SB_LINEUP:next-=self->Px(24);break;case SB_LINEDOWN:next+=self->Px(24);break;case SB_PAGEUP:next-=client.bottom;break;case SB_PAGEDOWN:next+=client.bottom;break;case SB_THUMBTRACK:case SB_THUMBPOSITION:next=info.nTrackPos;break;case SB_TOP:next=0;break;case SB_BOTTOM:next=INT_MAX;break;}self->ScrollTo(next);return 0;}
-            if(msg==WM_HSCROLL){SCROLLINFO info{sizeof(info),SIF_TRACKPOS};::GetScrollInfo(hwnd,SB_HORZ,&info);RECT client{};::GetClientRect(hwnd,&client);int next=self->scrollX_;switch(LOWORD(wParam)){case SB_LINELEFT:next-=self->Px(24);break;case SB_LINERIGHT:next+=self->Px(24);break;case SB_PAGELEFT:next-=client.right;break;case SB_PAGERIGHT:next+=client.right;break;case SB_THUMBTRACK:case SB_THUMBPOSITION:next=info.nTrackPos;break;case SB_LEFT:next=0;break;case SB_RIGHT:next=INT_MAX;break;}self->ScrollTo(self->scroll_,next);return 0;}
-            if(msg==WM_CLOSE){if(self->page_==3){::MessageBoxW(hwnd,L"Wait for the active installation operation to finish.",L"Aether Shell",MB_OK);return 0;}::PostQuitMessage(0);return 0;}
+            if(msg==WM_COMMAND){if(HIWORD(wParam)==BN_SETFOCUS || HIWORD(wParam)==EN_SETFOCUS){self->EnsureFocusVisible();return 0;}if(HIWORD(wParam)!=BN_CLICKED)return 0;switch(LOWORD(wParam)){case 1:self->CaptureControls();++self->page_;self->Build();return 0;case 2:self->Install();return 0;case 3:self->Finish();return 0;case 4:self->cancellation_.Cancel();if(HWND cancel=::GetDlgItem(hwnd,4)){::SetWindowTextW(cancel,L"Cancelling...");::EnableWindow(cancel,FALSE);}self->SetStatus(L"Setup stops at the next safe point.",form::Severity::Busy);return 0;case 8:self->CaptureControls();self->page_=self->page_==4?2:self->page_-1;self->Build();return 0;case 9:self->Browse();return 0;}}
+            if(msg==WM_GETMINMAXINFO){auto* info=reinterpret_cast<MINMAXINFO*>(lParam);const UINT dpi=self->Dpi();RECT frame{0,0,::MulDiv(420,static_cast<int>(dpi),96),::MulDiv(360,static_cast<int>(dpi),96)};::AdjustWindowRectExForDpi(&frame,WS_OVERLAPPEDWINDOW,FALSE,WS_EX_CONTROLPARENT,dpi);info->ptMinTrackSize=POINT{frame.right-frame.left,frame.bottom-frame.top};return 0;}
+            if(msg==WM_DPICHANGED){self->CaptureControls();const auto& r=*reinterpret_cast<RECT*>(lParam);self->Constrain(r);self->Layout();return 0;}
+            if(msg==WM_SETTINGCHANGE || msg==WM_THEMECHANGED || msg==WM_SYSCOLORCHANGE){self->RefreshTheme();self->Layout();return 0;}
+            if(msg==WM_SIZE){if(wParam!=SIZE_MINIMIZED)self->Layout();return 0;}
+            if(msg==WM_MOUSEWHEEL){if(self->styled_)::SendMessageW(self->scroll_.Viewport(),WM_MOUSEWHEEL,wParam,lParam);return 0;}
+            if(msg==WM_VSCROLL){if(self->styled_)self->scroll_.HandleScrollCode(LOWORD(wParam),static_cast<short>(HIWORD(wParam)));return 0;}
+            if(msg==WM_CLOSE){if(self->page_==3){self->SetStatus(L"Setup is finishing the current step safely; please wait.",form::Severity::Busy);return 0;}::PostQuitMessage(0);return 0;}
+            if(msg==WM_DESTROY){self->scroll_.Destroy();self->surface_.Detach();self->styled_=false;self->window_=nullptr;return 0;}
         }catch(...){::PostQuitMessage(1);return 0;}}
         return ::DefWindowProcW(hwnd,msg,wParam,lParam);
     }
+    void FocusById(int id) {
+        // Controls of the page live inside the scrolling canvas: search the whole window.
+        struct Search{int id;HWND found=nullptr;} search{id};
+        ::EnumChildWindows(window_,[](HWND child,LPARAM parameter)->BOOL{auto& s=*reinterpret_cast<Search*>(parameter);if(::GetDlgCtrlID(child)==s.id){s.found=child;return FALSE;}return TRUE;},reinterpret_cast<LPARAM>(&search));
+        if(search.found)::SetFocus(search.found);
+    }
     Options options_;WorkerPool worker_;platform::Win32UiDispatcher dispatcher_;platform::MessageLoop loop_;
-    HWND window_=nullptr,folder_=nullptr,startup_=nullptr,launch_=nullptr,shortcut_=nullptr,desktop_=nullptr,removeData_=nullptr;HFONT font_=nullptr;UINT dpi_=96;int page_=0;bool success_=false;
-    std::wstring error_;std::vector<HWND> children_;std::vector<RECT> locations_;int scroll_=0,scrollX_=0;std::shared_ptr<bool> alive_=std::make_shared<bool>(true);
+    form::FormSurface surface_;form::FormScrollView scroll_;bool styled_=false;bool collecting_=false;
+    graphics::DesignTokens tokens_;graphics::MotionPolicy motion_;
+    HWND window_=nullptr,folder_=nullptr,startup_=nullptr,launch_=nullptr,shortcut_=nullptr,desktop_=nullptr,removeData_=nullptr;
+    HWND title_=nullptr,version_=nullptr,step_=nullptr,status_=nullptr,primary_=nullptr,back_=nullptr,cancel_=nullptr,folderError_=nullptr;
+    D2D1_RECT_F brandMark_{},stepDots_{};
+    int page_=0;bool success_=false;
+    ErrorCode errorCode_=ErrorCode::Unknown;
+    std::wstring error_;std::vector<HWND> pageControls_;std::vector<Item> items_;std::shared_ptr<bool> alive_=std::make_shared<bool>(true);
     CancellationSource cancellation_;
+#ifdef AETHER_SETUP_TEST_MODE
+    platform::UniqueHandle testOperationGate_;
+#endif
 };
+
 }
 
 int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {

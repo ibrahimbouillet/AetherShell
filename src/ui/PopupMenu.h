@@ -16,11 +16,13 @@
 #pragma once
 
 #include "core/Result.h"
+#include "graphics/Glyphs.h"
 
 #include <windows.h>
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <type_traits>
@@ -41,6 +43,9 @@ struct MenuEntry {
     bool radio = false;     // a checked entry shows a bullet instead of a check mark
     bool separator = false;
     std::vector<MenuEntry> submenu;  // non-empty: this entry opens a submenu
+    // Optional leading glyph in the icon column of glass menus (a checked entry shows its check
+    // there instead). Native and owner-drawn HMENU presenters ignore it.
+    std::optional<graphics::Glyph> glyph;
 
     [[nodiscard]] static MenuEntry Command(std::uint32_t id, std::wstring text, bool enabled = true);
     [[nodiscard]] static MenuEntry Separator();
@@ -72,6 +77,10 @@ struct MenuRequest {
     MenuPlacement placement = MenuPlacement::AboveAnchor;
     bool rightButton = true;  // the right button can also choose an entry (TPM_RIGHTBUTTON)
     ForegroundRestore restore = ForegroundRestore::WhenDismissed;
+    // Glass menus only (HMENU presenters ignore these): the panel is at least this wide (a dropdown
+    // matches its field), and a keyboard-opened menu starts with its first enabled entry selected.
+    int minimumWidthPx = 0;
+    bool keyboard = false;
 };
 
 struct MenuSelection {

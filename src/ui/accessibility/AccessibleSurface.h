@@ -32,6 +32,10 @@ struct AccessibleItem {
     bool supportsInvoke = false;
     bool supportsToggle = false;
     ToggleState toggleState = ToggleState_Off;
+    bool supportsExpandCollapse = false;
+    ExpandCollapseState expandCollapseState = ExpandCollapseState_LeafNode;
+    bool supportsSelectionItem = false;
+    bool isSelected = false;
     // Advertise only a known finite reading. Unknown/unsupported sliders leave this false.
     bool supportsRangeValue = false;
     double rangeValue = 0;
@@ -57,9 +61,24 @@ public:
     virtual Result<void> SetRangeValue(int, double) {
         return MakeError(ErrorCode::Unsupported, "accessible item has no range-value action");
     }
+    virtual Result<void> SetExpanded(int, bool) {
+        return MakeError(ErrorCode::Unsupported, "accessible item has no expand-collapse action");
+    }
+    virtual Result<void> SelectItem(int) {
+        return MakeError(ErrorCode::Unsupported, "accessible item has no selection action");
+    }
+    virtual Result<void> RemoveItemFromSelection(int) {
+        return MakeError(ErrorCode::InvalidState, "selection cannot be removed");
+    }
+    [[nodiscard]] virtual bool SupportsSelection() const { return false; }
+    [[nodiscard]] virtual bool SelectionRequired() const { return false; }
+    // Optional links between transient HWND fragments (a submenu and its parent menu item).
+    [[nodiscard]] virtual winrt::com_ptr<IRawElementProviderFragment> ParentProvider() const { return {}; }
+    [[nodiscard]] virtual winrt::com_ptr<IRawElementProviderFragment> ChildProvider(int) const { return {}; }
 };
 
-// One flat UIA fragment per HWND. Connect, notifications, WM_GETOBJECT and Disconnect must run on
+// One UIA fragment per HWND, optionally linked to related transient fragments. Connect,
+// notifications, WM_GETOBJECT and Disconnect must run on
 // the HWND's STA thread. Call Disconnect from WM_DESTROY, before destroying the model. External COM
 // references may outlive both objects and then return UIA_E_ELEMENTNOTAVAILABLE safely.
 class AccessibleSurface {
@@ -76,9 +95,12 @@ public:
     [[nodiscard]] Result<void> NotifyFocusChanged(int id);
     [[nodiscard]] Result<void> NotifyPropertyChanged(int id);
     [[nodiscard]] Result<void> NotifyInvoked(int id);
+    [[nodiscard]] Result<void> NotifyExpandCollapseChanged(int id, ExpandCollapseState before);
+    [[nodiscard]] Result<void> NotifyMenuVisibility(bool shown);
 
     // An owning reference, useful for native integrations and own-window tests. Called on the STA.
     [[nodiscard]] Result<winrt::com_ptr<IRawElementProviderSimple>> RootProvider() const;
+    [[nodiscard]] Result<winrt::com_ptr<IRawElementProviderSimple>> ItemProvider(int id) const;
 
 private:
     struct Impl;

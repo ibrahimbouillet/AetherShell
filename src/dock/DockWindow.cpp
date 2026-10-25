@@ -15,7 +15,7 @@
 #include "platform/windows/Win32Error.h"
 #include "settings/SettingsSerialization.h"
 #include "ui/TooltipWindow.h"
-#include "ui/ThemedMenu.h"
+#include "ui/GlassMenu.h"
 #include "ui/accessibility/AccessibleSurface.h"
 
 #include <shellapi.h>
@@ -76,7 +76,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::vector<apps::RunningApplication> running;
     apps::ApplicationIndex catalog;
     std::vector<std::wstring> sessionOrder;
-    std::shared_ptr<ui::ThemedMenuPresenter> menus;
+    std::shared_ptr<ui::GlassMenuPresenter> menus;
     FittedDock fitted;
     DockLayout layout;
     std::vector<graphics::Spring> springs;
@@ -784,7 +784,8 @@ Result<void> DockWindow::Create(DockWindowOptions options) {
     return Guard([&]() -> Result<void> {
         if (!impl_->context.dispatcher.IsUiThread()) return MakeError(ErrorCode::InvalidState, "Dock requires the UI thread");
         impl_->options = options; impl_->settings = impl_->context.settings.Current().dock;
-        impl_->menus = std::make_shared<ui::ThemedMenuPresenter>(impl_->tokens);
+        impl_->menus = std::make_shared<ui::GlassMenuPresenter>(impl_->context.graphics, impl_->context.scheduler,
+                                                                impl_->tokens, impl_->motion);
         const auto work = options.workAreaPx.value_or(platform::PrimaryMonitor().workArea);
         ui::SurfaceWindowOptions native;
         native.className = L"AetherShell.Dock"; native.title = L"Aether Shell Dock"; native.owner = options.owner;
@@ -864,7 +865,7 @@ Result<void> DockWindow::SetTheme(const graphics::DesignTokens& tokens, const gr
         if (!impl_->AllowsDecoration()) { impl_->lifts.clear(); impl_->presses.clear(); impl_->bounces.clear(); impl_->attentionPulses.clear(); }
         impl_->tooltip.SetTheme(tokens, motion);
         impl_->preview.SetTheme(tokens, motion, static_cast<float>(impl_->settings.opacity));
-        if (impl_->menus) impl_->menus->SetTheme(tokens);
+        if (impl_->menus) impl_->menus->SetTheme(tokens, motion);
         if (IsShown() && IsTransitioning() && (motion.reduced || tokens.mode == graphics::ThemeMode::HighContrast))
             SurfaceWindow::Show(false); // cancel decorative motion immediately when policy changes
         if (!Handle()) return Ok();
@@ -885,6 +886,7 @@ Result<void> DockWindow::SetSuppressed(bool suppressed) {
             if (::GetCapture() == Handle()) ::ReleaseCapture();
             impl_->pointer.reset(); impl_->hovered.reset(); impl_->attentionPulses.clear();
             impl_->ResetHover();
+            if (impl_->menus) impl_->menus->Cancel();
             Hide(); impl_->tooltip.HideTooltip(); impl_->SetTargets();
         } else { Show(false); impl_->UpdateAttention(); }
         return Ok();
@@ -1186,6 +1188,7 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
 }
 void DockWindow::OnCreated() {}
 void DockWindow::OnDestroying() {
+    if (impl_->menus) impl_->menus->Cancel();
     ::KillTimer(Handle(), kTooltipTimer); ::KillTimer(Handle(), kErrorTimer); ::KillTimer(Handle(), kLongPressTimer);
     ::KillTimer(Handle(), kHoverTimer); impl_->hover.Reset(); impl_->armedHover.reset();
     impl_->accessible.Disconnect(); impl_->tooltip.Destroy(); impl_->preview.Destroy();

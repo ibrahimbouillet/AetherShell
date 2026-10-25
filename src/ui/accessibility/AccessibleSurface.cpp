@@ -94,7 +94,8 @@ struct State {
 // ProviderOptions_UseComThreading, UIA marshals calls back to the creating window's STA.
 class Node final : public IRawElementProviderSimple, public IRawElementProviderFragment,
                    public IRawElementProviderFragmentRoot,
-                   public IInvokeProvider, public IToggleProvider, public IRangeValueProvider {
+                   public IInvokeProvider, public IToggleProvider, public IRangeValueProvider,
+                   public IExpandCollapseProvider, public ISelectionItemProvider, public ISelectionProvider {
 public:
     Node(std::shared_ptr<State> state, int id) : state_(std::move(state)), id_(id) {}
 
@@ -113,6 +114,12 @@ public:
             *object = static_cast<IToggleProvider*>(this);
         else if (iid == __uuidof(IRangeValueProvider) && id_ != 0)
             *object = static_cast<IRangeValueProvider*>(this);
+        else if (iid == __uuidof(IExpandCollapseProvider) && id_ != 0)
+            *object = static_cast<IExpandCollapseProvider*>(this);
+        else if (iid == __uuidof(ISelectionItemProvider) && id_ != 0)
+            *object = static_cast<ISelectionItemProvider*>(this);
+        else if (iid == __uuidof(ISelectionProvider) && id_ == 0)
+            *object = static_cast<ISelectionProvider*>(this);
         else return E_NOINTERFACE;
         AddRef();
         return S_OK;
@@ -136,6 +143,8 @@ public:
         *result = nullptr;
         return Guard([&]() -> HRESULT {
             const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            if (id_ == 0 && pattern == UIA_SelectionPatternId && state_->model->SupportsSelection())
+                return QueryInterface(__uuidof(ISelectionProvider), reinterpret_cast<void**>(result));
             const auto* item = state_->Find(id_);
             if (!item) return S_OK;
             if (pattern == UIA_InvokePatternId && item->supportsInvoke)
@@ -144,6 +153,10 @@ public:
                 return QueryInterface(__uuidof(IToggleProvider), reinterpret_cast<void**>(result));
             if (pattern == UIA_RangeValuePatternId && item->supportsRangeValue)
                 return QueryInterface(__uuidof(IRangeValueProvider), reinterpret_cast<void**>(result));
+            if (pattern == UIA_ExpandCollapsePatternId && item->supportsExpandCollapse)
+                return QueryInterface(__uuidof(IExpandCollapseProvider), reinterpret_cast<void**>(result));
+            if (pattern == UIA_SelectionItemPatternId && item->supportsSelectionItem)
+                return QueryInterface(__uuidof(ISelectionItemProvider), reinterpret_cast<void**>(result));
             return S_OK;
         });
     }
@@ -176,6 +189,14 @@ public:
                 case UIA_IsInvokePatternAvailablePropertyId: BoolValue(*result, item && item->supportsInvoke); break;
                 case UIA_IsTogglePatternAvailablePropertyId: BoolValue(*result, item && item->supportsToggle); break;
                 case UIA_IsRangeValuePatternAvailablePropertyId: BoolValue(*result, item && item->supportsRangeValue); break;
+                case UIA_IsExpandCollapsePatternAvailablePropertyId: BoolValue(*result, item && item->supportsExpandCollapse); break;
+                case UIA_ExpandCollapseExpandCollapseStatePropertyId:
+                    if (item && item->supportsExpandCollapse) { result->vt = VT_I4; result->lVal = item->expandCollapseState; } break;
+                case UIA_IsSelectionItemPatternAvailablePropertyId: BoolValue(*result, item && item->supportsSelectionItem); break;
+                case UIA_SelectionItemIsSelectedPropertyId:
+                    if (item && item->supportsSelectionItem) BoolValue(*result, item->isSelected); break;
+                case UIA_IsSelectionPatternAvailablePropertyId:
+                    BoolValue(*result, id_ == 0 && state_->model->SupportsSelection()); break;
                 case UIA_RangeValueValuePropertyId:
                     if (item && item->supportsRangeValue) NumberValue(*result, item->rangeValue); break;
                 case UIA_RangeValueMinimumPropertyId:
@@ -204,6 +225,16 @@ public:
         *result = nullptr;
         return Guard([&]() -> HRESULT {
             const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            if (id_ == 0 && direction == NavigateDirection_Parent) {
+                auto parent = state_->model->ParentProvider();
+                parent.copy_to(result);
+                return S_OK;
+            }
+            if (id_ != 0 && (direction == NavigateDirection_FirstChild || direction == NavigateDirection_LastChild)) {
+                auto child = state_->model->ChildProvider(id_);
+                child.copy_to(result);
+                return S_OK;
+            }
             int index = -1;
             if (id_ != 0) {
                 const auto found = std::find_if(state_->items.begin(), state_->items.end(),
@@ -303,6 +334,81 @@ public:
     }
     HRESULT STDMETHODCALLTYPE Invoke() noexcept override { return Action(false); }
     HRESULT STDMETHODCALLTYPE Toggle() noexcept override { return Action(true); }
+    HRESULT STDMETHODCALLTYPE Expand() noexcept override { return ExpandCollapse(true); }
+    HRESULT STDMETHODCALLTYPE Collapse() noexcept override { return ExpandCollapse(false); }
+    HRESULT STDMETHODCALLTYPE get_ExpandCollapseState(ExpandCollapseState* result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = ExpandCollapseState_LeafNode;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsExpandCollapse) return UIA_E_NOTSUPPORTED;
+            *result = item->expandCollapseState;
+            return S_OK;
+        });
+    }
+    HRESULT STDMETHODCALLTYPE Select() noexcept override { return SelectItem(false); }
+    HRESULT STDMETHODCALLTYPE AddToSelection() noexcept override { return SelectItem(false, true); }
+    HRESULT STDMETHODCALLTYPE RemoveFromSelection() noexcept override { return SelectItem(true); }
+    HRESULT STDMETHODCALLTYPE get_IsSelected(BOOL* result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = FALSE;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsSelectionItem) return UIA_E_NOTSUPPORTED;
+            *result = item->isSelected ? TRUE : FALSE;
+            return S_OK;
+        });
+    }
+    HRESULT STDMETHODCALLTYPE get_SelectionContainer(IRawElementProviderSimple** result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = nullptr;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsSelectionItem || !state_->model->SupportsSelection()) return UIA_E_NOTSUPPORTED;
+            return state_->root->QueryInterface(__uuidof(IRawElementProviderSimple), reinterpret_cast<void**>(result));
+        });
+    }
+    HRESULT STDMETHODCALLTYPE GetSelection(SAFEARRAY** result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = nullptr;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            if (id_ != 0 || !state_->model->SupportsSelection()) return UIA_E_NOTSUPPORTED;
+            std::vector<winrt::com_ptr<IRawElementProviderSimple>> selected;
+            for (const auto& item : state_->items) {
+                if (!item.supportsSelectionItem || !item.isSelected) continue;
+                winrt::com_ptr<IRawElementProviderFragment> fragment;
+                if (FAILED(Fragment(item.id, fragment.put()))) continue;
+                selected.push_back(fragment.as<IRawElementProviderSimple>());
+            }
+            SAFEARRAY* array = ::SafeArrayCreateVector(VT_UNKNOWN, 0, static_cast<ULONG>(selected.size()));
+            if (!array) return E_OUTOFMEMORY;
+            for (LONG index = 0; index < static_cast<LONG>(selected.size()); ++index) {
+                const HRESULT put = ::SafeArrayPutElement(array, &index, selected[static_cast<std::size_t>(index)].get());
+                if (FAILED(put)) { ::SafeArrayDestroy(array); return put; }
+            }
+            *result = array;
+            return S_OK;
+        });
+    }
+    HRESULT STDMETHODCALLTYPE get_CanSelectMultiple(BOOL* result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = FALSE;
+        return state_->Check();
+    }
+    HRESULT STDMETHODCALLTYPE get_IsSelectionRequired(BOOL* result) noexcept override {
+        if (!result) return E_POINTER;
+        *result = FALSE;
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            if (id_ != 0 || !state_->model->SupportsSelection()) return UIA_E_NOTSUPPORTED;
+            *result = state_->model->SelectionRequired() ? TRUE : FALSE;
+            return S_OK;
+        });
+    }
     HRESULT STDMETHODCALLTYPE get_ToggleState(ToggleState* result) noexcept override {
         if (!result) return E_POINTER;
         *result = ToggleState_Off;
@@ -343,6 +449,29 @@ public:
     }
 
 private:
+    HRESULT ExpandCollapse(bool expanded) noexcept {
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsExpandCollapse) return UIA_E_NOTSUPPORTED;
+            if (!item->isEnabled) return UIA_E_ELEMENTNOTENABLED;
+            return ActionResult(state_->model->SetExpanded(id_, expanded));
+        });
+    }
+    HRESULT SelectItem(bool remove, bool add = false) noexcept {
+        return Guard([&]() -> HRESULT {
+            const auto hr = Refresh(); if (FAILED(hr)) return hr;
+            const auto* item = state_->Find(id_);
+            if (!item || !item->supportsSelectionItem) return UIA_E_NOTSUPPORTED;
+            if (!item->isEnabled) return UIA_E_ELEMENTNOTENABLED;
+            if (!remove && item->isSelected) return S_OK;
+            if (remove && !item->isSelected) return S_OK;
+            if (add && std::any_of(state_->items.begin(), state_->items.end(), [this](const AccessibleItem& candidate) {
+                return candidate.id != id_ && candidate.supportsSelectionItem && candidate.isSelected;
+            })) return UIA_E_INVALIDOPERATION;
+            return ActionResult(remove ? state_->model->RemoveItemFromSelection(id_) : state_->model->SelectItem(id_));
+        });
+    }
     HRESULT ReadRange(double* result, double AccessibleItem::* member) noexcept {
         if (!result) return E_POINTER;
         *result = 0;
@@ -391,6 +520,8 @@ HRESULT State::Refresh() {
         if (item.id <= 0 || !ids.insert(item.id).second || item.boundsPx.right < item.boundsPx.left ||
             item.boundsPx.bottom < item.boundsPx.top || item.toggleState < ToggleState_Off ||
             item.toggleState > ToggleState_Indeterminate) return E_INVALIDARG;
+        if (item.supportsExpandCollapse && (item.expandCollapseState < ExpandCollapseState_Collapsed ||
+            item.expandCollapseState > ExpandCollapseState_LeafNode)) return E_INVALIDARG;
         if (item.supportsRangeValue && (!std::isfinite(item.rangeValue) || !std::isfinite(item.rangeMinimum) ||
             !std::isfinite(item.rangeMaximum) || !std::isfinite(item.rangeSmallChange) || !std::isfinite(item.rangeLargeChange) ||
             item.rangeMinimum > item.rangeMaximum || item.rangeValue < item.rangeMinimum || item.rangeValue > item.rangeMaximum ||
@@ -509,6 +640,39 @@ Result<winrt::com_ptr<IRawElementProviderSimple>> AccessibleSurface::RootProvide
     const auto hr = Guard([&] { return impl_->Simple(0, result); });
     if (FAILED(hr)) return MakeError(ErrorCode::Platform, "accessible root unavailable", hr);
     return result;
+}
+
+Result<winrt::com_ptr<IRawElementProviderSimple>> AccessibleSurface::ItemProvider(int id) const {
+    if (id <= 0) return MakeError(ErrorCode::InvalidArgument, "accessible item identity must be positive");
+    winrt::com_ptr<IRawElementProviderSimple> result;
+    const auto hr = Guard([&] { return impl_->Simple(id, result); });
+    if (FAILED(hr)) return MakeError(ErrorCode::Platform, "accessible item unavailable", hr);
+    return result;
+}
+
+Result<void> AccessibleSurface::NotifyExpandCollapseChanged(int id, ExpandCollapseState before) {
+    return FromHr(Guard([&]() -> HRESULT {
+        winrt::com_ptr<IRawElementProviderSimple> node;
+        const auto hr = impl_->Simple(id, node); if (FAILED(hr)) return hr;
+        const auto* item = impl_->state->Find(id);
+        if (!item || !item->supportsExpandCollapse) return UIA_E_NOTSUPPORTED;
+        VARIANT oldValue{}, newValue{};
+        oldValue.vt = newValue.vt = VT_I4;
+        oldValue.lVal = before;
+        newValue.lVal = item->expandCollapseState;
+        const auto changed = ::UiaRaiseAutomationPropertyChangedEvent(node.get(), UIA_ExpandCollapseExpandCollapseStatePropertyId,
+                                                                     oldValue, newValue);
+        if (FAILED(changed)) return changed;
+        return ::UiaRaiseStructureChangedEvent(node.get(), StructureChangeType_ChildrenInvalidated, nullptr, 0);
+    }));
+}
+
+Result<void> AccessibleSurface::NotifyMenuVisibility(bool shown) {
+    return FromHr(Guard([&]() -> HRESULT {
+        winrt::com_ptr<IRawElementProviderSimple> node;
+        const auto hr = impl_->Simple(0, node); if (FAILED(hr)) return hr;
+        return ::UiaRaiseAutomationEvent(node.get(), shown ? UIA_MenuOpenedEventId : UIA_MenuClosedEventId);
+    }));
 }
 
 Result<void> AccessibleSurface::NotifyStructureChanged() {
