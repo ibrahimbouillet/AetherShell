@@ -1723,3 +1723,30 @@ Surface/taskbar readiness and a second process/path/hash check passed with one a
 five genuine pins. Installed app/settings hashes and startup value stayed unchanged. The compact
 prototype remains active for owner spacing acceptance; no new desktop capture was made. Private
 runtime receipts remain ignored. No installation, push, tag or release.
+
+### S-044 — unique desktop pin association (Codex, 2026-10-25)
+
+Scope: FR-002 / FR-003 / FR-004 / FR-034 / T46, source base `637ce80` plus the Dock patch. The owner
+reported one editor window showing separately from its pin. Private boolean-only checks confirm
+one standard editor AUMID pin and a matching installed executable process path; no private path,
+window title or screenshot is copied into source or documentation.
+
+The shared applications identity helper already permits missing-window-AUMID executable matching;
+the Dock had an additional stricter filter that rejected it. A bounded one-way fallback now joins
+an argument-free, nonpackaged AUMID pin with an executable-only running group only on validated
+full-path equality and unique pin ownership. Conflicting catalog/running AUMIDs, profile arguments,
+multiple candidate pins and different installations reject fallback. Explicit profile matching and
+the generic-pin/explicit-profile separation remain intact. The pinned ID and launch route survive
+late arrival of the running AUMID.
+
+Executed Release `/W4 /WX` Dock unit target through `scripts/build.ps1`, same review build folder:
+`aether_dock_tests` **65 cases pass** (CTest 1/1, 0.60 s). Three new unit cases cover joining,
+normalization, late identity, conflicting/profile/packaged/path/catalog cases and ambiguous pins.
+The separately rebuilt own-window native executable filtered by `dock preview identity:` passes
+**1 case, 4.16 s**: one pin only, matching genuine source thumbnail, activation through the runtime
+identity/fake launcher with zero launches, late AUMID refresh preserving the card, normal selected
+close, and pin/marker/card state after its running group disappears. No owner app is touched.
+
+Corner work is separate and not qualified by these results. Its first app compilation passed but
+native-fixture compilation failed; no full app gate or real corner deployment is claimed here.
+No push/tag/release or installation change.

@@ -11,6 +11,23 @@
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
 
+**Current work — pinned/running association and real maximized corners (S-044 / D40).** The owner
+reported a duplicate pinned/running editor icon and repeated the square maximized-corner defect.
+Dock association is corrected and scoped checks pass: a unique argument-free desktop AUMID pin
+can own an executable-only running group with the same validated full path; conflicting identities,
+profiles, installations and ambiguous pins stay separate. Pin ID and launch route remain stable.
+65 Dock unit cases and the new own-window pin/preview/activation/close regression pass. The supplied
+screenshots remain private.
+
+**Uncommitted corner work in progress:** `src/app/WindowCorners.*`, its unit/native tests and fixture,
+plus `src/app/main.cpp` early guard dispatch and `ShellApplication.cpp` lifecycle wiring. A separate
+child owns reversible maximized-window region leases and watches parent death, with conservative
+eligibility. Root review found a recovery snapshot lost after transient native errors; that fix and
+an owned-helper parent-death regression are being completed before deployment. First product
+compilation passed `/WX`, but the native fixture had a compile error; no full corner gate or owner
+runtime is claimed. The running shell is still the compact `fdc2691` prototype below. Do not run
+the unfinished corner candidate or infer universal foreign-window rounding.
+
 **Latest owner feedback — compact preview follow-up (S-043).** The owner confirmed the running
 hover prototype works very well, then requested less empty height/width around the miniature,
 without reducing the actual preview. The supplied screenshot stays private. The compact patch

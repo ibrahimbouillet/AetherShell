@@ -29,6 +29,34 @@ float Width(std::size_t count, float size, float spacing, float magnification) {
     return 24 + icons * size + std::max(0.0f, icons - 1) * spacing + 3.0f * size * (magnification - 1);
 }
 
+// Some desktop shortcuts expose an AppUserModelID that their windows omit. Match that missing
+// side only through a unique, argument-free pin and the same validated full executable path.
+// Explicit window/profile identities retain precedence; a browser binary alone is not a profile.
+bool MatchesUnidentifiedDesktop(const settings::PinnedApp& pin, const apps::RunningApplication& running,
+                               const DockModelInputs& inputs, const apps::ApplicationIndex& catalog) {
+    const auto aumid = text::Trim(pin.appUserModelId);
+    if (!apps::IsExplicitAumid(aumid) || apps::IsPackagedAumid(aumid) ||
+        !text::Trim(running.appUserModelId).empty() || !text::Trim(pin.arguments).empty()) return false;
+    const auto pinnedPath = apps::NormalizeExecutablePath(pin.executablePath);
+    const auto runningPath = apps::NormalizeExecutablePath(running.executablePath);
+    if (!pinnedPath || !runningPath || !text::EqualsIgnoreCase(*pinnedPath, *runningPath) ||
+        catalog.HasExecutableWithOtherAumid(*pinnedPath, aumid)) return false;
+    std::set<std::wstring> candidates;
+    for (const auto& other : inputs.settings.pinned) {
+        if (other.id.empty()) continue;
+        const auto path = apps::NormalizeExecutablePath(other.executablePath);
+        if (path && text::EqualsIgnoreCase(*path, *pinnedPath)) candidates.insert(text::ToLower(other.id));
+    }
+    if (candidates.size() != 1) return false;
+    for (const auto& other : inputs.running) {
+        const auto otherAumid = text::Trim(other.appUserModelId);
+        if (otherAumid.empty() || text::EqualsIgnoreCase(otherAumid, aumid)) continue;
+        const auto path = apps::NormalizeExecutablePath(other.executablePath);
+        if (path && text::EqualsIgnoreCase(*path, *pinnedPath)) return false;
+    }
+    return true;
+}
+
 }  // namespace
 
 Result<std::vector<DockItem>> BuildDockItems(const settings::DockSettings& settings,
@@ -68,6 +96,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                 // they share a browser binary. An explicit window identity requires an exact match.
                 const auto pinnedAumid = text::Trim(item.application.appUserModelId);
                 const auto runningAumid = text::Trim(app.appUserModelId);
+                const bool unidentifiedDesktop = MatchesUnidentifiedDesktop(pin, app, inputs, catalog);
                 bool legacyExplorer = false;
                 if (pinnedAumid.empty() && text::EqualsIgnoreCase(runningAumid, apps::kFileExplorerAumid) &&
                     item.application.arguments.empty()) {
@@ -76,8 +105,9 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                     legacyExplorer = pinnedPath && runningPath && text::EqualsIgnoreCase(*pinnedPath, *runningPath);
                 }
                 if ((!pinnedAumid.empty() || !runningAumid.empty()) && !text::EqualsIgnoreCase(item.id, app.id) &&
-                    !legacyExplorer && (pinnedAumid.empty() || runningAumid.empty() || !text::EqualsIgnoreCase(pinnedAumid, runningAumid))) continue;
-                if (!legacyExplorer && !apps::RefersToSameApplication(item.application, app)) continue;
+                    !legacyExplorer && !unidentifiedDesktop &&
+                    (pinnedAumid.empty() || runningAumid.empty() || !text::EqualsIgnoreCase(pinnedAumid, runningAumid))) continue;
+                if (!legacyExplorer && !unidentifiedDesktop && !apps::RefersToSameApplication(item.application, app)) continue;
                 if (!app.relaunchIconResource.empty() && apps::ParseIconResource(app.relaunchIconResource))
                     item.application.iconResource = app.relaunchIconResource; // presentation only; never replace the pin's launch route
                 item.running = true; item.foreground = item.foreground || app.foreground;

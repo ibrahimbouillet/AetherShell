@@ -91,6 +91,13 @@ The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.
 
 ## Model and layout
 
+S-044 fixes a missing-identity asymmetry: an argument-free desktop AUMID pin can absorb an
+executable-only running group through the same validated full executable path when that pin is
+unique and neither catalog nor running groups report a conflicting identity. This keeps a desktop
+editor's window on its existing icon. Packaged identities, explicit window/profile AUMIDs,
+argument-bearing pins, different installations and ambiguous same-executable pins are not guessed.
+The pin's stable ID/launch route is preserved; preview and activation use its genuine running windows.
+
 `BuildDockItems` emits configurable Start, Search and Task View entries before application items.
 It merges case-insensitive identities, including duplicate running groups, while preserving pinned
 order and accumulating windows for activation. Session ordering can temporarily move unpinned

@@ -125,6 +125,63 @@ AETHER_TEST("dock presentation: a legacy Explorer executable pin matches the can
     CHECK((*model)[1].running);
 }
 
+AETHER_TEST("dock presentation: a unique desktop AUMID pin absorbs its executable-only window") {
+    settings::DockSettings config; config.showStartButton = false; config.showTaskViewButton = false;
+    auto pin = Pin(L"aumid:Synthetic.Editor"); pin.appUserModelId = L"Synthetic.Editor";
+    pin.executablePath = LR"(C:\AetherFixture\Editor.exe)";
+    pin.shortcutPath = LR"(C:\AetherFixture\Editor.lnk)"; config.pinned = {pin};
+    auto running = Running(L"exe:synthetic-editor", true);
+    running.executablePath = L"c:/aetherfixture/editor.exe";
+    auto model = BuildDockItems(config, {running}); REQUIRE(model.ok()); REQUIRE_EQ(model->size(), 2u);
+    const auto& item = (*model)[1];
+    CHECK_EQ(item.kind, DockItemKind::Pinned); CHECK_EQ(item.id, pin.id);
+    CHECK(item.running); CHECK(item.foreground); CHECK_EQ(item.windowCount, 1u);
+    REQUIRE(item.runningApplication.has_value());
+    CHECK_EQ(item.runningApplication->windows[0].handle, running.windows[0].handle);
+    CHECK_EQ(item.application.shortcutPath, pin.shortcutPath);
+    running.id = pin.id; running.appUserModelId = pin.appUserModelId;
+    auto identified = BuildDockItems(config, {running}); REQUIRE(identified.ok());
+    REQUIRE_EQ(identified->size(), 2u); CHECK_EQ((*identified)[1].id, item.id);
+}
+
+AETHER_TEST("dock presentation: missing AUMID does not guess conflicting installs or profiles") {
+    settings::DockSettings config; config.showStartButton = false; config.showTaskViewButton = false;
+    auto pin = Pin(L"aumid:Synthetic.Editor"); pin.appUserModelId = L"Synthetic.Editor";
+    pin.executablePath = LR"(C:\AetherFixture\Editor.exe)";
+    auto running = Running(L"exe:synthetic-editor"); running.executablePath = pin.executablePath;
+    for (int variant = 0; variant < 5; ++variant) {
+        auto selected = pin; auto window = running;
+        if (variant == 0) window.appUserModelId = L"Synthetic.Other";
+        if (variant == 1) window.executablePath = LR"(C:\AetherOtherFixture\Editor.exe)";
+        if (variant == 2) selected.arguments = L"--profile=Synthetic";
+        if (variant == 3) selected.appUserModelId = L"Synthetic.Editor_123456789abcd!App";
+        if (variant == 4) window.executablePath = L"Editor.exe";
+        config.pinned = {selected};
+        auto model = BuildDockItems(config, {window}); REQUIRE(model.ok()); REQUIRE_EQ(model->size(), 3u);
+        CHECK_FALSE((*model)[1].running); CHECK((*model)[2].running);
+    }
+    config.pinned = {pin};
+    apps::ApplicationInfo profile; profile.id = L"aumid:Synthetic.Profile";
+    profile.appUserModelId = L"Synthetic.Profile"; profile.executablePath = pin.executablePath;
+    apps::ApplicationIndex catalog({profile}); const std::vector windows{running};
+    auto ambiguous = BuildDockItems(DockModelInputs{config, windows, {}, &catalog});
+    REQUIRE(ambiguous.ok()); REQUIRE_EQ(ambiguous->size(), 3u); CHECK_FALSE((*ambiguous)[1].running);
+}
+
+AETHER_TEST("dock presentation: an unidentified window never runs on two candidate pins") {
+    settings::DockSettings config; config.showStartButton = false; config.showTaskViewButton = false;
+    auto pin = Pin(L"aumid:Synthetic.Editor"); pin.appUserModelId = L"Synthetic.Editor";
+    pin.executablePath = LR"(C:\AetherFixture\Editor.exe)";
+    auto other = pin; other.id = L"aumid:Synthetic.Other"; other.appUserModelId = L"Synthetic.Other";
+    config.pinned = {pin, other};
+    auto running = Running(L"exe:synthetic-editor"); running.executablePath = pin.executablePath;
+    auto ambiguous = BuildDockItems(config, {running}); REQUIRE(ambiguous.ok()); REQUIRE_EQ(ambiguous->size(), 4u);
+    CHECK_FALSE((*ambiguous)[1].running); CHECK_FALSE((*ambiguous)[2].running);
+    other.id = running.id; other.appUserModelId.clear(); config.pinned = {pin, other};
+    auto exact = BuildDockItems(config, {running}); REQUIRE(exact.ok()); REQUIRE_EQ(exact->size(), 3u);
+    CHECK_FALSE((*exact)[1].running); CHECK((*exact)[2].running);
+}
+
 AETHER_TEST("dock session: external pin order and new pins preserve running application slots") {
     const std::vector<std::wstring> session{L"exe:running-a",L"exe:pin-a",L"exe:running-b",L"exe:pin-b"};
     const std::vector pins{Pin(L"exe:pin-b"),Pin(L"exe:pin-a"),Pin(L"exe:pin-new")};

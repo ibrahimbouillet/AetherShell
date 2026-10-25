@@ -263,6 +263,37 @@ const auto kFakeWindow = reinterpret_cast<HWND>(static_cast<std::uintptr_t>(1));
 
 }  // namespace
 
+AETHER_TEST("dock preview identity: one AUMID pin owns its executable-only window and preview") {
+    Fixture f;
+    SourceWindow source{nullptr, RGB(226, 48, 168), true};
+    CreateSource(source, {f.area.left + 40, f.area.top + 20, f.area.left + 680, f.area.top + 420}, L"Synthetic editor");
+    auto config = f.settings->Current().dock;
+    auto& pin = config.pinned[1];
+    pin.id = L"aumid:synthetic.editor"; pin.appUserModelId = L"Synthetic.Editor";
+    pin.parsingName = L"Synthetic.Editor"; pin.executablePath = LR"(C:\AetherFixture\Editor.exe)";
+    REQUIRE(f.window->SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), {}, config).ok());
+    auto editor = App(L"exe:synthetic-editor", false, {source.hwnd}); editor.executablePath = pin.executablePath;
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}), editor}).ok());
+    CHECK_EQ(f.Geometry().items.size(), 3u); // Search, A, one pinned editor
+    f.window->Show(false); f.LeaveDock(); f.Run(600); f.Hover(2); f.Run(600);
+    REQUIRE(f.Card().IsPresenting()); CHECK_EQ(f.Card().ApplicationId(), pin.id);
+    REQUIRE_EQ(f.Card().TileCount(), 1u); CHECK_EQ(f.Card().TileWindow(0), source.hwnd);
+    const auto body = f.Card().TileBodyPx(0); REQUIRE(body.has_value()); f.CardClick(*body); f.Run(100);
+    REQUIRE_EQ(f.launcher.activated.size(), 1u); CHECK_EQ(f.launcher.activated[0].id, editor.id);
+    CHECK_EQ(f.launcher.activated[0].windows[0].handle, source.hwnd); CHECK_EQ(f.launcher.launches, 0);
+    f.LeaveDock(); f.Run(700); f.Hover(2); f.Run(600);
+    REQUIRE(f.Card().IsPresenting());
+    editor.id = pin.id; editor.appUserModelId = pin.appUserModelId;
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}), editor}).ok());
+    CHECK_EQ(f.Geometry().items.size(), 3u); CHECK_EQ(f.Card().ApplicationId(), pin.id);
+    REQUIRE_EQ(f.Card().TileCount(), 1u); CHECK_EQ(f.Card().TileWindow(0), source.hwnd);
+    const auto close = f.Card().CloseButtonPx(0); REQUIRE(close.has_value()); f.CardClick(*close); f.Run(100);
+    CHECK_EQ(source.closeRequests, 1);
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow})}).ok()); f.Run(700);
+    CHECK_EQ(f.Geometry().items.size(), 3u); CHECK_FALSE(f.Card().IsPresenting());
+    CHECK_EQ(f.window->MarkerWidth(pin.id), 0.0f);
+}
+
 AETHER_TEST("dock preview review: tracker reorder cancels a pressed close for a different window") {
     Fixture f;
     SourceWindow first{nullptr, RGB(226, 48, 168), true}, second{nullptr, RGB(40, 196, 92), true};
