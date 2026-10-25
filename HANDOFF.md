@@ -7,9 +7,32 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — Claude (D39/T45 consolidation, T42/T43), 2026-10-25 (Europe/Paris)
+## Active continuation — Codex review of T42/T43, 2026-10-25 (Europe/Paris)
 
-Last updated: 2026-10-25 around 11:00 (Europe/Paris), by Claude. Codex reviews next.
+Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
+
+**Independent review checkpoint (S-042):** official `origin`, `main`, one worktree and the existing
+local history were checked. The two launcher files had unexpectedly moved to `installer/launcher/`;
+their blob hashes exactly matched `HEAD:launcher/`. A checked plain move back restored the tracked
+layout without content edits. The cause of the move is unknown. A fresh build folder avoids the
+failed old CMake cache. Private archive recovery remains Claude's S-040 receipt, not a new Codex
+restore verification.
+
+Three own-window regressions reproduced unsafe preview input: tracker reorder could redirect a
+pressed X or a keyboard close to a sibling, and capture loss/cancel mode could leave a close armed.
+The review patch cancels stale pointer gestures, follows keyboard identity through reorder and
+disarms a removed selection until navigation. Release `/W4 /WX` including the app and guard passes;
+graphics 74, Dock unit 61, Dock native 10 executed plus one opt-in recorder skipped (3/3 CTest
+executables, 49.17 s). No owner app was closed by these tests. Remaining: card anchoring during Dock
+reflow, thumbnail crop/aspect after a source-only resize, media controls, physical DPI/external-app
+acceptance and the other V3 tasks. See S-042 and the Dock module note.
+
+**Local preview authorization:** the owner directly requested that the reviewed prototype be launched
+on their computer and clearly announced so they can evaluate it. This covers the bounded shell
+instance swap; D36 still requires a fresh ready reply for recording or hiding/closing their apps.
+Prepare a private settings clone and an adjacent recovery helper; preserve the installed Alpha 2
+files and startup registration. The runtime receipt will identify which binary is actually running.
+No V3 installation, push, tag or release is authorized by this review.
 
 ### Current continuation — V3 accepted for development (D38)
 
@@ -616,13 +639,14 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
    `DockMotion.*`, the `DockWindow.cpp` wiring and `Motion().marker`, then rerun the S-041 command
    from this folder. Optional own-window motion frames (synthetic windows only, local output):
    `$env:AETHER_DOCK_PREVIEW_FRAMES='<local folder>'; build/v3-release/modules/dock/aether_dock_integration_tests.exe frames`.
-   Real-desktop preview needs the owner's explicit ready reply (D36) because it swaps instances:
-   with consent, quit the installed shell (its own Quit command, or
+   The owner has directly requested a local prototype launch after review (see authorization above).
+   Recording still requires a fresh D36 ready reply. For a bounded instance swap, quit the installed
+   shell (its own Quit command, or
    `%LOCALAPPDATA%\Programs\AetherShell\versions\0.2.0-alpha.2\AetherShellApp.exe --quit`), run `build/v3-release/modules/app/AetherShellApp.exe --data-dir <private temp folder>` (no
    startup registration happens unless chosen in its Settings), hover a background app with a
    foreground app present, dwell, cross into the card, leave, re-hover, click, then close a
-   disposable window through X. Never capture the owner's apps without consent; afterwards quit the
-   candidate (`build/v3-release/modules/app/AetherShellApp.exe --quit`) and relaunch the installed
+   disposable window through X. Never capture the owner's apps without consent; when ending the trial,
+   quit the candidate (its own binary with `--quit --data-dir <private temp folder>`) and relaunch the installed
    Alpha 2 from its Start-menu shortcut, confirming the native-taskbar state returns to what it was.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and

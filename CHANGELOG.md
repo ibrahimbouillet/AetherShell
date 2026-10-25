@@ -22,6 +22,9 @@ All notable changes to Aether Shell are documented here. The format follows
   dedicated, calmer marker spring; after a deliberate dwell a rounded glass card shows genuine DWM
   previews of its windows, each with a close button that requests a normal close of that window
   only. Pointer travel into the card keeps it open; activation continues the expanded marker.
+- Cancel preview close gestures when capture is lost or a tracker refresh changes the tile's
+  identity. Keyboard selection follows the chosen window through reorder and disarms actions when
+  that window disappears until the user navigates again.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 

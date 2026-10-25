@@ -66,6 +66,17 @@ button. Titles and pixels are transient: never logged or stored. Dismissal, refr
 DPI/display changes, disabled input and shutdown release every thumbnail. Media play/pause remains a
 later T43 step. Own-window tests cover the above; the owner's real-desktop acceptance is pending.
 
+Codex review (S-042) adds input lifetime checks: a pressed tile must keep its original slot and
+HWND/process/thread identity through release; otherwise the gesture is cancelled. Capture loss and
+cancel mode also disarm it. Keyboard selection follows the same window and body/X part through a
+reorder. If that window disappears, action keys do nothing until explicit navigation chooses another
+tile. Three native regressions first reproduced the defects and then passed after correction.
+
+Remaining geometry limitations: an already shown card retains its original icon anchor when the
+Dock model reflows. Source-window resize alone does not refresh the cached thumbnail crop/aspect
+until another tracker refresh or re-hover. These need visible-preview geometry observation and
+dedicated regressions; no continuous polling or complete reflow/resize acceptance is claimed.
+
 The native bottom Dock implements the application surface in FR-001 through FR-004: search,
 pinned applications and optional unpinned running applications. It contains no status data.
 The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.

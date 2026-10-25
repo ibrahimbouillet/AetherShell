@@ -70,6 +70,7 @@ struct SourceWindow {
     COLORREF color = RGB(0, 0, 0);
     bool refuse = false;
     int closeRequests = 0;
+    ~SourceWindow() { if (hwnd) ::DestroyWindow(hwnd); }
 };
 LRESULT CALLBACK SourceProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     if (message == WM_NCCREATE)
@@ -261,6 +262,86 @@ apps::RunningApplication App(const wchar_t* id, bool foreground, std::vector<HWN
 const auto kFakeWindow = reinterpret_cast<HWND>(static_cast<std::uintptr_t>(1));  // never a live identity
 
 }  // namespace
+
+AETHER_TEST("dock preview review: tracker reorder cancels a pressed close for a different window") {
+    Fixture f;
+    SourceWindow first{nullptr, RGB(226, 48, 168), true}, second{nullptr, RGB(40, 196, 92), true};
+    const RECT sourceArea{f.area.left + 40, f.area.top + 20, f.area.left + 680, f.area.top + 420};
+    CreateSource(first, sourceArea, L"Synthetic review window 1");
+    CreateSource(second, sourceArea, L"Synthetic review window 2");
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+        App(kIdB, false, {first.hwnd, second.hwnd})}).ok());
+    f.window->Show(false); f.LeaveDock(); f.Run(600);
+    f.Hover(2); f.Run(600);
+    REQUIRE(f.Card().IsPresenting());
+    REQUIRE_EQ(f.Card().TileCount(), 2u);
+    const auto close = f.Card().CloseButtonPx(0); REQUIRE(close.has_value());
+    f.LeaveDock(); f.CardMove(*close);
+    const auto point = ClientPoint(f.Card().Handle(), *close);
+    ::SendMessageW(f.Card().Handle(), WM_LBUTTONDOWN, 0, point);
+    // A tracker update can legitimately reorder a group's windows between down and up.
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+        App(kIdB, false, {second.hwnd, first.hwnd})}).ok());
+    REQUIRE_EQ(f.Card().TileWindow(0), second.hwnd);
+    ::SendMessageW(f.Card().Handle(), WM_LBUTTONUP, 0, point);
+    f.Run(100);
+    CHECK_EQ(first.closeRequests, 0);
+    CHECK_EQ(second.closeRequests, 0);
+    CHECK(f.launcher.activated.empty());
+}
+
+AETHER_TEST("dock preview review: keyboard close keeps its window identity after tracker reorder") {
+    Fixture f;
+    SourceWindow first{nullptr, RGB(226, 48, 168), true}, second{nullptr, RGB(40, 196, 92), true};
+    const RECT sourceArea{f.area.left + 40, f.area.top + 20, f.area.left + 680, f.area.top + 420};
+    CreateSource(first, sourceArea, L"Synthetic review keyboard 1");
+    CreateSource(second, sourceArea, L"Synthetic review keyboard 2");
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+        App(kIdB, false, {first.hwnd, second.hwnd})}).ok());
+    f.window->Show(false); f.LeaveDock(); f.Run(600);
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_END, 0);
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_UP, 0);
+    REQUIRE(f.Card().KeyboardActive());
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_RIGHT, 0); // first window's X
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+        App(kIdB, false, {second.hwnd, first.hwnd})}).ok());
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_DELETE, 0);
+    f.Run(100);
+    CHECK_EQ(first.closeRequests, 1);
+    CHECK_EQ(second.closeRequests, 0);
+    // Losing the selected window must not silently select its sibling for a destructive key.
+    REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+        App(kIdB, false, {second.hwnd})}).ok());
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_DELETE, 0);
+    f.Run(100);
+    CHECK_EQ(second.closeRequests, 0);
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_HOME, 0); // explicit navigation rearms
+    ::SendMessageW(f.window->Handle(), WM_KEYDOWN, VK_DELETE, 0);
+    f.Run(100);
+    CHECK_EQ(second.closeRequests, 1);
+}
+
+AETHER_TEST("dock preview review: capture loss and cancel mode disarm close gestures") {
+    for (const UINT cancel : {WM_CAPTURECHANGED, WM_CANCELMODE}) {
+        Fixture f;
+        SourceWindow source{nullptr, RGB(226, 48, 168), true};
+        const RECT area{f.area.left + 40, f.area.top + 20, f.area.left + 680, f.area.top + 420};
+        CreateSource(source, area, L"Synthetic review cancellation");
+        REQUIRE(f.window->SetRunningApplications({App(kIdA, true, {kFakeWindow}),
+            App(kIdB, false, {source.hwnd})}).ok());
+        f.window->Show(false); f.LeaveDock(); f.Run(600);
+        f.Hover(2); f.Run(600);
+        REQUIRE(f.Card().IsPresenting());
+        const auto close = f.Card().CloseButtonPx(0); REQUIRE(close.has_value());
+        f.LeaveDock(); f.CardMove(*close);
+        const auto point = ClientPoint(f.Card().Handle(), *close);
+        ::SendMessageW(f.Card().Handle(), WM_LBUTTONDOWN, 0, point);
+        ::SendMessageW(f.Card().Handle(), cancel, 0, reinterpret_cast<LPARAM>(f.window->Handle()));
+        ::SendMessageW(f.Card().Handle(), WM_LBUTTONUP, 0, point);
+        f.Run(100);
+        CHECK_EQ(source.closeRequests, 0);
+    }
+}
 
 AETHER_TEST("dock preview integration: hover grows the background marker and shows genuine own-window previews") {
     Fixture f;

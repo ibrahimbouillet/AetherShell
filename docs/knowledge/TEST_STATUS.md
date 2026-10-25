@@ -1619,3 +1619,51 @@ established DWM's above-content stacking on this Windows 11 build. Frames stay l
 the real desktop at normal speed, physical multi-monitor DPI changes while a card is shown,
 Windows 10 stacking, protected-content appearance, elevated-window UIPI refusal and owner
 acceptance. No real desktop capture, installation, startup change, push, tag or release occurred.
+
+### S-042 — independent hover-preview review and input lifetime corrections (Codex, 2026-10-25)
+
+Scope: D38 / D39 / FR-033 / FR-034 / T42 / T43 / T45, source base `0ca846e` plus the review patch.
+Claude confirmed it had stopped writing. Official `origin`, `main`, a single worktree and local
+lineage were checked. An unexpected folder move left `launcher/` deleted and `installer/launcher/`
+untracked. Both files matched the tracked Git blob hashes exactly; a checked plain move back
+restored them without content changes. Its cause is unknown. No reset, checkout replacement or
+history rewrite occurred. Private archive recovery is supported by Claude's S-040 receipt, not a
+new Codex archive restoration.
+
+**Defects reproduced before correction:** three new own-window regression cases failed on the
+original product source. Reordering two tracked windows between X-down and X-up closed the sibling;
+keyboard Delete after reorder targeted the new slot rather than the chosen window; capture loss
+and cancel mode left a close armed. Each test uses disposable synthetic windows that count and
+refuse close requests, fake tracking/launching, temporary settings and the private test backdrop.
+Their sources now have RAII destruction so failed assertions cannot leave a window using expired
+fixture state. No owner application, registry, work area or device setting was changed.
+
+**Correction:** retain keyboard window identity and body/X part through refresh; if it disappears,
+consume action keys until explicit navigation. Cancel pointer gestures when the original slot's
+HWND/process/thread changes, or capture/cancel mode invalidates the gesture. Notify accessibility
+of retained focus or the root when selection disappears. No new dependency or per-frame polling.
+
+**Executed final focused Release `/W4 /WX`:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-codex-hover-review -Jobs 4 `
+  -Target @('aether_dock_tests','aether_dock_integration_tests','aether_graphics_tests','AetherShellApp','AetherShell') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_(dock|graphics)_tests$|^aether_dock_integration_tests$' -TestExclude '' `
+  -JUnitFile build/wf-codex-hover-review/review-final-results.xml
+```
+
+Fresh build folder, warning-free app and recovery helper. **3/3 CTest executables pass, 49.17 s**:
+graphics **74 cases** (0.93 s), Dock unit **61 cases** (0.36 s), Dock native **11 reported cases**
+(47.51 s: 10 executed, opt-in own-window recorder skipped). New regressions cover cancelled
+pointer gestures after reorder, retained keyboard selection followed by removal and explicit
+navigation to rearm, and both capture-loss/cancel paths. The existing native thumbnail pixels,
+association, normal/refused close, hover transfer, keyboard/UIA, idle and reduced-motion checks pass.
+This rerun creates no new motion recording; it does not establish owner visual acceptance.
+
+**Remaining review boundaries:** an open card keeps its old anchor during Dock model reflow;
+source-only resize does not refresh cached crop/aspect until a later tracker refresh or re-hover.
+HWND/process/thread checks are not a universal window-generation identifier. Physical DPI changes,
+external/protected/elevated applications, media actions and normal-speed owner acceptance remain.
+The owner directly requested a reviewed local prototype launch; its runtime receipt is separate
+from these automated checks. No push, tag or release is part of this review.

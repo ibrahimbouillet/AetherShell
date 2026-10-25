@@ -62,10 +62,18 @@ void DockPreviewWindow::SetTheme(const graphics::DesignTokens& tokens, const gra
 
 bool DockPreviewWindow::Present(const DockPreviewContent& content, const RECT& anchorPx) {
     if (!Handle()) return false;
+    // A tracker refresh may reorder or remove windows between input events. A pointer gesture is
+    // valid only at its original slot/identity; keyboard exploration follows its original identity.
+    const auto pressedIdentity = pressed_ && pressed_->tile < tiles_.size()
+        ? std::optional(tiles_[pressed_->tile].identity) : std::nullopt;
+    const auto focusedIdentity = keyboard_ && focus_ / 2 < tiles_.size()
+        ? std::optional(tiles_[focus_ / 2].identity) : std::nullopt;
+    const std::size_t focusedPart = focus_ % 2;
     if (!text::EqualsIgnoreCase(content.applicationId, applicationId_)) {
         ReleaseThumbnails();
         tiles_.clear();
         hover_.reset(); pressed_.reset(); focus_ = 0;
+        keyboard_ = false;  // a different group needs a new explicit keyboard entry
     }
     applicationId_ = content.applicationId;
     applicationName_ = content.applicationName;
@@ -116,8 +124,23 @@ bool DockPreviewWindow::Present(const DockPreviewContent& content, const RECT& a
     if (tiles_.empty()) { Dismiss(true); return false; }
     for (auto& tile : tiles_) Register(tile);
     if (hover_ && hover_->tile >= tiles_.size()) hover_.reset();
-    if (pressed_ && pressed_->tile >= tiles_.size()) pressed_.reset();
-    focus_ = std::min(focus_, tiles_.size() * 2 - 1);
+    if (pressed_ && (!pressedIdentity || pressed_->tile >= tiles_.size() ||
+        !SameWindowIdentity(*pressedIdentity, tiles_[pressed_->tile].identity))) pressed_.reset();
+    if (keyboard_) {
+        // Do not silently focus a sibling after the selected window disappears. The one-past
+        // sentinel consumes action keys until explicit navigation chooses a window again.
+        focus_ = tiles_.size() * 2;
+        if (focusedIdentity) {
+            for (std::size_t index = 0; index < tiles_.size(); ++index) {
+                if (SameWindowIdentity(*focusedIdentity, tiles_[index].identity)) {
+                    focus_ = index * 2 + focusedPart;
+                    break;
+                }
+            }
+        }
+    } else {
+        focus_ = std::min(focus_, tiles_.size() * 2 - 1);
+    }
 
     const bool appearing = !IsShown() || dismissing_;
     dismissing_ = false;
@@ -141,6 +164,11 @@ bool DockPreviewWindow::Present(const DockPreviewContent& content, const RECT& a
         RequestAnimationFrame();
     }
     (void)accessible_.NotifyStructureChanged();
+    if (keyboard_) {
+        const int focusId = focus_ < tiles_.size() * 2
+            ? (focusedPart ? tiles_[focus_ / 2].closeId : tiles_[focus_ / 2].bodyId) : 0;
+        (void)accessible_.NotifyFocusChanged(focusId);
+    }
     Invalidate();
     return true;
 }
@@ -307,14 +335,17 @@ void DockPreviewWindow::Focus(std::size_t element) {
 bool DockPreviewWindow::HandleKey(UINT key) {
     if (!keyboard_ || tiles_.empty()) return false;
     const std::size_t last = tiles_.size() * 2 - 1;
+    const bool focused = focus_ <= last;
     const bool shift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
-    if (key == VK_RIGHT || (key == VK_TAB && !shift)) Focus(std::min(focus_ + 1, last));
-    else if (key == VK_LEFT || (key == VK_TAB && shift)) Focus(focus_ ? focus_ - 1 : 0);
+    if (key == VK_RIGHT || (key == VK_TAB && !shift)) Focus(focused ? std::min(focus_ + 1, last) : 0);
+    else if (key == VK_LEFT || (key == VK_TAB && shift)) Focus(focused ? (focus_ ? focus_ - 1 : 0) : last);
     else if (key == VK_HOME) Focus(0);
     else if (key == VK_END) Focus(last);
-    else if (key == VK_RETURN || key == VK_SPACE) Invoke(Element{focus_ / 2, focus_ % 2 ? Part::Close : Part::Body});
-    else if (key == VK_DELETE) Invoke(Element{focus_ / 2, Part::Close});
-    else return false;
+    else if (key == VK_RETURN || key == VK_SPACE) {
+        if (focused) Invoke(Element{focus_ / 2, focus_ % 2 ? Part::Close : Part::Body});
+    } else if (key == VK_DELETE) {
+        if (focused) Invoke(Element{focus_ / 2, Part::Close});
+    } else return false;
     return true;
 }
 
@@ -487,12 +518,23 @@ void DockPreviewWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F poin
     if (pressed && hit && pressed->tile == hit->tile && pressed->part == hit->part) Invoke(*hit);
 }
 
+void DockPreviewWindow::OnPointerCaptureLost() {
+    if (!pressed_) return;
+    pressed_.reset();
+    Invalidate();
+}
+
 void DockPreviewWindow::OnDeviceReplaced() {
     bitmaps_.Clear();
     Invalidate();
 }
 
 std::optional<LRESULT> DockPreviewWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == WM_CANCELMODE) {
+        OnPointerCaptureLost();
+        if (::GetCapture() == Handle()) ::ReleaseCapture();
+        return 0;
+    }
     if (message == WM_GETOBJECT) {
         LRESULT result = 0;
         if (accessible_.HandleGetObject(Handle(), wParam, lParam, result)) return result;

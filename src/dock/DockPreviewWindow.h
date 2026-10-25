@@ -99,6 +99,7 @@ protected:
     void OnPointerLeave() override;
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
+    void OnPointerCaptureLost() override;
     void OnDeviceReplaced() override;
     std::optional<LRESULT> OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
     void OnDestroying() override;
@@ -160,7 +161,7 @@ private:
     RECT anchorPx_{};
     std::optional<Element> hover_;
     std::optional<Element> pressed_;
-    std::size_t focus_ = 0;
+    std::size_t focus_ = 0;  // tiles_.size() * 2 means the focused identity disappeared; navigation rearms
     bool keyboard_ = false;
     bool inside_ = false;
     bool dismissing_ = false;
