@@ -11,6 +11,16 @@
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
 
+**Latest owner feedback — compact preview follow-up (S-043).** The owner confirmed the running
+hover prototype works very well, then requested less empty height/width around the miniature,
+without reducing the actual preview. The supplied screenshot stays private. The compact patch
+preserves the thumbnail fit and 28-DIP X, trims edge/tile padding to 4/4 DIPs and header gap to 4,
+and fits the row to its images instead of reserving unused 240×150 boxes. A 16:9 card changes from
+268×212 to 256×183 DIPs while its image stays 240×135; narrow sources keep a readable header.
+The final scoped Release `/W4 /WX` build and Dock unit/native suites pass (62 unit, 10 native plus
+one opt-in recorder skipped; 2/2 executables, 48.95 s). Candidate relaunch/spacing acceptance is the
+next runtime step; the earlier `f692b9f` prototype remains active until the explicit runtime update.
+
 **Independent review checkpoint (S-042):** official `origin`, `main`, one worktree and the existing
 local history were checked. The two launcher files had unexpectedly moved to `installer/launcher/`;
 their blob hashes exactly matched `HEAD:launcher/`. A checked plain move back restored the tracked
@@ -42,8 +52,8 @@ and one adjacent recovery guard are running, with no installed Alpha 2 process r
 candidate logged both surfaces started and taskbar replacement active. All five genuine pins were
 kept in a private settings clone; default settings hash, installed app hash and HKCU startup value
 are unchanged. No other user application was closed or hidden and no desktop capture was made.
-The prototype is left running for owner evaluation; visual acceptance has been requested, not
-received. It retains Alpha 2 version metadata and is **not** an installed/released Alpha 3.
+The owner confirmed its basic hover interaction works and requested the compact follow-up above.
+It retains Alpha 2 version metadata and is **not** an installed/released Alpha 3.
 An ignored local session host waits for candidate exit and attempts to relaunch installed Alpha 2
 after app/guard shutdown; that return path has not yet been exercised in this trial. Its script and
 runtime receipts are under `.local/hover-preview/`, never public. Startup still targets installed

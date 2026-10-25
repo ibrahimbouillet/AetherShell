@@ -46,17 +46,18 @@ struct PreviewWindowIdentity {
 // NotFound: the identity is stale. AccessDenied: Windows blocked the message (for example UIPI).
 [[nodiscard]] Result<void> RequestNormalClose(const PreviewWindowIdentity& identity);
 
-// Card geometry in DIPs. All tiles share one height, so the card is a single landscape row above
+// Card geometry in DIPs. All tiles share one height, so the card is a single compact row above
 // the icon; each tile has a header (icon, title, close button at its upper right) and a thumbnail
-// box in which the source keeps its aspect ratio without stretching or cropping.
+// area fitted to the actual content, preserving its size/aspect without stretching or cropping.
 struct PreviewLayoutMetrics {
-    float padding = 6.0f;        // card edge to tiles
+    float padding = 4.0f;        // card edge to tiles
     float gap = 4.0f;            // between tiles
-    float tilePadding = 8.0f;
+    float tilePadding = 4.0f;
     float headerHeight = 28.0f;  // icon + title row; the close button is a square of this size
-    float headerGap = 6.0f;
+    float headerGap = 4.0f;
     float iconSize = 16.0f;
-    float thumbnailWidth = 240.0f;   // landscape box (16:10), close to the Windows taskbar preview size
+    float minimumContentWidth = 160.0f;  // readable header even for narrow/tiny source windows
+    float thumbnailWidth = 240.0f;   // fit limits, not a fixed empty box around every thumbnail
     float thumbnailHeight = 150.0f;
     float moreWidth = 44.0f;     // trailing "+N" column when not every window fits
 };
@@ -66,7 +67,7 @@ struct PreviewTileGeometry {
     D2D1_RECT_F title{};
     D2D1_RECT_F close{};
     D2D1_RECT_F thumbnailBox{};
-    D2D1_RECT_F thumbnail{};  // aspect-preserving fit, centered in thumbnailBox
+    D2D1_RECT_F thumbnail{};  // unchanged aspect-preserving fit, centered in the shared row
 };
 struct PreviewLayout {
     D2D1_SIZE_F card{};

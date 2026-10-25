@@ -19,7 +19,7 @@ bool Inside(const D2D1_RECT_F& inner, const D2D1_RECT_F& outer) {
 }
 }  // namespace
 
-AETHER_TEST("dock preview layout: thumbnails keep the source aspect ratio inside a landscape card") {
+AETHER_TEST("dock preview layout: thumbnails keep the source aspect ratio inside a compact card") {
     const std::vector<SIZE> sources{{1920, 1080}, {1024, 768}, {900, 1600}, {3440, 1000}};
     for (const SIZE& source : sources) {
         const auto layout = LayoutPreviewCard(std::span(&source, 1), 96);
@@ -32,12 +32,30 @@ AETHER_TEST("dock preview layout: thumbnails keep the source aspect ratio inside
         CHECK(std::abs(Width(tile.thumbnail) - Width(tile.thumbnailBox)) < 0.01f ||
               std::abs(Height(tile.thumbnail) - Height(tile.thumbnailBox)) < 0.01f);
         CHECK_NEAR((tile.thumbnail.left + tile.thumbnail.right) / 2, (tile.thumbnailBox.left + tile.thumbnailBox.right) / 2, 0.01f);
-        CHECK(layout.card.width > layout.card.height);  // landscape even for a portrait window
+        CHECK(Width(tile.title) >= 96.0f);  // narrow sources still leave a readable header
         CHECK(Inside(tile.close, tile.tile));
         CHECK_NEAR(tile.close.right, tile.tile.right - PreviewLayoutMetrics{}.tilePadding, 0.001f);  // upper right
         CHECK_NEAR(tile.close.top, tile.tile.top + PreviewLayoutMetrics{}.tilePadding, 0.001f);
         CHECK(Width(tile.close) >= 24.0f);  // a clearly usable target
         CHECK(tile.title.right <= tile.close.left);
+    }
+}
+
+AETHER_TEST("dock preview layout: compact gutters preserve the wide thumbnail at every DPI") {
+    const SIZE source{2560, 1152};
+    for (const UINT dpi : {96u, 144u, 192u}) {
+        const auto layout = LayoutPreviewCard(std::span(&source, 1), dpi);
+        REQUIRE_EQ(layout.tiles.size(), 1u);
+        const auto& tile = layout.tiles[0];
+        CHECK_NEAR(Width(tile.thumbnail), 240.0f, 0.01f);
+        CHECK_NEAR(Height(tile.thumbnail), 108.0f, 0.01f);
+        CHECK_NEAR(tile.thumbnailBox.top, tile.thumbnail.top, 0.01f);
+        CHECK_NEAR(tile.thumbnailBox.bottom, tile.thumbnail.bottom, 0.01f);
+        CHECK(tile.thumbnail.left <= 8.0f);
+        CHECK(layout.card.width - tile.thumbnail.right <= 8.0f);
+        CHECK(tile.thumbnail.top - tile.close.bottom <= 4.0f);
+        CHECK(layout.card.height - tile.thumbnail.bottom <= 8.0f);
+        CHECK(Width(tile.close) >= 28.0f);
     }
 }
 

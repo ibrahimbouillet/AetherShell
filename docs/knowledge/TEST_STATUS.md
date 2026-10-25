@@ -1679,3 +1679,37 @@ pre-swap observations. No unrelated app closure, desktop recording, installation
 The candidate is left running for owner review; actual hover appearance/acceptance is still pending.
 The private waiting host attempts return to installed Alpha 2 after candidate Quit; that restoration
 branch has not been exercised in this trial. Runtime metadata stays ignored in `.local/hover-preview/`.
+
+### S-043 — content-fitted preview cards without shrinking the image (Codex, 2026-10-25)
+
+Scope: D38 / FR-034 / T43, source base `07f28f4` plus the compact geometry patch. The owner confirmed
+the running S-042 prototype works very well but supplied a private screenshot showing excessive
+card whitespace. It was used only as visual feedback and was not copied to the repository.
+
+The existing thumbnail fit formula and 240×150-DIP limits are unchanged. A two-pass layout sizes
+each tile to its fitted image (160-DIP minimum for header readability), with the tallest fitted
+image setting the shared row height. Outer/inner padding changes 6/8→4/4 DIPs; header gap 6→4.
+The 28-DIP X, 16-DIP icon, thumbnail pixels, aspect and no-upscaling policy remain unchanged.
+For one 16:9 source, card 268×212→256×183 DIPs, image still 240×135. A 20:9 source keeps 240×108
+pixels in DIP geometry and removes its unused vertical letterbox. Portrait cards may be taller
+than wide rather than forcing extra landscape space; headers remain readable. Mixed-window rows
+still share height; unknown thumbnails retain a full-size honest placeholder. Capacity remains
+conservative even when a custom minimum header width exceeds the thumbnail limit.
+
+Final Release `/W4 /WX` command:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-codex-hover-review -Jobs 4 `
+  -Target @('aether_dock_tests','aether_dock_integration_tests','AetherShellApp','AetherShell') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_dock_(tests|integration_tests)$' -TestExclude '' `
+  -JUnitFile build/wf-codex-hover-review/compact-preview-final-results.xml
+```
+
+**2/2 CTest executables pass, 48.95 s:** Dock **62 unit cases** (0.27 s), native **11 reported**
+(48.32 s: 10 executed, opt-in recorder skipped). New regression asserts the same 240×108 miniature
+at 96/144/192 DPI, no unused single-image vertical box, edge gutters at most 8 DIPs, header gap at
+most 4 and X at least 28. Existing aspect, no-upscale, multiple-window, source-pixel association,
+close/cancellation, keyboard/UIA and idle cases pass. The old blanket landscape assertion was
+replaced by header readability to honor the compact-content request. No owner app was closed by
+the tests. Runtime relaunch and owner acceptance of the tighter spacing remain separate checks.

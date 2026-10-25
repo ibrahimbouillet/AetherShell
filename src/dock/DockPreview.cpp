@@ -51,7 +51,7 @@ Result<void> RequestNormalClose(const PreviewWindowIdentity& identity) {
 std::size_t PreviewTileCapacity(float available, std::size_t limit, const PreviewLayoutMetrics& m) noexcept {
     limit = std::max<std::size_t>(1, limit);
     if (!std::isfinite(available)) return 1;
-    const float tile = m.thumbnailWidth + 2 * m.tilePadding;
+    const float tile = std::max(m.thumbnailWidth, m.minimumContentWidth) + 2 * m.tilePadding;
     const float usable = available - 2 * m.padding - m.moreWidth - m.gap;
     if (usable <= tile) return 1;
     const auto count = static_cast<std::size_t>(std::floor((usable + m.gap) / (tile + m.gap)));
@@ -61,18 +61,9 @@ std::size_t PreviewTileCapacity(float available, std::size_t limit, const Previe
 PreviewLayout LayoutPreviewCard(std::span<const SIZE> sources, UINT dpi, std::size_t omitted, const PreviewLayoutMetrics& m) {
     PreviewLayout layout;
     const float scale = dpi ? static_cast<float>(dpi) / 96.0f : 1.0f;
-    const float tileWidth = m.thumbnailWidth + 2 * m.tilePadding;
-    const float tileHeight = 2 * m.tilePadding + m.headerHeight + m.headerGap + m.thumbnailHeight;
-    float x = m.padding;
+    std::vector<D2D1_SIZE_F> fitted;
+    float rowHeight = 0;
     for (const SIZE& source : sources) {
-        PreviewTileGeometry tile;
-        tile.tile = {x, m.padding, x + tileWidth, m.padding + tileHeight};
-        const float left = x + m.tilePadding, right = x + tileWidth - m.tilePadding, top = m.padding + m.tilePadding;
-        tile.close = {right - m.headerHeight, top, right, top + m.headerHeight};
-        const float iconTop = top + (m.headerHeight - m.iconSize) / 2;
-        tile.icon = {left + 2, iconTop, left + 2 + m.iconSize, iconTop + m.iconSize};
-        tile.title = {tile.icon.right + 8, top, tile.close.left - 4, top + m.headerHeight};
-        tile.thumbnailBox = {left, top + m.headerHeight + m.headerGap, right, top + m.headerHeight + m.headerGap + m.thumbnailHeight};
         float width = m.thumbnailWidth, height = m.thumbnailHeight;
         if (source.cx > 0 && source.cy > 0) {
             const float sourceWidth = static_cast<float>(source.cx) / scale, sourceHeight = static_cast<float>(source.cy) / scale;
@@ -80,9 +71,25 @@ PreviewLayout LayoutPreviewCard(std::span<const SIZE> sources, UINT dpi, std::si
             width = std::max(1.0f, sourceWidth * fit);
             height = std::max(1.0f, sourceHeight * fit);
         }
+        // Keep the old fit exactly; shrink its surrounding card instead of scaling its pixels down.
+        fitted.push_back({width, height});
+        rowHeight = std::max(rowHeight, height);
+    }
+    const float tileHeight = 2 * m.tilePadding + m.headerHeight + m.headerGap + rowHeight;
+    float x = m.padding;
+    for (const auto& size : fitted) {
+        const float tileWidth = std::max(size.width, m.minimumContentWidth) + 2 * m.tilePadding;
+        PreviewTileGeometry tile;
+        tile.tile = {x, m.padding, x + tileWidth, m.padding + tileHeight};
+        const float left = x + m.tilePadding, right = x + tileWidth - m.tilePadding, top = m.padding + m.tilePadding;
+        tile.close = {right - m.headerHeight, top, right, top + m.headerHeight};
+        const float iconTop = top + (m.headerHeight - m.iconSize) / 2;
+        tile.icon = {left + 2, iconTop, left + 2 + m.iconSize, iconTop + m.iconSize};
+        tile.title = {tile.icon.right + 8, top, tile.close.left - 4, top + m.headerHeight};
+        tile.thumbnailBox = {left, top + m.headerHeight + m.headerGap, right, top + m.headerHeight + m.headerGap + rowHeight};
         const float cx = (tile.thumbnailBox.left + tile.thumbnailBox.right) / 2;
         const float cy = (tile.thumbnailBox.top + tile.thumbnailBox.bottom) / 2;
-        tile.thumbnail = {cx - width / 2, cy - height / 2, cx + width / 2, cy + height / 2};
+        tile.thumbnail = {cx - size.width / 2, cy - size.height / 2, cx + size.width / 2, cy + size.height / 2};
         layout.tiles.push_back(tile);
         x += tileWidth + m.gap;
     }

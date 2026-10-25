@@ -25,7 +25,7 @@ complete window-origin/layout motion remain unqualified.
 is *emphasized* at once: its marker retargets to `kDockMarkerPillWidth`, exactly the foreground
 marker's width, while only the observed foreground keeps the active colour. Emphasis never
 activates anything. After a 0.6 s dwell (deliberately longer than the 0.45 s name tooltip) the
-name tooltip is replaced by `DockPreviewWindow`, a landscape card above the icon. The icon and the
+name tooltip is replaced by `DockPreviewWindow`, a compact card above the icon. The icon and the
 card are one interaction: leaving the icon while a card is shown starts a 0.35 s crossing grace;
 entering the card or returning to the icon keeps both the card and the emphasis; leaving both
 dismisses the card and the marker contracts. A shown card switches to another running icon after
@@ -65,6 +65,14 @@ exposes a UIA list (`"<app> windows"`) with an invokable button per window and a
 button. Titles and pixels are transient: never logged or stored. Dismissal, refresh, suppression,
 DPI/display changes, disabled input and shutdown release every thumbnail. Media play/pause remains a
 later T43 step. Own-window tests cover the above; the owner's real-desktop acceptance is pending.
+
+Owner feedback after the reviewed local trial: the hover interaction works, but the card has too
+much empty space. The compact follow-up (S-043) preserves the existing thumbnail fit and its 240×150
+DIP limits, then sizes each tile to the fitted width (160-DIP header minimum) and the row to the
+tallest fitted thumbnail. Card/tile padding is 4/4 DIPs and header gap is 4; the X stays 28 DIPs.
+Single-window cards no longer reserve a full 150-DIP image row for a shorter image. Portrait cards
+may be taller than wide; header readability is preserved instead of forcing empty landscape space.
+Mixed-window groups retain a common row height, and unknown sources keep the full-size placeholder.
 
 Codex review (S-042) adds input lifetime checks: a pressed tile must keep its original slot and
 HWND/process/thread identity through release; otherwise the gesture is cancelled. Capture loss and

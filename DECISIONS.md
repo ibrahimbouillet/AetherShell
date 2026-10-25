@@ -78,6 +78,11 @@ reviews it. Prioritize true hover previews with selected-window normal-close X, 
 equal-width hover/foreground pills and slower continuous marker motion. Other V3 streams and
 publication remain outside this batch. See [the implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md).
 
+Owner runtime feedback, 2026-10-25: the reviewed hover prototype works very well, but its card has
+excessive empty height and width. Fit the panel around the existing miniature, reducing gutters
+without reducing the thumbnail itself or the usable close button. This accepts the basic interaction,
+not the final card spacing, all of T43 or a V3 release.
+
 ### D39 — One shared active checkout; retain private history as recovery data
 
 Owner-approved organization change, 2026-10-25. Claude and Codex should alternate in one canonical

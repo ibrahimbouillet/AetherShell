@@ -25,6 +25,8 @@ All notable changes to Aether Shell are documented here. The format follows
 - Cancel preview close gestures when capture is lost or a tracker refresh changes the tile's
   identity. Keyboard selection follows the chosen window through reorder and disarms actions when
   that window disappears until the user navigates again.
+- Trim hover-card gutters and fit the panel to its thumbnail content, keeping the rendered
+  miniature size, readable header and close-button target unchanged.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 

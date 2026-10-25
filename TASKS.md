@@ -18,7 +18,9 @@ are outside that first Claude batch. Claude implemented it locally on 2026-10-25
 rows below). Codex's focused independent review and corrections pass S-042. The owner requested a
 local prototype launch; its runtime receipt and the owner's visual acceptance are separate gates.
 The reviewed `f692b9f` prototype is now active in a private profile (HANDOFF/S-042); owner visual
-acceptance is pending. The installed Alpha 2 files and startup remain unchanged.
+acceptance of that basic interaction was received; the owner requested tighter card spacing.
+The compact patch preserves image/X size and passes S-043; its relaunch/spacing acceptance is next.
+The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
@@ -27,7 +29,7 @@ acceptance is pending. The installed Alpha 2 files and startup remain unchanged.
 | T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Compact panel implemented: top padding 12→9 DIPs, default height 70→67, unchanged icons/custom sizes/bottom gap; 96/144/192-DPI geometry checks pass (S-036). No settings migration or installed change. Symmetric work-area prototype and physical visual acceptance remain. |
 | T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Guarded native Windows 11 Quick Settings request and visible fallback preference implemented; fake injection/OS/partial-release and own-window preference tests pass (S-036). Native opening/placement under replacement, signal freshness and icon redesign remain unverified/unstarted. |
 | T42 — Living dot/pill indicators | FR-033; D38 | Claude implementation (S-041), independently reviewed and scoped tests rerun by Codex (S-042): dedicated calmer `Motion().marker` spring (≈0.35 s to 90 %, 0.52 s to 0.1 DIP; magnify unchanged); hover/card emphasis expands a background dot to exactly the foreground width without activation or active colour; activation hold preserves width through the observed transfer. Owner normal-speed real-desktop acceptance pending. |
-| T43 — Live hover cards and selected-window actions | FR-034; D38 | Claude implementation (S-041), Codex input corrections (S-042): genuine DWM thumbnails, normal selected-window close, crossing grace, keyboard and UIA. Three new regressions reproduced wrong-sibling close after reorder and armed cancellation; all pass after identity-preserving focus and gesture cancellation fixes. Card anchor after Dock reflow and source-only resize crop/aspect remain open, along with external-app/DPI runtime acceptance and later media controls. |
+| T43 — Live hover cards and selected-window actions | FR-034; D38 | Claude implementation (S-041), Codex input corrections (S-042); owner confirmed basic hover/preview works, requested tighter spacing. Compact content-fitted cards preserve thumbnail size and 28-DIP X; S-043 passes 62 unit and 10 executed native cases. New spacing acceptance, card anchor after Dock reflow, source-only resize crop/aspect, physical DPI and later media controls remain open. |
 | T44 — Window choreography and corners | FR-036; D38 | [Unwired owned-window prototype](docs/specs/window-corner-investigation.md) implemented: DPI/visible-frame clipping, true maximize/placement preservation, identity/region ownership and reentry-safe conditional restore. Seven new cases pass in the 19-case settings native suite (S-038), using hidden windows and synthetic frame/work observations. Actual DWM/caption/shadow quality, Settings observer wiring, external compatibility and icon-anchored choreography remain open. |
 
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
