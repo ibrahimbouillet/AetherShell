@@ -10,6 +10,15 @@ AppBar policy is unchanged. T40 subsequently reduces panel top padding from 12 t
 height 70→67), preserving icons, baseline and bottom gap. Checks cover 96/144/192 DPI and custom sizes
 (S-036). These patches are not installed over Alpha 2.
 
+T42 adds per-case-normalized application identity marker springs (S-037). Only an observed running
+application has a marker: its 5-DIP background dot expands to a 12-DIP pill while hovered or actually
+foreground. Hover leaves foreground identity and active color unchanged. Retargeting keeps current
+width and velocity; the marker center uses the existing animated icon/reorder geometry. Reduced
+motion/high contrast snap, observed closure removes the marker immediately, and settled markers
+request no further frames. Removal/overflow discards marker state; a later reappearance starts a
+new dot. Pure state tests and existing native Dock checks pass; physical visual acceptance and
+complete window-origin/layout motion remain unqualified.
+
 The native bottom Dock implements the application surface in FR-001 through FR-004: search,
 pinned applications and optional unpinned running applications. It contains no status data.
 The exact APIs are in `src/dock/DockWindow.h`, `DockModel.h` and `DockLayout.h`.

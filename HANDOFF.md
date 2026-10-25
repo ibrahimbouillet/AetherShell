@@ -7,9 +7,9 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — Codex, 2026-10-23 (Europe/Paris)
+## Active continuation — Codex, 2026-10-25 (Europe/Paris)
 
-Last updated: 2026-10-23 (Europe/Paris).
+Last updated: 2026-10-25 (Europe/Paris).
 
 ### Current continuation — V3 accepted for development (D38)
 
@@ -34,13 +34,22 @@ older Windows and opt-out retain the custom panel. Submission is not a native-pa
 do not retry an uncertain chord or open a competing panel. S-036 records passing scoped build/fake
 tests and own-window preference persistence. Actual hidden-taskbar/native-panel behavior is unverified.
 
+T42 now implements a per-application native spring: an observed running dot expands from 5 to
+12 DIPs on hover or real foreground activation, retaining width/velocity through interruption.
+Hover does not activate a window or change its active color, and closed pins never acquire a marker.
+Reduced motion/high contrast snap; stable visible identities survive reorder/model refresh.
+Release `/W4 /WX` passes 43 Dock unit cases and four native cases, 2/2 executables (S-037).
+Physical motion acceptance, measured cadence and complete layout-origin continuity remain open.
+
 The rest is requested/unimplemented: symmetric free edges; trustworthy signal freshness;
-rounded icon redesign; continuous dot/pill feedback;
+rounded icon redesign;
 real hover previews with selected-window close and supported media controls; icon-anchored window
 motion and rounded corners. The owner repeated the maximized-square-corner problem; read the
 [corner investigation](docs/specs/window-corner-investigation.md). Native maximized rounding is
 excluded by Windows policy; a simple DWM hint is not a fix. Start an owned Settings-window prototype
 without silently changing maximized state or manipulating foreign windows.
+Owner-added demo commit `d9095f5` is preserved unchanged. Its media was not captured or reviewed
+in this V3 continuation; do not infer T38 acceptance from the commit alone.
 T38's gallery failure remains open and is deferred behind the new V3 priority. Never publish the
 owner's supplied reference screenshot, which contains unrelated application content.
 

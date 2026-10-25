@@ -61,3 +61,99 @@ AETHER_TEST("dock motion: attention pulse is bounded finite and returns exactly 
     CHECK_EQ(DockAttentionAt(-1).opacity, 0.0f);
     CHECK_EQ(DockAttentionAt(std::numeric_limits<double>::infinity()).height, 0.0f);
 }
+
+namespace {
+void SettleIndicator(DockIndicatorMotion& marker) {
+    for (int frame = 0; frame < 600 && marker.IsAnimating(); ++frame) marker.Step(1.0 / 120);
+    CHECK_FALSE(marker.IsAnimating());
+}
+}
+
+AETHER_TEST("dock indicator: closed pins never show a marker from hover or an unobserved activation") {
+    DockIndicatorMotion marker;
+    const aether::graphics::MotionPolicy policy;
+    marker.Retarget(false, false, true, policy);
+    CHECK_EQ(marker.Width(), 0.0f);
+    CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(false, true, true, policy); // inconsistent foreground input cannot invent running state
+    marker.Step(0.05);
+    CHECK_EQ(marker.Width(), 0.0f);
+    CHECK_FALSE(marker.IsAnimating());
+}
+
+AETHER_TEST("dock indicator: running hover expands continuously and foreground survives pointer leave") {
+    DockIndicatorMotion marker;
+    const aether::graphics::MotionPolicy policy;
+    marker.Retarget(true, false, false, policy);
+    CHECK_EQ(marker.Width(), 5.0f);
+    CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(true, false, true, policy);
+    CHECK_EQ(marker.Width(), 5.0f);
+    CHECK(marker.IsAnimating());
+    marker.Step(0.03);
+    CHECK(marker.Width() > 5); CHECK(marker.Width() < 12);
+    SettleIndicator(marker);
+    CHECK_EQ(marker.Width(), 12.0f);
+    marker.Retarget(true, true, false, policy);
+    CHECK_EQ(marker.Width(), 12.0f);
+    CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(true, false, false, policy);
+    CHECK_EQ(marker.Width(), 12.0f);
+    SettleIndicator(marker);
+    CHECK_EQ(marker.Width(), 5.0f);
+}
+
+AETHER_TEST("dock indicator: rapid reversal and foreground retarget keep in-flight width and momentum") {
+    DockIndicatorMotion marker;
+    const aether::graphics::MotionPolicy policy;
+    marker.Retarget(true, false, true, policy);
+    marker.Step(0.03);
+    const float expanding = marker.Width();
+    marker.Retarget(true, false, false, policy);
+    CHECK_EQ(marker.Width(), expanding);
+    marker.Step(0.001);
+    CHECK(marker.Width() > expanding); // the velocity is retained rather than reset at reversal
+    const float reversed = marker.Width();
+    marker.Retarget(true, true, false, policy);
+    CHECK_EQ(marker.Width(), reversed);
+    SettleIndicator(marker);
+    CHECK_EQ(marker.Width(), 12.0f);
+    marker.Retarget(false, false, true, policy);
+    CHECK_EQ(marker.Width(), 0.0f); // observed closure removes the cue immediately
+    CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(true, false, false, policy);
+    CHECK_EQ(marker.Width(), 5.0f); // a new observed run starts as a dot, without stale pill velocity
+    CHECK_FALSE(marker.IsAnimating());
+}
+
+AETHER_TEST("dock indicator: reduced motion snaps both directions and stops frame demand") {
+    DockIndicatorMotion marker;
+    aether::graphics::MotionPolicy policy;
+    marker.Retarget(true, false, true, policy); marker.Step(0.02);
+    CHECK(marker.IsAnimating());
+    policy.reduced = true;
+    marker.Retarget(true, false, true, policy);
+    CHECK_EQ(marker.Width(), 12.0f); CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(true, false, false, policy);
+    CHECK_EQ(marker.Width(), 5.0f); CHECK_FALSE(marker.IsAnimating());
+    marker.Retarget(false, false, true, policy);
+    CHECK_EQ(marker.Width(), 0.0f); CHECK_FALSE(marker.IsAnimating());
+}
+
+AETHER_TEST("dock indicator: repeated observations preserve the curve at different frame cadences") {
+    DockIndicatorMotion first, second;
+    const aether::graphics::MotionPolicy policy;
+    first.Retarget(true, false, true, policy); second.Retarget(true, false, true, policy);
+    for (int frame = 0; frame < 30; ++frame) {
+        first.Step(0.01);
+        first.Retarget(true, false, true, policy);
+    }
+    for (int frame = 0; frame < 15; ++frame) second.Step(0.02);
+    CHECK(std::abs(first.Width() - second.Width()) < 0.001f);
+    SettleIndicator(first); SettleIndicator(second);
+    CHECK_EQ(first.Width(), second.Width());
+    for (int sample = 0; sample < 100; ++sample) {
+        first.Retarget(true, false, true, policy);
+        CHECK_FALSE(first.IsAnimating());
+    }
+}

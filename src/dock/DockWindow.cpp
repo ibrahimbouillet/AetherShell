@@ -101,6 +101,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::map<std::wstring, graphics::Spring> reorderOffsets;
     std::map<std::wstring, graphics::Spring> presses;
     std::map<std::wstring, graphics::Spring> lifts;
+    std::map<std::wstring, DockIndicatorMotion> indicators;
     std::map<std::wstring, float> baseCenters;
     std::map<std::wstring, double> attentionPulses;
     std::set<std::wstring> attentionLatched;
@@ -117,6 +118,27 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
 
     bool AllowsDecoration() const noexcept {
         return !motion.reduced && tokens.mode != graphics::ThemeMode::HighContrast;
+    }
+    void UpdateIndicators() {
+        auto policy = motion;
+        policy.reduced = !AllowsDecoration();
+        std::set<std::wstring> current;
+        bool moving = false;
+        bool changed = false;
+        for (std::size_t index = 0; index < fitted.items.size(); ++index) {
+            const auto& item = fitted.items[index];
+            if (!item.running) continue;
+            const auto id = text::ToLower(item.id);
+            current.insert(id);
+            auto& marker = indicators[id];
+            const float before = marker.Width();
+            marker.Retarget(true, item.foreground, hovered == index, policy);
+            changed = changed || before != marker.Width();
+            moving = moving || marker.IsAnimating();
+        }
+        changed = std::erase_if(indicators, [&](const auto& entry) { return !current.contains(entry.first); }) > 0 || changed;
+        if (changed) window.Invalidate();
+        if (moving) window.RequestAnimationFrame();
     }
     std::optional<std::size_t> DragIndex() const {
         for (std::size_t i = 0; i < fitted.items.size(); ++i)
@@ -348,7 +370,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
                 moving->second.SetParameters(motion.ScaleSpring(graphics::Motion().slide));
             }
         }
-        (void)Arrange(); UpdateAttention();
+        (void)Arrange(); UpdateAttention(); UpdateIndicators();
         if (!reorderOffsets.empty()) window.RequestAnimationFrame();
         const auto placement = PlaceDock(layout, area, window.Dpi(), fitted.iconSize,
             fitted.magnification, static_cast<float>(settings.bottomMargin), motion.reduced);
@@ -360,6 +382,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         return Ok();
     }
     void SetTargets() {
+        UpdateIndicators();
         auto targets = DockMagnification(fitted.items.size(), fitted.iconSize, static_cast<float>(settings.iconSpacing),
             fitted.magnification, width, pointer ? std::optional<float>(pointer->x) : std::nullopt);
         if (!targets) return;
@@ -759,7 +782,8 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
         }
         if (item.running) {
             const float center = (rect.left + rect.right) / 2;
-            const float half = item.foreground ? 6.0f : 2.5f;
+            const auto marker = impl_->indicators.find(text::ToLower(item.id));
+            const float half = marker == impl_->indicators.end() ? (item.foreground ? 6.0f : 2.5f) : marker->second.Width() / 2;
             graphics::PaintRunningIndicator(context.d2d, {center - half, impl_->layout.panel.bottom - 11,
                 center + half, impl_->layout.panel.bottom - 8}, impl_->tokens,
                 item.foreground ? graphics::IndicatorState::Active : graphics::IndicatorState::Running);
@@ -779,6 +803,7 @@ bool DockWindow::OnAnimate(double now) {
     const double dt = impl_->lastFrame == 0 ? Scheduler().RefreshInterval() : now - impl_->lastFrame;
     impl_->lastFrame = now;
     bool moving = false;
+    for (auto& [id, marker] : impl_->indicators) { (void)id; marker.Step(dt); if (marker.IsAnimating()) moving = true; }
     for (auto& spring : impl_->springs) { spring.Step(dt); if (!spring.IsSettled()) moving = true; }
     for (auto& [id, spring] : impl_->reorderOffsets) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }
     for (auto& [id, spring] : impl_->presses) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }

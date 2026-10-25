@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #pragma once
 
+#include "graphics/Animation.h"
+
 #include <cstddef>
 #include <optional>
 #include <span>
@@ -18,5 +20,20 @@ struct DockAttentionVisual { float opacity = 0; float height = 0; };
 // Three soft finite pulses per real request. Motion policy and static accessible cues are owned
 // by the window; no timer repeats the request after this envelope finishes.
 [[nodiscard]] DockAttentionVisual DockAttentionAt(double elapsed) noexcept;
+
+// The marker belongs to an observed running application, never to a pending launch. Retargets
+// preserve both width and velocity. Its center follows the existing animated icon geometry.
+class DockIndicatorMotion {
+public:
+    void Retarget(bool running, bool foreground, bool hovered,
+        const graphics::MotionPolicy& policy) noexcept;
+    void Step(double elapsed) noexcept { width_.Step(elapsed); }
+    [[nodiscard]] float Width() const noexcept { return width_.Value(); }
+    [[nodiscard]] bool IsAnimating() const noexcept { return !width_.IsSettled(); }
+
+private:
+    bool running_ = false;
+    graphics::Spring width_{0};
+};
 
 } // namespace aether::dock

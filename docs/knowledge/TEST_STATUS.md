@@ -1432,3 +1432,38 @@ the taskbar hidden and UIPI filtering; complete signal freshness/icon redesign; 
 prototype and external compatibility. The installed/published Alpha 2 is unchanged and remains usable.
 These are unreleased V3 source changes; the local executable still carries the existing Alpha 2
 base version, not a newly approved V3 release. No real capture or V3 publication occurred.
+
+### S-037 — continuous running-marker width (Codex, 2026-10-25)
+
+Scope: D38 / FR-033 / T42, source base `d9095f5` plus the Dock patch. The owner's existing demo
+commit is preserved; this gate neither produced nor accepted any presentation media.
+
+**Implemented:** stable case-normalized application IDs retain a native width spring. An observed
+running background marker starts at 5 DIPs, targets 12 while hovered or genuinely foreground, and
+returns to 5 on leave when background. Hover never changes activation/active color. Retargeting
+preserves width and velocity; the center follows existing animated icon/reorder geometry. Closed
+pins have no marker; closure removes one immediately. Reduced motion/high contrast snap, and
+settled widths stop frame demand. Overflow/removal discards state; reappearance starts a new dot.
+
+**Executed focused Release `/W4 /WX` gate:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -Target @('aether_dock_tests','aether_dock_integration_tests','AetherShellApp') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_dock(_integration)?_tests$' -TestExclude '' `
+  -JUnitFile build/alpha2-release/v3-indicator-results.xml
+```
+
+Warning-free build passes; **2/2 executables pass, 15.32 s** (unit 0.09 s; native 14.84 s).
+**43 unit + 4 native cases** pass. Five new deterministic cases cover closed/inconsistent state,
+hover/foreground/leave targets, interrupted reversal momentum and observed closure, instant policy
+changes, repeated observations, finite settlement and equal elapsed time at different step cadences.
+Existing own-window native Dock cases run, including idle/drag checks. Independent source review
+found no major defect; the new tests do not independently measure rendered native marker pixels.
+
+The unwired corner prototype was present during the app compilation; its final source and dedicated
+checks are a separate T44 gate. No owner window, real keyboard/device/startup/work-area setting or
+installed Alpha 2 is changed by the marker tests. Own-window synthetic captures remain local.
+Actual frame cadence, physical motion/visual acceptance, full layout-origin continuity, live previews
+and external-window choreography remain open. No V3 release, installation or real recording occurred.

@@ -30,4 +30,20 @@ DockAttentionVisual DockAttentionAt(double elapsed) noexcept {
     return {pulse * 0.65f, pulse * 6.0f};
 }
 
+void DockIndicatorMotion::Retarget(bool running, bool foreground, bool hovered,
+    const graphics::MotionPolicy& policy) noexcept {
+    if (!running) {
+        // A closed pin must not keep a fading marker or acquire one from hover alone.
+        running_ = false;
+        width_.SnapTo(0);
+        return;
+    }
+    if (!running_) width_.SnapTo(5);
+    running_ = true;
+    width_.SetParameters(policy.ScaleSpring(graphics::Motion().magnify));
+    const float target = foreground || hovered ? 12.0f : 5.0f;
+    if (policy.reduced) width_.SnapTo(target);
+    else width_.SetTarget(target);
+}
+
 } // namespace aether::dock

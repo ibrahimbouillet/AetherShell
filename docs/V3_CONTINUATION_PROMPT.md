@@ -17,7 +17,11 @@ Then continue the compact Dock/default spacing, genuine native Quick Settings/sy
 rounded icons, real Wi-Fi strength/freshness, dot-to-pill motion, live hover previews with close and
 supported media actions, and safe window-motion/corner feasibility in the documented order.
 The compact panel and guarded native Quick Settings request now have a first source implementation;
-read S-036 before repeating checks. Read docs/specs/window-corner-investigation.md for maximized
+read S-036 before repeating checks. T42 dot/pill width motion now has a tested first implementation
+(S-037): observed-running state only, hover/foreground targets, interruptible spring, reduced-motion
+and high-contrast snap, existing animated icon center. Physical acceptance/cadence and complete
+layout-origin continuity remain open; do not label all V3 motion complete.
+Read docs/specs/window-corner-investigation.md for maximized
 corners: insets plus DWMWCP_ROUND do not solve Windows' maximized-window policy. Do not silently
 restore/resize foreign windows to disguise it. Start with the owned Settings-window prototype.
 

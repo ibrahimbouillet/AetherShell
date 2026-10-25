@@ -14,6 +14,8 @@ All notable changes to Aether Shell are documented here. The format follows
 - Request native Windows 11 Quick Settings from the grouped status action when enabled; provide
   an explicit Top Bar preference to retain Aether controls. Native opening still needs device review.
 - Record the V3 design/motion requirements and the unresolved maximized-corner prototype plan.
+- Animate observed running markers from dot to pill on hover/foreground with continuous native
+  springs, preserved active-state identity and immediate reduced-motion/high-contrast feedback.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 
