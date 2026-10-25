@@ -1,0 +1,128 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ibrahim Bouillet
+#include "AetherTest.h"
+#include "app/WindowCorners.h"
+
+using namespace aether;
+using namespace aether::app;
+namespace {
+class FakeCorners final : public IWindowCornerBackend {
+public:
+    CornerWindowObservation observed{12, 34, {-8, -8, 1008, 708}, {0, 0, 1000, 700}, {12, 60, 988, 650}, 96, true};
+    std::optional<CornerRegion> region;
+    std::uintptr_t owner = 0;
+    unsigned writes = 0;
+    bool denyWrite = false;
+    bool denyClaim = false;
+    bool denyObserve = false;
+    bool denyRead = false;
+    Result<CornerWindowObservation> Observe(HWND) override {
+        if (denyObserve) return MakeError(ErrorCode::Unavailable, "synthetic observation failure");
+        return observed;
+    }
+    Result<std::optional<CornerRegion>> ReadRegion(HWND) override {
+        if (denyRead) return MakeError(ErrorCode::Platform, "synthetic region read failure");
+        return region;
+    }
+    Result<void> WriteRegion(HWND, const std::optional<CornerRegion>& value) override {
+        if (denyWrite) return MakeError(ErrorCode::Platform, "synthetic region failure");
+        region = value; ++writes; return Ok();
+    }
+    bool Owns(HWND, std::uintptr_t token) noexcept override { return owner == token; }
+    Result<void> Claim(HWND, std::uintptr_t token) override {
+        if (denyClaim || owner) return MakeError(ErrorCode::AccessDenied, "synthetic claim failure");
+        owner = token; return Ok();
+    }
+    void Release(HWND, std::uintptr_t token) noexcept override { if (owner == token) owner = 0; }
+};
+const auto window = reinterpret_cast<HWND>(std::uintptr_t{17});
+}
+
+AETHER_TEST("window corners: lease clips genuine observed geometry and skips unchanged writes") {
+    FakeCorners backend;
+    auto lease = WindowCornerLease::Acquire(backend, window, 1); REQUIRE(lease.ok());
+    REQUIRE(backend.region.has_value()); CHECK_EQ(backend.writes, 1u);
+    auto refreshed = (*lease)->Refresh(); REQUIRE(refreshed.ok()); CHECK(*refreshed);
+    CHECK_EQ(backend.writes, 1u);
+    backend.observed.dpi = 144;
+    REQUIRE((*lease)->Refresh().ok()); CHECK_EQ(backend.writes, 2u);
+    REQUIRE((*lease)->Restore().ok()); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+    CHECK_EQ(backend.writes, 3u);
+}
+AETHER_TEST("window corners: restore minimize or ineligibility removes only the leased region") {
+    FakeCorners backend;
+    auto lease = WindowCornerLease::Acquire(backend, window, 2); REQUIRE(lease.ok());
+    backend.observed.eligible = false;
+    auto refreshed = (*lease)->Refresh(); REQUIRE(refreshed.ok()); CHECK_FALSE(*refreshed);
+    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: custom existing and replaced application regions are preserved") {
+    FakeCorners backend;
+    const CornerRegion custom{std::byte{1}, std::byte{2}};
+    backend.region = custom;
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 3).ok()); CHECK_EQ(backend.writes, 0u);
+    backend.region.reset();
+    auto lease = WindowCornerLease::Acquire(backend, window, 3); REQUIRE(lease.ok());
+    backend.region = custom;
+    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
+    REQUIRE((*lease)->Restore().ok());
+    CHECK(backend.region == custom); CHECK_EQ(backend.writes, 1u); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: lost lifetime and changed process identity never restore another window") {
+    for (bool lifetimeLost : {false, true}) {
+        FakeCorners backend;
+        auto lease = WindowCornerLease::Acquire(backend, window, 4); REQUIRE(lease.ok());
+        if (lifetimeLost) backend.owner = 99;
+        else ++backend.observed.process;
+        CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
+        REQUIRE((*lease)->Restore().ok());
+        CHECK_EQ(backend.writes, 1u);
+    }
+}
+AETHER_TEST("window corners: refused application and invalid geometry leave no armed property") {
+    FakeCorners backend;
+    backend.denyClaim = true;
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.writes, 0u);
+    backend.denyClaim = false; backend.denyWrite = true;
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.owner, 0u);
+    backend.denyWrite = false; backend.observed.frame = {};
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.owner, 0u);
+    backend.observed.eligible = false;
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok());
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, nullptr, 5).ok());
+    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 0).ok());
+}
+AETHER_TEST("window corners: destructor restores a region while its identity remains owned") {
+    FakeCorners backend;
+    { auto lease = WindowCornerLease::Acquire(backend, window, 6); REQUIRE(lease.ok()); }
+    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.writes, 2u); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: temporary observation read and write failures retain exact recovery ownership") {
+    for (int kind : {0, 1, 2}) {
+        FakeCorners backend;
+        auto lease = WindowCornerLease::Acquire(backend, window, 7); REQUIRE(lease.ok());
+        const auto clipped = backend.region;
+        backend.observed.dpi = 144; // force a real geometry write in the third case
+        if (kind == 0) backend.denyObserve = true;
+        if (kind == 1) backend.denyRead = true;
+        if (kind == 2) backend.denyWrite = true;
+        CHECK_FALSE((*lease)->Refresh().ok()); CHECK((*lease)->HasOwnership());
+        CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
+        CHECK(backend.region == clipped); CHECK_EQ(backend.owner, 7u);
+        backend.denyObserve = backend.denyRead = backend.denyWrite = false;
+        REQUIRE((*lease)->Restore().ok()); CHECK_FALSE((*lease)->HasOwnership());
+        CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+    }
+}
+AETHER_TEST("window corners: internal dispatch rejects malformed handles and preserves normal arguments") {
+    auto normal = DispatchWindowCornerGuard({L"--settings"}); REQUIRE(normal.ok()); CHECK_FALSE(normal->has_value());
+    CHECK_FALSE(DispatchWindowCornerGuard({L"--window-corner-guard"}).ok());
+    CHECK_FALSE(DispatchWindowCornerGuard({L"--window-corner-guard", L"0", L"1", L"2"}).ok());
+    CHECK_FALSE(DispatchWindowCornerGuard({L"--window-corner-guard", L"1x", L"1", L"2"}).ok());
+    CHECK_FALSE(DispatchWindowCornerGuard({L"--window-corner-guard", L"9999999999999999999999", L"1", L"2"}).ok());
+}
+AETHER_TEST("window corners: isolated controller refuses native access without spawning a child") {
+    WindowCorners controller(false, L"not-an-executable");
+    CHECK_FALSE(controller.Request(true).ok()); REQUIRE(controller.Request(false).ok());
+    controller.Stop(); CHECK_FALSE(controller.Request(true).ok());
+}

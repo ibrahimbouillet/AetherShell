@@ -83,6 +83,22 @@ excessive empty height and width. Fit the panel around the existing miniature, r
 without reducing the thumbnail itself or the usable close button. This accepts the basic interaction,
 not the final card spacing, all of T43 or a V3 release.
 
+### D40 — Reversible corners for eligible maximized windows
+
+Owner-requested outcome, 2026-10-25 (FR-036/T44): retain true maximization and add rounded visible
+corners, rather than restoring/resizing normal windows to imitate maximize. Implementation choice:
+a separate child guard observes native geometry events, applies a provisional 12-DIP region lease
+and conditionally restores it on stop or parent exit. The main UI never performs foreign region
+calls. Start only during active taskbar replacement; isolated sessions cannot start the policy.
+
+Use documented APIs, same-user/session/medium-integrity checks and HWND lifetime markers. Preserve
+native placement, original simple regions and application replacements; retain snapshots and retry
+recoverable errors. Skip normal/snapped/full-monitor, shell/security, protected/elevated, owned/tool,
+layered/cloaked and nonstandard-region windows. This is bounded region clipping, not a universal
+antialiased DWM override. A hung target can delay the child; killing the guard itself loses its
+in-memory recovery state. Those limits remain explicit. No elevation, injection, application kill,
+registry change or V3 publication is authorized by this implementation choice. S-045 records proof.
+
 ### D39 — One shared active checkout; retain private history as recovery data
 
 Owner-approved organization change, 2026-10-25. Claude and Codex should alternate in one canonical

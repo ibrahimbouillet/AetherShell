@@ -1750,3 +1750,50 @@ close, and pin/marker/card state after its running group disappears. No owner ap
 Corner work is separate and not qualified by these results. Its first app compilation passed but
 native-fixture compilation failed; no full app gate or real corner deployment is claimed here.
 No push/tag/release or installation change.
+
+### S-045 — guarded genuine-maximize corner policy (Codex, 2026-10-25)
+
+Scope: D40 / FR-036 / T44, source base `568277b` plus the app guard/wiring/tests. The requested
+external corner outcome uses a child process because DWM's preference cannot override maximized
+rounding policy. The main app queues lifecycle requests and never calls foreign `SetWindowRgn`.
+The child uses actual native/DWM/work-area observations, lifetime/property and current-region
+checks, conservative eligibility, a 12-DIP radius and an explicit parent/ready/stop handle list.
+No maximize/placement/style substitution, injection, app termination or startup write.
+
+Independent review found a real recovery defect: an observation/read/write failure could discard
+the only original-region snapshot. Corrected by retaining owned failed leases and retrying at
+250 ms, including conditional shutdown restoration. Temporary observation failures no longer clear
+ownership; application replacements and positively lost identity are preserved. Nine new fake/unit
+cases cover geometry/DPI, unchanged writes, normal restore, custom/replaced regions, lifetime/PID
+loss, failures, destructor cleanup, malformed dispatch and isolated-session refusal.
+
+Focused Release `/W4 /WX` build includes `AetherShellApp`, launcher, Dock/app unit/native targets
+and the test-only parent fixture. Executed through `scripts/build.ps1`,
+`build/wf-codex-hover-review`, targets:
+`aether_dock_tests`, `aether_dock_integration_tests`, `aether_app_tests`,
+`aether_app_integration_tests`, `AetherShellApp`, `AetherShell`;
+`-CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2')`.
+
+Results across the scoped runs (not a single claimed all-green invocation):
+
+- Dock unit **65 pass**, 0.33 s; Dock native **12 reported**, 51.46 s (11 executed, recorder skipped).
+- App unit **49 pass**, 4.50 s, including all nine new corner cases.
+- Final app native **8 pass**, 6.41 s (CTest 1/1, 6.76 s), using
+  `-Target aether_app_integration_tests -Test -TestRegex '^aether_app_integration_tests$' -TestExclude ''`
+  and `-JUnitFile build/wf-codex-hover-review/corners-native-final-results.xml`.
+
+Earlier native fixtures had compile issues and showed normally instead of maximizing; those runs
+were failures. The final fixture uses genuine `SW_SHOWMAXIMIZED` with `WS_EX_NOACTIVATE`, asserts
+`IsZoomed`, maximized placement and unchanged foreground, then observes the actual DWM bounds and
+rounded-region corner membership. It verifies exact prior region restoration on stop, preservation
+of an app's replacement region, and restoration after a real owned fixture process exits without
+signalling stop. Every target is the test's own PID plus explicit HWND whitelist; no owner window
+is modified. The small lifetime helper exits on its event or a bounded timeout, is test-only and
+is excluded by the install payload's explicit file list.
+
+The production inherited child bootstrap is separate from the in-process native guard fixture;
+its ready log/process identity must be checked during the authorized runtime trial. Raster-region
+antialiasing, excluded/shell/protected/elevated/full-monitor/custom windows, physical DPI changes
+and broader compatibility remain unqualified. A target hanging inside synchronous `SetWindowRgn`
+can delay recovery; killing the recovery child loses its in-memory state. No universal recovery or
+all-window rounding guarantee. No real desktop capture, installation, push, tag or release.

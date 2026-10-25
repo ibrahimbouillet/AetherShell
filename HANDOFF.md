@@ -19,14 +19,17 @@ profiles, installations and ambiguous pins stay separate. Pin ID and launch rout
 65 Dock unit cases and the new own-window pin/preview/activation/close regression pass. The supplied
 screenshots remain private.
 
-**Uncommitted corner work in progress:** `src/app/WindowCorners.*`, its unit/native tests and fixture,
-plus `src/app/main.cpp` early guard dispatch and `ShellApplication.cpp` lifecycle wiring. A separate
-child owns reversible maximized-window region leases and watches parent death, with conservative
-eligibility. Root review found a recovery snapshot lost after transient native errors; that fix and
-an owned-helper parent-death regression are being completed before deployment. First product
-compilation passed `/WX`, but the native fixture had a compile error; no full corner gate or owner
-runtime is claimed. The running shell is still the compact `fdc2691` prototype below. Do not run
-the unfinished corner candidate or infer universal foreign-window rounding.
+**Corner implementation and focused gate complete (S-045 / D40):** `src/app/WindowCorners.*` runs
+foreign region calls in a separate recovery child, with early `main.cpp` dispatch and async
+`ShellApplication.cpp` lifecycle wiring. It preserves genuine maximize/placement and snapshots,
+restores only its own region/lifetime, and skips unsupported/system/protected targets. A review bug
+that dropped snapshots after transient errors is fixed and covered by failure/recovery tests.
+Dock unit 65, Dock native 11 executed plus recorder skipped, app unit 49 and app native 8 pass in
+scoped Release `/W4 /WX` runs. Three new own-window native cases cover genuine maximize, prior/app
+region preservation and a real fixture-process death without a stop signal. No owner window was
+modified by tests. The updated real-desktop trial is next; the older compact `fdc2691` prototype is
+still active until a separate runtime receipt. This is eligible-maximized-window raster clipping,
+not universal antialiasing: hung targets may delay recovery and a killed guard loses its snapshots.
 
 **Latest owner feedback — compact preview follow-up (S-043).** The owner confirmed the running
 hover prototype works very well, then requested less empty height/width around the miniature,
@@ -699,7 +702,8 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
    disposable window if testing X. End a trial with that candidate's own `--quit --data-dir` and
    confirm guard restoration before relaunching installed Alpha 2. No new recording without a
    fresh ready reply. Next source work: card anchor on model reflow, source-only resize geometry,
-   then remaining T43 media/physical-DPI qualification. T44 corners remain unwired.
+   then remaining T43 media/physical-DPI qualification. T44's new guarded corner policy is implemented
+   (D40/S-045); establish current runtime and owner visual acceptance before expanding eligibility.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
    `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,

@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
 #include "app/CrashHandler.h"
+#include "app/WindowCorners.h"
 #include "aether/BuildInfo.h"
 #include "core/WorkerPool.h"
 #include "diagnostics/Logger.h"
@@ -14,7 +15,11 @@
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     using namespace aether;
     try {
-        auto command = app::ParseCommandLine(app::ProcessArguments());
+        const auto arguments = app::ProcessArguments();
+        auto guard = app::DispatchWindowCornerGuard(arguments);
+        if (!guard) return 2;
+        if (guard->has_value()) return **guard;
+        auto command = app::ParseCommandLine(arguments);
         if (!command) { ::MessageBoxW(nullptr,L"Unrecognized or invalid Aether Shell command line.",L"Aether Shell",MB_OK|MB_ICONERROR); return 2; }
         if (command->showVersion) { ::MessageBoxW(nullptr, (L"Aether Shell " + std::wstring(build::kVersionW)).c_str(), L"Aether Shell", MB_OK); return 0; }
         // Bootstrap IO completes before the UI exists; it still executes on a background worker.

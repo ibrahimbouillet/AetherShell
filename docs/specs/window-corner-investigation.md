@@ -67,3 +67,36 @@ and icon-anchored choreography remain open. Native region clipping is not an ant
 corner solution or a universal rounding guarantee.
 
 Native ownership/message contract: [SetWindowRgn](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowrgn).
+
+## Guarded maximized-window policy — D40 / S-045, 2026-10-25
+
+The owner repeated the real application corner request. `src/app/WindowCorners.*` now provides a
+separate implementation that reuses the prototype's pure layout calculation. The original
+`MaximizedCornerPrototype` lease class itself remains unwired. `ShellApplication` asynchronously
+requests the new policy only during active, unsuspended taskbar replacement; isolated app sessions
+cannot enable it. `main.cpp` dispatches its internal inherited-handle mode before ordinary settings,
+logging, instance lock or UI bootstrap. No additional startup registration is created.
+
+The separate child observes WinEvents/display/work-area changes and coalesces geometry refreshes.
+It captures a window's process/thread, original simple region and private lifetime marker; intersects
+physical frame/work-area bounds at a provisional 12-DIP radius; and retains genuine maximize and
+placement. Same user/session and non-elevated medium-or-lower integrity are required. Normal/snapped,
+full-monitor, shell/security (including Explorer), parent Aether, owned/tool, layered/cloaked,
+protected/elevated and nonstandard-region windows are skipped. Original rectangular regions are
+accepted only if they contain the clip. App replacements or lost lifetimes win; the child does not
+fight the application. No placement/style change, subclass, injection, process termination or disk
+inventory is involved.
+
+The child watches parent death and a stop event through an explicit three-handle inheritance list.
+Snapshots survive recoverable native errors; owned failures retry at 250 ms. Shutdown removes hooks
+before conditional restoration and the child acknowledges by exiting only after snapshots are no
+longer needed. The parent waits at most five seconds for a slow recovery child, which may stay
+alive until an unresponsive target answers. Hard-killing/crashing the recovery child itself is not
+protected by a second guardian or durable journal. Native foreign HWND writes cannot be atomic.
+Region edges are rasterized, not compositor-antialiased. These are real remaining limits.
+
+S-045 qualifies fake error recovery and genuine own-window WinEvent/DWM geometry, maximize/placement,
+region restoration/replacement and a real fixture-process death. Every native target is restricted
+to the test's own PID and explicit HWND whitelist. The test-only lifetime helper has no windows and
+is excluded from installation payloads. The kernel parent-death branch is tested; actual production
+child dispatch/readiness and external appearance need the separate authorized runtime trial.

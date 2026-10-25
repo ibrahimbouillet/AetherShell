@@ -8,3 +8,9 @@ aether_add_module_library(aether_app EXCLUDE main.cpp
 aether_add_executable(AetherShellApp WIN32 SOURCES main.cpp LINK aether_app)
 aether_add_version_resource(AetherShellApp DESCRIPTION "Aether Shell native desktop interface" INTERNAL_NAME "AetherShellApp")
 aether_add_module_tests(app LINK aether_app)
+if(AETHER_BUILD_TESTS)
+    # Own synthetic lifetime fixture only: not installed or included in release payloads.
+    aether_add_executable(aether_window_corner_parent_fixture WIN32
+        SOURCES "${PROJECT_SOURCE_DIR}/tests/fixtures/app/WindowCornerLifetimeParent.cpp" LINK shell32)
+    add_dependencies(aether_app_integration_tests aether_window_corner_parent_fixture)
+endif()

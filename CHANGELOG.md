@@ -27,6 +27,11 @@ All notable changes to Aether Shell are documented here. The format follows
   that window disappears until the user navigates again.
 - Trim hover-card gutters and fit the panel to its thumbnail content, keeping the rendered
   miniature size, readable header and close-button target unchanged.
+- Keep executable-only desktop windows on their unique matching AUMID pin while retaining
+  explicit profile separation, launch metadata and genuine preview/window identity.
+- Add a separate reversible corner guard for eligible maximized windows during taskbar replacement;
+  preserve maximize/placement and restore owned regions on stop or parent exit. Unsupported
+  windows and compositor-quality antialiasing remain outside this bounded prototype.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 

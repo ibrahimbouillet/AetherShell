@@ -5,6 +5,7 @@
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
 #include "app/WorkAreaInsets.h"
+#include "app/WindowCorners.h"
 
 #include "applications/ShellApplicationCatalog.h"
 #include "applications/ShellApplicationLauncher.h"
@@ -118,6 +119,7 @@ struct ShellApplication::Impl {
     std::unique_ptr<dock::DockWindow> dock;
     std::unique_ptr<topbar::TopBarWindow> topbar;
     std::unique_ptr<TaskbarController> taskbar;
+    std::unique_ptr<WindowCorners> windowCorners;
     std::unique_ptr<WorkAreaInsets> sideInsets;
     std::unique_ptr<controlcenter::ControlCenterWindow> controls;
     std::unique_ptr<controlcenter::MediaBrightness> mediaBrightness;
@@ -243,6 +245,8 @@ struct ShellApplication::Impl {
         // when nothing more is scheduled (the Windows taskbar is back) or while suspended. A failed
         // reservation must never be re-enabled by a restoring callback.
         const bool wanted = settings && settings->Current().general.replaceWindowsTaskbar;
+        if (windowCorners) (void)windowCorners->Request(
+            nativeTaskbarAccess && wanted && update.active && !update.suspended && !closing);
         const bool reserve = ShouldForceDockReservation(taskbarReservationFailed, wanted, update);
         if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
         if (!update.active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
@@ -707,6 +711,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     controls = std::make_unique<controlcenter::ControlCenterWindow>(graphics, scheduler, dispatcher);
     if (auto result = controls->Initialize(); !result) return result;
     sideInsets=std::make_unique<WorkAreaInsets>(nativeTaskbarAccess);
+    windowCorners=std::make_unique<WindowCorners>(nativeTaskbarAccess, paths.executableDir / L"AetherShellApp.exe");
     connections.push_back(controls->Requested.Connect([this](controlcenter::ControlIntent intent) { HandleControl(intent); }));
     connections.push_back(controls->Closed.Connect([this]{
         ++*controlEpoch;controlActionCancellation->Cancel();
@@ -1015,6 +1020,8 @@ void ShellApplication::Impl::Stop() noexcept {
     { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
     {std::lock_guard lock(locationGate->mutex);locationGate->deliver={};}
     connections.clear(); channel.Close();
+    if (windowCorners) windowCorners->Stop();
+    windowCorners.reset();
     controls.reset(); sideInsets.reset();
     if (tracker) tracker->Stop();
     if (updates) updates->Stop();
