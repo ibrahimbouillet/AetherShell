@@ -1797,3 +1797,15 @@ antialiasing, excluded/shell/protected/elevated/full-monitor/custom windows, phy
 and broader compatibility remain unqualified. A target hanging inside synchronous `SetWindowRgn`
 can delay recovery; killing the recovery child loses its in-memory state. No universal recovery or
 all-window rounding guarantee. No real desktop capture, installation, push, tag or release.
+
+**Separate authorized runtime, 12:39 CET:** source `eae2684027b03ab7ac3ec0b6a0e9cf3f98f22e04` rebuilt
+after its local commit and launched in a fresh private profile. The prior compact trial quit normally,
+its host returned installed Alpha 2, then the new bounded swap quit that installed session and
+started the candidate. Independent process/path/hash checks confirm its primary app, taskbar helper
+and corner child, with the correct parent/internal CLI mode. Private logs acknowledge surfaces,
+active taskbar replacement and `window corner guard started`; this exercises the production child
+dispatch/readiness path omitted by the native fixture. Default settings/installed binary hashes,
+startup value and five genuine pins are preserved. The live guard may now apply requested corners
+to eligible owner windows; automated tests never did. The candidate remains active for owner
+verification of the duplicate-icon fix and visible rounding. No owner app was closed/moved, desktop
+recording, installation or publication occurred. Private receipts remain ignored.

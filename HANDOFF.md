@@ -7,7 +7,7 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — Codex review of T42/T43, 2026-10-25 (Europe/Paris)
+## Active continuation — pinned windows and guarded corners, 2026-10-25 (Europe/Paris)
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
 
@@ -27,9 +27,20 @@ that dropped snapshots after transient errors is fixed and covered by failure/re
 Dock unit 65, Dock native 11 executed plus recorder skipped, app unit 49 and app native 8 pass in
 scoped Release `/W4 /WX` runs. Three new own-window native cases cover genuine maximize, prior/app
 region preservation and a real fixture-process death without a stop signal. No owner window was
-modified by tests. The updated real-desktop trial is next; the older compact `fdc2691` prototype is
-still active until a separate runtime receipt. This is eligible-maximized-window raster clipping,
+modified by tests. This is eligible-maximized-window raster clipping,
 not universal antialiasing: hung targets may delay recovery and a killed guard loses its snapshots.
+
+**Current runtime — pin/corner prototype active, 12:39 CET.** Source
+`eae2684027b03ab7ac3ec0b6a0e9cf3f98f22e04` was rebuilt after its local commit and launched through
+the existing bounded private-profile swap. The old compact app/guard exited, installed Alpha 2
+returned, and that installed session was then quit normally before the new app started. A separate
+process/path/hash check confirms the primary app, its taskbar recovery helper and its corner child
+with the correct parent PID/internal mode. Logs acknowledge both surfaces, active taskbar replacement
+and corner-guard readiness. All five genuine pins, installed app/settings hashes and startup value
+are preserved. No unrelated app was closed/moved, no desktop capture was made and no install/push/
+tag/release occurred. The new child may now clip eligible maximized owner windows as requested;
+the tests did not do so. Owner confirmation of the single editor icon and visible corners has been
+requested and is pending. Runtime receipts/host remain ignored under `.local/hover-preview/`.
 
 **Latest owner feedback — compact preview follow-up (S-043).** The owner confirmed the running
 hover prototype works very well, then requested less empty height/width around the miniature,
@@ -40,7 +51,7 @@ and fits the row to its images instead of reserving unused 240×150 boxes. A 16:
 The final scoped Release `/W4 /WX` build and Dock unit/native suites pass (62 unit, 10 native plus
 one opt-in recorder skipped; 2/2 executables, 48.95 s).
 
-**Current runtime — compact prototype active, 11:47 CET.** The rebuilt source
+**Previous runtime — superseded compact prototype, 11:47 CET.** The rebuilt source
 `fdc2691133aa76fe3ad3580de38e433f5cf737ae` is running in a fresh private profile with all five pins.
 Normal Quit of the previous prototype exercised its waiting host's return to installed Alpha 2:
 the old candidate/guard exited and the installed supervisor/app/guard reappeared. The next bounded

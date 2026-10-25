@@ -18,14 +18,15 @@ are outside that first Claude batch. Claude implemented it locally on 2026-10-25
 rows below). Codex's focused independent review and corrections pass S-042. The owner requested a
 local prototype launch; its runtime receipt and the owner's visual acceptance are separate gates.
 The owner accepted the reviewed `f692b9f` prototype's basic interaction and requested tighter card
-spacing. The compact `fdc2691` prototype is now active in a private profile (HANDOFF/S-043), preserving
-image/X size. Its separate process/guard/readiness checks pass; owner spacing acceptance is pending.
+spacing. The compact `fdc2691` prototype preserved image/X size (S-043). The subsequent pin/corner
+prototype `eae2684` is now active in a private profile (S-044/S-045), with app/taskbar/corner-helper
+readiness checked. Owner verification of the single editor icon and visible corners is pending.
 The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
 | T45 — One active shared working folder | NFR-004, NFR-008, NFR-010; D18, D39 | Executed by Claude (S-040). Codex confirmed the official origin, single worktree, local lineage and a fresh successful build (S-042); an unexpected byte-identical launcher folder move was reversed without content edits. Private recovery/archive restore verification remains Claude's receipt. [Addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md). |
-| T46 — Attach executable-only windows to their unique desktop pin | FR-002, FR-003, FR-004, FR-034; NFR-004, NFR-008 | Implemented (S-044): same validated full executable path, argument-free desktop AUMID pin, no conflicting catalog/running identities or ambiguous pins. Explicit profiles remain separate; pin ID/launch route retained. 65 Dock unit cases and one own-window merged-pin preview/activation/close regression pass. Updated real-desktop trial pending. |
+| T46 — Attach executable-only windows to their unique desktop pin | FR-002, FR-003, FR-004, FR-034; NFR-004, NFR-008 | Implemented (S-044): same validated full executable path, argument-free desktop AUMID pin, no conflicting catalog/running identities or ambiguous pins. Explicit profiles remain separate; pin ID/launch route retained. 65 Dock unit cases and one own-window merged-pin preview/activation/close regression pass. Updated runtime is active; owner confirmation pending. |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Initial source patch removes expanded Dock/Top Bar visual HWND regions; outer shadows/entrance decoration are clipped. Focused native-region tests added; final results in S-035. Separate-process input delivery, rounded-corner pixels and physical visual acceptance remain. Not installed into the owner's Alpha 2. |
 | T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Compact panel implemented: top padding 12→9 DIPs, default height 70→67, unchanged icons/custom sizes/bottom gap; 96/144/192-DPI geometry checks pass (S-036). No settings migration or installed change. Symmetric work-area prototype and physical visual acceptance remain. |
 | T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Guarded native Windows 11 Quick Settings request and visible fallback preference implemented; fake injection/OS/partial-release and own-window preference tests pass (S-036). Native opening/placement under replacement, signal freshness and icon redesign remain unverified/unstarted. |
