@@ -100,3 +100,29 @@ region restoration/replacement and a real fixture-process death. Every native ta
 to the test's own PID and explicit HWND whitelist. The test-only lifetime helper has no windows and
 is excluded from installation payloads. The kernel parent-death branch is tested; actual production
 child dispatch/readiness and external appearance need the separate authorized runtime trial.
+
+## Transparent cutout correction — S-046, 2026-10-25
+
+The owner withdrew the apparent acceptance reply and rejected the dark rectangular remainder
+behind the curve. The original tests checked geometry/cleanup, not actual composed corner pixels.
+The new own-window fixture reproduces the defect with a custom non-client frame,
+`WS_EX_NOREDIRECTIONBITMAP` and `DWMSBT_MAINWINDOW`: all four cutouts differ from the real private
+backdrop in both colour phases. Standard and custom GDI frames do not show that defect.
+
+DWM's explicit system material fills the whole rectangular window independently of the region.
+The guard now snapshots the exact supported material and temporarily selects `DWMSBT_NONE`
+for explicit full-window materials. Read-back verifies it before applying the clip. Region and
+material restoration have independent ownership; an app replacing one does not strand the other.
+An app's new material wins and releases our clip. Partial first application stays in the observer
+with a bounded follow-up so recovery state survives a failed region write. No opaque corner
+mask, wallpaper copy, style change or non-client-rendering disable is used.
+
+Removing the system material also changes any transparent interior/title-bar areas that used it;
+it does not remove an application's own compositor content. The fixture therefore includes a
+genuine opaque `CompositionSurface` body and verifies that it remains visible while the outside
+pixels follow the changing backdrop. Exact region/material recovery and app replacements are
+separate assertions. Scope remains the eligible-window policy and this machine's native gate;
+broader OS/DPI compatibility, raster antialiasing and owner visual acceptance remain open.
+
+Documented API: [system backdrop values](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type)
+and [read/write attribute contract](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute).

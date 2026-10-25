@@ -99,6 +99,18 @@ antialiased DWM override. A hung target can delay the child; killing the guard i
 in-memory recovery state. Those limits remain explicit. No elevation, injection, application kill,
 registry change or V3 publication is authorized by this implementation choice. S-045 records proof.
 
+Owner correction / S-046, 2026-10-25: visible cutouts must be genuinely transparent. The initial
+region-only gate missed a DWM full-window material behind the rounded edge. For an explicitly
+selected `MAINWINDOW`, `TRANSIENTWINDOW` or `TABBEDWINDOW` system backdrop, lease `DWMSBT_NONE`
+while the region is managed, retaining the exact original enum independently of the region.
+Only this supported material attribute changes; non-client rendering, window styles, placement
+and application content are preserved. Material removal also affects otherwise-transparent
+interior/title-bar areas, so qualify those with real composition content. Read back before clipping,
+restore only our current material/region, preserve app replacements, and retain partial-application
+recovery snapshots on errors. Unsupported attributes remain unknown; do not invent a policy.
+Pixel evidence must compare the real composed cutouts against a changing private backdrop,
+not just inspect `GetWindowRgn`. Owner visual acceptance remains separate.
+
 ### D39 — One shared active checkout; retain private history as recovery data
 
 Owner-approved organization change, 2026-10-25. Claude and Codex should alternate in one canonical

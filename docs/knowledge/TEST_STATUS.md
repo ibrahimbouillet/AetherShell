@@ -1809,3 +1809,56 @@ startup value and five genuine pins are preserved. The live guard may now apply 
 to eligible owner windows; automated tests never did. The candidate remains active for owner
 verification of the duplicate-icon fix and visible rounding. No owner app was closed/moved, desktop
 recording, installation or publication occurred. Private receipts remain ignored.
+
+### S-046 — transparent cutouts instead of rectangular DWM material (Codex, 2026-10-25)
+
+Scope: D40 / FR-036 / T44. The owner explicitly withdrew the apparent acceptance of the pin/corner
+trial and rejected the dark rectangular remainder around the rounded edge. Neither current fix
+is owner-accepted on the basis of that reply. The supplied crop stays private.
+
+The original S-045 tests established region membership/cleanup only. A new own-window pixel fixture
+reproduced the missing case: custom non-client frame, `WS_EX_NOREDIRECTIONBITMAP` and explicit
+`DWMSBT_MAINWINDOW` failed every corner in both changing-backdrop phases (eight RGB mismatches),
+while the standard and custom GDI cases passed. This was a genuine failed baseline, not a visual
+acceptance claim. Native tests read only small guarded crops fully covered by an opaque own-pattern
+window and the explicit own target; pre/post coverage checks reject unexpected overlays. No capture
+is saved and no owner application is captured or modified by tests.
+
+Correction: independently snapshot the exact supported system material, temporarily select NONE
+for explicit full-window materials, read it back, acquire fresh geometry and apply the region.
+Material and region replacements are conditional and independent; app choices win. Retain a first
+partial application in the observer and schedule a bounded retry rather than losing recovery
+snapshots; abandon application-replaced lifetimes, including during initial acquisition. No style,
+placement or non-client-rendering change. Removing the system material can change transparent
+interior/title-bar areas too; a genuine opaque CompositionSurface body verifies the app content
+survives while the excluded pixels reveal the changing real backdrop.
+
+Nine new unit cases cover exact material restoration, unchanged AUTO/NONE/unavailable policies,
+independent app replacements, first-application recovery, native read/write/restore failures,
+synchronous material reassertion and later application opt-in. The first scoped Release `/W4 /WX`
+app unit run passes **58 cases**, 3.86 s (CTest 1/1, 4.27 s). Subsequent source review added initial
+replacement abandonment; the final gate will rerun this suite.
+
+Intermediate native run: **11 pass, 1 fail**. The final custom-composition/Mica cutout and material
+replacement cases pass; the standard fixture encounters an empty excluded-pixel mask and is under
+diagnosis. Earlier post-fix fixtures also incorrectly used GDI content with NOREDIRECTIONBITMAP
+and assumed DWM never installs its own normal region after a material change. Those fixture
+failures are recorded, not counted as a fully passing gate. No updated runtime, owner acceptance,
+installation, push, tag or release is claimed at this checkpoint.
+
+**Final scoped gate:** the standard fixture now settles its own initial native show/topmost frame
+before guard acquisition, then requires an actual complex region and nonempty excluded-pixel masks.
+No region is forced and RGB assertions are unchanged. Final Release `/W4 /WX` passes **58 app unit
+cases** (4.20 s) and **12 app native cases** (12.42 s), **2/2 CTest executables**, total 17.02 s.
+No skipped backdrop case on this run. All four excluded corner areas exactly match the genuine
+private backdrop in both phases for standard/custom GDI and custom composition/Mica fixtures;
+interior app pixels remain visible. Explicit stop restores MAINWINDOW and application material/
+region replacements survive cleanup. Existing parent-death region recovery remains covered.
+
+Command: `scripts/build.ps1 -Config release -BuildDir build/wf-codex-hover-review`
+with targets `aether_app_tests,aether_app_integration_tests,AetherShellApp,AetherShell`,
+`-CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2')`,
+`-Test -TestRegex '^aether_app_(integration_)?tests$' -TestExclude ''`
+and `-JUnitFile build/wf-codex-hover-review/corner-backdrop-final-results.xml`.
+Raw build/failure evidence remains ignored in `build/corner-*.log`. No universal OS/DPI or
+antialiasing claim. Owner visual acceptance remains pending; no publication or installation.

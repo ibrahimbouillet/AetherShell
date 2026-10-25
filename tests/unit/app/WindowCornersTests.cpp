@@ -16,6 +16,11 @@ public:
     bool denyClaim = false;
     bool denyObserve = false;
     bool denyRead = false;
+    std::optional<DWORD> backdrop;
+    unsigned backdropWrites = 0;
+    bool denyBackdropRead = false;
+    bool denyBackdropWrite = false;
+    bool replaceBackdropOnWrite = false;
     Result<CornerWindowObservation> Observe(HWND) override {
         if (denyObserve) return MakeError(ErrorCode::Unavailable, "synthetic observation failure");
         return observed;
@@ -27,6 +32,14 @@ public:
     Result<void> WriteRegion(HWND, const std::optional<CornerRegion>& value) override {
         if (denyWrite) return MakeError(ErrorCode::Platform, "synthetic region failure");
         region = value; ++writes; return Ok();
+    }
+    Result<std::optional<DWORD>> ReadBackdrop(HWND) override {
+        if (denyBackdropRead) return MakeError(ErrorCode::Platform, "synthetic backdrop read failure");
+        return backdrop;
+    }
+    Result<void> WriteBackdrop(HWND, DWORD value) override {
+        if (denyBackdropWrite) return MakeError(ErrorCode::Platform, "synthetic backdrop write failure");
+        backdrop = replaceBackdropOnWrite ? 4u : value; ++backdropWrites; return Ok();
     }
     bool Owns(HWND, std::uintptr_t token) noexcept override { return owner == token; }
     Result<void> Claim(HWND, std::uintptr_t token) override {
@@ -125,4 +138,84 @@ AETHER_TEST("window corners: isolated controller refuses native access without s
     WindowCorners controller(false, L"not-an-executable");
     CHECK_FALSE(controller.Request(true).ok()); REQUIRE(controller.Request(false).ok());
     controller.Stop(); CHECK_FALSE(controller.Request(true).ok());
+}
+
+AETHER_TEST("window corners: full-window system materials are leased and restored exactly") {
+    for (const DWORD material : {2u, 3u, 4u}) {
+        FakeCorners backend; backend.backdrop = material;
+        auto lease = WindowCornerLease::Acquire(backend, window, 8); REQUIRE(lease.ok());
+        CHECK(backend.backdrop == 1u); CHECK_EQ(backend.backdropWrites, 1u);
+        REQUIRE((*lease)->Refresh().ok()); CHECK_EQ(backend.backdropWrites, 1u);
+        REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == material);
+        CHECK_EQ(backend.backdropWrites, 2u); CHECK_FALSE(backend.region.has_value());
+        CHECK_FALSE((*lease)->HasOwnership());
+    }
+}
+AETHER_TEST("window corners: absent automatic and absent-material policies are never rewritten") {
+    for (const auto material : {std::optional<DWORD>{}, std::optional<DWORD>{0}, std::optional<DWORD>{1}}) {
+        FakeCorners backend; backend.backdrop = material;
+        { auto lease = WindowCornerLease::Acquire(backend, window, 9); REQUIRE(lease.ok()); }
+        CHECK(backend.backdrop == material); CHECK_EQ(backend.backdropWrites, 0u);
+        CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+    }
+}
+AETHER_TEST("window corners: app region replacement still restores the separately leased material") {
+    FakeCorners backend; backend.backdrop = 2;
+    auto lease = WindowCornerLease::Acquire(backend, window, 10); REQUIRE(lease.ok());
+    const CornerRegion replacement{std::byte{5}}; backend.region = replacement;
+    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
+    CHECK(backend.region == replacement); CHECK(backend.backdrop == 2u);
+    CHECK_EQ(backend.writes, 1u); CHECK_EQ(backend.backdropWrites, 2u);
+}
+AETHER_TEST("window corners: app material replacement wins and releases the leased region") {
+    FakeCorners backend; backend.backdrop = 2;
+    auto lease = WindowCornerLease::Acquire(backend, window, 11); REQUIRE(lease.ok());
+    backend.backdrop = 4;
+    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
+    CHECK_FALSE(backend.region.has_value()); CHECK(backend.backdrop == 4u);
+    CHECK_EQ(backend.backdropWrites, 1u);
+}
+AETHER_TEST("window corners: partial first application retains the material recovery snapshot") {
+    FakeCorners backend; backend.backdrop = 3; backend.denyWrite = true;
+    auto lease = WindowCornerLease::Acquire(backend, window, 12); REQUIRE(lease.ok());
+    CHECK((*lease)->HasOwnership()); CHECK(backend.backdrop == 1u); CHECK_FALSE(backend.region.has_value());
+    backend.denyBackdropWrite = true;
+    CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
+    backend.denyBackdropWrite = false;
+    REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == 3u); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: material read and restore failures retain recovery independently of region") {
+    for (const bool failRead : {false, true}) {
+        FakeCorners backend; backend.backdrop = 2;
+        auto lease = WindowCornerLease::Acquire(backend, window, 13); REQUIRE(lease.ok());
+        if (failRead) backend.denyBackdropRead = true;
+        else backend.denyBackdropWrite = true;
+        CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
+        CHECK_FALSE(backend.region.has_value()); CHECK(backend.backdrop == 1u);
+        backend.denyBackdropRead = backend.denyBackdropWrite = false;
+        REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == 2u); CHECK_EQ(backend.owner, 0u);
+    }
+}
+AETHER_TEST("window corners: material acquisition failures never leave untracked mutations") {
+    for (const bool failRead : {false, true}) {
+        FakeCorners backend; backend.backdrop = 2;
+        if (failRead) backend.denyBackdropRead = true;
+        else backend.denyBackdropWrite = true;
+        CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 14).ok());
+        CHECK(backend.backdrop == 2u); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+    }
+}
+AETHER_TEST("window corners: synchronous application material reassertion is not overwritten or clipped") {
+    FakeCorners backend; backend.backdrop = 2; backend.replaceBackdropOnWrite = true;
+    auto lease = WindowCornerLease::Acquire(backend, window, 15);
+    REQUIRE(!lease.ok()); CHECK(lease.error().code == ErrorCode::InvalidState);
+    CHECK(backend.backdrop == 4u); CHECK_FALSE(backend.region.has_value());
+    CHECK_EQ(backend.writes, 0u); CHECK_EQ(backend.backdropWrites, 1u); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: later application material opt-in relinquishes an automatic-policy clip") {
+    FakeCorners backend; backend.backdrop = 0;
+    auto lease = WindowCornerLease::Acquire(backend, window, 16); REQUIRE(lease.ok());
+    backend.backdrop = 2;
+    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
+    CHECK(backend.backdrop == 2u); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.backdropWrites, 0u);
 }

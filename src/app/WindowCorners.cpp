@@ -179,6 +179,21 @@ public:
         if (!::SetWindowRgn(window, native.Get(), TRUE)) return NativeError("Window corner region update failed");
         (void)native.Release(); return Ok();
     }
+    Result<std::optional<DWORD>> ReadBackdrop(HWND window) override {
+        DWORD value = 0;
+        const auto hr = ::DwmGetWindowAttribute(window, DWMWA_SYSTEMBACKDROP_TYPE, &value, sizeof(value));
+        // SYSTEMBACKDROP_TYPE is documented only on Windows 11 build 22621 and later.
+        if (hr == E_INVALIDARG || hr == E_NOTIMPL) return std::optional<DWORD>{};
+        if (FAILED(hr)) return MakeError(ErrorCode::Platform, "Window corner backdrop cannot be read", hr);
+        if (value > DWMSBT_TABBEDWINDOW)
+            return MakeError(ErrorCode::Unsupported, "Window corner backdrop type is not supported");
+        return std::optional<DWORD>{value};
+    }
+    Result<void> WriteBackdrop(HWND window, DWORD value) override {
+        const auto hr = ::DwmSetWindowAttribute(window, DWMWA_SYSTEMBACKDROP_TYPE, &value, sizeof(value));
+        if (FAILED(hr)) return MakeError(ErrorCode::Platform, "Window corner backdrop update failed", hr);
+        return Ok();
+    }
     bool Owns(HWND window, std::uintptr_t token) noexcept override {
         return ::GetPropW(window, kLeaseProperty) == reinterpret_cast<HANDLE>(token);
     }
@@ -229,7 +244,18 @@ struct Observer {
                 abandoned.erase(old);
             }
             auto lease = WindowCornerLease::Acquire(backend, window, ++nextToken);
-            if (lease) leases.emplace(window, std::move(*lease));
+            if (lease) {
+                leases.emplace(window, std::move(*lease));
+                // Also revisit a first application that retained a material snapshot after a
+                // failed region write. Do not rely on that failed write raising a WinEvent.
+                retry = true;
+            } else if (lease.error().code == ErrorCode::InvalidState) {
+                // A synchronous application replacement during first application wins too.
+                // Its own WinEvents must not cause repeated acquisition/material writes.
+                DWORD process = 0;
+                const auto thread = ::GetWindowThreadProcessId(window, &process);
+                if (thread) abandoned[window] = {process, thread};
+            }
         };
         if (options.onlyProcess) { for (const auto window : options.onlyWindows) visit(window); }
         else {
@@ -349,9 +375,17 @@ Result<std::unique_ptr<WindowCornerLease>> WindowCornerLease::Acquire(IWindowCor
     auto lease = std::unique_ptr<WindowCornerLease>(new WindowCornerLease(backend, window, token,
         observed->process, observed->thread));
     lease->original_ = *original; lease->installed_ = *original;
+    auto backdrop = backend.ReadBackdrop(window); if (!backdrop) return backdrop.error();
+    lease->originalBackdrop_ = *backdrop;
     if (auto claim = backend.Claim(window, token); !claim) return claim.error();
     lease->claimed_ = true;
-    auto applied = lease->Refresh(); if (!applied) return applied.error();
+    auto applied = lease->Refresh();
+    if (!applied) {
+        // A material write may have succeeded before the region write failed. Keep that lease
+        // in the observer so a failed rollback cannot discard its only recovery snapshot.
+        if (lease->claimed_ && (lease->applied_ || lease->backdropApplied_)) return lease;
+        return applied.error();
+    }
     if (!*applied) return MakeError(ErrorCode::Unavailable, "Window corner target changed before application");
     return lease;
 } catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease allocation failed"); }
@@ -375,10 +409,40 @@ Result<bool> WindowCornerLease::Refresh() try {
     auto observed = ObserveOwned(); if (!observed) return observed.error();
     auto current = backend_.ReadRegion(window_); if (!current) return current.error();
     if (*current != installed_) {
-        backend_.Release(window_, token_); claimed_ = false; installed_.reset(); applied_ = false;
+        // The app's region wins, but our separately leased material still needs restoration.
+        auto restored = Restore(); if (!restored) return restored.error();
         return MakeError(ErrorCode::InvalidState, "Application replaced its window region");
     }
     if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
+    if (originalBackdrop_) {
+        auto backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
+        if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
+        const DWORD expected = backdropApplied_ ? DWMSBT_NONE : *originalBackdrop_;
+        if (**backdrop != expected) {
+            auto restored = Restore(); if (!restored) return restored.error();
+            return MakeError(ErrorCode::InvalidState, "Application replaced its system backdrop");
+        }
+        if (*originalBackdrop_ >= DWMSBT_MAINWINDOW && !backdropApplied_) {
+            // DWM's system material fills the full rectangular bounds independently of the
+            // window region. Lease NONE while clipped; do not disable non-client rendering.
+            if (auto written = backend_.WriteBackdrop(window_, DWMSBT_NONE); !written) return written.error();
+            backdropApplied_ = true;
+            // The material change may recalculate the visible frame; use a fresh observation.
+            observed = ObserveOwned(); if (!observed) return observed.error();
+            if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
+            backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
+            if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
+            if (**backdrop != DWMSBT_NONE) {
+                auto restored = Restore(); if (!restored) return restored.error();
+                return MakeError(ErrorCode::InvalidState, "Application replaced its backdrop during update");
+            }
+            current = backend_.ReadRegion(window_); if (!current) return current.error();
+            if (*current != installed_) {
+                auto restored = Restore(); if (!restored) return restored.error();
+                return MakeError(ErrorCode::InvalidState, "Application replaced its region during backdrop update");
+            }
+        }
+    }
     auto rounded = RoundedRegion(*observed, original_); if (!rounded) return rounded.error();
     std::optional<CornerRegion> next{std::move(*rounded)};
     if (next == installed_) return true;
@@ -394,17 +458,24 @@ Result<void> WindowCornerLease::Restore() try {
     if (!claimed_) return Ok();
     // Before a successful clip there is no region mutation to undo. This also releases a claim
     // if allocation or the first native write failed during Acquire.
-    if (!applied_) { backend_.Release(window_, token_); claimed_ = false; return Ok(); }
+    if (!applied_ && !backdropApplied_) { backend_.Release(window_, token_); claimed_ = false; return Ok(); }
     auto observed = ObserveOwned();
     if (!observed) return observed.error();
-    auto current = backend_.ReadRegion(window_); if (!current) return current.error();
-    if (*current != installed_) {
-        backend_.Release(window_, token_); claimed_ = false; installed_.reset();
-        return MakeError(ErrorCode::InvalidState, "Application region replacement was preserved");
-    }
     if (applied_) {
-        if (auto written = backend_.WriteRegion(window_, original_); !written) return written;
-        installed_ = original_; applied_ = false;
+        auto current = backend_.ReadRegion(window_); if (!current) return current.error();
+        if (*current == installed_) {
+            if (auto written = backend_.WriteRegion(window_, original_); !written) return written;
+            installed_ = original_;
+        }
+        applied_ = false;
+    }
+    if (backdropApplied_) {
+        auto backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
+        if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop restoration unavailable");
+        if (**backdrop == DWMSBT_NONE) {
+            if (auto written = backend_.WriteBackdrop(window_, *originalBackdrop_); !written) return written;
+        }
+        backdropApplied_ = false;
     }
     backend_.Release(window_, token_); claimed_ = false; return Ok();
 } catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease restoration failed"); }

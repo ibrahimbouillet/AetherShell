@@ -20,7 +20,10 @@ local prototype launch; its runtime receipt and the owner's visual acceptance ar
 The owner accepted the reviewed `f692b9f` prototype's basic interaction and requested tighter card
 spacing. The compact `fdc2691` prototype preserved image/X size (S-043). The subsequent pin/corner
 prototype `eae2684` is now active in a private profile (S-044/S-045), with app/taskbar/corner-helper
-readiness checked. Owner verification of the single editor icon and visible corners is pending.
+readiness checked. The owner withdrew an apparent acceptance reply and rejected the dark remainder
+around the rounded corner; no acceptance of either fix may be inferred from that reply. S-046
+corrects the full-window material and passes the composed-pixel/cleanup gate (58 unit, 12 native).
+Corrected runtime launch and owner visual verification are separate; single-icon verification is pending.
 The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
@@ -32,7 +35,7 @@ The installed Alpha 2 files and startup remain unchanged.
 | T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Guarded native Windows 11 Quick Settings request and visible fallback preference implemented; fake injection/OS/partial-release and own-window preference tests pass (S-036). Native opening/placement under replacement, signal freshness and icon redesign remain unverified/unstarted. |
 | T42 — Living dot/pill indicators | FR-033; D38 | Claude implementation (S-041), independently reviewed and scoped tests rerun by Codex (S-042): dedicated calmer `Motion().marker` spring (≈0.35 s to 90 %, 0.52 s to 0.1 DIP; magnify unchanged); hover/card emphasis expands a background dot to exactly the foreground width without activation or active colour; activation hold preserves width through the observed transfer. Owner normal-speed real-desktop acceptance pending. |
 | T43 — Live hover cards and selected-window actions | FR-034; D38 | Claude implementation (S-041), Codex input corrections (S-042); owner confirmed basic hover/preview works, requested tighter spacing. Compact content-fitted cards preserve thumbnail size and 28-DIP X; S-043 passes 62 unit and 10 executed native cases. New spacing acceptance, card anchor after Dock reflow, source-only resize crop/aspect, physical DPI and later media controls remain open. |
-| T44 — Window choreography and corners | FR-036; D38, D40 | Guarded maximized-window region policy implemented (S-045), reusing S-038 geometry: separate child, actual WinEvent/DWM geometry, lifetime/region ownership, retained recovery snapshots, normal-stop/parent-death cleanup. Nine new unit cases and three own-window native cases pass; genuine maximize/placement and original/app replacement preserved. Supported-target runtime/visual acceptance is next; unsupported windows, antialiasing, guard-self-crash recovery, broad compatibility and icon-anchored choreography remain open. |
+| T44 — Window choreography and corners | FR-036; D38, D40 | Guarded policy implemented (S-045), then owner-rejected rectangular material corrected in S-046: independent exact material/region leases, app replacements preserved, partial-error recovery and bounded retry. 58 app unit and 12 native cases pass, including actual cutout pixels over two changing private backdrop phases with genuine composition content and material restoration. Corrected runtime/owner acceptance remains separate; unsupported windows, antialiasing, guard-self-crash recovery, broad compatibility and icon-anchored choreography remain open. |
 
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
 is published from `ad77019`, with exact-revision Windows CI, audited setup/checksums and a scoped

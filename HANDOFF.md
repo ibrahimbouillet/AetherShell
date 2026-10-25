@@ -11,6 +11,25 @@
 
 Last updated: 2026-10-25, by Codex. Claude has stopped writing; Codex owns the current edits.
 
+**Owner correction — corner appearance rejected, 2026-10-25.** The apparent reply accepting both
+fixes was explicitly withdrawn: the owner was absent and did not provide that validation. Do not
+record acceptance of either fix from that reply. The supplied private corner crop shows a rounded
+edge with an unwanted dark rectangular remainder. The requirement is actual transparent cutouts
+revealing whatever is behind the window, not a painted or wallpaper-matched corner. S-045's native
+tests establish region membership and recovery, not composed-pixel transparency. S-046 now adds
+the missing composed-pixel gate; owner visual acceptance is still pending.
+
+The regression now reproduces the remainder specifically with a custom non-client frame,
+`WS_EX_NOREDIRECTIONBITMAP` and an explicit DWM `MAINWINDOW` material. The correction leases
+`DWMSBT_NONE` separately from the region, preserves app replacements, verifies read-back and
+retains partial-application recovery state. A real composition body remains visible while all
+excluded corner pixels match both private backdrop phases. Final Release `/W4 /WX`: **58 app unit
+and 12 app native cases pass** (2/2 executables, 17.02 s), including standard/custom/Mica frames,
+exact material recovery and independent app replacements. The standard fixture settles its own
+initial native frame before guard acquisition and waits for an actual complex region. The old
+runtime receipt below still identifies `eae2684` until the separate corrected trial is launched;
+do not treat these tests as owner acceptance or publication.
+
 **Current work — pinned/running association and real maximized corners (S-044 / D40).** The owner
 reported a duplicate pinned/running editor icon and repeated the square maximized-corner defect.
 Dock association is corrected and scoped checks pass: a unique argument-free desktop AUMID pin
@@ -713,8 +732,10 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
    disposable window if testing X. End a trial with that candidate's own `--quit --data-dir` and
    confirm guard restoration before relaunching installed Alpha 2. No new recording without a
    fresh ready reply. Next source work: card anchor on model reflow, source-only resize geometry,
-   then remaining T43 media/physical-DPI qualification. T44's new guarded corner policy is implemented
-   (D40/S-045); establish current runtime and owner visual acceptance before expanding eligibility.
+   then remaining T43 media/physical-DPI qualification. The owner rejected the T44 region-only
+   corner appearance (D40/S-045); finish S-046 composed-pixel/material recovery qualification and
+   establish the actual corrected runtime. The apparent acceptance reply was explicitly withdrawn.
+   Obtain genuine owner visual acceptance before expanding eligibility.
 1. Read this public rule, the current D38 V3 continuation and delivered Alpha 2 receipt above,
    `AGENTS.md`, `PROJECT_SPEC.md` FR-031–FR-036, `TASKS.md` T39–T44, D38 in `DECISIONS.md`, and
    `docs/specs/v3-design-and-interaction.md`. Verify official `origin`, branch/HEAD,

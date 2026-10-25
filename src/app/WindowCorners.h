@@ -35,6 +35,9 @@ public:
     virtual Result<CornerWindowObservation> Observe(HWND window) = 0;
     virtual Result<std::optional<CornerRegion>> ReadRegion(HWND window) = 0;
     virtual Result<void> WriteRegion(HWND window, const std::optional<CornerRegion>& region) = 0;
+    // nullopt means this documented attribute is unavailable on this Windows version.
+    virtual Result<std::optional<DWORD>> ReadBackdrop(HWND window) = 0;
+    virtual Result<void> WriteBackdrop(HWND window, DWORD value) = 0;
     virtual bool Owns(HWND window, std::uintptr_t token) noexcept = 0;
     virtual Result<void> Claim(HWND window, std::uintptr_t token) = 0;
     virtual void Release(HWND window, std::uintptr_t token) noexcept = 0;
@@ -64,8 +67,10 @@ private:
     DWORD thread_ = 0;
     std::optional<CornerRegion> original_;
     std::optional<CornerRegion> installed_;
+    std::optional<DWORD> originalBackdrop_;
     bool claimed_ = false;
     bool applied_ = false;
+    bool backdropApplied_ = false;
 };
 
 struct WindowCornerGuardOptions {

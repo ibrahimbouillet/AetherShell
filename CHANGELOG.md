@@ -8,6 +8,9 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ### V3 development
 
+- Remove residual rectangular system material behind rounded maximized-window cutouts, with an
+  independently restored material lease and composed-pixel regression coverage.
+
 - Narrow Dock/Top Bar native input regions to their panels/current icons so decorative outer
   margins do not rely on same-thread-only input forwarding; external shadows are currently clipped.
 - Reduce Dock panel top padding by 3 DIPs while preserving icon sizes and the visible bottom gap.
