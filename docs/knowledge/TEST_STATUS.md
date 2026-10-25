@@ -1506,3 +1506,15 @@ window animation. The helper is default-off by absence of any production caller;
 global corner service. Continue with an opt-in owned Settings observer and visible qualification.
 No new real capture, installation or V3 publication occurred; the local app retains Alpha 2's base
 version. Owner-added media remains untouched, with no new media acceptance claim.
+
+### S-039 — focused Claude implementation handoff (Codex, 2026-10-25)
+
+Documentation-only owner refinement of D38 / FR-033/FR-034 / T42/T43. Source HEAD `35746c8` and a
+clean worktree were inspected before writing the focused implementation prompt. The installed
+Alpha 2 was not inspected, changed or claimed to display the local V3 work. The owner requests
+slower visible marker motion, actual aspect-preserving hover previews with selected-window normal
+close, and pointer continuity; Claude implements and Codex subsequently reviews.
+
+No product source, tests, settings, runtime windows or presentation assets were modified. No tests
+were rerun for this documentation-only change; S-037/S-038 retain their exact historical boundaries.
+The prompt requires focused build/native checks and actual visual inspection for the later code.

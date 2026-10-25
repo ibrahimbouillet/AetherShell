@@ -1,5 +1,9 @@
 # V3 continuation prompt
 
+Owner's immediate instruction (2026-10-25): Claude codes the focused T42/T43 batch and Codex reviews
+afterward. Start with [the dedicated implementation prompt](CLAUDE_V3_HOVER_PROMPT.md), which takes
+priority over the earlier broad ordering below. Do not start unrelated V3 work in that batch.
+
 Continue Aether Shell in the clean public checkout whose origin is
 https://github.com/ibrahimbouillet/AetherShell. Read AGENTS.md, HANDOFF.md including NEXT SESSION
 START HERE, PROJECT_SPEC.md FR-031–FR-036, D38 in DECISIONS.md, TASKS.md T39–T44, and

@@ -73,6 +73,11 @@ without injection, unsafe shell changes or unsupported universal promises. D36 c
 and all public/private boundaries remain binding. T38 media work remains open but is no longer the
 next priority ahead of this explicit V3 request.
 
+Owner refinement, 2026-10-25: Claude implements the next focused T42/T43 batch; Codex independently
+reviews it. Prioritize true hover previews with selected-window normal-close X, pointer continuity,
+equal-width hover/foreground pills and slower continuous marker motion. Other V3 streams and
+publication remain outside this batch. See [the implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md).
+
 ## Open questions and implementation discrepancies
 
 These are not approved new requirements or decisions. Keep their IDs stable; disposition is tracked

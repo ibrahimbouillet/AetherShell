@@ -13,6 +13,15 @@ Last updated: 2026-10-25 (Europe/Paris).
 
 ### Current continuation — V3 accepted for development (D38)
 
+**Owner-directed next batch, 2026-10-25:** Claude implements T42/T43; Codex subsequently reviews.
+Use [the focused Claude implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Prioritize a running
+background app's marker growing to the active marker's width, an actual window preview replacing
+the name tooltip, a selected-window normal-close X, pointer continuity into the preview, and calmer,
+visibly slower marker transitions. On genuine activation, the old/new markers retarget together.
+Do not expand this batch into the corner prototype, other V3 streams or publication. Source base
+`35746c8` remains separate from the unchanged installed Alpha 2; no product code changed for this
+prompt. The owner has not accepted the current motion's visual quality.
+
 The owner accepted the published Alpha 2 and requested a broader V3 design/interaction overhaul.
 The remaining-usage instruction prioritizes an English, traceable handoff, plus an initial input
 correction. Read [the complete V3 work order](docs/specs/v3-design-and-interaction.md), requirements

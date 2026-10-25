@@ -39,6 +39,13 @@ are not proof that another process receives clicks.
 
 ## Living running indicators (FR-033)
 
+Owner clarification, 2026-10-25: the next batch is assigned to Claude for implementation and Codex
+for independent review. Follow [the focused prompt](../CLAUDE_V3_HOVER_PROMPT.md). Marker motion
+must be calmer and perceptibly slower at normal speed. A background hover pill matches the active
+pill's width without changing foreground identity; actual activation retargets old/new markers
+together. If hover already expanded the destination, keep it expanded rather than restarting it.
+The prompt's suggested timing is an initial tuning proposal, not a fixed owner-approved duration.
+
 Use the current running dot and active wider pill as the starting visual language:
 
 | State/action | Desired behavior |
@@ -60,6 +67,10 @@ After a deliberate dwell over a running/background application, replace the text
 a rounded preview card using the same neutral translucent material. Show the actual window content,
 not a fabricated image. Moving into the card must keep it usable; leaving/dismissing it must not
 leave an invisible input window behind. Supply keyboard/UIA access and Escape dismissal.
+Keep the hovered application's marker expanded while the pointer is inside its preview or on X.
+Preserve source aspect ratio, use unambiguous selected-window content, and permit safe travel across
+the icon/card gap. Leaving both returns a background marker to its running dot; the actual active
+application stays wide. Media controls remain a later T43 follow-up after this focused preview/X lot.
 
 The top-right X requests normal closure of the selected real window only on explicit click. For
 multiple windows, identify/select each safely; never close an arbitrary sibling or terminate an app

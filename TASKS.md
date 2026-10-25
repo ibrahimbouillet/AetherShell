@@ -11,13 +11,18 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 [the English continuation prompt](docs/V3_CONTINUATION_PROMPT.md). This is a broader design/motion
 overhaul, not a finished release after one batch. Preserve the installed Alpha 2; no V3 publication yet.
 
+**Immediate owner priority, 2026-10-25:** Claude implements the focused T42/T43 hover-preview and
+slower marker-motion batch; Codex independently reviews afterward. See
+[the exact implementation prompt](docs/CLAUDE_V3_HOVER_PROMPT.md). Other V3 tasks remain open but
+are outside that first Claude batch. No source change or visual acceptance is implied by this prompt.
+
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Initial source patch removes expanded Dock/Top Bar visual HWND regions; outer shadows/entrance decoration are clipped. Focused native-region tests added; final results in S-035. Separate-process input delivery, rounded-corner pixels and physical visual acceptance remain. Not installed into the owner's Alpha 2. |
 | T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Compact panel implemented: top padding 12→9 DIPs, default height 70→67, unchanged icons/custom sizes/bottom gap; 96/144/192-DPI geometry checks pass (S-036). No settings migration or installed change. Symmetric work-area prototype and physical visual acceptance remain. |
 | T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38 | Guarded native Windows 11 Quick Settings request and visible fallback preference implemented; fake injection/OS/partial-release and own-window preference tests pass (S-036). Native opening/placement under replacement, signal freshness and icon redesign remain unverified/unstarted. |
 | T42 — Living dot/pill indicators | FR-033; D38 | Initial width motion implemented: observed-running 5-DIP dot retargets to 12-DIP hover/foreground pill with retained velocity; closed pins stay unmarked, reduced motion/high contrast snap. Stable visible identities retain width through reorder. 43 unit + 4 native Dock cases pass (S-037); physical motion/cadence and complete layout-origin continuity remain unverified. |
-| T43 — Live hover cards and selected-window actions | FR-034; D38 | Requested; thumbnails, normal X close and confidently attributed media controls unstarted. |
+| T43 — Live hover cards and selected-window actions | FR-034; D38 | Next Claude batch: real miniature preview replaces the name tooltip; usable selected-window normal-close X; icon-to-preview pointer continuity keeps the background marker expanded. Preview/close implementation remains unstarted. Confidently attributed media controls remain a later T43 follow-up. |
 | T44 — Window choreography and corners | FR-036; D38 | [Unwired owned-window prototype](docs/specs/window-corner-investigation.md) implemented: DPI/visible-frame clipping, true maximize/placement preservation, identity/region ownership and reentry-safe conditional restore. Seven new cases pass in the 19-case settings native suite (S-038), using hidden windows and synthetic frame/work observations. Actual DWM/caption/shadow quality, Settings observer wiring, external compatibility and icon-anchored choreography remain open. |
 
 **Delivered (D37):** [Alpha 2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
