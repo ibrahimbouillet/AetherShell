@@ -1713,3 +1713,13 @@ most 4 and X at least 28. Existing aspect, no-upscale, multiple-window, source-p
 close/cancellation, keyboard/UIA and idle cases pass. The old blanket landscape assertion was
 replaced by header readability to honor the compact-content request. No owner app was closed by
 the tests. Runtime relaunch and owner acceptance of the tighter spacing remain separate checks.
+
+**Separate runtime, 11:47 CET:** after its local commit, app/guard were rebuilt from
+`fdc2691133aa76fe3ad3580de38e433f5cf737ae` (no further product changes). Normal Quit of S-042's
+candidate exercised the private host's restoration branch: old candidate/guard exited, installed
+Alpha 2 supervisor/app/guard returned. The new trial then quit the installed session normally,
+waited for shutdown/baseline clearance and launched the compact app with fresh cloned settings.
+Surface/taskbar readiness and a second process/path/hash check passed with one adjacent guard and
+five genuine pins. Installed app/settings hashes and startup value stayed unchanged. The compact
+prototype remains active for owner spacing acceptance; no new desktop capture was made. Private
+runtime receipts remain ignored. No installation, push, tag or release.

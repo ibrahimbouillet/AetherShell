@@ -18,8 +18,17 @@ preserves the thumbnail fit and 28-DIP X, trims edge/tile padding to 4/4 DIPs an
 and fits the row to its images instead of reserving unused 240×150 boxes. A 16:9 card changes from
 268×212 to 256×183 DIPs while its image stays 240×135; narrow sources keep a readable header.
 The final scoped Release `/W4 /WX` build and Dock unit/native suites pass (62 unit, 10 native plus
-one opt-in recorder skipped; 2/2 executables, 48.95 s). Candidate relaunch/spacing acceptance is the
-next runtime step; the earlier `f692b9f` prototype remains active until the explicit runtime update.
+one opt-in recorder skipped; 2/2 executables, 48.95 s).
+
+**Current runtime — compact prototype active, 11:47 CET.** The rebuilt source
+`fdc2691133aa76fe3ad3580de38e433f5cf737ae` is running in a fresh private profile with all five pins.
+Normal Quit of the previous prototype exercised its waiting host's return to installed Alpha 2:
+the old candidate/guard exited and the installed supervisor/app/guard reappeared. The next bounded
+swap then quit that installed instance normally and started the compact app. Its surfaces and
+taskbar-replacement readiness were acknowledged; a separate process/path/hash check confirms the
+new candidate and one guard. Installed binary, default settings and startup value are unchanged.
+The compact trial is left active for owner spacing review, which is still pending. Its ignored host
+and receipts remain in `.local/hover-preview/`; no desktop capture, push or release occurred.
 
 **Independent review checkpoint (S-042):** official `origin`, `main`, one worktree and the existing
 local history were checked. The two launcher files had unexpectedly moved to `installer/launcher/`;
@@ -44,7 +53,7 @@ Prepare a private settings clone and an adjacent recovery helper; preserve the i
 files and startup registration. The runtime receipt will identify which binary is actually running.
 No V3 installation, push, tag or release is authorized by this review.
 
-**Runtime — local hover prototype active, 2026-10-25 11:32 CET.** Candidate source is
+**Previous runtime — superseded hover prototype, 2026-10-25 11:32 CET.** Candidate source was
 `f692b9fc8f1e12f7c00f7cf486d2af2bee3f22d3`, rebuilt after its local commit. The installed instance
 was quit normally; its app, supervisor and guard exited and its baseline file was cleared before
 starting the candidate app directly. Independent process/path/hash checks confirm that candidate
@@ -55,7 +64,7 @@ are unchanged. No other user application was closed or hidden and no desktop cap
 The owner confirmed its basic hover interaction works and requested the compact follow-up above.
 It retains Alpha 2 version metadata and is **not** an installed/released Alpha 3.
 An ignored local session host waits for candidate exit and attempts to relaunch installed Alpha 2
-after app/guard shutdown; that return path has not yet been exercised in this trial. Its script and
+after app/guard shutdown; this path was exercised during the compact follow-up above. Its script and
 runtime receipts are under `.local/hover-preview/`, never public. Startup still targets installed
 Alpha 2. Do not overwrite the private trial's settings or interrupt it without checking current state.
 
@@ -657,7 +666,7 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-0. **Read S-042 and the current runtime receipt before changing a running shell.** Codex completed
+0. **Read S-042/S-043 and the current runtime receipt before changing a running shell.** Codex completed
    the focused source review, repaired the byte-identical launcher move, reproduced and corrected
    three input defects, and passed the scoped Release gate. Do not repeat the old failed configure
    in `build/v3-release`; the working review build is `build/wf-codex-hover-review`.

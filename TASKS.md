@@ -17,9 +17,9 @@ slower marker-motion batch; Codex independently reviews afterward. See
 are outside that first Claude batch. Claude implemented it locally on 2026-10-25 (S-041, T42/T43
 rows below). Codex's focused independent review and corrections pass S-042. The owner requested a
 local prototype launch; its runtime receipt and the owner's visual acceptance are separate gates.
-The reviewed `f692b9f` prototype is now active in a private profile (HANDOFF/S-042); owner visual
-acceptance of that basic interaction was received; the owner requested tighter card spacing.
-The compact patch preserves image/X size and passes S-043; its relaunch/spacing acceptance is next.
+The owner accepted the reviewed `f692b9f` prototype's basic interaction and requested tighter card
+spacing. The compact `fdc2691` prototype is now active in a private profile (HANDOFF/S-043), preserving
+image/X size. Its separate process/guard/readiness checks pass; owner spacing acceptance is pending.
 The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
