@@ -46,8 +46,12 @@ rounded icon redesign;
 real hover previews with selected-window close and supported media controls; icon-anchored window
 motion and rounded corners. The owner repeated the maximized-square-corner problem; read the
 [corner investigation](docs/specs/window-corner-investigation.md). Native maximized rounding is
-excluded by Windows policy; a simple DWM hint is not a fix. Start an owned Settings-window prototype
-without silently changing maximized state or manipulating foreign windows.
+excluded by Windows policy; a simple DWM hint is not a fix. T44 now has an unwired owned-window
+region prototype with true maximize/placement preservation, DPI geometry, identity, conditional
+cleanup and synchronous-message reentry checks. S-038 passes seven new prototype cases inside the
+19-case settings native suite. Fixtures are hidden with synthetic frame/work observations; no actual
+DWM appearance or caption quality is established. Next: opt-in Settings-window observer/visible
+qualification, without silently changing maximize semantics or manipulating foreign windows.
 Owner-added demo commit `d9095f5` is preserved unchanged. Its media was not captured or reviewed
 in this V3 continuation; do not infer T38 acceptance from the commit alone.
 T38's gallery failure remains open and is deferred behind the new V3 priority. Never publish the

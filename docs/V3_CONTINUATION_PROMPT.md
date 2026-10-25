@@ -23,7 +23,11 @@ and high-contrast snap, existing animated icon center. Physical acceptance/caden
 layout-origin continuity remain open; do not label all V3 motion complete.
 Read docs/specs/window-corner-investigation.md for maximized
 corners: insets plus DWMWCP_ROUND do not solve Windows' maximized-window policy. Do not silently
-restore/resize foreign windows to disguise it. Start with the owned Settings-window prototype.
+restore/resize foreign windows to disguise it. S-038 covers the now-implemented but unwired
+MaximizedCornerPrototype helper: hidden own-window geometry/ownership/maximize tests pass, using
+synthetic frame/work observations. Next attach an opt-in observer to the owned Settings window,
+acquire fresh real DWM bounds and qualify visible caption/shadow/corner behavior. Restore on every
+state/disable/exit path; never generalize the hidden tests into a universal rounding claim.
 
 Keep observed Windows data truthful and unsupported behavior explicit. No process injection,
 Explorer replacement, silent elevation, private logs/assets in Git, or invented preview pixels.

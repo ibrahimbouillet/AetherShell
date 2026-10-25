@@ -1467,3 +1467,42 @@ checks are a separate T44 gate. No owner window, real keyboard/device/startup/wo
 installed Alpha 2 is changed by the marker tests. Own-window synthetic captures remain local.
 Actual frame cadence, physical motion/visual acceptance, full layout-origin continuity, live previews
 and external-window choreography remain open. No V3 release, installation or real recording occurred.
+
+### S-038 — unwired maximized-corner prototype (Codex, 2026-10-25)
+
+Scope: D38 / FR-036 / T44, continued from `d9095f5` with the tested T42 patch. The final source
+includes the reentrancy correction described below. No SettingsWindow production caller is added.
+
+**Implemented experimental helper:** physical native/DWM-visible/work-area intersection and
+window-local DPI-scaled radius, rejecting invalid/overflow/empty bounds. Attach requires own PID,
+owning UI thread and a top-level standard left-to-right resizable HWND. Apply requires genuine
+maximized, non-minimized state. A private property retains window-lifetime identity; original
+HRGN content is intersected and only private copies retained. USER32 gets ownership after successful
+SetWindowRgn. Unchanged regions are skipped; conditional restoration preserves a later replacement
+or lost identity. Root review identified synchronous SetWindowRgn message reentry: a busy guard
+and own-WndProc regression were added before the final build. Destructor cleanup contains errors.
+
+**Executed focused Release `/W4 /WX` gate:**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/alpha2-release -Jobs 2 `
+  -Target @('aether_settings_ui_integration_tests','AetherShellApp') `
+  -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_VERSION_PRERELEASE=alpha.2') `
+  -Test -TestRegex '^aether_settings_ui_integration_tests$' -TestExclude '' `
+  -JUnitFile build/alpha2-release/v3-maximized-corner-prototype-results.xml
+```
+
+Warning-free build passes; **1/1 executable, 19 cases pass, 6.44 s** (native executable 6.34 s).
+Seven added cases cover 96/144/192-DPI/negative-origin/small/overflow geometry, hidden genuine
+maximize/placement preservation, rounded-region point membership, original nonrectangular region
+intersection/restoration, replacement-region preservation, synchronous Apply/Restore reentry and
+normal/wrong-thread/destroyed-identity rejection. Independent source review found no further major
+defect. Windows are owned and never shown or activated; frame/work-area observations are synthetic.
+No real work-area/device/startup setting, owner window or installed Alpha 2 is changed.
+
+**Not established:** actual DWM frame observation/wiring, antialiased appearance, visible/input pixel
+quality, caption buttons/content, snap/restore transitions, foreign compatibility or icon-anchored
+window animation. The helper is default-off by absence of any production caller; it is not a shipped
+global corner service. Continue with an opt-in owned Settings observer and visible qualification.
+No new real capture, installation or V3 publication occurred; the local app retains Alpha 2's base
+version. Owner-added media remains untouched, with no new media acceptance claim.

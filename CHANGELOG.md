@@ -16,6 +16,8 @@ All notable changes to Aether Shell are documented here. The format follows
 - Record the V3 design/motion requirements and the unresolved maximized-corner prototype plan.
 - Animate observed running markers from dot to pill on hover/foreground with continuous native
   springs, preserved active-state identity and immediate reduced-motion/high-contrast feedback.
+- Add an unwired owned-window corner prototype with DPI clipping, true-maximize preservation,
+  region/identity ownership and conditional restore; visible/external qualification remains open.
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 
