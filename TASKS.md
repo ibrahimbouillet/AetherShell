@@ -17,6 +17,9 @@ the logo menu, every Settings page/control and all Aether-owned supporting inter
 Reuse the neutral glass identity while preserving native input/accessibility, real actions,
 consent/save behavior and the current private trial. Codex independently reviews afterward.
 The brief and requirements are recorded; this redesign is **unstarted**, not an implemented theme.
+Owner clarification: T47 also requires the complete installer/maintenance UI, from welcome/licence/
+options through progress, completion/errors, upgrade, repair and uninstall; a branding-only pass
+does not satisfy it. Preserve the installation engine and validate in isolated setup fixtures.
 
 **Earlier owner priority, 2026-10-25:** Claude implements the focused T42/T43 hover-preview and
 slower marker-motion batch; Codex independently reviews afterward. See

@@ -92,6 +92,12 @@ current stock white Settings form or opaque owner-drawn menu is insufficient. Au
 surface/state, implement shared presentation components and verify actual composed appearance.
 Use the [Claude implementation brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md).
 
+Owner follow-up the same day explicitly includes the complete installer/maintenance presentation:
+welcome, licence, options/consent, progress/cancellation, finish/errors, upgrade, repair and uninstall.
+It is a required visual redesign, not an optional branding-only pass. Preserve the existing
+deployment engine, trust/rollback/data/startup policies and clean-machine independence; validate
+the real setup target and isolated test wizard without modifying the owner's installed Alpha 2.
+
 The owner assigns implementation to Claude and subsequent independent review to Codex. This is
 the next V3 development priority, not completion/publication of V3. Preserve the usable private
 prototype, installed Alpha 2, taskbar/material recovery, pin identity, compact previews and exact

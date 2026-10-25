@@ -23,6 +23,10 @@ material, restrained rim, refined icons/type and deliberate fluid motion. Follow
 Codex reviews afterward. This turn records the prompt/requirements only; no runtime/source change
 or new build/visual acceptance is claimed. Settings currently lacks shared theme/motion routing;
 the existing HMENU DC owner-draw path remains opaque. Preserve native editor/UIA/consent behavior.
+The owner's follow-up explicitly requires the complete installer too: welcome/licence/options,
+progress/cancellation, finish/errors, upgrade, repair and uninstall. The brief now has mandatory
+installer-specific acceptance; a branding-only pass or application-only result does not finish T47.
+Preserve the deployment engine and installed Alpha 2; this clarification is documentation only.
 
 **Current runtime — both corrections active, 13:51 CET.** Source
 `661a4cd46fbd0e57e75291e8f56dc0c4b8e5629e` was rebuilt after its local commit and launched in a

@@ -1909,3 +1909,10 @@ native input/UIA constraints, consent/draft/save/update preservation, real backd
 focused Release gates, safe local prototype launch and review/handoff duties. Requirements/task/
 decision links updated. The redesign is unstarted. No C++ code, running instance, settings,
 installation or release changed; no new build/test or owner visual acceptance is claimed.
+
+Owner follow-up explicitly includes a full installer/maintenance visual redesign in T47. The
+brief now lists welcome/licence/options, progress/cancel/result/error and upgrade/repair/uninstall
+coverage, clean-machine operation and isolated setup target gates. `installer/CMakeLists.txt` and
+the installer module note were inspected; setup is the project's own native wizard with a separate
+test-only isolated target. This is a scope clarification only; no setup build, installation or
+visual qualification was performed in this documentation turn.

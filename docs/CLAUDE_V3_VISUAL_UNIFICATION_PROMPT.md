@@ -13,8 +13,8 @@ https://github.com/ibrahimbouillet/AetherShell, then inspect HEAD and staged/uns
 Do not create another clone/worktree, reset files, discard drafts, or assume another assistant has
 finished because a previous response says so. Coordinate disjoint files if using parallel agents.
 
-Read AGENTS.md, HANDOFF.md including NEXT SESSION START HERE, PROJECT_SPEC.md FR-011/FR-015/FR-022/
-FR-026/FR-034/FR-037 and NFR-001–NFR-011, TASKS.md T47, DECISIONS.md D26/D27/D38–D41,
+Read AGENTS.md, HANDOFF.md including NEXT SESSION START HERE, PROJECT_SPEC.md FR-011/FR-015/FR-016/
+FR-019–FR-022/FR-026/FR-034/FR-037 and NFR-001–NFR-011, TASKS.md T47, DECISIONS.md D26/D27/D38–D41,
 docs/specs/v3-design-and-interaction.md, and the relevant graphics/UI/settings module notes.
 Read TEST_STATUS S-046/S-047 before altering the latest rendering fixes. Markdown and current
 source are the shared contract; optional Graphify/Obsidian availability is not a prerequisite.
@@ -106,14 +106,53 @@ Inventory includes:
 4. Aether-owned reset, save failure, diagnostic export, permission explanation and quit flows.
 5. Dock context menus, preview chrome/tooltips, Search, Aether quick-controls/flyouts and any other
    owned popup. Reuse what is already coherent; change only the parts that violate the shared style.
-6. Owned installer/update/recovery presentation where it exists: inventory its current limitations,
-   align supported branding/colours/typography without replacing the deployment engine, creating
-   new autoruns or publishing a package. If the engine imposes a native opaque surface, record the
-   precise bounded exception and its reason instead of pretending it has compositor glass.
+6. **The complete installer and maintenance interface is mandatory in this redesign**, not an
+   optional branding pass. Include fresh installation, upgrade, repair, uninstall and recovery
+   presentation, preserving the existing safe deployment engine and consent policies. Follow
+   the installer-specific acceptance below; do not leave the current stock wizard untouched.
 
 Native Windows Settings, Quick Settings, UAC/security prompts, system permission dialogs, file
 pickers and other applications remain Windows-owned. Do not impersonate, embed, reskin or hook
 those interfaces. Aether's explanation before handing off to Windows must still be coherent.
+
+### Installer and maintenance specifics — explicitly confirmed by the owner
+
+The first screen a new user sees must already feel like Aether. Apply the same neutral frosted
+material, fine grain, restrained rim, rounded native icon family, typography, spacing and motion
+to the actual installer in `installer/main.cpp`. A logo/banner replacement or recoloured old
+wizard is insufficient. Read `docs/modules/installer.md`, `docs/modules/install.md`,
+`installer/CMakeLists.txt` and the existing isolated setup tests before editing.
+
+Cover the full journey and every available state:
+
+- Welcome/product identity and the explanation of reversible taskbar replacement.
+- Readable complete MIT licence, acceptance/navigation and keyboard access.
+- Installation destination/Browse, shortcuts, sign-in startup choice and existing-setting state.
+- Genuine installation/upgrade progress, verification state, cancellation availability and any
+  point after which atomic activation must finish. Unknown progress stays indeterminate.
+- Finish/launch choice, failure/retry guidance and recovery instructions.
+- Repair and uninstall entry, confirmation, progress, result and explicit keep/remove-data choices.
+
+Preserve D34's disclosed startup choice and opt-out, existing choices/Task Manager disables,
+the restore-taskbar shortcut, safe process handoff, exact embedded payload/hash verification,
+transaction/rollback and user-data preservation. Do not change command-line/silent behaviour,
+exit codes, elevation policy or registration semantics for visual reasons.
+
+Setup must work on a clean supported machine **before Aether is installed**, using its bundled
+resources and supported Windows components. Do not depend on an existing Aether process, user
+profile, developer tools, downloaded fonts or a new heavyweight runtime. Share suitable rendering
+primitives/resources without coupling setup to the running Dock or settings instance. Keep an
+intentional accessible opaque fallback when glass is unavailable, and a reliable native emergency
+error path before graphics starts; these bounded fallbacks do not exempt the normal wizard from
+the redesign. Windows-owned Browse/security/SmartScreen interfaces remain native.
+
+Build the real `AetherShellSetup` and isolated `AetherShellSetupTest` targets. Inspect all wizard
+and maintenance pages over owned private backdrops, including keyboard, text scaling, small
+viewport, DPI, contrast, cancellation and error states. Use temporary roots and the existing
+test-only isolation path: no real installation, startup/registry change, owner-app closure or
+uninstall on the owner's computer for automated checks. Produce a reviewable setup candidate,
+without installing over Alpha 2 or publishing it. A working application-only redesign does not
+complete T47 while the installer is still unfinished.
 
 ### Logo menu specifics
 
