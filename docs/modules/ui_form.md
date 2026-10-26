@@ -49,11 +49,44 @@ buttons wrap in the shared painter as well as in the fallback path.
 Containers forward `WM_COMMAND`, `WM_NOTIFY` and control-originated `WM_HSCROLL`/`WM_VSCROLL` to the
 form window, so owners see notifications exactly as from direct children.
 
+## Moving presentation (D43, SF-01, 2026-10-26)
+
+The owner saw scrolled Settings content break apart and reassemble on release. Reproduced in an
+own-window frame sequence (S-052): during wheel scrolling the scene was composed from children
+painted at different positions, and the opaque layered editors (a separate DWM channel) could reach
+the screen one frame apart from the form surface. Three shared changes remove it:
+
+- **Atomic present.** `Present(container)` renders the container and every visible registered
+  descendant in one pass and copies it with one blit through the container's window DC (child
+  windows are not clipped out), then validates everything it drew. `PresentMove` renders the frame at
+  the destination first, moves the canvas (`SWP_NOREDRAW | SWP_NOCOPYBITS`) and blits immediately
+  behind the move. Scrolling, container fades and hover tweens of a scrolling page all present through
+  the outermost registered container (`PresentRoot`), never by letting children repaint themselves.
+- **Editor masking.** Each layered editor's private image (PrintWindow) is kept current underneath it
+  at rest. While a container moves, the scene draws those images and the live editors stay in place
+  at the smallest nonzero opacity: still focusable, hit-testable and accessible; any key, pointer or
+  IME input reveals an editor at once. One identical frame is held at each transition
+  (Imaging → Holding → Moving → Revealing), so whichever composition channel arrives first shows the
+  same pixels. No live control is replaced by a snapshot at rest.
+- **Retained layers (Acrylic).** A cached material layer, a content layer in plain premultiplied
+  memory shifted by row moves, and a scratch target that renders only the newly exposed or dirty
+  rectangles (plus the scroll indicator overlay) keep the per-frame UI-thread cost small. Control
+  visuals are cached per control and re-rendered only after their own repaint, update region or tween.
+  Layers are prepared during idle after a page is built. Solid and Native materials render the full
+  scene each frame through the same atomic path. `Stats()` reports the UI-thread cost and cache use.
+
+`ClientOriginPx(hwnd)` gives decorators the origin of a moving canvas inside the frame being
+rendered. `SetTheme` rebuilds only when the appearance actually changed (`SameAppearance`), so a
+repeated theme notification does not drop the retained layers.
+
 ## Motion
 
 Hover, press, switch knob, navigation indicator and the page `FadeIn` use elapsed-time tweens with
 `form.feedback`, `form.indicator` and `form.page`, scaled by `MotionPolicy` (reduced motion is
-instant). Frames come from the optional `FrameScheduler`, otherwise a 16 ms timer that is killed as
+instant). Field wells animate a hover rim and navigation/list rows tween their hover fill; containers
+themselves take no hover (a pointer resting over a scrolling page must not repaint it piecemeal).
+The scheduler keeps a steady cadence while animating (each frame is due one interval after the
+previous frame's start, not after its end). Frames come from the optional `FrameScheduler`, otherwise a 16 ms timer that is killed as
 soon as everything settles; `Animating()` stays true until the final settled repaint. A state change
 that does not move (reduced motion) repaints once without starting frames. Indeterminate progress
 and the busy status ring animate only while visible and the window is not minimized.
@@ -68,7 +101,11 @@ overlay indicator child at the trailing edge (`GutterPx()` must be kept free of 
 moves the canvas without copying bits; wheel, `WM_VSCROLL` codes (`HandleScrollCode`, including the
 thumb position), `EnsureVisible`/`RevealFocus` and short animated scrolls are supported. The
 viewport answers `WM_GETOBJECT` with a UI Automation provider exposing the Scroll pattern merged with
-its native HWND provider.
+its native HWND provider. Wheel notches glide on a critically damped spring
+(stiffness 720, damping ratio 1): a burst or reversal retargets it with continuous velocity and the
+spring rests within 0.35 px / 6 px/s. Fractional precision-touchpad deltas move the view at once
+(carrying a glide in flight along), thumb drags follow the pointer, and line steps, immediate
+`ScrollTo` jumps and policy/layout clamps present at once. Reduced motion scrolls without animation.
 
 ## ConfirmDialog
 

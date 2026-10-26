@@ -10,6 +10,7 @@
 #include "status/StatusTypes.h"
 #include "ui/SurfaceWindow.h"
 
+#include <cstdint>
 #include <memory>
 
 namespace aether::controlcenter {
@@ -27,25 +28,41 @@ struct ControlCenterState {
 };
 
 enum class ControlIntentKind { SystemTile, SystemSettings, Volume, Brightness, ToggleMute,
-    MediaPrevious, MediaPlayPause, MediaNext, SelectMedia, SoundSettings, DisplaySettings, BatterySettings, AllSettings };
+    MediaPrevious, MediaPlayPause, MediaNext, SelectMedia, SoundSettings, DisplaySettings, BatterySettings, AllSettings,
+    NetworkList,          // Windows' own list of available networks (ms-availablenetworks:)
+    Accessibility,        // `feature`: a Windows accessibility start/stop shortcut or its settings page
+    StickyKeys,           // `enabled`: the documented Sticky Keys setting
+    VolumeMixer };        // Windows' volume mixer page
 struct ControlIntent {
     ControlIntentKind kind = ControlIntentKind::SystemTile;
     SystemControl control = SystemControl::Settings;
+    AccessibilityFeature feature = AccessibilityFeature::Settings;
     std::optional<bool> enabled;
     std::optional<int> percent;
     std::uint64_t session = 0;
 };
 
-// Presentation and input only. The host supplies real snapshots and handles explicit intents on
-// workers/providers; constructing or showing this window never changes a system setting.
+// The Aether-owned quick-controls panel (D44): a compact Windows-style panel of split radio tiles,
+// action tiles, two pages, brightness and volume sliders and a battery/settings footer, with Wi-Fi,
+// Bluetooth, Accessibility and sound-output detail views and a compact media card only while a real
+// session exists. Presentation and input only: the host supplies real snapshots and handles explicit
+// intents on workers/providers; constructing or showing this window never changes a system setting.
+// Capabilities Windows offers no documented control for (airplane mode, energy saver, night light,
+// hotspot, nearby sharing) are marked as opening Windows Settings, never as working on/off toggles.
 class ControlCenterWindow final : public ui::SurfaceWindow {
 public:
     ControlCenterWindow(graphics::GraphicsDevice& graphics, graphics::FrameScheduler& scheduler,
                         IUiDispatcher& dispatcher);
     ~ControlCenterWindow() override;
     [[nodiscard]] Result<void> Initialize();
-    [[nodiscard]] Result<void> Toggle(const RECT& anchorPx);
+    // Opens right-aligned directly below `anchorPx` (the Top Bar group, screen pixels) on its monitor,
+    // or closes when already open. `keyboard` shows focus cues from the first frame.
+    [[nodiscard]] Result<void> Toggle(const RECT& anchorPx, bool keyboard = false);
     void Close();
+    // Test and diagnostics seam: the panel's visible rectangle in screen pixels (empty when hidden).
+    [[nodiscard]] RECT PanelBoundsPx() const noexcept;
+    // Diagnostics seam: frames rendered so far (settled and hidden panels must stop rendering).
+    [[nodiscard]] std::uint64_t RenderCount() const noexcept;
     void SetState(ControlCenterState state);
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     Signal<ControlIntent> Requested;
@@ -56,6 +73,7 @@ protected:
     void OnRender(const ui::RenderContext& context) override;
     bool OnAnimate(double now) override;
     void OnPointerMove(D2D1_POINT_2F point) override;
+    void OnPointerLeave() override;
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;

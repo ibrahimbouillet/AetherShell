@@ -19,7 +19,8 @@ enum class SystemControl {
 };
 enum class TileKind { Toggle, Action, Unsupported };
 enum class SystemActionKind { Settings, KeyboardShortcut };
-enum class SystemShortcut { None, Accessibility, LiveCaptions, Cast, Project };
+// Documented Windows keyboard shortcuts (they start/stop the Windows feature; Windows reports no result).
+enum class SystemShortcut { None, Accessibility, LiveCaptions, Cast, Project, Magnifier, Narrator, OnScreenKeyboard };
 
 struct RadioStatus {
     // An empty enumeration is unavailable, not proof that hardware is absent.
@@ -36,8 +37,19 @@ struct SystemControlsSnapshot {
     std::optional<bool> energySaver; // SYSTEM_POWER_STATUS::SystemStatusFlag, read-only
     std::optional<Error> powerError;
     unsigned windowsBuild = 0; // gates Windows 11-only actions; zero stays unknown/unsupported
+    // SPI_GETSTICKYKEYS: unknown when unreadable or when the feature is not available on this system.
+    std::optional<bool> stickyKeys;
+    // SPI_GETSCREENREADER: some screen reader is running (not necessarily Narrator).
+    std::optional<bool> screenReader;
     // No global flight-mode/hotspot/sharing/night-light state is invented from radio state.
 };
+
+// Worker only, and only for an explicit user action. Sets the documented Sticky Keys flag
+// (SPI_SETSTICKYKEYS, saved to the user profile and broadcast) and succeeds only when a reread
+// confirms the requested state. Unavailable when Windows does not offer the feature.
+[[nodiscard]] Result<void> SetStickyKeys(bool enabled);
+// Pure: the reading of a STICKYKEYS flag set (exposed for tests).
+[[nodiscard]] std::optional<bool> StickyKeysState(unsigned long flags) noexcept;
 
 struct SystemAction {
     SystemActionKind kind = SystemActionKind::Settings;
@@ -67,6 +79,10 @@ struct SystemAction {
 // Pure fixed routing/model helpers: these never launch Settings, inject keys or change system state.
 // Action tiles must be presented as links/actions, never as fake checked/unchecked toggles.
 [[nodiscard]] Result<SystemAction> ActionFor(SystemControl control);
+// The accessibility features offered in the quick controls' Accessibility view (Sticky Keys is a
+// real setting, see SetStickyKeys; these are Windows' own documented start/stop shortcuts).
+enum class AccessibilityFeature { Magnifier, Narrator, OnScreenKeyboard, LiveCaptions, Settings };
+[[nodiscard]] Result<SystemAction> ActionFor(AccessibilityFeature feature);
 [[nodiscard]] Result<TileKind> TileKindFor(SystemControl control, const SystemControlsSnapshot& snapshot);
 
 } // namespace aether::controlcenter

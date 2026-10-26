@@ -7,7 +7,40 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active direction — owner rejects Settings motion/frame quality, 2026-10-26 (S-050)
+## Current checkpoint — Settings fluidity and owned Quick Settings implemented, 2026-10-26 (S-052)
+
+Claude implemented both parts of the [focused brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md)
+in the shared `main` checkout. **Owner acceptance is pending for both; nothing below claims it.**
+
+- **Settings fluidity (D43/T47):** the reported scroll fragmentation was reproduced in own-window
+  moving frames (dark 24/39, light 19/36 incoherent distinct frames before) and corrected with
+  atomic container presentation, live-editor motion masking, retained layers and a spring scroll;
+  fresh runs show 0 incoherent frames in both themes, UI-thread present work about 3.7 ms mean
+  (p95 ≤ 5.5 ms) and a move cadence p50 of about 16.8 ms on this 150 % configuration. Field and
+  row hover animate; the Acrylic title strip shares the window material with native caption
+  buttons, Snap, system menu, resize and maximize. Native editors, IME path, UIA, consent, drafts
+  and persistence are unchanged in kind.
+- **Owned Quick Settings (D44/T41):** `ControlCenterWindow` now recreates the private reference:
+  3 × 2 tiles with split Wi-Fi/Bluetooth, two pages, sliders with output/mixer, battery/gear
+  footer, Wi-Fi/Bluetooth/Accessibility/output detail views, conditional media, installed Windows
+  icon fonts (`graphics::SymbolRenderer`), retargetable motion, light/dark frosted grain and
+  below-group anchoring from the first frame. Unsupported global switches open Windows Settings and
+  say so. Routing: `topBar.windowsQuickSettings` (default false); the legacy Alpha 2 flag no longer
+  routes, so existing files open the Aether panel and installed preferences are not rewritten.
+- **Evidence:** TEST_STATUS S-052 (24/24 units; native aggregate 8/11 with Dock UIA intermittents
+  reproduced on the unchanged baseline and transient Search/Settings failures that pass on rerun),
+  the SF/QC tables in the [surface inventory](docs/specs/v3-visual-unification-inventory.md) and
+  the [quick controls](docs/modules/controlcenter.md) capability matrix.
+- **Not verified:** real radio/audio/brightness/accessibility/media actions from the panel,
+  physical multi-monitor DPI, IME composition, screen readers, Windows 10 and owner judgement of the
+  moving interface. Private references and comparison sheets stay outside Git.
+
+The local commit and the private candidate launched from it are recorded in the runtime receipt
+below once verified.
+
+## Previous direction — owner rejected Settings motion/frame quality, 2026-10-26 (S-050, S-051)
+
+Implemented by Claude in S-052 above; this section records the assignment as given.
 
 The owner tried the T47 prototype and reports that scrolling fragments/deforms the content until
 release, actionable icons lack adequate hover feedback and some state changes snap. Their private
@@ -853,16 +886,16 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**New owner priority:** Claude implements
-[the Settings fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), FR-037/D43/T47, after the
-shared reading order, including D44's complete Aether-owned Quick Settings assignment in section 14
-(T41/FR-026/FR-035). Open the supplied private image references before designing; Codex prepares
-instructions/images only. The owner rejects the current scrolling/interaction/caption quality. Read the
-active direction at the top and S-050 before S-049's historical scoped gate. Preserve the previous
-`2e4ff0d` prototype/recovery host; verify live identity before any swap. New moving-frame and owner
-acceptance gates are unverified. The older full visual-unification brief still defines the broader
-owned-surface scope. Do not discard the implementation or relaunch an older binary from a historical
-paragraph. This Codex turn prepared documentation only; Claude is the next implementation writer.
+**Current state (S-052):** Claude implemented the Settings fluidity brief (D43/T47) and the owned
+Quick Settings panel (D44/T41); read the current checkpoint at the top, TEST_STATUS S-052 and the
+SF/QC tables in the surface inventory. The next step is the **owner's review of the running private
+candidate** (scrolling Settings with wheel/touchpad, hover/press, the title strip, and the Top Bar
+group's new panel in both themes). Feed concrete feedback back into T47/T41; do not mark either
+accepted without the owner's own words. Pending engineering: the Dock UIA intermittents (S-024 and
+the preview-card stage-2 case), real-device checks of the panel's actions, physical DPI/IME/screen-
+reader qualification. Verify the live candidate identity before any swap; the recovery host returns
+to installed Alpha 2 when the candidate quits. The older full visual-unification brief still defines
+the broader owned-surface scope.
 
 0. **Read S-042/S-043 and the current runtime receipt before changing a running shell.** Codex completed
    the focused source review, repaired the byte-identical launcher move, reproduced and corrected

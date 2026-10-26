@@ -59,7 +59,8 @@ AETHER_TEST("settings schema: new fields have the documented defaults") {
     CHECK(defaults.dock.showStartButton);
     CHECK(defaults.dock.showTaskViewButton);
     CHECK_EQ(defaults.topBar.height, 32);
-    CHECK(defaults.topBar.openWindowsFlyouts);
+    CHECK(defaults.topBar.openWindowsFlyouts);       // legacy Alpha 2 flag, kept but no longer routing
+    CHECK_FALSE(defaults.topBar.windowsQuickSettings);  // D44: Aether's quick controls unless chosen
     CHECK_EQ(defaults.topBar.weatherPlacement, WeatherPlacement::Left);
     CHECK_EQ(defaults.topBar.keyboardIndicator, KeyboardIndicatorStyle::TwoLine);
     CHECK_FALSE(defaults.topBar.showNotificationAreaButton);  // D27 removed the trailing native-taskbar arrow
@@ -161,7 +162,7 @@ AETHER_TEST("settings schema: new boolean and marker fields use their documented
     const std::pair<const char*, const char*> names[] = {
         {"dock", "reserveAnimationSpace"}, {"dock", "metricsVersion"}, {"dock", "dismissedPins"},
         {"dock", "explorerDefaultApplied"}, {"dock", "showStartButton"}, {"dock", "showTaskViewButton"},
-        {"topBar", "height"}, {"topBar", "openWindowsFlyouts"}, {"topBar", "weatherPlacement"},
+        {"topBar", "height"}, {"topBar", "openWindowsFlyouts"}, {"topBar", "windowsQuickSettings"}, {"topBar", "weatherPlacement"},
         {"topBar", "keyboardIndicator"}, {"topBar", "showNotificationAreaButton"}, {"topBar", "showBatteryPercent"},
         {"general", "syncTaskbarPins"}, {"general", "themeMode"}, {"general", "accentSource"},
         {"general", "animationSpeed"}};
@@ -359,4 +360,26 @@ AETHER_TEST("settings validation: dismissed pins drop empty duplicate and excess
     CHECK_EQ(mixed.value.dock.dismissedPins[0], std::wstring(L"exe:synthetic-kept"));
     CHECK_EQ(mixed.warnings.size(), 3u);
     for (const auto& warning : mixed.warnings) CHECK(warning.find("synthetic") == std::string::npos);
+}
+
+AETHER_TEST("settings schema: Windows Quick Settings routing is an explicit choice, not the legacy default") {
+    // An Alpha 2 file (Dock metrics marker 2) stored the always-true legacy flag: it opens Aether's
+    // own panel (D44).
+    const auto alpha2 = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"openWindowsFlyouts":true}})");
+    CHECK(alpha2.warnings.empty());
+    CHECK(alpha2.value.topBar.openWindowsFlyouts);
+    CHECK_FALSE(alpha2.value.topBar.windowsQuickSettings);
+    // An explicit choice of Windows' panel survives a round trip, and the legacy flag is untouched.
+    const auto chosen = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"openWindowsFlyouts":false,"windowsQuickSettings":true}})");
+    CHECK(chosen.warnings.empty());
+    CHECK(chosen.value.topBar.windowsQuickSettings);
+    CHECK_FALSE(chosen.value.topBar.openWindowsFlyouts);
+    auto document = ToJson(chosen.value);
+    REQUIRE(document.ok());
+    const auto* topBar = document->Find("topBar");
+    REQUIRE(topBar != nullptr);
+    REQUIRE(topBar->Find("windowsQuickSettings") != nullptr);
+    CHECK(topBar->Find("windowsQuickSettings")->AsBool() == std::optional<bool>(true));
+    REQUIRE(topBar->Find("openWindowsFlyouts") != nullptr);
+    CHECK(topBar->Find("openWindowsFlyouts")->AsBool() == std::optional<bool>(false));
 }

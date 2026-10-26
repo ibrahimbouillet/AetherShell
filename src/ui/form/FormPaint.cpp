@@ -476,16 +476,18 @@ void PaintComboField(ID2D1DeviceContext* context, graphics::TextCache& text, con
 }
 
 void PaintFieldWell(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, bool enabled, bool focused, bool error, float pixel,
-                    const DesignTokens& tokens) {
+                    const DesignTokens& tokens, float hover) {
     if (!context || !Usable(rect)) return;
     Brush brush(context);
     const auto& f = tokens.form;
     const float radius = std::min(f.fieldRadius, Height(rect) / 2.0f);
+    // The fill must stay identical to the editor's own opaque background: hover strengthens the rim.
     FillRound(context, brush, rect, radius, enabled ? f.fieldFill : f.fieldFillDisabled);
     if (error) {
         StrokeRound(context, brush, rect, radius, tokens.critical, 1.0f);
     } else {
-        StrokeRound(context, brush, rect, radius, f.fieldStroke, pixel > 0.0f ? pixel : PixelOf(context));
+        const Color rim = enabled ? Mix(f.fieldStroke, tokens.textSecondary.WithAlpha(0.55f), Clamp01(hover)) : f.fieldStroke;
+        StrokeRound(context, brush, rect, radius, rim, pixel > 0.0f ? pixel : PixelOf(context));
     }
     if (focused && enabled) {
         // The accent line follows the rounded bottom corners: the rounded shape clipped to its bottom.
@@ -605,7 +607,7 @@ void PaintNavigationRow(ID2D1DeviceContext* context, graphics::TextCache& text, 
 }
 
 void PaintListRow(ID2D1DeviceContext* context, graphics::TextCache& text, const D2D1_RECT_F& row, std::wstring_view value,
-                  bool selected, bool hover, bool focusRing, bool enabled, const DesignTokens& tokens) {
+                  bool selected, float hover, bool focusRing, bool enabled, const DesignTokens& tokens) {
     if (!context || !Usable(row)) return;
     Brush brush(context);
     const auto& f = tokens.form;
@@ -614,8 +616,9 @@ void PaintListRow(ID2D1DeviceContext* context, graphics::TextCache& text, const 
     const auto pill = Deflate(row, 3.0f, 1.0f);
     Color tint = base;
     if (selected) tint = Over(tokens.accentRoles.fill.WithAlpha(tokens.mode == graphics::ThemeMode::Dark ? 0.26f : 0.16f), tint);
-    if (hover && enabled) tint = Over(f.rowHover, tint);
-    if (selected || (hover && enabled)) FillRound(context, brush, pill, 4.0f, tint);
+    const float amount = enabled ? Clamp01(hover) : 0.0f;
+    if (amount > 0.0f) tint = Over(f.rowHover.WithAlpha(f.rowHover.a * amount), tint);
+    if (selected || amount > 0.0f) FillRound(context, brush, pill, 4.0f, tint);
     const Color color = enabled ? f.fieldText : tokens.textDisabled;
     DrawText(context, text, value, D2D1::RectF(pill.left + 8.0f, row.top, pill.right - 6.0f, row.bottom), BodyStyle(tokens), brush(color));
     if (focusRing) PaintInnerFocusRing(context, row, 4.0f + FocusRingExtent(tokens), tokens);

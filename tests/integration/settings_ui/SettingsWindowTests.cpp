@@ -396,7 +396,7 @@ AETHER_TEST("settings UI: Windows location is an explicit action and keeps real 
     window.Close();
 }
 
-AETHER_TEST("settings UI: native Quick Settings preference can be turned off and persists without system actions") {
+AETHER_TEST("settings UI: native Quick Settings is an explicit opt-in that persists without system actions") {
     platform::ComApartment apartment;
     INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
     ManualDispatcher dispatcher;
@@ -412,10 +412,13 @@ AETHER_TEST("settings UI: native Quick Settings preference can be turned off and
         reinterpret_cast<Search*>(parameter)->found=child;return FALSE;
     },reinterpret_cast<LPARAM>(&search));
     HWND checkbox=search.found;
-    REQUIRE(checkbox!=nullptr);CHECK_EQ(::SendMessageW(checkbox,BM_GETCHECK,0,0),LRESULT{BST_CHECKED});
+    // D44: off by default (Aether's quick controls), whatever the legacy Alpha 2 flag says.
+    REQUIRE(checkbox!=nullptr);CHECK_EQ(::SendMessageW(checkbox,BM_GETCHECK,0,0),LRESULT{BST_UNCHECKED});
+    CHECK(service.Current().topBar.openWindowsFlyouts);
     ::SendMessageW(checkbox,BM_CLICK,0,0); // this fixture's own checkbox, no keyboard/system injection
-    REQUIRE(Pump(dispatcher,[&]{return !service.Current().topBar.openWindowsFlyouts&&!service.Dirty();}));
+    REQUIRE(Pump(dispatcher,[&]{return service.Current().topBar.windowsQuickSettings&&!service.Dirty();}));
     CHECK_FALSE(service.Current().general.startWithWindows);window.Close();
     settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
-    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));CHECK_FALSE(reloaded.Current().topBar.openWindowsFlyouts);
+    REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));CHECK(reloaded.Current().topBar.windowsQuickSettings);
+    CHECK(reloaded.Current().topBar.openWindowsFlyouts);  // the legacy flag is left exactly as it was
 }

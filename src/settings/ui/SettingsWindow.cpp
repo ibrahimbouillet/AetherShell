@@ -18,6 +18,7 @@
 #include "ui/form/FormSurface.h"
 
 #include <commctrl.h>
+#include <dwmapi.h>
 #include <shellapi.h>
 #include <algorithm>
 #include <chrono>
@@ -38,7 +39,9 @@ using form::Severity;
 using form::TextRole;
 
 constexpr wchar_t kClass[] = L"AetherShell.Settings";
-constexpr int kNavigation = 100, kApply = 101, kReset = 102, kStatus = 103, kScrollView = 120, kBrandLabel = 121;
+constexpr int kNavigation = 100, kApply = 101, kReset = 102, kStatus = 103, kScrollView = 120, kBrandLabel = 121, kCaptionTitle = 122;
+// DWM attributes spelled out for older SDK headers (Windows 11 build 22000 and later).
+constexpr DWORD kDwmCaptionButtonBounds = 5, kDwmCaptionColor = 35, kDwmTextColor = 36, kDwmColorDefault = 0xFFFFFFFFu;
 constexpr UINT_PTR kLiveApplyTimer = 19;
 constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPostpone = 303,
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
@@ -182,9 +185,16 @@ struct SettingsWindow::Impl {
     CancellationSource geocodeCancel;
     std::shared_ptr<bool> alive = std::make_shared<bool>(true);
     HWND window = nullptr, navigation = nullptr, status = nullptr, brandLabel = nullptr, applyButton = nullptr, resetButton = nullptr;
+    HWND captionTitle = nullptr;
     form::FormSurface surface;
     form::FormScrollView scroll;
     bool surfaceReady = false;
+    // Over Acrylic the standard caption is removed (WM_NCCALCSIZE) so the title strip shows the same
+    // tint and grain as the rest of the window. DWM still draws the native caption buttons there and
+    // hit-tests them (DwmDefWindowProc, Snap layouts); the window keeps WS_OVERLAPPEDWINDOW, its
+    // system menu, keyboard commands, borders and resizing. Other materials keep the standard frame.
+    bool customFrame = false;
+    D2D1_RECT_F captionMark{};  // form client DIPs
     graphics::DesignTokens tokens;
     graphics::MotionPolicy motion;
     SettingsPage page = SettingsPage::Dock;
@@ -237,6 +247,54 @@ struct SettingsWindow::Impl {
         return std::ceil(surface.MeasureText(text, role, std::max(1.0f, width), true).height);
     }
     [[nodiscard]] float Preferred(HWND control) const { return surfaceReady ? surface.PreferredWidth(control) : 120.0f; }
+
+    // --- window frame ---
+    // The resize border hidden above a maximized window (its frame extends past the monitor).
+    [[nodiscard]] int FrameInsetPx() const {
+        const UINT dpi = DpiNow();
+        return platform::SystemMetricForDpi(SM_CYSIZEFRAME, dpi) + platform::SystemMetricForDpi(SM_CXPADDEDBORDER, dpi);
+    }
+    // Height of the title strip in client pixels: down to the bottom of DWM's caption buttons.
+    [[nodiscard]] int CaptionHeightPx() const {
+        if (!customFrame || !window) return 0;
+        const int inset = ::IsZoomed(window) ? FrameInsetPx() : 0;
+        RECT buttons{};
+        if (SUCCEEDED(::DwmGetWindowAttribute(window, kDwmCaptionButtonBounds, &buttons, sizeof(buttons))) && buttons.bottom > inset)
+            return buttons.bottom - inset;
+        return platform::SystemMetricForDpi(SM_CYCAPTION, DpiNow()) + FrameInsetPx();
+    }
+    // Chooses the frame for the current material and recomputes the non-client area when it changes.
+    void UpdateFrame() {
+        if (!window) return;
+        const bool wanted = surfaceReady && surface.Material() == form::FormMaterial::Acrylic;
+        const bool solid = surfaceReady && surface.Material() == form::FormMaterial::Solid;
+        // Opaque material on Windows 11: the standard caption takes the window's own colors.
+        const COLORREF caption = solid ? tokens.form.windowSolid.ToColorRef() : kDwmColorDefault;
+        const COLORREF title = solid ? tokens.textPrimary.ToColorRef() : kDwmColorDefault;
+        (void)::DwmSetWindowAttribute(window, kDwmCaptionColor, &caption, sizeof(caption));
+        (void)::DwmSetWindowAttribute(window, kDwmTextColor, &title, sizeof(title));
+        if (captionTitle) ::ShowWindow(captionTitle, wanted ? SW_SHOWNA : SW_HIDE);
+        if (wanted == customFrame) return;
+        customFrame = wanted;
+        ::SetWindowPos(window, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    }
+    LRESULT HitTest(WPARAM wParam, LPARAM lParam) {
+        const LRESULT hit = ::DefWindowProcW(window, WM_NCHITTEST, wParam, lParam);
+        if (hit != HTCLIENT) return hit;
+        POINT point{static_cast<short>(LOWORD(lParam)), static_cast<short>(HIWORD(lParam))};
+        ::ScreenToClient(window, &point);
+        RECT client{};
+        ::GetClientRect(window, &client);
+        if (!::IsZoomed(window) && point.y < FrameInsetPx()) {
+            const int corner = FrameInsetPx() * 2;
+            return point.x < corner ? HTTOPLEFT : point.x >= client.right - corner ? HTTOPRIGHT : HTTOP;
+        }
+        if (point.y < CaptionHeightPx()) {
+            const RECT mark{Px(captionMark.left), Px(captionMark.top), Px(captionMark.right), Px(captionMark.bottom)};
+            return ::PtInRect(&mark, point) ? HTSYSMENU : HTCAPTION;
+        }
+        return HTCLIENT;
+    }
     [[nodiscard]] float ControlHeight() const {
         return std::max(tokens.form.controlHeight,
                         std::ceil(surface.MeasureText(L"Ag", TextRole::Body, 10000.0f, false).height) + 12.0f);
@@ -482,7 +540,7 @@ void SettingsWindow::Impl::BuildPage() {
     const auto pixels = [](double minimum, double maximum) { NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.unit = L"px"; return f; };
     const auto percent = [] { NumberFormat f; f.minimum = 30; f.maximum = 100; f.scale = 100; f.unit = L"%"; return f; };
     const auto factor = [](double minimum, double maximum) {
-        NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.step = 0.05; f.decimals = 2; f.unit = L"×"; return f;
+        NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.step = 0.05; f.decimals = 2; f.unit = L"Ã"; return f;
     };
     if (page == SettingsPage::Dock) {
         header(L"Dock", L"Size, spacing, motion and the applications pinned to the Dock.");
@@ -554,8 +612,8 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Behavior");
         Check(L"Reserve screen space above windows", L"Maximized windows stay below the Top Bar.",
               [](const Settings& s){return s.topBar.reserveSpace;}, [](Settings& s,bool v){s.topBar.reserveSpace=v;});
-        Check(L"Use Windows Quick Settings (Windows 11)", L"Opens the native Windows 11 Quick Settings instead of Aether's quick controls.",
-              [](const Settings& s){return s.topBar.openWindowsFlyouts;}, [](Settings& s,bool v){s.topBar.openWindowsFlyouts=v;});
+        Check(L"Use Windows Quick Settings (Windows 11)", L"Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.",
+              [](const Settings& s){return s.topBar.windowsQuickSettings;}, [](Settings& s,bool v){s.topBar.windowsQuickSettings=v;});
     } else if (page == SettingsPage::Weather) {
         header(L"Weather", L"An optional forecast in the Top Bar, provided by Open-Meteo.");
         BeginSection(L"Forecast");
@@ -848,11 +906,24 @@ void SettingsWindow::Impl::Layout() {
         stackStatus ? statusHeight + f.relatedGap + actionsHeight + 16.0f : std::max(statusHeight, actionsHeight) + 16.0f);
     const float footerTop = std::max(0.0f, height - footerHeight);
 
-    brandMark = D2D1::RectF(narrow ? (navWidth - 22.0f) / 2.0f : 22.0f, 18.0f, narrow ? (navWidth + 22.0f) / 2.0f : 44.0f, 40.0f);
+    // The title strip of the integrated frame: a small mark and the window title on the same glass.
+    const float caption = Dip(static_cast<float>(CaptionHeightPx()));
+    if (customFrame) {
+        RECT buttons{};
+        float buttonsLeft = width - 138.0f;
+        if (SUCCEEDED(::DwmGetWindowAttribute(window, kDwmCaptionButtonBounds, &buttons, sizeof(buttons))) && buttons.right > buttons.left)
+            buttonsLeft = Dip(static_cast<float>(buttons.left));
+        captionMark = D2D1::RectF(14.0f, (caption - 16.0f) / 2.0f, 30.0f, (caption + 16.0f) / 2.0f);
+        Place(captionTitle, 40.0f, 0.0f, std::max(41.0f, buttonsLeft - 8.0f), caption);
+    } else {
+        captionMark = D2D1::RectF();
+    }
+    brandMark = D2D1::RectF(narrow ? (navWidth - 22.0f) / 2.0f : 22.0f, caption + 18.0f, narrow ? (navWidth + 22.0f) / 2.0f : 44.0f,
+                            caption + 40.0f);
     ::ShowWindow(brandLabel, narrow ? SW_HIDE : SW_SHOWNA);
-    Place(brandLabel, 52.0f, 14.0f, navWidth - 8.0f, 44.0f);
+    Place(brandLabel, 52.0f, caption + 14.0f, navWidth - 8.0f, caption + 44.0f);
     surface.SetNavigationCompact(navigation, narrow);
-    const float navTop = 56.0f;
+    const float navTop = caption + 56.0f;
     const float navBottom = std::min(navTop + 8.0f * f.navItemHeight + 4.0f, footerTop - 8.0f);
     Place(navigation, 8.0f, navTop, navWidth - 4.0f, navBottom);
 
@@ -865,7 +936,7 @@ void SettingsWindow::Impl::Layout() {
     const float statusTop = stackStatus ? footerTop + 8.0f : footerTop + (footerHeight - statusHeight) / 2.0f;
     Place(status, statusLeft, statusTop, statusRight, statusTop + statusHeight);
 
-    const RECT viewport = PxRect(contentLeft, 0.0f, width, footerTop);
+    const RECT viewport = PxRect(contentLeft, caption, width, footerTop);
     scroll.SetFrame(viewport);
     LayoutCanvas();
 }
@@ -1464,6 +1535,7 @@ void SettingsWindow::Impl::Navigate(int delta) {
 void SettingsWindow::Impl::ApplyTheme() {
     if (!window) return;
     if (surfaceReady) surface.SetTheme(tokens, motion);
+    UpdateFrame();
     for (const auto& [id, control] : controls)
         if (id >= kFirstField && id < kFirstField + 70) {
             const auto index = static_cast<std::size_t>(id - kFirstField);
@@ -1473,6 +1545,22 @@ void SettingsWindow::Impl::ApplyTheme() {
 }
 
 LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam) {
+    if (customFrame) {
+        // DWM's caption buttons first: hover, press, Snap layouts and their hit testing.
+        LRESULT result = 0;
+        if (::DwmDefWindowProc(window, message, wParam, lParam, &result)) return result;
+        if (message == WM_NCCALCSIZE && wParam) {
+            // Keep the side and bottom borders; the client starts at the window's top edge (below the
+            // hidden resize border while maximized).
+            auto* params = reinterpret_cast<NCCALCSIZE_PARAMS*>(lParam);
+            const LONG top = params->rgrc[0].top;
+            const LRESULT standard = ::DefWindowProcW(window, message, wParam, lParam);
+            params->rgrc[0].top = top + (::IsZoomed(window) ? FrameInsetPx() : 0);
+            return standard;
+        }
+        if (message == WM_NCHITTEST) return HitTest(wParam, lParam);
+    }
+    if (message == WM_DWMCOMPOSITIONCHANGED) UpdateFrame();
     if (surfaceReady) {
         if (auto handled = surface.HandleMessage(message, wParam, lParam)) return *handled;
     }
@@ -1571,10 +1659,12 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
             impl.surfaceReady = true;
             impl.surface.SetDecorator([this](ID2D1DeviceContext* target, const D2D1_RECT_F&, const graphics::DesignTokens& tokens) {
                 auto& state = *impl_;
+                if (state.customFrame && state.captionMark.right > state.captionMark.left)
+                    graphics::PaintBrandMark(target, state.captionMark, tokens);
                 graphics::PaintBrandMark(target, state.brandMark, tokens);
                 if (state.page != SettingsPage::About || state.aboutMark.right <= state.aboutMark.left || !state.scroll.Canvas()) return;
-                POINT origin{0, 0};
-                ::MapWindowPoints(state.scroll.Canvas(), state.window, &origin, 1);
+                // Includes a scroll the surface is presenting, so the mark moves with its page.
+                const POINT origin = state.surface.ClientOriginPx(state.scroll.Canvas());
                 const RECT viewport = state.scroll.Frame();
                 const float dx = state.Dip(static_cast<float>(origin.x));
                 const float dy = state.Dip(static_cast<float>(origin.y));
@@ -1592,6 +1682,9 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
             return attached.error();
         }
         impl.brandLabel = impl.Label(window, L"Settings", TextRole::Strong, kBrandLabel, Severity::None, false);
+        // The title shown in the integrated title strip (a static label is transparent to hit testing,
+        // so the strip still drags the window). The window text stays the accessible/Alt+Tab title.
+        impl.captionTitle = impl.Label(window, L"Aether Shell Settings", TextRole::Caption, kCaptionTitle, Severity::None, false);
         impl.navigation = impl.Make(window, L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT, kNavigation);
         for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance"}) ::SendMessageW(impl.navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
         { form::ControlSpec spec; spec.role = ControlRole::Navigation; impl.Style(impl.navigation, spec); }
@@ -1605,6 +1698,7 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         impl.status = impl.Label(window, L"", TextRole::Status, kStatus, Severity::None, true);
         impl.resetButton = impl.Button(window, L"Reset defaults...", kReset, ButtonStyle::Secondary, Glyph::Reset);
         impl.applyButton = impl.Button(window, L"&Apply", kApply, ButtonStyle::Primary, std::nullopt, BS_DEFPUSHBUTTON);
+        impl.UpdateFrame();
     }
     ::SendMessageW(impl.navigation, LB_SETCURSEL, static_cast<WPARAM>(page), 0); impl.BuildPage();
     impl.rebuildOnShow = false;
@@ -1672,6 +1766,12 @@ Result<void> SettingsWindow::ResetAfterConsent() {
 }
 void SettingsWindow::SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion) {
     try {
+        // The application re-sends its theme after every settings change. Only a real change of
+        // material, colors, text scale or motion restyles and lays out the open page again.
+        if (impl_->window && form::SameAppearance(impl_->tokens, tokens) && impl_->motion.reduced == motion.reduced &&
+            impl_->motion.durationScale == motion.durationScale) {
+            return;
+        }
         impl_->tokens = tokens;
         impl_->motion = motion;
         impl_->ApplyTheme();

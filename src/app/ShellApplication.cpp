@@ -516,6 +516,8 @@ void ShellApplication::Impl::QueueControl(controlcenter::ControlIntent intent) {
                 case ControlIntentKind::Brightness:
                     if(intent.percent){auto readback=mediaBrightness->SetBrightness(*intent.percent,cancel);if(readback){brightness=*readback;result=Ok();}else result=readback.error();}break;
                 case ControlIntentKind::SelectMedia:result=mediaBrightness->SelectSession(intent.session);break;
+                case ControlIntentKind::StickyKeys:
+                    if(intent.enabled)result=SetStickyKeys(*intent.enabled);break;
                 case ControlIntentKind::MediaPrevious:case ControlIntentKind::MediaPlayPause:case ControlIntentKind::MediaNext:
                     result=mediaBrightness->ControlMedia(intent.session,intent.kind==ControlIntentKind::MediaNext?MediaAction::Next:
                         intent.kind==ControlIntentKind::MediaPrevious?MediaAction::Previous:MediaAction::TogglePlayPause,cancel);break;
@@ -543,6 +545,25 @@ void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) 
         case ControlIntentKind::BatterySettings:open(L"ms-settings:batterysaver");return;
         case ControlIntentKind::SoundSettings:open(L"ms-settings:sound");return;
         case ControlIntentKind::DisplaySettings:open(L"ms-settings:display");return;
+        case ControlIntentKind::VolumeMixer:open(L"ms-settings:apps-volume");return;
+        // Windows' own network list: Aether never reads or shows network names (FR-008).
+        case ControlIntentKind::NetworkList:open(L"ms-availablenetworks:");return;
+        case ControlIntentKind::Accessibility:{
+            auto action=ActionFor(intent.feature);if(!action){ReportControl(action.error());return;}
+            if(action->minimumWindowsBuild&&!platform::IsBuildOrGreater(action->minimumWindowsBuild)){ReportControl(MakeError(ErrorCode::Unsupported,"Windows feature unavailable"));return;}
+            if(action->kind==SystemActionKind::Settings){open(action->settingsUri);return;}
+            controls->Close();Result<void> result=MakeError(ErrorCode::Unsupported,"Windows shortcut unavailable");
+            switch(action->shortcut){
+                case SystemShortcut::Magnifier:result=platform::SendKeyChord({VK_LWIN,VK_OEM_PLUS});break;
+                case SystemShortcut::Narrator:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,VK_RETURN});break;
+                case SystemShortcut::OnScreenKeyboard:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('O')});break;
+                case SystemShortcut::LiveCaptions:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('L')});break;
+                default:break;
+            }
+            if(!result&&settingsWindow)settingsWindow->ReportActionStatus(L"The Windows accessibility feature could not be started");
+            return;
+        }
+        case ControlIntentKind::StickyKeys:QueueControl(intent);return;
         case ControlIntentKind::Volume:case ControlIntentKind::ToggleMute:{
             if(!audio)return;
             const auto weak=std::weak_ptr<bool>(alive);
@@ -740,7 +761,9 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
         if (closing || !controls) return;
-        if (nativeTaskbarAccess && settings->Current().topBar.openWindowsFlyouts && platform::IsWindows11OrGreater()) {
+        // D44: Aether's own panel unless the person explicitly chose Windows' Quick Settings. The
+        // legacy always-true openWindowsFlyouts flag of Alpha 2 files is deliberately not consulted.
+        if (nativeTaskbarAccess && settings->Current().topBar.windowsQuickSettings && platform::IsWindows11OrGreater()) {
             controls->Close();
             auto requested = apps::OpenWindowsQuickSettings();
             if (!requested) {
@@ -753,7 +776,9 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
             return;
         }
         PublishControls();
-        if (auto opened = controls->Toggle(anchor); opened && controls->IsShown()) RefreshControls(true);
+        // Activated from the keyboard (Enter/Space on the focused group): show focus cues at once.
+        const bool keyboard = (::GetKeyState(VK_RETURN) & 0x8000) != 0 || (::GetKeyState(VK_SPACE) & 0x8000) != 0;
+        if (auto opened = controls->Toggle(anchor, keyboard); opened && controls->IsShown()) RefreshControls(true);
     }));
     connections.push_back(dock->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
     connections.push_back(dock->SettingsRequested.Connect([this]{ OpenSettings(); }));

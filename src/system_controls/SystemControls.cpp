@@ -145,6 +145,10 @@ Result<SystemControlsSnapshot> QuerySystemControls(bool grantedAccess, Cancellat
             if (power.SystemStatusFlag <= 1) result.energySaver = power.SystemStatusFlag == 1;
             else result.powerError = MakeError(ErrorCode::Unavailable, "Windows power-saving state is unknown");
         } else result.powerError = MakeError(ErrorCode::Platform, "Windows power-saving state could not be read", ::GetLastError());
+        STICKYKEYS keys{sizeof(keys), 0};
+        if (::SystemParametersInfoW(SPI_GETSTICKYKEYS, sizeof(keys), &keys, 0)) result.stickyKeys = StickyKeysState(keys.dwFlags);
+        BOOL reader = FALSE;
+        if (::SystemParametersInfoW(SPI_GETSCREENREADER, 0, &reader, 0)) result.screenReader = reader != FALSE;
 
         status::WinRtApartmentScope apartment;
         if (!apartment.IsUsable()) {
@@ -217,6 +221,39 @@ Result<void> SetRadioEnabled(RadioKind kind, bool enabled, bool grantedAccess,
     } catch (const winrt::hresult_error& error) {
         return RadioError(error.code(), "Windows radio state change failed; refresh the current state or use Windows settings");
     } catch (...) { return MakeError(ErrorCode::Internal, "Radio state change failed; refresh the current state"); }
+}
+
+std::optional<bool> StickyKeysState(unsigned long flags) noexcept {
+    if (!(flags & SKF_AVAILABLE)) return std::nullopt;
+    return (flags & SKF_STICKYKEYSON) != 0;
+}
+
+Result<void> SetStickyKeys(bool enabled) {
+    try {
+        STICKYKEYS keys{sizeof(keys), 0};
+        if (!::SystemParametersInfoW(SPI_GETSTICKYKEYS, sizeof(keys), &keys, 0))
+            return MakeError(ErrorCode::Platform, "Sticky Keys state could not be read", ::GetLastError());
+        if (!StickyKeysState(keys.dwFlags)) return MakeError(ErrorCode::Unsupported, "Sticky Keys is not available on this system");
+        if (*StickyKeysState(keys.dwFlags) == enabled) return Ok();
+        keys.dwFlags = enabled ? (keys.dwFlags | SKF_STICKYKEYSON) : (keys.dwFlags & ~static_cast<DWORD>(SKF_STICKYKEYSON));
+        if (!::SystemParametersInfoW(SPI_SETSTICKYKEYS, sizeof(keys), &keys, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE))
+            return MakeError(ErrorCode::Platform, "Windows did not change Sticky Keys", ::GetLastError());
+        STICKYKEYS check{sizeof(check), 0};
+        if (!::SystemParametersInfoW(SPI_GETSTICKYKEYS, sizeof(check), &check, 0) || StickyKeysState(check.dwFlags) != enabled)
+            return MakeError(ErrorCode::Unavailable, "Sticky Keys did not take the requested state; refresh the current state");
+        return Ok();
+    } catch (...) { return MakeError(ErrorCode::Internal, "Sticky Keys change failed"); }
+}
+
+Result<SystemAction> ActionFor(AccessibilityFeature feature) {
+    switch (feature) {
+        case AccessibilityFeature::Magnifier: return Shortcut(SystemShortcut::Magnifier);
+        case AccessibilityFeature::Narrator: return Shortcut(SystemShortcut::Narrator);
+        case AccessibilityFeature::OnScreenKeyboard: return Shortcut(SystemShortcut::OnScreenKeyboard);
+        case AccessibilityFeature::LiveCaptions: return Shortcut(SystemShortcut::LiveCaptions, 22621);
+        case AccessibilityFeature::Settings: return Settings(L"ms-settings:easeofaccess");
+    }
+    return MakeError(ErrorCode::InvalidArgument, "Unknown accessibility feature");
 }
 
 Result<SystemAction> ActionFor(SystemControl control) {

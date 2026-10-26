@@ -40,6 +40,8 @@
 
 #include <d2d1_1.h>
 
+#include <array>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -63,6 +65,9 @@ enum class FormMaterial { Acrylic, Solid, Native };
                                                bool systemBackdropSupported, bool renderer) noexcept;
 // True on Windows 11 build 22621 or later (DWMWA_SYSTEMBACKDROP_TYPE).
 [[nodiscard]] bool SystemBackdropSupported() noexcept;
+// True when two token sets present a form identically (mode, transparency, text scale, families,
+// accent and material colors). SetTheme with the same appearance and motion does nothing.
+[[nodiscard]] bool SameAppearance(const graphics::DesignTokens& a, const graphics::DesignTokens& b) noexcept;
 
 enum class ControlRole {
     Label,       // STATIC with SS_OWNERDRAW. Text from the window text, style from TextRole.
@@ -204,6 +209,62 @@ public:
     // area (FormScrollView's overlay indicator). Not called in the Native material.
     using RegionOverlay = std::function<void(ID2D1DeviceContext* target, const graphics::DesignTokens& tokens)>;
     void PaintRegion(HWND windowBeingPainted, HDC hdc, const RECT& clipPx, const RegionOverlay& overlay);
+
+    // Presents the complete scene of `container` (a registered Container): window material, cards,
+    // dividers, decorator and the visual of every visible registered descendant, rendered in one
+    // buffered pass and copied to the screen with a single blit; everything drawn is then validated.
+    // Scrolling and container fades use it, so a moving page is never composed from some controls at
+    // their old position and others at the new one. Opaque layered editors keep their own surfaces.
+    // Returns false when nothing was presented (Native material, no renderer, hidden window): the
+    // caller then invalidates the container the ordinary way.
+    bool Present(HWND container);
+    // The same for a move: `move` repositions `moving` (a descendant of `container`) by `dyPx`. The
+    // frame is rendered at the destination first, then `move` runs and the frame is copied right
+    // behind it, so opaque layered editors (which DWM moves on its own) and the scene appear in the
+    // same composition. Returns false without calling `move` when nothing can be presented.
+    bool PresentMove(HWND container, HWND moving, int dyPx, const std::function<void()>& move);
+    // Motion masking of opaque layered editors (FR-037 SF-01). DWM composes those editors apart from
+    // the form's own surface, and during continuous motion the two can reach the screen one frame
+    // apart. Every editor's private image is kept current underneath the live editor (never visible
+    // there). While `container` moves, MaskEditors leaves only that image in the presented scene and
+    // keeps the live editor in place - focusable, accessible and hit-testable - at the smallest
+    // nonzero opacity. Keyboard, pointer or IME input to an editor reveals it at once; a masked
+    // editor that changes is re-imaged. MaskEditors returns false when an image first had to be
+    // refreshed: present, let one frame pass and call it again. Callers keep one frame between
+    // masking and the first movement and between the last movement and UnmaskEditors, so every
+    // transition overlaps identical pixels whichever channel reaches the screen first.
+    [[nodiscard]] bool HasVisibleEditors(HWND container) const noexcept;
+    bool MaskEditors(HWND container);
+    void UnmaskEditors(HWND container) noexcept;
+    [[nodiscard]] bool EditorsMasked(HWND container) const noexcept;
+    // Origin of `hwnd`'s client area in form-client pixels, including a move PresentMove is
+    // rendering. Decorators that draw content attached to a scrolling canvas must use it.
+    [[nodiscard]] POINT ClientOriginPx(HWND hwnd) const noexcept;
+    // An overlay drawn over `container`'s presented scene (FormScrollView's scroll indicator) and the
+    // child window that otherwise paints it; Present validates that window. An empty overlay removes it.
+    void SetContainerOverlay(HWND container, RegionOverlay overlay, HWND overlayWindow);
+
+    // UI-thread cost of Present (CPU time spent rendering and blitting; not compositor timing).
+    struct PresentStats {
+        std::uint64_t frames = 0;
+        double totalSeconds = 0.0;
+        double maxSeconds = 0.0;
+        std::array<std::uint32_t, 34> histogram{};  // 0.5 ms buckets; the last one collects slower frames
+        // Cumulative seconds per stage: rendering the scene, moving the windows, copying the frame to
+        // the screen and the bookkeeping after it (validation).
+        std::array<double, 4> stageSeconds{};
+        // Retained composition: material, invalidation, shift, content, copy, blend, overlay (diagnostic).
+        std::array<double, 7> composeSeconds{};
+        std::uint64_t backgroundRenders = 0;  // retained material re-rendered (diagnostic)
+        std::uint64_t contentRebuilds = 0;    // retained content re-rendered completely (diagnostic)
+        std::array<std::uint64_t, 4> materialReasons{};  // created, origin, dpi, invalidated (diagnostic)
+        std::uint64_t retainedFallbacks = 0;  // frames rendered in full because a retained layer failed
+        POINT lastOriginFrom{}, lastOriginTo{};  // diagnostic
+        std::uint64_t visualsReused = 0;    // control visuals Present drew from its cache...
+        std::uint64_t visualsRendered = 0;  // ...and those it had to render again
+    };
+    [[nodiscard]] PresentStats Stats() const noexcept;
+    void ResetStats() noexcept;
 
     // The frame scheduler given to Attach (null: timer-driven animation). FormScrollView uses it
     // for its own short scroll and indicator animations.

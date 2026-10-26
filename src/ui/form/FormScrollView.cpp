@@ -193,7 +193,17 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     int content = 0;
     int position = 0;
     int wheelRemainder = 0;
-    graphics::Tween scroll;
+    // Animated scrolling follows a critically damped spring: new wheel notches retarget it without
+    // resetting its velocity, a reversal decelerates through zero instead of jumping, and it never
+    // overshoots the content.
+    graphics::Spring spring;
+    double lastStep = 0.0;
+    // Opaque layered editors are masked while the canvas moves (FormSurface::MaskEditors): the frame
+    // after masking holds still, motion follows, and the editors are revealed once it has settled.
+    enum class Masking { None, Imaging, Holding, Moving, Revealing };
+    Masking masking = Masking::None;
+    std::optional<int> deferred;  // an immediate position waiting for the held frame
+    bool movedSinceTick = false;  // the canvas moved since the previous frame tick
     graphics::Tween thumbHover;
     bool scrolling = false;
     bool hovered = false;
@@ -224,7 +234,14 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     [[nodiscard]] double Now() const noexcept { return graphics::FrameScheduler::Now(); }
     // The position the view is heading to (the animation target while one runs).
     [[nodiscard]] int Goal() const noexcept {
-        return scrolling ? static_cast<int>(std::lround(scroll.Target())) : position;
+        return scrolling ? static_cast<int>(std::lround(spring.Target())) : position;
+    }
+    [[nodiscard]] graphics::Spring::Parameters SpringParameters() const noexcept {
+        // About 0.2 s to settle a notch at normal speed (form.scroll is 0.16 s), in pixels.
+        auto parameters = graphics::SpringFromDampingRatio(720.0f, 1.0f);
+        parameters.restDelta = 0.35f;
+        parameters.restVelocity = 6.0f;
+        return surface ? surface->Motion().ScaleSpring(parameters) : parameters;
     }
 
     // --- layout and position ---
@@ -235,9 +252,9 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         const int width = client.right;
         const int height = std::max<int>(client.bottom, content);
         position = std::clamp(position, 0, Range());
-        if (scrolling && scroll.Target() > static_cast<float>(Range())) {
+        if (scrolling && spring.Target() > static_cast<float>(Range())) {
             scrolling = false;
-            scroll.SnapTo(static_cast<float>(position));
+            spring.SnapTo(static_cast<float>(position));
         }
         ::SetWindowPos(canvas, nullptr, 0, -position, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
         const int gutter = Gutter();
@@ -246,17 +263,80 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         ::InvalidateRect(indicator, nullptr, FALSE);
     }
 
-    void Apply(int next) {
+    // True when the canvas may move now. The first movement next to visible editors only masks
+    // them and presents the unmoved frame; movement starts on the next frame.
+    bool ReadyToMove() {
+        switch (masking) {
+            case Masking::Moving:
+                return true;
+            case Masking::Revealing:
+                masking = Masking::Moving;  // still masked: continue without another hold
+                return true;
+            case Masking::Imaging:
+            case Masking::Holding:
+                return false;
+            case Masking::None:
+                break;
+        }
+        if (!surface->HasVisibleEditors(viewport)) return true;
+        if (!surface->MaskEditors(viewport)) {
+            // Stale images were refreshed: show them under the live editors before hiding them.
+            (void)surface->Present(viewport);
+            masking = Masking::Imaging;
+        } else {
+            if (!surface->EditorsMasked(viewport)) return true;
+            masking = Masking::Holding;
+        }
+        RequestFrame();
+        return false;
+    }
+
+    void EndMasking() noexcept {
+        if (masking == Masking::None) return;
+        masking = Masking::None;
+        deferred.reset();
+        if (surface) surface->UnmaskEditors(viewport);
+    }
+
+    // `continuous`: part of a motion (spring, drag, touchpad) - masked next to editors. An isolated jump
+    // (keyboard, UI Automation, focus reveal) lands coherently in one composition and moves at once.
+    void Apply(int next, bool continuous = true) {
         next = std::clamp(next, 0, Range());
         if (next == position || !viewport) return;
+        if (masking == Masking::Imaging || masking == Masking::Holding) {
+            deferred = next;
+            return;
+        }
+        if ((continuous || masking != Masking::None) && !ReadyToMove()) {
+            deferred = next;
+            return;
+        }
+        ApplyNow(next);
+        if (masking != Masking::None) RequestFrame();  // reveal once the motion has settled
+    }
+
+    void ApplyNow(int next) {
+        next = std::clamp(next, 0, Range());
+        if (next == position || !viewport) return;
+        movedSinceTick = true;
         const double before = VerticalPercent();
+        const int previous = position;
         position = next;
         RECT client{};
         ::GetClientRect(viewport, &client);
-        ::SetWindowPos(canvas, nullptr, 0, -position, client.right, std::max<int>(client.bottom, content),
-                       SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
-        // Every visible pixel is repainted from the scene, so the grain stays anchored to the form.
-        ::RedrawWindow(viewport, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+        // The whole visible scene - material, cards and every control at the new offset - is
+        // rendered first and presented as one frame right behind the move. Repainting child by child
+        // would show controls at old and new positions together (and stale pixels) until the last
+        // one painted. The grain stays anchored to the form because every visible pixel comes from
+        // the scene.
+        const auto move = [&] {
+            ::SetWindowPos(canvas, nullptr, 0, -position, client.right, std::max<int>(client.bottom, content),
+                           SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
+        };
+        if (!surface->PresentMove(viewport, canvas, previous - next, move)) {
+            move();
+            ::RedrawWindow(viewport, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+        }
         RaiseScrolled(before);
         if (owner && owner->scrolled) {
             const std::weak_ptr<int> alive = life;
@@ -285,20 +365,37 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         if (!viewport || !surface) return;
         target = std::clamp(target, 0, Range());
         const auto& motion = surface->Motion();
-        const double now = Now();
-        const double duration = motion.Scale(Tokens().form.scroll);
-        const int from = position;
+        const int from = scrolling ? static_cast<int>(std::lround(spring.Value())) : position;
         // Short animated moves only: long jumps (Home/End, scroll bar drags) stay immediate.
-        if (animate && motion.AllowsMovement() && duration > 0.0 && std::abs(target - from) <= 3 * std::max(1, Page())) {
-            if (!scrolling) scroll.SnapTo(static_cast<float>(from));
-            scroll.AnimateTo(static_cast<float>(target), now, duration, Tokens().curves.decelerate);
+        if (animate && motion.AllowsMovement() && motion.Scale(Tokens().form.scroll) > 0.0 &&
+            std::abs(target - from) <= 3 * std::max(1, Page())) {
+            if (!scrolling) {
+                spring.SnapTo(static_cast<float>(position));
+                lastStep = Now();
+                if (target != position) (void)ReadyToMove();  // masks at input time when editors are visible
+            }
+            spring.SetParameters(SpringParameters());
+            spring.SetTarget(static_cast<float>(target));
             scrolling = true;
             RequestFrame();
             return;
         }
         scrolling = false;
-        scroll.SnapTo(static_cast<float>(target));
-        Apply(target);
+        spring.SnapTo(static_cast<float>(target));
+        Apply(target, false);
+    }
+
+    // Continuous input (precision touchpads, high-resolution wheels) already arrives smoothly: it
+    // moves the view at once, carrying any notch animation in flight along with it.
+    void ScrollImmediately(int delta) {
+        if (!scrolling) {
+            Apply(position + delta);
+            return;
+        }
+        spring.ShiftBy(static_cast<float>(delta));
+        const float range = static_cast<float>(Range());
+        if (spring.Target() < 0.0f || spring.Target() > range) spring.SetTarget(std::clamp(spring.Target(), 0.0f, range));
+        Apply(static_cast<int>(std::lround(std::clamp(spring.Value(), 0.0f, range))));
     }
 
     // --- animation ---
@@ -330,12 +427,52 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     void Tick(double now) {
         const std::weak_ptr<int> alive = life;
         bool again = false;
-        if (scrolling) {
-            const bool running = scroll.IsAnimating(now);
-            Apply(static_cast<int>(std::lround(scroll.Value(now))));
+        const bool wasMoving = masking == Masking::Moving;
+        const bool movedBefore = movedSinceTick;  // immediate steps between frames (drag, touchpad)
+        movedSinceTick = false;
+        if (masking == Masking::Imaging) {
+            // The refreshed images are on screen under the live editors: hide the editors now.
+            if (surface->MaskEditors(viewport)) {
+                masking = surface->EditorsMasked(viewport) ? Masking::Holding : Masking::None;
+                if (masking == Masking::None && deferred) {
+                    const int target = *deferred;
+                    deferred.reset();
+                    ApplyNow(target);
+                    if (alive.expired()) return;
+                }
+            }
+            lastStep = now;
+            again = true;
+        } else if (masking == Masking::Holding) {
+            // The masked, unmoved frame has been on screen for a frame: movement may start.
+            masking = Masking::Moving;
+            lastStep = now;
+            if (deferred) {
+                const int target = *deferred;
+                deferred.reset();
+                ApplyNow(target);
+                if (alive.expired()) return;
+            }
+            again = true;
+        } else if (scrolling) {
+            spring.Step(std::clamp(now - lastStep, 0.0, 0.05));
+            lastStep = now;
+            const bool running = !spring.IsSettled();
+            if (!running) spring.SnapTo(spring.Target());
+            Apply(static_cast<int>(std::lround(spring.Value())));
             if (alive.expired()) return;
             scrolling = running;
             again = running;
+        }
+        const bool moved = movedBefore || movedSinceTick;
+        movedSinceTick = false;
+        if (masking == Masking::Revealing && !moved) {
+            EndMasking();
+        } else if (masking == Masking::Moving && wasMoving && !moved && !scrolling && !dragging) {
+            masking = Masking::Revealing;  // one still frame first, then the editors return
+            again = true;
+        } else if (masking != Masking::None) {
+            again = true;
         }
         if (thumbHover.IsAnimating(now)) {
             ::InvalidateRect(indicator, nullptr, FALSE);
@@ -352,14 +489,15 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
 
     void PolicyChanged() {
         if (surface->Motion().AllowsMovement() && surface->Material() != FormMaterial::Native) return;
-        const int target = Goal();
+        const int target = deferred.value_or(Goal());
         scrolling = false;
-        scroll.SnapTo(static_cast<float>(target));
+        EndMasking();
+        spring.SnapTo(static_cast<float>(target));
         thumbHover.SnapTo(thumbHover.Target());
         if (auto* scheduler = surface->Scheduler()) scheduler->Cancel(this);
         frameRequested = false;
         StopTimer();
-        Apply(target);
+        Apply(target, false);
         if (indicator) ::InvalidateRect(indicator, nullptr, FALSE);
     }
 
@@ -395,6 +533,22 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         return thumb;
     }
 
+    // The thumb in DIPs of a window whose client starts `offsetXPx` left of the indicator's.
+    void DrawThumb(ID2D1DeviceContext* target, const graphics::DesignTokens& tokens, int offsetXPx) {
+        if (!indicator || Range() <= 0) return;
+        const Thumb thumb = ThumbGeometry();
+        RECT client{};
+        ::GetClientRect(indicator, &client);
+        const float amount = std::clamp(thumbHover.Value(Now()), 0.0f, 1.0f);
+        const auto& f = tokens.form;
+        const float scale = surface->ToPx(1.0f);
+        const float width = f.scrollbarWidth + (f.scrollbarHoverWidth - f.scrollbarWidth) * amount;
+        const float right = static_cast<float>(offsetXPx + client.right - thumb.inset) / scale;
+        const auto rect = D2D1::RectF(right - width, static_cast<float>(thumb.top) / scale, right,
+                                      static_cast<float>(thumb.top + thumb.length) / scale);
+        paint::PaintScrollThumb(target, rect, amount, tokens);
+    }
+
     void PaintIndicator() {
         PAINTSTRUCT ps{};
         HDC hdc = ::BeginPaint(indicator, &ps);
@@ -409,19 +563,21 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
                 RECT r{client.right - thumb.inset - width, thumb.top, client.right - thumb.inset, thumb.top + thumb.length};
                 ::FillRect(hdc, &r, ::GetSysColorBrush(hovered || dragging ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT));
             } else {
-                const auto& f = Tokens().form;
-                const float scale = surface->ToPx(1.0f);
-                const float width = f.scrollbarWidth + (f.scrollbarHoverWidth - f.scrollbarWidth) * amount;
-                const float right = static_cast<float>(client.right - thumb.inset) / scale;
-                const auto rect = D2D1::RectF(right - width, static_cast<float>(thumb.top) / scale, right,
-                                              static_cast<float>(thumb.top + thumb.length) / scale);
-                surface->PaintRegion(indicator, hdc, ps.rcPaint,
-                                     [rect, amount](ID2D1DeviceContext* target, const graphics::DesignTokens& tokens) {
-                                         paint::PaintScrollThumb(target, rect, amount, tokens);
-                                     });
+                surface->PaintRegion(indicator, hdc, ps.rcPaint, [this](ID2D1DeviceContext* target, const graphics::DesignTokens& tokens) {
+                    DrawThumb(target, tokens, 0);
+                });
             }
         }
         ::EndPaint(indicator, &ps);
+    }
+
+    // Present draws the thumb with the scene (in the viewport's client coordinates).
+    void DrawThumbOverlay(ID2D1DeviceContext* target, const graphics::DesignTokens& tokens) {
+        if (!indicator || !::IsWindowVisible(indicator)) return;
+        RECT bounds{};
+        ::GetWindowRect(indicator, &bounds);
+        ::MapWindowPoints(nullptr, viewport, reinterpret_cast<POINT*>(&bounds), 2);
+        DrawThumb(target, tokens, bounds.left);
     }
 
     void IndicatorMouse(UINT message, LPARAM lParam) {
@@ -437,7 +593,10 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
                     const Thumb thumb = ThumbGeometry();
                     const int travel = std::max(1, thumb.track - thumb.length);
                     const double fraction = static_cast<double>(y - dragOffset - thumb.inset) / travel;
-                    ScrollTo(static_cast<int>(std::lround(fraction * Range())), false);
+                    scrolling = false;
+                    const int target = static_cast<int>(std::lround(fraction * Range()));
+                    spring.SnapTo(static_cast<float>(std::clamp(target, 0, Range())));
+                    Apply(target, true);  // a drag is continuous motion
                 }
                 break;
             case WM_MOUSELEAVE:
@@ -477,7 +636,8 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     // --- input ---
     bool Wheel(WPARAM wParam) {
         if (Range() <= 0) return false;
-        wheelRemainder += GET_WHEEL_DELTA_WPARAM(wParam);
+        const int raw = GET_WHEEL_DELTA_WPARAM(wParam);
+        wheelRemainder += raw;
         UINT lines = 3;
         ::SystemParametersInfoW(SPI_GETWHEELSCROLLLINES, 0, &lines, 0);
         int delta = 0;
@@ -491,7 +651,9 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             delta = -static_cast<int>(pixels);
             if (delta != 0) wheelRemainder = 0;
         }
-        if (delta != 0) ScrollTo(Goal() + delta, true);
+        if (delta == 0) return true;
+        if (raw % WHEEL_DELTA != 0) ScrollImmediately(delta);  // continuous source: follow it directly
+        else ScrollTo(Goal() + delta, true);                   // notches glide on the spring
         return true;
     }
 
@@ -779,6 +941,9 @@ Result<void> FormScrollView::Create(FormSurface& surface, HWND parent, int id) {
             impl.DestroyWindows();
             return result;
         }
+        surface.SetContainerOverlay(
+            impl.viewport, [&impl](ID2D1DeviceContext* target, const graphics::DesignTokens& tokens) { impl.DrawThumbOverlay(target, tokens); },
+            impl.indicator);
         impl.Layout();
         return Ok();
     } catch (...) {
@@ -817,7 +982,7 @@ void FormScrollView::SetContentHeight(int heightPx) {
             // Layout clamped the position: report it like any other scroll.
             const int clamped = impl.position;
             impl.position = before;
-            impl.Apply(clamped);
+            impl.Apply(clamped, false);
         }
     } catch (...) {
         AETHER_LOG_ERROR("ui_form", "scroll view layout failed");

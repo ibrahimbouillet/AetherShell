@@ -49,3 +49,42 @@ The HOTKEY control's drawing is replaced because it ignores
 running Aether instance, user profile or downloaded resource. Pre-renderer emergency dialogs remain
 `MessageBoxW` by design. Physical DPI transitions, screen-reader walkthroughs and owner acceptance
 remain open (see TEST_STATUS and the [surface inventory](../specs/v3-visual-unification-inventory.md)).
+
+## Amendment — coherent movement and the integrated title strip (D43, 2026-10-26)
+
+Status: implemented by Claude; automated and own-window moving-frame evidence in TEST_STATUS S-052.
+Owner acceptance of the moving interface remains pending.
+
+**Context.** The owner saw scrolled Settings content break apart and reassemble on release, and a
+caption strip of a different material above the glass client. An own-window frame sequence
+reproduced the first: children repainted themselves at different moments while the canvas moved,
+and the opaque layered editors (composed by DWM apart from the form surface) could reach the screen
+one frame before or after it.
+
+**Decision.**
+- Moving containers present atomically: one buffered render of the container and all registered
+  descendants at the destination position, the move, then one blit right behind it; everything
+  drawn is validated so no child repaints a stale piece afterward. Hover/fade tweens inside a
+  scrolling page present through the outermost registered container.
+- Layered editors stay live native controls. Their private images are kept current underneath them
+  at rest; during motion the scene draws the images and the editors stay in place, focusable and
+  hit-testable, at the smallest nonzero opacity, with one identical frame held at each transition.
+  Any input reveals an editor immediately. Painted placeholders never replace an editor at rest.
+- Acrylic forms keep retained material/content layers and per-control visual caches so a scroll
+  frame renders only exposed or changed regions. Wheel notches glide on a critically damped spring;
+  continuous touchpad input moves immediately.
+- Settings removes the standard caption over Acrylic (`WM_NCCALCSIZE`), keeps the side/bottom resize
+  borders, lets DWM draw and hit-test the caption buttons (`DwmDefWindowProc`) and answers the strip,
+  top edge and mark through `WM_NCHITTEST`. Solid material colors the standard caption with the
+  window's own colors; Native keeps the system caption.
+
+**Alternatives rejected.** Hiding editor windows during motion (`SW_HIDE` drops focus, IME and their
+UIA presence);
+replacing editors with painted fields (violates NFR-007); a hardware DC render target (measured no
+better and added a creation hitch); a fully custom-drawn frame without DWM's buttons (loses Snap
+layouts and native caption behavior).
+
+**Limits.** The editor masking is a presentation technique for continuous motion only; an editor
+that changes while masked is re-imaged before it is shown. Retained layers apply to the Acrylic
+material; Solid/Native render complete frames through the same atomic path. Measurements are from one
+Windows 11 configuration (150 %) and describe UI-thread cost, not compositor latency.

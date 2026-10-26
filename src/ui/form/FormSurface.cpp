@@ -16,11 +16,18 @@
 #include <dwmapi.h>
 #include <oleacc.h>
 #include <uxtheme.h>
+#include <wincodec.h>
+#if defined(_M_X64) || defined(_M_IX86)
+#include <emmintrin.h>
+#endif
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <cstring>
 #include <initializer_list>
 #include <map>
+#include <new>
 #include <utility>
 
 namespace aether::ui::form {
@@ -29,6 +36,16 @@ namespace {
 constexpr UINT_PTR kSubclassId = 0x464F524Du;      // "FORM"
 constexpr UINT_PTR kAnimationTimer = 0x464F524Du;  // timer id on the form window (no scheduler)
 constexpr UINT kTimerIntervalMs = 16;
+// Posted once after editors change: their images are refreshed after the queued input is handled.
+UINT SnapshotRefreshMessage() noexcept {
+    static const UINT message = ::RegisterWindowMessageW(L"AetherShell.Form.RefreshEditorImages");
+    return message;
+}
+// Posted after a scrolling container first paints: its retained layers are prepared while idle.
+UINT PrepareLayersMessage() noexcept {
+    static const UINT message = ::RegisterWindowMessageW(L"AetherShell.Form.PrepareLayers");
+    return message;
+}
 // DWMWA_SYSTEMBACKDROP_TYPE and its values (dwmapi.h of the Windows 11 SDK); spelled out so the
 // module also builds against older SDK headers.
 constexpr DWORD kDwmSystemBackdropType = 38;
@@ -204,6 +221,9 @@ struct ControlState {
     std::vector<graphics::Glyph> glyphs;
     bool compact = false;
     int hoverIndex = -1;
+    int leaveIndex = -1;         // the row whose hover is fading out
+    graphics::Tween rowHover;    // hover amount of hoverIndex
+    graphics::Tween rowLeave;    // remaining hover of leaveIndex
     int selected = -2;
     int topIndex = -1;
     graphics::Tween indicator;  // centre of the indicator, DIPs of the list client area
@@ -213,6 +233,16 @@ struct ControlState {
     // Container fade
     graphics::Tween fade{1.0f};
     double start = 0.0;  // continuous animations (Busy ring, indeterminate sweep)
+    // Motion masking of an opaque layered editor (see FormSurface::MaskEditors): a private image of
+    // the editor, premultiplied BGRA of its window rectangle, drawn in the scene while it moves.
+    bool masked = false;
+    bool snapshotDirty = true;  // the editor changed since its image was taken
+    std::vector<std::uint32_t> snapshot;
+    SIZE snapshotSize{};
+    // Present's cached rendering of a self-painted visual (see DrawCachedSelf). Valid while the
+    // control has neither repainted nor been invalidated since, and its size is unchanged.
+    winrt::com_ptr<ID2D1Bitmap> visual;
+    SIZE visualSize{};
 };
 
 struct FormSurface::Impl final : graphics::IFrameClient {
@@ -226,6 +256,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     bool renderer = false;
     bool frameRequested = false;
     bool timerRunning = false;
+    bool snapshotTimer = false;  // a refresh message is queued
     bool bufferedPaint = false;
     bool helpUnavailableLogged = false;
     std::shared_ptr<int> life = std::make_shared<int>(0);
@@ -246,6 +277,203 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     std::vector<FormCard> cards;
     std::vector<FormDivider> dividers;
     FormDecorator decorator;
+    // Present: one pass over a container and all its registered descendants.
+    struct ContainerOverlay {
+        HWND container = nullptr;
+        RegionOverlay overlay;
+        HWND window = nullptr;
+    };
+    std::vector<ContainerOverlay> overlays;
+    bool deep = false;
+    PresentStats stats;
+    // A move Present is about to apply: the scene is rendered as if `pendingWindow` (and everything
+    // inside it) already sat `pendingDy` pixels lower, so the move and the blit can follow back to back.
+    HWND pendingWindow = nullptr;
+    LONG pendingDy = 0;
+
+    // A premultiplied top-down 32-bit DIB selected into its own memory DC (bounded by the size of the
+    // presented container, reused while that size stays the same).
+    struct Dib {
+        HDC dc = nullptr;
+        HBITMAP bitmap = nullptr;
+        HGDIOBJ previous = nullptr;
+        std::uint32_t* bits = nullptr;
+        SIZE size{};
+        Dib() = default;
+        Dib(const Dib&) = delete;
+        Dib& operator=(const Dib&) = delete;
+        ~Dib() { Release(); }
+        // True when the buffer had to be (re)created: its pixels are undefined.
+        bool Ensure(LONG width, LONG height, bool& created) {
+            created = false;
+            if (dc && size.cx == width && size.cy == height) return true;
+            Release();
+            BITMAPINFO info{};
+            info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            info.bmiHeader.biWidth = width;
+            info.bmiHeader.biHeight = -height;
+            info.bmiHeader.biPlanes = 1;
+            info.bmiHeader.biBitCount = 32;
+            info.bmiHeader.biCompression = BI_RGB;
+            void* pixels = nullptr;
+            dc = ::CreateCompatibleDC(nullptr);
+            bitmap = dc ? ::CreateDIBSection(dc, &info, DIB_RGB_COLORS, &pixels, nullptr, 0) : nullptr;
+            if (!dc || !bitmap || !pixels) {
+                Release();
+                return false;
+            }
+            previous = ::SelectObject(dc, bitmap);
+            bits = static_cast<std::uint32_t*>(pixels);
+            size = SIZE{width, height};
+            created = true;
+            return true;
+        }
+        void Release() noexcept {
+            if (dc && previous) ::SelectObject(dc, previous);
+            if (bitmap) ::DeleteObject(bitmap);
+            if (dc) ::DeleteDC(dc);
+            dc = nullptr;
+            bitmap = nullptr;
+            previous = nullptr;
+            bits = nullptr;
+            size = SIZE{};
+        }
+    };
+
+    // A software Direct2D target drawing straight into a WIC bitmap's memory (no per-draw copies).
+    struct WicLayer {
+        winrt::com_ptr<IWICBitmap> bitmap;
+        winrt::com_ptr<ID2D1RenderTarget> target;
+        winrt::com_ptr<ID2D1DeviceContext> context;
+        SIZE size{};
+        // False when the layer cannot be created. `created` reports fresh (undefined) pixels.
+        bool Ensure(IWICImagingFactory* wic, ID2D1Factory* d2d, LONG width, LONG height, UINT dpi, bool& created) {
+            created = false;
+            if (context && size.cx == width && size.cy == height) return true;
+            bitmap = nullptr;
+            target = nullptr;
+            context = nullptr;
+            size = SIZE{};
+            if (!wic || !d2d || width <= 0 || height <= 0) return false;
+            if (FAILED(wic->CreateBitmap(static_cast<UINT>(width), static_cast<UINT>(height), GUID_WICPixelFormat32bppPBGRA,
+                                         WICBitmapCacheOnLoad, bitmap.put()))) {
+                return false;
+            }
+            const auto properties = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_SOFTWARE,
+                                                                 D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+                                                                 static_cast<float>(dpi), static_cast<float>(dpi));
+            if (FAILED(d2d->CreateWicBitmapRenderTarget(bitmap.get(), &properties, target.put()))) {
+                bitmap = nullptr;
+                return false;
+            }
+            context = target.try_as<ID2D1DeviceContext>();
+            if (!context) {
+                bitmap = nullptr;
+                target = nullptr;
+                return false;
+            }
+            size = SIZE{width, height};
+            created = true;
+            return true;
+        }
+    };
+
+    // Direct pixel access to a WIC layer for the duration of a scope (never while it is drawn to).
+    struct LockedPixels {
+        winrt::com_ptr<IWICBitmapLock> lock;
+        std::uint32_t* bits = nullptr;
+        UINT stride = 0;
+        explicit LockedPixels(WicLayer& layer) {
+            const WICRect all{0, 0, layer.size.cx, layer.size.cy};
+            UINT bytes = 0;
+            BYTE* data = nullptr;
+            if (layer.bitmap && SUCCEEDED(layer.bitmap->Lock(&all, WICBitmapLockRead | WICBitmapLockWrite, lock.put())) &&
+                SUCCEEDED(lock->GetStride(&stride)) && SUCCEEDED(lock->GetDataPointer(&bytes, &data))) {
+                bits = reinterpret_cast<std::uint32_t*>(data);
+            }
+        }
+        [[nodiscard]] std::uint32_t* Row(LONG y) const noexcept {
+            return reinterpret_cast<std::uint32_t*>(reinterpret_cast<BYTE*>(bits) + static_cast<std::size_t>(y) * stride);
+        }
+    };
+
+    // Present's retained layers of one container (Acrylic): the window material and fixed decoration
+    // as they lie under the container (static), and the moving content on transparency. A scroll
+    // shifts the content layer and renders only what came into view or changed.
+    struct ContainerLayers {
+        HWND container = nullptr;
+        WicLayer background;
+        std::vector<std::uint32_t> content;  // premultiplied content pixels, only ever written by this code
+        WicLayer scratch;             // Direct2D draws changed content here; it is copied into `content`
+        POINT origin{};               // form-client origin the background was rendered for
+        UINT dpi = 0;
+        bool backgroundValid = false;
+        bool contentValid = false;
+        HRGN dirty = nullptr;         // container pixels painted the ordinary way since the last Present
+        ContainerLayers() = default;
+        ContainerLayers(const ContainerLayers&) = delete;
+        ContainerLayers& operator=(const ContainerLayers&) = delete;
+        ~ContainerLayers() {
+            if (dirty) ::DeleteObject(dirty);
+        }
+        void MarkDirty(const RECT& rect) {
+            if (!contentValid || ::IsRectEmpty(&rect)) return;
+            HRGN add = ::CreateRectRgnIndirect(&rect);
+            if (!add) {
+                contentValid = false;
+                return;
+            }
+            if (!dirty) {
+                dirty = add;
+                return;
+            }
+            ::CombineRgn(dirty, dirty, add, RGN_OR);
+            ::DeleteObject(add);
+        }
+    };
+    Dib composed;  // the composed frame Present copies to the screen
+    winrt::com_ptr<IWICImagingFactory> wic;
+    bool wicUnavailable = false;
+    bool retained = false;  // drawing the retained content layer (control visuals may come from cache)
+    std::vector<std::unique_ptr<ContainerLayers>> layers;
+
+    void InvalidateLayers() noexcept {
+        for (auto& layer : layers) {
+            layer->backgroundValid = false;
+            layer->contentValid = false;
+        }
+    }
+
+    void ReleaseLayers() noexcept {
+        layers.clear();
+        composed.Release();
+    }
+
+    // Ordinary painting inside a container with retained layers marks that part of its content stale.
+    void NoteOrdinaryPaint(HWND hwnd, const RECT& paintedPx) {
+        if (layers.empty() || ::IsRectEmpty(&paintedPx)) return;
+        for (auto& layer : layers) {
+            if (hwnd != layer->container && !::IsChild(layer->container, hwnd)) continue;
+            RECT rect = MapRect(hwnd, layer->container, paintedPx);
+            layer->MarkDirty(rect);
+        }
+    }
+
+    // Form-client pixels of a rectangle in `from`'s client coordinates, honoring a pending move.
+    [[nodiscard]] RECT ToForm(HWND from, RECT rect) const noexcept {
+        rect = MapRect(from, window, rect);
+        if (pendingWindow && pendingDy && (from == pendingWindow || ::IsChild(pendingWindow, from))) ::OffsetRect(&rect, 0, pendingDy);
+        return rect;
+    }
+    [[nodiscard]] RECT FormClient(HWND hwnd) const noexcept {
+        RECT client{};
+        ::GetClientRect(hwnd, &client);
+        return ToForm(hwnd, client);
+    }
+    [[nodiscard]] POINT FormOrigin(HWND hwnd) const noexcept {
+        const RECT origin = ToForm(hwnd, RECT{});
+        return POINT{origin.left, origin.top};
+    }
 
     ~Impl() override { DetachAll(); }
 
@@ -362,6 +590,8 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         fieldBrush = fieldDisabledBrush = nullptr;
         target = nullptr;
         context = nullptr;
+        ReleaseLayers();
+        DropVisualCaches();
     }
 
     IAccPropServices* AccProps() {
@@ -444,7 +674,123 @@ struct FormSurface::Impl final : graphics::IFrameClient {
 
     void UpdateLayeredAlpha(ControlState& c) {
         if (!(::GetWindowLongPtrW(c.hwnd, GWL_EXSTYLE) & WS_EX_LAYERED) || !(c.addedExStyle & WS_EX_LAYERED)) return;
-        ::SetLayeredWindowAttributes(c.hwnd, 0, AlphaByte(FadeOf(c.hwnd)), LWA_ALPHA);
+        // A masked editor keeps the smallest nonzero opacity: invisible, yet still hit-testable.
+        ::SetLayeredWindowAttributes(c.hwnd, 0, c.masked ? BYTE{1} : AlphaByte(FadeOf(c.hwnd)), LWA_ALPHA);
+    }
+
+    // --- motion masking ---
+    // Every shown editor of the container counts, not only those in view: motion brings others in.
+    [[nodiscard]] bool Maskable(const ControlState& c, HWND container) const noexcept {
+        if (!Welled(c.spec.role) || !::IsChild(container, c.hwnd) || !::IsWindowVisible(c.hwnd)) return false;
+        return (c.addedExStyle & WS_EX_LAYERED) != 0;
+    }
+
+    bool CaptureSnapshot(ControlState& c) {
+        RECT bounds{};
+        if (!::GetWindowRect(c.hwnd, &bounds)) return false;
+        const LONG width = bounds.right - bounds.left;
+        const LONG height = bounds.bottom - bounds.top;
+        if (width <= 0 || height <= 0 || width > 8192 || height > 8192) return false;
+        BITMAPINFO info{};
+        info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+        info.bmiHeader.biWidth = width;
+        info.bmiHeader.biHeight = -height;
+        info.bmiHeader.biPlanes = 1;
+        info.bmiHeader.biBitCount = 32;
+        void* bits = nullptr;
+        HDC memory = ::CreateCompatibleDC(nullptr);
+        HBITMAP bitmap = memory ? ::CreateDIBSection(memory, &info, DIB_RGB_COLORS, &bits, nullptr, 0) : nullptr;
+        bool captured = false;
+        if (memory && bitmap && bits) {
+            const HGDIOBJ previous = ::SelectObject(memory, bitmap);
+            captured = ::PrintWindow(c.hwnd, memory, 0) != FALSE;
+            ::GdiFlush();
+            if (captured) {
+                const auto* source = static_cast<const std::uint32_t*>(bits);
+                c.snapshot.assign(source, source + static_cast<std::size_t>(width) * static_cast<std::size_t>(height));
+                for (auto& pixel : c.snapshot) pixel |= 0xFF000000u;  // GDI leaves alpha 0; the editor is opaque
+                c.snapshotSize = SIZE{width, height};
+            }
+            ::SelectObject(memory, previous);
+        }
+        if (bitmap) ::DeleteObject(bitmap);
+        if (memory) ::DeleteDC(memory);
+        return captured;
+    }
+
+    void DrawSnapshot(ID2D1DeviceContext* d2d, const ControlState& c, HWND parent) {
+        if (c.snapshot.empty()) return;
+        const RECT bounds = WindowRectInParent(c.hwnd);
+        if (bounds.right - bounds.left != c.snapshotSize.cx || bounds.bottom - bounds.top != c.snapshotSize.cy) return;
+        winrt::com_ptr<ID2D1Bitmap> bitmap;
+        const auto properties = D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+                                                       static_cast<float>(dpi), static_cast<float>(dpi));
+        if (FAILED(d2d->CreateBitmap(D2D1::SizeU(static_cast<UINT32>(c.snapshotSize.cx), static_cast<UINT32>(c.snapshotSize.cy)),
+                                     c.snapshot.data(), static_cast<UINT32>(c.snapshotSize.cx) * 4u, properties, bitmap.put()))) {
+            return;
+        }
+        d2d->DrawBitmap(bitmap.get(), ToDip(ToForm(parent, bounds)), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+    }
+
+    bool HasVisibleEditors(HWND container) const noexcept {
+        for (const auto& control : controls) {
+            if (Maskable(*control, container)) return true;
+        }
+        return false;
+    }
+
+    // An editor's image is kept current underneath the live editor at rest (where it is never
+    // visible), so a motion can start by hiding the editor without first waiting for its image.
+    void MarkSnapshotDirty(ControlState& c) {
+        c.snapshotDirty = true;
+        if (!snapshotTimer && window) snapshotTimer = ::PostMessageW(window, SnapshotRefreshMessage(), 0, 0) != FALSE;
+    }
+
+    void RefreshSnapshots() {
+        snapshotTimer = false;
+        if (!Styled()) return;
+        for (auto& control : controls) {
+            ControlState& c = *control;
+            if (!c.snapshotDirty || !Welled(c.spec.role) || !(c.addedExStyle & WS_EX_LAYERED) || !::IsWindowVisible(c.hwnd)) continue;
+            if (CaptureSnapshot(c)) {
+                c.snapshotDirty = false;
+                InvalidateFrame(c);
+            }
+        }
+    }
+
+    // True when every editor of `container` is now hidden behind its current image. False when an
+    // image had to be refreshed first: present it, let a frame pass and call again.
+    bool MaskEditors(HWND container) {
+        bool refreshed = false;
+        for (auto& control : controls) {
+            ControlState& c = *control;
+            if (c.masked || !Maskable(c, container) || (!c.snapshotDirty && !c.snapshot.empty())) continue;
+            if (CaptureSnapshot(c)) {
+                c.snapshotDirty = false;
+                refreshed = true;
+            }
+        }
+        if (refreshed) return false;
+        for (auto& control : controls) {
+            ControlState& c = *control;
+            if (c.masked || !Maskable(c, container) || c.snapshot.empty()) continue;
+            c.masked = true;
+            UpdateLayeredAlpha(c);
+        }
+        return true;
+    }
+
+    void Unmask(ControlState& c) {
+        if (!c.masked) return;
+        c.masked = false;
+        UpdateLayeredAlpha(c);  // the scene still shows the identical snapshot underneath
+    }
+
+    void UnmaskEditors(HWND container) {
+        for (auto& control : controls) {
+            if (control->masked && (!container || ::IsChild(container, control->hwnd))) Unmask(*control);
+        }
     }
 
     void ApplyRole(ControlState& c) {
@@ -732,7 +1078,8 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             for (auto& other : controls) {
                 if (Welled(other->spec.role) && ::IsChild(c.hwnd, other->hwnd)) UpdateLayeredAlpha(*other);
             }
-            ::RedrawWindow(c.hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+            // A fading container is presented as one frame; its children never repaint one by one.
+            if (!Present(PresentRoot(c.hwnd))) ::RedrawWindow(c.hwnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
         } else if (Welled(c.spec.role)) {
             InvalidateFrame(c);
             if (c.spec.role == ControlRole::List) ::InvalidateRect(c.hwnd, nullptr, FALSE);
@@ -769,7 +1116,17 @@ struct FormSurface::Impl final : graphics::IFrameClient {
 
     [[nodiscard]] bool TweensRunning(const ControlState& c, double now) const noexcept {
         return c.hover.IsAnimating(now) || c.pressed.IsAnimating(now) || c.on.IsAnimating(now) ||
-               c.indicator.IsAnimating(now) || c.fade.IsAnimating(now);
+               c.indicator.IsAnimating(now) || c.fade.IsAnimating(now) || c.rowHover.IsAnimating(now) ||
+               c.rowLeave.IsAnimating(now);
+    }
+
+    // Hover amount of one Navigation/List row: the entering row rises, the previous one fades out
+    // from wherever it was, so a pointer sweeping down the list leaves a short continuous trail.
+    [[nodiscard]] float RowHoverAmount(const ControlState& c, int index, double now) const noexcept {
+        if (index < 0) return 0.0f;
+        if (index == c.hoverIndex) return std::clamp(c.rowHover.Value(now), 0.0f, 1.0f);
+        if (index == c.leaveIndex) return std::clamp(c.rowLeave.Value(now), 0.0f, 1.0f);
+        return 0.0f;
     }
 
     void Tick(double now) {
@@ -865,16 +1222,29 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             TRACKMOUSEEVENT track{sizeof(track), TME_LEAVE, c.hwnd, 0};
             ::TrackMouseEvent(&track);
         }
-        if (SelfPainted(c.spec.role)) {
-            Animate(c.hover, hovered ? 1.0f : 0.0f, tokens.form.feedback);
+        if ((SelfPainted(c.spec.role) && c.spec.role != ControlRole::Container) || Welled(c.spec.role)) {
+            // Arrival is quicker than departure: feedback starts at once and leaves gently. Containers
+            // have no hover look of their own.
+            Animate(c.hover, hovered ? 1.0f : 0.0f, tokens.form.feedback * (hovered ? 0.75 : 1.0));
             StartAnimation(c);
         }
     }
 
     void SetRowHover(ControlState& c, int index) {
         if (index == c.hoverIndex) return;
+        const double now = Now();
+        const int previous = c.hoverIndex;
+        const float previousAmount = RowHoverAmount(c, previous, now);
+        const float enteringFrom = index >= 0 && index == c.leaveIndex ? RowHoverAmount(c, index, now) : 0.0f;
+        const std::array<int, 3> touched{c.leaveIndex, previous, index};
+        c.leaveIndex = previous;
+        c.rowLeave.SnapTo(previousAmount);
+        if (previous >= 0) c.rowLeave.AnimateTo(0.0f, now, Duration(tokens.form.feedback), tokens.curves.standard);
+        c.hoverIndex = index;
+        c.rowHover.SnapTo(enteringFrom);
+        if (index >= 0) c.rowHover.AnimateTo(1.0f, now, Duration(tokens.form.feedback * 0.75), tokens.curves.standard);
         if (c.spec.role == ControlRole::List) {
-            for (const int row : {c.hoverIndex, index}) {
+            for (const int row : touched) {
                 RECT item{};
                 if (row >= 0 && ::SendMessageW(c.hwnd, LB_GETITEMRECT, static_cast<WPARAM>(row), reinterpret_cast<LPARAM>(&item)) != LB_ERR)
                     ::InvalidateRect(c.hwnd, &item, FALSE);
@@ -882,7 +1252,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         } else {
             ::InvalidateRect(c.hwnd, nullptr, FALSE);
         }
-        c.hoverIndex = index;
+        StartAnimation(c);
     }
 
     // --- painting ---
@@ -891,6 +1261,46 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         HDC hdc = ::BeginPaint(hwnd, &ps);
         if (hdc && !::IsRectEmpty(&ps.rcPaint)) PaintRegion(hwnd, hdc, ps.rcPaint, nullptr);
         ::EndPaint(hwnd, &ps);
+        NoteOrdinaryPaint(hwnd, ps.rcPaint);
+        for (const auto& entry : overlays) {
+            if (entry.container == hwnd || ::IsChild(entry.container, hwnd)) SchedulePrepare(entry.container);
+        }
+    }
+
+    // A scrolling container (one with an overlay) that painted without current retained layers gets them
+    // prepared once the queued messages are handled, so its first scroll does not render everything.
+    void SchedulePrepare(HWND container) {
+        if (material != FormMaterial::Acrylic || preparePosted) return;
+        if (std::none_of(overlays.begin(), overlays.end(), [container](const auto& entry) { return entry.container == container; })) return;
+        for (const auto& layer : layers) {
+            if (layer->container == container && layer->contentValid && layer->backgroundValid) return;
+        }
+        preparePosted = ::PostMessageW(window, PrepareLayersMessage(), reinterpret_cast<WPARAM>(container), 0) != FALSE;
+    }
+
+    void Prepare(HWND container) {
+        preparePosted = false;
+        ControlState* self = Find(container);
+        if (!self || self->spec.role != ControlRole::Container || material != FormMaterial::Acrylic || !Styled() || !TopLevelShown() ||
+            !::IsWindowVisible(container) || !EnsureTarget()) {
+            return;
+        }
+        // Prepare after the page has painted: a later ordinary paint would only mark the work stale.
+        RECT pending{};
+        if (::GetUpdateRect(container, &pending, FALSE)) return;
+        for (const auto& control : controls) {
+            if (!Welled(control->spec.role) && ::IsChild(container, control->hwnd) && ::GetUpdateRect(control->hwnd, &pending, FALSE)) return;
+        }
+        RECT client{};
+        ::GetClientRect(container, &client);
+        if (::IsRectEmpty(&client)) return;
+        deep = true;
+        try {
+            (void)ComposeRetained(container, client, nullptr, nullptr, 0, false);
+        } catch (...) {
+            InvalidateLayers();
+        }
+        deep = false;
     }
 
     void PaintRegion(HWND hwnd, HDC hdc, const RECT& clip, const RegionOverlay* overlay) {
@@ -906,44 +1316,69 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         if (buffer) ::EndBufferedPaint(buffer, TRUE);
     }
 
-    void RenderScene(HWND hwnd, HDC hdc, const RECT& clip, const RegionOverlay* overlay) {
+    // What RenderScene draws: everything (ordinary painting), only the window material and fixed
+    // decoration (Present's cached background), or only what lies on the moving content (Present's
+    // retained content layer, transparent elsewhere and without the container's own fade).
+    enum class SceneLayer { All, Background, Content };
+
+    void RenderScene(HWND hwnd, HDC hdc, const RECT& clip, const RegionOverlay* overlay, SceneLayer layer = SceneLayer::All) {
         if (FAILED(target->BindDC(hdc, &clip))) return;
-        const float s = Scale();
         target->SetDpi(static_cast<float>(dpi), static_cast<float>(dpi));
+        auto* d2d = context.get();
+        d2d->BeginDraw();
+        DrawSceneLayer(d2d, hwnd, clip, RECT{0, 0, clip.right - clip.left, clip.bottom - clip.top}, overlay, layer);
+        const HRESULT hr = d2d->EndDraw();
+        if (hr == D2DERR_RECREATE_TARGET) {
+            target = nullptr;
+            context = nullptr;
+            DropVisualCaches();
+            InvalidateLayers();
+            ::InvalidateRect(hwnd, nullptr, FALSE);
+        }
+    }
+
+    // Draws `clip` (client pixels of `hwnd`) of the scene into `d2d` between its BeginDraw and EndDraw,
+    // with `clip`'s top-left corner at `targetPx` (pixels of the target). Cleared to transparency first.
+    void DrawSceneLayer(ID2D1DeviceContext* d2d, HWND hwnd, const RECT& clip, const RECT& targetPx, const RegionOverlay* overlay,
+                        SceneLayer layer) {
+        const float s = Scale();
         POINT origin{0, 0};
-        ::MapWindowPoints(hwnd, window, &origin, 1);
+        origin = FormOrigin(hwnd);
         const float ox = static_cast<float>(origin.x + clip.left) / s;
         const float oy = static_cast<float>(origin.y + clip.top) / s;
         const D2D1_RECT_F area = D2D1::RectF(ox, oy, static_cast<float>(origin.x + clip.right) / s,
                                              static_cast<float>(origin.y + clip.bottom) / s);
-        auto* d2d = context.get();
-        d2d->BeginDraw();
-        d2d->SetTransform(D2D1::Matrix3x2F::Translation(-ox, -oy));
+        const float tx = static_cast<float>(targetPx.left) / s;
+        const float ty = static_cast<float>(targetPx.top) / s;
+        d2d->SetTransform(D2D1::Matrix3x2F::Translation(tx - ox, ty - oy));
         // Grayscale over translucent glass; ClearType only where every pixel is opaque (Solid).
-        d2d->SetTextAntialiasMode(material == FormMaterial::Solid ? D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE
-                                                                  : D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
-        d2d->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+        d2d->SetTextAntialiasMode(material == FormMaterial::Solid && layer != SceneLayer::Content ? D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE
+                                                                                                    : D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
         d2d->PushAxisAlignedClip(area, D2D1_ANTIALIAS_MODE_ALIASED);
-        paint::PaintBackground(d2d, area, tokens, material);
-        const float fade = FadeOf(hwnd);
+        d2d->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+        if (layer != SceneLayer::Content) paint::PaintBackground(d2d, area, tokens, material);
+        const float fade = layer == SceneLayer::All ? FadeOf(hwnd) : 1.0f;
         const bool layered = fade < 0.999f;
         if (layered) {
             d2d->PushLayer(D2D1::LayerParameters1(D2D1::InfiniteRect(), nullptr, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
                                                   D2D1::IdentityMatrix(), fade, nullptr, D2D1_LAYER_OPTIONS1_NONE),
                            nullptr);
         }
-        DrawCards(d2d, area);
-        DrawDividers(d2d, area);
-        if (decorator) {
+        DrawCards(d2d, area, layer);
+        DrawDividers(d2d, area, layer);
+        if (decorator && layer != SceneLayer::Background) {
             try {
                 decorator(d2d, area, tokens);
             } catch (...) {
                 AETHER_LOG_ERROR("ui_form", "form decorator threw");
             }
         }
-        DrawControls(d2d, hwnd, area);
-        if (overlay && *overlay) {
-            d2d->SetTransform(D2D1::Matrix3x2F::Translation(-static_cast<float>(clip.left) / s, -static_cast<float>(clip.top) / s));
+        if (layer != SceneLayer::Background) {
+            DrawControls(d2d, hwnd, area);
+            if (deep) DrawDescendants(d2d, hwnd, area);
+        }
+        if (overlay && *overlay && layer == SceneLayer::All) {
+            d2d->SetTransform(D2D1::Matrix3x2F::Translation(tx - static_cast<float>(clip.left) / s, ty - static_cast<float>(clip.top) / s));
             try {
                 (*overlay)(d2d, tokens);
             } catch (...) {
@@ -952,19 +1387,13 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         }
         if (layered) d2d->PopLayer();
         d2d->PopAxisAlignedClip();
-        const HRESULT hr = d2d->EndDraw();
-        if (hr == D2DERR_RECREATE_TARGET) {
-            target = nullptr;
-            context = nullptr;
-            ::InvalidateRect(hwnd, nullptr, FALSE);
-        }
     }
 
     // Visible part of a descendant window in form client pixels (clipped by every ancestor).
     RECT VisibleInForm(HWND hwnd) const noexcept {
-        RECT visible = ClientIn(hwnd, window);
+        RECT visible = FormClient(hwnd);
         for (HWND parent = ::GetParent(hwnd); parent && parent != window; parent = ::GetParent(parent)) {
-            const RECT clip = ClientIn(parent, window);
+            const RECT clip = FormClient(parent);
             ::IntersectRect(&visible, &visible, &clip);
         }
         return visible;
@@ -981,14 +1410,20 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         return D2D1::RectF(snap(rect.left), snap(rect.top), snap(rect.right), snap(rect.bottom));
     }
 
-    void DrawCards(ID2D1DeviceContext* d2d, const D2D1_RECT_F& area) {
+    // Cards and dividers on a canvas move with the content; the others stay with the background.
+    static bool InLayer(HWND canvas, SceneLayer layer) noexcept {
+        return layer == SceneLayer::All || (layer == SceneLayer::Content) == (canvas != nullptr);
+    }
+
+    void DrawCards(ID2D1DeviceContext* d2d, const D2D1_RECT_F& area, SceneLayer layer) {
         const float pixel = 1.0f / Scale();
         for (const auto& card : cards) {
+            if (!InLayer(card.canvas, layer)) continue;
             RECT px = card.px;
             std::optional<D2D1_RECT_F> clip;
             if (card.canvas) {
                 if (!::IsWindow(card.canvas) || !::IsWindowVisible(card.canvas)) continue;
-                px = MapRect(card.canvas, window, px);
+                px = ToForm(card.canvas, px);
                 clip = ToDip(VisibleInForm(card.canvas));
             }
             const auto rect = Snap(ToDip(px));
@@ -999,13 +1434,14 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         }
     }
 
-    void DrawDividers(ID2D1DeviceContext* d2d, const D2D1_RECT_F& area) {
+    void DrawDividers(ID2D1DeviceContext* d2d, const D2D1_RECT_F& area, SceneLayer layer) {
         for (const auto& divider : dividers) {
+            if (!InLayer(divider.canvas, layer)) continue;
             RECT px = divider.px;
             std::optional<D2D1_RECT_F> clip;
             if (divider.canvas) {
                 if (!::IsWindow(divider.canvas) || !::IsWindowVisible(divider.canvas)) continue;
-                px = MapRect(divider.canvas, window, px);
+                px = ToForm(divider.canvas, px);
                 clip = ToDip(VisibleInForm(divider.canvas));
             }
             const auto rect = ToDip(px);
@@ -1029,22 +1465,517 @@ struct FormSurface::Impl final : graphics::IFrameClient {
 
     void DrawControls(ID2D1DeviceContext* d2d, HWND hwnd, const D2D1_RECT_F& area) {
         const double now = Now();
-        for (std::size_t i = 0; i < controls.size(); ++i) {
-            ControlState& c = *controls[i];
-            if (!Welled(c.spec.role) || ::GetParent(c.hwnd) != hwnd || !::IsWindowVisible(c.hwnd)) continue;
-            const auto rect = Snap(ToDip(MapRect(hwnd, window, FrameOf(c))));
-            if (!Intersects(rect, area)) continue;
-            const HWND focus = ::GetFocus();
-            const bool focused = c.spec.role != ControlRole::List && (focus == c.hwnd || ::IsChild(c.hwnd, focus));
-            paint::PaintFieldWell(d2d, rect, ::IsWindowEnabled(c.hwnd) != FALSE, focused, c.error, 1.0f / Scale(), tokens);
-        }
+        DrawWells(d2d, hwnd, area, now);
         ControlState* self = Find(hwnd);
         if (!self || !SelfPainted(self->spec.role) || self->spec.role == ControlRole::Container) return;
         DrawSelf(d2d, *self, now);
     }
 
+    // The wells of the opaque layered children whose parent is `parent`.
+    void DrawWells(ID2D1DeviceContext* d2d, HWND parent, const D2D1_RECT_F& area, double now) {
+        for (std::size_t i = 0; i < controls.size(); ++i) {
+            ControlState& c = *controls[i];
+            if (!Welled(c.spec.role) || ::GetParent(c.hwnd) != parent || !::IsWindowVisible(c.hwnd)) continue;
+            const auto rect = Snap(ToDip(ToForm(parent, FrameOf(c))));
+            if (!Intersects(rect, area)) continue;
+            const HWND focus = ::GetFocus();
+            const bool focused = c.spec.role != ControlRole::List && (focus == c.hwnd || ::IsChild(c.hwnd, focus));
+            const bool enabled = ::IsWindowEnabled(c.hwnd) != FALSE;
+            paint::PaintFieldWell(d2d, rect, enabled, focused, c.error, 1.0f / Scale(), tokens,
+                                  enabled ? std::clamp(c.hover.Value(now), 0.0f, 1.0f) : 0.0f);
+            DrawSnapshot(d2d, c, parent);
+        }
+    }
+
+    // Present's single pass: the wells of every nested container, then the visual of every visible
+    // self-painted descendant, each clipped to the part of its window that is actually visible.
+    // The outermost registered container holding `container` (itself when none): a nested container
+    // such as a scroll canvas is presented as part of its viewport, never on its own.
+    HWND PresentRoot(HWND container) const noexcept {
+        HWND root = container;
+        for (HWND parent = ::GetParent(container); parent && parent != window; parent = ::GetParent(parent)) {
+            if (const ControlState* c = Find(parent); c && c->spec.role == ControlRole::Container) root = parent;
+        }
+        return root;
+    }
+
+    // What DrawDescendants draws for one root, in drawing order; computed once per Present (several
+    // changed strips share it) instead of walking every window's ancestors for every strip.
+    struct DrawEntry {
+        ControlState* control = nullptr;
+        D2D1_RECT_F visible{};
+        float fade = 1.0f;
+    };
+    std::vector<DrawEntry> drawList;
+    HWND drawListRoot = nullptr;
+    bool presenting = false;  // inside one retained Present: the draw list stays valid
+    bool preparePosted = false;
+
+    void BuildDrawList(HWND root) {
+        drawList.clear();
+        drawListRoot = nullptr;
+        const float rootFade = std::max(0.001f, FadeOf(root));
+        for (const bool wells : {true, false}) {
+            for (std::size_t i = 0; i < controls.size(); ++i) {
+                ControlState& c = *controls[i];
+                const bool container = c.spec.role == ControlRole::Container;
+                if (wells != container) continue;
+                if (!container && (Welled(c.spec.role) || !SelfPainted(c.spec.role))) continue;
+                if (c.hwnd == root || !::IsChild(root, c.hwnd) || !::IsWindowVisible(c.hwnd)) continue;
+                const auto visible = ToDip(VisibleInForm(c.hwnd));
+                if (visible.right <= visible.left || visible.bottom <= visible.top) continue;
+                drawList.push_back(DrawEntry{&c, visible, std::clamp(FadeOf(c.hwnd) / rootFade, 0.0f, 1.0f)});
+            }
+        }
+        drawListRoot = root;
+    }
+
+    void DrawDescendants(ID2D1DeviceContext* d2d, HWND root, const D2D1_RECT_F& area) {
+        const double now = Now();
+        if (!presenting || drawListRoot != root) BuildDrawList(root);  // ordinary paints rebuild it each time
+        for (const auto& entry : drawList) {
+            {
+                ControlState& c = *entry.control;
+                const bool container = c.spec.role == ControlRole::Container;
+                const auto& visible = entry.visible;
+                if (!Intersects(visible, area)) continue;
+                const float fade = entry.fade;
+                const bool layered = fade < 0.999f;
+                d2d->PushAxisAlignedClip(visible, D2D1_ANTIALIAS_MODE_ALIASED);
+                if (layered) {
+                    d2d->PushLayer(D2D1::LayerParameters1(D2D1::InfiniteRect(), nullptr, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
+                                                          D2D1::IdentityMatrix(), fade, nullptr, D2D1_LAYER_OPTIONS1_NONE),
+                                   nullptr);
+                }
+                if (container) DrawWells(d2d, c.hwnd, area, now);
+                else if (!DrawCachedSelf(d2d, c, now)) DrawSelf(d2d, c, now);
+                if (layered) d2d->PopLayer();
+                d2d->PopAxisAlignedClip();
+            }
+        }
+    }
+
+
+    // `move` (optional) repositions `moving` by `dy` pixels: the frame is rendered at the destination
+    // first, then the windows move and the finished frame is copied right behind them, so the opaque
+    // layered editors (composed separately by DWM) and the scene land in the same composition.
+    // Returns false without calling `move` when nothing can be presented.
+    // A moving page keeps every control's look: Present reuses each visual rendered earlier instead of
+    // re-rendering its text and shapes on every frame. A control that repainted, is invalidated or is
+    // animating is rendered again. Only over translucent glass, where text is grayscale either way.
+    bool DrawCachedSelf(ID2D1DeviceContext* d2d, ControlState& c, double now) {
+        if (!retained || material != FormMaterial::Acrylic || Continuous(c) || c.spec.role == ControlRole::Navigation) return false;
+        const RECT client = FormClient(c.hwnd);
+        const SIZE size{client.right - client.left, client.bottom - client.top};
+        if (size.cx <= 0 || size.cy <= 0) return true;
+        const auto rect = ToDip(client);
+        RECT pending{};
+        const bool stale = !c.visual || c.visualSize.cx != size.cx || c.visualSize.cy != size.cy || TweensRunning(c, now) ||
+                           ::GetUpdateRect(c.hwnd, &pending, FALSE) != FALSE;
+        if (stale) {
+            c.visual = nullptr;
+            winrt::com_ptr<ID2D1BitmapRenderTarget> layer;
+            const D2D1_SIZE_F dipSize{rect.right - rect.left, rect.bottom - rect.top};
+            const D2D1_SIZE_U pixelSize{static_cast<UINT32>(size.cx), static_cast<UINT32>(size.cy)};
+            if (FAILED(d2d->CreateCompatibleRenderTarget(&dipSize, &pixelSize, nullptr, D2D1_COMPATIBLE_RENDER_TARGET_OPTIONS_NONE,
+                                                         layer.put()))) {
+                return false;
+            }
+            auto layerContext = layer.try_as<ID2D1DeviceContext>();
+            if (!layerContext) return false;
+            layerContext->SetDpi(static_cast<float>(dpi), static_cast<float>(dpi));
+            layerContext->BeginDraw();
+            layerContext->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+            layerContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+            layerContext->SetTransform(D2D1::Matrix3x2F::Translation(-rect.left, -rect.top));
+            DrawSelf(layerContext.get(), c, now);
+            if (FAILED(layerContext->EndDraw()) || FAILED(layer->GetBitmap(c.visual.put()))) {
+                c.visual = nullptr;
+                return false;
+            }
+            c.visualSize = size;
+            ++stats.visualsRendered;
+        } else {
+            ++stats.visualsReused;
+        }
+        d2d->DrawBitmap(c.visual.get(), rect, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+        return true;
+    }
+
+    void DropVisualCaches() noexcept {
+        for (auto& control : controls) control->visual = nullptr;
+    }
+
+    bool Present(HWND container, HWND moving = nullptr, LONG dy = 0, const std::function<void()>& move = {}) {
+        ControlState* self = Find(container);
+        if (!self || self->spec.role != ControlRole::Container || !Styled() || !TopLevelShown() || !::IsWindowVisible(container) ||
+            !EnsureTarget()) {
+            return false;
+        }
+        RECT client{};
+        ::GetClientRect(container, &client);
+        if (::IsRectEmpty(&client)) {
+            if (move) move();
+            return true;
+        }
+        bool frameCreated = false;
+        if (!composed.Ensure(client.right, client.bottom, frameCreated)) return false;
+        const double started = Now();
+        const RegionOverlay* overlay = nullptr;
+        HWND overlayWindow = nullptr;
+        for (const auto& entry : overlays) {
+            if (entry.container == container && entry.overlay) {
+                overlay = &entry.overlay;
+                overlayWindow = entry.window;
+            }
+        }
+        deep = true;
+        pendingWindow = move ? moving : nullptr;
+        pendingDy = move ? dy : 0;
+        try {
+            // ClearType over opaque material, or no retained layers: the full scene, rendered at once.
+            if (material != FormMaterial::Acrylic || !ComposeRetained(container, client, overlay, overlayWindow, move ? dy : 0))
+            {
+                if (material == FormMaterial::Acrylic) ++stats.retainedFallbacks;
+                RenderScene(container, composed.dc, client, overlay);
+            }
+        } catch (...) {
+            deep = false;
+            pendingWindow = nullptr;
+            pendingDy = 0;
+            InvalidateLayers();
+            if (move) move();
+            throw;
+        }
+        deep = false;
+        pendingWindow = nullptr;
+        pendingDy = 0;
+        const double moveStarted = Now();
+        stats.stageSeconds[0] += moveStarted - started;
+        if (move) move();  // the windows move now; the finished frame follows immediately
+        stats.stageSeconds[1] += Now() - moveStarted;
+        // No DCX_CLIPCHILDREN: this one copy covers the descendants' pixels as well. The DC is taken
+        // after the move so its visible region describes the final window arrangement.
+        HDC hdc = ::GetDCEx(container, nullptr, DCX_CACHE | DCX_CLIPSIBLINGS);
+        if (!hdc) {
+            ::RedrawWindow(container, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+            return true;
+        }
+        const double copyStarted = Now();
+        ::BitBlt(hdc, 0, 0, client.right, client.bottom, composed.dc, 0, 0, SRCCOPY);
+        ::ReleaseDC(container, hdc);
+        const double copied = Now();
+        stats.stageSeconds[2] += copied - copyStarted;
+        ::ValidateRect(container, nullptr);
+        for (const auto& control : controls) {
+            const ControlState& c = *control;
+            if (c.hwnd == container || Welled(c.spec.role) || !SelfPainted(c.spec.role) || !::IsChild(container, c.hwnd)) continue;
+            ::ValidateRect(c.hwnd, nullptr);
+        }
+        RepaintForeignChildren(container, overlayWindow);
+        if (overlayWindow) ::ValidateRect(overlayWindow, nullptr);
+        const double finished = Now();
+        stats.stageSeconds[3] += finished - copied;
+        Record(finished - started);
+        return true;
+    }
+
+    ContainerLayers& LayersFor(HWND container) {
+        for (auto& layer : layers) {
+            if (layer->container == container) return *layer;
+        }
+        auto created = std::make_unique<ContainerLayers>();
+        created->container = container;
+        layers.push_back(std::move(created));
+        return *layers.back();
+    }
+
+    // Adds `hwnd`'s pending update region (its client pixels awaiting WM_PAINT) to `region`, in the
+    // client coordinates of `container`.
+    static void AddUpdateRegion(HWND hwnd, HWND container, HRGN region) {
+        HRGN update = ::CreateRectRgn(0, 0, 0, 0);
+        if (!update) return;
+        if (::GetUpdateRgn(hwnd, update, FALSE) > NULLREGION) {
+            POINT offset{0, 0};
+            ::MapWindowPoints(hwnd, container, &offset, 1);
+            ::OffsetRgn(update, offset.x, offset.y);
+            ::CombineRgn(region, region, update, RGN_OR);
+        }
+        ::DeleteObject(update);
+    }
+
+    // Premultiplied source-over of `count` pixels: dst = src * k + dst * (1 - srcA * k), k = alpha/255.
+    // Two channels per 32-bit multiply; exact to the rounding of an 8-bit blend.
+    static void BlendOver(std::uint32_t* dst, const std::uint32_t* src, std::size_t count, std::uint32_t alpha) noexcept {
+        const auto scale = [](std::uint32_t pixel, std::uint32_t factor) noexcept {
+            std::uint32_t rb = (pixel & 0x00FF00FFu) * factor + 0x00800080u;
+            rb = ((rb + ((rb >> 8) & 0x00FF00FFu)) >> 8) & 0x00FF00FFu;
+            std::uint32_t ag = ((pixel >> 8) & 0x00FF00FFu) * factor + 0x00800080u;
+            ag = (ag + ((ag >> 8) & 0x00FF00FFu)) & 0xFF00FF00u;
+            return rb | ag;
+        };
+        std::size_t i = 0;
+#if defined(_M_X64) || defined(_M_IX86)
+        // Four pixels at a time with 16-bit lanes; the same rounding as `scale`.
+        const __m128i zero = _mm_setzero_si128();
+        const __m128i full = _mm_set1_epi16(255);
+        const __m128i half = _mm_set1_epi16(128);
+        const __m128i constant = _mm_set1_epi16(static_cast<short>(alpha));
+        const auto divide = [&](__m128i value) {  // value / 255, rounded
+            value = _mm_add_epi16(value, half);
+            return _mm_srli_epi16(_mm_add_epi16(value, _mm_srli_epi16(value, 8)), 8);
+        };
+        const auto alphas = [](__m128i pixels) { return _mm_shufflehi_epi16(_mm_shufflelo_epi16(pixels, 0xFF), 0xFF); };
+        for (; i + 4 <= count; i += 4) {
+            const __m128i source = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src + i));
+            if (_mm_movemask_epi8(_mm_cmpeq_epi32(source, zero)) == 0xFFFF) continue;  // all transparent
+            __m128i sLo = _mm_unpacklo_epi8(source, zero);
+            __m128i sHi = _mm_unpackhi_epi8(source, zero);
+            if (alpha < 255) {
+                sLo = divide(_mm_mullo_epi16(sLo, constant));
+                sHi = divide(_mm_mullo_epi16(sHi, constant));
+            }
+            const __m128i target = _mm_loadu_si128(reinterpret_cast<const __m128i*>(dst + i));
+            const __m128i dLo = divide(_mm_mullo_epi16(_mm_unpacklo_epi8(target, zero), _mm_sub_epi16(full, alphas(sLo))));
+            const __m128i dHi = divide(_mm_mullo_epi16(_mm_unpackhi_epi8(target, zero), _mm_sub_epi16(full, alphas(sHi))));
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(dst + i), _mm_packus_epi16(_mm_add_epi16(sLo, dLo), _mm_add_epi16(sHi, dHi)));
+        }
+#endif
+        for (; i < count; ++i) {
+            std::uint32_t source = src[i];
+            if (alpha < 255) source = scale(source, alpha);
+            const std::uint32_t a = source >> 24;
+            if (a == 0) continue;
+            dst[i] = a == 255 ? source : source + scale(dst[i], 255 - a);
+        }
+    }
+
+    IWICImagingFactory* Wic() {
+        if (!wic && !wicUnavailable) {
+            if (FAILED(::CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory),
+                                          wic.put_void()))) {
+                wic = nullptr;
+                wicUnavailable = true;  // e.g. no COM on this thread: Present renders the full scene instead
+            }
+        }
+        return wic.get();
+    }
+
+    // The retained composition: cached material, the content layer brought up to date (shifted by
+    // the move, then only exposed and changed rectangles rendered), its fade, and the overlay.
+    // Returns false when the retained layers are unavailable (the caller renders the full scene).
+    // `composeFrame` false only brings the retained layers up to date (idle preparation).
+    bool ComposeRetained(HWND container, const RECT& client, const RegionOverlay* overlay, HWND overlayWindow, LONG dy,
+                         bool composeFrame = true) {
+        ContainerLayers& layer = LayersFor(container);
+        bool backgroundCreated = false, scratchCreated = false;
+        const auto pixelCount = static_cast<std::size_t>(client.right) * static_cast<std::size_t>(client.bottom);
+        const bool contentCreated = layer.content.size() != pixelCount;
+        if (contentCreated) layer.content.assign(pixelCount, 0u);
+        if (!layer.background.Ensure(Wic(), factory.get(), client.right, client.bottom, dpi, backgroundCreated) ||
+            !layer.scratch.Ensure(Wic(), factory.get(), client.right, client.bottom, dpi, scratchCreated)) {
+            std::erase_if(layers, [container](const auto& entry) { return entry->container == container; });
+            return false;
+        }
+        const POINT origin = FormOrigin(container);
+        if (!layer.backgroundValid) ++stats.materialReasons[3];
+        if (backgroundCreated) ++stats.materialReasons[0];
+        if (origin.x != layer.origin.x || origin.y != layer.origin.y) {
+            ++stats.materialReasons[1];
+            stats.lastOriginFrom = layer.origin;
+            stats.lastOriginTo = origin;
+        }
+        if (layer.dpi != dpi) ++stats.materialReasons[2];
+        if (backgroundCreated || origin.x != layer.origin.x || origin.y != layer.origin.y || layer.dpi != dpi) layer.backgroundValid = false;
+        if (contentCreated || scratchCreated || layer.dpi != dpi) {
+            layer.contentValid = false;
+            DropVisualCaches();  // they belong to the previous scratch target
+        }
+        layer.dpi = dpi;
+        double mark = Now();
+        const auto lap = [&](std::size_t index) {
+            const double now = Now();
+            stats.composeSeconds[index] += now - mark;
+            mark = now;
+        };
+        if (!layer.backgroundValid) {
+            ++stats.backgroundRenders;
+            auto* d2d = layer.background.context.get();
+            d2d->BeginDraw();
+            DrawSceneLayer(d2d, container, client, client, nullptr, SceneLayer::Background);
+            if (FAILED(d2d->EndDraw())) {
+                std::erase_if(layers, [container](const auto& entry) { return entry->container == container; });
+                return false;
+            }
+            layer.origin = origin;
+            layer.backgroundValid = true;
+        }
+        lap(0);
+        HRGN dirty = ::CreateRectRgn(0, 0, 0, 0);
+        if (!dirty) throw std::bad_alloc();
+        if (!layer.contentValid) {
+            ++stats.contentRebuilds;
+            ::SetRectRgn(dirty, 0, 0, client.right, client.bottom);
+        } else {
+            if (layer.dirty) ::CombineRgn(dirty, dirty, layer.dirty, RGN_OR);
+            AddUpdateRegion(container, container, dirty);
+            for (const auto& control : controls) {
+                const ControlState& c = *control;
+                if (Welled(c.spec.role) || !::IsChild(container, c.hwnd) || !::IsWindowVisible(c.hwnd)) continue;
+                AddUpdateRegion(c.hwnd, container, dirty);
+            }
+            lap(1);
+            if (dy != 0 && std::abs(dy) < client.bottom) {
+                const auto width = static_cast<std::size_t>(client.right);
+                const auto rows = static_cast<std::size_t>(client.bottom - std::abs(dy));
+                std::uint32_t* pixels = layer.content.data();
+                if (dy < 0) std::memmove(pixels, pixels + static_cast<std::size_t>(-dy) * width, rows * width * 4);
+                else std::memmove(pixels + static_cast<std::size_t>(dy) * width, pixels, rows * width * 4);
+                ::OffsetRgn(dirty, 0, dy);
+                HRGN exposed = dy < 0 ? ::CreateRectRgn(0, client.bottom + dy, client.right, client.bottom)
+                                      : ::CreateRectRgn(0, 0, client.right, dy);
+                if (exposed) {
+                    ::CombineRgn(dirty, dirty, exposed, RGN_OR);
+                    ::DeleteObject(exposed);
+                }
+            } else if (dy != 0) {
+                ::SetRectRgn(dirty, 0, 0, client.right, client.bottom);
+            }
+        }
+        if (layer.dirty) {
+            ::DeleteObject(layer.dirty);
+            layer.dirty = nullptr;
+        }
+        lap(2);
+        // Changed rectangles of the content, and the overlay column (drawn in the same pass).
+        std::vector<RECT> rects;
+        RECT bounds{};
+        if (::GetRgnBox(dirty, &bounds) != NULLREGION) {
+            const DWORD bytes = ::GetRegionData(dirty, 0, nullptr);
+            if (bytes) {
+                std::vector<std::byte> data(bytes);
+                auto* region = reinterpret_cast<RGNDATA*>(data.data());
+                if (::GetRegionData(dirty, bytes, region) && region->rdh.nCount <= 12) {
+                    const auto* first = reinterpret_cast<const RECT*>(region->Buffer);
+                    rects.assign(first, first + region->rdh.nCount);
+                }
+            }
+            if (rects.empty()) rects.push_back(bounds);
+            for (auto& rect : rects) ::IntersectRect(&rect, &rect, &client);
+            std::erase_if(rects, [](const RECT& rect) { return ::IsRectEmpty(&rect) != FALSE; });
+        }
+        ::DeleteObject(dirty);
+        RECT strip{};
+        if (overlay && *overlay && overlayWindow && ::IsWindowVisible(overlayWindow)) {
+            strip = MapRect(overlayWindow, container, ClientIn(overlayWindow, overlayWindow));
+            ::IntersectRect(&strip, &strip, &client);
+        }
+        const bool overlaid = !::IsRectEmpty(&strip);
+        std::optional<LockedPixels> scratch;
+        if (!rects.empty() || overlaid) {
+            auto* d2d = layer.scratch.context.get();
+            d2d->BeginDraw();
+            retained = true;
+            presenting = true;
+            BuildDrawList(container);
+            for (const RECT& rect : rects) DrawSceneLayer(d2d, container, rect, rect, nullptr, SceneLayer::Content);
+            presenting = false;
+            drawListRoot = nullptr;
+            retained = false;
+            if (overlaid) {
+                const float s = Scale();
+                d2d->SetTransform(D2D1::IdentityMatrix());
+                d2d->PushAxisAlignedClip(D2D1::RectF(static_cast<float>(strip.left) / s, static_cast<float>(strip.top) / s,
+                                                     static_cast<float>(strip.right) / s, static_cast<float>(strip.bottom) / s),
+                                         D2D1_ANTIALIAS_MODE_ALIASED);
+                d2d->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+                try {
+                    (*overlay)(d2d, tokens);  // drawn in the container's client DIPs
+                } catch (...) {
+                    AETHER_LOG_ERROR("ui_form", "region overlay threw");
+                }
+                d2d->PopAxisAlignedClip();
+            }
+            if (FAILED(d2d->EndDraw())) {
+                std::erase_if(layers, [container](const auto& entry) { return entry->container == container; });
+                return false;
+            }
+            scratch.emplace(layer.scratch);
+            if (!scratch->bits) {
+                layer.contentValid = false;
+                return false;
+            }
+            // The content never reaches into the overlay column (the scroll gutter is kept free).
+            const auto width = static_cast<std::size_t>(client.right);
+            for (RECT rect : rects) {
+                if (overlaid && rect.right > strip.left && rect.left < strip.right) rect.right = std::max(rect.left, strip.left);
+                const auto span = static_cast<std::size_t>(std::max<LONG>(0, rect.right - rect.left)) * 4;
+                if (!span) continue;
+                for (LONG y = rect.top; y < rect.bottom; ++y) {
+                    std::memcpy(layer.content.data() + static_cast<std::size_t>(y) * width + static_cast<std::size_t>(rect.left),
+                                scratch->Row(y) + rect.left, span);
+                }
+            }
+        }
+        layer.contentValid = true;
+        lap(3);
+        if (!composeFrame) return true;
+        // Compose: material, then the content at the container's fade, then the overlay.
+        ::GdiFlush();
+        const auto width = static_cast<std::size_t>(client.right);
+        const float fade = std::clamp(FadeOf(container), 0.0f, 1.0f);
+        {
+            LockedPixels background(layer.background);
+            if (!background.bits) return false;
+            for (LONG y = 0; y < client.bottom; ++y) {
+                std::uint32_t* row = composed.bits + static_cast<std::size_t>(y) * width;
+                std::memcpy(row, background.Row(y), width * 4);
+            }
+            lap(4);
+            if (fade > 0.0f) BlendOver(composed.bits, layer.content.data(), layer.content.size(), AlphaByte(fade));
+        }
+        lap(5);
+        if (overlaid && scratch && scratch->bits) {
+            for (LONG y = strip.top; y < strip.bottom; ++y) {
+                BlendOver(composed.bits + static_cast<std::size_t>(y) * width + static_cast<std::size_t>(strip.left),
+                          scratch->Row(y) + strip.left, static_cast<std::size_t>(strip.right - strip.left), 255);
+            }
+        }
+        lap(6);
+        return true;
+    }
+
+    // Unregistered, unlayered descendants are not part of the scene: they repaint over it.
+    void RepaintForeignChildren(HWND container, HWND overlayWindow) {
+        struct Walk {
+            Impl* self;
+            HWND container;
+            HWND overlay;
+        } walk{this, container, overlayWindow};
+        ::EnumChildWindows(
+            container,
+            [](HWND child, LPARAM parameter) -> BOOL {
+                auto& w = *reinterpret_cast<Walk*>(parameter);
+                if (child == w.overlay || w.self->Find(child) || !::IsWindowVisible(child)) return TRUE;
+                for (HWND walkUp = child; walkUp && walkUp != w.container; walkUp = ::GetParent(walkUp)) {
+                    if (::GetWindowLongPtrW(walkUp, GWL_EXSTYLE) & WS_EX_LAYERED) return TRUE;  // its own surface
+                }
+                ::InvalidateRect(child, nullptr, FALSE);
+                return TRUE;
+            },
+            reinterpret_cast<LPARAM>(&walk));
+    }
+
+    void Record(double seconds) noexcept {
+        ++stats.frames;
+        stats.totalSeconds += seconds;
+        stats.maxSeconds = std::max(stats.maxSeconds, seconds);
+        const auto bucket = static_cast<std::size_t>(std::max(0.0, seconds * 2000.0));
+        ++stats.histogram[std::min(bucket, stats.histogram.size() - 1)];
+    }
+
     void DrawSelf(ID2D1DeviceContext* d2d, ControlState& c, double now) {
-        const auto client = ToDip(ClientIn(c.hwnd, window));
+        const auto client = ToDip(FormClient(c.hwnd));
         const auto visual = VisualOf(c, now);
         const float margin = c.hasFrame ? tokens.form.focusMargin : 0.0f;
         const auto inner = D2D1::RectF(client.left + margin, client.top + margin, client.right - margin, client.bottom - margin);
@@ -1101,7 +2032,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
                 ::SendMessageW(c.hwnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&thumb));
                 auto v = visual;
                 v.pressed = std::max(v.pressed, ::GetCapture() == c.hwnd ? 1.0f : 0.0f);
-                paint::PaintSlider(d2d, ToDip(MapRect(c.hwnd, window, channel)), ToDip(MapRect(c.hwnd, window, thumb)), v, tokens);
+                paint::PaintSlider(d2d, ToDip(ToForm(c.hwnd, channel)), ToDip(ToForm(c.hwnd, thumb)), v, tokens);
                 break;
             }
             case ControlRole::Progress: {
@@ -1127,7 +2058,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         RECT client{};
         ::GetClientRect(c.hwnd, &client);
         POINT origin{0, 0};
-        ::MapWindowPoints(c.hwnd, window, &origin, 1);
+        origin = FormOrigin(c.hwnd);
         const float s = Scale();
         const float ox = static_cast<float>(origin.x) / s;
         const float oy = static_cast<float>(origin.y) / s;
@@ -1142,11 +2073,11 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             RECT item{};
             if (::SendMessageW(c.hwnd, LB_GETITEMRECT, static_cast<WPARAM>(index), reinterpret_cast<LPARAM>(&item)) == LB_ERR) break;
             if (item.top >= client.bottom) break;
-            const auto row = ToDip(MapRect(c.hwnd, window, item));
+            const auto row = ToDip(ToForm(c.hwnd, item));
             std::optional<graphics::Glyph> glyph;
             if (static_cast<std::size_t>(index) < c.glyphs.size()) glyph = c.glyphs[static_cast<std::size_t>(index)];
             paint::PaintNavigationRow(d2d, text, row, ListText(c.hwnd, index, LB_GETTEXTLEN, LB_GETTEXT), glyph, glyphColumn,
-                                      index == selected, index == c.hoverIndex ? 1.0f : 0.0f, c.compact, visual.enabled, tokens);
+                                      index == selected, RowHoverAmount(c, index, now), c.compact, visual.enabled, tokens);
             if (index == caret) caretRow = row;
             if (!anyPill) anyPill = paint::NavigationPillRect(row);
         }
@@ -1363,7 +2294,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             const bool cues = detail::ShowsFocusCues(c.hwnd);
             paint::PaintListRow(context.get(), text, ToDip(rect),
                                 ListText(c.hwnd, static_cast<int>(item.itemID), LB_GETTEXTLEN, LB_GETTEXT),
-                                (item.itemState & ODS_SELECTED) != 0, static_cast<int>(item.itemID) == c.hoverIndex,
+                                (item.itemState & ODS_SELECTED) != 0, RowHoverAmount(c, static_cast<int>(item.itemID), Now()),
                                 (item.itemState & ODS_FOCUS) != 0 && !(item.itemState & ODS_NOFOCUSRECT) && cues,
                                 !(item.itemState & ODS_DISABLED), tokens);
             if (context->EndDraw() == D2DERR_RECREATE_TARGET) {
@@ -1454,6 +2385,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     }
 
     void Forget(HWND hwnd) noexcept {
+        std::erase_if(overlays, [hwnd](const auto& entry) { return entry.container == hwnd || entry.window == hwnd; });
         auto it = std::find_if(controls.begin(), controls.end(), [hwnd](const auto& c) { return c->hwnd == hwnd; });
         if (it == controls.end()) return;
         ClearHelp(**it);
@@ -1520,6 +2452,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             return std::nullopt;
         }
         if (message == WM_PAINT && SelfPainted(role) && (styled || role == ControlRole::Container)) {
+            c.visual = nullptr;  // it repaints itself: Present renders it afresh next time
             Paint(hwnd);
             return 0;
         }
@@ -1528,6 +2461,17 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             ::GetClientRect(hwnd, &client);
             PaintRegion(hwnd, reinterpret_cast<HDC>(wParam), client, nullptr);
             return 0;
+        }
+
+        if (c.masked) {
+            switch (message) {
+                case WM_KEYDOWN: case WM_SYSKEYDOWN: case WM_CHAR: case WM_LBUTTONDOWN: case WM_RBUTTONDOWN:
+                case WM_MBUTTONDOWN: case WM_MOUSEWHEEL: case WM_IME_STARTCOMPOSITION:
+                    Unmask(c);  // the user is working in this editor: show it live at once
+                    break;
+                default:
+                    break;
+            }
         }
 
         switch (message) {
@@ -1570,6 +2514,23 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             c.fraction.reset();
         }
         return std::nullopt;
+    }
+
+    // Messages after which an editor may look different (it often draws directly, without WM_PAINT).
+    static bool ChangesEditorImage(UINT message, WPARAM wParam) noexcept {
+        if (message == WM_MOUSEMOVE) return (wParam & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON)) != 0;  // selection drag
+        if (message >= WM_KEYFIRST && message <= WM_KEYLAST) return true;
+        if (message >= WM_MOUSEFIRST && message <= WM_MOUSELAST) return true;
+        if (message >= EM_GETSEL && message <= EM_GETIMESTATUS) return message != EM_GETSEL && message != EM_GETLINE;
+        if (message >= LB_ADDSTRING && message <= LB_GETLISTBOXINFO) return true;
+        switch (message) {
+            case WM_PAINT: case WM_SETTEXT: case WM_SETFOCUS: case WM_KILLFOCUS: case WM_ENABLE: case WM_VSCROLL:
+            case WM_HSCROLL: case WM_WINDOWPOSCHANGED: case WM_CUT: case WM_PASTE: case WM_CLEAR: case WM_UNDO:
+            case WM_IME_COMPOSITION: case WM_IME_ENDCOMPOSITION: case HKM_SETHOTKEY: case WM_THEMECHANGED: case WM_SETFONT:
+                return true;
+            default:
+                return false;
+        }
     }
 
     // Messages after which a control's visual may have changed. Control messages share the WM_USER
@@ -1615,6 +2576,14 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     void AfterMessage(ControlState& c, UINT message, WPARAM wParam, LPARAM lParam) {
         (void)lParam;
         const ControlRole role = c.spec.role;
+        if (Welled(role) && Styled() && (c.addedExStyle & WS_EX_LAYERED) && ChangesEditorImage(message, wParam)) {
+            if (c.masked) {
+                // Its image is what the moving scene shows: follow the change at once.
+                if (CaptureSnapshot(c)) c.snapshotDirty = false;
+            } else {
+                MarkSnapshotDirty(c);
+            }
+        }
         if (!StateChanging(role, message)) return;
         if (message == WM_SETFOCUS && ::GetKeyState(VK_LBUTTON) >= 0 && ::GetKeyState(VK_RBUTTON) >= 0) {
             // Keyboard (or programmatic) focus: let a scrolling ancestor bring the control into view.
@@ -1654,9 +2623,11 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     void DetachAll() noexcept {
         for (auto& control : controls) RestoreControl(*control);
         controls.clear();
+        overlays.clear();
         if (scheduler) scheduler->Cancel(this);
         frameRequested = false;
         StopTimer();
+        snapshotTimer = false;
         RestoreWindowMaterial();
         if (window && ::IsWindow(window)) ::RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
         ReleaseResources();
@@ -1668,6 +2639,8 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     }
 
     void OnDpiChanged(UINT newDpi) {
+        DropVisualCaches();
+        InvalidateLayers();
         dpi = newDpi ? newDpi : platform::DpiForWindow(window);
         CreateFonts();
         for (auto& control : controls) {
@@ -1728,26 +2701,53 @@ void FormSurface::Detach() noexcept { impl_->DetachAll(); }
 bool FormSurface::Attached() const noexcept { return impl_->Attached(); }
 HWND FormSurface::Window() const noexcept { return impl_->window; }
 
+bool SameAppearance(const graphics::DesignTokens& a, const graphics::DesignTokens& b) noexcept {
+    const auto same = [](const graphics::Color& x, const graphics::Color& y) {
+        return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
+    };
+    // Tokens are derived deterministically from the mode, the accent palette/source, transparency and
+    // the text scale; these fields identify every input that changes form presentation.
+    return a.mode == b.mode && a.transparencyEnabled == b.transparencyEnabled && a.textScale == b.textScale &&
+           a.fontFamily == b.fontFamily && a.displayFontFamily == b.displayFontFamily && a.accentSource == b.accentSource &&
+           a.systemAccent == b.systemAccent && same(a.accent, b.accent) && same(a.accentRoles.fill, b.accentRoles.fill) &&
+           same(a.accentRoles.fillHover, b.accentRoles.fillHover) && same(a.accentRoles.fillPressed, b.accentRoles.fillPressed) &&
+           same(a.accentRoles.text, b.accentRoles.text) && same(a.accentRoles.textOnAccent, b.accentRoles.textOnAccent) &&
+           same(a.textPrimary, b.textPrimary) && same(a.textSecondary, b.textSecondary) && same(a.form.windowTint, b.form.windowTint) &&
+           same(a.form.windowSolid, b.form.windowSolid) && same(a.form.fieldFill, b.form.fieldFill) && same(a.focus.outer, b.focus.outer);
+}
+
 void FormSurface::SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion) {
     auto& impl = *impl_;
     if (!impl.Attached()) return;
     try {
         const FormMaterial previous = impl.material;
+        // Unrelated settings changes re-send the same theme: rebuilding fonts, brushes and every
+        // control frame then would visibly reconstruct the page while the user is interacting.
+        const bool appearance = !SameAppearance(impl.tokens, tokens);
+        const bool motionChanged = motion.reduced != impl.motion.reduced || motion.durationScale != impl.motion.durationScale;
+        if (!appearance && !motionChanged) return;
         impl.tokens = tokens;
         impl.motion = motion;
-        impl.material = ResolveFormMaterial(tokens.mode, tokens.transparencyEnabled, SystemBackdropSupported(), impl.renderer);
-        if (impl.dwrite) impl.text.Initialize(impl.dwrite.get(), tokens.fontFamily, tokens.displayFontFamily);
-        impl.CreateFonts();
-        impl.CreateBrushes();
-        impl.ApplyWindowMaterial();
+        if (appearance) {
+            impl.UnmaskEditors(nullptr);
+            impl.DropVisualCaches();
+            impl.InvalidateLayers();
+            impl.material = ResolveFormMaterial(tokens.mode, tokens.transparencyEnabled, SystemBackdropSupported(), impl.renderer);
+            if (impl.dwrite) impl.text.Initialize(impl.dwrite.get(), tokens.fontFamily, tokens.displayFontFamily);
+            impl.CreateFonts();
+            impl.CreateBrushes();
+            impl.ApplyWindowMaterial();
+        }
         for (std::size_t i = 0; i < impl.controls.size(); ++i) {
             auto& control = *impl.controls[i];
             if (!motion.AllowsMovement() || impl.material == FormMaterial::Native) {
-                for (auto* tween : {&control.hover, &control.pressed, &control.on, &control.indicator, &control.fade})
+                for (auto* tween : {&control.hover, &control.pressed, &control.on, &control.indicator, &control.fade, &control.rowHover,
+                                    &control.rowLeave})
                     tween->SnapTo(tween->Target());
                 control.animating = false;
                 impl.UpdateLayeredAlpha(control);
             }
+            if (!appearance) continue;
             ::SendMessageW(control.hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(impl.font), FALSE);
             impl.ApplyRole(control);
             impl.ApplyFrame(control);
@@ -1764,7 +2764,7 @@ void FormSurface::SetTheme(const graphics::DesignTokens& tokens, const graphics:
         if (previous != impl.material) {
             AETHER_LOG_INFO("ui_form", "form material changed to {}", ToString(impl.material));
         }
-        ::RedrawWindow(impl.window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
+        if (appearance) ::RedrawWindow(impl.window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
         impl.KickContinuous();
     } catch (...) {
         AETHER_LOG_ERROR("ui_form", "form theme update failed");
@@ -1958,8 +2958,88 @@ void FormSurface::FadeIn(HWND container) {
     for (auto& other : impl.controls) {
         if (Welled(other->spec.role) && ::IsChild(container, other->hwnd)) impl.UpdateLayeredAlpha(*other);
     }
+    try {
+        if (impl.Present(impl.PresentRoot(container))) return;
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "container presentation failed");
+    }
     ::RedrawWindow(container, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
+
+bool FormSurface::Present(HWND container) {
+    try {
+        return impl_->Attached() && impl_->Present(container);
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "container presentation failed");
+        return false;
+    }
+}
+
+bool FormSurface::PresentMove(HWND container, HWND moving, int dyPx, const std::function<void()>& move) {
+    if (!move) return Present(container);
+    bool called = false;
+    const auto once = [&] {
+        if (called) return;
+        called = true;
+        move();
+    };
+    try {
+        if (impl_->Attached() && impl_->Present(container, moving, dyPx, once)) return true;
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "container presentation failed");
+        if (!called) once();
+        ::RedrawWindow(container, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+        return true;  // moved, and the ordinary repaint was requested
+    }
+    return false;
+}
+
+POINT FormSurface::ClientOriginPx(HWND hwnd) const noexcept {
+    if (!impl_->Attached() || !hwnd) return POINT{};
+    return impl_->FormOrigin(hwnd);
+}
+
+void FormSurface::SetContainerOverlay(HWND container, RegionOverlay overlay, HWND overlayWindow) {
+    auto& overlays = impl_->overlays;
+    std::erase_if(overlays, [container](const auto& entry) { return entry.container == container; });
+    if (container && overlay) overlays.push_back(Impl::ContainerOverlay{container, std::move(overlay), overlayWindow});
+}
+
+bool FormSurface::HasVisibleEditors(HWND container) const noexcept {
+    try {
+        return impl_->Attached() && impl_->Styled() && impl_->HasVisibleEditors(container);
+    } catch (...) {
+        return false;
+    }
+}
+
+bool FormSurface::MaskEditors(HWND container) {
+    try {
+        return !(impl_->Attached() && impl_->Styled()) || impl_->MaskEditors(container);
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "editor masking failed");
+        impl_->UnmaskEditors(container);
+        return true;
+    }
+}
+
+void FormSurface::UnmaskEditors(HWND container) noexcept {
+    try {
+        impl_->UnmaskEditors(container);
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "editor unmasking failed");
+    }
+}
+
+bool FormSurface::EditorsMasked(HWND container) const noexcept {
+    for (const auto& control : impl_->controls) {
+        if (control->masked && (!container || ::IsChild(container, control->hwnd))) return true;
+    }
+    return false;
+}
+
+FormSurface::PresentStats FormSurface::Stats() const noexcept { return impl_->stats; }
+void FormSurface::ResetStats() noexcept { impl_->stats = PresentStats{}; }
 
 bool FormSurface::Animating() const noexcept { return impl_->AnyAnimating(); }
 
@@ -2008,11 +3088,23 @@ std::optional<LRESULT> FormSurface::HandleMessage(UINT message, WPARAM wParam, L
                 return std::nullopt;
             case WM_SHOWWINDOW:
                 if (wParam) impl.KickContinuous();
+                else {
+                    impl.DropVisualCaches();  // a hidden form keeps no cached renderings
+                    impl.ReleaseLayers();
+                }
                 return std::nullopt;
             case WM_NCDESTROY:
                 impl.DetachAll();
                 return std::nullopt;
             default:
+                if (message == SnapshotRefreshMessage()) {
+                    impl.RefreshSnapshots();
+                    return 0;
+                }
+                if (message == PrepareLayersMessage()) {
+                    impl.Prepare(reinterpret_cast<HWND>(wParam));
+                    return 0;
+                }
                 return std::nullopt;
         }
     } catch (...) {

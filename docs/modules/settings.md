@@ -146,7 +146,8 @@ All new members are additive; 0.1 ignores them with a warning, so rolling back i
 - `dock`: `reserveAnimationSpace` (false), `metricsVersion` (internal, 1..2), `dismissedPins` (at most
   128 ids, each at most 1024 UTF-16 units, unique ignoring case), `explorerDefaultApplied` (false),
   `showStartButton` and `showTaskViewButton` (true).
-- `topBar`: `height` (32 DIP, 24..48), `openWindowsFlyouts` (true), `weatherPlacement`
+- `topBar`: `height` (32 DIP, 24..48), `openWindowsFlyouts` (true; legacy, no longer routes since
+  D44), `windowsQuickSettings` (false; see below), `weatherPlacement`
   (`left`/`right`), `keyboardIndicator` (`two-line`/`compact`, default two-line; two-line needs at least
   30 DIP and the Top Bar falls back to compact below that), `showNotificationAreaButton` and
   `showBatteryPercent` (true).
@@ -279,3 +280,30 @@ cases adapted only in mechanics: `ScrollMetrics` instead of the window scroll ba
 for the Quick Settings switch, a 2-pixel DPI tolerance at fractional scales), redesigned page/layout/
 input/state checks and
 `tests/unit/settings_ui` (formatting and slider mapping). See TEST_STATUS S-049.
+
+## Quick Settings routing key (D44, 2026-10-26)
+
+`topBar.windowsQuickSettings` (default false) is the only routing choice for the Top Bar's grouped
+network/volume/battery action: false opens Aether's own quick-controls panel below the group, true
+opens Windows' Quick Settings (Win+A, Windows 11). Alpha 2's `openWindowsFlyouts` defaulted to true,
+so a stored true cannot be told apart from an untouched default; it is still read, validated and
+written back unchanged for older builds sharing the file, but V3 no longer routes on it. Every Alpha 2
+file (which lacks the new key) therefore opens the Aether panel; the Top Bar page's
+**Use Windows Quick Settings (Windows 11)** switch records an explicit native choice that persists.
+Schema version stays 1; rolling back to Alpha 2 keeps its own flag untouched. Installed Alpha 2
+preferences are not migrated by this change.
+
+## Integrated title strip (D43, SF-05, 2026-10-26)
+
+With the Acrylic form material, Settings removes the standard caption (`WM_NCCALCSIZE` keeps the
+side and bottom borders; the client starts at the window's top edge, below the hidden resize border
+while maximized) so the title strip shows the same tint and grain as the rest of the window, with a
+small brand mark and the window title. DWM still draws and hit-tests the native caption buttons
+(`DwmDefWindowProc`, Snap layouts). `WM_NCHITTEST` returns the top resize edge/corners, `HTCAPTION`
+for the strip (the title text is transparent to hit testing), `HTSYSMENU` for the mark and `HTCLIENT`
+below; the window keeps `WS_OVERLAPPEDWINDOW`, its system menu, keyboard commands and maximize
+behavior. Solid material keeps the standard caption, colored with the window's own background and
+text colors through `DWMWA_CAPTION_COLOR`/`DWMWA_TEXT_COLOR` on Windows 11; Native material keeps the
+system caption. Windows draws an inactive window's Acrylic as its flat fallback (documented, not
+overridden), so the strip and client change together on deactivation. Evidence: the settings_ui
+frame case (S-052) and own-window captures.

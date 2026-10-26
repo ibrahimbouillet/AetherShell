@@ -59,6 +59,7 @@ private:
     bool armed_ = false;
     double refreshInterval_ = 1.0 / 60.0;
     double lastRefreshQuery_ = 0.0;
+    double lastTick_ = 0.0;  // start of the most recent frame (steady cadence while animating)
     std::vector<IFrameClient*> pending_;
     std::vector<IFrameClient*> running_;
 };

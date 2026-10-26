@@ -54,6 +54,7 @@ void Fields(S& s, F&& f) {
     f("topBar", "reserveSpace", s.topBar.reserveSpace);
     f("topBar", "height", s.topBar.height);
     f("topBar", "openWindowsFlyouts", s.topBar.openWindowsFlyouts);
+    f("topBar", "windowsQuickSettings", s.topBar.windowsQuickSettings);
     f("topBar", "weatherPlacement", s.topBar.weatherPlacement);
     f("topBar", "keyboardIndicator", s.topBar.keyboardIndicator);
     f("topBar", "showNotificationAreaButton", s.topBar.showNotificationAreaButton);

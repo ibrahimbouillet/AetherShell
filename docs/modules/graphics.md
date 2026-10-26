@@ -189,6 +189,19 @@ not query providers, fabricate readings or perform system actions.
 Geometries and the stroke style are cached per factory on the calling thread
 (`ReleaseGlyphResources()`).
 
+### System symbols (D44)
+
+`SystemSymbols.h` is the symbol family of transient control surfaces (the owned Quick Settings panel
+and its detail views). `SymbolRenderer` resolves each `Symbol` once per renderer against the icon
+fonts Windows itself installs — Segoe Fluent Icons (Windows 11), then Segoe MDL2 Assets with
+per-symbol alternates (captions and Narrator), then the original vectors in `PaintSymbolVector` — and
+requires `IDWriteFont::HasCharacter` before using a glyph, so a missing glyph never shows a box. Glyph
+runs are drawn on their em box, centred in the target box and snapped to device pixels. No font is
+bundled, downloaded or redistributed (FR-022). `BatterySymbol` and `VolumeSymbol` choose glyphs only
+from known readings (unknown battery and unknown volume never claim a level). The vector fallback
+includes a closed swept-wing aircraft silhouette instead of the rejected crossing-stroke airplane;
+symbols without a vector draw nothing rather than a misleading substitute.
+
 ## Text
 
 `TextStyle` gains `opticalSmall` (Segoe UI Variable Small for 12 DIPs or less, when the text family
@@ -200,7 +213,9 @@ through a text layout, so changing digits such as the clock do not shift).
 Unit (`tests/unit/graphics`, no window): design tokens, motion and transitions, glass geometry,
 glyph geometry, text formats, and painters rendered headless on a WARP device into an offscreen
 bitmap (`D2DCanvas.h`): exterior-only shadow, shared nine-slice profile, grain, high contrast,
-indicators, highlights, the two-tone focus ring, the lift shadow and icon drawing. Integration
+indicators, highlights, the two-tone focus ring, the lift shadow and icon drawing, and the system
+symbol family (code points, battery/speaker selection, installed glyphs centred at 100/200 % and
+the vector fallback; `SystemSymbolTests.cpp`). Integration
 (`tests/integration/ui`) owns the backdrop RGB-delta gate; executed native receipts are dated below
 and in [shared UI](ui.md).
 

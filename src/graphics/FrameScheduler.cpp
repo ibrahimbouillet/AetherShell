@@ -82,10 +82,16 @@ void FrameScheduler::Cancel(IFrameClient* client) noexcept {
 
 void FrameScheduler::Arm() {
     if (armed_ || !timer_) return;
-    if (Now() - lastRefreshQuery_ > 5.0) UpdateRefreshInterval();
+    const double now = Now();
+    if (now - lastRefreshQuery_ > 5.0) UpdateRefreshInterval();
+    // Continuous animation keeps one refresh interval between frame starts: a frame's own work is
+    // not added on top (a 10 ms frame would otherwise run every 27 ms). After a pause, or when a
+    // frame overran, the next one is a full interval away / almost immediate respectively.
+    double delay = refreshInterval_;
+    if (lastTick_ > 0.0 && now - lastTick_ < refreshInterval_ * 1.5) delay = std::max(0.001, lastTick_ + refreshInterval_ - now);
     // Relative due time in 100 ns units (negative = relative).
     LARGE_INTEGER due{};
-    due.QuadPart = -static_cast<LONGLONG>(refreshInterval_ * 10'000'000.0);
+    due.QuadPart = -static_cast<LONGLONG>(delay * 10'000'000.0);
     if (::SetWaitableTimerEx(timer_, &due, 0, nullptr, nullptr, nullptr, 0)) {
         armed_ = true;
     } else {
@@ -98,6 +104,7 @@ void FrameScheduler::Tick() {
     running_.swap(pending_);
     pending_.clear();
     const double now = Now();
+    lastTick_ = now;
     for (std::size_t i = 0; i < running_.size(); ++i) {
         if (IFrameClient* client = running_[i]) client->OnFrame(now);
     }

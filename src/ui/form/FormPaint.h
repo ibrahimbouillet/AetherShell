@@ -104,8 +104,9 @@ void PaintComboField(ID2D1DeviceContext* context, graphics::TextCache& text, con
 
 // Opaque field well (Field, Document, List): fieldFill (fieldFillDisabled when disabled), hairline
 // stroke, critical stroke on error and a 2-DIP accent bottom line while the editor has focus.
+// `hover` 0..1 strengthens the rim only: the fill must match the editor's own background.
 void PaintFieldWell(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, bool enabled, bool focused, bool error,
-                    float pixel, const graphics::DesignTokens& tokens);
+                    float pixel, const graphics::DesignTokens& tokens, float hover = 0.0f);
 
 // Slider at the native geometry: `channel` and `thumb` are the trackbar's own rectangles (DIPs).
 void PaintSlider(ID2D1DeviceContext* context, const D2D1_RECT_F& channel, const D2D1_RECT_F& thumb, const Visual& visual,
@@ -131,9 +132,9 @@ void PaintNavigationRow(ID2D1DeviceContext* context, graphics::TextCache& text, 
 [[nodiscard]] D2D1_RECT_F NavigationIndicatorRect(const D2D1_RECT_F& pill, float centerY,
                                                   const graphics::DesignTokens& tokens) noexcept;
 
-// Owner-drawn list row on the opaque field fill (the whole row is painted opaque).
+// Owner-drawn list row on the opaque field fill (the whole row is painted opaque); `hover` 0..1.
 void PaintListRow(ID2D1DeviceContext* context, graphics::TextCache& text, const D2D1_RECT_F& row, std::wstring_view value,
-                  bool selected, bool hover, bool focusRing, bool enabled, const graphics::DesignTokens& tokens);
+                  bool selected, float hover, bool focusRing, bool enabled, const graphics::DesignTokens& tokens);
 
 // Label text with an optional leading glyph or status badge; `busyAngle` (degrees) rotates the
 // Busy ring.

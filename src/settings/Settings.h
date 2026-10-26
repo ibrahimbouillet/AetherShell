@@ -80,9 +80,14 @@ struct TopBarSettings {
     bool showWeather = true;       // only effective when weather.enabled
     bool reserveSpace = true;      // register as a top AppBar so maximized windows stay below it
     int height = 32;               // bar height in DIPs, 24..48; glyphs, text and reservation follow it
-    // Persisted preference for future flyout/settings routing. Current status actions use their
-    // documented fixed routes; this switch is not yet consumed by the app (see KNOWN_LIMITATIONS).
+    // Legacy Alpha 2 routing flag. It defaulted to true, so a stored true cannot be told apart from
+    // an untouched default; V3 no longer consumes it for routing (D44). It is still read and written
+    // unchanged so an older Aether Shell sharing the file keeps its own behavior.
     bool openWindowsFlyouts = true;
+    // The Top Bar's network/volume/battery group opens Windows' own Quick Settings (Win+A, Windows 11)
+    // instead of Aether's quick controls. Off unless the person explicitly chooses it (D44); a file
+    // without this key, including every Alpha 2 file, therefore opens Aether's panel.
+    bool windowsQuickSettings = false;
     WeatherPlacement weatherPlacement = WeatherPlacement::Left;
     // TwoLine needs a height of at least 30 DIPs; the Top Bar falls back to Compact below that.
     KeyboardIndicatorStyle keyboardIndicator = KeyboardIndicatorStyle::TwoLine;

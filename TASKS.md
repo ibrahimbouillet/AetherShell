@@ -11,22 +11,25 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 [the English continuation prompt](docs/V3_CONTINUATION_PROMPT.md). This is a broader design/motion
 overhaul, not a finished release after one batch. Preserve the installed Alpha 2; no V3 publication yet.
 
-**Current owner priority, 2026-10-26 — T47/D43:** Claude implements
-[the Settings fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md). The owner rejects the current
-scroll fragmentation, weak actionable-icon hover response, abrupt transitions and caption/content
-material mismatch. Codex prepared the detailed English prompt and performed source-only reviews;
-no follow-up code or moving-frame test is implemented. Use SF-01–SF-11, reproduce before diagnosing,
-measure responsiveness on a stated configuration and inspect actual movement before claiming
-success. Preserve native controls/UIA/consent/persistence, the current Dock and installed Alpha 2.
+**Current owner priority, 2026-10-26 — T47/D43 (implemented by Claude, S-052; owner review pending):**
+[the Settings fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md). The owner rejected scroll
+fragmentation, weak actionable-icon hover response, abrupt transitions and the caption/content
+material mismatch. Claude reproduced the fragmentation in own-window moving frames and corrected it
+with atomic container presentation, live-editor motion masking, retained layers and a spring scroll;
+field and row hover now animate, and the Acrylic title strip shares the window material with native
+caption buttons. Evidence and remaining SF gaps: S-052 and the
+[surface inventory](docs/specs/v3-visual-unification-inventory.md). Native controls/UIA/consent/
+persistence, the Dock's tuning and installed Alpha 2 are preserved.
 
-**Updated owner assignment — T41/D44:** Claude builds a complete Aether-owned Quick Settings panel
-faithful to the supplied private picture: compact three-by-two grid, split buttons/details, proper
-recognizable icons (the crude airplane is rejected), paging, brightness/volume/output, battery/gear
-footer, polished interaction/motion, and Aether light/dark frosted grain below the clicked Top Bar
-group. Section 14 of the focused brief replaces the previous native-placement investigation with
-QC-01–QC-10 and a capability-parity matrix. Codex updates/transmits the prompt and private pictures
-only; implementation remains unstarted. Preserve real state/API/privacy, explicit routing/default
-policy, conditional media and installed Alpha 2; no mockup-only or fake-toggle completion claim.
+**Updated owner assignment — T41/D44 (implemented by Claude, S-052; owner review pending):** a complete
+Aether-owned Quick Settings panel faithful to the supplied private picture: three-by-two grid with
+split Wi-Fi/Bluetooth tiles and details, installed Windows icon fonts (no crossing-stick airplane),
+two pages, brightness/volume/output, battery/gear footer, Accessibility/Wi-Fi/Bluetooth/output
+detail views, retargetable motion, Aether light/dark frosted grain and below-group anchoring. Routing:
+`topBar.windowsQuickSettings` (default false) replaces the legacy flag for routing (D44). Unsupported
+global switches are labelled Settings routes; see the capability matrix in
+[quick controls](docs/modules/controlcenter.md). Real actions and owner visual acceptance remain
+manual checks.
 
 **Previous implementation checkpoint, 2026-10-25 — T47:** Codex resumed Claude's interrupted visual redesign across
 the logo menu, every Settings page/control and all Aether-owned supporting interfaces. Follow
@@ -64,12 +67,12 @@ The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
-| T47 — Coherent Settings, menus and supporting UI | FR-037, FR-011, FR-015, FR-022, FR-026, FR-034; NFR-001–NFR-011; D41–D43 | Base shared forms/menus in `2e4ff0d` have S-049's Release/unit/scoped-native/layout evidence. On 2026-10-26 the owner rejects current Settings scrolling, hover/state transitions and caption material. Claude implements the [focused fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md); SF-01–SF-11 moving-frame, interaction, caption and response criteria remain unstarted/unverified (S-050 is source inspection and prompt preparation only). Preserve wider installer/updater scope and native exceptions in the [surface inventory](docs/specs/v3-visual-unification-inventory.md). Owner acceptance, physical DPI, screen-reader/IME and clean-machine qualification remain open; V3 is not complete or published. |
+| T47 — Coherent Settings, menus and supporting UI | FR-037, FR-011, FR-015, FR-022, FR-026, FR-034; NFR-001–NFR-011; D41–D43 | Base shared forms/menus in `2e4ff0d` have S-049's Release/unit/scoped-native/layout evidence. On 2026-10-26 the owner rejected current Settings scrolling, hover/state transitions and caption material. Claude implemented the [focused fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) (S-052): SF-01 reproduced and corrected (own-window moving-frame regressions pass in both themes), animated field/row hover, integrated Acrylic title strip with native caption behavior; per-criterion evidence and the SF items still only partially evidenced are in the inventory. Preserve wider installer/updater scope and native exceptions in the [surface inventory](docs/specs/v3-visual-unification-inventory.md). Owner acceptance, physical DPI, screen-reader/IME and clean-machine qualification remain open; V3 is not complete or published. |
 | T45 — One active shared working folder | NFR-004, NFR-008, NFR-010; D18, D39 | Executed by Claude (S-040). Codex confirmed the official origin, single worktree, local lineage and a fresh successful build (S-042); an unexpected byte-identical launcher folder move was reversed without content edits. Private recovery/archive restore verification remains Claude's receipt. [Addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md). |
 | T46 — Attach executable-only windows to their unique desktop pin | FR-002, FR-003, FR-004, FR-034; NFR-004, NFR-008 | Implemented (S-044): same validated full executable path, argument-free desktop AUMID pin, no conflicting catalog/running identities or ambiguous pins. Explicit profiles remain separate; pin ID/launch route retained. 65 Dock unit cases and one own-window merged-pin preview/activation/close regression pass. Updated runtime is active; owner confirmation pending. |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Source patch removes expanded Dock/Top Bar visual HWND regions (S-035). S-047 additionally disables Dock panel/lift shadows that were clipped into square patches at raised icon slots; dark/light composed white-backdrop probes pass without expanding input regions or changing magnification. Separate-process input delivery, rounded-corner input and physical visual acceptance remain. Not installed into the owner's Alpha 2. |
 | T40 — Compact Dock and symmetric usable edges | FR-031, FR-032, FR-027; D38 | Compact panel implemented: top padding 12→9 DIPs, default height 70→67, unchanged icons/custom sizes/bottom gap; 96/144/192-DPI geometry checks pass (S-036). No settings migration or installed change. Symmetric work-area prototype and physical visual acceptance remain. |
-| T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38, D44 | Earlier Win+A native-opening evidence remains historical. The owner now chooses a complete owned-panel recreation of the private reference, with polished glyphs/controls/motion, Aether glass and below-click anchoring. Claude implements section 14/QC-01–QC-10 of the [focused brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md); Codex provides prompt/private image references only. Current source has real adapters and an anchored two-card panel, not the requested final presentation. New visual/functional parity, routing, moving-frame and owner gates remain unstarted/unverified; unsupported API gaps must be explicit. |
+| T41 — Native system controls, real signal and rounded icons | FR-035, FR-026; D38, D44 | Earlier Win+A native-opening evidence remains historical. The owner now chooses a complete owned-panel recreation of the private reference, with polished glyphs/controls/motion, Aether glass and below-click anchoring. Section 14/QC-01–QC-10 of the [focused brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) define it; Codex provided the prompt and private image references only. Claude implemented the owned panel (S-052): reference layout and proportions, installed icon fonts, details, paging, sliders, footer, conditional media, D44 routing key, motion sequences reviewed and idle verified, 11 native panel cases. Unsupported global switches are explicit Settings routes. Real actions and owner visual acceptance remain manual checks. |
 | T42 — Living dot/pill indicators | FR-033; D38 | Claude implementation (S-041), independently reviewed and scoped tests rerun by Codex (S-042): dedicated calmer `Motion().marker` spring (≈0.35 s to 90 %, 0.52 s to 0.1 DIP; magnify unchanged); hover/card emphasis expands a background dot to exactly the foreground width without activation or active colour; activation hold preserves width through the observed transfer. Owner normal-speed real-desktop acceptance pending. |
 | T43 — Live hover cards and selected-window actions | FR-034; D38 | Claude implementation (S-041), Codex input corrections (S-042); owner confirmed basic hover/preview works, requested tighter spacing. Compact content-fitted cards preserve thumbnail size and 28-DIP X; S-043 passes 62 unit and 10 executed native cases. New spacing acceptance, card anchor after Dock reflow, source-only resize crop/aspect, physical DPI and later media controls remain open. |
 | T44 — Window choreography and corners | FR-036; D38, D40 | Guarded policy implemented (S-045), then owner-rejected rectangular material corrected in S-046: independent exact material/region leases, app replacements preserved, partial-error recovery and bounded retry. 58 app unit and 12 native cases pass, including actual cutout pixels over two changing private backdrop phases with genuine composition content and material restoration. Corrected runtime/owner acceptance remains separate; unsupported windows, antialiasing, guard-self-crash recovery, broad compatibility and icon-anchored choreography remain open. |

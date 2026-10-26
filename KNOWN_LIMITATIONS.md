@@ -80,10 +80,25 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   qualified. Audio output mute/volume and microphone endpoint mute remain separate from recording
   and microphone-in-use detection. The owner clarified right-click applies to Dock icons, avatars to
   Chrome profiles, and requested Windows voice typing in addition to mute/settings.
-- `topBar.openWindowsFlyouts` is stored for compatibility but is not yet a routing switch. Current
-  actions have fixed targets (network/sound/power/privacy Settings and the calendar key chord).
-  The microphone menu now requests Windows voice typing after restoring application focus. Actual
-  dictation availability/focus/permission remains a manual check; automated tests never open it.
+- `topBar.openWindowsFlyouts` is stored for compatibility but is not a routing switch. In V3 source
+  (D44, local only, not in Alpha 2) the grouped network/volume/battery action opens Aether's own Quick
+  Settings panel unless `topBar.windowsQuickSettings` is explicitly chosen; other actions keep fixed
+  targets (network/sound/power/privacy Settings and the calendar key chord). The microphone menu
+  requests Windows voice typing after restoring application focus. Actual dictation availability/
+  focus/permission remains a manual check; automated tests never open it.
+- The V3 Aether Quick Settings panel (D44, local source only) has no documented global switch for
+  airplane mode, energy saver, night light, mobile hotspot or nearby sharing: those tiles open the
+  matching Windows Settings page and say so. Direct output-device switching is not implemented (the
+  output view offers mute, the volume mixer and Sound settings). Wi-Fi shows connection state, never a
+  network name (FR-008). Narrator/Magnifier/On-screen keyboard/Live captions are started with their
+  documented Windows shortcuts, whose effect is not read back. Real radio, audio, brightness,
+  accessibility and media actions from this panel need owner checks; automated tests use synthetic
+  state and never perform them. Owner visual/motion acceptance is pending.
+- V3 Settings (D43, local source only) integrates its title strip with the Acrylic material on
+  Windows 11 22H2+; Windows 10, transparency off and high contrast keep a standard caption. The
+  inactive window shows Windows' flat Acrylic fallback. Scrolling coherence was measured on one
+  Windows 11 configuration at 150 % scaling; physical multi-monitor DPI, IME composition and
+  screen-reader walkthroughs remain open.
 
 Record new reproducible issues in the official repository without personal paths, account details,
 credentials, unrelated application data or whole-desktop screenshots.

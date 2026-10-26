@@ -19,6 +19,7 @@
 
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <span>
 #include <string>
 #include <thread>
@@ -495,5 +496,70 @@ AETHER_TEST("settings design: pages render on the form material over a private b
             }
         }
     }
+    window.Close();
+}
+
+AETHER_TEST("settings design: the integrated title strip keeps native caption, resize, menu and maximize behaviour") {
+    Fixture f("settings-design-frame");
+    settings::ui::SettingsWindow window(f.service, f.dispatcher);
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{});
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    const HWND hwnd = window.Handle();
+    const int dpi = static_cast<int>(::GetDpiForWindow(hwnd));
+    const RECT safe = SafeArea();
+    const int width = std::min<int>(safe.right - safe.left - 40, ::MulDiv(820, dpi, 96));
+    const int height = std::min<int>(safe.bottom - safe.top - 20, ::MulDiv(600, dpi, 96));
+    ::SetWindowPos(hwnd, nullptr, (safe.left + safe.right - width) / 2, (safe.top + safe.bottom - height) / 2, width, height,
+                   SWP_NOZORDER | SWP_NOACTIVATE);
+    PumpFor(f.dispatcher, 200ms);
+    const auto origin = [&] { POINT point{0, 0}; ::ClientToScreen(hwnd, &point); return point; };
+    RECT frame{};
+    ::GetWindowRect(hwnd, &frame);
+    // The window stays a standard resizable, maximizable window with its system menu.
+    const auto style = static_cast<DWORD>(::GetWindowLongPtrW(hwnd, GWL_STYLE));
+    CHECK((style & WS_THICKFRAME) != 0); CHECK((style & WS_MAXIMIZEBOX) != 0); CHECK((style & WS_SYSMENU) != 0);
+    const HMENU menu = ::GetSystemMenu(hwnd, FALSE);
+    REQUIRE(menu != nullptr);
+    CHECK(::GetMenuState(menu, SC_MAXIMIZE, MF_BYCOMMAND) != static_cast<UINT>(-1));
+    CHECK(::GetMenuState(menu, SC_CLOSE, MF_BYCOMMAND) != static_cast<UINT>(-1));
+    if (origin().y != frame.top) {
+        // Opaque material keeps the standard caption (colored by the window on Windows 11).
+        TEST_NOTE("standard frame: the form material is opaque on this system");
+        CHECK(origin().y > frame.top);
+        window.Close();
+        return;
+    }
+    // Integrated strip: the client starts at the window's top; side borders remain resize borders.
+    CHECK(origin().x > frame.left);
+    RECT buttons{};
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(hwnd, 5 /* DWMWA_CAPTION_BUTTON_BOUNDS */, &buttons, sizeof(buttons))));
+    REQUIRE(buttons.right > buttons.left); REQUIRE(buttons.bottom > buttons.top);
+    const auto hit = [&](LONG x, LONG y) { return ::SendMessageW(hwnd, WM_NCHITTEST, 0, MAKELPARAM(x, y)); };
+    const LONG stripY = frame.top + (buttons.top + buttons.bottom) / 2;
+    CHECK_EQ(hit((frame.left + frame.right) / 2, frame.top + 1), LRESULT{HTTOP});
+    CHECK_EQ(hit(origin().x + 2, frame.top + 1), LRESULT{HTTOPLEFT});
+    CHECK_EQ(hit(frame.left + buttons.left / 2, stripY), LRESULT{HTCAPTION});
+    CHECK_EQ(hit(frame.left + buttons.right - (buttons.right - buttons.left) / 8, stripY), LRESULT{HTCLOSE});
+    CHECK_EQ(hit(origin().x + ::MulDiv(22, dpi, 96), origin().y + buttons.bottom / 2), LRESULT{HTSYSMENU});
+    CHECK_EQ(hit((frame.left + frame.right) / 2, frame.top + buttons.bottom + ::MulDiv(60, dpi, 96)), LRESULT{HTCLIENT});
+    // The title text lets the strip drag the window through it.
+    const HWND title = ::GetDlgItem(hwnd, 122);
+    REQUIRE(title != nullptr); CHECK(::IsWindowVisible(title));
+    RECT titleRect{};
+    ::GetWindowRect(title, &titleRect);
+    CHECK_EQ(::SendMessageW(title, WM_NCHITTEST, 0, MAKELPARAM((titleRect.left + titleRect.right) / 2, (titleRect.top + titleRect.bottom) / 2)),
+             LRESULT{HTTRANSPARENT});
+    CHECK(titleRect.bottom <= frame.top + buttons.bottom + 1);
+    // Maximized: the client begins at the work area (not under the screen edge) and the top is caption.
+    ::ShowWindow(hwnd, SW_MAXIMIZE);
+    PumpFor(f.dispatcher, 250ms);
+    MONITORINFO monitor{sizeof(monitor)};
+    REQUIRE(::GetMonitorInfoW(::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &monitor) != FALSE);
+    CHECK(std::abs(origin().y - monitor.rcWork.top) <= 1);
+    CHECK_EQ(hit((monitor.rcWork.left + monitor.rcWork.right) / 2, monitor.rcWork.top + 2), LRESULT{HTCAPTION});
+    ::ShowWindow(hwnd, SW_RESTORE);
+    PumpFor(f.dispatcher, 250ms);
+    ::GetWindowRect(hwnd, &frame);
+    CHECK_EQ(origin().y, frame.top);
     window.Close();
 }

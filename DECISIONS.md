@@ -134,6 +134,14 @@ pixels as shipping assets. Preserve media capability conditionally without the d
 card. The panel remains transient; no extra persistent desktop surface, new dependency, installation,
 push, tag or release is authorized. The supplied pictures remain local and ignored.
 
+Routing policy as implemented (Claude, 2026-10-26, S-052): a new `topBar.windowsQuickSettings`
+(default false) is the only routing choice. The Alpha 2 `openWindowsFlyouts` flag defaulted to true,
+so a stored true is indistinguishable from an untouched default; it is kept, validated and written
+unchanged for older builds but no longer routes. Files without the new key, including every Alpha 2
+file, open the Aether panel; the Settings switch records an explicit native choice. No installed
+preference is rewritten. Unsupported global switches (airplane mode, energy saver, night light,
+hotspot, nearby sharing) are labelled Settings routes; see [quick controls](docs/modules/controlcenter.md).
+
 ### D43 — Settings must remain coherent during movement and share its glass with the top frame
 
 Owner direction, 2026-10-26 (FR-037/FR-015/T47): the current private Settings presentation is not
@@ -155,6 +163,11 @@ targets in the brief are reference-configuration engineering proposals, not new 
 budgets or amendments to Q-001. D42's implementation may be revised with evidence and a focused ADR
 update; native editing/UIA/consent/persistence requirements are preserved. This turn authorizes no
 source implementation by Codex, new dependency, installation, push, tag or release.
+
+Implementation (Claude, 2026-10-26, S-052): reproduced in own-window moving frames and corrected
+with atomic container presentation, live-editor motion masking, retained layers, a spring scroll and
+an integrated Acrylic title strip with native caption buttons; see the ADR 0011 amendment. Owner
+acceptance of the moving interface remains pending.
 
 ### D42 — Native forms on one scene with opaque native editors; glass popups behind IMenuPresenter
 

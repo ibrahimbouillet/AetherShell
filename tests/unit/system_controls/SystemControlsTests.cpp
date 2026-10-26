@@ -3,6 +3,8 @@
 #include "AetherTest.h"
 #include "system_controls/SystemControls.h"
 
+#include <windows.h>
+
 #include <array>
 #include <chrono>
 
@@ -157,4 +159,34 @@ AETHER_TEST("system_controls radio mutation requires a known kind and explicit p
     for (const auto kind : {RadioKind::WiFi, RadioKind::Bluetooth})
         for (const bool enabled : {false, true})
             ExpectError(SetRadioEnabled(kind, enabled, false), ErrorCode::AccessDenied);
+}
+
+AETHER_TEST("system_controls accessibility features use documented shortcuts and settings") {
+    struct Expected { AccessibilityFeature feature; SystemShortcut shortcut; unsigned build; };
+    constexpr std::array shortcuts{
+        Expected{AccessibilityFeature::Magnifier, SystemShortcut::Magnifier, 0},
+        Expected{AccessibilityFeature::Narrator, SystemShortcut::Narrator, 0},
+        Expected{AccessibilityFeature::OnScreenKeyboard, SystemShortcut::OnScreenKeyboard, 0},
+        Expected{AccessibilityFeature::LiveCaptions, SystemShortcut::LiveCaptions, 22621}};
+    for (const auto& expected : shortcuts) {
+        const auto action = ActionFor(expected.feature);
+        REQUIRE(action.ok());
+        CHECK(action->kind == SystemActionKind::KeyboardShortcut);
+        CHECK(action->shortcut == expected.shortcut);
+        CHECK_EQ(action->minimumWindowsBuild, expected.build);
+        CHECK(action->settingsUri.empty());
+    }
+    const auto settings = ActionFor(AccessibilityFeature::Settings);
+    REQUIRE(settings.ok());
+    CHECK(settings->kind == SystemActionKind::Settings);
+    CHECK(settings->settingsUri == L"ms-settings:easeofaccess");
+    ExpectError(ActionFor(static_cast<AccessibilityFeature>(99)), ErrorCode::InvalidArgument);
+}
+
+AETHER_TEST("system_controls sticky keys reading needs the feature to be available") {
+    CHECK_FALSE(StickyKeysState(0).has_value());                                 // not offered: unknown
+    CHECK_FALSE(StickyKeysState(SKF_STICKYKEYSON).has_value());                  // on without availability: unknown
+    CHECK(StickyKeysState(SKF_AVAILABLE) == std::optional<bool>(false));
+    CHECK(StickyKeysState(SKF_AVAILABLE | SKF_STICKYKEYSON) == std::optional<bool>(true));
+    CHECK(StickyKeysState(SKF_AVAILABLE | SKF_HOTKEYACTIVE) == std::optional<bool>(false));
 }

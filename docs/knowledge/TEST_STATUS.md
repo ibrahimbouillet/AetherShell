@@ -2099,3 +2099,97 @@ including a proper airplane. Font/asset licensing and no-redistribution requirem
 runtime test, native panel movement/opening, real-device mutation, candidate relaunch, installation
 or publication. The new panel and QC criteria remain unstarted/unverified. Prompt references,
 public privacy/whitespace and command syntax are checked separately; these are not UI acceptance.
+
+### S-052 — Settings fluidity and owned Quick Settings implemented (Claude, 2026-10-26)
+
+Claude implemented both parts of the [focused brief](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md)
+(D43/D44, T47/T41) in the shared `main` checkout, starting from `4cd4ae2`. Environment: Windows 11
+build 26300 x64, MSVC 14.51, one 1920 × 1080 display at 150 %, interactive desktop with the previous
+private trial (`2e4ff0d`) running. Build folder `build/wf-claude-fluidity` (Release, `/W4 /WX`).
+No owner desktop capture was made; every capture is an own test window over a private backdrop.
+
+**SF-01 reproduction (before).** A new dense own-window fixture (`FormMotionTests.cpp`: cards,
+labels, buttons, layered EDIT fields, check/slider/helper rows and alignment bars) scrolled by a
+wheel script (notch bursts, reversal, fast burst, fractional deltas) while a capture thread analysed
+every distinct frame for bar/button/field-text registration. On the unchanged code: dark **24 of 39**
+and light **19 of 36** distinct moving frames were incoherent (detached or misregistered pieces), with
+a 619 ms stall. A channel diagnostic showed layered editors and the form surface reaching the screen
+in different frames during continuous steps.
+
+**Correction.** Atomic `Present`/`PresentMove` of the outermost registered container, live-editor
+motion masking (images kept current at rest, editors stay focusable/hit-testable at minimum
+opacity while moving, one held frame per transition), retained material/content layers with
+per-control visual caches (Acrylic), a critically damped spring scroll with immediate fractional
+deltas, steady scheduler cadence, animated field/row hover without container hover, and the
+integrated Acrylic title strip. See the ADR 0011 amendment and the [ui_form](../modules/ui_form.md)
+and [settings](../modules/settings.md) module docs. A hardware DC render target was tried and
+rejected (no gain, 419 ms creation hitch).
+
+**After (fresh run, final source):** `aether_ui_form_integration_tests "ui_form motion"` 4/4 pass:
+
+- dark: 115 frames captured, **71 distinct, 0 incoherent** (200 rows checked); light: 115/72, **0**
+  (202 rows). Distinct-frame interval p50 16.6/16.7 ms, p95 18.1/17.9 ms, max 51.2/50.6 ms
+  (capture-thread observation, not compositor telemetry).
+- UI-thread present work: mean 3.77 (dark) / 3.67 (light) / 3.49 ms (no recorder); p95 ≤ 5.5 ms;
+  max 6.07 ms. Stage means ≈ render 2.2, move 0.7, copy 0.35, bookkeeping 0.3 ms; no material
+  re-render, content rebuild or fallback during the scroll.
+- In-motion move cadence p50 16.8–16.9 ms, p95 19.0–21.3 ms, worst single interval 35–51 ms.
+- Channel diagnostic: isolated jumps reach the screen in both channels in the same frame
+  (13.6–27.6 ms after input); 44/44 continuous steps arrive in the same frame.
+
+Earlier iterations (retained as history): before the container-hover exclusion one run showed
+incoherent frames while the real pointer rested over the canvas; ≥ 8 dark/light runs since then
+showed none. Measurements describe this configuration only.
+
+**Owned Quick Settings (D44).** The private reference was opened and measured (360 × 388 DIPs);
+icons were compared at 1× and 2× in private scratch sheets (never committed). New/rewritten tests:
+
+- `aether_graphics_tests "system symbols"` 4/4: code points, battery/speaker selection, installed
+  glyphs centred at 100/200 % (Segoe Fluent Icons resolved for the airplane), vector fallback.
+- `aether_system_controls_tests` 12/12 (Sticky Keys reading, accessibility routes);
+  `aether_settings_tests` routing-key case (D44 default, legacy flag untouched).
+- `aether_controlcenter_integration_tests` **11/11** (30.1 s in the aggregate): exact page-1 UIA
+  layout and names (Wi-Fi shows connection state only), range intents without fake readback, media
+  only for a real session, split toggle vs. details, unknown/unswitchable radios, paging by button/
+  dots/keys/wheel, accessibility and output details, anchoring below the group with work-area
+  clamping (left/right/bottom/off-monitor) before showing, repeated clicks, outside click, keyboard
+  focus and geometric navigation, closed-queue rejection and DPI close, ten dark/light receipts and a
+  motion case. The motion case recorded entrance, hover retarget, press/release, interrupted and
+  normal paging, interrupted and normal detail transitions, back and slider drag (≈22 frames each);
+  every sequence returned to zero frames (the quiescence check needs two quiet 60 ms intervals and
+  reported 125–141 ms) and a hidden panel rendered none.
+- The motion case found two defects that were fixed: an unconfirmed slider request kept the panel
+  rendering every frame for 1.5 s (now a one-shot timer), and hiding rendered one extra frame (focus
+  loss while closing). It also showed that `Closed` was announced twice when hiding re-entered
+  through deactivation (now once). Detail transitions became a fade-through after frame review.
+- A temporary local diagnostic (removed) showed captures refused because the running trial's own
+  topmost Dock window rose over the guard band after activation changes; the sequence now re-raises
+  its own windows before each frame. UI Automation Invoke moves keyboard focus to the element first
+  (observed), so UIA-driven receipts show focus rings.
+
+**Gates (final source unless noted):**
+
+- `scripts/build.ps1 -Config release -BuildDir build/wf-claude-fluidity -Jobs 6 -Test -TestExclude
+  'network|integration' -JUnitFile build/wf-claude-fluidity/unit-results.xml`: first attempt built
+  everything but failed `aether_settings_tests` (23/24): the new routing case parsed a fragment
+  without the Dock metrics marker, which correctly warns about the 0.1 size migration; the fixture
+  now models a real Alpha 2 file. Second attempt: a test compile error (const buffer to WIC). Third:
+  **complete build, 24/24 unit executables pass (20.77 s)**. After the last panel fixes, the same
+  command on the final source reports `ninja: no work to do` and **24/24 pass (19.67 s)**.
+- Sequential native aggregate `ctest --test-dir build/wf-claude-fluidity -R
+  '^aether_(accessibility|ui|ui_form|settings_ui|installer|dock|topbar|search_ui|app|controlcenter|install)_integration_tests$'`:
+  **8/11 executables pass (320.25 s)**. Failures: Dock (preview card UIA "stage 2": card HWND
+  answered as a default pane), Search UI (3 cases: capture guard refused, window not open after
+  activation loss) and Settings UI (navigation case: restored scroll 159 vs 0, focus-dependent).
+- A/B against the unchanged `2e4ff0d` build in `build/wf-claude-all`: Search UI 10/10 on both
+  builds, twice each; Settings navigation case 2/2 baseline, 3/3 new; the **baseline reproduces the
+  same Dock preview UIA stage-2 failure**. A ctest rerun of the three: Search UI and Settings UI
+  (29 cases incl. the new frame case) pass; Dock fails the preview stage-2 case and the light-fixture
+  UIA root check (KNOWN_LIMITATIONS S-024); two isolated new-build Dock runs passed 12/12. These Dock
+  UIA intermittents are recorded as pre-existing, not resolved; there is no uniformly green
+  11-suite aggregate.
+- Settings frame case: caption, top edge, top-left corner, HTSYSMENU mark, DWM close button and
+  client hit testing, transparent title text, maximized client at the work-area top, restore.
+- `git diff --check` and a privacy scan of the change (user paths, private network label, machine
+  names) are clean. Real radio/audio/brightness/accessibility/media actions, physical multi-monitor
+  DPI, IME composition, screen readers, Windows 10 and owner acceptance were not exercised.
