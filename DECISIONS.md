@@ -108,6 +108,32 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D45 — Notifications, real hidden icons and complete rounded maximized frames
+
+Owner direction, 2026-10-26 (FR-038/T48, FR-011, FR-036/T44, FR-037/T47): the Top Bar date/time
+must open the actual notification center/calendar; add a small dedicated chevron for the actual
+hidden notification-area application icons. The latter are background app icons, not notification
+messages or a second Dock. This narrowly supersedes D27's arrow prohibition for that purpose only;
+existing taskbar-recovery entry points remain. Reuse supported Windows interaction and genuine state,
+qualify hidden-taskbar/version/monitor behavior, and state unsupported overflow placement/access
+instead of inventing icons or treating a taskbar-restoration button as completed overflow.
+
+The owner also rejects square corners on a maximized external application and explicitly requires
+a thin continuous Aether-style perimeter around the entire window, including true maximize. This
+clarifies FR-036/FR-037 beyond D40's region/material lease, which draws no rim. Preserve maximize,
+placement, native caption/input/UIA and real transparent cutouts. Qualify owned and foreign window
+paths separately; respect protected/unsupported targets and conditional ownership/restoration.
+No injection, private Explorer memory/interfaces, silent restore-and-resize, or unapproved global
+overlay is authorized. Significant backend/ownership changes need a separate technical decision.
+
+Claude implements [the focused brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md), including
+Codex's S-053 source-review fixes. Codex prepares the shared assignment and private images; actual
+delivery/read in an external Claude chat is not established. Five owner references remain local
+and ignored; their private contents must not enter public material. No installation, push, V3
+release, device-state change or new persistent desktop surface follows from this direction.
+Requirements are authorized; implementation, actual native/foreign compatibility and owner visual
+acceptance remain pending. S-053 records the independent existing-unit-binary rerun and review.
+
 ### D44 — Recreate Quick Settings as a complete Aether-owned native panel
 
 Owner direction, 2026-10-26 (FR-026/FR-035/FR-037, T41/T47): rather than depend on unestablished

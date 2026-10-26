@@ -1,5 +1,11 @@
 # V3 continuation prompt
 
+**Latest D45 assignment, 2026-10-26:** read
+[CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md](CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) after
+the shared contracts/current HANDOFF. Claude implements date/time notifications, a real hidden-icons
+chevron and rounded maximized frames with a continuous fine rim, plus the S-053 source-review fixes.
+The S-052 Settings/Quick Settings implementation below is the baseline, with owner acceptance open.
+
 **Current D43/D44 follow-up, 2026-10-26:** Claude implements
 [CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), including Settings
 fluidity and section 14's complete Aether-owned Quick Settings panel. Open the private reference

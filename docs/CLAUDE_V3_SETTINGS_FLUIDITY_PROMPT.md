@@ -2,6 +2,11 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # Claude implementation brief — Settings that feels as fluid and finished as the Dock
 
+**Continuation after S-052, 2026-10-26:** the next owner assignment and independent review corrections
+are in [CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md](CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md)
+(D45/S-053). Preserve the implementation below; the new brief adds notifications, hidden icons and
+rounded maximized frames. Historical preparation-only statements below refer to this earlier brief.
+
 Owner direction recorded on 2026-10-26. Scope: FR-037 / FR-015 / NFR-002 / NFR-006 / NFR-007 /
 NFR-011, T47, D41–D43. This is an implementation assignment for Claude. Codex prepared this brief
 and inspected source; it has not implemented or reproduced the new motion fixes.

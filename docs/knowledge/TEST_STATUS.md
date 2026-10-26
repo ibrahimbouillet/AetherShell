@@ -2236,3 +2236,54 @@ checks: one primary, one taskbar helper and one corner child from the new sessio
 binaries, surfaces/replacement/corner logged with no warnings or errors, no installed process. The
 surfaces again started under full-screen suppression; this time a **single** `--settings` request
 showed Settings (verified visible, then closed). Not owner acceptance, installation or publication.
+
+### S-053 — Independent S-052 review and next Claude assignment (Codex, 2026-10-26)
+
+Scope: source review of `3084a93937fe044b274e738894bf49172c4f9034` and
+`bccd5729ca7ffe59780eae77a0a2169fa53187e3`, handoff-only reviewed HEAD `86e7196`, then D45
+instruction/reference preparation. Three read-only reviewers covered Quick Settings, Settings
+motion and maximized corners in the single shared checkout. No product source was edited.
+
+**Independently executed:**
+
+```powershell
+ctest --test-dir build/wf-claude-fluidity -L unit -LE 'network|integration' `
+  --output-on-failure --output-junit codex-review-unit-results.xml
+```
+
+Result: **24/24 existing unit executable suites pass, 21.61 s**. The XML stays under ignored build
+output. This reruns existing binaries; no fresh compilation/source-to-binary verification occurred.
+A preceding `cmake --build build/wf-claude-fluidity -- -n` dry run printed glob/CMake regeneration
+steps, so it is not a no-work/freshness receipt. No native integration, live candidate identification,
+physical device/desktop or owner acceptance check ran. Preserve S-052's nonuniform aggregate and
+scoped-rerun distinction; none of its pending qualification gates becomes passed here.
+
+**Source findings, not live reproductions (all P2):**
+
+- `src/ui/form/FormScrollView.cpp`, `ScrollImmediately` (review line 392) and `Apply` (305–312):
+  fractional input queues `position+delta` while Imaging/Holding leaves position unchanged, so
+  repeated input overwrites rather than accumulates deferred motion. Immediate Home/reset can
+  retain a pending target when the new target equals visible position. Existing motion assertion
+  (`FormMotionTests.cpp`, review line 444) checks only positive movement, not exact displacement.
+- `src/controlcenter/ControlCenterWindow.cpp`, `Impl::Open` (493–500): interrupted detail transitions
+  discard current composition and snap progress to zero, yielding a discontinuity on quick Back.
+- The same file, `SetState` (1295–1307): media arrival adds height without recomputing the initial
+  work-area fit/anchor, risking off-screen controls on constrained/high-DPI work areas.
+- Separate **pre-existing** input issue: `OnPointerUp` (1435) admits a focused target without
+  matching the actual pressed target. It exists in `3084a93^`; not a newly introduced regression.
+
+**Requested features and source boundaries:** clock action still sends Win+Alt+D; Microsoft documents
+Win+N for Windows 11 notification center/calendar and Win+A for Windows 10 Action Center. The model
+unconditionally omits the former notification-area arrow under D27; the remaining route is a
+60-second native-taskbar recovery action. D45 authorizes a dedicated real hidden-icons entry point.
+The foreign corner guard does not draw a rim and excludes Aether-owned windows; the form background
+sets square/no-border rendering. S-046's cutout tests are not a full rounded perimeter or universal
+foreign compatibility proof. The supplied still cannot establish the actual guard's skip reason.
+
+**Prepared:** [next Claude brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md), D45/FR-038/T48
+and FR-036/FR-037 frame clarifications. Five unchanged owner attachments were copied to ignored
+private references, byte-identity checked with SHA-256, and their private README extended. No
+private image/content enters tracked files. This is shared-file preparation; no direct external
+Claude-chat transport or receipt is claimed. New feature implementation/acceptance remains pending.
+Installed Alpha 2, private runtime/recovery host, startup/device state and owner windows were not
+changed. No capture, installation, commit, push, tag or release was performed in this review turn.

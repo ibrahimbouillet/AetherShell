@@ -2,6 +2,14 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # topbar — native floating system status surface
 
+**Next assignment, D45/FR-038/T48 (2026-10-26):** implement genuine notifications/calendar from
+date/time and a dedicated real hidden-icons chevron following
+[the Claude brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md). Current clock routing remains
+Win+Alt+D; the model omits the old D27 arrow even when its legacy field is true. The historical
+recovery route described below is still in code but is not a visible overflow implementation.
+D45 narrows D27's arrow ban for the new hidden-icons purpose only. Source implementation and native
+hidden-taskbar/overflow verification are pending; S-053 records the source review/existing units.
+
 V3 source follow-up (D38/T39, S-035): native input/window region is the visible panel rectangle,
 with no expanded outer shadow region. This avoids relying on same-thread-only HTTRANSPARENT
 outside the panel; outer shadow decoration is clipped. Work-area allocation, physical visual

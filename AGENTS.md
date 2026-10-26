@@ -44,6 +44,9 @@ continuous moving-frame evidence and owner acceptance remain separate from S-049
 D44 replaces the native Quick Settings placement investigation with a complete Aether-owned panel
 faithful to the private visual reference, including polished icons and below-click anchoring.
 Claude implements section 14 of that same focused brief; Codex prepares instructions/images only.
+D45 adds the next Claude assignment: real notifications from the clock, a dedicated hidden-icons
+chevron and rounded maximized window frames with a continuous fine perimeter. Read
+`docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md`; Codex reviews/prepares, Claude implements.
 
 ## This repository is PUBLIC
 Everything committed here will be published in the public GitHub repository. Never write private

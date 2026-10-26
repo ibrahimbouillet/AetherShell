@@ -7,7 +7,31 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Settings fluidity and owned Quick Settings implemented, 2026-10-26 (S-052)
+## Current assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
+
+**Next implementation writer: Claude.** The owner requests date/time access to the actual Windows
+notification center/calendar, a dedicated Top Bar chevron for real hidden notification-area icons,
+and four rounded window corners with a continuous fine Aether-style perimeter even when genuinely
+maximized. The external-window still is an unresolved owner rejection, not proof of a diagnosed
+guard failure. The two close-ups clarify the visible frame, beyond earlier region-only clipping.
+Read [the new focused brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md): FR-038/T48,
+FR-036/T44 and FR-037/T47. D45 narrowly supersedes D27's arrow ban for the hidden-icons entry point.
+
+Codex and three read-only reviewers inspected S-052 source (`3084a93`, `bccd572`; reviewed HEAD
+`86e7196`). Codex reran existing unit binaries: **24/24 executable suites passed, 21.61 s**. No fresh
+build, native test rerun, live runtime-identity verification or owner acceptance occurred. Three
+source-level issues need correction: deferred precision-scroll accumulation/cancellation, panel
+detail-animation reversal and panel refitting on asynchronous media arrival. A separate pointer
+press/release admission issue predates S-052. Exact evidence and limits: TEST_STATUS S-053 and the
+new brief. S-052's earlier native aggregate remains nonuniform; its scoped reruns are not erased.
+
+Five unchanged hash-checked owner images were added only to the ignored private reference package;
+read its README. No product code, installed Alpha 2, running prototype/recovery host, device state
+or startup entry was changed. No desktop capture, push, tag or release occurred. The shared brief
+is prepared for Claude; there is no direct messaging connector to the external Claude chat, so
+actual receipt/read/implementation is not claimed. Existing untracked assistant files are preserved.
+
+## Previous checkpoint — Settings fluidity and owned Quick Settings implemented, 2026-10-26 (S-052)
 
 Claude implemented both parts of the [focused brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md)
 in the shared `main` checkout. **Owner acceptance is pending for both; nothing below claims it.**

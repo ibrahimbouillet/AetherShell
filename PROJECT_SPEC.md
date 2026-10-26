@@ -180,6 +180,25 @@ alternative. Preserve real supported behavior, consent, native UIA/input and FR-
 fabricated global toggle or success state. Unsupported parity is an explicit gap. Section 14 of the
 focused brief defines QC-01–QC-10; nothing here declares implementation, verification or owner acceptance.
 
+### Additional V3 owner direction — D45, 2026-10-26
+
+| ID | Requirement | Priority | Acceptance | Verification | Dependencies |
+| --- | --- | --- | --- | --- | --- |
+| FR-038 | Genuine notifications and hidden notification-area access from the Top Bar. | P1 | Date/time opens the actual Windows notification center/calendar through the supported version-specific route. A distinct small chevron provides access to real hidden background-app notification-area icons; no fake icon inventory, notification content/badges or substituted Dock. Pointer, keyboard and UIA share guarded actions; preserve recovery, privacy and explicit unsupported/version/placement limits. Merely revealing the native taskbar is partial overflow completion. | Fake routing/error/lifecycle/layout/UIA checks; separately qualified Windows-version, hidden-taskbar, Explorer-restart and genuine overflow/manual behavior. | FR-011, FR-015, FR-017, FR-024; NFR-002–NFR-008; D45 |
+
+**FR-011/D27 clarification:** D45 authorizes the dedicated hidden-icons chevron as a narrow exception
+to the former trailing native-taskbar-arrow ban. It serves real tray overflow, with recovery retained
+in Settings/logo menu/CLI. New default/migration must not let a legacy false silently suppress it.
+
+**FR-036/FR-037 clarification:** all four visible corners and a thin continuous neutral Aether-style
+perimeter are required around the complete window in normal and genuinely maximized presentation.
+The owner's external-window still and rim close-ups reject treating region clipping alone as the
+finished result. Preserve true maximize/placement/native caption/input and transparent changing-scene
+cutouts; qualify Aether-owned and external rendering families separately. Unsupported targets remain
+explicit. D40's bounded ownership/recovery rules remain; universal compatibility is not presumed.
+Claude implements [the D45 brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md); authorization
+of the requirements does not establish implementation, runtime verification or owner acceptance.
+
 ## D. Non-functional requirements
 
 | ID | Requirement and rationale | Priority | Acceptance / verification | Dependencies |

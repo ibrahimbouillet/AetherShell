@@ -1,5 +1,13 @@
 # Maximized-window corner investigation
 
+**Latest owner clarification, D45 (2026-10-26):** four rounded corners must be accompanied by a
+thin continuous Aether-style perimeter around the complete window, including genuine maximize.
+The supplied rejected target is an external application; Aether-owned frames need their own path.
+Current D40 region/material leases draw no perimeter and exclude Aether-owned windows. No actual
+target skip/abandonment reason has been established from the still. Follow
+[the next Claude brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md), FR-036/T44 and FR-037/T47;
+S-053 separates source findings, historical cutout evidence and unverified real-window acceptance.
+
 D38 / FR-036 / T44, 2026-10-23. The owner repeated that maximized applications must have rounded
 corners matching Aether. This outcome is still open; neither inspection nor a DWM hint is a fix.
 

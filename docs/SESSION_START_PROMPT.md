@@ -9,6 +9,9 @@ For the Settings quality follow-up under D43/T47, use
 order below. It supplements the earlier full visual-unification brief; current progress stays in HANDOFF.
 Its section 14 now carries D44's complete Aether-owned Quick Settings assignment and private image
 references, superseding the earlier native-panel relocation investigation. Claude implements it.
+The next D45 assignment is [CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md](CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md):
+real notifications, hidden notification-area icons and rounded maximized frames with a fine continuous
+perimeter, plus Codex's S-052 review findings. Claude implements; current evidence stays in HANDOFF.
 
 The owner pastes the text below (everything under the line) as the first message of every new
 session, whichever assistant takes over (Claude, ChatGPT/Codex or another). It is deliberately
