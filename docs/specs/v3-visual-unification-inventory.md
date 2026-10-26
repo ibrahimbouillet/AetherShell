@@ -15,6 +15,12 @@ Status labels are separate gates and are never inferred from one another:
 
 No row is owner accepted by this document. Windows-owned interfaces are listed only to record the boundary.
 
+**Owner feedback, 2026-10-26:** the current Settings motion/interaction and caption material are
+rejected (D43). Follow the [Settings fluidity brief](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md).
+SF-01–SF-11 continuous-frame, hover/transition, native-caption and responsiveness checks are the
+next implementation/evidence checklist. They are unstarted; earlier scoped passes below remain
+historical functional/layout evidence, not acceptance of the moving interface.
+
 Codex's final scoped gate is S-049: complete Release `/W4 /WX`, 24 unit executables and passing
 runs of all 11 changed-consumer native executables. The first 11-suite native aggregate failed
 only the two historical Dock entrance probes; their corrected fixture passes its full suite

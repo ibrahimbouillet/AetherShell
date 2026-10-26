@@ -157,6 +157,24 @@ window behavior remains subject to documented Windows capabilities and explicit 
 | FR-036 | Icon-anchored window motion and coherent rounded corners. | P1 | Desired reveal/activation from clicked icon and minimize-return transition coordinated with marker growth; interruption/late launches and reduced motion remain truthful. Coherent rounded Aether windows; investigate external/maximized corners and motion through documented APIs, preserve original attributes and explicitly record unsupported states. Owner clarification 2026-10-25: excluded corner pixels must reveal the actual underlying scene completely, without opaque dark rectangles or a painted wallpaper approximation; region membership alone does not establish this. Universal external-window control is not presumed feasible. | Native own-window prototype, deterministic geometry/motion and cleanup tests, composed corner pixels over a changing private backdrop, compatibility matrix and owner visual acceptance. | FR-003, FR-015, FR-027, FR-033; NFR-003, NFR-006–NFR-008, NFR-011 |
 | FR-037 | One coherent visual language across Aether-owned interfaces. | P1 | Owner request 2026-10-25, D41: carry the existing neutral translucent fine-grain glass, restrained light rim, refined rounded glyphs, readable typography and deliberate interruptible motion through the logo menu, every Settings page/control/dropdown, update/status/error/confirmation flows and other owned surfaces. The full installer/upgrade/repair/uninstall interface is explicitly mandatory, not a branding-only pass; preserve the safe deployment engine and clean-machine operation. Eliminate the stock white/grey form appearance without losing native input, accessibility, consent or persistence semantics. Inventory remaining surfaces and precise native exceptions; Windows-owned UI stays native. Preserve neutral lighting, exact hit regions and recent corner/shadow fixes. | Tracked surface/state inventory; focused functional/UIA/keyboard checks; changing private-backdrop pixel renders in dark/light and accessibility/failure modes; normal-speed motion inspection; isolated setup/maintenance preview; separately identified running prototype and genuine owner acceptance. | FR-004, FR-011, FR-015, FR-016, FR-019–FR-022, FR-026, FR-034; NFR-001–NFR-011 |
 
+**FR-037 owner clarification, 2026-10-26 (D43/T47):** the current Settings presentation is not
+owner-accepted. Continuous scrolling must keep text, glyphs, cards and native controls visually
+registered without fragmentation or reconstruction on release. Every enabled actionable control
+needs coherent hover/press/focus/state feedback, with responsive interruptible page/state transitions.
+The title/caption region must share the intended neutral translucent material with the content in
+supported normal mode while preserving native frame operations and system accessibility/fallback
+policies. Verify intermediate moving frames and actual responsiveness; resting stills and final
+positions are insufficient. Follow the [focused brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md).
+Its numeric tuning/performance targets remain engineering proposals on a stated configuration,
+not new universal NFR-002 release budgets. Native input/UIA, consent, persistence and the current
+Dock's accepted response are protected; no broader scope or release authorization changes.
+
+Related FR-035 feasibility request, 2026-10-26: the owner confirms genuine Windows Quick Settings
+opening but requests placement beside the clicked Top Bar group rather than the bottom. Investigate
+documented native anchoring support; none is established by the current Win+A route. Preserve the
+native choice and distinguish the already anchored Aether panel honestly. See the focused brief,
+section 14, and T41; this is not a claim of supported or implemented shell-window relocation.
+
 ## D. Non-functional requirements
 
 | ID | Requirement and rationale | Priority | Acceptance / verification | Dependencies |

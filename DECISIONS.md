@@ -108,6 +108,28 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D43 — Settings must remain coherent during movement and share its glass with the top frame
+
+Owner direction, 2026-10-26 (FR-037/FR-015/T47): the current private Settings presentation is not
+accepted. The owner reports content breaking apart during scrolling and reconstructing on release,
+insufficient actionable-icon hover response and abrupt state changes. The supplied private still
+also shows a caption strip materially different from the content. Settings must match the current
+Dock's quality of responsiveness, continuous interaction and restraint, without retuning the Dock.
+The title/frame region is explicitly included in the coherent translucent design where supported;
+preserve native window commands, accessibility and system fallback policies.
+
+Claude implements next; Codex prepares the
+[detailed implementation/acceptance brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) and reviews
+afterward. The reported motion defect is not independently reproduced by this documentation turn.
+Source inspection identifies separately repainted native children/backgrounds as one hypothesis,
+not an established cause. S-049's passing functional tests and resting stills do not establish
+continuous-frame visual quality. Require before/after reproduction, meaningful intermediate-frame
+regressions, actual visual inspection and stated performance measurements. Numeric timing/cadence
+targets in the brief are reference-configuration engineering proposals, not new global release
+budgets or amendments to Q-001. D42's implementation may be revised with evidence and a focused ADR
+update; native editing/UIA/consent/persistence requirements are preserved. This turn authorizes no
+source implementation by Codex, new dependency, installation, push, tag or release.
+
 ### D42 — Native forms on one scene with opaque native editors; glass popups behind IMenuPresenter
 
 Implementation decision under D41 (Claude, continued/reviewed by Codex, 2026-10-25,

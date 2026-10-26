@@ -1,5 +1,10 @@
 # Claude implementation brief — one coherent Aether visual language
 
+**2026-10-26 follow-up:** the first implementation exists, but the owner rejects Settings scrolling,
+interaction feedback, abrupt transitions and the caption/content material mismatch. The next
+implementation follows [the Settings fluidity brief](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), D43/T47.
+The starting-source facts below are historical; preserve the wider surface/safety scope here.
+
 You are continuing Aether Shell as the native C++ UI implementer. The owner rejects the unfinished
 appearance of Settings and asks for a substantial, polished redesign across **all Aether-owned
 interfaces**, starting at the Top Status Bar logo menu. Implement the working product, inspect it,

@@ -4,6 +4,9 @@ Use this same English prompt for Claude, Codex or another coding assistant. Prog
 worktree locations and live verification state belong in `HANDOFF.md`, not in this reusable prompt.
 For the owner-approved V3 continuation, the additional focused prompt is
 [V3_CONTINUATION_PROMPT.md](V3_CONTINUATION_PROMPT.md); it supplements this contract and the current handoff.
+For the Settings quality follow-up under D43/T47, use
+[CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) after the shared reading
+order below. It supplements the earlier full visual-unification brief; current progress stays in HANDOFF.
 
 The owner pastes the text below (everything under the line) as the first message of every new
 session, whichever assistant takes over (Claude, ChatGPT/Codex or another). It is deliberately

@@ -2025,3 +2025,49 @@ default settings and startup value are unchanged. Private startup, pin import an
 checks are disabled; the waiting host remains alive to attempt return to installed Alpha 2 after
 candidate exit. Leave the trial active. This is runtime verification, not owner visual acceptance,
 installation, publication or a claim that V3 is complete. No push, tag or release occurred.
+
+### S-050 — Settings fluidity/frame follow-up brief, source inspection only (Codex, 2026-10-26)
+
+Owner feedback for FR-037/FR-015/T47/D43: scrolling appears to fragment/deform content and reconstruct
+on release, actionable icons lack sufficient hover response and some transitions snap. The supplied
+private image visibly shows a different native-caption material from the translucent client. The
+owner assigns implementation to Claude; Codex prepares the detailed English brief. No new runtime
+motion reproduction is claimed from a still.
+
+Root and two read-only reviewers inspected FormScrollView, FormSurface/FormPaint, SettingsWindow,
+shared animation/tokens/scheduler, app theme routing and current integration tests. Confirmed source
+facts: scrolling moves a canvas HWND then invalidates its child hierarchy; regions repaint separately
+with buffered Direct2D DC rendering, including separate layered native editor/list/document children.
+Cards/dividers remap coordinates during paint. This can plausibly produce mixed-position frames;
+it remains a hypothesis until Claude reproduces/instruments the defect. Software-first DC rendering,
+repeated full-hierarchy painting, value-only wheel retargeting and redundant theme/resource rebuilding
+are additional investigation leads, not measured root causes.
+
+Hover/press/switch/navigation/page motion already exists. Navigation/list hover flags and some field
+states change discretely; page construction destroys outgoing native controls before fading the new
+page. Settings keeps a separate ordinary DWM caption, with frame extension/dark-mode routing but no
+complete custom-caption hit-test/layout path. Settled scroll positions/resting screenshots and idle
+tests do not establish intermediate-frame coherence or complete interruption behavior.
+
+The [Claude brief](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) records SF-01–SF-11, required native input/
+window semantics, complete interaction-state coverage, moving-frame/normal-speed review, cold/warm
+resource checks and reference-configuration latency/cadence proposals. Official Apple Motion/Materials,
+Microsoft Fluent Motion, title-frame/DWM/Snap/Mica documentation was consulted; links are in the brief.
+Numeric targets are proposals, not an owner-approved global performance amendment. Root requirements,
+decision, task, inventory, session entry points and handoff are aligned to the follow-up.
+
+This session changes documentation only: **no C++ implementation, build, executed runtime test,
+candidate relaunch, desktop capture, installation or startup change**. The private image was not
+copied into Git. Existing S-049 results are historical evidence and are not rerun or promoted into
+new visual acceptance. The new continuous-frame/caption/interaction criteria and final owner
+acceptance remain unverified. No push, tag or release.
+
+Owner subsequently confirms native Windows Quick Settings opens from the Top Bar, but requests
+placement beside the clicked group instead of the bottom. Source-only routing inspection confirms
+the group emits a screen RECT; the native branch discards it and calls the Windows-11-gated Win+A
+wrapper, while the Aether fallback uses it for monitor/DPI-clamped below-anchor placement. Consulted
+Microsoft shortcut and popup/icon-position docs did not identify a native Quick Settings anchor
+contract; this is not proof that every undocumented technique fails. Section 14 of the brief
+records T41/FR-035 feasibility and preservation of the saved native choice. No native panel was
+opened, moved or captured, no settings/device state changed, and the supplied private image stays
+outside Git. Existing fake chord tests are not native placement proof.

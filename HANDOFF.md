@@ -7,7 +7,42 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — reviewed visual-unification prototype, 2026-10-26 (S-049)
+## Active direction — owner rejects Settings motion/frame quality, 2026-10-26 (S-050)
+
+The owner tried the T47 prototype and reports that scrolling fragments/deforms the content until
+release, actionable icons lack adequate hover feedback and some state changes snap. Their private
+still shows a distinct native-caption material above the translucent client. Settings must attain
+the current Dock's fluidity/response and share the glass identity through its top frame. This is
+explicit rejection of the current Settings quality, not withdrawal of all earlier functional tests
+or permission to retune the Dock. FR-037/T47/D43 now record the clarified acceptance.
+
+**Next writer: Claude.** The owner specifically asked Codex to prepare a substantial implementation
+prompt rather than implement this follow-up. Read
+[CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) after the shared
+contracts. It includes inspected source paths, hypotheses separated from observations, SF-01–SF-11
+blocking/functional criteria, a complete interaction-state audit, native-caption behavior,
+reference-machine performance proposals and moving-frame/normal-speed verification requirements.
+Official Apple/Microsoft design and Win32 references are linked; this is not a platform/runtime change.
+
+Codex and two read-only reviewers inspected the form/scroll/frame/motion/tests. Separately painted
+native children/backgrounds are a plausible source of mixed-position frames; the scrolling defect
+has **not** been independently reproduced this turn. Existing hover/tweens are present but uneven;
+the title frame is separate from the shared client scene. No C++ change, build, new executed test,
+candidate relaunch, desktop capture or installed/startup mutation was performed. The supplied image
+stays outside Git. The previously verified `2e4ff0d` prototype/recovery host must be preserved;
+verify actual live identity before changing it. S-049 below is the prior scoped gate, not owner
+acceptance of motion. All new implementation/moving-frame criteria remain unverified.
+
+**Owner follow-up — native Quick Settings placement:** genuine Windows controls now open when the
+Top Bar group is clicked, but the owner wants them beside that top anchor instead of the bottom.
+Section 14 of the same Claude brief records the investigation (T41/FR-035). Current native routing
+submits Win+A without any anchor; only the owned Aether panel consumes the group rectangle. No
+public documented native placement contract was identified in the consulted references. This is
+a limited feasibility finding, not proof of impossibility or a relocated runtime. Preserve the
+native choice and distinguish any alternative Aether panel honestly. No live system panel was
+opened/moved by this source-only investigation; the private panel image stays outside Git.
+
+## Previous implementation checkpoint — visual-unification prototype, 2026-10-26 (S-049)
 
 The owner asked Codex to continue Claude's interrupted T47 implementation. The shared official
 `main` checkout retains Claude's redesign plus reviewed corrections, recorded in local source commit
@@ -802,13 +837,14 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**New owner priority:** read [the Claude visual-unification brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md)
-and FR-037/D41/D42/T47 before choosing new work. Codex completed the interrupted implementation's
-review, corrections, scoped Release checks, local source commit and private prototype launch.
-Read the active continuation at the top and S-049 first. Use `build/wf-claude-all` for this integrated
-candidate; preserve the running `2e4ff0d` trial and recovery host. Owner visual/motion acceptance
-remains pending. Older documentation-only and runtime paragraphs below are historical checkpoints,
-not instructions to discard the implementation or relaunch an older binary.
+**New owner priority:** Claude implements
+[the Settings fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), FR-037/D43/T47, after the
+shared reading order. The owner rejects the current scrolling/interaction/caption quality. Read the
+active direction at the top and S-050 before S-049's historical scoped gate. Preserve the previous
+`2e4ff0d` prototype/recovery host; verify live identity before any swap. New moving-frame and owner
+acceptance gates are unverified. The older full visual-unification brief still defines the broader
+owned-surface scope. Do not discard the implementation or relaunch an older binary from a historical
+paragraph. This Codex turn prepared documentation only; Claude is the next implementation writer.
 
 0. **Read S-042/S-043 and the current runtime receipt before changing a running shell.** Codex completed
    the focused source review, repaired the byte-identical launcher move, reproduced and corrected
