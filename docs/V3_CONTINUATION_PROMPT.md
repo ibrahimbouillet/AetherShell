@@ -1,6 +1,13 @@
 # V3 continuation prompt
 
-Owner's immediate instruction (2026-10-25): Claude codes the focused T42/T43 batch and Codex reviews
+**Current D43/D44 follow-up, 2026-10-26:** Claude implements
+[CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), including Settings
+fluidity and section 14's complete Aether-owned Quick Settings panel. Open the private reference
+images and match the polished icons/layout, real controls, Aether light/dark glass and below-click
+placement. Codex prepares/transmits instructions and pictures only. The older hover-only and
+native-first statements below are historical checkpoints, not the current implementation priority.
+
+Historical owner instruction (2026-10-25): Claude codes the focused T42/T43 batch and Codex reviews
 afterward. Start with [the dedicated implementation prompt](CLAUDE_V3_HOVER_PROMPT.md), which takes
 priority over the earlier broad ordering below. Do not start unrelated V3 work in that batch.
 
@@ -39,11 +46,3 @@ Tests use fakes/own windows. Ask and wait for an explicit ready reply before EAC
 attempt; earlier blanket permission is superseded by D36. Keep captures local until privacy review.
 Update the English requirements, tasks, decisions, test evidence and handoff at each coherent
 checkpoint. Distinguish source inspection, tests, actual runtime verification and owner acceptance.
-# D44 follow-up supersedes native-first Quick Settings work
-
-The owner's 2026-10-26 direction assigns Claude the complete Aether-owned Quick Settings panel in
-section 14 of [CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), including
-private reference-image viewing, polished near-matching icons, real controls, Aether light/dark
-glass and below-click placement. Earlier native-routing statements below are historical source
-checkpoints, not the current panel objective. Preserve the parallel Settings fluidity assignment.
-
