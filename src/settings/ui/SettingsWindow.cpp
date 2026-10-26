@@ -248,6 +248,18 @@ struct SettingsWindow::Impl {
     }
     [[nodiscard]] float Preferred(HWND control) const { return surfaceReady ? surface.PreferredWidth(control) : 120.0f; }
 
+    // Shows the window (restoring it when minimized) and brings it forward. A process started hidden
+    // (STARTUPINFO SW_HIDE, as a launcher or the private preview host does) has its first top-level
+    // ShowWindow replaced by that state; when Settings is the first window shown - the Dock and Top
+    // Bar suppressed by a full-screen application - it would stay hidden. A repeated request is
+    // honored; it is skipped whenever the first one already showed the window.
+    void Reveal() {
+        const int command = ::IsIconic(window) ? SW_RESTORE : SW_SHOW;
+        ::ShowWindow(window, command);
+        if (!::IsWindowVisible(window)) ::ShowWindow(window, command);
+        ::SetForegroundWindow(window);
+    }
+
     // --- window frame ---
     // The resize border hidden above a maximized window (its frame extends past the monitor).
     [[nodiscard]] int FrameInsetPx() const {
@@ -1638,7 +1650,8 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
     if (impl.livePending) impl.Apply(false);
     if (impl.window && !impl.rebuildOnShow && impl.page == page) {
         impl.RefreshCleanFields();
-        ::ShowWindow(impl.window, ::IsIconic(impl.window) ? SW_RESTORE : SW_SHOW); ::SetForegroundWindow(impl.window); return Ok();
+        impl.Reveal();
+        return Ok();
     }
     impl.SavePageDraft();
     if (impl.page != page) impl.geocodeCancel.Cancel();
@@ -1703,7 +1716,8 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
     ::SendMessageW(impl.navigation, LB_SETCURSEL, static_cast<WPARAM>(page), 0); impl.BuildPage();
     impl.rebuildOnShow = false;
     impl.RestorePageDraft();
-    ::ShowWindow(impl.window, ::IsIconic(impl.window) ? SW_RESTORE : SW_SHOW); ::SetForegroundWindow(impl.window); return Ok();
+    impl.Reveal();
+    return Ok();
 } catch (...) { return MakeError(ErrorCode::Internal,"settings window could not be shown"); }
 Result<void> SettingsWindow::PrepareToClose(std::function<void()> ready) {
     try {

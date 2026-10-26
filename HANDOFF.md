@@ -50,8 +50,8 @@ logged, no warnings or errors, installed binary/settings/startup unchanged, no i
 running. The Top Bar and Dock started suppressed because a full-screen window was in front (designed
 behavior; they return when it leaves full screen). A `--settings` request created Settings hidden: the
 hidden-started process applied its STARTUPINFO show state to that first `ShowWindow`; a second request
-showed it (verified visible, then closed). This launch-state quirk predates this batch; a guarded
-fix is a proposed follow-up. Leave the trial and its recovery host running; receipts stay ignored under
+showed it (verified visible, then closed). This launch-state quirk predated this batch and is fixed in
+the follow-up commit below. Leave the trial and its recovery host running; receipts stay ignored under
 `.local/hover-preview/`. No installation, push, tag or release occurred.
 
 ## Previous direction — owner rejected Settings motion/frame quality, 2026-10-26 (S-050, S-051)

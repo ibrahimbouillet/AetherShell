@@ -2211,3 +2211,15 @@ first `--settings` request left Settings hidden because the hidden-started proce
 STARTUPINFO show state to that first `ShowWindow`; a second request showed it (verified, then
 closed). Recorded as a pre-existing launch-state quirk with a proposed guarded fix; not owner
 acceptance, installation or publication.
+
+**Follow-up — hidden first Settings window fixed (Claude, 2026-10-26, owner-requested):** the
+launch-state quirk above is corrected in `SettingsWindow` (`Reveal`): when the first `ShowWindow` of a
+hidden-started process leaves the window hidden, the request is repeated once; it is skipped whenever
+the first call already showed it. New settings_ui cases start this test executable as a child with
+`STARTF_USESHOWWINDOW`/`SW_HIDE`: a control child confirms this system hides a plain first
+`ShowWindow`, and the Settings child must be visible as its first window. With the second call
+temporarily removed the regression fails (child exit 1, Settings not visible), restored it passes.
+`scripts/build.ps1 -Config release -BuildDir build/wf-claude-fluidity -Jobs 6 -Test -TestExclude
+'network|integration'`: complete build, **24/24 unit executables (21.06 s)**. `ctest -R
+'^aether_(settings_ui|app)_integration_tests$'`: **2/2 executables pass (111.28 s; settings_ui 32
+cases)**. Other overlapped/popup surfaces were not changed.

@@ -7,6 +7,7 @@
 
 #include <commctrl.h>
 #include <chrono>
+#include <string>
 #include <thread>
 
 using namespace aether;
@@ -421,4 +422,75 @@ AETHER_TEST("settings UI: native Quick Settings is an explicit opt-in that persi
     settings::SettingsService reloaded(file,dispatcher);REQUIRE(reloaded.Load({}).ok());
     REQUIRE(Pump(dispatcher,[&]{return reloaded.Loaded();}));CHECK(reloaded.Current().topBar.windowsQuickSettings);
     CHECK(reloaded.Current().topBar.openWindowsFlyouts);  // the legacy flag is left exactly as it was
+}
+
+// --- hidden-started process (STARTUPINFO SW_HIDE) -------------------------------------------------
+// Windows replaces the first top-level ShowWindow of a process started with STARTF_USESHOWWINDOW by
+// that state. The parent case below starts this executable hidden with one of the child cases; each
+// child is inert unless AETHER_TEST_HIDDEN_START_CHILD names it, so ordinary runs only pass through.
+namespace {
+std::wstring HiddenStartRole() {
+    wchar_t value[32]{};
+    const DWORD length = ::GetEnvironmentVariableW(L"AETHER_TEST_HIDDEN_START_CHILD", value, 32);
+    return length > 0 && length < 32 ? std::wstring(value, length) : std::wstring{};
+}
+LRESULT CALLBACK PlainWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    return ::DefWindowProcW(hwnd, message, wParam, lParam);
+}
+// Runs the named child case of this executable started hidden; returns its exit code (or -1).
+int RunHiddenChild(const wchar_t* role, const wchar_t* filter) {
+    wchar_t path[MAX_PATH]{};
+    if (::GetModuleFileNameW(nullptr, path, MAX_PATH) == 0) return -1;
+    std::wstring command = L"\"" + std::wstring(path) + L"\" \"" + filter + L"\"";
+    STARTUPINFOW startup{sizeof(startup)};
+    startup.dwFlags = STARTF_USESHOWWINDOW;
+    startup.wShowWindow = SW_HIDE;
+    PROCESS_INFORMATION process{};
+    if (!::SetEnvironmentVariableW(L"AETHER_TEST_HIDDEN_START_CHILD", role)) return -1;
+    const BOOL created = ::CreateProcessW(path, command.data(), nullptr, nullptr, FALSE, 0, nullptr, nullptr, &startup, &process);
+    ::SetEnvironmentVariableW(L"AETHER_TEST_HIDDEN_START_CHILD", nullptr);
+    if (!created) return -1;
+    DWORD code = static_cast<DWORD>(-1);
+    if (::WaitForSingleObject(process.hProcess, 60000) == WAIT_OBJECT_0) ::GetExitCodeProcess(process.hProcess, &code);
+    else ::TerminateProcess(process.hProcess, 2);  // our own child test process
+    ::CloseHandle(process.hThread); ::CloseHandle(process.hProcess);
+    return static_cast<int>(code);
+}
+}  // namespace
+
+AETHER_TEST("settings UI hidden-start control child: a plain first ShowWindow is replaced by the start state") {
+    if (HiddenStartRole() != L"control") return;
+    WNDCLASSW cls{}; cls.lpfnWndProc = PlainWindowProc; cls.hInstance = ::GetModuleHandleW(nullptr);
+    cls.lpszClassName = L"Aether.SettingsTest.HiddenStartControl";
+    REQUIRE(::RegisterClassW(&cls) != 0);
+    HWND window = ::CreateWindowExW(0, cls.lpszClassName, L"Hidden-start control", WS_OVERLAPPEDWINDOW,
+                                    CW_USEDEFAULT, CW_USEDEFAULT, 320, 200, nullptr, nullptr, cls.hInstance, nullptr);
+    REQUIRE(window != nullptr);
+    ::ShowWindow(window, SW_SHOW);
+    const bool visible = ::IsWindowVisible(window) != FALSE;
+    ::DestroyWindow(window);
+    CHECK_FALSE(visible);  // exit code 1 here means this system does not reproduce the hidden first show
+}
+
+AETHER_TEST("settings UI hidden-start child: Settings shown as the first window becomes visible") {
+    if (HiddenStartRole() != L"settings") return;
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    const auto file=test::MakeTempDirectory("hidden-start-settings")/L"settings.json";
+    settings::SettingsService service(file,dispatcher);
+    REQUIRE(service.Load({}).ok());REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    settings::ui::SettingsWindow window(service,dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    CHECK(::IsWindowVisible(window.Handle()) != FALSE);
+    window.Close();
+}
+
+AETHER_TEST("settings UI: a process started hidden still shows its first Settings window") {
+    if (!HiddenStartRole().empty()) return;  // never recurse from a child
+    const int control = RunHiddenChild(L"control", L"hidden-start control child");
+    if (control != 0)
+        TEST_NOTE("control child exit " + std::to_string(control) +
+                  ": this system did not hide a plain first ShowWindow, so the regression below is not discriminating");
+    CHECK_EQ(RunHiddenChild(L"settings", L"hidden-start child: Settings"), 0);
 }
