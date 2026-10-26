@@ -7,7 +7,56 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Active continuation — next Claude visual redesign brief, 2026-10-25 (Europe/Paris)
+## Active continuation — reviewed visual-unification prototype, 2026-10-26 (S-049)
+
+The owner asked Codex to continue Claude's interrupted T47 implementation. The shared official
+`main` checkout retains Claude's redesign plus reviewed corrections, recorded in local source commit
+`2e4ff0d2433eb0f0ae274e73406228817ecc1c88`. Automatically attached assistant worktrees were not used
+for development; pre-existing untracked assistant/tool files were preserved and excluded from Git.
+
+**Implemented and tested:** shared native forms and glass menus now serve all eight Settings
+pages, setup/maintenance, updater and ordinary confirmations. Independent reviews corrected build
+syntax, retry cancellation, compact/enlarged-text layout, page drafts and refresh, native dropdown/
+menu accessibility, progress contrast and private-profile startup. Release `/W4 /WX` passes all
+24 unit executables (33.65 s). Ten native executables passed the final aggregate; its two historical
+Dock entrance probes initially failed, then the corrected fixture's entire executable passed
+(53.77 s). All 11 affected native executables therefore have passing final scoped runs; there was
+no uniformly green 11-suite aggregate rerun. See S-049 and the
+[surface inventory](docs/specs/v3-visual-unification-inventory.md) for exact evidence and exceptions.
+
+**Current private runtime — started 2026-10-25, 23:23 CET:** the rebuilt committed candidate is running with a private
+settings clone and all five genuine installed pins. Independent process/path/hash and log checks
+confirm one primary, its correctly parented taskbar helper and corner child, both desktop surfaces,
+active taskbar replacement and corner readiness. A subsequent `--settings` request exited normally;
+the candidate's own Settings HWND was independently verified visible. Candidate SHA-256:
+`7aeac68edd467c4f82968236c72dec4c846639d1e83fb386d55de3d40b385660`.
+Installed Alpha 2 binary/settings hashes and startup registration remain unchanged. Private startup,
+pin import and automatic update checks are disabled. Leave this trial and its waiting recovery host
+active; the host attempts to restore installed Alpha 2 when the candidate exits. Receipts remain
+ignored under `.local/hover-preview/`; do not publish them.
+
+All 16 Settings page stills and 32 setup/updater stills received own-window visual review. This
+does not establish every scrolled/focus/error state, active Acrylic on inactive forms, physical DPI,
+screen-reader/IME workflows or normal-speed motion acceptance. Native combo dropdowns intentionally
+retain Windows Selection/ExpandCollapse behavior. Owner acceptance and remaining V3 work are open.
+No unrelated application was closed/moved, no real-desktop capture was made, and no installation,
+push, tag or release occurred. Package privacy/freshness audit passed; local commits only.
+
+## Previous runtime relaunch — superseded, 2026-10-25 19:01 CET
+
+At the owner's request, Codex launched the newest existing complete app binary, the 13:49
+prototype from source `661a4cd46fbd0e57e75291e8f56dc0c4b8e5629e` (SHA-256
+`1a9e1f26632f7f9a0ffbcc265645098c944773e2cc99415f100d360dfc88d116`). No Aether
+process was running before launch. The existing private recovery host created a fresh isolated
+profile with all five installed pins; independent process/path/hash and log checks confirm the
+primary app, its taskbar helper, its corner child, both surfaces and taskbar-replacement readiness.
+Installed settings, startup registration and installed binary hashes are unchanged. Leave this
+trial active. Its runtime and separate binary-provenance verification receipts remain ignored
+under `.local/hover-preview/`; the host's `source` field records the checkout HEAD, not the
+binary's earlier source revision. No build, source edit, installation or publication was performed;
+Claude's unfinished visual-unification changes remain in place. This is launch verification only.
+
+## Historical briefing checkpoint — Claude visual redesign brief, 2026-10-25 (Europe/Paris)
 
 Last updated: 2026-10-25, by Codex. This prompt-preparation turn is documentation only. Claude is
 the next implementation writer for T47 when the owner starts the brief; Codex reviews afterward.
@@ -754,9 +803,12 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 ## NEXT SESSION START HERE
 
 **New owner priority:** read [the Claude visual-unification brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md)
-and FR-037/D41/T47 before choosing new work. It supersedes the older hover-only batch as the next
-implementation assignment. Preserve the active trial described below/above and all recent fixes;
-the visual redesign itself is not implemented. Codex's current turn was documentation only.
+and FR-037/D41/D42/T47 before choosing new work. Codex completed the interrupted implementation's
+review, corrections, scoped Release checks, local source commit and private prototype launch.
+Read the active continuation at the top and S-049 first. Use `build/wf-claude-all` for this integrated
+candidate; preserve the running `2e4ff0d` trial and recovery host. Owner visual/motion acceptance
+remains pending. Older documentation-only and runtime paragraphs below are historical checkpoints,
+not instructions to discard the implementation or relaunch an older binary.
 
 0. **Read S-042/S-043 and the current runtime receipt before changing a running shell.** Codex completed
    the focused source review, repaired the byte-identical launcher move, reproduced and corrected

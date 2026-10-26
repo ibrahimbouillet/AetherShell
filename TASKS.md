@@ -11,12 +11,17 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 [the English continuation prompt](docs/V3_CONTINUATION_PROMPT.md). This is a broader design/motion
 overhaul, not a finished release after one batch. Preserve the installed Alpha 2; no V3 publication yet.
 
-**Next owner priority, 2026-10-25 — T47:** Claude implements the coherent visual redesign across
+**Current owner priority, 2026-10-25 — T47:** Codex resumed Claude's interrupted visual redesign across
 the logo menu, every Settings page/control and all Aether-owned supporting interfaces. Follow
 [the full English implementation brief](docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md), FR-037/D41.
 Reuse the neutral glass identity while preserving native input/accessibility, real actions,
-consent/save behavior and the current private trial. Codex independently reviews afterward.
-The brief and requirements are recorded; this redesign is **unstarted**, not an implemented theme.
+consent/save behavior and the current private trial. The reviewed source is committed locally as
+`2e4ff0d`; corrections cover build, retry, compact/text-scaled layout, page drafts/refresh,
+accessibility and progress contrast. Complete Release `/W4 /WX` and 24 unit executables pass;
+all 11 affected native executables have passing final scoped runs (S-049 records the initial
+Dock fixture failure and separate corrected rerun). The private committed candidate is running
+with Settings verified visible and five pins preserved. Owner visual/motion acceptance remains
+separate; the installed Alpha 2 and startup registration are preserved. No push/install/release.
 Owner clarification: T47 also requires the complete installer/maintenance UI, from welcome/licence/
 options through progress, completion/errors, upgrade, repair and uninstall; a branding-only pass
 does not satisfy it. Preserve the installation engine and validate in isolated setup fixtures.
@@ -33,8 +38,8 @@ prototype `eae2684` was reviewed in a private profile (S-044/S-045), with app/ta
 readiness checked. The owner withdrew an apparent acceptance reply and rejected the dark remainder
 around the rounded corner; no acceptance of either fix may be inferred from that reply. S-046
 corrects the full-window material and passes the composed-pixel/cleanup gate (58 unit, 12 native).
-The combined corrected `661a4cd` trial is now active with independent process/hash/readiness checks;
-owner visual verification, including the single-icon scenario, remains pending.
+The combined corrected `661a4cd` trial was verified independently, then superseded by the T47
+`2e4ff0d` trial above; owner visual verification, including the single-icon scenario, remains pending.
 The owner then reported rectangular grey patches around magnified Dock icons on white backgrounds.
 S-047 removes the clipped panel/lift shadows; two dark/light own-window pixel probes pass. Both
 corrections are in that active private runtime, preserving the exact input footprint.
@@ -42,7 +47,7 @@ The installed Alpha 2 files and startup remain unchanged.
 
 | Task | Requirement links | Current boundary |
 | --- | --- | --- |
-| T47 — Coherent Settings, menus and supporting UI | FR-037, FR-011, FR-015, FR-022, FR-026, FR-034; NFR-001–NFR-011; D41 | Owner direction and detailed English Claude brief recorded; source gaps independently inspected: Settings lacks shared theme/motion routing and uses stock controls, HMENU owner-drawing remains opaque. Implement the full owned-surface inventory with native behavior/accessibility and true supported glass; functional/pixel/motion/runtime/owner gates remain unstarted. Preserve S-046/S-047 and the active private trial. |
+| T47 — Coherent Settings, menus and supporting UI | FR-037, FR-011, FR-015, FR-022, FR-026, FR-034; NFR-001–NFR-011; D41, D42 | Implemented and independently reviewed in local source commit `2e4ff0d`: shared forms/menus across all Settings pages, setup/maintenance, updater and ordinary confirmations. Release `/W4 /WX`, 24 unit executables and final scoped runs of all 11 affected native executables pass (initial Dock fixture failure and corrected full rerun recorded in S-049). All 16 Settings and 32 setup/updater stills inspected; private runtime/hash/helpers/pins and Settings visibility verified. See the [surface inventory](docs/specs/v3-visual-unification-inventory.md) for native exceptions and unqualified states. Owner visual/motion acceptance, physical DPI, screen-reader/IME and clean-machine qualification remain; V3 is not complete or published. |
 | T45 — One active shared working folder | NFR-004, NFR-008, NFR-010; D18, D39 | Executed by Claude (S-040). Codex confirmed the official origin, single worktree, local lineage and a fresh successful build (S-042); an unexpected byte-identical launcher folder move was reversed without content edits. Private recovery/archive restore verification remains Claude's receipt. [Addendum](docs/CLAUDE_SINGLE_CHECKOUT_PROMPT.md). |
 | T46 — Attach executable-only windows to their unique desktop pin | FR-002, FR-003, FR-004, FR-034; NFR-004, NFR-008 | Implemented (S-044): same validated full executable path, argument-free desktop AUMID pin, no conflicting catalog/running identities or ambiguous pins. Explicit profiles remain separate; pin ID/launch route retained. 65 Dock unit cases and one own-window merged-pin preview/activation/close regression pass. Updated runtime is active; owner confirmation pending. |
 | T39 — Exact bar input footprint | FR-031; NFR-006–NFR-008, NFR-011; D38 | Source patch removes expanded Dock/Top Bar visual HWND regions (S-035). S-047 additionally disables Dock panel/lift shadows that were clipped into square patches at raised icon slots; dark/light composed white-backdrop probes pass without expanding input regions or changing magnification. Separate-process input delivery, rounded-corner input and physical visual acceptance remain. Not installed into the owner's Alpha 2. |

@@ -1916,3 +1916,112 @@ coverage, clean-machine operation and isolated setup target gates. `installer/CM
 the installer module note were inspected; setup is the project's own native wizard with a separate
 test-only isolated target. This is a scope clarification only; no setup build, installation or
 visual qualification was performed in this documentation turn.
+
+### S-049 — Interrupted visual-unification implementation resumed (Codex, 2026-10-25)
+
+Work starts from public-history `fe8d03c` plus Claude's uncommitted T47 changes in the shared
+official `main` checkout. The automatically attached assistant worktrees are not development
+locations. The initial and intermediate failures below are historical evidence; the final scoped
+gate and runtime receipt follow them. No owner acceptance is asserted.
+
+- `scripts/build.ps1 -Config release -BuildDir build/wf-claude-all -CMakeArgs
+  '-DAETHER_WARNINGS_AS_ERRORS=ON' -Jobs 6 -Test -TestExclude 'network|integration'` resumed the
+  integrated build. It failed at malformed multiline character literals in setup; a second
+  malformed literal in the new licence test was also found and repaired.
+- An interim `ctest -L unit -LE 'network|integration'` passed 23 executables, with Settings UI not
+  run because its executable was not built. This is a failed/incomplete full gate, not 24/24.
+- Initial `ctest -R '^aether_(ui|ui_form)_integration_tests$'` passed 2/2 executables (48.21 s),
+  before the review's accessibility/text-scale corrections. Their guarded own-window PNGs for
+  form material, confirmations and menus were inspected; no owner desktop capture was made.
+- Independent reviews found cancelled retries reusing a cancelled token, narrow layout bounds
+  masked by viewport clipping, and incomplete native dropdown/menu UIA semantics. Corrections
+  and final executed evidence are pending below.
+- No Aether process was running at the initial live check. Installed Alpha 2 was launched while
+  validation continues; no installation, startup-registration change or public delivery occurred.
+
+Intermediate review evidence (retain the negative results):
+
+- Full Release `/W4 /WX` build completed and all 24 unit executables passed (22.11 s). Later
+  corrections are rechecked before the final source receipt; this result alone is not the final gate.
+- The first combined redesigned native batch passed accessibility but failed menu UIA enumeration,
+  material pixel comparisons and one existing Settings shortcut-refresh case. All new compact/
+  text-scale, page-draft, native-combo, idle and confirmation checks passed. The shortcut case exposed
+  same-page Show retaining stale untouched controls; it now refreshes clean fields while preserving
+  dirty input/consent. Material comparison diagnostics retain strict pixel gates.
+- The new menu-pattern case passed 10/10 fresh-process repetitions, but preceding it with the
+  existing leaf-Invoke UIA case in the same process reproduced an empty child subtree. This is
+  being investigated as a provider/native-window lifecycle problem, not accepted as random timing.
+- Four isolated setup design cases now pass (33.58 s), including temporary install/repair/uninstall,
+  cancellation/retry and guarded dark/light images. The earlier PNG failures were absent after
+  rebuilding the explicit apartment fixes. No capture guard was weakened.
+- A previous installer-suite access violation pointed, through supporting symbol evidence with an
+  overwritten PDB, toward UISettings activation-factory lifetime. Production updater now retains a
+  checked COM UI apartment; presenter-only fixtures inject deterministic tokens rather than query
+  cached WinRT factories across test apartments. Both filtered updater presentation cases pass
+  (4.72 s), including actual progress/success/failure renders. The complete rebuilt suite is pending.
+
+Resolved follow-up diagnoses:
+
+- Keeping the test UI thread's COM apartment for its thread lifetime (matching production) made
+  the exact leaf-Invoke → menu-pattern pair pass 6/6 repetitions. All strict child-count, subtree,
+  check/radio and action assertions remain, with no readiness retry. This demonstrates fixture
+  apartment-lifetime dependence; it does not prove Windows' internal cache cause or a production
+  provider lifecycle defect. Retained-reference/disconnect/wrong-thread checks remain enabled.
+- Material comparisons now use reduced motion and a fresh screen capture bracketed by identical
+  offscreen scene states. Separate motion tests remain. Dark/light focused probes pass with solid
+  delta 0; the original hard pixel thresholds were retained.
+- Parallel read-only visual QA inspected all 16 Settings page captures and 32 setup/updater
+  captures. No foreign application content was found. It caught insufficient dark progress-track
+  contrast with a real neutral Windows accent and misleading cancellation advice; both are
+  corrected, with rendered synthetic-accent and isolated cancellation-message regressions.
+- Private `--data-dir` profiles now reject startup registration before registry access. The
+  installed startup entry is checked separately during the bounded prototype swap.
+- These stills cover the captured top-page/state regions, not every scrolled/focus/error state,
+  active Acrylic on every form, physical monitor transitions, screen-reader/IME workflows or
+  normal-speed motion acceptance. Those remain explicit limitations, not inferred passes.
+
+**Final scoped gate and local delivery:**
+
+- Complete Release `/W4 /WX` build in `build/wf-claude-all`, then **24/24 unit executables pass**,
+  **33.65 s**: `scripts/build.ps1 -Config release -BuildDir build/wf-claude-all -Jobs 4 -Test
+  -TestExclude 'network|integration' -JUnitFile build/wf-claude-all/unit-results.xml`.
+  The existing CMake cache has `AETHER_WARNINGS_AS_ERRORS=ON`.
+- The final native aggregate uses `ctest --test-dir build/wf-claude-all
+  -R '^aether_(accessibility|ui|ui_form|settings_ui|installer|dock|topbar|search_ui|app|controlcenter|install)_integration_tests$'
+  --output-on-failure --output-junit final-native-results.xml`: **10/11 executables pass**, **335.50 s**.
+  The sole failing executable is Dock: two historical dark/light hover probes sent their synthetic
+  pointer after a fixed 300 ms, before the compositor entrance completed. Assertions exposed
+  40-DIP rest rather than the required magnification; no production Dock motion was changed.
+- The fixture now pumps to an actual shown/nontransitioning state, bounded by three seconds.
+  Focused probes pass (9.257 s), observing entrance completion at **347/419 ms**, rest **40 DIPs**,
+  hover **58 DIPs**, magnification **1.45**, and white transparent-corner channels **255**. Assertions
+  and pixel thresholds are unchanged. Rebuilt full Dock executable passes **1/1**, **53.77 s**:
+  `ctest --test-dir build/wf-claude-all -R '^aether_dock_integration_tests$'
+  --output-on-failure --output-junit final-dock-results.xml`. Its runner reports 12 passes,
+  including the explicitly skipped opt-in own-window recorder (11 executed cases).
+- All **11 affected native executables have passing final scoped runs**. The other ten were not
+  rerun after the test-only Dock readiness correction; do not report a uniformly green aggregate.
+  Form stills used inactive material fallback, so active Acrylic response was not established there.
+  Menu real-backdrop pixel checks pass. Windows denied background UIA focus as expected and the
+  no-activate state was restored. Network tests and manual owner workflows were not run.
+- The fresh setup/embedded-payload audit passes:
+  `python scripts/release/audit_package.py build/wf-claude-all/modules/installer/AetherShellSetup.exe
+  --source-root . --check-freshness --version 0.2.0-alpha.2`. Source privacy/license checks and
+  `git diff --check` pass. Build output, own-window captures and private runtime receipts remain
+  ignored and are not committed. No owner desktop capture was made.
+- Verified source commit: **`2e4ff0d2433eb0f0ae274e73406228817ecc1c88`**. A post-commit complete build
+  reports `ninja: no work to do`. SHA-256: app
+  `7aeac68edd467c4f82968236c72dec4c846639d1e83fb386d55de3d40b385660`, launcher
+  `42178afcc1076ac23ce0ae67c26fbbf60af95940bcbdbc2980795f0017660537b`, setup
+  `bc6b0acdcfa02f77fdf967fb23d1416bf8b0ef3a5982bd464a1895edd172479c`.
+
+**Separate authorized private runtime, 2026-10-25, 23:23 CET:** the committed/rebuilt candidate started through
+the existing bounded recovery host, after installed Alpha 2 quit normally. Independent process/path/
+hash checks confirm exactly one primary, one correctly parented taskbar helper and one correctly
+parented corner child, with no competing Aether session. Logs acknowledge both native surfaces,
+active replacement and corner readiness. A `--settings` request exits normally and its own Settings
+HWND is verified visible. All five installed pins are preserved in the clone; installed binary,
+default settings and startup value are unchanged. Private startup, pin import and automatic update
+checks are disabled; the waiting host remains alive to attempt return to installed Alpha 2 after
+candidate exit. Leave the trial active. This is runtime verification, not owner visual acceptance,
+installation, publication or a claim that V3 is complete. No push, tag or release occurred.
