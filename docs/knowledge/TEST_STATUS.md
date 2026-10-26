@@ -2071,3 +2071,31 @@ contract; this is not proof that every undocumented technique fails. Section 14 
 records T41/FR-035 feasibility and preservation of the saved native choice. No native panel was
 opened, moved or captured, no settings/device state changed, and the supplied private image stays
 outside Git. Existing fake chord tests are not native placement proof.
+
+### S-051 — Owned Quick Settings prompt and private reference package (Codex, 2026-10-26)
+
+The owner changes the chosen direction to a complete native Aether-owned recreation of the supplied
+Quick Settings reference (D44/FR-026/FR-035/T41), with near-matching polished icons, real controls,
+full interaction/motion, Aether light/dark frosted grain and below-click anchoring. They explicitly
+repeat that Codex must not implement: update/transmit Claude's prompt and provide the picture for
+comparison. This supersedes the native-placement investigation as the next panel assignment.
+
+Section 14 of the focused brief now defines layout/control/icon/motion/capability/routing and
+QC-01–QC-10 acceptance, including actual reference-image viewing. Three owner attachments were
+copied unmodified into an existing Git-ignored local input area, source/copy SHA-256 equality and
+Git exclusion verified. The close panel image is the primary icon/layout reference, the wider image
+shows desired placement, and the Settings image supports the parallel frame/material task. No
+private network/device text was transcribed into public docs, assets or tests.
+
+A read-only source reviewer compared the existing controlcenter/system adapters and the private
+reference. The current two-card media-first layout and coarse airplane differ from the target;
+provider, intent/admission, RangeValue, consent and placement infrastructure can be reused. Current
+airplane/energy-saver routes are Settings actions, not implemented global toggles. The prompt requires
+real supported parity and truthful explicit gaps, preserving FR-008 privacy and conditional media.
+Microsoft's Segoe Fluent Icons/MDL2 documentation was checked for installed-font glyph options,
+including a proper airplane. Font/asset licensing and no-redistribution requirements are preserved.
+
+**Documentation and private input preparation only:** no C++/product implementation, build, executed
+runtime test, native panel movement/opening, real-device mutation, candidate relaunch, installation
+or publication. The new panel and QC criteria remain unstarted/unverified. Prompt references,
+public privacy/whitespace and command syntax are checked separately; these are not UI acceptance.

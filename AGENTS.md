@@ -41,6 +41,9 @@ implementation batch; preserve native input/accessibility and the current privat
 D43 records the owner's subsequent rejection of Settings scroll/motion quality and caption material
 discontinuity. The next Claude implementation follows `docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md`;
 continuous moving-frame evidence and owner acceptance remain separate from S-049's scoped tests.
+D44 replaces the native Quick Settings placement investigation with a complete Aether-owned panel
+faithful to the private visual reference, including polished icons and below-click anchoring.
+Claude implements section 14 of that same focused brief; Codex prepares instructions/images only.
 
 ## This repository is PUBLIC
 Everything committed here will be published in the public GitHub repository. Never write private

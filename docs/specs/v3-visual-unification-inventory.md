@@ -21,6 +21,11 @@ SF-01–SF-11 continuous-frame, hover/transition, native-caption and responsiven
 next implementation/evidence checklist. They are unstarted; earlier scoped passes below remain
 historical functional/layout evidence, not acceptance of the moving interface.
 
+**Subsequent D44 direction:** Claude also recreates the Quick Settings reference as a complete
+Aether-owned anchored panel, following section 14/QC-01–QC-10 of that brief. The current quick-controls
+row below is historical source state; it is not accepted as the final design. Private reference
+images are provided locally for actual icon/layout comparison; new implementation/evidence is unstarted.
+
 Codex's final scoped gate is S-049: complete Release `/W4 /WX`, 24 unit executables and passing
 runs of all 11 changed-consumer native executables. The first 11-suite native aggregate failed
 only the two historical Dock entrance probes; their corrected fixture passes its full suite

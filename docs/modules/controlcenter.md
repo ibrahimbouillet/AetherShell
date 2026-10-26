@@ -12,13 +12,15 @@ A submitted chord does not acknowledge shell opening; UIPI can silently filter i
 competing popup follows uncertainty. Native placement with taskbar replacement is still unverified.
 Installed Alpha 2 is unchanged.
 
-Owner follow-up, 2026-10-26 (T41/FR-035): native opening works in their trial, but its bottom placement
-is rejected; they request an anchor beside the clicked Top Bar group. The current Win+A wrapper
-accepts no rectangle. `ShellApplication` uses the emitted anchor only for the owned Aether panel,
-whose `Toggle(anchor)` positions below/right-aligned and clamps to the clicked monitor work area.
-No documented native placement contract was identified during source/docs inspection. Follow
-[the focused brief, section 14](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md); this is feasibility work,
-not an implemented or verified shell-panel relocation. Preserve the saved native/fallback choice.
+Owner follow-up, 2026-10-26 (D44/T41/FR-026/FR-035): after rejecting native bottom placement, the
+owner chooses a complete Aether-owned panel closely matching their private visual reference,
+with polished glyphs, compact tile/split-button/slider/footer composition, full interactive motion
+and Aether light/dark frosted grain. Claude implements
+[the updated brief, section 14](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md); Codex only prepares the
+instructions/private pictures. The current two-card media-first source is not that final design.
+Reuse its below-anchor monitor/DPI-clamped placement and real adapter architecture, preserve media
+conditionally, define the requested candidate routing/default/migration and disclose unsupported
+API parity honestly. Installed Alpha 2 and actual preferences remain untouched in this preparation.
 
 The panel receives immutable real snapshots and emits explicit intents. It never discovers devices,
 opens Settings, changes audio/radios/brightness or injects input itself. The app bridge admits actual

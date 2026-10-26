@@ -5,8 +5,9 @@
 Owner direction recorded on 2026-10-26. Scope: FR-037 / FR-015 / NFR-002 / NFR-006 / NFR-007 /
 NFR-011, T47, D41–D43. This is an implementation assignment for Claude. Codex prepared this brief
 and inspected source; it has not implemented or reproduced the new motion fixes.
-The owner's subsequent Quick Settings placement question is a separate FR-035/T41 feasibility
-follow-up in section 14; preserve the existing native-panel preference while investigating it.
+The owner's subsequent direction in D44 replaces the native-panel placement investigation with
+a full Aether-owned Quick Settings reproduction, specified in section 14. Claude implements both
+assignments; Codex only updates the brief and prepares the private visual references.
 
 ## 1. Your mission and the owner's actual feedback
 
@@ -413,57 +414,199 @@ Do not stop at a plan or a resting screenshot. The owner needs Settings to remai
 quick, responsive surface while they use it. If your own playback still shows pieces rebuilding
 after a gesture, return to diagnosis before presenting the batch as complete.
 
-## 14. Owner follow-up — can Windows Quick Settings open beside the Top Bar click?
+## 14. Updated owner assignment — reproduce Quick Settings as an Aether-owned panel
 
-The owner confirms that clicking the Top Bar's grouped Wi-Fi/sound/battery area now opens genuine
-Windows Quick Settings, but dislikes its bottom placement. Desired result: open immediately below
-the clicked Top Bar group on the same monitor, near the activation point, with a modest gap and
-work-area/DPI clamping. Keyboard activation should anchor to the focused group rather than an
-unrelated current pointer position. This is a FR-035/T41 investigation in addition to Settings work;
-it is not permission to substitute a fake Windows panel or change real radio/audio/battery settings.
+### 14.1. The decision: build it, rather than relocating the Windows surface
 
-Inspected source facts:
+The owner has now chosen the product direction (D44 / FR-026 / FR-035 / T41): recreate the panel
+shown in their screenshot as Aether's own native interactive interface, anchored under the clicked
+Top Bar group. Reproduce its recognizable layout, control families, icon shapes, proportions and
+quality of interaction, then apply Aether's neutral translucent fine-grain material in light and
+dark modes. A generic collection of unrelated tiles or rough stick-figure icons is rejected.
 
-- `src/topbar/TopBarWindow.cpp` emits `QuickControlsRequested` with the screen rectangle of the
-  grouped item. Network, volume and battery currently form one group, not separate anchor targets.
-- `src/app/ShellApplication.cpp` receives that rectangle. Its native branch calls
-  `apps::OpenWindowsQuickSettings()` without passing an anchor; only the Aether branch uses it.
-- `src/applications/SystemShellActions.*` gates Windows 11 and submits one `Win+A` chord. This
-  wrapper has no HWND/RECT/placement parameter and no shell-opening acknowledgement.
-- `src/controlcenter/ControlCenterWindow.cpp::Toggle(anchor)` already positions Aether's own panel
-  below the group, right-aligns it, selects the anchor monitor/DPI and clamps to the work area.
+This replaces the earlier native Quick Settings placement feasibility assignment. Do not spend the
+batch trying to move, reparent or embed the Windows shell panel. Aether owns and renders this new
+panel and invokes real supported Windows/provider actions through its existing adapters. It is a
+transient control surface under FR-026, not a new persistent desktop surface or a separate shell.
+Rebuild the presentation as extensively as necessary while preserving useful real backend code.
 
-[Microsoft documents Win+A as opening Quick Settings](https://support.microsoft.com/en-us/accessibility/windows/narrator/chapter-2-narrator-basics).
-The documentation consulted during preparation did not identify an official public anchor/position
-API for that **Windows-owned** panel. This is a limited feasibility finding, not proof that no
-technique can ever work. A generic HWND movement call is not a documented Quick Settings placement
-contract, and successful key submission is not proof that the panel opened or moved.
+**Claude implements. Codex must not implement this batch.** The owner repeated this distinction:
+Codex updates and transmits the prompt plus pictures; Claude studies them, builds, compares and
+tests the result. Do not interpret this preparation turn as an already implemented panel.
 
-Investigate whether a documented route exists for the supported Windows builds. Cite exact primary
-API documentation, supported versions and lifecycle behavior. Do not confuse the following with
-control over the Windows panel:
+### 14.2. Open the actual reference images before designing
 
-- [`CalculatePopupWindowPosition`](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-calculatepopupwindowposition)
-  computes suitable placement for a popup that the caller owns/positions; it does not redirect Win+A.
-- [`Shell_NotifyIconGetRect`](https://learn.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shell_notifyicongetrect)
-  reads a notification icon's rectangle; it does not change the native system flyout's anchor.
-- XAML Flyout placement applies to that application's own Flyout, not an arbitrary shell panel.
+The owner explicitly authorizes providing these screenshots to Claude. Unmodified, hash-checked
+copies are available in the shared checkout, privately ignored by Git:
 
-If a supported native route is found, make a bounded prototype that opens directly at the desired
-anchor, avoids a visible bottom-to-top jump and preserves Escape/outside-click/focus/keyboard,
-system controls, work-area bounds, DPI and multiple-monitor behavior. Verify repeated opens,
-subpages/back, content size changes and Explorer restart. Test only with appropriate isolated
-seams first; keep any real panel interaction separate from automated no-system-mutation tests.
+- `.local/claude-references/quick-controls-reference.png` — the latest close view; primary source
+  for the panel layout, glyph silhouettes, split buttons, sliders, separators and footer.
+- `.local/claude-references/topbar-placement-reference.png` — the wider scene; use only to understand
+  the Top Bar activation point and why bottom placement is uncomfortable.
+- `.local/claude-references/settings-frame-reference.png` — the earlier Settings frame/material
+  mismatch, for the parallel Settings assignment above.
 
-Do not repeatedly reposition shell windows with a polling timer, reparent/embed the shell panel,
-inject code, hook Explorer, alter global taskbar/work-area settings to coerce placement, or select
-foreign windows by localized title/guessed class. An OS-specific cross-process experiment, if
-investigated, remains explicitly experimental/unsupported until qualified; never silently ship it
-as a reliable Windows capability. No repeated Win+A retries: a second chord may close the panel.
+Use your image-viewing capability to **open and inspect the pixels**, not just the filenames.
+The private README beside them explains their roles. Do not claim image-based comparison if a
+reference could not be opened; report the missing file before inventing its contents. Never commit,
+upload publicly or copy these images into README/showcase/tests. Do not transcribe any network name,
+device identifier or other personal content. References are visual direction, not live test data.
 
-If no reliable supported route is established, report that clearly, keep the native choice working
-at its Windows-controlled position and present the existing anchored Aether controls as an honest
-alternative. Do not silently toggle the saved preference or describe Aether controls as the actual
-Windows interface. This feasibility limit must not be hidden by a screenshot/mockup or block the
-independent Settings corrections. Record the exact native-versus-Aether outcome in T41, HANDOFF and
-TEST_STATUS. The private supplied panel image and any network/device information remain outside Git.
+### 14.3. Match this structure and hierarchy
+
+Study and measure relative proportions from the crop before implementing; do not treat its pixel
+dimensions as fixed DIPs. Compare at equivalent visual scale and inspect the actual control size.
+
+1. One compact rounded panel with a coherent outer rim and fine-grain translucent backdrop. Its
+   content is divided into a tile zone, a slider zone and a slightly distinguished footer.
+2. A three-column, two-row first-page grid. First row: Wi-Fi split tile, Bluetooth split tile,
+   airplane mode. Second row: accessibility, energy saver, live captions. Labels sit below the
+   tiles and use the reference's hierarchy, alignment and compact spacing.
+3. Wi-Fi and Bluetooth have separate main-action and chevron targets inside one joined tile. The
+   divider, corner treatment, hit regions, hover/pressed states and focus outline must agree.
+   The arrow opens the appropriate real detail/selection flow; it must not toggle the radio too.
+   Preserve the accessibility tile's visible detail-chevron affordance and give it a real action.
+4. Preserve the reference's compact page/scroll affordance at the right of the grid when there is
+   genuine additional content. It must work, indicate the actual page and remain keyboard/UIA
+   accessible; do not paint inert dots/arrows just to resemble the screenshot.
+5. A restrained separator, then a brightness row with a proper sun glyph, long track and round
+   thumb; then a volume row with a proper speaker/waves glyph, matching track/thumb and a distinct
+   output/mixer detail target at the right. Match optical alignment and usable hit sizes.
+6. A lower footer separated from the sliders: battery glyph plus genuine percentage/status at the
+   left, a proper Settings gear action at the right. Do not copy a reference percentage as live data.
+
+Do not retain the existing large empty “Media controls” area above this grid when no compatible
+session exists. Preserve genuine media functionality through a compact conditional card or an
+appropriate secondary view when a real session is present; do not remove its supported commands.
+Do not add promotional headings, giant margins, decorative empty cards or unrelated controls to
+the reference's first page. Preserve additional existing capabilities in deliberate secondary pages.
+
+Adapt the material to Aether, keeping hierarchy and contrast over bright/dark/busy private
+backgrounds. No directional sheen, travelling light, plastic gloss or heavy stacked borders.
+Light mode is a complete designed variant, not simply white icons over the same dark image.
+Respect high contrast, transparency off and reduced motion with intentional native/opaque states.
+
+### 14.4. Icon fidelity is a blocking acceptance gate
+
+The owner explicitly rejects the previous airplane made from crude straight sticks. The airplane
+must be immediately recognizable as a professional aircraft silhouette: coherent nose, fuselage,
+wings and tail, with the reference's optical weight and balanced shape. No cross, asterisk, three
+disconnected bars, emoji, missing-glyph square or rough placeholder may pass as the final icon.
+
+Compare **each** glyph: Wi-Fi arcs/point, Bluetooth rune, airplane, accessibility figure, energy
+saver battery/leaf, captions rectangle/details, brightness sun, speaker/waves/mute, output/mixer,
+battery/charging and Settings gear, plus all chevrons/page indicators. Match readable silhouettes,
+stroke family, visual centre, weight and sizes at the final rendered scale. Hover/selection must
+not make them blur, distort or jump to a different optical centre.
+
+Prefer real system icon glyphs where they match: Microsoft's
+[Segoe Fluent Icons reference](https://learn.microsoft.com/en-us/windows/apps/design/iconography/segoe-fluent-icons-font)
+lists the Windows icon family and mappings, including Wi-Fi `E701`, Bluetooth `E702`, brightness
+`E706` and airplane `E709`. Verify the **installed** font and actual rendered glyph; PUA values
+require the correct family and a verified fallback. Use installed system-font rendering through
+the existing native graphics stack, without importing XAML/WinUI merely to draw a font glyph.
+Do not download or redistribute font binaries. Validate Windows 10 fallback separately; consult
+[Segoe MDL2 Assets](https://learn.microsoft.com/en-us/windows/apps/design/iconography/segoe-ui-symbol-font)
+instead of assuming every glyph exists in every font.
+
+Where a suitable installed glyph is unavailable or visibly mismatched, create a polished original
+vector with the same clear semantic silhouette and qualify it side by side. Do not extract artwork
+from the private screenshot into shipping assets. Reuse/extend a shared icon renderer with bounded
+glyph/geometry caches rather than hardcoding a second unrelated icon set in OnRender.
+
+Produce a local side-by-side icon comparison at native size and enlarged inspection size, for
+dark/light and ordinary/high DPI. Open and inspect it. Presence of an enum, a codepoint or any
+nonempty pixels proves none of the requested icon quality. If the airplane still looks like sticks,
+the icon gate fails and the batch must return to design before claiming completion.
+
+### 14.5. Reproduce interactions, not just the resting screenshot
+
+Every actionable tile, chevron, icon button, page control, slider and footer action needs coherent
+hover/press/release/focus/disabled/busy/error feedback. Apply the motion principles and measurement
+requirements in sections 5–10. The current Dock is the response-quality reference; do not retune it.
+
+Use interruptible shared animation tokens: selection and page/detail changes transition smoothly,
+split-button hover remains local to the correct target, glyph emphasis stays restrained, sliders
+track pointer input immediately and settle without waiting for a delayed system callback. Keep
+observed value and an in-flight requested drag target distinct; do not pretend a request succeeded.
+Support pointer capture, drag outside/release/capture loss, keyboard small/large steps and accurate
+UIA RangeValue/Toggle/Invoke/ExpandCollapse/Selection semantics where the control actually needs them.
+
+Open directly under the Top Bar group with a modest gap, right-aligned or appropriately clamped to
+the same monitor work area. Use the emitted screen-space anchor for pointer and keyboard activation.
+Prove DPI, display-edge, small-work-area and negative-coordinate behavior. No initial bottom-right
+flash followed by teleporting to the top. Escape, outside click, deactivation, repeated click and
+detail/back navigation must work without closing the wrong view or leaking input into the desktop.
+Hidden/settled panels must stop animation frames and unnecessary refresh work.
+
+### 14.6. Full UI ownership does not mean fabricated system capabilities
+
+Start with `src/controlcenter/ControlCenterWindow.*`, its model/intents and app bridge,
+`src/system_controls/SystemControls.*`, `src/status/audio`, the brightness/media adapters,
+`src/topbar/TopBarWindow.cpp`, and `src/app/ShellApplication.cpp`. The existing Aether panel already
+has anchor placement, real providers, action admission and test seams; preserve their useful work.
+Its current two-card/media-first presentation and mostly discrete hover painting are not the target.
+
+Audit capability parity in a table: reference control, desired direct behavior, documented API,
+permission/OS requirements, actual implemented route, current-state readback, failure/unsupported
+presentation and executed evidence. Implement missing functionality where a supported safe API
+exists. Recreating the pixels does not automatically grant the shell's private capabilities.
+
+- Wi-Fi/Bluetooth: real state and explicit user-initiated consent, separate toggle/detail actions,
+  no optimistic success. Respect hardware/policy refusal, unknown state and device disappearance.
+- Airplane mode and energy saver: investigate genuine global read/write support. Do not derive
+  global airplane state from toggling two radios or paint a Settings link as a working on/off tile.
+- Accessibility/live captions and output selection: implement the documented real behavior, with
+  build/availability handling. A detail arrow must expose a meaningful working flow.
+- Volume/mute/brightness: preserve asynchronous providers, observed values, supported-display limits,
+  readback, coalescing and failure recovery. Do not mutate device state during automated UI checks.
+- Battery: actual presence/percentage/charging/low state only; absent and unknown remain explicit.
+- Network/device labels: FR-008 still prohibits SSID/profile-name access/display. Keep the reference's
+  label area with truthful connectivity/state text under the current privacy policy. Do not copy
+  the private screenshot's network name, add identity reads or treat visual similarity as a privacy
+  policy waiver. Any later identity-display requirement needs an explicit recorded owner amendment.
+
+If direct parity for a required tile is unsupported, implement an honest clearly labelled
+unavailable/action state and record the precise remaining gap; do not call that full functional
+parity or hide it behind a generic success animation. Finish supported independent controls, present
+the concrete limitation with evidence and request only a genuinely necessary product decision.
+Never invent percentages, availability, connections, devices or permissions to fill the reference.
+
+### 14.7. Routing and native option
+
+The new Aether-owned panel is the target for this owner-requested preview; stop treating it as a
+visually secondary unfinished fallback. Configure the private candidate accordingly and announce
+which panel is being tested. The owner's new choice authorizes that private routing change; do not
+ask for the same design approval again or leave an old `openWindowsFlyouts=true` silently bypassing
+the new implementation. Define the default/migration policy coherently and document how retained
+explicit native choices work. Do not silently alter installed Alpha 2 preferences/startup or perform
+an unrecorded settings migration. Preserve existing explicit choices; document any route/default
+change, schema implications and recovery. The native Win+A option may remain a separate explicit
+choice, but it is not a substitute for delivering this new panel. Never show both after an uncertain
+native request. No shell-window relocation hacks, reparenting, injection or OS UI impersonation.
+
+### 14.8. Required evidence before declaring it finished
+
+| ID | Blocking/qualification gate |
+|---|---|
+| QC-01 | Actual private reference images opened; reference structure mapped to the real implemented panel. |
+| QC-02 | Three-by-two grid, split buttons, labels, paging, slider zone and battery/gear footer match the reference's hierarchy and proportions; extra media does not displace an empty first page. |
+| QC-03 | Every icon visually compared at normal and enlarged scale, especially airplane; coherent glyph family, crisp DPI scaling, no placeholders or missing-glyph boxes. |
+| QC-04 | Aether neutral grain/glass in both themes, readable controlled-backdrop pixels and intentional policy fallbacks; no private reference pixels baked into assets. |
+| QC-05 | Real supported actions/detail routes and capability/readback/error matrix, with honest unsupported gaps; no forged state or real-device mutation in automated tests. |
+| QC-06 | Hover/pressed/selected/focus and interrupted transitions inspected in moving sequences; responsive sliders, navigation and capture-loss recovery. |
+| QC-07 | Correct Top Bar anchor from first visible frame across tested DPI/edges, plus dismissal, keyboard and complete UIA semantics. |
+| QC-08 | Reference comparison, dark/light stills and complete normal-speed/frame-by-frame own-window sequences actually opened and reviewed; actual latency/cadence/resource/idle measurements labelled accurately. |
+| QC-09 | Focused Release `/W4 /WX` graphics/controlcenter/system_controls/applications/app and affected provider tests, full unit gate and sequential affected native suites pass or have explicit unresolved evidence. |
+| QC-10 | Source/commit/candidate identity, private preview configuration and preserved installed Alpha 2 recorded; owner acceptance remains separate. |
+
+Use fake providers and own windows for visual/input tests, with the guarded private backdrop and
+privacy rules above. Test radio-off/on/unknown/denied, unavailable brightness, no battery, muted/
+missing audio, paging/detail/back, external provider changes during drag, theme/DPI changes,
+rapid reopen and reduced motion. Never capture a live network/device list into test artifacts.
+Keep screenshot comparisons local and masked for dynamic/private content; shipping fixtures must
+use synthetic identifiers only where the privacy contract permits them.
+
+Do not declare success from a screenshot-like mockup. The result must be the working native panel,
+with the requested icon quality and Aether material, anchored where the owner clicks. Leave a precise
+handoff and the actual reviewed candidate for the owner's judgment, without publication or installation.

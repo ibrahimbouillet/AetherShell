@@ -7,6 +7,8 @@ For the owner-approved V3 continuation, the additional focused prompt is
 For the Settings quality follow-up under D43/T47, use
 [CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md) after the shared reading
 order below. It supplements the earlier full visual-unification brief; current progress stays in HANDOFF.
+Its section 14 now carries D44's complete Aether-owned Quick Settings assignment and private image
+references, superseding the earlier native-panel relocation investigation. Claude implements it.
 
 The owner pastes the text below (everything under the line) as the first message of every new
 session, whichever assistant takes over (Claude, ChatGPT/Codex or another). It is deliberately

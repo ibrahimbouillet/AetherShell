@@ -108,6 +108,32 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D44 — Recreate Quick Settings as a complete Aether-owned native panel
+
+Owner direction, 2026-10-26 (FR-026/FR-035/FR-037, T41/T47): rather than depend on unestablished
+placement of Windows Quick Settings, implement Aether's own native panel closely matching the
+supplied private reference's layout, control families, polished recognizable icons, interactivity
+and animation. It must open below the clicked Top Bar group and use Aether's neutral translucent
+fine-grain material in both themes. The previous crude airplane glyph is explicitly rejected;
+compare real rendered icons against the private picture. Reuse proven native providers/adapters,
+but rebuild the presentation as needed. This is the primary panel for the reviewed private
+candidate, not an unfinished fallback or a simulated Windows screenshot.
+
+This supersedes the native-placement-first investigation in the earlier section 14 of the brief.
+Claude implements; Codex only updates/transmits instructions and privately supplies the owner images.
+See [the updated brief, section 14](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md). The owner authorizes
+the private candidate's Aether routing; record coherent defaults/migration and any retained explicit
+native alternative. Do not let a stale native-routing flag bypass the requested panel or modify
+installed Alpha 2 preferences/startup during this development preview.
+
+Preserve real observed state, supported APIs, explicit consent, failures, native input/UIA and
+FR-008 network-identifier privacy. Where Windows exposes no supported equivalent, report the
+specific functional gap instead of inventing a toggle/state or claiming full parity. Installed
+system-icon rendering is permitted under FR-022; do not redistribute fonts or extract reference
+pixels as shipping assets. Preserve media capability conditionally without the default empty media
+card. The panel remains transient; no extra persistent desktop surface, new dependency, installation,
+push, tag or release is authorized. The supplied pictures remain local and ignored.
+
 ### D43 — Settings must remain coherent during movement and share its glass with the top frame
 
 Owner direction, 2026-10-26 (FR-037/FR-015/T47): the current private Settings presentation is not

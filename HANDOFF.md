@@ -33,7 +33,23 @@ stays outside Git. The previously verified `2e4ff0d` prototype/recovery host mus
 verify actual live identity before changing it. S-049 below is the prior scoped gate, not owner
 acceptance of motion. All new implementation/moving-frame criteria remain unverified.
 
-**Owner follow-up — native Quick Settings placement:** genuine Windows controls now open when the
+**Latest owner follow-up — implement a faithful Aether Quick Settings panel (D44):** the owner now
+chooses a complete Aether-owned recreation of the supplied Windows panel, preserving its recognizable
+layout/control families and polished near-matching glyphs, with Aether light/dark frosted grain and
+below-Top-Bar click anchoring. They explicitly reject the crude airplane and repeat that **Claude
+implements; Codex only updates/transmits the prompt and picture**. Section 14 of the focused brief
+is rewritten accordingly; native-placement investigation is no longer the assignment. Keep useful
+providers/actions, genuine state, UIA/consent/privacy and conditional media, but rebuild presentation
+and define routing so the new private candidate actually opens this panel. Do not change installed
+Alpha 2 or publish. Any unsupported functional parity remains explicit, not a fake toggle.
+
+Unmodified hash-checked copies of the three owner images are privately available under the ignored
+`.local/claude-references/` folder with a README; Claude must open the close panel reference and
+compare glyphs at real/enlarged size. The private network/device text must not enter public content.
+This follow-up changes documentation/private inputs only: no product code, build, GUI/device-state
+change or new visual/runtime proof. New panel implementation and acceptance remain unstarted.
+
+**Earlier owner follow-up — superseded native Quick Settings placement investigation:** genuine Windows controls now open when the
 Top Bar group is clicked, but the owner wants them beside that top anchor instead of the bottom.
 Section 14 of the same Claude brief records the investigation (T41/FR-035). Current native routing
 submits Win+A without any anchor; only the owned Aether panel consumes the group rectangle. No
@@ -839,7 +855,9 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 **New owner priority:** Claude implements
 [the Settings fluidity brief](docs/CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), FR-037/D43/T47, after the
-shared reading order. The owner rejects the current scrolling/interaction/caption quality. Read the
+shared reading order, including D44's complete Aether-owned Quick Settings assignment in section 14
+(T41/FR-026/FR-035). Open the supplied private image references before designing; Codex prepares
+instructions/images only. The owner rejects the current scrolling/interaction/caption quality. Read the
 active direction at the top and S-050 before S-049's historical scoped gate. Preserve the previous
 `2e4ff0d` prototype/recovery host; verify live identity before any swap. New moving-frame and owner
 acceptance gates are unverified. The older full visual-unification brief still defines the broader
