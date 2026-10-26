@@ -39,3 +39,11 @@ Tests use fakes/own windows. Ask and wait for an explicit ready reply before EAC
 attempt; earlier blanket permission is superseded by D36. Keep captures local until privacy review.
 Update the English requirements, tasks, decisions, test evidence and handoff at each coherent
 checkpoint. Distinguish source inspection, tests, actual runtime verification and owner acceptance.
+# D44 follow-up supersedes native-first Quick Settings work
+
+The owner's 2026-10-26 direction assigns Claude the complete Aether-owned Quick Settings panel in
+section 14 of [CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md](CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md), including
+private reference-image viewing, polished near-matching icons, real controls, Aether light/dark
+glass and below-click placement. Earlier native-routing statements below are historical source
+checkpoints, not the current panel objective. Preserve the parallel Settings fluidity assignment.
+

@@ -98,13 +98,16 @@ not implemented by the current tooltip or the already available global media pan
   airplane mode, radios, audio, brightness and the remaining controls. Distinguish real toggles
   from clearly labeled Windows Settings routes; show unavailable/error states rather than a dead tile.
   Existing source routes are not proof that the owner's clicks succeed; reproduce the failure.
-- Prefer opening the genuine Windows Quick Settings surface from the grouped Wi-Fi/audio/battery
-  action if supported, as requested by the owner. Investigate the documented Windows shortcut,
-  close Aether's own popup first, honor OS differences and verify while native taskbar replacement
-  is active. A keyboard shortcut is not an embedding API or an acknowledgement that a panel opened.
-  Retain an honest custom/Settings fallback; never silently open two panels.
+- **D44 supersedes the earlier native-first request (2026-10-26):** Claude builds a complete native
+  Aether-owned Quick Settings panel closely matching the private reference's layout, polished
+  recognizable glyphs, real interactions and animations, with Aether light/dark frosted grain and
+  below-Top-Bar click anchoring. Follow section 14 of
+  [the focused brief](../CLAUDE_V3_SETTINGS_FLUIDITY_PROMPT.md). Native Win+A may remain an explicit
+  alternative; it is not the target panel or an embedding API. Define candidate routing/defaults
+  coherently, preserve installed Alpha 2 and never open two competing panels.
 - Redesign the icon family with rounded, readable, proportional forms, including a recognizable
-  airplane and Wi-Fi waves. A single coherent original vector system is preferred; imported assets
+  airplane and Wi-Fi waves. Use a coherent native glyph/original vector family, with installed
+  system-icon rendering permitted under FR-022. Imported assets
   require provenance/license review, and a new runtime dependency still requires a recorded decision.
   Preserve contrast, DPI, accessibility labels and actual state. No unrelated online images or logos.
 
@@ -130,8 +133,9 @@ attributes on cleanup. Do not promise an arbitrary third-party application can b
 
 1. Fix empty-margin input interception; separate source tests from cross-process/visual acceptance.
 2. Implement and inspect the smaller default; prototype the work-area/margin policy separately.
-3. Qualify native Quick Settings routing and each existing system tile; fix genuine signal freshness
-   and mapping; revise the rounded icon family.
+3. Under D44, implement and qualify the reference-faithful Aether-owned Quick Settings panel, each
+   real supported system tile and below-click routing; fix genuine signal freshness/mapping and
+   verify the polished icon family against the private images. Record unsupported API parity honestly.
 4. Implement interruptible dot/pill motion, then real hover cards and supported per-window actions.
 5. Prototype window choreography/corners, document OS limits, then obtain actual owner visual review.
 
