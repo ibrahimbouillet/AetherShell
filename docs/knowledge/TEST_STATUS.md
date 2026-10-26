@@ -2193,3 +2193,21 @@ icons were compared at 1× and 2× in private scratch sheets (never committed). 
 - `git diff --check` and a privacy scan of the change (user paths, private network label, machine
   names) are clean. Real radio/audio/brightness/accessibility/media actions, physical multi-monitor
   DPI, IME composition, screen readers, Windows 10 and owner acceptance were not exercised.
+
+**Verified source commit and private runtime (2026-10-26, 16:15 CET):** `3084a93937fe044b274e738894bf49172c4f9034`;
+a post-commit complete build reports `ninja: no work to do`. SHA-256: app
+`493ecf74504c2f29549f62e77aac31eecb82f476423c055530a8c90779364b91`, launcher
+`e5797a29e624e86af0debbc3cd75b9799546a162365cefd452a8adaacab33998`, setup
+`904abf3c45617af8e6f0218a178059640c2a8dad2c568c9098c0b5bfe5c38343`.
+`python scripts/release/audit_package.py build/wf-claude-fluidity/modules/installer/AetherShellSetup.exe
+--source-root . --check-freshness --version 0.2.0-alpha.2` passes. The previous `2e4ff0d` trial quit
+through its own data directory and its host restored installed Alpha 2; a new bounded host (same
+procedure, private clone with explicit `windowsQuickSettings=false`, five pins, startup/pin import/
+update checks disabled) quit installed Alpha 2 normally and reported the candidate ready with
+installed settings, startup value and binary unchanged. Independent process/path/hash/log checks
+confirm one primary, one taskbar helper and one corner child from the new session and no installed
+process. The surfaces started under full-screen suppression (a full-screen window was in front). The
+first `--settings` request left Settings hidden because the hidden-started process applied its
+STARTUPINFO show state to that first `ShowWindow`; a second request showed it (verified, then
+closed). Recorded as a pre-existing launch-state quirk with a proposed guarded fix; not owner
+acceptance, installation or publication.

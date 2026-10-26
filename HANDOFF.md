@@ -35,8 +35,24 @@ in the shared `main` checkout. **Owner acceptance is pending for both; nothing b
   physical multi-monitor DPI, IME composition, screen readers, Windows 10 and owner judgement of the
   moving interface. Private references and comparison sheets stay outside Git.
 
-The local commit and the private candidate launched from it are recorded in the runtime receipt
-below once verified.
+**Local commit and private runtime, 2026-10-26 16:15 CET:** source commit
+`3084a93937fe044b274e738894bf49172c4f9034` (post-commit build: no work). SHA-256: app
+`493ecf74504c2f29549f62e77aac31eecb82f476423c055530a8c90779364b91`, launcher
+`e5797a29e624e86af0debbc3cd75b9799546a162365cefd452a8adaacab33998`, setup
+`904abf3c45617af8e6f0218a178059640c2a8dad2c568c9098c0b5bfe5c38343`; the package privacy/freshness
+audit passes. The `2e4ff0d` trial was ended with its own `--quit --data-dir`; its waiting host
+restored installed Alpha 2, which the new bounded host then quit normally before starting the
+candidate with a private settings clone (all five installed pins, startup/pin-import/update checks
+off, `topBar.windowsQuickSettings=false` written explicitly so the group opens the Aether panel; the
+legacy flag is cloned unchanged). Independent checks: one primary, its taskbar helper and its corner
+child from the new session folder, binaries hash-identical to the build, surfaces/replacement/corner
+logged, no warnings or errors, installed binary/settings/startup unchanged, no installed process
+running. The Top Bar and Dock started suppressed because a full-screen window was in front (designed
+behavior; they return when it leaves full screen). A `--settings` request created Settings hidden: the
+hidden-started process applied its STARTUPINFO show state to that first `ShowWindow`; a second request
+showed it (verified visible, then closed). This launch-state quirk predates this batch; a guarded
+fix is a proposed follow-up. Leave the trial and its recovery host running; receipts stay ignored under
+`.local/hover-preview/`. No installation, push, tag or release occurred.
 
 ## Previous direction — owner rejected Settings motion/frame quality, 2026-10-26 (S-050, S-051)
 
@@ -108,7 +124,7 @@ Dock entrance probes initially failed, then the corrected fixture's entire execu
 no uniformly green 11-suite aggregate rerun. See S-049 and the
 [surface inventory](docs/specs/v3-visual-unification-inventory.md) for exact evidence and exceptions.
 
-**Current private runtime — started 2026-10-25, 23:23 CET:** the rebuilt committed candidate is running with a private
+**Superseded private runtime — started 2026-10-25, 23:23 CET, ended 2026-10-26 16:15 CET for S-052:** the rebuilt committed candidate is running with a private
 settings clone and all five genuine installed pins. Independent process/path/hash and log checks
 confirm one primary, its correctly parented taskbar helper and corner child, both desktop surfaces,
 active taskbar replacement and corner readiness. A subsequent `--settings` request exited normally;
