@@ -35,7 +35,15 @@ in the shared `main` checkout. **Owner acceptance is pending for both; nothing b
   physical multi-monitor DPI, IME composition, screen readers, Windows 10 and owner judgement of the
   moving interface. Private references and comparison sheets stay outside Git.
 
-**Local commit and private runtime, 2026-10-26 16:15 CET:** source commit
+**Current private runtime, 2026-10-26 16:38 CET:** the follow-up commit
+`bccd5729ca7ffe59780eae77a0a2169fa53187e3` (hidden first Settings window fixed) replaced the trial below
+through the same bounded procedure; app SHA-256
+`9691a4d065c5c74bda7ebaf0b1beed496187f7800915a9ccd586fa9aff48487c`. Same verified process set, private
+profile, five pins and explicit Aether routing; installed Alpha 2 settings/startup/binary unchanged.
+With a full-screen window in front, one `--settings` request now shows Settings. Leave this trial and
+its recovery host running. Receipt: TEST_STATUS S-052.
+
+**Superseded runtime, 2026-10-26 16:15 CET:** source commit
 `3084a93937fe044b274e738894bf49172c4f9034` (post-commit build: no work). SHA-256: app
 `493ecf74504c2f29549f62e77aac31eecb82f476423c055530a8c90779364b91`, launcher
 `e5797a29e624e86af0debbc3cd75b9799546a162365cefd452a8adaacab33998`, setup
@@ -51,8 +59,8 @@ running. The Top Bar and Dock started suppressed because a full-screen window wa
 behavior; they return when it leaves full screen). A `--settings` request created Settings hidden: the
 hidden-started process applied its STARTUPINFO show state to that first `ShowWindow`; a second request
 showed it (verified visible, then closed). This launch-state quirk predated this batch and is fixed in
-the follow-up commit below. Leave the trial and its recovery host running; receipts stay ignored under
-`.local/hover-preview/`. No installation, push, tag or release occurred.
+`bccd572` above. Receipts stay ignored under `.local/hover-preview/`. No installation, push, tag or
+release occurred.
 
 ## Previous direction — owner rejected Settings motion/frame quality, 2026-10-26 (S-050, S-051)
 

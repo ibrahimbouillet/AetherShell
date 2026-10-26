@@ -2223,3 +2223,16 @@ temporarily removed the regression fails (child exit 1, Settings not visible), r
 'network|integration'`: complete build, **24/24 unit executables (21.06 s)**. `ctest -R
 '^aether_(settings_ui|app)_integration_tests$'`: **2/2 executables pass (111.28 s; settings_ui 32
 cases)**. Other overlapped/popup surfaces were not changed.
+
+**Relaunched private runtime (2026-10-26, 16:38 CET):** source `bccd5729ca7ffe59780eae77a0a2169fa53187e3`;
+post-commit build `ninja: no work to do`; package audit passes. SHA-256: app
+`9691a4d065c5c74bda7ebaf0b1beed496187f7800915a9ccd586fa9aff48487c`, launcher
+`e5797a29e624e86af0debbc3cd75b9799546a162365cefd452a8adaacab33998` (unchanged), setup
+`e684a0dcda1e3cbc3530154e122b2cfa3edf882e1a9c963da3135161572c245e`. The `3084a93` trial quit through its
+own data directory and its host restored installed Alpha 2; the same bounded procedure then started
+the new candidate (private clone, five pins, explicit `windowsQuickSettings=false`, startup/pin
+import/update checks off; installed settings, startup value and binary unchanged). Independent
+checks: one primary, one taskbar helper and one corner child from the new session, hash-identical
+binaries, surfaces/replacement/corner logged with no warnings or errors, no installed process. The
+surfaces again started under full-screen suppression; this time a **single** `--settings` request
+showed Settings (verified visible, then closed). Not owner acceptance, installation or publication.
