@@ -10,8 +10,9 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 [Aether Shell Alpha 3, `0.3.0-alpha.3`](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
 is published as the Latest release, accepted by the owner as version 3: tag on the CI-verified
 revision `4835641`, audited setup and checksums only, [release notes](docs/releases/0.3.0-alpha.3.md),
-README downloads switched. Not done: installing Alpha 3 over the owner's Alpha 2 (needs approval),
-Alpha 3 gallery media (T38), and the unexecuted qualifications listed in KNOWN_LIMITATIONS.
+README downloads switched. The owner installed it over Alpha 2 the same day with preferences and
+startup preserved (S-059). Not done: Alpha 3 gallery media (T38) and the unexecuted qualifications
+listed in KNOWN_LIMITATIONS.
 
 **Owner assignment, 2026-10-27 — D47, T49 (implemented in source by Claude, S-057):** Auto-Hide
 for the Dock and the Top Bar (independent persisted settings, edge reveal, smooth transitions, full

@@ -25,9 +25,14 @@ passed for that revision. Later documentation receipts do not move the tag.
   local files byte for byte. The unsigned manifest stayed local; automatic updates remain unavailable.
 - README, INSTALLATION, KNOWN_LIMITATIONS, PROJECT_CONTEXT/SPEC, AGENTS, TASKS and the changelog now
   describe Alpha 3 as the current release.
-- **Not done:** the owner's machine still runs the installed Alpha 2 (plus the private Alpha 3 trial
-  build). Installing the published setup over Alpha 2 needs the owner's approval. No Alpha 3 gallery
-  media exists yet (T38, D36 readiness required).
+- **Installed:** at the owner's request the private trial was stopped, and the owner installed the
+  published setup over Alpha 2 (16:14 CET). The installed app/launcher match the audited build;
+  preferences, sign-in startup and taskbar replacement were preserved, with only the four new Alpha 3
+  keys added at their defaults (Auto-Hide off). `versions/0.2.0-alpha.2` remains the rollback copy.
+  Receipt: TEST_STATUS S-059. The ignored private trial host now treats `0.3.0-alpha.3` as the
+  installed version.
+- **Not done:** no Alpha 3 gallery media exists yet (T38, D36 readiness required); sign-in timing
+  after a reboot was not observed.
 
 ## Previous checkpoint — Alpha 3 (`0.3.0-alpha.3`) pushed to `main` by Claude (S-058, 2026-10-27)
 

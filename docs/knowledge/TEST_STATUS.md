@@ -2569,5 +2569,25 @@ committed before the tag in `4835641abef7b6f019bfeec042859cb645554a5d`.
   `1db099ecba2e2c88ac525506468e0e4483bb63707b9f3aa1865b6e04bb573e93`; checksums 110 bytes, SHA-256
   `c2c8fa25a271dfa0ab4d0a4026e75c1dd092031737f60e39f92ea6be1f658716`. GitHub's asset digests match,
   and a fresh download of both assets is byte-identical to the audited local files.
-- Not executed: installing the published setup on a real machine (the owner's Alpha 2 is untouched),
-  Windows 10, multi-monitor/DPI and the other qualifications listed in KNOWN_LIMITATIONS.
+- Not executed by the assistant: Windows 10, multi-monitor/DPI and the other qualifications listed in
+  KNOWN_LIMITATIONS.
+
+**Owner installation over Alpha 2 (2026-10-27, 16:14 CET).** The owner asked for Alpha 3 to replace
+the installed Alpha 2 while keeping preferences and the startup choice. Before anything changed, the
+installed settings were backed up privately and the startup state recorded (sign-in startup through
+the stable launcher with `--autostart`, no StartupApproved value). The private trial was quit through
+its own data directory and its host restored Alpha 2. Meanwhile the owner had downloaded the
+published setup and ran it themself, so no second installation was started. Read-only verification
+afterwards:
+
+- Setup log: completed successfully. `versions/0.3.0-alpha.3` is active; `0.2.0-alpha.2` is kept as
+  the previous version.
+- The installed app and stable launcher are byte-identical to the audited `4835641` Release build;
+  product version `0.3.0-alpha.3`. The app runs with exactly one corner-guard child, taskbar
+  replacement active, Dock and Top Bar started, and no warning or error outside weather logged.
+- Preferences: none of the 63 existing settings keys changed or disappeared; only the four new keys
+  were added with their defaults (`dock.autoHide` and `topBar.autoHide` false,
+  `topBar.showHiddenIconsButton` true, `topBar.windowsQuickSettings` false). Startup and replacement
+  stay on; the HKCU Run entry is byte-identical; no StartupApproved value was created.
+- Not covered: sign-in timing after a reboot, and Auto-Hide in the installed copy (off until the owner
+  turns it on; the trial's choices were not copied into installed preferences).

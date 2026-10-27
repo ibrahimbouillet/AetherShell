@@ -8,8 +8,9 @@ D3/D4/D6 retain their existing provisional qualification status until platform/b
 
 **Current delivery:** **Aether Shell Alpha 3, `0.3.0-alpha.3`**, is the latest public release
 (D48–D50, 2026-10-27): source pushed to `main`, tag `v0.3.0-alpha.3`, and a published GitHub Release
-marked Latest that carries only the audited x64 setup and its checksums. Installing Alpha 3 over the
-owner's Alpha 2 is a separate owner approval. The previous release is **0.2.0-alpha.2** (D29:
+marked Latest that carries only the audited x64 setup and its checksums. The owner installed it over
+Alpha 2 the same day (preferences and startup preserved; TEST_STATUS S-059). The previous release is
+**0.2.0-alpha.2** (D29:
 reviewed `main`, tag `v0.2.0-alpha.2` and its GitHub Release, 2026-10-22). Do not infer approval for
 unrelated repository or account settings. Check HANDOFF for the exact pushed commits and receipts.
 
@@ -120,8 +121,9 @@ Latest), the release is published as a normal release with exactly the setup and
 README download links move to it. The tag stays on the CI-verified revision; later documentation
 receipts do not move it. The acceptance covers the Alpha 3 build as a whole; checks that were never
 executed (for example Windows 10, multi-monitor/DPI and other window-rendering families) stay listed
-as limitations rather than becoming passes. Installing Alpha 3 over the owner's Alpha 2 is not part
-of this instruction. Evidence: TEST_STATUS S-059.
+as limitations rather than becoming passes. Afterwards the owner asked for Alpha 3 to replace the
+installed Alpha 2 while keeping preferences and the startup choice, and ran the published setup
+themself; the assistant verified the result read-only. Evidence: TEST_STATUS S-059.
 
 ### D49 — Tag `v0.3.0-alpha.3` and prepare a draft GitHub prerelease for owner review
 

@@ -35,8 +35,8 @@ Owner/author: Ibrahim Bouillet. License: MIT. Official repository: `github.com/i
 D38 starts the owner-approved V3 design/interaction development track (FR-031–FR-036, T39–T44).
 Read `docs/specs/v3-design-and-interaction.md` and the latest handoff; the installed Alpha 2 stays
 usable. D48 (2026-10-27) names the current V3 source **Alpha 3, `0.3.0-alpha.3`**, and authorizes its
-commit and push to `main`; D49/D50 tag and publish it as the Latest GitHub Release. Installing it
-over the owner's Alpha 2 is not authorized.
+commit and push to `main`; D49/D50 tag and publish it as the Latest GitHub Release. The owner
+installed it over Alpha 2 on 2026-10-27; keep that installed Alpha 3 usable.
 D41/FR-037/T47 subsequently prioritizes visual coherence across Settings, the logo menu and all
 Aether-owned supporting UI. Follow `docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md` for the next Claude
 implementation batch; preserve native input/accessibility and the current private prototype.
@@ -124,8 +124,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
   public `main`, tag `v0.2.0-alpha.2`, and its GitHub Release are authorized. Do not infer approval for
   unrelated repository/account settings or a later release; consult `HANDOFF.md` for exact receipts.
 - **D48–D50 (2026-10-27):** Alpha 3 (`0.3.0-alpha.3`) is published: `main`, tag `v0.3.0-alpha.3`
-  and its GitHub Release (Latest, setup and checksums only). Do not move the tag or republish; a later
-  release or installing over the owner's Alpha 2 needs the owner's explicit approval.
+  and its GitHub Release (Latest, setup and checksums only), installed by the owner over Alpha 2. Do
+  not move the tag or republish; a later release or installation needs the owner's explicit approval.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.
