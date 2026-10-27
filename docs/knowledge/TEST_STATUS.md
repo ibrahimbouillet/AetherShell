@@ -2417,3 +2417,31 @@ headroom; whether it visually meets the Dock was not observed.
 **Still open:** owner judgement of the overflow's placement and of clicking the Aether chevron while
 the overflow is open (light dismiss may close it first and the click then reopens it); Windows 10;
 Explorer restart; other monitors and DPI.
+
+### S-056 — Hidden-icons overflow placed below the chevron after owner feedback (Claude, 2026-10-27)
+
+Owner feedback on the S-055 trial: the overflow opened at the bottom right, partly behind the Dock,
+and should appear directly below the Top Bar button, in front, fully visible. Cause: Explorer places
+its overflow above its own (hidden) taskbar's chevron, and both it and the Dock are topmost windows.
+
+**Change `448b8839a3b3f022bc187c634c209ca08d143878`:** `HiddenIconsRequested` carries the chevron's
+screen bounds (the menu command activates the chevron itself). After Explorer shows the overflow,
+`PlaceTrayOverflow` moves that window, position and z-order only (asynchronous `SetWindowPos`,
+`HWND_TOPMOST`, no resize or activation), centred below the chevron with a 6-DIP gap inside the
+chevron monitor's work area, holds it for 0.6 s with at most six corrections, and stops quietly when
+the overflow is dismissed. New unit cases cover the geometry (centred, both edge clamps, little room
+below), the single move, one Explorer re-layout, dismissal, a bounded give-up and cancellation (9
+HiddenIcons cases); the Top Bar integration suite (5/5) checks the anchor equals the chevron's bounds
+for pointer and menu activation. Complete Release /W4 /WX build, **24/24 unit suites** (20.0 s),
+no-work post-commit build and package audit pass. SHA-256: app
+`066f9c9c0962d209193fed9b369587bbcd9b9bb46f5c6fdf00f98678eaef3d2b`, launcher
+`0b22657ba42873c37bd6d92ea4b7301b859cea0b42d0a7507133e76e05d3f9df` (unchanged), setup
+`a4bff16f385ecc7cf6580561668b13e27edb820389190f4f3c9c498f4d6a79f9`.
+
+**Live (owner-approved session, geometry and z-order only, no capture):** the `af9f168` trial was
+replaced by `448b883` through the bounded procedure (installed preferences, startup entry and binary
+unchanged). Invoking the trial's chevron: Explorer showed the overflow above its hidden taskbar at
+65 ms and Aether moved it at 82 ms; final position centred on the chevron (both centres x = 1260,
+physical pixels at 150 %), 9 px below it, no overlap with the Dock window, above the Top Bar in
+z-order, no warning logged. Still open: the owner's own look at the placement (including the
+one-frame appearance at Windows' position) and a second chevron click while the overflow is open.

@@ -13,9 +13,11 @@ menu offers the same command. Visibility is the new `topBar.showHiddenIconsButto
 independent of the legacy D27 field, which still never shows the old arrow. The app opens Windows'
 own overflow (`app/HiddenIcons`): it invokes Explorer's overflow button through UI Automation (Windows
 11: the system tray button showing a chevron glyph; Windows 10: the `TrayNotifyWnd` button) and
-verifies that Explorer's overflow window opened. A replaced taskbar stays hidden; the overflow opens
-as a window of its own, positioned by Windows. Failures show the item's explanatory tooltip. The
-route was checked live on Windows 11 build 26300 (S-055); Windows 10 remains unverified.
+verifies that Explorer's overflow window opened. A replaced taskbar stays hidden. `HiddenIconsRequested`
+carries the chevron's screen bounds (the menu command activates the chevron itself), and the app
+moves the overflow centred below it, in front of other topmost windows (S-056). Failures show the
+item's explanatory tooltip. Checked live on Windows 11 build 26300 (S-055/S-056); Windows 10 remains
+unverified.
 The older 60-second taskbar recovery command below remains as a separate recovery route.
 
 V3 source follow-up (D38/T39, S-035): native input/window region is the visible panel rectangle,

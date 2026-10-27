@@ -168,7 +168,11 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   invoked through Invoke/Toggle/ExpandCollapse; overflow windows count only from Explorer's process,
   when visible, uncloaked and non-empty. The work runs on a dedicated MTA worker. The taskbar is not
   revealed: its content stays reachable while Aether hides it, and Explorer shows the overflow as a
-  window of its own (S-055 live check). No icon is enumerated, copied or drawn by Aether.
+  window of its own (S-055 live check). `PlaceTrayOverflow` then moves that window (asynchronous
+  `SetWindowPos`, `HWND_TOPMOST`, no size or activation change) to `OverflowPlacement`: centred below
+  the chevron's bounds with a 6-DIP gap, inside the chevron monitor's work area. It holds the place
+  for 0.6 s with at most six corrections and stops quietly when the overflow is dismissed; a lost
+  tug of war is only logged (S-056). No icon is enumerated, copied or drawn by Aether.
 - **Maximized perimeter (`WindowCorners`, ADR 0012):** the guard clips eligible maximized windows
   inside their rounded outline by `CornerRimWidthPx` and keeps one click-through ring window
   (`AetherShell.WindowCornerGuard.Rim`) directly beneath each clipped window, shaped to the band and
