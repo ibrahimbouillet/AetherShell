@@ -290,3 +290,12 @@ logo entries gain icons (Search, Settings, Taskbar, Download, Updates, About, Po
 the keyboard (Applications key, Shift+F10, Enter/Space on the logo) start with their first entry
 selected; an open menu is cancelled when the bar hides for full screen or is destroyed. The stale
 command revalidation after the modal loop is unchanged.
+
+## Auto-Hide and follow-ups (D47/FR-039, S-057)
+
+`topBar.autoHide` (default off): `SetAutoHidden` slides the bar up off the screen (exit/enter
+transitions by the panel's extent) without touching full-screen suppression, which keeps priority;
+`Engaged()` reports the pointer over the bar, a running menu or keyboard navigation. An auto-hidden
+bar registers no AppBar. The hidden-icons chevron shows Windows' overflow state (`SetHiddenIconsOpen`:
+up while open, down when closed) and the focus ring is drawn only after keyboard navigation of the
+bar (`FocusCuesVisible`); a click hides it.

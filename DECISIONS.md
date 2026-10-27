@@ -108,6 +108,27 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D47 — Auto-Hide for the Dock and the Top Bar; follow-ups to D45/D46
+
+Owner direction, 2026-10-27, given to Claude in the implementing session (new FR-039/T49): the Dock
+and the Top Bar each get an independent, persisted Auto-Hide setting for a true full-screen
+experience. An enabled bar hides while an application window covers it and returns when the pointer
+reaches its screen edge (bottom for the Dock, top for the Top Bar) with smooth transitions; it stays
+while in use and hides again afterwards; on the desktop with no window over it, it stays visible
+without the setting changing. Technical choices (Claude): like Windows' auto-hide taskbar, an
+auto-hidden bar reserves no work area, so maximized windows keep the full screen and the revealed bar
+floats over them instead of resizing every window on each reveal; with both bars auto-hiding the
+replacement-mode side margins are dropped too. Edge and cover detection sample the pointer and window
+bounds on a 50 ms timer that runs only while a bar has Auto-Hide on; no hook or strip window
+intercepts input at the screen edges. Full-screen suppression keeps priority.
+
+Same session, owner feedback on D45/D46: the hidden-icons chevron is a toggle (arrow up while
+Windows' overflow is open; a second click closes it), the Top Bar's focus ring follows keyboard
+navigation only, and the corner guard clips a window again (bounded, growing delay) when an
+application merely re-applies the material it had before the clip, because Chromium's re-applied
+Mica left some maximized windows square. A different material or an own region still wins.
+Evidence: TEST_STATUS S-057; owner acceptance pending.
+
 ### D46 — A ring window beneath maximized windows; Settings draws its own maximized caption
 
 Owner choice, 2026-10-26, asked by Claude while implementing D45 (FR-036/T44, FR-037/T47): the

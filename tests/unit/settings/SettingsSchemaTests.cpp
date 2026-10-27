@@ -162,9 +162,10 @@ AETHER_TEST("settings schema: new boolean and marker fields use their documented
     REQUIRE(document.ok());
     const std::pair<const char*, const char*> names[] = {
         {"dock", "reserveAnimationSpace"}, {"dock", "metricsVersion"}, {"dock", "dismissedPins"},
-        {"dock", "explorerDefaultApplied"}, {"dock", "showStartButton"}, {"dock", "showTaskViewButton"},
+        {"dock", "explorerDefaultApplied"}, {"dock", "showStartButton"}, {"dock", "showTaskViewButton"}, {"dock", "autoHide"},
         {"topBar", "height"}, {"topBar", "openWindowsFlyouts"}, {"topBar", "windowsQuickSettings"}, {"topBar", "weatherPlacement"},
         {"topBar", "keyboardIndicator"}, {"topBar", "showNotificationAreaButton"}, {"topBar", "showHiddenIconsButton"}, {"topBar", "showBatteryPercent"},
+        {"topBar", "autoHide"},
         {"general", "syncTaskbarPins"}, {"general", "themeMode"}, {"general", "accentSource"},
         {"general", "animationSpeed"}};
     for (const auto& [group, key] : names) {
@@ -396,4 +397,22 @@ AETHER_TEST("settings schema: the hidden-icons chevron is not hidden by the lega
     CHECK(hidden.warnings.empty());
     CHECK_FALSE(hidden.value.topBar.showHiddenIconsButton);
     CHECK_FALSE(RoundTrip(hidden.value).value.topBar.showHiddenIconsButton);
+}
+
+AETHER_TEST("settings schema: auto-hide is off by default, independent for Dock and Top Bar and persisted") {
+    // D47: an Alpha 2 file has neither key, so both bars keep their behavior until the person opts in.
+    const Settings defaults{};
+    CHECK_FALSE(defaults.dock.autoHide);
+    CHECK_FALSE(defaults.topBar.autoHide);
+    const auto alpha2 = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"reserveSpace":true}})");
+    REQUIRE(alpha2.value.dock.metricsVersion == 2);
+    CHECK_FALSE(alpha2.value.dock.autoHide);
+    CHECK_FALSE(alpha2.value.topBar.autoHide);
+    const auto dockOnly = ParseText(R"({"dock":{"metricsVersion":2,"autoHide":true},"topBar":{"autoHide":false}})");
+    CHECK(dockOnly.value.dock.autoHide);
+    CHECK_FALSE(dockOnly.value.topBar.autoHide);
+    const auto both = RoundTrip(ParseText(R"({"dock":{"metricsVersion":2,"autoHide":true},"topBar":{"autoHide":true}})").value);
+    CHECK(both.value.dock.autoHide);
+    CHECK(both.value.topBar.autoHide);
+    CHECK(both.value.topBar.reserveSpace);  // the reservation choice is kept for when auto-hide is off
 }

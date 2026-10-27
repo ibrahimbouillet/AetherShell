@@ -199,6 +199,12 @@ explicit. D40's bounded ownership/recovery rules remain; universal compatibility
 Claude implements [the D45 brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md); authorization
 of the requirements does not establish implementation, runtime verification or owner acceptance.
 
+### Additional V3 owner direction — D47, 2026-10-27
+
+| ID | Requirement | Priority | Acceptance | Verification | Dependencies |
+| --- | --- | --- | --- | --- | --- |
+| FR-039 | Auto-Hide for the Dock and the Top Bar. | P1 | Independent, persisted settings (default off). An enabled bar hides with a smooth transition while an application window covers it and returns when the pointer reaches its screen edge (Dock: bottom, Top Bar: top); it stays while used (pointer, menus, panels, drag, keyboard) and hides again afterwards. On the desktop with no window over it the bar stays visible without changing the setting. An auto-hidden bar reserves no work area, so maximized windows use the full screen (both bars: no side margins either). No flicker, stuck bar, input interception at the edges or interference with other windows; full-screen suppression keeps priority. | Pure decision tests (edge dwell, use, hide delay, desktop rule, setting off); settings schema/persistence; own-window bar hide/show and reservation release; owner manual check of edge reveal, animation and real applications. | FR-005, FR-011, FR-012, FR-036; NFR-002–NFR-008; D47 |
+
 ## D. Non-functional requirements
 
 | ID | Requirement and rationale | Priority | Acceptance / verification | Dependencies |

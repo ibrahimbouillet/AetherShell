@@ -48,6 +48,9 @@ struct DockSettings {
     double magnification = 1.45;   // hover scale factor, 1.00 (off)..2.00
     bool showRunningApps = true;   // show unpinned running applications
     bool reserveSpace = false;     // register as an AppBar and reserve work area
+    // D47: hide while an application window covers the Dock, reveal at the screen's bottom edge. An
+    // auto-hidden Dock reserves no work area, so maximized windows use the whole screen height.
+    bool autoHide = false;
     std::vector<PinnedApp> pinned; // in display order; at most 64, ids unique ignoring case
     // Replacement mode: true also reserves hover magnification, launch bounce and focus headroom
     // (ADR 0009 item 5); false reserves only the visible panel and the bottom gap.
@@ -79,6 +82,9 @@ struct TopBarSettings {
     bool showMicrophone = true;
     bool showWeather = true;       // only effective when weather.enabled
     bool reserveSpace = true;      // register as a top AppBar so maximized windows stay below it
+    // D47: hide while an application window covers the Top Bar, reveal at the screen's top edge. An
+    // auto-hidden Top Bar reserves no work area.
+    bool autoHide = false;
     int height = 32;               // bar height in DIPs, 24..48; glyphs, text and reservation follow it
     // Legacy Alpha 2 routing flag. It defaulted to true, so a stored true cannot be told apart from
     // an untouched default; V3 no longer consumes it for routing (D44). It is still read and written

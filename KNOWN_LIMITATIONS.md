@@ -118,5 +118,13 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   Aether Settings draws its own caption buttons and turns opaque while maximized. Broad application
   compatibility, physical multi-monitor and 192 DPI behavior still need checks.
 
+- V3 Auto-Hide (D47, local source only, off by default): the Dock and the Top Bar hide while an
+  application window overlaps them and return at the bottom or top edge of the primary monitor. An
+  auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
+  than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the
+  primary one, that edge is not a hard stop: the pointer has to rest on it briefly. The pointer and
+  window bounds are sampled every 50 ms only while Auto-Hide is on. Edge reveal, animation and real
+  applications still need the owner's check; multi-monitor setups are unverified.
+
 Record new reproducible issues in the official repository without personal paths, account details,
 credentials, unrelated application data or whole-desktop screenshots.

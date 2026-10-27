@@ -179,3 +179,19 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   filled with a neutral system-theme color. Captioned, resizable `WS_EX_LAYERED` windows are now
   eligible; an abandoned window gets one fresh attempt after it leaves the maximized presentation.
   Native tests verify cutouts, a continuous ring and rim lifecycle over a private two-phase backdrop.
+
+## D47 additions — Auto-Hide and hidden-icons toggle (S-057)
+
+- **Auto-Hide (`AutoHide.h/.cpp`):** `AutoHideState` is the pure per-bar decision (setting, covered,
+  engaged, pointer on the edge, monotonic time; reveal after 40 ms on the edge, hide 700 ms after
+  the last use, always shown when off or uncovered). `ApplicationWindowCovers` enumerates top-level
+  windows and counts visible, non-minimized, uncloaked application windows (no tool, click-through or
+  no-activate windows, the desktop, shell flyouts or Aether's own surfaces except Settings) whose
+  visible frame overlaps the bar's area. `ShellApplication` runs a 50 ms timer only while a bar has
+  Auto-Hide on: the pointer position every tick, coverage every fifth. The Top Bar counts as engaged
+  while Quick Settings or the hidden-icons overflow is open; an attention request briefly reveals the
+  Dock. With both bars auto-hiding, the replacement-mode side margins are released (`UpdateSideInsets`).
+- **Hidden-icons toggle:** `ToggleHiddenIcons` closes an open overflow through Explorer's own button
+  (`CloseTrayOverflow`), treats an overflow that Windows closed within 0.5 s (dismissed by that very
+  press) as the toggle's close, and a 100 ms watch timer flips the chevron back when Windows closes the
+  overflow on its own.

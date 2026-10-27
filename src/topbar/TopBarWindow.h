@@ -59,6 +59,12 @@ public:
     [[nodiscard]] Result<void> SetUpdateAvailable(bool available);
     [[nodiscard]] Result<void> SetTaskbarReplacementState(bool available, bool active, bool suspended);
     void SetFullscreenHidden(bool hidden);
+    // D47 Auto-Hide (the host decides when): slides the bar up off the screen or back, without
+    // touching full-screen suppression, which always wins. An auto-hidden bar keeps its state.
+    void SetAutoHidden(bool hidden);
+    [[nodiscard]] bool AutoHidden() const noexcept;
+    // In use: the pointer is over the bar, one of its menus is open or it has keyboard navigation.
+    [[nodiscard]] bool Engaged() const noexcept;
     // A host action started from `item` failed: a short explanation below that item, never over a
     // hidden, suppressed or disabled bar.
     void ReportItemFailure(ItemKind item, std::wstring_view message);

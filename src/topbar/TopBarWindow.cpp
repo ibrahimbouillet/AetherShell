@@ -8,6 +8,7 @@
 #include "graphics/Glyphs.h"
 #include "graphics/SystemSymbols.h"
 #include "graphics/TextCache.h"
+#include "graphics/Transition.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "status/ClockProvider.h"
@@ -127,6 +128,9 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<float> pendingVolume;
     bool focusedWindow = false;
     bool keyboardCues = false;     // the focus ring follows keyboard navigation only
+    bool autoHidden = false;       // D47: slid away by Auto-Hide (independent of full-screen suppression)
+    bool pointerInside = false;    // the pointer is over the bar's window
+    bool menuOpen = false;         // one of the bar's menus is running its modal loop
     bool hiddenIconsOpen = false;  // Windows' overflow is open: the chevron points up
     bool registered = false;
     std::optional<RECT> reservedBounds;
@@ -457,7 +461,8 @@ void TopBarWindow::Relayout() {
     } else {
         const auto footprint = ComputeTopBarPlacement(monitor.bounds, dpi, height, margin, shadow);
         if (!footprint) { impl_->relayouting = false; return; }
-        if (impl_->context.allowAppBar && impl_->settings.reserveSpace) {
+        // D47: an auto-hidden bar reserves nothing; maximized windows take the screen's top edge.
+        if (impl_->context.allowAppBar && impl_->settings.reserveSpace && !impl_->settings.autoHide) {
             APPBARDATA data{sizeof(data)}; data.hWnd = Handle(); data.uCallbackMessage = kAppBarMessage;
             if (!impl_->registered) impl_->registered = ::SHAppBarMessage(ABM_NEW, &data) != 0;
             if (impl_->registered) {
@@ -489,6 +494,28 @@ void TopBarWindow::Relayout() {
 }
 
 void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
+void TopBarWindow::SetAutoHidden(bool hidden) {
+    auto& p = *impl_;
+    if (p.autoHidden == hidden || p.destroyed) return;
+    p.autoHidden = hidden;
+    if (!Handle() || p.fullscreen) return;  // full-screen suppression already hides it; it decides showing
+    // Slides by the panel's own extent so it leaves (and returns over) the screen's top edge.
+    graphics::TransitionShape shape;
+    shape.offsetY = -(p.panel.bottom + 8.0f);
+    if (hidden) {
+        p.hover.reset(); p.pointerInside = false; p.tooltip.HideTooltip();
+        HideAnimated(graphics::MakeExitTransition(shape, p.tokens, p.motion));
+    } else if (IsHiding()) {
+        Show(false);  // reversed mid-way: back at once rather than replaying the entrance
+    } else if (!IsShown()) {
+        ShowAnimated(graphics::MakeEnterTransition(shape, p.tokens, p.motion));
+    }
+}
+bool TopBarWindow::AutoHidden() const noexcept { return impl_->autoHidden; }
+bool TopBarWindow::Engaged() const noexcept {
+    return impl_->pointerInside || impl_->menuOpen || (impl_->focusedWindow && impl_->keyboardCues);
+}
+
 void TopBarWindow::SetHiddenIconsOpen(bool open) {
     if (impl_->hiddenIconsOpen == open) return;
     impl_->hiddenIconsOpen = open;
@@ -509,8 +536,8 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
     impl_->fullscreen = hidden;
     // State transitions only: never log foreground identities, titles, paths or repeated probes.
     AETHER_LOG_INFO("topbar", "fullscreen suppression {}", hidden);
-    if (hidden) { impl_->hover.reset(); impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
-    else Show(false);
+    if (hidden) { impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
+    else if (!impl_->autoHidden) Show(false);
     try { FullscreenChanged.Emit(hidden); }
     catch (...) { AETHER_LOG_ERROR("topbar", "fullscreen listener threw an exception"); }
 }
@@ -568,6 +595,7 @@ bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(
 
 void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
     if (impl_->destroyed || !Handle() || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
+    impl_->pointerInside = true;
     const auto hovered = HitTest(impl_->placed, point);
     if (hovered == impl_->hover) return;
     impl_->hover = hovered; Invalidate();
@@ -575,7 +603,7 @@ void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
     const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [&](const auto& item) { return item.item.id == *hovered; });
     if (found != impl_->placed.end()) impl_->tooltip.ShowFor(found->item.tooltip, impl_->ItemBounds(found->rect), ui::TooltipPlacement::Below);
 }
-void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Invalidate(); }
+void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); Invalidate(); }
 void TopBarWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
     if (impl_->keyboardCues) { impl_->keyboardCues = false; Invalidate(); }  // a click hides the focus ring
     if (const auto id = HitTest(impl_->placed, point)) {
@@ -637,8 +665,10 @@ void TopBarWindow::ShowItemMenu(int id, bool keyboard) {
     ui::IMenuPresenter* presenter = impl_->context.menu ? impl_->context.menu : presenterOwner.get();
     std::weak_ptr<Impl::Gate> weak = impl_->gate;
     impl_->tooltip.HideTooltip();
+    impl_->menuOpen = true;  // keeps an auto-hiding bar in place while its menu runs
     const auto selected = presenter->Show(entries, request);
     const auto alive = weak.lock();
+    if (alive && alive->owner) alive->owner->impl_->menuOpen = false;
     if (!alive || !alive->owner || !selected) return;
     auto& owner = *alive->owner;
     auto& state = *owner.impl_;

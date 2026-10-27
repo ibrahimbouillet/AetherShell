@@ -31,6 +31,7 @@ void Fields(S& s, F&& f) {
     f("dock", "magnification", s.dock.magnification);
     f("dock", "showRunningApps", s.dock.showRunningApps);
     f("dock", "reserveSpace", s.dock.reserveSpace);
+    f("dock", "autoHide", s.dock.autoHide);
     f("dock", "pinned", s.dock.pinned);
     f("dock", "reserveAnimationSpace", s.dock.reserveAnimationSpace);
     f("dock", "metricsVersion", s.dock.metricsVersion);
@@ -52,6 +53,7 @@ void Fields(S& s, F&& f) {
     f("topBar", "showMicrophone", s.topBar.showMicrophone);
     f("topBar", "showWeather", s.topBar.showWeather);
     f("topBar", "reserveSpace", s.topBar.reserveSpace);
+    f("topBar", "autoHide", s.topBar.autoHide);
     f("topBar", "height", s.topBar.height);
     f("topBar", "openWindowsFlyouts", s.topBar.openWindowsFlyouts);
     f("topBar", "windowsQuickSettings", s.topBar.windowsQuickSettings);

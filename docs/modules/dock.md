@@ -326,3 +326,13 @@ Item, overflow and background menus use a shared `GlassMenuPresenter` (the reent
 the presenter alive across its own modal loop is unchanged; an injected `menuPresenter` still wins).
 An open menu is cancelled when the Dock is suppressed or destroyed. Layout, magnification, previews,
 shadows and input regions are unchanged.
+
+## Auto-Hide (D47/FR-039, S-057)
+
+`dock.autoHide` (default off). The host (`app/AutoHide`) decides; the Dock only executes:
+`SetAutoHidden(true)` slides it down off the screen with the exit transition (panel height plus the
+entrance offset) and clears hover and tooltip; `SetAutoHidden(false)` plays the entrance, or shows at
+once when an exit is reversed mid-way. Full-screen suppression keeps priority (`SetSuppressed(false)`
+no longer shows an auto-hidden Dock). `Engaged()` reports pointer, drag, menu (its modal loop),
+preview or keyboard use; `PanelBoundsPx()` is the area an application window covers. An auto-hidden
+Dock registers no AppBar, also in replacement mode, so maximized windows take the full height.

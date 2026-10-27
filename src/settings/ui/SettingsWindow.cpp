@@ -756,6 +756,8 @@ void SettingsWindow::Impl::BuildPage() {
               [](const Settings& s){return s.dock.showRunningApps;}, [](Settings& s,bool v){s.dock.showRunningApps=v;});
         Check(L"Reserve screen space for the Dock", L"Maximized windows stay above the Dock instead of under it.",
               [](const Settings& s){return s.dock.reserveSpace;}, [](Settings& s,bool v){s.dock.reserveSpace=v;});
+        Check(L"Automatically hide the Dock", L"Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.",
+              [](const Settings& s){return s.dock.autoHide;}, [](Settings& s,bool v){s.dock.autoHide=v;});
         BeginSection(L"Pinned applications");
         HWND pins = Make(canvas, L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL, kPinList);
         for (const auto& pin : current.dock.pinned) ::SendMessageW(pins, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(pin.displayName.c_str()));
@@ -803,6 +805,8 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Behavior");
         Check(L"Reserve screen space above windows", L"Maximized windows stay below the Top Bar.",
               [](const Settings& s){return s.topBar.reserveSpace;}, [](Settings& s,bool v){s.topBar.reserveSpace=v;});
+        Check(L"Automatically hide the Top Bar", L"Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.",
+              [](const Settings& s){return s.topBar.autoHide;}, [](Settings& s,bool v){s.topBar.autoHide=v;});
         Check(L"Use Windows Quick Settings (Windows 11)", L"Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.",
               [](const Settings& s){return s.topBar.windowsQuickSettings;}, [](Settings& s,bool v){s.topBar.windowsQuickSettings=v;});
     } else if (page == SettingsPage::Weather) {

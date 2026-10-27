@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
+#include "app/AutoHide.h"
 #include "app/DesktopPolicy.h"
 #include "app/HiddenIcons.h"
 #include "app/TaskbarController.h"
@@ -73,6 +74,8 @@ constexpr UINT_PTR kAttentionPeekTimer = 0xA374;
 constexpr UINT_PTR kLocationRefreshTimer = 0xA375;
 constexpr UINT_PTR kOverflowWatchTimer = 0xA376;     // the chevron follows Windows' overflow closing
 constexpr ULONGLONG kOverflowDismissWindowMs = 500;  // a click that itself dismissed the overflow
+constexpr UINT_PTR kAutoHideTimer = 0xA377;          // D47: edge and cover sampling while Auto-Hide is on
+constexpr UINT kAutoHideTickMs = 50;
 
 // The documented Windows keyboard shortcuts behind fixed system actions. Windows reports nothing
 // back: a submitted chord is not proof that the feature opened.
@@ -177,6 +180,11 @@ struct ShellApplication::Impl {
     bool hiddenIconsPending = false;    // an overflow request is with the tray worker
     bool hiddenIconsOpen = false;       // Windows' overflow is open after the chevron opened it
     ULONGLONG hiddenIconsClosedAt = 0;  // when it was last seen closing on its own
+    // D47 Auto-Hide: one decision per bar, fed by a short timer that runs only while a bar has it on.
+    AutoHideState topAutoHide, dockAutoHide;
+    bool topCovered = false, dockCovered = false;
+    bool autoHideArmed = false;
+    unsigned autoHideTick = 0;
     std::uint64_t resumeDeadline = 0;
     bool fullscreenSuppressed = false;
     bool attentionPeekArmed = false;
@@ -217,6 +225,74 @@ struct ShellApplication::Impl {
             });
         });
     }
+    // The side margins of maximized windows in replacement mode. D47: with both bars auto-hiding,
+    // maximized windows take the whole screen, sides included.
+    void UpdateSideInsets() {
+        if (!sideInsets) return;
+        const bool wanted = settings && settings->Current().general.replaceWindowsTaskbar;
+        const bool fullScreen = settings && settings->Current().dock.autoHide && settings->Current().topBar.autoHide;
+        const bool enabled = nativeTaskbarAccess && wanted && desktopState.active && !desktopState.suspended && !closing && !fullScreen;
+        if (auto aligned = sideInsets->SetEnabled(enabled); !aligned && enabled) {
+            // An optional side alignment failure never strands the native taskbar or Dock.
+            (void)sideInsets->SetEnabled(false);
+            AETHER_LOG_WARN("app", "maximized-window side margins unavailable");
+        }
+    }
+    // D47 Auto-Hide. Arms the sampling timer while either bar has it on; a bar that turned it off
+    // comes back at once.
+    void UpdateAutoHide() {
+        if (closing || !settings || !settings->Loaded()) return;
+        const auto& value = settings->Current();
+        const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
+        if (!topOn) { topAutoHide = AutoHideState{}; if (topbar) topbar->SetAutoHidden(false); }
+        if (!dockOn) { dockAutoHide = AutoHideState{}; if (dock) dock->SetAutoHidden(false); }
+        if (!topOn && !dockOn) {
+            if (autoHideArmed) ::KillTimer(events.Handle(), kAutoHideTimer);
+            autoHideArmed = false;
+            return;
+        }
+        if (!autoHideArmed) {
+            autoHideTick = 0;
+            autoHideArmed = ::SetTimer(events.Handle(), kAutoHideTimer, kAutoHideTickMs, nullptr) != 0;
+            if (!autoHideArmed) AETHER_LOG_WARN("app", "auto-hide sampling could not start; the bars stay visible");
+        }
+        if (autoHideArmed) AutoHideTick();
+    }
+    // One sample: the pointer position (the screen edges reveal; nothing intercepts input there) every
+    // tick, which application windows cover each bar four times a second.
+    void AutoHideTick() {
+        if (closing || !settings || !autoHideArmed) return;
+        const auto& value = settings->Current();
+        const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
+        if (!topOn && !dockOn) { UpdateAutoHide(); return; }
+        const auto monitor = platform::PrimaryMonitor();
+        POINT cursor{};
+        const bool pointer = ::GetCursorPos(&cursor) != FALSE && cursor.x >= monitor.bounds.left && cursor.x < monitor.bounds.right;
+        const auto now = ::GetTickCount64();
+        if (autoHideTick++ % 5 == 0) {
+            topCovered = topOn && ApplicationWindowCovers(topbar->BoundsPx());
+            dockCovered = dockOn && ApplicationWindowCovers(dock->PanelBoundsPx());
+        }
+        if (topOn) {
+            AutoHideSample sample;
+            sample.enabled = true;
+            sample.covered = topCovered;
+            sample.engaged = topbar->Engaged() || (controls && controls->IsShown()) || hiddenIconsOpen || hiddenIconsPending;
+            sample.atEdge = pointer && cursor.y <= monitor.bounds.top;
+            sample.now = now;
+            topbar->SetAutoHidden(topAutoHide.Update(sample));
+        }
+        if (dockOn) {
+            AutoHideSample sample;
+            sample.enabled = true;
+            sample.covered = dockCovered;
+            // An application asking for attention reveals the Dock for a moment, as over full screen.
+            sample.engaged = dock->Engaged() || (attentionPeekArmed && !attentionApplications.empty() && now < attentionDeadline);
+            sample.atEdge = pointer && cursor.y >= monitor.bounds.bottom - 1;
+            sample.now = now;
+            dock->SetAutoHidden(dockAutoHide.Update(sample));
+        }
+    }
     void ApplyDockSuppression() {
         const bool peek=attentionPeekArmed&&!attentionApplications.empty()&&::GetTickCount64()<attentionDeadline&&!closing;
         if(dock)(void)dock->SetSuppressed(ShouldSuppressDock(fullscreenSuppressed,desktopState,peek));
@@ -230,7 +306,7 @@ struct ShellApplication::Impl {
         if(dock)(void)dock->SetRunningApplications(running);
         if(attentionApplications.empty()){
             ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
-        }else if(fresh&&fullscreenSuppressed&&desktopState.active&&!desktopState.suspended){
+        }else if(fresh&&(fullscreenSuppressed||(dock&&dock->AutoHidden()))&&desktopState.active&&!desktopState.suspended){
             attentionDeadline=::GetTickCount64()+6000;
             attentionPeekArmed=::SetTimer(events.Handle(),kAttentionPeekTimer,6000,nullptr)!=0;
         }
@@ -282,14 +358,7 @@ struct ShellApplication::Impl {
         const bool reserve = ShouldForceDockReservation(taskbarReservationFailed, wanted, update);
         if (dock && !dock->SetTaskbarReplacement(reserve) && reserve) { FailTaskbarReservation(); return; }
         if (!update.active && taskbarReservationFailed) taskbarStatus = L"Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.";
-        if(sideInsets){
-            const bool enabled=nativeTaskbarAccess&&wanted&&update.active&&!update.suspended&&!closing;
-            if(auto aligned=sideInsets->SetEnabled(enabled);!aligned&&enabled){
-                // An optional side alignment failure never strands the native taskbar or Dock.
-                (void)sideInsets->SetEnabled(false);
-                AETHER_LOG_WARN("app","maximized-window side margins unavailable");
-            }
-        }
+        UpdateSideInsets();
         if (!ShouldObserveTaskbar(update)) {
             // Nothing more happens until the next request (setting toggled, Explorer restarted,
             // resumed); each of them arms the timer again through EnsureTaskbarReplacement or the
@@ -772,6 +841,8 @@ void ShellApplication::Impl::ApplySettings() {
         }
     }
     if (topbar) { topbar->SetTheme(tokens, motion); topbar->SetSettings(value.topBar, value.weather.enabled); }
+    UpdateSideInsets();
+    UpdateAutoHide();
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
     if (controls) controls->SetTheme(tokens, motion);
     // Settings follows the Windows app mode (AppsUseLightTheme), the shell surfaces the system mode.
@@ -1216,6 +1287,7 @@ void ShellApplication::Impl::Stop() noexcept {
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kOverflowWatchTimer);
+    ::KillTimer(events.Handle(), kAutoHideTimer); autoHideArmed = false;
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
@@ -1306,6 +1378,10 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             if(delay&&*delay>0)impl_->attentionPeekArmed=::SetTimer(impl_->events.Handle(),kAttentionPeekTimer,static_cast<UINT>(std::min<std::uint64_t>(*delay,6000)),nullptr)!=0;
             else impl_->attentionPeekArmed=false;
             impl_->ApplyDockSuppression();return true;
+        }
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kAutoHideTimer) {
+            impl_->AutoHideTick();
+            return true;
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kOverflowWatchTimer) {
             // Windows closes its overflow on its own (a click elsewhere, an icon, Escape): the chevron follows.

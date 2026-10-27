@@ -11,6 +11,7 @@
 #include "graphics/BitmapCache.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
+#include "graphics/Transition.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/Win32Error.h"
 #include "settings/SettingsSerialization.h"
@@ -89,6 +90,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     float grabOffsetX = 0;
     bool dragging = false;
     bool suppressed = false;
+    bool autoHidden = false;  // D47: slid away by Auto-Hide (independent of full-screen suppression)
+    bool menuOpen = false;    // a Dock menu is running its modal loop
     bool keyboard = false;
     std::size_t focused = 0;
     HWND previousForeground = nullptr;
@@ -216,7 +219,8 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         return area;
     }
     Result<void> Reserve() {
-        const bool wanted = options.allowWorkAreaReservation &&
+        // D47: an auto-hidden Dock reserves nothing; maximized windows take the screen's full height.
+        const bool wanted = options.allowWorkAreaReservation && !settings.autoHide &&
             (settings.reserveSpace || options.replacementTaskbarMode) && !options.workAreaPx;
         if (!wanted && appBar) {
             APPBARDATA data{sizeof(data)}; data.hWnd = window.Handle();
@@ -695,9 +699,11 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         ui::MenuRequest request; request.owner = window.Handle(); request.anchor = Anchor(index);
         request.placement = ui::MenuPlacement::AboveAnchor;
         request.restore = ui::ForegroundRestore::Always;
+        menuOpen = true;  // keeps an auto-hiding Dock in place while its menu runs
         auto selection = presenter->Show(entries, request);
         const auto live = lifetime.lock();
         if (!live || !*live) return; // do not access this after a nested loop destroyed the owner
+        menuOpen = false;
         if (!window.Handle() || suppressed || !window.IsShown() || !::IsWindowEnabled(window.Handle())) return;
         const auto currentItem = std::find_if(fitted.items.begin(), fitted.items.end(), [&](const auto& entry) {
             return text::EqualsIgnoreCase(entry.id, item.id);
@@ -888,9 +894,43 @@ Result<void> DockWindow::SetSuppressed(bool suppressed) {
             impl_->ResetHover();
             if (impl_->menus) impl_->menus->Cancel();
             Hide(); impl_->tooltip.HideTooltip(); impl_->SetTargets();
-        } else { Show(false); impl_->UpdateAttention(); }
+        } else {
+            if (!impl_->autoHidden) Show(false);
+            impl_->UpdateAttention();
+        }
         return Ok();
     });
+}
+void DockWindow::SetAutoHidden(bool hidden) {
+    auto& p = *impl_;
+    if (p.autoHidden == hidden) return;
+    p.autoHidden = hidden;
+    if (!Handle() || p.suppressed) return;  // full-screen suppression already hides it; it decides showing
+    if (hidden) {
+        ::KillTimer(Handle(), kTooltipTimer); ::KillTimer(Handle(), kLongPressTimer);
+        p.pointer.reset(); p.hovered.reset();
+        p.ResetHover();
+        p.tooltip.HideTooltip();
+        // Slides by the panel's own extent so it leaves (and returns over) the screen's bottom edge.
+        graphics::TransitionShape shape;
+        shape.offsetY = (p.layout.panel.bottom - p.layout.panel.top) + kDockEntranceOffset;
+        HideAnimated(graphics::MakeExitTransition(shape, p.tokens, p.motion));
+        p.SetTargets();
+    } else {
+        Show(false);  // the entrance, or at once when reversed mid-way
+        p.SetTargets();
+    }
+}
+bool DockWindow::AutoHidden() const noexcept { return impl_->autoHidden; }
+bool DockWindow::Engaged() const noexcept {
+    const auto& p = *impl_;
+    return p.pointer.has_value() || p.dragging || p.menuOpen || p.keyboard || p.preview.IsPresenting();
+}
+RECT DockWindow::PanelBoundsPx() const noexcept {
+    const auto bounds = BoundsPx();
+    const auto& panel = impl_->layout.panel;
+    return RECT{bounds.left + static_cast<LONG>(std::lround(ToPx(panel.left))), bounds.top + static_cast<LONG>(std::lround(ToPx(panel.top))),
+                bounds.left + static_cast<LONG>(std::lround(ToPx(panel.right))), bounds.top + static_cast<LONG>(std::lround(ToPx(panel.bottom)))};
 }
 Result<void> DockWindow::OnExplorerRestarted() {
     const bool registered = impl_->appBar;

@@ -50,6 +50,14 @@ public:
     Result<void> SetRunningApplications(std::vector<apps::RunningApplication> applications);
     Result<void> SetApplicationCatalog(std::vector<apps::ApplicationInfo> applications);
     Result<void> SetSuppressed(bool suppressed);
+    // D47 Auto-Hide (the host decides when): slides the Dock down off the screen or back. Full-screen
+    // suppression always wins; an auto-hidden Dock keeps its pins, running state and layout.
+    void SetAutoHidden(bool hidden);
+    [[nodiscard]] bool AutoHidden() const noexcept;
+    // In use: the pointer is over it, a menu or preview is open, an icon is dragged or it has keyboard focus.
+    [[nodiscard]] bool Engaged() const noexcept;
+    // The visible panel in physical screen pixels (also while hidden): the area an application covers.
+    [[nodiscard]] RECT PanelBoundsPx() const noexcept;
     Result<void> Relayout();
     Result<void> OnExplorerRestarted();
     Result<void> SetTaskbarReplacement(bool active);

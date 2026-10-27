@@ -479,6 +479,59 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
 }
 
+AETHER_TEST("topbar integration: auto-hide slides the bar away and back without overriding full-screen suppression") {
+    // D47: the host decides when; the bar executes, reports use and never touches the work area here.
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    RECT before{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &before, 0) != FALSE);
+    bool fullscreen = false;
+    unsigned changes = 0;
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false;
+    context.fullscreenProbe = [&] { return fullscreen; };
+    TopBarWindow window(context); REQUIRE(window.Create(RECT{80, 180, 1180, 228}).ok());
+    window.SetSettings(settings::TopBarSettings{}, false); window.SetSnapshots(Synthetic());
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    auto connection = window.FullscreenChanged.Connect([&](bool) { ++changes; });
+    window.Show(false); RunFor(loop, 30);
+    // In use while the pointer is over it; not after it left.
+    CHECK_FALSE(window.Engaged());
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, 0, MAKELPARAM(40, 20));
+    CHECK(window.Engaged());
+    ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0);
+    CHECK_FALSE(window.Engaged());
+    // Reduced motion: away and back at once.
+    window.SetAutoHidden(true); RunFor(loop, 30);
+    CHECK(window.AutoHidden()); CHECK_FALSE(window.IsShown()); CHECK(::IsWindowVisible(window.Handle()) == FALSE);
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK(window.IsShown()); CHECK(::IsWindowVisible(window.Handle()) != FALSE);
+    CHECK_EQ(changes, 0u);  // auto-hide is not full-screen suppression
+    // Full-screen suppression wins both ways.
+    window.SetAutoHidden(true);
+    fullscreen = true; window.SetFullscreenHidden(true);
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK_FALSE(window.IsShown());  // still suppressed by the full-screen application
+    window.SetAutoHidden(true);
+    fullscreen = false; window.SetFullscreenHidden(false); RunFor(loop, 30);
+    CHECK_FALSE(window.IsShown());  // the full-screen application left, but the bar is auto-hidden
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK(window.IsShown());
+    // With motion, the bar slides away: still shown while it leaves, gone afterwards, and back.
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{});
+    window.SetAutoHidden(true);
+    CHECK(window.IsShown()); CHECK(window.IsHiding());
+    RunFor(loop, 700);
+    CHECK_FALSE(window.IsShown());
+    window.SetAutoHidden(false);
+    RunFor(loop, 700);
+    CHECK(window.IsShown()); CHECK_FALSE(window.IsTransitioning());
+    RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
+    CHECK(::EqualRect(&before, &after) != FALSE);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
+}
+
 AETHER_TEST("topbar integration: AppBar notifications recheck current fullscreen policy without raw overrides") {
     platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
     platform::MessageLoop loop;

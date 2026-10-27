@@ -7,7 +7,28 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — D45 implemented in source by Claude (S-054, 2026-10-27)
+## Current checkpoint — Auto-Hide and D45 follow-ups by Claude (S-057, 2026-10-27)
+
+**Owner acceptance is pending for everything below.** After trying the trial, the owner asked for:
+
+- **Hidden-icons chevron as a toggle:** the arrow points up while Windows' overflow is open; a second
+  click closes it through Explorer's own button. An overflow that Windows closes on that same press,
+  on a click elsewhere, an icon or Escape flips the arrow back and is not reopened.
+- **No outline after clicking the chevron:** the Top Bar's focus ring now follows keyboard navigation
+  only (as Windows shows focus cues); focus alone or a click never draws it.
+- **Consistently rounded maximized windows:** a maximized Chrome window had re-applied its Mica, so
+  the guard had left it square; seen through the cut corners of the windows above, it looked like
+  content spilling past the rim. A re-asserted previous material is now clipped again after a growing
+  delay, at most eight times per maximize (ADR 0012 updated).
+- **Auto-Hide (new D47/FR-039/T49):** independent persisted `dock.autoHide` / `topBar.autoHide`
+  (Settings checkboxes, default off). A bar hides while an application window overlaps it, slides back
+  when the pointer rests on its screen edge, stays while used and on the uncovered desktop; auto-hidden
+  bars reserve no work area (both: no side margins), so maximized windows get the full screen.
+
+Evidence and limits: TEST_STATUS S-057, [known limitations](KNOWN_LIMITATIONS.md). The owner's own check
+of edge reveal, animation, the toggle and real applications is the next step.
+
+## Previous checkpoint — D45 implemented in source by Claude (S-054, 2026-10-27)
 
 **Owner acceptance and the live Explorer/foreign-application checks are pending; nothing below claims
 them.** Claude implemented [the D45 brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) in the

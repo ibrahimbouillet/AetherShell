@@ -41,9 +41,14 @@ Measured on Windows 11 (build 26300) with owned test windows before deciding:
   that is merely `WS_EX_LAYERED` (Chromium/Electron transparency) is an ordinary application window;
   click-through overlays stay excluded by `WS_EX_TRANSPARENT`, tool-window and caption/frame rules.
   This was the established cause of the rejected still: its window was layered and therefore skipped.
-- **Bounded reacquisition.** After an application replaces the region or material, the guard keeps
-  out of that maximized presentation. Once the window is restored, minimized or hidden, its next
-  maximize is a new presentation and gets one fresh attempt; there is never immediate re-application.
+- **Bounded reacquisition.** After an application replaces the region or chooses a different
+  material, the guard keeps out of that maximized presentation. Once the window is restored,
+  minimized or hidden, its next maximize is a new presentation and gets one fresh attempt; there is
+  never immediate re-application. Owner feedback, 2026-10-27 (D47): Chromium re-applies the very Mica
+  it had before the clip, which left such windows square for the rest of the maximize; seen through
+  the cut corners of the windows above, they looked like content spilling past the rim. A merely
+  re-asserted previous material is therefore clipped again after a growing delay (0.25 s doubling to
+  8 s), at most eight times per maximized presentation; anything else still wins at once.
 - **Aether-owned Settings, maximized.** The form paints its whole client as a rounded opaque body
   with the same rim (`windowRim` token), Settings applies the matching rounded window region over its
   visible client, and draws minimize, restore and close itself because DWM shows none under a region.

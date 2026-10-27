@@ -569,6 +569,73 @@ AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit 
     window.Destroy();
 }
 
+AETHER_TEST("dock integration: auto-hide slides the Dock away and back, reports use and yields to full-screen suppression") {
+    // D47: the host decides when; the Dock executes, reports pointer/menu use and keeps its state.
+    class FakeMenu final : public ui::IMenuPresenter {
+    public:
+        std::function<void()> during;
+        Result<ui::MenuSelection> Show(std::span<const ui::MenuEntry>, const ui::MenuRequest&) override {
+            if (during) during();
+            return ui::MenuSelection{0, nullptr};
+        }
+    } menu;
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok()); ManualDispatcher dispatcher;
+    settings::SettingsService settings(test::MakeTempDirectory("dock-autohide") / L"settings.json", dispatcher);
+    REQUIRE(settings.Load({}).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 5s;
+    while (!settings.Loaded() && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(settings.Loaded());
+    FakeLauncher launcher; FakeIcons icons;
+    dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings, &menu});
+    const RECT area{0, 0, 1000, 600}; RECT workBefore{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workBefore, 0));
+    dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false;
+    REQUIRE(window.Create(options).ok());
+    auto look = settings.Current().dock; look.autoHide = true;  // an auto-hiding Dock registers no reservation
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true}, look).ok());
+    window.Show(false);
+    // The visible panel, in screen pixels, inside the Dock window.
+    const RECT panel = window.PanelBoundsPx(), bounds = window.BoundsPx();
+    CHECK(panel.right > panel.left); CHECK(panel.bottom > panel.top);
+    CHECK(panel.left >= bounds.left); CHECK(panel.right <= bounds.right); CHECK(panel.bottom <= bounds.bottom);
+    // Use: a menu running its modal loop keeps it in place; not afterwards.
+    CHECK_FALSE(window.Engaged());
+    bool engagedDuringMenu = false;
+    menu.during = [&] { engagedDuringMenu = window.Engaged(); };
+    auto geometry = window.Geometry(); REQUIRE(geometry.ok()); REQUIRE_FALSE(geometry->items.empty());
+    ::SendMessageW(window.Handle(), WM_RBUTTONUP, 0, Point(window, geometry->items[0].icon));
+    CHECK(engagedDuringMenu);
+    ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0);
+    CHECK_FALSE(window.Engaged());
+    // Reduced motion: away and back at once.
+    window.SetAutoHidden(true); RunFor(loop, 30);
+    CHECK(window.AutoHidden()); CHECK_FALSE(window.IsShown());
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK(window.IsShown());
+    // Full-screen suppression wins both ways.
+    window.SetAutoHidden(true);
+    REQUIRE(window.SetSuppressed(true).ok());
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK_FALSE(window.IsShown());  // still suppressed over the full-screen application
+    window.SetAutoHidden(true);
+    REQUIRE(window.SetSuppressed(false).ok()); RunFor(loop, 30);
+    CHECK_FALSE(window.IsShown());  // suppression ended, but the Dock is auto-hidden
+    window.SetAutoHidden(false); RunFor(loop, 30);
+    CHECK(window.IsShown());
+    // With motion it slides away: still shown while it leaves, gone afterwards, and back.
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{}, look).ok());
+    window.SetAutoHidden(true);
+    CHECK(window.IsShown()); CHECK(window.IsHiding());
+    RunFor(loop, 700);
+    CHECK_FALSE(window.IsShown());
+    window.SetAutoHidden(false);
+    RunFor(loop, 900);
+    CHECK(window.IsShown()); CHECK_FALSE(window.IsTransitioning());
+    RECT workAfter{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workAfter, 0)); CHECK(::EqualRect(&workBefore, &workAfter));
+    window.Destroy();
+}
+
 AETHER_TEST("dock integration: captured drag follows continuously and neighbour drop and attention motions settle") {
     platform::ComApartment com(COINIT_APARTMENTTHREADED);
     platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
