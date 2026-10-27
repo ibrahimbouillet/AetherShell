@@ -12,7 +12,7 @@ body:
     attributes:
       label: Aether Shell version
       description: Settings → About
-      placeholder: 0.2.0-alpha.2
+      placeholder: 0.3.0-alpha.3
     validations:
       required: true
   - type: input

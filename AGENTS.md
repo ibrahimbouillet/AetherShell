@@ -34,7 +34,8 @@ Owner/author: Ibrahim Bouillet. License: MIT. Official repository: `github.com/i
 
 D38 starts the owner-approved V3 design/interaction development track (FR-031–FR-036, T39–T44).
 Read `docs/specs/v3-design-and-interaction.md` and the latest handoff; the installed Alpha 2 stays
-usable. This first batch does not finish V3, and no V3 tag/release/version number is authorized yet.
+usable. D48 (2026-10-27) names the current V3 source **Alpha 3, `0.3.0-alpha.3`**, and authorizes its
+commit and push to `main` only: no tag, GitHub Release, uploaded assets or installation over Alpha 2.
 D41/FR-037/T47 subsequently prioritizes visual coherence across Settings, the logo menu and all
 Aether-owned supporting UI. Follow `docs/CLAUDE_V3_VISUAL_UNIFICATION_PROMPT.md` for the next Claude
 implementation batch; preserve native input/accessibility and the current private prototype.
@@ -121,6 +122,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - **D25 delivery hold was lifted by the owner on 2026-10-22 only for Alpha 2 (D29):** the reviewed
   public `main`, tag `v0.2.0-alpha.2`, and its GitHub Release are authorized. Do not infer approval for
   unrelated repository/account settings or a later release; consult `HANDOFF.md` for exact receipts.
+- **D48 (2026-10-27):** Alpha 3 (`0.3.0-alpha.3`) source may be committed and pushed to `main`. A tag,
+  GitHub Release, assets or installation over Alpha 2 still need the owner's explicit approval.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.

@@ -2,6 +2,8 @@
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
 The second public alpha, [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2), is a manual-install preview; wider Version 1 qualification remains open.
+Alpha 3 (`0.3.0-alpha.3`) is on `main` as source only; until its setup is published, build it with
+[BUILDING.md](BUILDING.md) and `scripts/package.ps1`.
 
 Run setup as your ordinary Windows user. The wizard explains the product, displays the MIT license,
 and lets you choose a folder (default `%LOCALAPPDATA%\Programs\AetherShell`), shortcuts and optional

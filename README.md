@@ -21,21 +21,34 @@ A native Windows desktop interface by **Ibrahim Bouillet**. Aether Shell pairs a
 a compact Top Status Bar, using a softly blurred, translucent material. It is built in C++20 with
 Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under the MIT License.
 
-> **Alpha software:** 0.2.0-alpha.2 is an early public preview. It is not a fully qualified Windows
-> shell replacement. Save your work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
+> **Alpha software:** the source on `main` is **Alpha 3 (0.3.0-alpha.3)**; the latest published
+> setup is Alpha 2 (0.2.0-alpha.2). Neither is a fully qualified Windows shell replacement. Save your
+> work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
 
 ## What it does
 
 - **Dock:** launch and switch between applications, keep favorites, reorder pinned icons, see running
-  apps, open Search, and reach Start and Task View.
-- **Top Status Bar:** show Windows-provided clock, input language, network, audio and battery status,
-  with supported system actions and a grouped quick-controls panel.
+  apps with animated markers and genuine window previews on hover, open Search, and reach Start and
+  Task View.
+- **Top Status Bar:** show Windows-provided clock, input language, network, audio and battery status.
+  The date and time open Windows notifications and the calendar, a chevron opens Windows' hidden
+  notification-area icons, and the grouped status action opens Aether's Quick Settings panel.
+- **Auto-Hide:** let the Dock and the Top Bar, each on its own, slide away while an application window
+  covers them and return when the pointer reaches their screen edge, for a full-screen workspace.
 - **Weather:** optionally use Windows location permission for a coarse position and a forecast. If
   location or the network is unavailable, weather remains unavailable rather than guessing.
-- **Motion and appearance:** animated Dock interactions, dark/light appearance, keyboard navigation,
-  reduced-motion support and a translucent Windows composition surface.
+- **Motion and appearance:** one neutral frosted-glass design across the bars, Settings, menus and
+  setup; fluid Settings scrolling; rounded maximized windows while Aether replaces the taskbar;
+  dark/light appearance, keyboard navigation and reduced-motion support.
 - **Recovery:** a per-user installer, a separate recovery helper, repair/uninstall support and a
   Windows-taskbar restore command.
+
+## What's new in Alpha 3
+
+Alpha 3 brings the V3 design and interaction work: Auto-Hide, notifications and hidden icons from the
+Top Bar, Aether's own Quick Settings, Dock window previews, rounded maximized windows and a unified
+glass design for every Aether window. Read the [draft release notes](docs/releases/0.3.0-alpha.3.md)
+and the [changelog](CHANGELOG.md). Alpha 3 has no published setup yet; build it from source to try it.
 
 ## Replacing the Windows taskbar
 
@@ -72,7 +85,7 @@ limitations](KNOWN_LIMITATIONS.md).
 
 ## Visual preview
 
-Fresh screenshots and recordings of Alpha 2 will be added to the [versioned gallery](docs/media/README.md)
+Fresh screenshots and recordings of Alpha 2 and Alpha 3 will be added to the [versioned gallery](docs/media/README.md)
 after capture and privacy review. Alpha 2 is available from the release linked above. Earlier component
 fixtures are not presented as this version's appearance.
 

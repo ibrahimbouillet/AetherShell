@@ -2,7 +2,8 @@
 
 Owner-approved direction, 2026-10-23, D38; requirements FR-031–FR-036. The owner accepted Alpha 2
 and started a broader V3 design, motion and interaction overhaul. This first batch does **not**
-complete V3. No V3 release number, tag or publication is authorized by this work order.
+complete V3. No V3 release number, tag or publication is authorized by this work order. (Later, D48
+named the accumulated V3 source Alpha 3, `0.3.0-alpha.3`, and authorized its push to `main` only.)
 
 Keep Alpha 2 installed and usable. The supplied reference screenshot contains unrelated application
 content: do not copy it into the repository, fixtures or public presentation. Examples below use

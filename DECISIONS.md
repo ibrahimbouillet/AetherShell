@@ -6,10 +6,12 @@ chosen design). Product requirements and their IDs: [PROJECT_SPEC.md](PROJECT_SP
 Approval and implementation verification are separate: ADRs 0002, 0003 and 0005 are accepted choices;
 D3/D4/D6 retain their existing provisional qualification status until platform/behavior tests run.
 
-**Current delivery:** D25's temporary hold was explicitly lifted by the owner on 2026-10-22 for the
-second public release, **Aether Shell 0.2.0-alpha.2** (D29). That authorization covers the reviewed
-`main` changes, tag `v0.2.0-alpha.2`, and its GitHub Release only; do not infer approval for unrelated
-repository or account settings. Check HANDOFF for the exact pushed commit and release receipts.
+**Current delivery:** D48 (2026-10-27) names the current V3 source **Aether Shell Alpha 3,
+`0.3.0-alpha.3`**, and authorizes committing and pushing it to the official `main`. It does not
+authorize a tag, a GitHub Release, uploaded assets or installing over the owner's Alpha 2; those
+remain separate owner approvals. The latest published release is still **0.2.0-alpha.2** (D29:
+reviewed `main`, tag `v0.2.0-alpha.2` and its GitHub Release, 2026-10-22). Do not infer approval for
+unrelated repository or account settings. Check HANDOFF for the exact pushed commits and receipts.
 
 **Approval source.** The owner's brief delegates technical choices to the engineering lead ("choose …
 and document the decision"). D1–D14, D16 and D17 were taken by assistants under that delegation:
@@ -107,6 +109,23 @@ Record and qualify any necessary compatible custom-control strategy before subst
 Windows-owned and pre-renderer emergency UI retain honest documented native exceptions. No
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
+
+### D48 — The current V3 source is Aether Shell Alpha 3 (`0.3.0-alpha.3`); push it to `main`
+
+Owner instruction, 2026-10-27, given to Claude: commit and push the project as **AetherShell Alpha 3
+(v3)**, including all new designs; this is version 3 of the application. This supersedes D38's "no
+V3 version number" and the D45 brief's "no push" for this source only. Following the existing
+`0.1.0-alpha.1` / `0.2.0-alpha.2` pattern, the version is `0.3.0-alpha.3` (CMake project version
+`0.3.0`, prerelease `alpha.3`). "All new designs" means the implemented V3 designs in source and
+documentation: the unified glass Settings, menus and installer, owned Quick Settings, Dock hover
+previews and markers, notifications, hidden icons, rounded maximized windows and Auto-Hide. The
+private reference images and runtime receipts stay out of Git as before.
+
+Not authorized by this instruction: tag `v0.3.0-alpha.3`, a GitHub Release or uploaded assets,
+replacing the installed Alpha 2, or changing repository settings. RELEASE_PROCESS still governs any
+later release (CI on the pushed revision, audited package, reviewed notes, then the owner's release
+approval). Owner acceptance of the S-054–S-057 behavior remains pending and is not implied by the
+version name. Evidence: TEST_STATUS S-058.
 
 ### D47 — Auto-Hide for the Dock and the Top Bar; follow-ups to D45/D46
 

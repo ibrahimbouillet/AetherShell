@@ -6,38 +6,73 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-### V3 development
+## 0.3.0-alpha.3 — Alpha 3 — 2026-10-27
 
-- Remove Dock shadow fragments that formed grey rectangles around raised icons on light windows,
-  retaining the exact input footprint and magnification animation.
+Third alpha (owner decision D48): the V3 design and interaction work since Alpha 2. The source is on
+`main`. No setup, tag or GitHub Release has been published for it yet, so the latest downloadable
+release is still 0.2.0-alpha.2. Draft notes: [docs/releases/0.3.0-alpha.3.md](docs/releases/0.3.0-alpha.3.md).
+Owner acceptance of the latest behavior (S-054 to S-057) is pending.
 
-- Remove residual rectangular system material behind rounded maximized-window cutouts, with an
-  independently restored material lease and composed-pixel regression coverage.
+### Added
 
-- Narrow Dock/Top Bar native input regions to their panels/current icons so decorative outer
-  margins do not rely on same-thread-only input forwarding; external shadows are currently clipped.
-- Reduce Dock panel top padding by 3 DIPs while preserving icon sizes and the visible bottom gap.
-- Request native Windows 11 Quick Settings from the grouped status action when enabled; provide
-  an explicit Top Bar preference to retain Aether controls. Native opening still needs device review.
-- Record the V3 design/motion requirements and the unresolved maximized-corner prototype plan.
-- Animate observed running markers from dot to pill on hover/foreground with continuous native
-  springs, preserved active-state identity and immediate reduced-motion/high-contrast feedback.
-- Add an unwired owned-window corner prototype with DPI clipping, true-maximize preservation,
-  region/identity ownership and conditional restore; visible/external qualification remains open.
-- Hovering a running background app expands its marker to exactly the active marker's width with a
-  dedicated, calmer marker spring; after a deliberate dwell a rounded glass card shows genuine DWM
-  previews of its windows, each with a close button that requests a normal close of that window
-  only. Pointer travel into the card keeps it open; activation continues the expanded marker.
-- Cancel preview close gestures when capture is lost or a tracker refresh changes the tile's
-  identity. Keyboard selection follows the chosen window through reorder and disarms actions when
-  that window disappears until the user navigates again.
-- Trim hover-card gutters and fit the panel to its thumbnail content, keeping the rendered
-  miniature size, readable header and close-button target unchanged.
-- Keep executable-only desktop windows on their unique matching AUMID pin while retaining
-  explicit profile separation, launch metadata and genuine preview/window identity.
-- Add a separate reversible corner guard for eligible maximized windows during taskbar replacement;
-  preserve maximize/placement and restore owned regions on stop or parent exit. Unsupported
-  windows and compositor-quality antialiasing remain outside this bounded prototype.
+- **Auto-Hide for the Dock and the Top Bar** (D47): two independent, persisted settings, off by
+  default (Settings → Dock → *Automatically hide the Dock*, Settings → Top Bar → *Automatically hide
+  the Top Bar*). An enabled bar slides away while an application window covers it and slides back
+  when the pointer rests on its screen edge (bottom for the Dock, top for the Top Bar). It stays while
+  in use, while one of its menus or panels is open, and on the uncovered desktop. Auto-hidden bars
+  reserve no screen space, so maximized windows use the full screen; full-screen suppression keeps
+  priority.
+- **Notifications and calendar** (D45): the Top Bar date and time opens the Windows notification
+  center (Win+N on Windows 11, Win+A on Windows 10); the clock menu adds the calendar (Win+Alt+D).
+  Aether never reads, clears or badges notifications.
+- **Hidden icons** (D45): a Top Bar chevron (Settings → Top Bar → *Show hidden icons button*, on by
+  default) opens Windows' own notification-area overflow directly below it, in front of other
+  windows. It is a toggle: the arrow points up while the overflow is open, and a second click closes it.
+- **Aether Quick Settings** (D44): the grouped network, audio and battery action opens a rebuilt
+  quick-controls panel with split tiles, two pages, sliders, conditional media controls and detail
+  views for Wi-Fi, Bluetooth, accessibility and sound output. Switches that Windows does not expose
+  to applications open the matching Windows Settings page. *Use Windows Quick Settings (Windows 11)*
+  routes the action to Windows' own panel instead.
+- **Dock window previews** (T42/T43): hovering a running app widens its marker and, after a short
+  dwell, shows a glass card with genuine previews of its windows. Each preview has a close button for
+  that window only; pointer travel into the card keeps it open.
+- **Rounded maximized windows** (D40/D46, ADR 0012): while Aether replaces the taskbar, eligible
+  maximized windows are clipped to rounded corners, with a thin continuous rim drawn by a
+  click-through window beneath them. Placement and maximize state are preserved and every change is
+  undone on exit. A maximized Settings window draws its own rounded frame and caption buttons with
+  native Snap layouts, system commands and accessibility.
+
+### Changed
+
+- **One glass design across Aether** (D41/D42): Settings, the logo and context menus, setup,
+  maintenance, the updater and confirmations share the neutral frosted-glass material, controls,
+  typography, glyphs and motion. Native text editing, keyboard input and accessibility are kept.
+- **Fluid Settings** (D43): Settings stays coherent while it moves and scrolls (spring scrolling,
+  retained layers, animated hover), and its title strip shares the window material while keeping the
+  native caption buttons, Snap, system menu and resizing.
+- A more compact Dock (3 DIPs less top padding, same icon sizes and bottom gap). Running markers
+  animate from dot to pill on hover and activation, and hover cards fit their thumbnails.
+- The Top Bar's focus ring appears only after keyboard navigation, as Windows shows focus cues; a
+  click no longer outlines the chevron.
+- Dock and Top Bar input regions are narrowed to their visible panels.
+
+### Fixed
+
+- Grey rectangular shadow fragments around raised Dock icons on light windows.
+- Rectangular system backdrops behind rounded maximized-window corners. Chromium windows that
+  re-apply Mica are clipped again, so they no longer stay square behind other windows.
+- Settings now appears even when it is the first window of a process that was started hidden.
+- Executable-only desktop windows stay on their unique pinned Dock icon.
+- Preview close gestures cancel when capture is lost or the window list changes; keyboard selection
+  follows the chosen window.
+- Interrupted Quick Settings detail transitions continue from where they are; precision scrolling,
+  media arrival and press-and-release targets behave correctly.
+
+### Known limits
+
+Edge reveal and Auto-Hide with real applications, the hidden-icons toggle on every Windows build,
+multi-monitor and DPI changes, Windows 10 and some window-rendering families are not yet qualified
+on real hardware. See [KNOWN_LIMITATIONS](KNOWN_LIMITATIONS.md).
 
 ## [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) — 2026-10-23
 

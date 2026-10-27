@@ -13,6 +13,9 @@ Dock. Both shortcuts are configurable in Settings → General; conflicts are rep
 The Dock distinguishes pinned apps from other running apps. Use its context menu or Settings →
 Dock to pin/unpin/reorder entries and adjust size, magnification and motion. A running app can be
 activated from its Dock item. Some UWP window attribution still needs qualification.
+Alpha 3: hovering a running app widens its marker and, after a short pause, shows a card with
+previews of its windows. Click a preview to switch to that window, or its close button to ask that
+one window to close normally; the app decides whether to close (for example after asking to save).
 
 The Top Bar displays snapshots from documented Windows APIs. Unknown status remains unknown.
 A desktop PC without a battery can hide the battery item. A microphone-in-use indicator is
@@ -27,6 +30,16 @@ mute; its right-click menu offers privacy settings and **Start Windows voice typ
 The voice action returns focus to the previous application before asking Windows to open dictation
 in its active field. Windows controls dictation availability, microphone permission and processing;
 Aether Shell does not capture or store speech. Automated tests do not invoke real dictation.
+
+Alpha 3 adds three Top Bar entry points. Click the date and time to open the Windows notification
+center (Win+N on Windows 11, Win+A on Windows 10); its menu also opens the calendar. Aether never
+reads, clears or counts your notifications. The small chevron opens Windows' own hidden
+notification-area icons directly below it; the arrow points up while they are open, and a second
+click closes them. Hide the chevron with Settings → Top Bar → **Show hidden icons button**. The
+grouped network/audio/battery action opens Aether's Quick Settings panel, with a second page and
+detail views for Wi-Fi, Bluetooth, accessibility and sound output; switches that Windows keeps to
+itself open the matching Windows Settings page. On Windows 11, **Use Windows Quick Settings
+(Windows 11)** on the same page opens Windows' own panel instead.
 
 Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop and Appearance pages. Weather
 starts disabled. Choose automatic Windows location with consent or a manual location before enabling
@@ -51,6 +64,17 @@ it and press Apply to enable replacement again. Closing/navigating away discards
 In replacement mode the Dock reserves space below maximized applications. Ordinary manually placed
 windows may still need moving. The status message shows whether replacement is active or unavailable.
 Windows Settings retains its native taskbar page; change Aether Shell's behavior here.
+In Alpha 3 replacement mode, eligible maximized windows get rounded corners and a thin rim, without
+changing their size or maximize state; Aether undoes this when it exits. Some applications and
+window types keep square corners.
+
+**Auto-Hide** (Alpha 3) is set separately for each bar: Settings → Dock → **Automatically hide the
+Dock** and Settings → Top Bar → **Automatically hide the Top Bar**. Both are off by default. An
+auto-hiding bar slides away while an application window covers it. Rest the pointer on the bottom
+(Dock) or top (Top Bar) edge of the screen to bring it back. It stays while you use it or one of its
+menus or panels is open, and hides again shortly after. On the desktop, with no window over it, the
+bar stays visible. An auto-hiding bar reserves no screen space, so maximized windows fill the screen
+and the revealed bar appears over them, like Windows' own auto-hide taskbar.
 
 Desktop also offers Import Windows taskbar pins. It reads available supported pinned shortcuts and
 adds missing entries without changing Windows pins or replacing your Aether pins. Some Windows 11
@@ -65,9 +89,9 @@ per-window profile icon metadata can distinguish Chrome profiles; missing metada
 Dock context menus offer applicable window/new-instance/pin actions without guessing a profile.
 
 Top Bar menus expose clock, power, sound and network settings. The visible trailing native-taskbar
-arrow was removed for Alpha 2. Recovery remains available through Desktop settings, Quit and the
-standalone recovery command. The compatibility suspend/resume path remains internal; it is not a
-replacement for the Windows notification area.
+arrow was removed for Alpha 2; since Alpha 3 the hidden-icons chevron gives access to Windows' own
+notification-area overflow instead. Recovery remains available through Desktop settings, Quit and the
+standalone recovery command. The compatibility suspend/resume path remains internal.
 
 To restore the native bar, disable the Desktop option or choose Quit from the Top Bar menu.
 

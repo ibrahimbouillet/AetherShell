@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(AetherShell
-    VERSION 0.2.0
+    VERSION 0.3.0
     DESCRIPTION "A modular native Windows desktop interface with a floating application dock, system status bar, and original glass design."
     HOMEPAGE_URL "https://github.com/ibrahimbouillet/AetherShell"
     LANGUAGES C CXX RC)

@@ -6,6 +6,7 @@ their own directories; create fresh media for a new release rather than relabell
 
 | Version | Gallery | Status |
 | --- | --- | --- |
+| 0.3.0-alpha.3 | Not created yet | No capture yet; any take needs D36 readiness and every-frame privacy review |
 | 0.2.0-alpha.2 | [Alpha 2 gallery](0.2.0-alpha.2/README.md) | Draft — fresh capture and privacy review pending |
 
 Only selected, reviewed exports belong here. Raw recordings, process metadata, private configuration

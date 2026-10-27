@@ -5,7 +5,8 @@ executed checks establish **what it currently does**; implementation does not re
 Owner/author: Ibrahim Bouillet. License: MIT. Baseline: 2026-10-18, existing project decisions and
 module work orders, plus the owner's request for one traceable specification. The first
 `0.1.0-alpha.1` manual-install alpha is public. The owner-approved V2 prerelease is
-`0.2.0-alpha.2`; its exact build/delivery evidence is recorded separately when executed.
+`0.2.0-alpha.2`; its exact build/delivery evidence is recorded separately when executed. The owner
+named the V3 source Alpha 3, `0.3.0-alpha.3` (D48, 2026-10-27); it is pushed to `main` but not released.
 
 **Sources of requirements, in order of authority.** (1) Explicit owner instructions recorded as
 owner-approved decisions in [DECISIONS.md](DECISIONS.md) (including D15, D18, D19, D21 and D23). (2) The owner's original
@@ -14,9 +15,9 @@ the repository; its binding content is captured in this file and cited as "brief
 decisions taken by assistants under the authority the brief delegates ("choose … and document the
 decision"); they may be revised with evidence, never silently. (4) Module work orders (`docs/specs/`)
 and module references (`docs/modules/`), which add detail but no authority. Terminology: **Version 1**
-is the product scope and definition of done of brief §17 (section G). `0.1.0-alpha.1` and
-`0.2.0-alpha.2` (the latter called "V2" in D19/ADR 0009) are prereleases of that work, not
-product versions 1 and 2.
+is the product scope and definition of done of brief §17 (section G). `0.1.0-alpha.1`,
+`0.2.0-alpha.2` (called "V2" in D19/ADR 0009) and `0.3.0-alpha.3` ("V3", D38/D48) are prereleases of
+that work, not product versions 1, 2 and 3.
 
 ## A. Identity and mission
 

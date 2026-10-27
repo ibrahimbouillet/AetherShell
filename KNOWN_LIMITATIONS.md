@@ -2,8 +2,8 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The current V2 release is `0.2.0-alpha.2`; the earlier `0.1.0-alpha.1` delivery does not qualify this
-version. Build, package and CI
+The source on `main` is Alpha 3, `0.3.0-alpha.3` (D48), which has no published setup yet; the latest
+published release is `0.2.0-alpha.2`. Earlier deliveries do not qualify later versions. Build, package and CI
 receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
 
 - The corrected Dock light native fixture intermittently exposes its own HWND as UIA Pane rather

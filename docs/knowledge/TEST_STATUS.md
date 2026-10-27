@@ -2495,3 +2495,44 @@ exactly one corner-guard child acknowledged; no warning or error logged). The tr
 clone has no Auto-Hide keys, so Auto-Hide is off there until the owner turns it on in Settings. Live
 edge reveal, animation, the toggle on the real overflow and real applications with Auto-Hide await
 the owner's check.
+
+### S-058 — Alpha 3 (`0.3.0-alpha.3`): version, documentation and push (Claude, 2026-10-27)
+
+Owner instruction (D48): commit and push the project as AetherShell Alpha 3 (v3), including all new
+designs. Version `0.3.0-alpha.3` (CMake `0.3.0`, prerelease `alpha.3`); documentation per HANDOFF.
+No tag, GitHub Release, asset upload or installation over Alpha 2 was made.
+
+**Trial outage before this checkpoint (local diagnosis; nothing private recorded):** the `8134984`
+trial started at 10:40 stopped at about 10:47, a minute after the owner turned on both Auto-Hide
+settings. There is no crash report, dump or application-error event, the log has no shutdown line and
+the trial host never ran its restore step, so host and trial were ended together from outside, most
+likely with the assistant's tool session (its shells run inside a job object), not by a product
+fault. The native taskbar stayed hidden until Alpha 2 was started again at 12:31. A relaunch at 15:02
+stopped safely because that Alpha 2 left a recovery baseline when it quit (its host restarted Alpha 2);
+the retry at 15:03 started the trial from the owner's terminal, outside the tool job, with the owner's
+Auto-Hide choices carried over. Lesson recorded in HANDOFF.
+
+**Executed (version-bump gate):**
+
+- Release /W4 /WX build in the existing directory, reconfigured with
+  `-DAETHER_VERSION_PRERELEASE=alpha.3` (a cached value otherwise survives): CMake reports
+  `Aether Shell 0.3.0-alpha.3 (x64)`; **24/24 unit suites** pass (56.4 s).
+- `audit_package.py ... --check-freshness --version 0.3.0-alpha.3` passes (setup and embedded payload).
+  App, launcher and setup report product and file version `0.3.0-alpha.3`. SHA-256: app
+  `958a0ab9f6b4ed192cf1f31150e56a73f5af27fa21c598c48f0de2062af232f6`, launcher
+  `c95cbe6cfdf386c6e213806c4c89a0d3ce3223bb009f3d86a1829708a6bb4eb8`, setup
+  `be14ef6acd7f5b494ab85b32e05ff186bde1ac18d56d7d23efde692c00f3415f`.
+- Install integration **7/7**. Installer integration: first full run **9/13** (four setup design and
+  viewport cases did not find the wizard window or the next page's controls), second full run **11/13**
+  (two other design cases failed; the earlier failures, including the viewport case, passed); the four
+  setup design cases then passed **three consecutive isolated runs** (about 54 s each against 33.6 s
+  recorded earlier, on a loaded desktop). Classified as timing flakiness of the fixed 120 ms wait after
+  page navigation, not a version effect: no setup code changed and the version string keeps its
+  length. The wait is not corrected in this checkpoint.
+- The S-054 to S-057 feature suites were not rerun for this metadata-only change; their evidence stands.
+
+**Publication review before the push:** the 41 local commits since `origin/main` plus this one are
+authored and committed with the public GitHub no-reply identity and add no binary or media file.
+Their 29,316 added lines contain no user path, machine name, private address, MAC, SID or secret
+pattern; the only hits are the relative name of the ignored trial folder and generic application names
+in an existing owner brief. The private reference images and runtime receipts remain untracked.

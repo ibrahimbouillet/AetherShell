@@ -7,7 +7,33 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Auto-Hide and D45 follow-ups by Claude (S-057, 2026-10-27)
+## Current checkpoint — Alpha 3 (`0.3.0-alpha.3`) pushed to `main` by Claude (S-058, 2026-10-27)
+
+**Owner instruction (D48):** commit and push the project as AetherShell Alpha 3 (v3), including all
+new designs. Done in this checkpoint:
+
+- **Version:** CMake project version `0.3.0`, prerelease `alpha.3` (`0.3.0-alpha.3`); the bug-report
+  template follows. An existing build directory keeps its cached `AETHER_VERSION_PRERELEASE`, so
+  reconfigure it with `-CMakeArgs '-DAETHER_VERSION_PRERELEASE=alpha.3'` (fresh CI directories need nothing).
+- **Documentation:** a complete Alpha 3 [changelog](CHANGELOG.md) entry,
+  [draft release notes](docs/releases/0.3.0-alpha.3.md), README (features, "What's new", status),
+  [user guide](USER_GUIDE.md) (previews, notifications, hidden icons, Quick Settings, rounded maximized
+  windows, Auto-Hide), D48, and the version references in AGENTS, PROJECT_SPEC, PROJECT_CONTEXT,
+  KNOWN_LIMITATIONS, INSTALLATION, TASKS, the V3 work order and the media index.
+- **Not done (not authorized):** tag `v0.3.0-alpha.3`, a GitHub Release or assets, installation over
+  the owner's Alpha 2. The installed Alpha 2 and its preferences/startup are unchanged.
+
+Gate evidence, the pushed revision and its Windows CI result: TEST_STATUS S-058.
+
+**Private trial lifetime (lesson from this session).** A trial started from an assistant's tool shell
+was ended together with that tool session: the trial and its host stopped without the host's restore
+step, and the native taskbar stayed hidden until Alpha 2 was started again. Start the private trial
+from a shell that outlives the assistant session (for example the owner's terminal), and if a trial
+disappears, check that Alpha 2 is running before relaunching. The ignored trial host refuses to start
+while the installed session leaves a recovery baseline, and puts Alpha 2 back; it now also carries the
+owner's Auto-Hide choices from the previous trial into the new one.
+
+## Previous checkpoint — Auto-Hide and D45 follow-ups by Claude (S-057, 2026-10-27)
 
 **Owner acceptance is pending for everything below.** After trying the trial, the owner asked for:
 

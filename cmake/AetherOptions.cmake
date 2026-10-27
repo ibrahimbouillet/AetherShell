@@ -4,7 +4,7 @@
 # Project-wide build options. Every value here can be overridden on the CMake
 # command line (for example by CI when producing a release build).
 
-set(AETHER_VERSION_PRERELEASE "alpha.2" CACHE STRING
+set(AETHER_VERSION_PRERELEASE "alpha.3" CACHE STRING
     "SemVer 2.0.0 prerelease identifier appended to the project version (empty for a stable build)")
 if(AETHER_VERSION_PRERELEASE)
     set(AETHER_VERSION_FULL "${PROJECT_VERSION}-${AETHER_VERSION_PRERELEASE}")

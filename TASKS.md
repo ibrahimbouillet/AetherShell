@@ -6,7 +6,13 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
-**Latest owner assignment, 2026-10-27 — D47, T49 (implemented in source by Claude, S-057):** Auto-Hide
+**Latest owner instruction, 2026-10-27 — D48 (Claude, S-058):** the accumulated V3 source is
+**Aether Shell Alpha 3, `0.3.0-alpha.3`**, committed and pushed to `main`, with version metadata,
+changelog, [draft release notes](docs/releases/0.3.0-alpha.3.md), README, user guide and reference
+documents updated. A tag, GitHub Release, audited public assets and installation over Alpha 2 remain
+separate owner approvals (RELEASE_PROCESS). Owner acceptance of the S-054 to S-057 behavior is still pending.
+
+**Owner assignment, 2026-10-27 — D47, T49 (implemented in source by Claude, S-057):** Auto-Hide
 for the Dock and the Top Bar (independent persisted settings, edge reveal, smooth transitions, full
 screen for maximized windows, bars kept on the desktop), plus D45/D46 follow-ups: the hidden-icons
 chevron as a toggle with its arrow, no focus outline after clicks, and maximized windows kept
