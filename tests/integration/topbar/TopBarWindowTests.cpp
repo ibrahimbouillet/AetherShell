@@ -295,6 +295,18 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
         ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_RETURN, 0);
     }
     CHECK_EQ(keyboard, 2); CHECK_EQ(network, 2); CHECK_EQ(weather, 2); CHECK_EQ(hiddenIcons, 1);
+    // The focus ring follows keyboard navigation only: focus alone or a click never shows it.
+    ::SetFocus(window.Handle()); RunFor(loop, 20);
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, MAKELPARAM(0, 0));  // a click on no item
+    CHECK_FALSE(window.FocusCuesVisible());
+    ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_LEFT, 0);
+    CHECK(window.FocusCuesVisible());
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, MAKELPARAM(0, 0));
+    CHECK_FALSE(window.FocusCuesVisible());
+    // The chevron shows Windows' overflow state: up while open, down once it closed.
+    CHECK_FALSE(window.HiddenIconsOpen());
+    window.SetHiddenIconsOpen(true); CHECK(window.HiddenIconsOpen());
+    window.SetHiddenIconsOpen(false); CHECK_FALSE(window.HiddenIconsOpen());
     std::atomic<bool> finished{false}; bool passed = false;
     const HWND hwnd = window.Handle();
     std::thread client([&] {

@@ -589,7 +589,7 @@ AETHER_TEST("window corners pixels: a layered composition window with a backdrop
     VerifyComposedCornerCutouts(true, true, true);
 }
 
-AETHER_TEST("window corners native: after an application replacement, only a new maximize gets a fresh attempt") {
+AETHER_TEST("window corners native: a re-asserted material is clipped again; another choice waits for a new maximize") {
     OwnWindow target(true, true);
     if (!target.mainWindowBackdrop) {
         test::Note("SKIPPED mainwindow-backdrop fixture: this Windows build does not support the documented attribute");
@@ -597,17 +597,29 @@ AETHER_TEST("window corners native: after an application replacement, only a new
     }
     OwnGuard guard(target.window); REQUIRE(guard.Ready());
     REQUIRE(PumpUntil([&] { return HasRegion(target.window) && OwnRim() != nullptr; }));
-    // The application asserts its own material: the guard gives the window back and stays away.
-    const DWM_SYSTEMBACKDROP_TYPE mine = DWMSBT_MAINWINDOW;
+    const auto leased = [&] { return ::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") != nullptr; };
+    DWM_SYSTEMBACKDROP_TYPE material = DWMSBT_AUTO;
+    // D46: the application re-applies the very material it had (as Chromium does with Mica). The guard
+    // gives the window back at once, then clips it again after a short, bounded delay.
+    const DWM_SYSTEMBACKDROP_TYPE same = DWMSBT_MAINWINDOW;
+    REQUIRE(SUCCEEDED(::DwmSetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &same, sizeof(same))));
+    REQUIRE(::RedrawWindow(target.window, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME));
+    REQUIRE(PumpUntil([&] { return !leased() && OwnRim() == nullptr; }));
+    const auto givenBack = std::chrono::steady_clock::now();
+    REQUIRE(PumpUntil([&] { return leased() && HasRegion(target.window) && OwnRim() != nullptr; }));
+    CHECK(std::chrono::steady_clock::now() - givenBack >= std::chrono::milliseconds(200));  // never immediately
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
+    CHECK_EQ(material, DWMSBT_NONE);
+    // A different material is the application's own new choice: it wins while this maximize lasts.
+    const DWM_SYSTEMBACKDROP_TYPE mine = DWMSBT_TABBEDWINDOW;
     REQUIRE(SUCCEEDED(::DwmSetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &mine, sizeof(mine))));
     REQUIRE(::RedrawWindow(target.window, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME));
-    REQUIRE(PumpUntil([&] { return !::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") && OwnRim() == nullptr; }));
-    const auto stillAway = std::chrono::steady_clock::now() + std::chrono::milliseconds(600);
+    REQUIRE(PumpUntil([&] { return !leased() && OwnRim() == nullptr; }));
+    const auto stillAway = std::chrono::steady_clock::now() + std::chrono::milliseconds(1200);
     REQUIRE(PumpUntil([&] { return std::chrono::steady_clock::now() >= stillAway; }));
-    CHECK_FALSE(::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease"));  // no fight while maximized
-    DWM_SYSTEMBACKDROP_TYPE material = DWMSBT_AUTO;
+    CHECK_FALSE(leased());  // no fight while maximized
     REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
-    CHECK_EQ(material, DWMSBT_MAINWINDOW);
+    CHECK_EQ(material, DWMSBT_TABBEDWINDOW);
     // Leaving the maximized presentation and maximizing again is a new presentation: one new lease.
     ::ShowWindow(target.window, SW_SHOWNOACTIVATE);  // restores without activating this own fixture
     REQUIRE(PumpUntil([&] { return !::IsZoomed(target.window); }));
@@ -622,6 +634,6 @@ AETHER_TEST("window corners native: after an application replacement, only a new
     CHECK_EQ(material, DWMSBT_NONE);
     REQUIRE(guard.Finish()); CHECK_EQ(guard.exitCode.load(), 0);
     REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
-    CHECK_EQ(material, DWMSBT_MAINWINDOW);
+    CHECK_EQ(material, DWMSBT_TABBEDWINDOW);  // the application's latest own choice, restored exactly
     CHECK(OwnRim() == nullptr);
 }

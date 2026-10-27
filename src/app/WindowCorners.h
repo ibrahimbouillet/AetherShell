@@ -5,6 +5,7 @@
 #include "core/Result.h"
 
 #include <windows.h>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
@@ -57,6 +58,19 @@ public:
     virtual void Release(HWND window, std::uintptr_t token) noexcept = 0;
 };
 
+// What made a lease give its window back.
+enum class CornerReplacement {
+    None,
+    Region,              // the application installed its own window region
+    Material,            // the application chose a different system material
+    MaterialReasserted,  // the application re-applied the very material it had before the clip
+};
+// D46 (owner feedback, 2026-10-27): an application that only re-asserts its previous material
+// (Chromium re-applying Mica) is clipped again after a growing delay, at most this many times per
+// maximized presentation. Every other replacement wins until the window is maximized anew.
+inline constexpr int kCornerMaterialRetries = 8;
+[[nodiscard]] std::optional<std::chrono::milliseconds> CornerRetryDelay(CornerReplacement replacement, int attempt) noexcept;
+
 // A lifetime/region lease, not an HWND-only instruction. If an app changes its region, the
 // replacement is preserved and the guard stops managing that identity until it is destroyed.
 class WindowCornerLease final {
@@ -71,6 +85,8 @@ public:
     [[nodiscard]] bool HasOwnership() const noexcept { return claimed_; }
     // The perimeter to draw beneath the window while it is clipped (nullopt when restored).
     [[nodiscard]] const std::optional<CornerRim>& Rim() const noexcept { return rim_; }
+    // Why the last Refresh gave the window back (None while it is still clipped).
+    [[nodiscard]] CornerReplacement Replacement() const noexcept { return replacement_; }
 
 private:
     WindowCornerLease(IWindowCornerBackend& backend, HWND window, std::uintptr_t token,
@@ -85,6 +101,7 @@ private:
     std::optional<CornerRegion> installed_;
     std::optional<DWORD> originalBackdrop_;
     std::optional<CornerRim> rim_;
+    CornerReplacement replacement_ = CornerReplacement::None;
     bool claimed_ = false;
     bool applied_ = false;
     bool backdropApplied_ = false;

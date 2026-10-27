@@ -62,6 +62,13 @@ public:
     // A host action started from `item` failed: a short explanation below that item, never over a
     // hidden, suppressed or disabled bar.
     void ReportItemFailure(ItemKind item, std::wstring_view message);
+    // Windows' hidden-icons overflow is open (the host's observation): the chevron points up, and
+    // down again once it closes.
+    void SetHiddenIconsOpen(bool open);
+    [[nodiscard]] bool HiddenIconsOpen() const noexcept;
+    // The keyboard focus ring is drawn only after keyboard navigation of the bar, never after a click
+    // or a focus change alone (as Windows shows focus cues).
+    [[nodiscard]] bool FocusCuesVisible() const noexcept;
     [[nodiscard]] const std::vector<PlacedItem>& Items() const;
     [[nodiscard]] std::uint64_t RenderCount() const noexcept;
 

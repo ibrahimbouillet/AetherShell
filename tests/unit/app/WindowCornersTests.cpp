@@ -219,3 +219,36 @@ AETHER_TEST("window corners: later application material opt-in relinquishes an a
     CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
     CHECK(backend.backdrop == 2u); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.backdropWrites, 0u);
 }
+AETHER_TEST("window corners: a give-back records whether the app re-asserted its own material, chose another or its own region") {
+    // D46: Chromium re-applying the very Mica it had before the clip is distinguishable from a new choice.
+    FakeCorners reasserted; reasserted.backdrop = 2;
+    auto lease = WindowCornerLease::Acquire(reasserted, window, 30); REQUIRE(lease.ok());
+    CHECK((*lease)->Replacement() == CornerReplacement::None);
+    reasserted.backdrop = 2;
+    CHECK_FALSE((*lease)->Refresh().ok());
+    CHECK((*lease)->Replacement() == CornerReplacement::MaterialReasserted);
+    CHECK(reasserted.backdrop == 2u); CHECK_FALSE(reasserted.region.has_value());  // still given back at once
+
+    FakeCorners other; other.backdrop = 2;
+    lease = WindowCornerLease::Acquire(other, window, 31); REQUIRE(lease.ok());
+    other.backdrop = 4;
+    CHECK_FALSE((*lease)->Refresh().ok());
+    CHECK((*lease)->Replacement() == CornerReplacement::Material);
+
+    FakeCorners region;
+    lease = WindowCornerLease::Acquire(region, window, 32); REQUIRE(lease.ok());
+    region.region = CornerRegion{std::byte{1}, std::byte{2}};
+    CHECK_FALSE((*lease)->Refresh().ok());
+    CHECK((*lease)->Replacement() == CornerReplacement::Region);
+}
+AETHER_TEST("window corners: only a re-asserted previous material is clipped again, later each time and a bounded number of times") {
+    using std::chrono::milliseconds;
+    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 0) == milliseconds{250});
+    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 1) == milliseconds{500});
+    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 4) == milliseconds{4000});
+    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 7) == milliseconds{8000});
+    CHECK_FALSE(CornerRetryDelay(CornerReplacement::MaterialReasserted, kCornerMaterialRetries).has_value());
+    CHECK_FALSE(CornerRetryDelay(CornerReplacement::MaterialReasserted, -1).has_value());
+    for (const auto other : {CornerReplacement::None, CornerReplacement::Region, CornerReplacement::Material})
+        CHECK_FALSE(CornerRetryDelay(other, 0).has_value());  // the application's own choice wins
+}

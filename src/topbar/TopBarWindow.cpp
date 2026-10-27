@@ -126,6 +126,8 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<int> focused;
     std::optional<float> pendingVolume;
     bool focusedWindow = false;
+    bool keyboardCues = false;     // the focus ring follows keyboard navigation only
+    bool hiddenIconsOpen = false;  // Windows' overflow is open: the chevron points up
     bool registered = false;
     std::optional<RECT> reservedBounds;
     bool relayouting = false;
@@ -487,6 +489,14 @@ void TopBarWindow::Relayout() {
 }
 
 void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
+void TopBarWindow::SetHiddenIconsOpen(bool open) {
+    if (impl_->hiddenIconsOpen == open) return;
+    impl_->hiddenIconsOpen = open;
+    if (Handle()) Invalidate();
+}
+bool TopBarWindow::HiddenIconsOpen() const noexcept { return impl_->hiddenIconsOpen; }
+bool TopBarWindow::FocusCuesVisible() const noexcept { return impl_->focusedWindow && impl_->keyboardCues && impl_->focused.has_value(); }
+
 void TopBarWindow::ReportItemFailure(ItemKind item, std::wstring_view message) {
     auto& p = *impl_;
     if (p.destroyed || p.fullscreen || !Handle() || !IsShown() || !::IsWindowEnabled(Handle()) || message.empty()) return;
@@ -517,7 +527,7 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
     for (const auto& entry : impl_->placed) {
-        if (impl_->focusedWindow && impl_->focused == entry.item.id) {
+        if (impl_->focusedWindow && impl_->keyboardCues && impl_->focused == entry.item.id) {
             const auto inset = D2D1::RectF(entry.rect.left+2,entry.rect.top+3,entry.rect.right-2,entry.rect.bottom-3);
             graphics::PaintFocusRing(context.d2d,inset,6,impl_->tokens);
         }
@@ -525,7 +535,8 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
         if (entry.item.kind == ItemKind::NotificationArea) {
             const float cx = (entry.rect.left + entry.rect.right) * 0.5f, cy = (entry.rect.top + entry.rect.bottom) * 0.5f;
-            impl_->symbols.Draw(context.d2d, graphics::Symbol::ChevronDown, D2D1::RectF(cx - 8, cy - 8, cx + 8, cy + 8), brush.get(), 12.0f);
+            const auto chevron = impl_->hiddenIconsOpen ? graphics::Symbol::ChevronUp : graphics::Symbol::ChevronDown;
+            impl_->symbols.Draw(context.d2d, chevron, D2D1::RectF(cx - 8, cy - 8, cx + 8, cy + 8), brush.get(), 12.0f);
             continue;
         }
         const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
@@ -566,6 +577,7 @@ void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
 }
 void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->tooltip.HideTooltip(); Invalidate(); }
 void TopBarWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
+    if (impl_->keyboardCues) { impl_->keyboardCues = false; Invalidate(); }  // a click hides the focus ring
     if (const auto id = HitTest(impl_->placed, point)) {
         if (button == ui::PointerButton::Left) Activate(*id);
         else if (button == ui::PointerButton::Right) ShowItemMenu(*id);
@@ -671,8 +683,9 @@ bool TopBarWindow::OnKeyDown(UINT key) {
     std::vector<int> actions;
     for (const auto& item : impl_->placed) if (item.item.actionable) actions.push_back(item.item.id);
     if (actions.empty()) return false;
-    if (key == VK_ESCAPE) { impl_->focused.reset(); ::SetFocus(nullptr); impl_->tooltip.HideTooltip(); Invalidate(); return true; }
+    if (key == VK_ESCAPE) { impl_->focused.reset(); impl_->keyboardCues = false; ::SetFocus(nullptr); impl_->tooltip.HideTooltip(); Invalidate(); return true; }
     if (key == VK_RETURN || key == VK_SPACE) {
+        impl_->keyboardCues = true;
         if (impl_->focused) {
             // A menu opened from the keyboard (the logo) starts with its first entry selected.
             impl_->keyboardMenu = true;
@@ -682,6 +695,7 @@ bool TopBarWindow::OnKeyDown(UINT key) {
         return true;
     }
     if (key != VK_LEFT && key != VK_RIGHT && key != VK_TAB && key != VK_HOME && key != VK_END) return false;
+    impl_->keyboardCues = true;
     auto found = std::find(actions.begin(), actions.end(), impl_->focused.value_or(0));
     int index = found == actions.end() ? 0 : static_cast<int>(found - actions.begin());
     if (key == VK_HOME) index = 0;

@@ -331,13 +331,26 @@ struct Observer {
     NativeBackend backend;
     const WindowCornerGuardOptions& options;
     std::map<HWND, std::unique_ptr<WindowCornerLease>> leases;
-    std::map<HWND, std::pair<DWORD, DWORD>> abandoned;
+    // A window given back to its application: its identity, and when a re-asserted material may be
+    // clipped again (0: not before the window is maximized anew).
+    struct Abandoned { DWORD process = 0; DWORD thread = 0; ULONGLONG retryAt = 0; };
+    std::map<HWND, Abandoned> abandoned;
+    std::map<HWND, int> materialRetries;  // per maximized presentation (D46)
     std::map<HWND, std::unique_ptr<RimWindow>> rims;  // D45: one perimeter ring per clipped window
     std::uintptr_t nextToken = 1;
     UINT_PTR timer = 0;
+    ULONGLONG timerDue = 0;
     bool stopping = false;
     Observer(DWORD excluded, const WindowCornerGuardOptions& value) : backend(excluded, value), options(value) {}
-    void Queue(UINT delay = 40) noexcept { if (!stopping && !timer) timer = ::SetTimer(nullptr, kRefreshTimer, delay, nullptr); }
+    // One pending refresh; an earlier request replaces a later one.
+    void Queue(UINT delay = 40) noexcept {
+        if (stopping) return;
+        const ULONGLONG due = ::GetTickCount64() + delay;
+        if (timer && due >= timerDue) return;
+        if (timer) ::KillTimer(nullptr, timer);
+        timer = ::SetTimer(nullptr, kRefreshTimer, delay, nullptr);
+        timerDue = due;
+    }
     void Refresh() {
         if (timer) { ::KillTimer(nullptr, timer); timer = 0; }
         bool retry = false;
@@ -349,20 +362,34 @@ struct Observer {
                 // only prior-region snapshot while this guard still owns a clipped window.
                 if (it->second->HasOwnership()) { retry = true; ++it; continue; }
                 DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(it->first, &process);
-                if (thread) abandoned[it->first] = {process, thread};
+                if (thread) {
+                    Abandoned entry{process, thread, 0};
+                    int& attempts = materialRetries[it->first];
+                    if (const auto delay = CornerRetryDelay(it->second->Replacement(), attempts)) {
+                        ++attempts;
+                        entry.retryAt = ::GetTickCount64() + static_cast<ULONGLONG>(delay->count());
+                        Queue(static_cast<UINT>(delay->count()));
+                    }
+                    abandoned[it->first] = entry;
+                }
             }
             it = leases.erase(it);
         }
         auto visit = [&](HWND window) {
+            const bool presented = ::IsZoomed(window) && !::IsIconic(window) && ::IsWindowVisible(window);
+            if (!presented) materialRetries.erase(window);
             if (leases.size() >= kMaxLeases || leases.contains(window)) return;
             if (const auto old = abandoned.find(window); old != abandoned.end()) {
                 DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (old->second == std::pair{process, thread}) {
+                if (old->second.process == process && old->second.thread == thread) {
                     // The application's own region/material wins for as long as this maximized presentation
                     // lasts. Once the window leaves it (restored or minimized), its next maximize is a new
-                    // presentation and gets one fresh attempt; there is never an immediate re-application.
-                    if (!::IsZoomed(window) || ::IsIconic(window) || !::IsWindowVisible(window)) abandoned.erase(old);
-                    return;
+                    // presentation and gets one fresh attempt. D46: a merely re-asserted previous material
+                    // is clipped again once its bounded delay has passed; never immediately.
+                    if (!presented) { abandoned.erase(old); return; }
+                    if (!old->second.retryAt) return;
+                    const ULONGLONG now = ::GetTickCount64();
+                    if (now < old->second.retryAt) { Queue(static_cast<UINT>(old->second.retryAt - now)); return; }
                 }
                 abandoned.erase(old);
             }
@@ -377,7 +404,7 @@ struct Observer {
                 // Its own WinEvents must not cause repeated acquisition/material writes.
                 DWORD process = 0;
                 const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (thread) abandoned[window] = {process, thread};
+                if (thread) abandoned[window] = Abandoned{process, thread, 0};
             }
         };
         if (options.onlyProcess) { for (const auto window : options.onlyWindows) visit(window); }
@@ -445,6 +472,7 @@ void CALLBACK EventHook(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LO
     if (window && object == OBJID_WINDOW && platform::WindowClassName(window) == kRimClass) return;
     if (event == EVENT_OBJECT_DESTROY && object == OBJID_WINDOW && child == CHILDID_SELF && !::IsWindow(window)) {
         currentObserver->abandoned.erase(window);
+        currentObserver->materialRetries.erase(window);
     }
     if (event < EVENT_OBJECT_CREATE || (object == OBJID_WINDOW && child == CHILDID_SELF)) currentObserver->Queue();
 }
@@ -511,6 +539,11 @@ Result<std::unique_ptr<GuardSession>> StartGuard(const std::filesystem::path& ex
 
 int CornerRimWidthPx(UINT dpi) noexcept { return std::max(1, ::MulDiv(1, static_cast<int>(dpi ? dpi : 96), 96)); }
 
+std::optional<std::chrono::milliseconds> CornerRetryDelay(CornerReplacement replacement, int attempt) noexcept {
+    if (replacement != CornerReplacement::MaterialReasserted || attempt < 0 || attempt >= kCornerMaterialRetries) return std::nullopt;
+    return std::chrono::milliseconds{std::min(8000, 250 << std::min(attempt, 5))};  // 0.25, 0.5, 1, 2, 4, 8 s, ...
+}
+
 WindowCornerLease::WindowCornerLease(IWindowCornerBackend& backend, HWND window, std::uintptr_t token,
     DWORD process, DWORD thread) noexcept : backend_(backend), window_(window), token_(token), process_(process), thread_(thread) {}
 WindowCornerLease::~WindowCornerLease() { try { (void)Restore(); } catch (...) {} }
@@ -562,6 +595,7 @@ Result<bool> WindowCornerLease::Refresh() try {
     if (*current != installed_) {
         // The app's region wins, but our separately leased material still needs restoration.
         auto restored = Restore(); if (!restored) return restored.error();
+        replacement_ = CornerReplacement::Region;
         return MakeError(ErrorCode::InvalidState, "Application replaced its window region");
     }
     if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
@@ -570,7 +604,9 @@ Result<bool> WindowCornerLease::Refresh() try {
         if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
         const DWORD expected = backdropApplied_ ? DWMSBT_NONE : *originalBackdrop_;
         if (**backdrop != expected) {
+            const auto chosen = **backdrop;
             auto restored = Restore(); if (!restored) return restored.error();
+            replacement_ = chosen == *originalBackdrop_ ? CornerReplacement::MaterialReasserted : CornerReplacement::Material;
             return MakeError(ErrorCode::InvalidState, "Application replaced its system backdrop");
         }
         if (*originalBackdrop_ >= DWMSBT_MAINWINDOW && !backdropApplied_) {
@@ -584,12 +620,15 @@ Result<bool> WindowCornerLease::Refresh() try {
             backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
             if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
             if (**backdrop != DWMSBT_NONE) {
+                const auto chosen = **backdrop;
                 auto restored = Restore(); if (!restored) return restored.error();
+                replacement_ = chosen == *originalBackdrop_ ? CornerReplacement::MaterialReasserted : CornerReplacement::Material;
                 return MakeError(ErrorCode::InvalidState, "Application replaced its backdrop during update");
             }
             current = backend_.ReadRegion(window_); if (!current) return current.error();
             if (*current != installed_) {
                 auto restored = Restore(); if (!restored) return restored.error();
+                replacement_ = CornerReplacement::Region;
                 return MakeError(ErrorCode::InvalidState, "Application replaced its region during backdrop update");
             }
         }

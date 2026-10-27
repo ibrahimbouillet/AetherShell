@@ -71,6 +71,8 @@ constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
 constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
 constexpr UINT_PTR kAttentionPeekTimer = 0xA374;
 constexpr UINT_PTR kLocationRefreshTimer = 0xA375;
+constexpr UINT_PTR kOverflowWatchTimer = 0xA376;     // the chevron follows Windows' overflow closing
+constexpr ULONGLONG kOverflowDismissWindowMs = 500;  // a click that itself dismissed the overflow
 
 // The documented Windows keyboard shortcuts behind fixed system actions. Windows reports nothing
 // back: a submitted chord is not proof that the feature opened.
@@ -172,7 +174,9 @@ struct ShellApplication::Impl {
     TaskbarUpdate desktopState;
     bool automaticResume = false;
     bool resumeTimerArmed = false;
-    bool hiddenIconsPending = false;  // an overflow request is with the tray worker
+    bool hiddenIconsPending = false;    // an overflow request is with the tray worker
+    bool hiddenIconsOpen = false;       // Windows' overflow is open after the chevron opened it
+    ULONGLONG hiddenIconsClosedAt = 0;  // when it was last seen closing on its own
     std::uint64_t resumeDeadline = 0;
     bool fullscreenSuppressed = false;
     bool attentionPeekArmed = false;
@@ -364,15 +368,70 @@ struct ShellApplication::Impl {
         const Result<void> sent = action ? SendShortcut(action->shortcut) : Result<void>(action.error());
         if (!sent && topbar) topbar->ReportItemFailure(topbar::ItemKind::Clock, L"The Windows calendar could not be opened");
     }
-    // The hidden-icons chevron (D45): Explorer's own notification-area overflow. A worker invokes the
-    // taskbar's overflow button through UI Automation - also while Aether hides the taskbar, which stays
-    // hidden: the overflow is a window of its own. Success means Windows showed the overflow window;
-    // failures are reported, never imitated. The overflow is then moved directly below the chevron
-    // (`anchor`), in front of other topmost windows such as the Dock, on the chevron's monitor.
-    void OpenHiddenIcons(RECT anchor) {
+    // Notes that Windows' overflow is no longer shown (closed by a click elsewhere, an icon or Escape).
+    void ObserveOverflowClosed() {
+        ::KillTimer(events.Handle(), kOverflowWatchTimer);
+        if (hiddenIconsOpen) hiddenIconsClosedAt = ::GetTickCount64();
+        hiddenIconsOpen = false;
+        if (topbar) topbar->SetHiddenIconsOpen(false);
+    }
+    // The hidden-icons chevron (D45) is a toggle for Explorer's own notification-area overflow: the
+    // first click opens it below the chevron, the next closes it. Windows also closes the overflow on
+    // a press outside it - possibly this very click on the chevron - so an overflow that closed just
+    // now counts as that click's close and is not reopened.
+    void ToggleHiddenIcons(RECT anchor) {
         if (closing || hiddenIconsPending) return;
+        const bool shown = MakeSystemTrayOverflow()->OverflowOpen();
+        if (!shown && hiddenIconsOpen) ObserveOverflowClosed();
+        if (!shown && hiddenIconsClosedAt && ::GetTickCount64() - hiddenIconsClosedAt < kOverflowDismissWindowMs) {
+            hiddenIconsClosedAt = 0;
+            return;
+        }
+        hiddenIconsClosedAt = 0;
+        if (shown) CloseHiddenIcons();
+        else OpenHiddenIcons(anchor);
+    }
+    void CloseHiddenIcons() {
+        hiddenIconsPending = true;
+        ::KillTimer(events.Handle(), kOverflowWatchTimer);
+        if (topbar) topbar->SetHiddenIconsOpen(false);  // the arrow answers the click at once
+        const auto weak = std::weak_ptr<bool>(alive);
+        const auto cancel = cancellation.Token();
+        const bool posted = trayWorker.Post([this, weak, cancel] {
+            Result<void> result = MakeError(ErrorCode::Platform, "hidden icons unavailable");
+            try {
+                const auto tray = MakeSystemTrayOverflow();
+                result = CloseTrayOverflow(*tray, cancel);
+            } catch (...) {
+                result = MakeError(ErrorCode::Platform, "hidden icons failed");
+            }
+            (void)dispatcher.Post([this, weak, result = std::move(result)] {
+                const auto live = weak.lock();
+                if (!live || !*live) return;
+                hiddenIconsPending = false;
+                if (closing) return;
+                if (result) { hiddenIconsOpen = false; return; }
+                AETHER_LOG_WARN("app", "hidden icons could not be closed: {}", result.error().Describe());
+                // Still open: the chevron keeps saying so and keeps watching.
+                hiddenIconsOpen = true;
+                if (topbar) topbar->SetHiddenIconsOpen(true);
+                (void)::SetTimer(events.Handle(), kOverflowWatchTimer, 100, nullptr);
+            });
+        });
+        if (!posted) {
+            hiddenIconsPending = false;
+            if (topbar) topbar->SetHiddenIconsOpen(hiddenIconsOpen);
+        }
+    }
+    // Explorer's overflow, opened by invoking the taskbar's overflow button through UI Automation on a
+    // worker - also while Aether hides the taskbar, which stays hidden: the overflow is a window of its
+    // own. Success means Windows showed the overflow window; failures are reported, never imitated.
+    // The overflow is then moved directly below the chevron (`anchor`), in front of other topmost
+    // windows such as the Dock, on the chevron's monitor.
+    void OpenHiddenIcons(RECT anchor) {
         if (controls) controls->Close();
         hiddenIconsPending = true;
+        if (topbar) topbar->SetHiddenIconsOpen(true);  // the arrow answers the click at once
         const auto monitor = platform::QueryMonitor(::MonitorFromRect(&anchor, MONITOR_DEFAULTTONEAREST)).value_or(platform::PrimaryMonitor());
         const RECT work = monitor.workArea;
         const UINT dpi = monitor.dpi;
@@ -397,13 +456,20 @@ struct ShellApplication::Impl {
                     // Shown, only not where Aether wanted it: worth a log line, not an error for the person.
                     if (!placed && placed.error().code != ErrorCode::Cancelled)
                         AETHER_LOG_WARN("app", "hidden icons left where Windows placed them: {}", placed.error().Describe());
+                    hiddenIconsOpen = true;
+                    if (MakeSystemTrayOverflow()->OverflowOpen()) (void)::SetTimer(events.Handle(), kOverflowWatchTimer, 100, nullptr);
+                    else ObserveOverflowClosed();  // already dismissed while it was being placed
                     return;
                 }
+                if (topbar) topbar->SetHiddenIconsOpen(false);
                 AETHER_LOG_WARN("app", "hidden icons unavailable: {}", result.error().Describe());
                 if (topbar) topbar->ReportItemFailure(topbar::ItemKind::NotificationArea, L"Windows did not show its hidden icons");
             });
         });
-        if (!posted) hiddenIconsPending = false;
+        if (!posted) {
+            hiddenIconsPending = false;
+            if (topbar) topbar->SetHiddenIconsOpen(false);
+        }
     }
     void OpenSettings(settings::ui::SettingsPage page = settings::ui::SettingsPage::Dock) {
         if (!closing && !updateHandoffPending && settingsWindow) (void)settingsWindow->Show(page);
@@ -881,7 +947,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->PowerSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:powersleep"); }));
     connections.push_back(topbar->ClockRequested.Connect([this]{ OpenNotifications(); }));
     connections.push_back(topbar->CalendarRequested.Connect([this]{ OpenCalendar(); }));
-    connections.push_back(topbar->HiddenIconsRequested.Connect([this](RECT anchor){ OpenHiddenIcons(anchor); }));
+    connections.push_back(topbar->HiddenIconsRequested.Connect([this](RECT anchor){ ToggleHiddenIcons(anchor); }));
     connections.push_back(topbar->RevealWindowsTaskbarRequested.Connect([this]{
         if (closing) return;
         automaticResume = true;
@@ -1149,6 +1215,7 @@ void ShellApplication::Impl::Stop() noexcept {
     ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
+    ::KillTimer(events.Handle(), kOverflowWatchTimer);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
     { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
@@ -1239,6 +1306,11 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             if(delay&&*delay>0)impl_->attentionPeekArmed=::SetTimer(impl_->events.Handle(),kAttentionPeekTimer,static_cast<UINT>(std::min<std::uint64_t>(*delay,6000)),nullptr)!=0;
             else impl_->attentionPeekArmed=false;
             impl_->ApplyDockSuppression();return true;
+        }
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kOverflowWatchTimer) {
+            // Windows closes its overflow on its own (a click elsewhere, an icon, Escape): the chevron follows.
+            if (impl_->closing || !impl_->hiddenIconsOpen || !MakeSystemTrayOverflow()->OverflowOpen()) impl_->ObserveOverflowClosed();
+            return true;
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarResumeTimer) {
             const auto delay = TaskbarRevealDelay(impl_->automaticResume, impl_->resumeTimerArmed,

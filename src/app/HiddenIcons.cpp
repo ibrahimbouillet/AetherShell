@@ -208,6 +208,24 @@ Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& canc
     return MakeError(ErrorCode::Unavailable, "the Windows taskbar is unavailable");
 }
 
+Result<void> CloseTrayOverflow(ITrayOverflow& tray, const CancellationToken& cancel, const OverflowTiming& timing,
+                               const std::function<void(std::chrono::milliseconds)>& sleep) {
+    const auto wait = [&](std::chrono::milliseconds duration) {
+        if (sleep) sleep(duration);
+        else std::this_thread::sleep_for(duration);
+    };
+    if (cancel.IsCancelled()) return MakeError(ErrorCode::Cancelled, "hidden icons cancelled");
+    if (!tray.OverflowOpen()) return Ok();
+    if (auto invoked = tray.InvokeOverflowButton(); !invoked) return invoked.error();
+    const auto step = std::max(std::chrono::milliseconds{1}, timing.poll);
+    for (auto waited = std::chrono::milliseconds{0}; waited < timing.openWait; waited += step) {
+        if (cancel.IsCancelled()) return MakeError(ErrorCode::Cancelled, "hidden icons cancelled");
+        if (!tray.OverflowOpen()) return Ok();
+        wait(step);
+    }
+    return tray.OverflowOpen() ? Result<void>(MakeError(ErrorCode::Unavailable, "Windows kept the hidden icons open")) : Ok();
+}
+
 POINT OverflowPlacement(const RECT& anchor, SIZE overflow, const RECT& work, int gapPx, int marginPx) noexcept {
     const LONG width = std::max<LONG>(0, overflow.cx), height = std::max<LONG>(0, overflow.cy);
     const LONG centre = anchor.left + (anchor.right - anchor.left) / 2;

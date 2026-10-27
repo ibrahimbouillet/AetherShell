@@ -56,6 +56,11 @@ struct OverflowTiming {
 [[nodiscard]] Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& cancel, const OverflowTiming& timing = {},
                                             const std::function<void(std::chrono::milliseconds)>& sleep = {});
 
+// Worker only. The chevron's second click: invokes the overflow button again so Windows closes its
+// overflow, and confirms that it closed. An overflow that is already closed counts as closed.
+[[nodiscard]] Result<void> CloseTrayOverflow(ITrayOverflow& tray, const CancellationToken& cancel, const OverflowTiming& timing = {},
+                                             const std::function<void(std::chrono::milliseconds)>& sleep = {});
+
 // Where the overflow goes: centred below the Top Bar's chevron (`anchor`, screen pixels) with `gapPx`
 // between them, kept inside `work` with `marginPx` to spare (pure; unit tested).
 [[nodiscard]] POINT OverflowPlacement(const RECT& anchor, SIZE overflow, const RECT& work, int gapPx, int marginPx) noexcept;

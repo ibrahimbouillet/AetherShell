@@ -222,3 +222,50 @@ AETHER_TEST("hidden icons: placement ends quietly when dismissed and gives up ag
     CHECK(stopped.error().code == ErrorCode::Cancelled);
     CHECK(cancelled.moves.empty());
 }
+
+namespace {
+// Windows' overflow as the second click finds it: open, closing `closesAfter` checks after the invoke.
+struct OpenOverflow final : ITrayOverflow {
+    bool open = true;
+    int closesAfter = 0;  // negative: Windows keeps it open
+    ErrorCode failure = ErrorCode::Unknown;
+    int invokes = 0, checks = 0;
+    Result<void> InvokeOverflowButton() override {
+        if (failure != ErrorCode::Unknown) return MakeError(failure, "fake failure");
+        ++invokes;
+        return Ok();
+    }
+    bool OverflowOpen() override {
+        if (invokes > 0 && closesAfter >= 0 && checks++ >= closesAfter) open = false;
+        return open;
+    }
+    std::optional<RECT> OverflowBounds() override { return std::nullopt; }
+    bool MoveOverflow(POINT) override { return false; }
+};
+}  // namespace
+
+AETHER_TEST("hidden icons: the second click closes the overflow through the same button and confirms it") {
+    OpenOverflow tray;
+    tray.closesAfter = 2;
+    CHECK(CloseTrayOverflow(tray, {}, Fast(), [](std::chrono::milliseconds) {}).ok());
+    CHECK_EQ(tray.invokes, 1);
+    CHECK_FALSE(tray.open);
+
+    OpenOverflow closed;
+    closed.open = false;  // already dismissed (a click elsewhere): nothing to invoke
+    CHECK(CloseTrayOverflow(closed, {}, Fast(), [](std::chrono::milliseconds) {}).ok());
+    CHECK_EQ(closed.invokes, 0);
+
+    OpenOverflow stubborn;
+    stubborn.closesAfter = -1;
+    auto result = CloseTrayOverflow(stubborn, {}, Fast(), [](std::chrono::milliseconds) {});
+    REQUIRE_FALSE(result.ok());
+    CHECK(result.error().code == ErrorCode::Unavailable);
+    CHECK_EQ(stubborn.invokes, 1);  // never a second invoke, which would reopen it
+
+    OpenOverflow missing;
+    missing.failure = ErrorCode::NotFound;
+    result = CloseTrayOverflow(missing, {}, Fast(), [](std::chrono::milliseconds) {});
+    REQUIRE_FALSE(result.ok());
+    CHECK(result.error().code == ErrorCode::NotFound);
+}
