@@ -31,7 +31,8 @@ edit the manifest after signing: the application verifies its exact bytes.
 For a manual-install alpha without the trusted offline signing key, `scripts/package.ps1` keeps the
 unsigned manifest local and writes checksums for the setup executable only. Upload exactly the
 versioned setup executable and its checksums file; never upload an unsigned manifest or use a broad
-`dist/*` upload. This is the policy for `v0.2.0-alpha.2`; automatic updates remain unavailable.
+`dist/*` upload. This is the policy for `v0.2.0-alpha.2` and `v0.3.0-alpha.3`; automatic updates
+remain unavailable.
 A plain checksum checks integrity and does not authenticate the publisher. Before manifest generation,
 packaging invalidates any same-version signature left in a reused output directory so a prior
 signature cannot accompany newly generated unsigned bytes or survive a failed signing attempt.

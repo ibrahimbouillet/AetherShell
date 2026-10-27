@@ -7,9 +7,11 @@ Approval and implementation verification are separate: ADRs 0002, 0003 and 0005 
 D3/D4/D6 retain their existing provisional qualification status until platform/behavior tests run.
 
 **Current delivery:** D48 (2026-10-27) names the current V3 source **Aether Shell Alpha 3,
-`0.3.0-alpha.3`**, and authorizes committing and pushing it to the official `main`. It does not
-authorize a tag, a GitHub Release, uploaded assets or installing over the owner's Alpha 2; those
-remain separate owner approvals. The latest published release is still **0.2.0-alpha.2** (D29:
+`0.3.0-alpha.3`**, and authorizes committing and pushing it to the official `main`. D49 (same day)
+adds tag `v0.3.0-alpha.3` and a **draft** GitHub prerelease carrying only the audited x64 setup and
+its checksums, for the owner's review. Publishing that draft, switching README downloads to it and
+installing over the owner's Alpha 2 remain separate owner approvals. The latest published release is
+still **0.2.0-alpha.2** (D29:
 reviewed `main`, tag `v0.2.0-alpha.2` and its GitHub Release, 2026-10-22). Do not infer approval for
 unrelated repository or account settings. Check HANDOFF for the exact pushed commits and receipts.
 
@@ -109,6 +111,21 @@ Record and qualify any necessary compatible custom-control strategy before subst
 Windows-owned and pre-renderer emergency UI retain honest documented native exceptions. No
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
+
+### D49 — Tag `v0.3.0-alpha.3` and prepare a draft GitHub prerelease for owner review
+
+Owner instruction, 2026-10-27, given to Claude: tag `v0.3.0-alpha.3` and prepare a draft GitHub
+prerelease with the audited setup and checksums for the owner's review. Following RELEASE_PROCESS and
+the Alpha 2 precedent: the tag is a plain tag on the exact pushed source revision whose Windows CI
+passed; the setup comes from a fresh Release `/W4 /WX` build of that revision in a new build directory
+(a reused cache can keep an older prerelease identifier) and passes the package privacy/freshness
+audit; the draft is marked as a prerelease and carries exactly
+`AetherShell-0.3.0-alpha.3-win-x64-setup.exe` and `AetherShell-0.3.0-alpha.3-checksums.txt`. Without
+the trusted offline signing key the manifest stays local and unsigned; no manifest, signature, PDB or
+media is uploaded. The release text comes from `docs/releases/0.3.0-alpha.3.md`.
+
+Not authorized: publishing the draft (making it public), moving the tag after review, switching the
+README download links, or installing Alpha 3 over the owner's Alpha 2. Evidence: TEST_STATUS S-059.
 
 ### D48 — The current V3 source is Aether Shell Alpha 3 (`0.3.0-alpha.3`); push it to `main`
 
