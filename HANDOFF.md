@@ -18,9 +18,9 @@ shared `main` checkout:
   badges notifications.
 - **Hidden icons (FR-038/T48):** a small chevron before the keyboard item (`topBar.showHiddenIconsButton`,
   default on, independent of the legacy D27 field) opens Explorer's own overflow by UI Automation and
-  verifies Explorer showed it. While Aether replaces the taskbar, the native taskbar is shown only
-  while that overflow is open. The Windows 11 element identity (`SystemTray.ChevronIconView`) is
-  verified on fakes only: **an owner-approved live check is the next step** (D36 readiness first).
+  verifies Explorer showed it. The owner-approved live check (S-055) found the first identity wrong
+  (no such element is exposed) and that no taskbar reveal is needed: the button is now recognized by
+  its chevron glyph inside the taskbar's XAML content, invoked while the replaced taskbar stays hidden.
 - **Maximized perimeter (FR-036/FR-037, D46/[ADR 0012](docs/decisions/0012-maximized-window-perimeter.md)):**
   the owner chose a click-through ring window beneath each clipped maximized foreign window; the
   rejected window was diagnosed (privately) as layered and ineligible, and captioned layered windows

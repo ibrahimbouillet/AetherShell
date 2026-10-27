@@ -103,10 +103,10 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   documented Windows shortcut (Win+N on Windows 11, Win+A on Windows 10, whose calendar stays on
   Win+Alt+D in the clock menu). Aether reads no notifications and shows no badges. The hidden-icons
   chevron opens Windows' own notification-area overflow through UI Automation on Explorer's overflow
-  button. While Aether replaces the taskbar, the native taskbar is shown for as long as that overflow
-  is open, then hidden again; Windows decides the overflow's position. The Explorer element identity
-  used for Windows 11 is verified only on fakes so far; if Explorer exposes no such button, the
-  chevron reports that it is unavailable and nothing else happens.
+  button (recognized by its chevron glyph); a replaced taskbar stays hidden and Windows decides the
+  overflow's position. Checked live on one Windows 11 build (26300); Windows 10 and other builds are
+  unverified. If Explorer shows no such button (for example when no icon is hidden), the chevron
+  reports that it is unavailable and nothing else happens.
 - V3 rounded maximized windows (D45/D46, local source only): an eligible maximized application is
   clipped about one DIP inside its rounded outline and a click-through Aether ring beneath it draws the
   thin perimeter. Applications whose caption buttons are drawn by Windows lose them while clipped,

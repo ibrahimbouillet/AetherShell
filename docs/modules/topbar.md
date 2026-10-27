@@ -2,7 +2,7 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # topbar — native floating system status surface
 
-**D45/FR-038/T48, implemented in source (Claude, S-054; owner/live checks pending):** clicking the
+**D45/FR-038/T48, implemented in source (Claude, S-054/S-055; owner acceptance pending):** clicking the
 date/time (pointer, Enter/Space or UIA Invoke) emits `ClockRequested`; the app sends the documented
 shortcut for the running Windows version (`system_controls::NotificationsAction`: Win+N on Windows 11
 build 22000+, Win+A Action Center on Windows 10). The clock menu offers "Open notifications and
@@ -11,11 +11,11 @@ badged. A dedicated 30-DIP chevron item (`ItemKind::NotificationArea`, "Show hid
 keyboard item, collapsing with weather/keyboard on narrow bars) emits `HiddenIconsRequested`; its
 menu offers the same command. Visibility is the new `topBar.showHiddenIconsButton` (default true),
 independent of the legacy D27 field, which still never shows the old arrow. The app opens Windows'
-own overflow (`app/HiddenIcons`): it invokes Explorer's overflow button through UI Automation
-(Windows 11 `SystemTray.ChevronIconView`, Windows 10 `TrayNotifyWnd` button), verifies that Explorer's
-overflow window opened, and, while Aether replaces the taskbar, shows the native taskbar until that
-window closes. Failures show the item's explanatory tooltip. The live Explorer identity is verified
-only on fakes; [the brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) and S-054 record limits.
+own overflow (`app/HiddenIcons`): it invokes Explorer's overflow button through UI Automation (Windows
+11: the system tray button showing a chevron glyph; Windows 10: the `TrayNotifyWnd` button) and
+verifies that Explorer's overflow window opened. A replaced taskbar stays hidden; the overflow opens
+as a window of its own, positioned by Windows. Failures show the item's explanatory tooltip. The
+route was checked live on Windows 11 build 26300 (S-055); Windows 10 remains unverified.
 The older 60-second taskbar recovery command below remains as a separate recovery route.
 
 V3 source follow-up (D38/T39, S-035): native input/window region is the visible panel rectangle,

@@ -19,11 +19,12 @@ namespace aether::app {
 namespace {
 
 constexpr wchar_t kTaskbarClass[] = L"Shell_TrayWnd";
+// Windows 11 hosts the taskbar's content (system tray included) in this XAML island child window.
+constexpr wchar_t kContentBridgeClass[] = L"Windows.UI.Composition.DesktopWindowContentBridge";
+// The automation id every Windows 11 system tray button shares.
+constexpr wchar_t kTrayButtonId[] = L"SystemTrayIcon";
 // The overflow windows Explorer creates: Windows 11's XAML island and Windows 10's tray window.
 constexpr std::array<std::wstring_view, 2> kOverflowClasses{L"TopLevelWindowForOverflowXamlIsland", L"NotifyIconOverflowWindow"};
-// Windows 11's system tray draws its overflow button with this view type; UI Automation reports a
-// XAML element's runtime type as its class name, independent of the display language.
-constexpr std::wstring_view kChevronView = L"SystemTray.ChevronIconView";
 
 std::wstring ClassOf(HWND window) {
     wchar_t name[96]{};
@@ -31,9 +32,9 @@ std::wstring ClassOf(HWND window) {
     return std::wstring(name, length > 0 ? static_cast<std::size_t>(length) : 0);
 }
 
-std::wstring ClassOf(IUIAutomationElement& element) {
+std::wstring NameOf(IUIAutomationElement& element) {
     BSTR value = nullptr;
-    if (FAILED(element.get_CurrentClassName(&value))) return {};
+    if (FAILED(element.get_CurrentName(&value))) return {};
     std::wstring result(value ? value : L"");
     ::SysFreeString(value);
     return result;
@@ -66,14 +67,11 @@ bool Actionable(IUIAutomationElement& element) {
 
 class SystemTrayOverflow final : public ITrayOverflow {
 public:
-    bool TaskbarVisible() override {
-        const HWND taskbar = ::FindWindowW(kTaskbarClass, nullptr);
-        return taskbar && ::IsWindowVisible(taskbar);
-    }
-
+    // The taskbar may be hidden (Aether's replacement): its content stays reachable through UI
+    // Automation and Explorer shows the overflow as a window of its own.
     Result<void> InvokeOverflowButton() override {
         const HWND taskbar = ::FindWindowW(kTaskbarClass, nullptr);
-        if (!taskbar || !::IsWindowVisible(taskbar)) return MakeError(ErrorCode::Unavailable, "the Windows taskbar is not shown");
+        if (!taskbar) return MakeError(ErrorCode::Unavailable, "the Windows taskbar is unavailable");
         winrt::com_ptr<IUIAutomation> automation;
         if (FAILED(::CoCreateInstance(__uuidof(CUIAutomation), nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), automation.put_void())) || !automation)
             return MakeError(ErrorCode::Platform, "UI Automation is unavailable");
@@ -107,38 +105,47 @@ public:
     }
 
 private:
-    // Windows 11: the system tray's overflow view, or its nearest actionable ancestor (the button
-    // hosting it), inside this taskbar only.
+    // Windows 11: among the system tray buttons (one shared automation id) inside this taskbar's
+    // content, the actionable one whose text element shows a chevron glyph.
     static winrt::com_ptr<IUIAutomationElement> Windows11Button(IUIAutomation& automation, HWND taskbar) {
+        const HWND bridge = ::FindWindowExW(taskbar, nullptr, kContentBridgeClass, nullptr);
         winrt::com_ptr<IUIAutomationElement> root;
-        if (FAILED(automation.ElementFromHandle(taskbar, root.put())) || !root) return nullptr;
-        VARIANT name{};
-        name.vt = VT_BSTR;
-        name.bstrVal = ::SysAllocStringLen(kChevronView.data(), static_cast<UINT>(kChevronView.size()));
-        if (!name.bstrVal) return nullptr;
+        if (FAILED(automation.ElementFromHandle(bridge ? bridge : taskbar, root.put())) || !root) return nullptr;
+        VARIANT id{};
+        id.vt = VT_BSTR;
+        id.bstrVal = ::SysAllocString(kTrayButtonId);
+        if (!id.bstrVal) return nullptr;
         winrt::com_ptr<IUIAutomationCondition> condition;
-        const HRESULT created = automation.CreatePropertyCondition(UIA_ClassNamePropertyId, name, condition.put());
-        ::VariantClear(&name);
+        const HRESULT created = automation.CreatePropertyCondition(UIA_AutomationIdPropertyId, id, condition.put());
+        ::VariantClear(&id);
         if (FAILED(created) || !condition) return nullptr;
-        winrt::com_ptr<IUIAutomationElement> view;
-        if (FAILED(root->FindFirst(TreeScope_Descendants, condition.get(), view.put())) || !view) return nullptr;
+        winrt::com_ptr<IUIAutomationElementArray> buttons;
+        if (FAILED(root->FindAll(TreeScope_Descendants, condition.get(), buttons.put())) || !buttons) return nullptr;
         winrt::com_ptr<IUIAutomationTreeWalker> walker;
-        if (FAILED(automation.get_ControlViewWalker(walker.put())) || !walker) return nullptr;
-        winrt::com_ptr<IUIAutomationElement> current = view;
-        for (int depth = 0; current && depth < 4; ++depth) {
-            if (Actionable(*current)) return current;
-            winrt::com_ptr<IUIAutomationElement> parent;
-            if (FAILED(walker->GetParentElement(current.get(), parent.put()))) return nullptr;
-            current = parent;
+        if (FAILED(automation.get_RawViewWalker(walker.put())) || !walker) return nullptr;
+        int count = 0;
+        if (FAILED(buttons->get_Length(&count))) return nullptr;
+        for (int index = 0; index < count; ++index) {
+            winrt::com_ptr<IUIAutomationElement> button;
+            if (FAILED(buttons->GetElement(index, button.put())) || !button) continue;
+            winrt::com_ptr<IUIAutomationElement> part;
+            if (FAILED(walker->GetFirstChildElement(button.get(), part.put()))) continue;
+            for (int guard = 0; part && guard < 8; ++guard) {
+                if (IsOverflowGlyph(NameOf(*part))) return button;  // its action decides Unsupported
+                winrt::com_ptr<IUIAutomationElement> next;
+                if (FAILED(walker->GetNextSiblingElement(part.get(), next.put()))) break;
+                part = next;
+            }
         }
         return nullptr;
     }
 
-    // Windows 10: the Win32 chevron button inside the notification area.
+    // Windows 10: the Win32 chevron button inside the notification area (its own visibility style:
+    // the taskbar itself may be hidden).
     static winrt::com_ptr<IUIAutomationElement> Windows10Button(IUIAutomation& automation, HWND taskbar) {
         const HWND notify = ::FindWindowExW(taskbar, nullptr, L"TrayNotifyWnd", nullptr);
         const HWND chevron = notify ? ::FindWindowExW(notify, nullptr, L"Button", nullptr) : nullptr;
-        if (!chevron || !::IsWindowVisible(chevron)) return nullptr;
+        if (!chevron || !(::GetWindowLongPtrW(chevron, GWL_STYLE) & WS_VISIBLE)) return nullptr;
         winrt::com_ptr<IUIAutomationElement> element;
         if (FAILED(automation.ElementFromHandle(chevron, element.put())) || !element) return nullptr;
         return Actionable(*element) ? element : nullptr;
@@ -146,6 +153,12 @@ private:
 };
 
 }  // namespace
+
+bool IsOverflowGlyph(std::wstring_view text) noexcept {
+    // ChevronDown/Up, ChevronUp/DownSmall, ChevronUp/DownMed (the taskbar's up or down overflow arrow).
+    constexpr std::array<wchar_t, 6> kChevrons{L'\xE70D', L'\xE70E', L'\xE96D', L'\xE96E', L'\xE971', L'\xE972'};
+    return text.size() == 1 && std::find(kChevrons.begin(), kChevrons.end(), text.front()) != kChevrons.end();
+}
 
 Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& cancel, const OverflowTiming& timing,
                               const std::function<void(std::chrono::milliseconds)>& sleep) {
@@ -157,14 +170,10 @@ Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& canc
     for (int attempt = 0; attempt < std::max(1, timing.attempts); ++attempt) {
         if (cancel.IsCancelled()) return MakeError(ErrorCode::Cancelled, "hidden icons cancelled");
         if (tray.OverflowOpen()) return Ok();
-        if (!tray.TaskbarVisible()) {
-            wait(timing.interval);  // Explorer is still bringing its taskbar back
-            continue;
-        }
         auto invoked = tray.InvokeOverflowButton();
         if (!invoked) {
             if (invoked.error().code != ErrorCode::NotFound && invoked.error().code != ErrorCode::Unavailable) return invoked.error();
-            last = invoked.error();  // the taskbar's content may still be populating
+            last = invoked.error();  // Explorer may still be populating (or restarting) its taskbar
             wait(timing.interval);
             continue;
         }
@@ -177,10 +186,8 @@ Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& canc
         return tray.OverflowOpen() ? Ok() : Result<void>(MakeError(ErrorCode::Unavailable, "Windows did not show the hidden icons"));
     }
     if (last) return *last;
-    return MakeError(ErrorCode::Timeout, "the Windows taskbar did not become available");
+    return MakeError(ErrorCode::Unavailable, "the Windows taskbar is unavailable");
 }
-
-bool OverflowNeedsReveal(const TaskbarUpdate& state) noexcept { return state.active && !state.suspended; }
 
 std::unique_ptr<ITrayOverflow> MakeSystemTrayOverflow() { return std::make_unique<SystemTrayOverflow>(); }
 

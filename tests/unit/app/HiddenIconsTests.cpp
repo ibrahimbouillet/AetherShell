@@ -11,20 +11,19 @@ using namespace aether::app;
 
 namespace {
 
-// A scripted taskbar: visible after `hiddenFor` checks, button found after `missingFor` invokes,
-// overflow shown `opensAfter` checks after the invoke (never when `opensAfter` is negative).
+// A scripted taskbar: button found after `missingFor` invokes, overflow shown `opensAfter` checks
+// after the invoke (never when `opensAfter` is negative).
 struct FakeTray final : ITrayOverflow {
-    int hiddenFor = 0;
     int missingFor = 0;
     int opensAfter = 0;
     bool alreadyOpen = false;
+    ErrorCode missing = ErrorCode::NotFound;
     ErrorCode failure = ErrorCode::Unknown;  // Unknown: invoking succeeds
-    int visibleChecks = 0, invokes = 0, openChecks = 0, invokeAttempts = 0;
+    int invokes = 0, openChecks = 0, invokeAttempts = 0;
     std::function<void()> onCheck;
 
-    bool TaskbarVisible() override { return visibleChecks++ >= hiddenFor; }
     Result<void> InvokeOverflowButton() override {
-        if (invokeAttempts++ < missingFor) return MakeError(ErrorCode::NotFound, "not populated yet");
+        if (invokeAttempts++ < missingFor) return MakeError(missing, "not populated yet");
         if (failure != ErrorCode::Unknown) return MakeError(failure, "fake failure");
         ++invokes;
         return Ok();
@@ -39,7 +38,7 @@ struct FakeTray final : ITrayOverflow {
 
 OverflowTiming Fast() {
     OverflowTiming timing;
-    timing.attempts = 12;
+    timing.attempts = 4;
     timing.interval = std::chrono::milliseconds{75};
     timing.openWait = std::chrono::milliseconds{900};
     return timing;
@@ -64,9 +63,8 @@ AETHER_TEST("hidden icons: an overflow that is already open is not invoked again
     CHECK_EQ(tray.invokeAttempts, 0);  // invoking would close it
 }
 
-AETHER_TEST("hidden icons: a taskbar coming back and content still populating are waited for") {
+AETHER_TEST("hidden icons: a taskbar still populating its content is waited for briefly") {
     FakeTray tray;
-    tray.hiddenFor = 3;
     tray.missingFor = 2;
     tray.opensAfter = 0;
     CHECK(OpenTrayOverflow(tray, {}, Fast(), [](std::chrono::milliseconds) {}).ok());
@@ -83,7 +81,7 @@ AETHER_TEST("hidden icons: no overflow after the invoke is a failure, not a seco
     CHECK_EQ(tray.invokes, 1);
 }
 
-AETHER_TEST("hidden icons: unsupported buttons, missing buttons, a hidden taskbar and cancellation end honestly") {
+AETHER_TEST("hidden icons: unsupported or missing buttons, no taskbar and cancellation end honestly and soon") {
     FakeTray unsupported;
     unsupported.failure = ErrorCode::Unsupported;
     auto result = OpenTrayOverflow(unsupported, {}, Fast(), [](std::chrono::milliseconds) {});
@@ -93,33 +91,39 @@ AETHER_TEST("hidden icons: unsupported buttons, missing buttons, a hidden taskba
 
     FakeTray missing;
     missing.missingFor = 1000;  // no hidden icons at all: the taskbar shows no button
-    result = OpenTrayOverflow(missing, {}, Fast(), [](std::chrono::milliseconds) {});
+    std::chrono::milliseconds slept{0};
+    result = OpenTrayOverflow(missing, {}, Fast(), [&](std::chrono::milliseconds d) { slept += d; });
     REQUIRE_FALSE(result.ok());
     CHECK(result.error().code == ErrorCode::NotFound);
     CHECK_EQ(missing.invokes, 0);
+    CHECK_EQ(missing.invokeAttempts, 4);
+    CHECK(slept.count() <= 300);  // reported within a moment, not after a long wait
 
-    FakeTray hidden;
-    hidden.hiddenFor = 1000;
-    result = OpenTrayOverflow(hidden, {}, Fast(), [](std::chrono::milliseconds) {});
+    FakeTray absent;
+    absent.missingFor = 1000;
+    absent.missing = ErrorCode::Unavailable;  // Explorer's taskbar is gone (restarting)
+    result = OpenTrayOverflow(absent, {}, Fast(), [](std::chrono::milliseconds) {});
     REQUIRE_FALSE(result.ok());
-    CHECK(result.error().code == ErrorCode::Timeout);
-    CHECK_EQ(hidden.invokeAttempts, 0);
+    CHECK(result.error().code == ErrorCode::Unavailable);
+    CHECK_EQ(absent.invokes, 0);
 
     CancellationSource source;
     FakeTray cancelled;
-    cancelled.hiddenFor = 2;
-    cancelled.onCheck = [&] { if (cancelled.visibleChecks >= 1) source.Cancel(); };
+    cancelled.missingFor = 2;
+    cancelled.onCheck = [&] { if (cancelled.invokeAttempts >= 1) source.Cancel(); };
     result = OpenTrayOverflow(cancelled, source.Token(), Fast(), [](std::chrono::milliseconds) {});
     REQUIRE_FALSE(result.ok());
     CHECK(result.error().code == ErrorCode::Cancelled);
-    CHECK_EQ(cancelled.invokeAttempts, 0);
+    CHECK_EQ(cancelled.invokes, 0);
 }
 
-AETHER_TEST("hidden icons: only a taskbar Aether currently hides has to be shown first") {
-    TaskbarUpdate state;
-    CHECK_FALSE(OverflowNeedsReveal(state));          // Windows' taskbar is visible
-    state.active = true;
-    CHECK(OverflowNeedsReveal(state));                // hidden by replacement
-    state.suspended = true;
-    CHECK_FALSE(OverflowNeedsReveal(state));          // already shown (suspended)
+AETHER_TEST("hidden icons: only a single chevron glyph identifies the overflow button, in any language") {
+    for (const wchar_t glyph : {L'\xE971', L'\xE972', L'\xE70E', L'\xE70D', L'\xE96D', L'\xE96E'})
+        CHECK(IsOverflowGlyph(std::wstring_view(&glyph, 1)));
+    // Other tray glyphs (keyboard, volume, network, battery, notifications) and text never match.
+    for (const wchar_t glyph : {L'\xE765', L'\xE995', L'\xEC3F', L'\xF8DB', L'\xF2A8', L'\xE76B', L'\xE76C', L'^', L'v'})
+        CHECK_FALSE(IsOverflowGlyph(std::wstring_view(&glyph, 1)));
+    CHECK_FALSE(IsOverflowGlyph(L""));
+    CHECK_FALSE(IsOverflowGlyph(L"\xE971\xE971"));
+    CHECK_FALSE(IsOverflowGlyph(L"Show hidden icons"));
 }

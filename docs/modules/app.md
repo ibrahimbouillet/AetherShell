@@ -160,14 +160,15 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   the clock item's tooltip.
 - **Hidden icons (`HiddenIcons.h/.cpp`):** `OpenTrayOverflow` drives an injected `ITrayOverflow`
   (invoke Explorer's overflow button once, wait for Explorer's overflow window, bounded retries for
-  not-yet-available elements). `MakeSystemTrayOverflow` finds the Windows 11 button through UI
-  Automation by its runtime class `SystemTray.ChevronIconView` (or the Windows 10 `TrayNotifyWnd`
-  button) and invokes it through Invoke/Toggle/ExpandCollapse; overflow windows are only accepted from
-  Explorer's process. The work runs on a dedicated MTA worker. While the taskbar is replaced and not
-  suspended, the app suspends the replacement, opens the overflow and resumes automatically when a
-  watch timer sees the overflow closed; an existing user suspension is left alone. No icon is
-  enumerated, copied or drawn by Aether. Fake-backed unit tests cover the sequencing; the live
-  Explorer identity awaits an owner-approved check.
+  not-yet-populated content, about 0.3 s). `MakeSystemTrayOverflow` reads the Windows 11 taskbar's
+  XAML content (`Windows.UI.Composition.DesktopWindowContentBridge` under `Shell_TrayWnd`) through UI
+  Automation: the system tray buttons share automation id `SystemTrayIcon`, and the overflow button is
+  the one whose text element shows a chevron glyph (`IsOverflowGlyph`, language-independent; U+E971
+  observed on build 26300). The Windows 10 fallback is the `TrayNotifyWnd` button. The button is
+  invoked through Invoke/Toggle/ExpandCollapse; overflow windows count only from Explorer's process,
+  when visible, uncloaked and non-empty. The work runs on a dedicated MTA worker. The taskbar is not
+  revealed: its content stays reachable while Aether hides it, and Explorer shows the overflow as a
+  window of its own (S-055 live check). No icon is enumerated, copied or drawn by Aether.
 - **Maximized perimeter (`WindowCorners`, ADR 0012):** the guard clips eligible maximized windows
   inside their rounded outline by `CornerRimWidthPx` and keeps one click-through ring window
   (`AetherShell.WindowCornerGuard.Rim`) directly beneath each clipped window, shaped to the band and
