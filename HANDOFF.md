@@ -36,9 +36,11 @@ shared `main` checkout:
   `c30ef53`; two warning-free Release builds, 24/24 unit suites; native settings_ui 33/33, app 14/14,
   topbar 5/5, search_ui 10/10, installer 13/13; ui_form 14/16 and controlcenter 13/14 fail only on
   this live desktop's capture rate and foreground theft (diagnosed, still open).
-- **Private runtime:** the `c30ef53` candidate replaced the `bccd572` trial through the same bounded
-  procedure (installed Alpha 2 preferences, startup and binary unchanged). Nothing was installed,
-  pushed, tagged or released.
+- **Private runtime:** the `af9f168` candidate (S-055 route fix) now runs, after `c30ef53` replaced the
+  `bccd572` trial, each through the same bounded procedure (installed Alpha 2 preferences, startup
+  and binary unchanged). Nothing was installed, pushed, tagged or released.
+- **Live hidden-icons check (S-055, owner-approved):** verified end to end on Windows 11 build 26300
+  after the fix; placement and repeated-click behavior await the owner's own judgement.
 
 ## Previous assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
 

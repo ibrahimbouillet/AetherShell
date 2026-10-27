@@ -2373,3 +2373,47 @@ acknowledged, no warning or error in its log; installed preferences, startup ent
 binary unchanged. A forwarded `--settings` request showed the window (the first, cold open later
 than a 10 s observation window; a second request visible after 0.8 s); it was closed again. No
 desktop capture, notification/overflow invocation or device action was made on the live desktop.
+
+### S-055 — Owner-approved live hidden-icons check and route correction (Claude, 2026-10-27)
+
+Scope: the owner asked for the live check and confirmed readiness on this desktop (D36). Windows 11
+build 26300, 150 %, private trial running in taskbar-replacement mode. Observations used window
+classes, visibility/cloaking, rectangles, UI Automation structure and icon-font code points only:
+no screenshot, no notification or tray-icon name or other application content was read or recorded.
+
+**First attempt (`c30ef53` trial):** the chevron was invoked through the trial Top Bar's UI Automation
+button. The taskbar was shown (replacement suspended), but the route failed after about 5 s with
+`NotFound: the taskbar shows no hidden-icons button`; the replacement resumed and the item showed
+its failure tooltip. A second attempt that the assistant did not start (most likely the owner's own
+click) ended the same way. Recovery behaved as designed both times.
+
+**Diagnosis:** Explorer exposes no `SystemTray.ChevronIconView` element. Its Windows 11 taskbar
+content lives in the `Windows.UI.Composition.DesktopWindowContentBridge` child of `Shell_TrayWnd`,
+reachable through UI Automation even while the taskbar is hidden. The system tray buttons share
+automation id `SystemTrayIcon` (classes `SystemTray.NormalButton`, `AccentButton`, `OmniButton*`,
+`ShowDesktopButton`, all Invoke); only the overflow button's text element shows a chevron glyph,
+U+E971. Invoking it with the taskbar still hidden made Explorer's `TopLevelWindowForOverflowXamlIsland`
+visible within 0.08 s; invoking it again hid it 0.23 s later. A taskbar reveal is not needed.
+
+**Correction `af9f16823e1a3d37f80deed20fae74e470fcb9c1`:** the button is found by `IsOverflowGlyph`
+(single chevron code point, language-independent) among the `SystemTrayIcon` buttons of the content
+bridge; the taskbar reveal, its watch timer and resume bookkeeping are removed; missing buttons are
+reported after about 0.3 s. HiddenIcons unit tests (6, including the glyph identity) and the app unit
+suite (64) pass; a complete Release /W4 /WX build with **24/24 unit suites** (40.3 s), a no-work
+post-commit build and the package audit pass. SHA-256: app
+`d4d1e0ba390040f89682e36733a4fd3e3882379615c1ee6bd12d18f941cd13e4`, launcher
+`0b22657ba42873c37bd6d92ea4b7301b859cea0b42d0a7507133e76e05d3f9df` (unchanged), setup
+`008a59bb0a4a93a55035226691d519bde2da550cd5989e0a2737a88b9eef6210`.
+
+**Live end-to-end (`af9f168` trial):** the `c30ef53` trial quit through its own data directory, its
+host restored installed Alpha 2, and the same procedure started `af9f168` (installed preferences,
+startup entry and binary unchanged; one corner-guard child). Invoking the trial's chevron made
+Explorer's overflow visible after 0.3 s with the taskbar still hidden and no warning in the trial
+log. The overflow then closed on its own within seconds while another application held the
+foreground (light dismiss; not attributed further). It appeared at the bottom right of the primary
+monitor, above where the hidden taskbar's chevron would be, inside the Dock window's transparent
+headroom; whether it visually meets the Dock was not observed.
+
+**Still open:** owner judgement of the overflow's placement and of clicking the Aether chevron while
+the overflow is open (light dismiss may close it first and the click then reopens it); Windows 10;
+Explorer restart; other monitors and DPI.
