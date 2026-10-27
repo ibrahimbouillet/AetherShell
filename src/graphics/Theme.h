@@ -189,6 +189,9 @@ struct FormTokens {
     Color windowTint;
     float windowTintAlpha = 0.44f;
     Color windowSolid;
+    // D45: the thin neutral perimeter of a form window - DWM's border while it is a normal window,
+    // the form's own rim around its rounded body while maximized (DWM draws neither then).
+    Color windowRim;
     Color footerTint;          // translucent band behind the status/action footer
     Color cardFill;            // grouped settings card over glass (translucent)
     Color cardFillSolid;       // the card in an opaque window

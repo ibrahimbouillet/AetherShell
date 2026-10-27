@@ -47,6 +47,8 @@ Claude implements section 14 of that same focused brief; Codex prepares instruct
 D45 adds the next Claude assignment: real notifications from the clock, a dedicated hidden-icons
 chevron and rounded maximized window frames with a continuous fine perimeter. Read
 `docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md`; Codex reviews/prepares, Claude implements.
+Claude implemented it in source (S-054); D46/ADR 0012 record the owner-chosen ring window beneath
+maximized foreign windows. Live overflow, foreign-application and owner acceptance remain pending.
 
 ## This repository is PUBLIC
 Everything committed here will be published in the public GitHub repository. Never write private

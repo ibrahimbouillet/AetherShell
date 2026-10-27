@@ -135,3 +135,13 @@ confirmation dialog's keyboard, buttons, owner, quit and no-activation behavior.
 Acrylic is sampled only while the test form is active; the window-level material itself is DWM's.
 Remaining: physical multi-monitor DPI transitions, screen-reader walkthroughs and owner visual
 acceptance.
+
+D45 frame (S-054): every non-high-contrast form asks DWM for rounded corners
+(`DWMWA_WINDOW_CORNER_PREFERENCE = ROUND`) and a border in the new `windowRim` token
+(`DWMWA_BORDER_COLOR`); detaching restores both defaults. `FormSurface::SetMaximizedFrame(true)`
+tells the surface its window is genuinely maximized: the Acrylic material resolves to Solid, and the
+background of every window of the form is painted as one rounded body over the whole client
+(`paint::kWindowFrameRadius`, 8 DIPs) with a pixel-snapped one-DIP `windowRim` stroke inside its
+edge. The owner shapes the window with the matching region (Settings, ADR 0012). High contrast keeps
+the system frame. FormScrollView now accumulates deferred precision input (`Pending()`) and drops a
+stale pending target when an immediate move lands on the visible position (S-053 finding).

@@ -99,6 +99,23 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   inactive window shows Windows' flat Acrylic fallback. Scrolling coherence was measured on one
   Windows 11 configuration at 150 % scaling; physical multi-monitor DPI, IME composition and
   screen-reader walkthroughs remain open.
+- V3 notifications and hidden icons (D45, local source only): the Top Bar date/time sends the
+  documented Windows shortcut (Win+N on Windows 11, Win+A on Windows 10, whose calendar stays on
+  Win+Alt+D in the clock menu). Aether reads no notifications and shows no badges. The hidden-icons
+  chevron opens Windows' own notification-area overflow through UI Automation on Explorer's overflow
+  button. While Aether replaces the taskbar, the native taskbar is shown for as long as that overflow
+  is open, then hidden again; Windows decides the overflow's position. The Explorer element identity
+  used for Windows 11 is verified only on fakes so far; if Explorer exposes no such button, the
+  chevron reports that it is unavailable and nothing else happens.
+- V3 rounded maximized windows (D45/D46, local source only): an eligible maximized application is
+  clipped about one DIP inside its rounded outline and a click-through Aether ring beneath it draws the
+  thin perimeter. Applications whose caption buttons are drawn by Windows lose them while clipped,
+  and for standard captions Windows may draw its own caption over the top of the outline (square
+  top corners, no top rim) while the window is active; applications drawing their own caption are
+  not affected. Their own region/material choices still win; protected, elevated, full-screen and
+  unsupported windows stay square. The ring and corners are not antialiased and follow the Windows app theme.
+  Aether Settings draws its own caption buttons and turns opaque while maximized. Broad application
+  compatibility, physical multi-monitor and 192 DPI behavior still need checks.
 
 Record new reproducible issues in the official repository without personal paths, account details,
 credentials, unrelated application data or whole-desktop screenshots.

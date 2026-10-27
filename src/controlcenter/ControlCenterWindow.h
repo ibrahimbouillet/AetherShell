@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 namespace aether::controlcenter {
 
@@ -63,6 +64,14 @@ public:
     [[nodiscard]] RECT PanelBoundsPx() const noexcept;
     // Diagnostics seam: frames rendered so far (settled and hidden panels must stop rendering).
     [[nodiscard]] std::uint64_t RenderCount() const noexcept;
+    // Diagnostics seam: the views composed at `now`, bottom to top - 0 the main view, 1..4 the Wi-Fi,
+    // Bluetooth, Accessibility and sound-output details - with opacity and horizontal offset (DIPs).
+    struct ComposedView {
+        int view = 0;
+        float opacity = 1.0f;
+        float offsetDip = 0.0f;
+    };
+    [[nodiscard]] std::vector<ComposedView> ComposedViews(double now) const;
     void SetState(ControlCenterState state);
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     Signal<ControlIntent> Requested;
@@ -84,6 +93,9 @@ protected:
     void OnDestroying() override;
 
 private:
+    // Sizes and places the panel below `anchorPx` on its monitor's work area (scaled down when needed);
+    // false when no readable scale fits.
+    bool PlaceAt(const RECT& anchorPx);
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };

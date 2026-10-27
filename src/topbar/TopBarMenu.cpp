@@ -40,8 +40,12 @@ std::vector<ui::MenuEntry> BuildTopBarMenu(ItemKind item, TaskbarReplacementStat
                 command(BarCommand::MicrophoneSettings, L"Microphone &privacy settings…")};
             break;
         case ItemKind::Battery: entries.push_back(command(BarCommand::PowerSettings, L"&Power settings…")); break;
-        case ItemKind::Clock: entries.push_back(command(BarCommand::Clock, L"&Calendar and notifications…")); break;
-        case ItemKind::NotificationArea: notification(); break;
+        case ItemKind::Clock:
+            // Windows 11 shows its calendar with the notifications; Windows 10 keeps it as a separate flyout.
+            entries = {command(BarCommand::Clock, L"Open &notifications and calendar"),
+                       command(BarCommand::Calendar, L"Open &calendar\tWin+Alt+D")};
+            break;
+        case ItemKind::NotificationArea: entries.push_back(command(BarCommand::HiddenIcons, L"Show &hidden icons")); break;
         case ItemKind::QuickControls: break; // transient panel is opened by the host, not a menu
     }
     return entries;

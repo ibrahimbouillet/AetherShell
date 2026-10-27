@@ -255,3 +255,10 @@ Appearance, Power, Taskbar, Plus, Minus, Folder, Download, Shield, Warning, Loca
 Reset, all inside the 16-DIP grid with the round stroke. `GlassStyle::border` allows a borderless body
 whose frame DWM already draws. The glass painter's caches are kept per Direct2D device (up to four per
 thread) so native forms' DC render targets and the composition device do not evict each other.
+
+D45 (S-054): `FormTokens::windowRim` is the thin neutral window perimeter (`#4D4D4F` dark,
+`#C6C6C8` light, window text in high contrast), used by DWM's border on normal forms and the painted
+rim of a maximized Settings window; the foreign-window ring uses the same values for the system
+theme. `SystemSymbols` adds `ChevronDown`/`ChevronUp` (the hidden-icons chevron) and the caption
+glyphs `ChromeMinimize`/`ChromeMaximize`/`ChromeRestore`/`ChromeClose` (Segoe Fluent Icons/MDL2 code
+points with vector fallbacks).

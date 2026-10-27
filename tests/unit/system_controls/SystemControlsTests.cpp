@@ -190,3 +190,29 @@ AETHER_TEST("system_controls sticky keys reading needs the feature to be availab
     CHECK(StickyKeysState(SKF_AVAILABLE | SKF_STICKYKEYSON) == std::optional<bool>(true));
     CHECK(StickyKeysState(SKF_AVAILABLE | SKF_HOTKEYACTIVE) == std::optional<bool>(false));
 }
+
+AETHER_TEST("system_controls date and time open the notifications of the running Windows version") {
+    // Windows 11: notification centre with its calendar.
+    for (const unsigned build : {22000u, 22631u, 26300u}) {
+        const auto action = NotificationsAction(build);
+        REQUIRE(action.ok());
+        CHECK(action->kind == SystemActionKind::KeyboardShortcut);
+        CHECK(action->shortcut == SystemShortcut::NotificationCenter);
+        CHECK(action->settingsUri.empty());
+    }
+    // Windows 10: Action Center, with the calendar kept as its own flyout.
+    for (const unsigned build : {10240u, 19045u, 21999u}) {
+        const auto action = NotificationsAction(build);
+        REQUIRE(action.ok());
+        CHECK(action->shortcut == SystemShortcut::ActionCenter);
+    }
+    for (const unsigned build : {10240u, 19045u, 26300u}) {
+        const auto calendar = CalendarAction(build);
+        REQUIRE(calendar.ok());
+        CHECK(calendar->shortcut == SystemShortcut::Calendar);
+    }
+    // An unknown or older build is unsupported, never guessed.
+    ExpectError(NotificationsAction(0), ErrorCode::Unsupported);
+    ExpectError(NotificationsAction(9600), ErrorCode::Unsupported);
+    ExpectError(CalendarAction(0), ErrorCode::Unsupported);
+}

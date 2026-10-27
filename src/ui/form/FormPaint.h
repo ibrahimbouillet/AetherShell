@@ -57,8 +57,12 @@ void DrawText(ID2D1DeviceContext* context, graphics::TextCache& text, std::wstri
 // Window background over `area` (DIPs of the form client): Acrylic = the translucent window tint
 // and grain over the DWM backdrop; Solid = opaque windowSolid (grain only with transparency on).
 // The grain brush is anchored to the coordinate origin, i.e. the form client origin.
+// `frame` (D45, a maximized window): the whole client as a rounded body - outside it stays transparent,
+// so the scene behind the window shows in the corners - with the thin windowRim along its edge.
 void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const graphics::DesignTokens& tokens,
-                     FormMaterial material);
+                     FormMaterial material, const D2D1_RECT_F* frame = nullptr);
+// Corner radius of a form window's own frame (DIPs), matching Windows 11 windows.
+inline constexpr float kWindowFrameRadius = 8.0f;
 // A rounded card with a uniform hairline (`pixel` = one device pixel in DIPs).
 void PaintCard(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const graphics::DesignTokens& tokens,
                FormMaterial material, bool emphasis, float pixel);

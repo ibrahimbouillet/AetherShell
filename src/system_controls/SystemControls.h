@@ -20,7 +20,10 @@ enum class SystemControl {
 enum class TileKind { Toggle, Action, Unsupported };
 enum class SystemActionKind { Settings, KeyboardShortcut };
 // Documented Windows keyboard shortcuts (they start/stop the Windows feature; Windows reports no result).
-enum class SystemShortcut { None, Accessibility, LiveCaptions, Cast, Project, Magnifier, Narrator, OnScreenKeyboard };
+enum class SystemShortcut { None, Accessibility, LiveCaptions, Cast, Project, Magnifier, Narrator, OnScreenKeyboard,
+    NotificationCenter,  // Win+N: Windows 11 notification centre with its calendar
+    ActionCenter,        // Win+A: Windows 10 Action Center (notifications)
+    Calendar };          // Win+Alt+D: the date and calendar flyout
 
 struct RadioStatus {
     // An empty enumeration is unavailable, not proof that hardware is absent.
@@ -84,5 +87,11 @@ struct SystemAction {
 enum class AccessibilityFeature { Magnifier, Narrator, OnScreenKeyboard, LiveCaptions, Settings };
 [[nodiscard]] Result<SystemAction> ActionFor(AccessibilityFeature feature);
 [[nodiscard]] Result<TileKind> TileKindFor(SystemControl control, const SystemControlsSnapshot& snapshot);
+// The Top Bar date/time (FR-038, D45): the documented shortcut that opens Windows' notifications on
+// this build - notification centre with its calendar on Windows 11 (22000+), Action Center on
+// Windows 10 (10240+). Unknown or older builds are unsupported rather than guessed.
+[[nodiscard]] Result<SystemAction> NotificationsAction(unsigned windowsBuild);
+// The calendar flyout on its own (Windows 10 keeps it apart from Action Center).
+[[nodiscard]] Result<SystemAction> CalendarAction(unsigned windowsBuild);
 
 } // namespace aether::controlcenter

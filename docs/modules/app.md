@@ -152,3 +152,25 @@ replacement is active. Manually placed windows are never moved/resized. Disable/
 both; Explorer/display notifications refresh them. Top Bar preserves Shell-approved horizontal exclusions and its existing visible inset;
 side leases honor the approved vertical extents between top/bottom allocations. Native qualification remains
 pending; geometry tests alone are not evidence that Explorer honors/restores these reservations.
+
+## D45 additions — notifications, hidden icons and maximized perimeter (S-054)
+
+- **Notifications/calendar:** `ClockRequested` and `CalendarRequested` close Aether's own panels and
+  send the version-specific shortcut from `system_controls` (see that module). A failure is shown as
+  the clock item's tooltip.
+- **Hidden icons (`HiddenIcons.h/.cpp`):** `OpenTrayOverflow` drives an injected `ITrayOverflow`
+  (invoke Explorer's overflow button once, wait for Explorer's overflow window, bounded retries for
+  not-yet-available elements). `MakeSystemTrayOverflow` finds the Windows 11 button through UI
+  Automation by its runtime class `SystemTray.ChevronIconView` (or the Windows 10 `TrayNotifyWnd`
+  button) and invokes it through Invoke/Toggle/ExpandCollapse; overflow windows are only accepted from
+  Explorer's process. The work runs on a dedicated MTA worker. While the taskbar is replaced and not
+  suspended, the app suspends the replacement, opens the overflow and resumes automatically when a
+  watch timer sees the overflow closed; an existing user suspension is left alone. No icon is
+  enumerated, copied or drawn by Aether. Fake-backed unit tests cover the sequencing; the live
+  Explorer identity awaits an owner-approved check.
+- **Maximized perimeter (`WindowCorners`, ADR 0012):** the guard clips eligible maximized windows
+  inside their rounded outline by `CornerRimWidthPx` and keeps one click-through ring window
+  (`AetherShell.WindowCornerGuard.Rim`) directly beneath each clipped window, shaped to the band and
+  filled with a neutral system-theme color. Captioned, resizable `WS_EX_LAYERED` windows are now
+  eligible; an abandoned window gets one fresh attempt after it leaves the maximized presentation.
+  Native tests verify cutouts, a continuous ring and rim lifecycle over a private two-phase backdrop.

@@ -810,3 +810,161 @@ AETHER_TEST("controlcenter motion: entrance, hover, press, paging, detail and sl
     if (sequences) test::Note("Quick-controls motion sheets: " + std::to_string(sequences) + " in " + output.string());
     CHECK_FALSE(fixture.wrongThread);
 }
+
+namespace {
+// Every view visible before a change is still composed right after it with the same opacity and
+// offset, and nothing visible appears out of nowhere: the change continues from the frame on screen.
+bool ContinuesFrom(const std::vector<ControlCenterWindow::ComposedView>& before,
+                   const std::vector<ControlCenterWindow::ComposedView>& after, std::string& why) {
+    const auto find = [](const auto& list, int view) -> const ControlCenterWindow::ComposedView* {
+        for (const auto& item : list) if (item.view == view) return &item;
+        return nullptr;
+    };
+    for (const auto& item : before) {
+        if (item.opacity <= 0.02f) continue;
+        const auto* next = find(after, item.view);
+        if (!next || std::fabs(next->opacity - item.opacity) > 0.03f || std::fabs(next->offsetDip - item.offsetDip) > 0.75f) {
+            why = "view " + std::to_string(item.view) + " opacity " + std::to_string(item.opacity) + " offset " + std::to_string(item.offsetDip) +
+                  (next ? " became " + std::to_string(next->opacity) + " / " + std::to_string(next->offsetDip) : std::string(" vanished"));
+            return false;
+        }
+    }
+    for (const auto& item : after) {
+        if (item.opacity > 0.02f && !find(before, item.view)) {
+            why = "view " + std::to_string(item.view) + " appeared at " + std::to_string(item.opacity);
+            return false;
+        }
+    }
+    return true;
+}
+void PointerAt(ControlCenterWindow& window, UINT message, POINT screen) {
+    REQUIRE(::ScreenToClient(window.Handle(), &screen) != FALSE);
+    ::SendMessageW(window.Handle(), message, message == WM_LBUTTONDOWN ? MK_LBUTTON : 0, MAKELPARAM(screen.x, screen.y));
+}
+POINT CenterOf(const RECT& rect) { return POINT{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2}; }
+RECT Bounds(Fixture& fixture, int id) {
+    RECT rect{};
+    Client(fixture, [&](IUIAutomation& automation, HWND hwnd) {
+        auto root = Root(automation, hwnd); Hr(Item(automation, *root, id)->get_CurrentBoundingRectangle(&rect));
+    });
+    return rect;
+}
+}  // namespace
+
+AETHER_TEST("controlcenter integration: interrupted and rapid detail transitions continue from the composed frame") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{});
+    const RECT wifiArrow = Bounds(fixture, 200);
+    window.Close();
+    REQUIRE(window.Toggle(fixture.anchor, true).ok());
+    Key(window, VK_RIGHT);  // keyboard focus on the Wi-Fi arrow
+    const auto now = [] { return graphics::FrameScheduler::Now(); };
+    // Both sides at one instant: a tween evaluated before its (re)start reports its start value, so
+    // `after` is the composition the change begins from, independent of how long handling took.
+    const auto step = [&](const char* what, UINT key) {
+        const double at = now();
+        const auto before = window.ComposedViews(at);
+        Key(window, key);
+        const auto after = window.ComposedViews(at);
+        std::string why;
+        const bool continuous = ContinuesFrom(before, after, why);
+        if (!continuous) TEST_NOTE(std::string(what) + ": " + why);
+        CHECK(continuous);
+    };
+    // Into Wi-Fi, then back partway through the slide: the arriving detail leaves from where it is.
+    step("open Wi-Fi", VK_RETURN);
+    RunFor(fixture.loop, 70);
+    step("Escape during entry", VK_ESCAPE);  // focus returns to the Wi-Fi arrow
+    // Rapid alternation, each change mid-flight.
+    for (int i = 0; i < 4; ++i) {
+        RunFor(fixture.loop, 30 + 10 * i);
+        if (i % 2 == 0) step("reopen Wi-Fi", VK_RETURN);
+        else step("back again", VK_ESCAPE);
+    }
+    // Leaving Wi-Fi, then straight into Bluetooth: Wi-Fi keeps fading where it was.
+    RunFor(fixture.loop, 50);
+    Key(window, VK_RIGHT);  // Bluetooth's main part
+    Key(window, VK_RIGHT);  // Bluetooth's arrow
+    step("Bluetooth while Wi-Fi leaves", VK_RETURN);
+    RunFor(fixture.loop, 600);
+    auto settled = window.ComposedViews(now());
+    REQUIRE_EQ(settled.size(), 1u);
+    CHECK_EQ(settled[0].view, 2);
+    CHECK(settled[0].opacity >= 0.999f);
+    CHECK(std::fabs(settled[0].offsetDip) < 0.01f);
+    // Reduced motion: every change lands at once, with no transition layers.
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    Key(window, VK_ESCAPE);
+    settled = window.ComposedViews(now());
+    REQUIRE_EQ(settled.size(), 1u);
+    CHECK_EQ(settled[0].view, 0);
+    CHECK(settled[0].opacity >= 0.999f);
+    Click(window, wifiArrow);
+    settled = window.ComposedViews(now());
+    REQUIRE_EQ(settled.size(), 1u);
+    CHECK_EQ(settled[0].view, 1);
+    // Only navigation happened: no detail row was invoked.
+    CHECK(fixture.intents.empty());
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+AETHER_TEST("controlcenter integration: media arriving at a bottom-clamped anchor keeps the whole panel on screen") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    const auto area = platform::PrimaryMonitor().workArea;
+    const RECT anchor{area.left + 500, area.bottom - 40, area.left + 720, area.bottom - 4};
+    window.Close();
+    REQUIRE(window.Toggle(anchor).ok());
+    const auto inside = [&](const RECT& panel) {
+        return panel.left >= area.left && panel.top >= area.top && panel.right <= area.right && panel.bottom <= area.bottom;
+    };
+    const RECT without = window.PanelBoundsPx();
+    CHECK(inside(without));
+    window.SetState(Synthetic(true));
+    REQUIRE(window.IsShown());
+    const RECT with = window.PanelBoundsPx();
+    if (!inside(with)) TEST_NOTE("with media: " + std::to_string(with.top) + ".." + std::to_string(with.bottom));
+    CHECK(inside(with));
+    CHECK(with.bottom - with.top > without.bottom - without.top);
+    CHECK(std::abs(with.right - anchor.right) <= 1);
+    // Every control stays reachable: the media card and the footer lie inside the work area.
+    for (const int id : {403, 401, 501}) {
+        const RECT item = Bounds(fixture, id);
+        CHECK(item.top >= area.top);
+        CHECK(item.bottom <= area.bottom);
+    }
+    window.SetState(Synthetic(false));
+    CHECK(inside(window.PanelBoundsPx()));
+    CHECK(fixture.intents.empty());
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+AETHER_TEST("controlcenter integration: release activates only the target that was pressed") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    window.Close();
+    REQUIRE(window.Toggle(fixture.anchor, true).ok());  // keyboard opening: focus on the Wi-Fi tile
+    const RECT wifi = Bounds(fixture, 100), wifiArrow = Bounds(fixture, 200), bluetooth = Bounds(fixture, 101);
+    const POINT gap{wifiArrow.right + (bluetooth.left - wifiArrow.right) / 2, (wifiArrow.top + wifiArrow.bottom) / 2};
+    // Press on empty space, release over the focused tile: nothing was pressed, nothing happens.
+    PointerAt(window, WM_LBUTTONDOWN, gap);
+    PointerAt(window, WM_LBUTTONUP, CenterOf(wifi));
+    CHECK(fixture.intents.empty());
+    // Press one tile, release over another.
+    PointerAt(window, WM_LBUTTONDOWN, CenterOf(bluetooth));
+    PointerAt(window, WM_LBUTTONUP, CenterOf(wifi));
+    CHECK(fixture.intents.empty());
+    // A press cancelled by capture loss owns nothing afterwards.
+    PointerAt(window, WM_LBUTTONDOWN, CenterOf(wifi));
+    ::SendMessageW(window.Handle(), WM_CAPTURECHANGED, 0, 0);
+    PointerAt(window, WM_LBUTTONUP, CenterOf(wifi));
+    CHECK(fixture.intents.empty());
+    // An ordinary click still acts once.
+    PointerAt(window, WM_LBUTTONDOWN, CenterOf(wifi));
+    PointerAt(window, WM_LBUTTONUP, CenterOf(wifi));
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].kind == ControlIntentKind::SystemTile);
+    CHECK(fixture.intents[0].control == SystemControl::WiFi);
+    CHECK_FALSE(fixture.wrongThread);
+}

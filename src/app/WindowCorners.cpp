@@ -61,8 +61,14 @@ Result<CornerRegion> RoundedRegion(const CornerWindowObservation& observation,
         observation.bounds, observation.frame, observation.work, observation.dpi);
     if (!geometry) return geometry.error();
     const auto& rect = geometry->clipPx;
-    platform::UniqueRegion region(::CreateRoundRectRgn(rect.left, rect.top, rect.right, rect.bottom,
-        geometry->radiusPx * 2, geometry->radiusPx * 2));
+    // Inset by the rim (D45): the ring window beneath fills the band between this clip and the
+    // outer rounded edge, with the same rasterized geometry, so there is no gap or overlap.
+    const int width = CornerRimWidthPx(observation.dpi);
+    const int radius = std::max(0, geometry->radiusPx - width);
+    if (rect.right - rect.left <= 2 * width || rect.bottom - rect.top <= 2 * width)
+        return MakeError(ErrorCode::Unsupported, "Window corner target is too small for a rim");
+    platform::UniqueRegion region(::CreateRoundRectRgn(rect.left + width, rect.top + width, rect.right - width,
+        rect.bottom - width, radius * 2, radius * 2));
     if (!region) return NativeError("Window corner rounded region allocation failed");
     if (original) {
         auto prior = DeserializeRegion(*original);
@@ -71,6 +77,113 @@ Result<CornerRegion> RoundedRegion(const CornerWindowObservation& observation,
     }
     return SerializeRegion(region.Get());
 }
+std::optional<CornerRim> RimFor(const CornerWindowObservation& observation) {
+    const auto geometry = settings::ui::experimental::ComputeMaximizedCornerLayout(
+        observation.bounds, observation.frame, observation.work, observation.dpi);
+    if (!geometry) return std::nullopt;
+    CornerRim rim;
+    rim.bounds = geometry->clipPx;
+    ::OffsetRect(&rim.bounds, observation.bounds.left, observation.bounds.top);
+    rim.radiusPx = geometry->radiusPx;
+    rim.widthPx = CornerRimWidthPx(observation.dpi);
+    return rim;
+}
+
+// --- rim windows (D45) ---------------------------------------------------------------------------
+// One per clipped window, owned by this guard: a click-through layered popup directly beneath its
+// target, shaped to the ring between the target's inset clip and the outer rounded edge and filled
+// with one neutral color. It never covers the target, takes input or activation, or has a taskbar entry.
+constexpr wchar_t kRimClass[] = L"AetherShell.WindowCornerGuard.Rim";
+
+// A restrained neutral perimeter for the system theme: lighter than dark content, darker than light
+// content. High contrast uses the system's window frame color.
+COLORREF RimColor() noexcept {
+    HIGHCONTRASTW contrast{sizeof(contrast)};
+    if (::SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) && (contrast.dwFlags & HCF_HIGHCONTRASTON))
+        return ::GetSysColor(COLOR_WINDOWFRAME);
+    DWORD light = 1, size = sizeof(light);
+    (void)::RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                         L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &light, &size);
+    return light ? RGB(0xC6, 0xC6, 0xC8) : RGB(0x4D, 0x4D, 0x4F);
+}
+
+LRESULT CALLBACK RimProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
+    switch (message) {
+        case WM_NCHITTEST: return HTTRANSPARENT;
+        case WM_MOUSEACTIVATE: return MA_NOACTIVATE;
+        case WM_ERASEBKGND: {
+            RECT bounds{};
+            ::GetClientRect(window, &bounds);
+            if (HBRUSH brush = ::CreateSolidBrush(static_cast<COLORREF>(::GetWindowLongPtrW(window, GWLP_USERDATA)))) {
+                ::FillRect(reinterpret_cast<HDC>(wParam), &bounds, brush);
+                ::DeleteObject(brush);
+            }
+            return 1;
+        }
+        case WM_PAINT: {
+            PAINTSTRUCT paint{};
+            ::BeginPaint(window, &paint);
+            ::EndPaint(window, &paint);
+            return 0;
+        }
+        default: return ::DefWindowProcW(window, message, wParam, lParam);
+    }
+}
+
+class RimWindow {
+public:
+    RimWindow() = default;
+    RimWindow(const RimWindow&) = delete;
+    RimWindow& operator=(const RimWindow&) = delete;
+    ~RimWindow() { if (window_) ::DestroyWindow(window_); }
+
+    // Places the ring for `rim` directly beneath `target`; false if the ring cannot be shown.
+    bool Sync(HWND target, const CornerRim& rim, COLORREF color) {
+        if (!window_ && !Create()) return false;
+        const int width = rim.bounds.right - rim.bounds.left, height = rim.bounds.bottom - rim.bounds.top;
+        if (!shape_ || !(*shape_ == rim)) {
+            const int inner = std::max(0, rim.radiusPx - rim.widthPx);
+            platform::UniqueRegion outer(::CreateRoundRectRgn(0, 0, width, height, rim.radiusPx * 2, rim.radiusPx * 2));
+            platform::UniqueRegion hole(::CreateRoundRectRgn(rim.widthPx, rim.widthPx, width - rim.widthPx, height - rim.widthPx,
+                                                             inner * 2, inner * 2));
+            if (!outer || !hole || ::CombineRgn(outer.Get(), outer.Get(), hole.Get(), RGN_DIFF) == ERROR) return false;
+            if (!::SetWindowRgn(window_, outer.Get(), TRUE)) return false;
+            (void)outer.Release();  // owned by the window now
+            shape_ = rim;
+        }
+        if (color != color_) {
+            color_ = color;
+            (void)::SetWindowLongPtrW(window_, GWLP_USERDATA, static_cast<LONG_PTR>(color));
+            ::InvalidateRect(window_, nullptr, TRUE);
+        }
+        RECT placed{};
+        const bool moved = !::GetWindowRect(window_, &placed) || !::EqualRect(&placed, &rim.bounds);
+        if (moved || !::IsWindowVisible(window_) || ::GetWindow(target, GW_HWNDNEXT) != window_) {
+            if (!::SetWindowPos(window_, target, rim.bounds.left, rim.bounds.top, width, height,
+                                SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW))
+                return false;
+        }
+        return true;
+    }
+
+private:
+    bool Create() {
+        WNDCLASSEXW type{sizeof(type)};
+        type.hInstance = ::GetModuleHandleW(nullptr);
+        type.lpszClassName = kRimClass;
+        type.lpfnWndProc = RimProc;
+        if (!platform::RegisterWindowClassOnce(type)) return false;
+        window_ = ::CreateWindowExW(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, kRimClass, L"",
+                                    WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, type.hInstance, nullptr);
+        if (!window_) return false;
+        (void)::SetLayeredWindowAttributes(window_, 0, 255, LWA_ALPHA);
+        return true;
+    }
+    HWND window_ = nullptr;
+    std::optional<CornerRim> shape_;
+    COLORREF color_ = CLR_INVALID;
+};
+
 bool ExcludedClass(HWND window) {
     const auto name = platform::WindowClassName(window);
     return name.empty() || name.starts_with(L"Aether") || name.starts_with(L"Shell_") ||
@@ -141,7 +254,10 @@ public:
             (!options_.onlyProcess && ExcludedClass(window))) return result;
         const auto style = ::GetWindowLongPtrW(window, GWL_STYLE);
         const auto extended = ::GetWindowLongPtrW(window, GWL_EXSTYLE);
-        const auto excludedExtended = WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_LAYOUTRTL |
+        // D45: a layered window that is also captioned, resizable and genuinely maximized is an ordinary
+        // application window (Chromium/Electron use WS_EX_LAYERED for transparency); click-through
+        // overlays stay excluded through WS_EX_TRANSPARENT and the caption/frame requirement.
+        const auto excludedExtended = WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_LAYOUTRTL |
             (options_.onlyProcess ? 0 : WS_EX_NOACTIVATE);
         if ((style & WS_CAPTION) != WS_CAPTION || !(style & WS_THICKFRAME) || (style & WS_CHILD) ||
             (extended & excludedExtended) ||
@@ -216,6 +332,7 @@ struct Observer {
     const WindowCornerGuardOptions& options;
     std::map<HWND, std::unique_ptr<WindowCornerLease>> leases;
     std::map<HWND, std::pair<DWORD, DWORD>> abandoned;
+    std::map<HWND, std::unique_ptr<RimWindow>> rims;  // D45: one perimeter ring per clipped window
     std::uintptr_t nextToken = 1;
     UINT_PTR timer = 0;
     bool stopping = false;
@@ -240,7 +357,13 @@ struct Observer {
             if (leases.size() >= kMaxLeases || leases.contains(window)) return;
             if (const auto old = abandoned.find(window); old != abandoned.end()) {
                 DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (old->second == std::pair{process, thread}) return;
+                if (old->second == std::pair{process, thread}) {
+                    // The application's own region/material wins for as long as this maximized presentation
+                    // lasts. Once the window leaves it (restored or minimized), its next maximize is a new
+                    // presentation and gets one fresh attempt; there is never an immediate re-application.
+                    if (!::IsZoomed(window) || ::IsIconic(window) || !::IsWindowVisible(window)) abandoned.erase(old);
+                    return;
+                }
                 abandoned.erase(old);
             }
             auto lease = WindowCornerLease::Acquire(backend, window, ++nextToken);
@@ -266,6 +389,29 @@ struct Observer {
             }, reinterpret_cast<LPARAM>(&visit));
         }
         if (retry) Queue(250);
+        SyncRims();
+    }
+    // Rings follow their leases: shown, reshaped, recolored and kept directly beneath each clipped
+    // window; removed with the clip. A ring that cannot be shown leaves the clip as it is.
+    void SyncRims() noexcept {
+        try {
+            for (auto it = rims.begin(); it != rims.end();) {
+                const auto lease = leases.find(it->first);
+                if (stopping || lease == leases.end() || !lease->second->Rim()) it = rims.erase(it);
+                else ++it;
+            }
+            if (stopping) return;
+            const COLORREF color = RimColor();
+            for (const auto& [window, lease] : leases) {
+                const auto& rim = lease->Rim();
+                if (!rim) continue;
+                auto& ring = rims[window];
+                if (!ring) ring = std::make_unique<RimWindow>();
+                if (!ring->Sync(window, *rim, color)) rims.erase(window);
+            }
+        } catch (...) {
+            rims.clear();
+        }
     }
     bool RestoreAll() {
         for (auto it = leases.begin(); it != leases.end();) {
@@ -273,6 +419,7 @@ struct Observer {
             if (restored || !it->second->HasOwnership()) it = leases.erase(it);
             else ++it;
         }
+        SyncRims();
         return leases.empty();
     }
     ~Observer() {
@@ -294,6 +441,8 @@ LRESULT CALLBACK BroadcastProc(HWND window, UINT message, WPARAM wParam, LPARAM 
 }
 void CALLBACK EventHook(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LONG child, DWORD, DWORD) noexcept {
     if (!currentObserver) return;
+    // The guard's own rings move with their targets; their events must not schedule more work.
+    if (window && object == OBJID_WINDOW && platform::WindowClassName(window) == kRimClass) return;
     if (event == EVENT_OBJECT_DESTROY && object == OBJID_WINDOW && child == CHILDID_SELF && !::IsWindow(window)) {
         currentObserver->abandoned.erase(window);
     }
@@ -359,6 +508,8 @@ Result<std::unique_ptr<GuardSession>> StartGuard(const std::filesystem::path& ex
     return MakeError(cancelled.load() ? ErrorCode::Cancelled : ErrorCode::Timeout, "Window corner guard startup interrupted");
 }
 } // namespace
+
+int CornerRimWidthPx(UINT dpi) noexcept { return std::max(1, ::MulDiv(1, static_cast<int>(dpi ? dpi : 96), 96)); }
 
 WindowCornerLease::WindowCornerLease(IWindowCornerBackend& backend, HWND window, std::uintptr_t token,
     DWORD process, DWORD thread) noexcept : backend_(backend), window_(window), token_(token), process_(process), thread_(thread) {}
@@ -445,6 +596,7 @@ Result<bool> WindowCornerLease::Refresh() try {
     }
     auto rounded = RoundedRegion(*observed, original_); if (!rounded) return rounded.error();
     std::optional<CornerRegion> next{std::move(*rounded)};
+    rim_ = RimFor(*observed);  // also follows a same-size move to another position or monitor
     if (next == installed_) return true;
     if (auto written = backend_.WriteRegion(window_, next); !written) return written.error();
     installed_ = std::move(next); applied_ = true;
@@ -455,6 +607,7 @@ Result<bool> WindowCornerLease::Refresh() try {
     return true;
 } catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease refresh failed"); }
 Result<void> WindowCornerLease::Restore() try {
+    rim_.reset();  // the rim leaves with the clip, never stays around an unclipped window
     if (!claimed_) return Ok();
     // Before a successful clip there is no region mutation to undo. This also releases a claim
     // if allocation or the first native write failed during Acquire.

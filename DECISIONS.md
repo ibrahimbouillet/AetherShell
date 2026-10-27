@@ -108,6 +108,21 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D46 — A ring window beneath maximized windows; Settings draws its own maximized caption
+
+Owner choice, 2026-10-26, asked by Claude while implementing D45 (FR-036/T44, FR-037/T47): the
+thin perimeter around an eligible maximized foreign window is a click-through Aether ring window
+directly beneath it, with the window clipped inside its rounded outline by the ring width. This is
+the separate technical decision D45 required for the backend change; it adds no global overlay,
+injection, subclassing or geometry change. Captioned, resizable `WS_EX_LAYERED` windows become
+eligible, and an application's own region/material replacement wins until that window's next
+maximize. Technical consequence for Aether Settings (no owner choice needed, recorded here): a
+window region removes DWM's caption buttons on Windows 11, so a maximized Settings window draws
+minimize/restore/close itself with native hit codes (Snap layouts), system commands and
+title-bar accessibility rectangles, and turns opaque while maximized. Details, rejected alternatives
+and limits: [ADR 0012](docs/decisions/0012-maximized-window-perimeter.md); evidence: S-054.
+Owner visual acceptance and broad application compatibility remain pending.
+
 ### D45 — Notifications, real hidden icons and complete rounded maximized frames
 
 Owner direction, 2026-10-26 (FR-038/T48, FR-011, FR-036/T44, FR-037/T47): the Top Bar date/time

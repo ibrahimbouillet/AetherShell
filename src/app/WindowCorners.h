@@ -27,6 +27,20 @@ struct CornerWindowObservation {
 };
 using CornerRegion = std::vector<std::byte>;
 
+// D45: the thin continuous perimeter around a clipped window. The window is clipped to a rounded
+// rectangle inset by `widthPx`; a click-through ring window directly beneath it fills exactly that
+// band (the same rasterized geometry), so the rim never covers application content or input.
+struct CornerRim {
+    RECT bounds{};      // outer rounded rectangle, screen pixels
+    int radiusPx = 0;   // outer corner radius
+    int widthPx = 0;    // ring width (the clip is inset by this much)
+    [[nodiscard]] bool operator==(const CornerRim& other) const noexcept {
+        return ::EqualRect(&bounds, &other.bounds) != FALSE && radiusPx == other.radiusPx && widthPx == other.widthPx;
+    }
+};
+// Physical width of the rim at `dpi` (one DIP, at least one pixel).
+[[nodiscard]] int CornerRimWidthPx(UINT dpi) noexcept;
+
 // Injection boundary for lease tests. All native methods run exclusively in the child guard,
 // never on Aether's UI thread. A missing region means the window has no custom region.
 class IWindowCornerBackend {
@@ -55,6 +69,8 @@ public:
     [[nodiscard]] Result<bool> Refresh(); // false means restored because it is no longer eligible
     [[nodiscard]] Result<void> Restore();
     [[nodiscard]] bool HasOwnership() const noexcept { return claimed_; }
+    // The perimeter to draw beneath the window while it is clipped (nullopt when restored).
+    [[nodiscard]] const std::optional<CornerRim>& Rim() const noexcept { return rim_; }
 
 private:
     WindowCornerLease(IWindowCornerBackend& backend, HWND window, std::uintptr_t token,
@@ -68,6 +84,7 @@ private:
     std::optional<CornerRegion> original_;
     std::optional<CornerRegion> installed_;
     std::optional<DWORD> originalBackdrop_;
+    std::optional<CornerRim> rim_;
     bool claimed_ = false;
     bool applied_ = false;
     bool backdropApplied_ = false;

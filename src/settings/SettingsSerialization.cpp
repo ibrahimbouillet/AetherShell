@@ -58,6 +58,7 @@ void Fields(S& s, F&& f) {
     f("topBar", "weatherPlacement", s.topBar.weatherPlacement);
     f("topBar", "keyboardIndicator", s.topBar.keyboardIndicator);
     f("topBar", "showNotificationAreaButton", s.topBar.showNotificationAreaButton);
+    f("topBar", "showHiddenIconsButton", s.topBar.showHiddenIconsButton);
     f("topBar", "showBatteryPercent", s.topBar.showBatteryPercent);
     f("weather", "enabled", s.weather.enabled);
     f("weather", "locationName", s.weather.locationName);

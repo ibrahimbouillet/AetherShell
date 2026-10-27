@@ -559,9 +559,86 @@ void RunChannelLatency() {
     scheduler.Shutdown();
 }
 
+// SF-02 (S-053 review): precision-wheel events that arrive before the frame which masks the editors
+// are held back; they must add up exactly, and an immediate return to the visible position must
+// cancel them so nothing lands later. `staleImages` edits the fields first, so masking has to
+// refresh their images (the Imaging path) instead of using current ones (the Holding path).
+void RunDeferredInput(bool staleImages) {
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop;
+    graphics::FrameScheduler scheduler;
+    REQUIRE(scheduler.Initialize(loop).ok());
+    {
+        auto tokens = graphics::MakeDesignTokens(ThemeMode::Dark);
+        tokens.transparencyEnabled = SystemBackdropSupported() && platform::SystemTransparencyEnabled();
+        MotionForm f;
+        BuildMotionForm(f, tokens, scheduler);
+        f.host.Show();
+        const auto settle = [&](double seconds) {
+            const double start = graphics::FrameScheduler::Now();
+            RunNested(loop, [&] { return graphics::FrameScheduler::Now() - start > seconds; });
+        };
+        settle(0.6);
+        const HWND viewport = f.scroll.Viewport();
+        RECT bounds{};
+        ::GetWindowRect(viewport, &bounds);
+        const LPARAM at = MAKELPARAM((bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2);
+        // Synchronous: no frame can run between consecutive events.
+        const auto wheel = [&](short delta) { ::SendMessageW(viewport, WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(delta)), at); };
+        const auto prepare = [&] {
+            if (!staleImages) return;
+            for (int row = 0; row < 6; ++row) ::SetWindowTextW(::GetDlgItem(f.scroll.Canvas(), 3000 + row), L"Changed text");
+        };
+        // One fractional event alone gives this system's step (its wheel-lines setting).
+        prepare();
+        int before = f.scroll.Position();
+        wheel(-40);
+        settle(0.5);
+        const int step = f.scroll.Position() - before;
+        REQUIRE(step > 0);
+        // Three events before any frame land as three steps, not one.
+        prepare();
+        before = f.scroll.Position();
+        wheel(-40);
+        wheel(-40);
+        wheel(-40);
+        settle(0.5);
+        const int three = f.scroll.Position() - before;
+        CHECK_EQ(three, 3 * step);
+        // Held-back events, then an immediate return to where the view is: nothing moves later.
+        prepare();
+        before = f.scroll.Position();
+        wheel(-40);
+        wheel(-40);
+        f.scroll.ScrollTo(before, false);
+        settle(0.5);
+        CHECK_EQ(f.scroll.Position(), before);
+        // Accumulation stops at the end of the range.
+        f.scroll.ScrollTo(f.scroll.Range() - step, false);
+        settle(0.3);
+        prepare();
+        wheel(-40);
+        wheel(-40);
+        wheel(-40);
+        settle(0.5);
+        CHECK_EQ(f.scroll.Position(), f.scroll.Range());
+        TEST_NOTE(std::string(staleImages ? "stale" : "current") + " images: step " + std::to_string(step) + " px, three events " +
+                  std::to_string(three) + " px");
+    }
+    scheduler.Shutdown();
+}
+
 }  // namespace
 
 AETHER_TEST("ui_form motion diagnostic: presentation channel latency") { RunChannelLatency(); }
+
+AETHER_TEST("ui_form motion: precision input held back for current editor images adds up and resets cancel it") {
+    RunDeferredInput(false);
+}
+
+AETHER_TEST("ui_form motion: precision input held back for stale editor images adds up and resets cancel it") {
+    RunDeferredInput(true);
+}
 
 AETHER_TEST("ui_form motion: dark scrolling frames stay registered while moving") {
     RunScrollCoherence(ThemeMode::Dark, "dark");

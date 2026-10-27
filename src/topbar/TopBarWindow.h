@@ -59,12 +59,18 @@ public:
     [[nodiscard]] Result<void> SetUpdateAvailable(bool available);
     [[nodiscard]] Result<void> SetTaskbarReplacementState(bool available, bool active, bool suspended);
     void SetFullscreenHidden(bool hidden);
+    // A host action started from `item` failed: a short explanation below that item, never over a
+    // hidden, suppressed or disabled bar.
+    void ReportItemFailure(ItemKind item, std::wstring_view message);
     [[nodiscard]] const std::vector<PlacedItem>& Items() const;
     [[nodiscard]] std::uint64_t RenderCount() const noexcept;
 
     Signal<> SearchRequested, SettingsRequested, CheckForUpdatesRequested, UpdatesRequested, AboutRequested, QuitRequested;
     Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
-    Signal<> ClockRequested, PowerSettingsRequested, SoundSettingsRequested;
+    // ClockRequested: Windows' notifications with their calendar; CalendarRequested: the calendar alone.
+    Signal<> ClockRequested, CalendarRequested, PowerSettingsRequested, SoundSettingsRequested;
+    // The hidden-icons chevron (D45): the host opens Windows' own notification-area overflow.
+    Signal<> HiddenIconsRequested;
     Signal<> VoiceTypingRequested;
     // Observed output state changed on the UI thread; never an instruction to change a device.
     // Emitted after the Top Bar model/render update, allowing listeners to destroy the surface.

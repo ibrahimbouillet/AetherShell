@@ -225,11 +225,27 @@ AETHER_TEST("topbar preferences: weather moves left while status targets remain 
     }
 }
 
-AETHER_TEST("topbar actions: minimal bar omits native-taskbar arrow even for legacy settings") {
-    settings::TopBarSettings config;config.showNotificationAreaButton=true;
-    for(const auto state:{TaskbarReplacementState{},TaskbarReplacementState{true,true,false},TaskbarReplacementState{true,false,true}}){
-        auto items=BuildDisplayItems({},config,false,{},state);REQUIRE(items.ok());
-        CHECK(Find(*items,ItemKind::NotificationArea)==nullptr);
+AETHER_TEST("topbar actions: the hidden-icons chevron follows its own setting, never the legacy arrow flag") {
+    // D45: shown by default whatever the legacy D27 flag says (false in every Alpha 2 file) and
+    // whatever the taskbar replacement state is; recovery is not this item's job.
+    for (const bool legacy : {false, true}) {
+        settings::TopBarSettings config; config.showNotificationAreaButton = legacy;
+        for (const auto state : {TaskbarReplacementState{}, TaskbarReplacementState{true, true, false}, TaskbarReplacementState{true, false, true}}) {
+            auto items = BuildDisplayItems({}, config, false, {}, state); REQUIRE(items.ok());
+            const auto* chevron = Find(*items, ItemKind::NotificationArea);
+            REQUIRE(chevron != nullptr);
+            CHECK(chevron->actionable);
+            CHECK(chevron->accessibleName == L"Show hidden icons");
+            CHECK(chevron->text.empty());
+            // It leads the status cluster, ahead of the input indicator, like Windows' own chevron.
+            const auto position = [&](ItemKind kind) {
+                return std::find_if(items->begin(), items->end(), [kind](const auto& item) { return item.kind == kind; }) - items->begin();
+            };
+            CHECK(position(ItemKind::NotificationArea) < position(ItemKind::Keyboard));
+        }
+        config.showHiddenIconsButton = false;
+        auto items = BuildDisplayItems({}, config, false, {}, {}); REQUIRE(items.ok());
+        CHECK(Find(*items, ItemKind::NotificationArea) == nullptr);
     }
 }
 

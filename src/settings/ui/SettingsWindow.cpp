@@ -8,12 +8,14 @@
 #include "diagnostics/Logger.h"
 #include "graphics/Glyphs.h"
 #include "graphics/SystemPalette.h"
+#include "graphics/SystemSymbols.h"
 #include "platform/windows/DpiUtilities.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "settings/SettingsSerialization.h"
 #include "settings/ui/SettingsFormat.h"
 #include "ui/form/ConfirmDialog.h"
+#include "ui/form/FormPaint.h"
 #include "ui/form/FormScrollView.h"
 #include "ui/form/FormSurface.h"
 
@@ -42,6 +44,8 @@ constexpr wchar_t kClass[] = L"AetherShell.Settings";
 constexpr int kNavigation = 100, kApply = 101, kReset = 102, kStatus = 103, kScrollView = 120, kBrandLabel = 121, kCaptionTitle = 122;
 // DWM attributes spelled out for older SDK headers (Windows 11 build 22000 and later).
 constexpr DWORD kDwmCaptionButtonBounds = 5, kDwmCaptionColor = 35, kDwmTextColor = 36, kDwmColorDefault = 0xFFFFFFFFu;
+// Width of a caption button Settings draws itself (a maximized window, D45), as on Windows 11.
+constexpr float kCaptionButtonWidth = 46.0f;
 constexpr UINT_PTR kLiveApplyTimer = 19;
 constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPostpone = 303,
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
@@ -195,6 +199,15 @@ struct SettingsWindow::Impl {
     // system menu, keyboard commands, borders and resizing. Other materials keep the standard frame.
     bool customFrame = false;
     D2D1_RECT_F captionMark{};  // form client DIPs
+    // D45: while maximized the window takes its rounded corners from a window region, and DWM draws
+    // no caption buttons under a region; Settings then draws minimize, restore and close itself.
+    // They hit-test as HTMINBUTTON/HTMAXBUTTON/HTCLOSE (Snap layouts open over the maximize button),
+    // act through WM_SYSCOMMAND when released over the button that was pressed, and report their
+    // rectangles to accessibility clients through WM_GETTITLEBARINFOEX.
+    bool framedRegion = false;
+    int captionHot = HTNOWHERE;
+    int captionPressed = HTNOWHERE;
+    graphics::SymbolRenderer captionSymbols;
     graphics::DesignTokens tokens;
     graphics::MotionPolicy motion;
     SettingsPage page = SettingsPage::Dock;
@@ -269,6 +282,8 @@ struct SettingsWindow::Impl {
     // Height of the title strip in client pixels: down to the bottom of DWM's caption buttons.
     [[nodiscard]] int CaptionHeightPx() const {
         if (!customFrame || !window) return 0;
+        // The height DWM gives the caption buttons of a maximized window.
+        if (framedRegion) return platform::SystemMetricForDpi(SM_CYSIZE, DpiNow());
         const int inset = ::IsZoomed(window) ? FrameInsetPx() : 0;
         RECT buttons{};
         if (SUCCEEDED(::DwmGetWindowAttribute(window, kDwmCaptionButtonBounds, &buttons, sizeof(buttons))) && buttons.bottom > inset)
@@ -278,7 +293,8 @@ struct SettingsWindow::Impl {
     // Chooses the frame for the current material and recomputes the non-client area when it changes.
     void UpdateFrame() {
         if (!window) return;
-        const bool wanted = surfaceReady && surface.Material() == form::FormMaterial::Acrylic;
+        // D45: while maximized the form draws its own rounded frame, so the integrated strip stays too.
+        const bool wanted = surfaceReady && (surface.Material() == form::FormMaterial::Acrylic || surface.MaximizedFrame());
         const bool solid = surfaceReady && surface.Material() == form::FormMaterial::Solid;
         // Opaque material on Windows 11: the standard caption takes the window's own colors.
         const COLORREF caption = solid ? tokens.form.windowSolid.ToColorRef() : kDwmColorDefault;
@@ -286,9 +302,169 @@ struct SettingsWindow::Impl {
         (void)::DwmSetWindowAttribute(window, kDwmCaptionColor, &caption, sizeof(caption));
         (void)::DwmSetWindowAttribute(window, kDwmTextColor, &title, sizeof(title));
         if (captionTitle) ::ShowWindow(captionTitle, wanted ? SW_SHOWNA : SW_HIDE);
-        if (wanted == customFrame) return;
-        customFrame = wanted;
-        ::SetWindowPos(window, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        if (wanted != customFrame) {
+            customFrame = wanted;
+            ::SetWindowPos(window, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        }
+        UpdateFrameRegion();
+    }
+    // D45: the rounded shape of a maximized window - its visible client area (the frame of a maximized
+    // window extends past the monitor) with the radius of the form's own frame. Points outside it
+    // belong to whatever is behind the window, for pointer input as well as for the eye.
+    void UpdateFrameRegion() {
+        if (!window) return;
+        if (!customFrame || !::IsZoomed(window) || !surfaceReady || !surface.MaximizedFrame()) {
+            if (framedRegion) {
+                framedRegion = false;
+                ::SetWindowRgn(window, nullptr, TRUE);
+            }
+            // A drawn button held while the window leaves maximize (keyboard, Snap) lets the pointer go.
+            if (captionPressed != HTNOWHERE && ::GetCapture() == window) {
+                captionPressed = HTNOWHERE;
+                ::ReleaseCapture();
+            }
+            captionHot = captionPressed = HTNOWHERE;
+            return;
+        }
+        RECT bounds{};
+        ::GetWindowRect(window, &bounds);
+        POINT origin{0, 0};
+        ::ClientToScreen(window, &origin);
+        RECT client{};
+        ::GetClientRect(window, &client);
+        const int left = origin.x - bounds.left, top = origin.y - bounds.top;
+        const int diameter = 2 * Px(form::paint::kWindowFrameRadius);
+        // GDI leaves the last row and column out of a round-rectangle region.
+        HRGN region = ::CreateRoundRectRgn(left, top, left + client.right + 1, top + client.bottom + 1, diameter, diameter);
+        if (!region) return;
+        if (::SetWindowRgn(window, region, TRUE)) framedRegion = true;  // the system owns the region now
+        else ::DeleteObject(region);
+    }
+    // --- caption buttons drawn by Settings (maximized window) ---
+    // Client pixels of the button for `hit` (HTMINBUTTON, HTMAXBUTTON or HTCLOSE), at the top right.
+    [[nodiscard]] RECT CaptionButtonPx(int hit) const {
+        RECT client{};
+        ::GetClientRect(window, &client);
+        const int width = Px(kCaptionButtonWidth);
+        const int slot = hit == HTCLOSE ? 1 : hit == HTMAXBUTTON ? 2 : 3;
+        return RECT{client.right - slot * width, 0, client.right - (slot - 1) * width, CaptionHeightPx()};
+    }
+    [[nodiscard]] int CaptionButtonAt(POINT client) const {
+        if (!framedRegion) return HTNOWHERE;
+        for (const int hit : {HTMINBUTTON, HTMAXBUTTON, HTCLOSE}) {
+            const RECT rect = CaptionButtonPx(hit);
+            if (::PtInRect(&rect, client)) return hit;
+        }
+        return HTNOWHERE;
+    }
+    void SetCaptionState(int hot, int pressed) {
+        if (hot == captionHot && pressed == captionPressed) return;
+        captionHot = hot;
+        captionPressed = pressed;
+        RECT strip = CaptionButtonPx(HTMINBUTTON);
+        strip.right = CaptionButtonPx(HTCLOSE).right;
+        ::InvalidateRect(window, &strip, FALSE);
+    }
+    void PaintCaptionButtons(ID2D1DeviceContext* target, const graphics::DesignTokens& look) {
+        if (!framedRegion || !target) return;
+        winrt::com_ptr<ID2D1SolidColorBrush> brush;
+        if (FAILED(target->CreateSolidColorBrush(look.textPrimary.ToD2D(), brush.put()))) return;
+        const bool active = ::GetActiveWindow() == window;
+        // Caption glyphs are grayscale, as Windows draws them (no ClearType fringes over opaque material).
+        const D2D1_TEXT_ANTIALIAS_MODE antialias = target->GetTextAntialiasMode();
+        target->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+        for (const int hit : {HTMINBUTTON, HTMAXBUTTON, HTCLOSE}) {
+            const RECT px = CaptionButtonPx(hit);
+            const D2D1_RECT_F box = D2D1::RectF(Dip(static_cast<float>(px.left)), Dip(static_cast<float>(px.top)),
+                                                Dip(static_cast<float>(px.right)), Dip(static_cast<float>(px.bottom)));
+            // Windows 11 caption states: a subtle fill on hover and press; close turns red.
+            const bool pressed = captionPressed == hit && captionHot == hit;
+            const bool hot = captionHot == hit && (captionPressed == HTNOWHERE || pressed);
+            graphics::Color fill{0.0f, 0.0f, 0.0f, 0.0f};
+            graphics::Color glyph = active ? look.textPrimary : look.textSecondary;
+            if (hit == HTCLOSE && hot) {
+                fill = graphics::Color::FromHex(0xC42B1C, pressed ? 0.9f : 1.0f);
+                glyph = graphics::Color::FromHex(0xFFFFFF, pressed ? 0.7f : 1.0f);
+            } else if (hot) {
+                fill = look.textPrimary.WithAlpha(pressed ? 0.04f : 0.06f);
+            }
+            if (fill.a > 0.0f) {
+                brush->SetColor(fill.ToD2D());
+                target->FillRectangle(box, brush.get());
+            }
+            brush->SetColor(glyph.ToD2D());
+            const auto symbol = hit == HTCLOSE ? graphics::Symbol::ChromeClose
+                              : hit == HTMAXBUTTON ? graphics::Symbol::ChromeRestore : graphics::Symbol::ChromeMinimize;
+            captionSymbols.Draw(target, symbol, box, brush.get(), 10.0f);
+        }
+        target->SetTextAntialiasMode(antialias);
+    }
+    // Pointer tracking of the drawn buttons: press captures the pointer, release over the same button acts.
+    std::optional<LRESULT> HandleCaptionButtons(UINT message, WPARAM wParam, LPARAM lParam) {
+        const auto button = [](WPARAM hit) { return hit == HTMINBUTTON || hit == HTMAXBUTTON || hit == HTCLOSE; };
+        const POINT point{static_cast<short>(LOWORD(lParam)), static_cast<short>(HIWORD(lParam))};
+        switch (message) {
+            case WM_NCMOUSEMOVE:
+                if (captionPressed == HTNOWHERE) {
+                    SetCaptionState(button(wParam) ? static_cast<int>(wParam) : HTNOWHERE, HTNOWHERE);
+                    TRACKMOUSEEVENT track{sizeof(track), TME_LEAVE | TME_NONCLIENT, window, 0};
+                    ::TrackMouseEvent(&track);
+                }
+                return std::nullopt;  // the system still sees the hover (Snap layouts)
+            case WM_NCMOUSELEAVE:
+                if (captionPressed == HTNOWHERE) SetCaptionState(HTNOWHERE, HTNOWHERE);
+                return std::nullopt;
+            case WM_NCLBUTTONDOWN:
+            case WM_NCLBUTTONDBLCLK:
+                if (!button(wParam)) return std::nullopt;
+                ::SetCapture(window);
+                SetCaptionState(static_cast<int>(wParam), static_cast<int>(wParam));
+                return 0;
+            case WM_MOUSEMOVE:
+                if (captionPressed == HTNOWHERE) return std::nullopt;
+                SetCaptionState(CaptionButtonAt(point) == captionPressed ? captionPressed : HTNOWHERE, captionPressed);
+                return 0;
+            case WM_LBUTTONUP: {
+                if (captionPressed == HTNOWHERE) return std::nullopt;
+                const int pressed = captionPressed;
+                const bool over = CaptionButtonAt(point) == pressed;
+                SetCaptionState(over ? pressed : HTNOWHERE, HTNOWHERE);
+                ::ReleaseCapture();
+                if (over) ::SendMessageW(window, WM_SYSCOMMAND, pressed == HTCLOSE ? SC_CLOSE : pressed == HTMAXBUTTON ? SC_RESTORE : SC_MINIMIZE, 0);
+                return 0;
+            }
+            case WM_CAPTURECHANGED:
+                if (captionPressed != HTNOWHERE) SetCaptionState(HTNOWHERE, HTNOWHERE);
+                return std::nullopt;
+            case WM_NCACTIVATE:
+                if (framedRegion) {
+                    RECT strip = CaptionButtonPx(HTMINBUTTON);
+                    strip.right = CaptionButtonPx(HTCLOSE).right;
+                    ::InvalidateRect(window, &strip, FALSE);  // active and inactive glyphs differ
+                }
+                return std::nullopt;
+            case WM_GETTITLEBARINFOEX: {
+                // The system's title bar accessibility reads the buttons from here.
+                const LRESULT standard = ::DefWindowProcW(window, message, wParam, lParam);
+                auto* info = reinterpret_cast<TITLEBARINFOEX*>(lParam);
+                if (!info || info->cbSize < sizeof(TITLEBARINFOEX)) return standard;
+                RECT strip{0, 0, 0, CaptionHeightPx()};
+                RECT client{};
+                ::GetClientRect(window, &client);
+                strip.right = client.right;
+                ::MapWindowPoints(window, nullptr, reinterpret_cast<POINT*>(&strip), 2);
+                info->rcTitleBar = strip;
+                for (const auto& [index, hit] : {std::pair{2, HTMINBUTTON}, std::pair{3, HTMAXBUTTON}, std::pair{5, HTCLOSE}}) {
+                    RECT rect = CaptionButtonPx(hit);
+                    ::MapWindowPoints(window, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+                    info->rgrect[index] = rect;
+                    info->rgstate[index] &= ~static_cast<DWORD>(STATE_SYSTEM_INVISIBLE | STATE_SYSTEM_OFFSCREEN);
+                }
+                return standard;
+            }
+            default:
+                return std::nullopt;
+        }
     }
     LRESULT HitTest(WPARAM wParam, LPARAM lParam) {
         const LRESULT hit = ::DefWindowProcW(window, WM_NCHITTEST, wParam, lParam);
@@ -302,6 +478,7 @@ struct SettingsWindow::Impl {
             return point.x < corner ? HTTOPLEFT : point.x >= client.right - corner ? HTTOPRIGHT : HTTOP;
         }
         if (point.y < CaptionHeightPx()) {
+            if (const int button = CaptionButtonAt(point); button != HTNOWHERE) return button;
             const RECT mark{Px(captionMark.left), Px(captionMark.top), Px(captionMark.right), Px(captionMark.bottom)};
             return ::PtInRect(&mark, point) ? HTSYSMENU : HTCAPTION;
         }
@@ -621,6 +798,8 @@ void SettingsWindow::Impl::BuildPage() {
         Check(L"Show microphone", L"", [](const Settings& s){return s.topBar.showMicrophone;}, [](Settings& s,bool v){s.topBar.showMicrophone=v;});
         Check(L"Show weather when enabled", L"Weather itself is turned on in Weather settings.",
               [](const Settings& s){return s.topBar.showWeather;}, [](Settings& s,bool v){s.topBar.showWeather=v;});
+        Check(L"Show hidden icons button", L"A small chevron that opens Windows' hidden notification-area icons.",
+              [](const Settings& s){return s.topBar.showHiddenIconsButton;}, [](Settings& s,bool v){s.topBar.showHiddenIconsButton=v;});
         BeginSection(L"Behavior");
         Check(L"Reserve screen space above windows", L"Maximized windows stay below the Top Bar.",
               [](const Settings& s){return s.topBar.reserveSpace;}, [](Settings& s,bool v){s.topBar.reserveSpace=v;});
@@ -923,7 +1102,8 @@ void SettingsWindow::Impl::Layout() {
     if (customFrame) {
         RECT buttons{};
         float buttonsLeft = width - 138.0f;
-        if (SUCCEEDED(::DwmGetWindowAttribute(window, kDwmCaptionButtonBounds, &buttons, sizeof(buttons))) && buttons.right > buttons.left)
+        if (framedRegion) buttonsLeft = Dip(static_cast<float>(CaptionButtonPx(HTMINBUTTON).left));
+        else if (SUCCEEDED(::DwmGetWindowAttribute(window, kDwmCaptionButtonBounds, &buttons, sizeof(buttons))) && buttons.right > buttons.left)
             buttonsLeft = Dip(static_cast<float>(buttons.left));
         captionMark = D2D1::RectF(14.0f, (caption - 16.0f) / 2.0f, 30.0f, (caption + 16.0f) / 2.0f);
         Place(captionTitle, 40.0f, 0.0f, std::max(41.0f, buttonsLeft - 8.0f), caption);
@@ -1558,9 +1738,14 @@ void SettingsWindow::Impl::ApplyTheme() {
 
 LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam) {
     if (customFrame) {
-        // DWM's caption buttons first: hover, press, Snap layouts and their hit testing.
+        // DWM's caption buttons first: hover, press, Snap layouts and their hit testing. Under the
+        // region of a maximized window there are none; Settings tracks its own.
         LRESULT result = 0;
-        if (::DwmDefWindowProc(window, message, wParam, lParam, &result)) return result;
+        if (framedRegion) {
+            if (auto handled = HandleCaptionButtons(message, wParam, lParam)) return *handled;
+        } else if (::DwmDefWindowProc(window, message, wParam, lParam, &result)) {
+            return result;
+        }
         if (message == WM_NCCALCSIZE && wParam) {
             // Keep the side and bottom borders; the client starts at the window's top edge (below the
             // hidden resize border while maximized).
@@ -1632,7 +1817,16 @@ LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam)
         if (surfaceReady && position) scroll.ScrollTo(::MulDiv(position, std::max(1, scroll.Range()), range));
         return 0;
     }
-    if (message == WM_SIZE) { if (wParam != SIZE_MINIMIZED) Layout(); return 0; }
+    if (message == WM_SIZE) {
+        if (wParam != SIZE_MINIMIZED) {
+            if (surfaceReady) {
+                surface.SetMaximizedFrame(wParam == SIZE_MAXIMIZED);
+                UpdateFrame();
+            }
+            Layout();
+        }
+        return 0;
+    }
     if (message == WM_DESTROY) { ::KillTimer(window,kLiveApplyTimer); geocodeCancel.Cancel(); scroll.Destroy(); surface.Detach(); surfaceReady = false; window = nullptr; return 0; }
     return ::DefWindowProcW(window, message, wParam, lParam);
 }
@@ -1670,10 +1864,14 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         if (!window) return MakeError(ErrorCode::Platform, "settings window could not be created");
         if (auto attached = impl.surface.Attach(window, impl.tokens, impl.motion, impl.callbacks.scheduler); attached) {
             impl.surfaceReady = true;
+            winrt::com_ptr<IDWriteFactory> dwrite;
+            if (SUCCEEDED(::DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(dwrite.put()))))
+                impl.captionSymbols.Initialize(dwrite.get());
             impl.surface.SetDecorator([this](ID2D1DeviceContext* target, const D2D1_RECT_F&, const graphics::DesignTokens& tokens) {
                 auto& state = *impl_;
                 if (state.customFrame && state.captionMark.right > state.captionMark.left)
                     graphics::PaintBrandMark(target, state.captionMark, tokens);
+                state.PaintCaptionButtons(target, tokens);
                 graphics::PaintBrandMark(target, state.brandMark, tokens);
                 if (state.page != SettingsPage::About || state.aboutMark.right <= state.aboutMark.left || !state.scroll.Canvas()) return;
                 // Includes a scroll the surface is presenting, so the mark moves with its page.

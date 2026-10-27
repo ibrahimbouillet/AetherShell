@@ -92,6 +92,9 @@ struct TopBarSettings {
     // TwoLine needs a height of at least 30 DIPs; the Top Bar falls back to Compact below that.
     KeyboardIndicatorStyle keyboardIndicator = KeyboardIndicatorStyle::TwoLine;
     bool showNotificationAreaButton = false; // legacy schema field; trailing arrow removed by D27
+    // D45: the small chevron that opens Windows' hidden notification-area icons. A separate key so the
+    // legacy false above (every Alpha 2 file) cannot hide it; absent means shown.
+    bool showHiddenIconsButton = true;
     bool showBatteryPercent = true;
 };
 

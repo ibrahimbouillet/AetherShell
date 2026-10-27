@@ -7,7 +7,34 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
+## Current checkpoint — D45 implemented in source by Claude (S-054, 2026-10-27)
+
+**Owner acceptance and the live Explorer/foreign-application checks are pending; nothing below claims
+them.** Claude implemented [the D45 brief](docs/CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) in the
+shared `main` checkout:
+
+- **Notifications (FR-038/T48):** date/time click, Enter/Space and UIA Invoke send Win+N (Windows 11)
+  or Win+A (Windows 10); the clock menu adds "Open calendar" (Win+Alt+D). Nothing reads, clears or
+  badges notifications.
+- **Hidden icons (FR-038/T48):** a small chevron before the keyboard item (`topBar.showHiddenIconsButton`,
+  default on, independent of the legacy D27 field) opens Explorer's own overflow by UI Automation and
+  verifies Explorer showed it. While Aether replaces the taskbar, the native taskbar is shown only
+  while that overflow is open. The Windows 11 element identity (`SystemTray.ChevronIconView`) is
+  verified on fakes only: **an owner-approved live check is the next step** (D36 readiness first).
+- **Maximized perimeter (FR-036/FR-037, D46/[ADR 0012](docs/decisions/0012-maximized-window-perimeter.md)):**
+  the owner chose a click-through ring window beneath each clipped maximized foreign window; the
+  rejected window was diagnosed (privately) as layered and ineligible, and captioned layered windows
+  are now eligible; an application's own replacement wins until its next maximize. Windows-drawn
+  standard captions can cover the top of the outline while active (measured; recorded D46 limit).
+  Settings gets DWM rounding with the `windowRim` border when restored and, maximized, a rounded
+  region, painted rim and its own caption buttons (DWM draws none under a region), opaque while
+  maximized because DWM draws Acrylic outside a region.
+- **S-053 corrections:** deferred precision scroll accumulates and resets cancel it; interrupted
+  Quick Settings detail transitions continue from the composed frame; media arrival refits the panel;
+  a release activates only the target that was pressed. Each has a discriminating regression.
+- **Evidence and limits:** TEST_STATUS S-054; [known limitations](KNOWN_LIMITATIONS.md).
+
+## Previous assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
 
 **Next implementation writer: Claude.** The owner requests date/time access to the actual Windows
 notification center/calendar, a dedicated Top Bar chevron for real hidden notification-area icons,

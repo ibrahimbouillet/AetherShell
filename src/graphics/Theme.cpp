@@ -75,6 +75,7 @@ void ApplyDarkRoles(DesignTokens& t) {
     f.windowTint = Color::FromHex(0x1C1C1C);
     f.windowTintAlpha = 0.44f;
     f.windowSolid = Color::FromHex(0x202020);
+    f.windowRim = Color::FromHex(0x4D4D4F);
     f.footerTint = Color::FromHex(0x000000, 0.10f);
     f.cardFill = Color::FromHex(0xFFFFFF, 0.045f);
     f.cardFillSolid = Color::FromHex(0x2B2B2B);
@@ -153,6 +154,7 @@ void ApplyLightRoles(DesignTokens& t) {
     f.windowTint = Color::FromHex(0xF3F3F3);
     f.windowTintAlpha = 0.50f;
     f.windowSolid = Color::FromHex(0xF3F3F3);
+    f.windowRim = Color::FromHex(0xC6C6C8);
     f.footerTint = Color::FromHex(0xFFFFFF, 0.30f);
     f.cardFill = Color::FromHex(0xFFFFFF, 0.55f);
     f.cardFillSolid = Color::FromHex(0xFBFBFB);
@@ -244,6 +246,7 @@ void ApplyHighContrastRoles(DesignTokens& t) {
     f.windowTint = window;
     f.windowTintAlpha = 1.0f;
     f.windowSolid = window;
+    f.windowRim = windowText;
     f.footerTint = window;
     f.cardFill = window;
     f.cardFillSolid = window;

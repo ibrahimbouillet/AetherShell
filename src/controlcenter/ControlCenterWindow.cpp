@@ -151,6 +151,12 @@ struct Pending {
     double since = 0.0;
 };
 
+// Main/detail fade-through with mirrored curves: the leaving view is gone at 60 % of the slide and
+// the arriving one starts at 40 %, so they overlap only faintly, and reversing at any moment
+// continues from exactly the opacities on screen.
+float LeavingOpacity(float amount) noexcept { return std::clamp(1.0f - amount / 0.6f, 0.0f, 1.0f); }
+float ArrivingOpacity(float amount) noexcept { return LeavingOpacity(1.0f - amount); }
+
 }  // namespace
 
 struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
@@ -175,6 +181,10 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     graphics::Tween pageMotion{0.0f};
     graphics::Tween viewMotion{1.0f};  // 0 just changed .. 1 settled on `detail`
     float viewDirection = 1.0f;        // +1 into a detail view, -1 back to the main view
+    Detail residual = Detail::None;    // a third view still fading out after a quick change of mind
+    graphics::Tween residualFade{0.0f};
+    float residualOffset = 0.0f;
+    RECT anchor{};                     // the Top Bar group the panel opened from (screen pixels)
     bool destroyed = false, volumeTimerArmed = false, closing = false;
     std::uint64_t renders = 0;
 
@@ -492,12 +502,32 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     // side it belongs to; input moves to the new view at once (no waiting for the animation).
     void Open(Detail next) {
         if (next == detail) return;
-        fromView = detail;
+        const double now = graphics::FrameScheduler::Now();
+        const float amount = std::clamp(viewMotion.Value(now), 0.0f, 1.0f);
+        if (amount < 0.999f && fromView != detail) {
+            // Interrupted: continue from the frame on screen. The arriving view becomes the leaving one
+            // at the same opacity and offset (mirrored curves; transitions alternate direction).
+            if (next != fromView) {
+                // A third view: the one that was leaving fades out where it is.
+                const float leaving = LeavingOpacity(amount);
+                if (leaving > residualFade.Value(now)) {
+                    residual = fromView;
+                    residualOffset = -viewDirection * 40.0f * amount;
+                    residualFade.SnapTo(leaving);
+                    residualFade.AnimateTo(0.0f, now, motion.Scale(0.12), tokens.curves.standard);
+                }
+            }
+            fromView = detail;
+            viewMotion.SnapTo(1.0f - amount);
+            viewMotion.AnimateTo(1.0f, now, motion.Scale(0.22 * std::max(0.35f, amount)), tokens.curves.decelerate);
+        } else {
+            fromView = detail;
+            viewMotion.SnapTo(0.0f);
+            viewMotion.AnimateTo(1.0f, now, motion.Scale(0.22), tokens.curves.decelerate);
+        }
         viewDirection = next != Detail::None ? 1.0f : -1.0f;
         detail = next;
-        const double now = graphics::FrameScheduler::Now();
-        viewMotion.SnapTo(0.0f);
-        viewMotion.AnimateTo(1.0f, now, motion.Scale(0.22), tokens.curves.decelerate);
+        if (residual == detail) residualFade.SnapTo(0.0f);  // never the same view twice
         hover.clear();
         press.clear();
         hovered.reset();
@@ -511,6 +541,26 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         }
         owner.RequestAnimationFrame();
         owner.Invalidate();
+    }
+    // The views composed at `now`, bottom to top, with their opacity and horizontal offset (DIPs).
+    struct Layer {
+        Detail view = Detail::None;
+        float opacity = 1.0f;
+        float offset = 0.0f;
+    };
+    std::vector<Layer> Composed(double now) const {
+        std::vector<Layer> layers;
+        const float fade = std::clamp(residualFade.Value(now), 0.0f, 1.0f);
+        const float amount = std::clamp(viewMotion.Value(now), 0.0f, 1.0f);
+        const bool moving = amount < 0.999f && fromView != detail;
+        if (fade > 0.001f && residual != detail && (!moving || residual != fromView)) layers.push_back({residual, fade, residualOffset});
+        if (moving) {
+            layers.push_back({fromView, LeavingOpacity(amount), -viewDirection * 40.0f * amount});
+            layers.push_back({detail, ArrivingOpacity(amount), viewDirection * 40.0f * (1.0f - amount)});
+        } else {
+            layers.push_back({detail, 1.0f, 0.0f});
+        }
+        return layers;
     }
     static std::optional<int> OpenerOf(Detail view) {
         switch (view) {
@@ -1159,11 +1209,12 @@ Result<void> ControlCenterWindow::Toggle(const RECT& anchor, bool keyboard) {
         return Ok();
     }
     auto& p = *impl_;
-    const auto monitor = platform::QueryMonitor(::MonitorFromRect(&anchor, MONITOR_DEFAULTTONEAREST)).value_or(platform::PrimaryMonitor());
     // Move the hidden HWND to the anchor monitor first so PMv2 updates Dpi() before layout.
     SetBoundsPx({anchor.left, anchor.top, anchor.left + 1, anchor.top + 1});
     p.detail = Detail::None;
     p.fromView = Detail::None;
+    p.residual = Detail::None;
+    p.residualFade.SnapTo(0.0f);
     p.page = 0;
     p.pageMotion.SnapTo(0.0f);
     p.viewMotion.SnapTo(1.0f);
@@ -1175,29 +1226,9 @@ Result<void> ControlCenterWindow::Toggle(const RECT& anchor, bool keyboard) {
     p.cues = keyboard;
     p.Rebuild();
     p.SyncTileStates(true);
-    const float dpiScale = static_cast<float>(Dpi()) / 96.0f;
-    const auto area = monitor.workArea;
-    const float width = kPanelWidth + 2.0f * kMargin, height = p.PanelHeight() + 2.0f * kMargin;
-    const float fit = std::min({1.0f, static_cast<float>(area.right - area.left - 16) / (width * dpiScale),
-                                static_cast<float>(area.bottom - area.top - 16) / (height * dpiScale)});
-    if (fit < 0.55f) return MakeError(ErrorCode::Unavailable, "screen area is too small for quick controls");
-    p.scale = fit;
-    const LONG w = static_cast<LONG>(std::ceil(width * fit * dpiScale)), h = static_cast<LONG>(std::ceil(height * fit * dpiScale));
-    const LONG margin = static_cast<LONG>(std::lround(kMargin * fit * dpiScale));
-    const LONG gap = static_cast<LONG>(std::lround(6.0f * dpiScale));
-    // The visible panel's right edge meets the group's right edge, its top sits just below it; both
-    // are clamped to the monitor's work area (negative coordinates included).
-    const LONG edge = static_cast<LONG>(std::lround(8.0f * dpiScale));
-    const LONG x = std::clamp(anchor.right + margin - w, area.left + edge - margin, std::max(area.left + edge - margin, area.right - edge + margin - w));
-    const LONG y = std::clamp(anchor.bottom + gap - margin, area.top - margin, std::max(area.top - margin, area.bottom - edge + margin - h));
-    SetBoundsPx({x, y, x + w, y + h});
+    if (!PlaceAt(anchor)) return MakeError(ErrorCode::Unavailable, "screen area is too small for quick controls");
+    const float fit = p.scale;
     const auto panel = p.PanelRect();
-    const RECT region{static_cast<LONG>(std::floor(panel.left * fit * dpiScale)), static_cast<LONG>(std::floor(panel.top * fit * dpiScale)),
-                      static_cast<LONG>(std::ceil(panel.right * fit * dpiScale)), static_cast<LONG>(std::ceil(panel.bottom * fit * dpiScale))};
-    SetInputRegionPx(std::span<const RECT>(&region, 1));
-    SetVisualRegionPx(std::span<const RECT>(&region, 1));
-    SetBackdropPanel(D2D1::RectF(panel.left * fit, panel.top * fit, panel.right * fit, panel.bottom * fit), kRadius * fit,
-                     p.tokens.transparencyEnabled, p.tokens.glass.backdropOpacity);
     // Opens from the Top Bar: a short settle downwards, never a jump from another place.
     graphics::TransitionShape from;
     from.offsetY = -6.0f;
@@ -1223,7 +1254,43 @@ Result<void> ControlCenterWindow::Toggle(const RECT& anchor, bool keyboard) {
     return Ok();
 }
 
+bool ControlCenterWindow::PlaceAt(const RECT& anchor) {
+    auto& p = *impl_;
+    p.anchor = anchor;
+    const auto monitor = platform::QueryMonitor(::MonitorFromRect(&anchor, MONITOR_DEFAULTTONEAREST)).value_or(platform::PrimaryMonitor());
+    const float dpiScale = static_cast<float>(Dpi()) / 96.0f;
+    const auto area = monitor.workArea;
+    const float width = kPanelWidth + 2.0f * kMargin, height = p.PanelHeight() + 2.0f * kMargin;
+    const float fit = std::min({1.0f, static_cast<float>(area.right - area.left - 16) / (width * dpiScale),
+                                static_cast<float>(area.bottom - area.top - 16) / (height * dpiScale)});
+    if (fit < 0.55f) return false;
+    p.scale = fit;
+    const LONG w = static_cast<LONG>(std::ceil(width * fit * dpiScale)), h = static_cast<LONG>(std::ceil(height * fit * dpiScale));
+    const LONG margin = static_cast<LONG>(std::lround(kMargin * fit * dpiScale));
+    const LONG gap = static_cast<LONG>(std::lround(6.0f * dpiScale));
+    // The visible panel's right edge meets the group's right edge, its top sits just below it; both
+    // are clamped to the monitor's work area (negative coordinates included).
+    const LONG edge = static_cast<LONG>(std::lround(8.0f * dpiScale));
+    const LONG x = std::clamp(anchor.right + margin - w, area.left + edge - margin, std::max(area.left + edge - margin, area.right - edge + margin - w));
+    const LONG y = std::clamp(anchor.bottom + gap - margin, area.top - margin, std::max(area.top - margin, area.bottom - edge + margin - h));
+    SetBoundsPx({x, y, x + w, y + h});
+    const auto panel = p.PanelRect();
+    const RECT region{static_cast<LONG>(std::floor(panel.left * fit * dpiScale)), static_cast<LONG>(std::floor(panel.top * fit * dpiScale)),
+                      static_cast<LONG>(std::ceil(panel.right * fit * dpiScale)), static_cast<LONG>(std::ceil(panel.bottom * fit * dpiScale))};
+    SetInputRegionPx(std::span<const RECT>(&region, 1));
+    SetVisualRegionPx(std::span<const RECT>(&region, 1));
+    SetBackdropPanel(D2D1::RectF(panel.left * fit, panel.top * fit, panel.right * fit, panel.bottom * fit), kRadius * fit,
+                     p.tokens.transparencyEnabled, p.tokens.glass.backdropOpacity);
+    return true;
+}
+
 std::uint64_t ControlCenterWindow::RenderCount() const noexcept { return impl_->renders; }
+
+std::vector<ControlCenterWindow::ComposedView> ControlCenterWindow::ComposedViews(double now) const {
+    std::vector<ComposedView> views;
+    for (const auto& layer : impl_->Composed(now)) views.push_back({static_cast<int>(layer.view), layer.opacity, layer.offset});
+    return views;
+}
 
 RECT ControlCenterWindow::PanelBoundsPx() const noexcept {
     if (!IsShown()) return RECT{};
@@ -1270,6 +1337,7 @@ void ControlCenterWindow::SetTheme(const graphics::DesignTokens& tokens, const g
             for (auto& [id, tween] : *tweens) tween.SnapTo(tween.Target());
         impl_->pageMotion.SnapTo(impl_->pageMotion.Target());
         impl_->viewMotion.SnapTo(impl_->viewMotion.Target());
+        impl_->residualFade.SnapTo(impl_->residualFade.Target());
     }
     if (IsShown()) {
         const float fit = impl_->scale;
@@ -1293,18 +1361,13 @@ void ControlCenterWindow::SetState(ControlCenterState state) {
     p.Rebuild();
     p.SyncTileStates(false);
     if (mediaBefore != p.MediaShown() && IsShown()) {
-        // The media card appeared or left: grow/shrink downwards from the same top-right anchor.
-        const auto bounds = BoundsPx();
-        const float factor = p.scale * static_cast<float>(Dpi()) / 96.0f;
-        const LONG h = static_cast<LONG>(std::ceil((p.PanelHeight() + 2.0f * kMargin) * factor));
-        SetBoundsPx({bounds.left, bounds.top, bounds.right, bounds.top + h});
-        const auto panel = p.PanelRect();
-        const RECT region{static_cast<LONG>(std::floor(panel.left * factor)), static_cast<LONG>(std::floor(panel.top * factor)),
-                          static_cast<LONG>(std::ceil(panel.right * factor)), static_cast<LONG>(std::ceil(panel.bottom * factor))};
-        SetInputRegionPx(std::span<const RECT>(&region, 1));
-        SetVisualRegionPx(std::span<const RECT>(&region, 1));
-        SetBackdropPanel(D2D1::RectF(panel.left * p.scale, panel.top * p.scale, panel.right * p.scale, panel.bottom * p.scale),
-                         kRadius * p.scale, p.tokens.transparencyEnabled, p.tokens.glass.backdropOpacity);
+        // The media card appeared or left: place the panel again against the same group and the
+        // current work area, so a taller panel stays whole on screen (moved up or scaled down as at
+        // opening). A work area too small for any readable panel closes it instead of hiding controls.
+        if (!PlaceAt(p.anchor)) {
+            Close();
+            return;
+        }
     }
     Invalidate();
 }
@@ -1336,7 +1399,6 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context) {
     // Main view and detail views slide past each other inside the body; the footer stays.
     const float body = p.BodyTop();
     const auto zone = D2D1::RectF(panel.left, body, panel.right, body + kGridHeight + kSliderHeight);
-    const float amount = std::clamp(p.viewMotion.Value(context.now), 0.0f, 1.0f);
     dc->PushAxisAlignedClip(zone, D2D1_ANTIALIAS_MODE_ALIASED);
     const auto layer = [&](float opacity, float offset, const auto& paint) {
         if (opacity <= 0.001f) return;
@@ -1354,18 +1416,19 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context) {
         if (view == Detail::None) p.PaintMain(g);
         else p.PaintDetail(g, view);
     };
-    if (amount < 0.999f) {
-        // The view being left keeps drawing from its own targets while it slides out.
-        std::vector<Target> outgoing;
-        p.Build(p.fromView, outgoing);
-        p.painting = &outgoing;
-        // Fade-through: the outgoing view is gone by 55 % of the slide and the incoming one appears from
-        // 20 %, so they overlap only briefly and faintly instead of reading as one double-exposed page.
-        layer(std::clamp(1.0f - amount / 0.55f, 0.0f, 1.0f), -p.viewDirection * 40.0f * amount, [&] { paintView(p.fromView); });
+    for (const auto& composed : p.Composed(context.now)) {
+        if (composed.view == p.detail && composed.opacity >= 0.999f && composed.offset == 0.0f) {
+            paintView(p.detail);
+            continue;
+        }
+        // A view other than the current one keeps drawing from its own targets while it leaves.
+        std::vector<Target> own;
+        if (composed.view != p.detail) {
+            p.Build(composed.view, own);
+            p.painting = &own;
+        }
+        layer(composed.opacity, composed.offset, [&] { paintView(composed.view); });
         p.painting = nullptr;
-        layer(std::clamp((amount - 0.2f) / 0.8f, 0.0f, 1.0f), p.viewDirection * 40.0f * (1.0f - amount), [&] { paintView(p.detail); });
-    } else {
-        paintView(p.detail);
     }
     dc->PopAxisAlignedClip();
     p.PaintFooter(g);
@@ -1374,7 +1437,7 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context) {
 
 bool ControlCenterWindow::OnAnimate(double now) {
     auto& p = *impl_;
-    bool running = p.pageMotion.IsAnimating(now) || p.viewMotion.IsAnimating(now);
+    bool running = p.pageMotion.IsAnimating(now) || p.viewMotion.IsAnimating(now) || p.residualFade.IsAnimating(now);
     for (const auto* tweens : {&p.hover, &p.press, &p.on, &p.thumbs})
         for (const auto& [id, tween] : *tweens) running = running || tween.IsAnimating(now);
     return running;
@@ -1404,9 +1467,11 @@ void ControlCenterWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F 
     auto& p = *impl_;
     if (button != ui::PointerButton::Left) return;
     const auto hit = p.Hit(point);
-    if (!hit) return;
-    const auto* target = p.Find(*hit);
-    if (!target || !target->enabled) return;
+    const auto* target = hit ? p.Find(*hit) : nullptr;
+    if (!target || !target->enabled) {
+        p.SetPressed(std::nullopt);  // a press on empty space or a disabled control owns nothing
+        return;
+    }
     p.cues = false;  // pointer interaction: no keyboard focus ring
     p.Focus(*hit, false);
     p.SetPressed(*hit);
@@ -1420,6 +1485,7 @@ void ControlCenterWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F 
 void ControlCenterWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
     auto& p = *impl_;
     if (button != ui::PointerButton::Left) return;
+    const auto pressed = p.pressedId;  // cleared by capture loss or a press that owned nothing
     p.SetPressed(std::nullopt);
     if (p.dragging) {
         const int id = *p.dragging;
@@ -1431,8 +1497,8 @@ void ControlCenterWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F po
         p.dragValue.reset();
         return;
     }
-    // One action per gesture, on release over the target that was pressed.
-    if (const auto hit = p.Hit(point); hit && p.focused == hit) p.Activate(*hit);
+    // One action per gesture: release over the very target that was pressed (not merely the focused one).
+    if (const auto hit = p.Hit(point); hit && pressed == hit) p.Activate(*hit);
 }
 
 void ControlCenterWindow::OnPointerCaptureLost() {

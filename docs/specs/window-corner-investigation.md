@@ -3,8 +3,9 @@
 **Latest owner clarification, D45 (2026-10-26):** four rounded corners must be accompanied by a
 thin continuous Aether-style perimeter around the complete window, including genuine maximize.
 The supplied rejected target is an external application; Aether-owned frames need their own path.
-Current D40 region/material leases draw no perimeter and exclude Aether-owned windows. No actual
-target skip/abandonment reason has been established from the still. Follow
+S-054 implements the perimeter (ring window beneath foreign windows, own frame for Settings) and
+establishes the skip reason privately: the pictured window was layered and therefore ineligible;
+see the last section. Follow
 [the next Claude brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md), FR-036/T44 and FR-037/T47;
 S-053 separates source findings, historical cutout evidence and unverified real-window acceptance.
 
@@ -134,3 +135,33 @@ broader OS/DPI compatibility, raster antialiasing and owner visual acceptance re
 
 Documented API: [system backdrop values](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwm_systembackdrop_type)
 and [read/write attribute contract](https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute).
+
+## Rounded perimeter including maximize — D45/D46, S-054, 2026-10-27
+
+Diagnosis (private, read-only; no title, content, path or process inventory recorded): the pictured
+application's top-level window is captioned, resizable and genuinely maximized but `WS_EX_LAYERED`,
+which the D40 guard excluded, so it was never clipped. Layered captioned windows are now eligible;
+click-through overlays stay excluded through `WS_EX_TRANSPARENT`, tool-window and caption/frame
+rules. Other maximized windows observed without a lease were not diagnosed further; a late
+region/material replacement by the application is the leading hypothesis and is handled by the
+bounded reacquisition below, not by overriding the application.
+
+Technique (owner-chosen, [ADR 0012](../decisions/0012-maximized-window-perimeter.md)): the lease
+clips the window inside its rounded outline by the rim width, and the guard keeps a click-through
+ring window directly beneath it, shaped to exactly that band with the same GDI geometry. Native
+tests over two private backdrop phases verify all four cutouts, a continuous ring at every edge
+midpoint, the ring beneath the target in z-order, a layered composition window with a backdrop,
+rim removal on restore and guard stop, and that an application replacement keeps its own choice until the
+next maximize. Aether Settings has its own path: a rounded region over its visible client, a
+painted rim and its own caption buttons (DWM draws none under a region); restored, DWM rounds it with
+the `windowRim` border.
+
+Measured constraints (owned windows, Windows 11 build 26300): any region on a maximized custom-frame
+window removes DWM's caption buttons, also with forced DWM non-client rendering; without a region a
+frame-extended window's transparent corners show DWM's frame fill; DWM draws system material
+outside a window region (so maximized Settings is opaque); and a standard-frame window under a
+region alternates between the basic caption and DWM's own caption composed over the top of the
+region while active. The standard-frame native case therefore requires all corners and the bottom,
+left and right rim edges, and records the top edge as observed (D46 limit). Not yet qualified: the pictured
+application after the change, other rendering families, 192 DPI, negative monitor coordinates on a
+physical second monitor and owner visual acceptance.

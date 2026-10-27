@@ -116,6 +116,13 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
+        if (config.showHiddenIconsButton) {
+            // D45: Windows' own hidden notification-area icons (background apps), not notifications and
+            // not a second Dock. The host opens Explorer's overflow; nothing here lists or imitates icons.
+            auto item = Item(ItemKind::NotificationArea, L"", L"Show hidden icons", true);
+            item.tooltip += L"\nOpens Windows' notification-area overflow";
+            result.push_back(std::move(item));
+        }
         if (config.showKeyboard) {
             const bool available = s.keyboard.state == status::ProviderState::Available && !s.keyboard.shortLabel.empty();
             auto item = Item(ItemKind::Keyboard, available ? s.keyboard.shortLabel : L"—",
@@ -216,7 +223,8 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
         clock.tooltip += L"\nClick to open calendar and notifications";
         clock.accessibleName = clock.tooltip;
         result.push_back(std::move(clock));
-        // D27 removes the trailing native-taskbar arrow. Recovery remains in Settings/menu/CLI.
+        // D27 removed the trailing native-taskbar arrow; recovery stays in Settings, the logo menu and the CLI.
+        // D45's hidden-icons chevron above is a different item that opens only the overflow.
         (void)taskbar; // kept in the API for existing callers and future recovery status.
         return result;
     } catch (...) { return MakeError(ErrorCode::Internal, "top bar display model failed"); }
@@ -238,12 +246,13 @@ std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items, const
         active.emplace_back(items[index], std::clamp(requested, 28.0f, 400.0f));
     }
     const auto total = [&] { float value = 0; for (const auto& item : active) value += item.second; return value; };
-    for (const auto kind : {ItemKind::Weather, ItemKind::Keyboard}) {
+    // The hidden-icons chevron gives way before the input language: both stay reachable from Windows.
+    for (const auto kind : {ItemKind::Weather, ItemKind::NotificationArea, ItemKind::Keyboard}) {
         if (total() <= available) break;
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }
     // At extreme widths, retain the clock before decorative/status glyphs. Never overlap targets.
-    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery, ItemKind::NotificationArea, ItemKind::QuickControls}) {
+    for (const auto kind : {ItemKind::Network, ItemKind::Microphone, ItemKind::Volume, ItemKind::Battery, ItemKind::QuickControls}) {
         if (total() <= available) break;
         std::erase_if(active, [kind](const auto& item) { return item.first.kind == kind; });
     }

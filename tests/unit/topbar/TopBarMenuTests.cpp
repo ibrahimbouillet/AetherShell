@@ -55,7 +55,21 @@ AETHER_TEST("topbar menus: runtime reveal and resume follow availability without
     menu = BuildTopBarMenu(ItemKind::Logo, {true, false, true}, false);
     CHECK(Find(menu, BarCommand::RevealWindowsTaskbar) == nullptr);
     CHECK(Find(menu, BarCommand::ResumeReplacement) != nullptr);
-    CHECK(BuildTopBarMenu(ItemKind::NotificationArea, {}, false).empty());
+    // D45: the hidden-icons chevron opens Windows' overflow; taskbar recovery stays in the logo menu.
+    for (const auto state : {TaskbarReplacementState{}, TaskbarReplacementState{true, true, false}, TaskbarReplacementState{true, false, true}}) {
+        menu = BuildTopBarMenu(ItemKind::NotificationArea, state, false);
+        REQUIRE_EQ(menu.size(), 1u);
+        CHECK(Find(menu, BarCommand::HiddenIcons) != nullptr);
+        CHECK(Find(menu, BarCommand::RevealWindowsTaskbar) == nullptr);
+        CHECK(Find(menu, BarCommand::ResumeReplacement) == nullptr);
+    }
+}
+
+AETHER_TEST("topbar menus: the clock offers notifications with the calendar and the calendar on its own") {
+    const auto menu = BuildTopBarMenu(ItemKind::Clock, {}, false);
+    REQUIRE(ui::ValidateMenu(menu).ok());
+    CHECK(Find(menu, BarCommand::Clock) != nullptr);
+    CHECK(Find(menu, BarCommand::Calendar) != nullptr);
 }
 
 AETHER_TEST("topbar menus: update commands cannot remain in a cleared menu") {

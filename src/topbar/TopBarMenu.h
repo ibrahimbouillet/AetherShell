@@ -10,7 +10,8 @@ namespace aether::topbar {
 enum class BarCommand : std::uint32_t {
     Search = 1, Settings, CheckUpdates, About, Quit, ViewUpdate,
     Keyboard, Network, Weather, ToggleVolume, SoundSettings, ToggleMicrophone,
-    MicrophoneSettings, PowerSettings, Clock, RevealWindowsTaskbar, ResumeReplacement, VoiceTyping
+    MicrophoneSettings, PowerSettings, Clock, RevealWindowsTaskbar, ResumeReplacement, VoiceTyping,
+    Calendar, HiddenIcons
 };
 
 // Pure menu model; no shell action, input injection, audio mutation or native popup is performed.

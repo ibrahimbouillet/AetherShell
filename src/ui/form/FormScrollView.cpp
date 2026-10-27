@@ -232,9 +232,12 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         return Px(f.scrollbarHoverWidth + 2.0f * f.scrollbarInset);
     }
     [[nodiscard]] double Now() const noexcept { return graphics::FrameScheduler::Now(); }
+    // Where the view will be once a move held back for the editors' images lands (`position`
+    // otherwise). Immediate input accumulates from here, so events arriving before that frame add up.
+    [[nodiscard]] int Pending() const noexcept { return deferred.value_or(position); }
     // The position the view is heading to (the animation target while one runs).
     [[nodiscard]] int Goal() const noexcept {
-        return scrolling ? static_cast<int>(std::lround(spring.Target())) : position;
+        return scrolling ? static_cast<int>(std::lround(spring.Target())) : Pending();
     }
     [[nodiscard]] graphics::Spring::Parameters SpringParameters() const noexcept {
         // About 0.2 s to settle a notch at normal speed (form.scroll is 0.16 s), in pixels.
@@ -252,6 +255,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         const int width = client.right;
         const int height = std::max<int>(client.bottom, content);
         position = std::clamp(position, 0, Range());
+        if (deferred) *deferred = std::clamp(*deferred, 0, Range());
         if (scrolling && spring.Target() > static_cast<float>(Range())) {
             scrolling = false;
             spring.SnapTo(static_cast<float>(position));
@@ -302,7 +306,11 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     // (keyboard, UI Automation, focus reveal) lands coherently in one composition and moves at once.
     void Apply(int next, bool continuous = true) {
         next = std::clamp(next, 0, Range());
-        if (next == position || !viewport) return;
+        if (!viewport) return;
+        if (next == position) {
+            deferred.reset();  // back where the view already is (Home, a reset): nothing may land later
+            return;
+        }
         if (masking == Masking::Imaging || masking == Masking::Holding) {
             deferred = next;
             return;
@@ -365,12 +373,12 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         if (!viewport || !surface) return;
         target = std::clamp(target, 0, Range());
         const auto& motion = surface->Motion();
-        const int from = scrolling ? static_cast<int>(std::lround(spring.Value())) : position;
+        const int from = scrolling ? static_cast<int>(std::lround(spring.Value())) : Pending();
         // Short animated moves only: long jumps (Home/End, scroll bar drags) stay immediate.
         if (animate && motion.AllowsMovement() && motion.Scale(Tokens().form.scroll) > 0.0 &&
             std::abs(target - from) <= 3 * std::max(1, Page())) {
             if (!scrolling) {
-                spring.SnapTo(static_cast<float>(position));
+                spring.SnapTo(static_cast<float>(Pending()));  // from a held-back move, not behind it
                 lastStep = Now();
                 if (target != position) (void)ReadyToMove();  // masks at input time when editors are visible
             }
@@ -389,7 +397,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     // moves the view at once, carrying any notch animation in flight along with it.
     void ScrollImmediately(int delta) {
         if (!scrolling) {
-            Apply(position + delta);
+            Apply(Pending() + delta);
             return;
         }
         spring.ShiftBy(static_cast<float>(delta));

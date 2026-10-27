@@ -64,6 +64,7 @@ AETHER_TEST("settings schema: new fields have the documented defaults") {
     CHECK_EQ(defaults.topBar.weatherPlacement, WeatherPlacement::Left);
     CHECK_EQ(defaults.topBar.keyboardIndicator, KeyboardIndicatorStyle::TwoLine);
     CHECK_FALSE(defaults.topBar.showNotificationAreaButton);  // D27 removed the trailing native-taskbar arrow
+    CHECK(defaults.topBar.showHiddenIconsButton);  // D45: the hidden-icons chevron is shown unless turned off
     CHECK(defaults.topBar.showBatteryPercent);
     CHECK(defaults.general.syncTaskbarPins);
     CHECK_EQ(defaults.general.themeMode, ThemePreference::System);
@@ -163,7 +164,7 @@ AETHER_TEST("settings schema: new boolean and marker fields use their documented
         {"dock", "reserveAnimationSpace"}, {"dock", "metricsVersion"}, {"dock", "dismissedPins"},
         {"dock", "explorerDefaultApplied"}, {"dock", "showStartButton"}, {"dock", "showTaskViewButton"},
         {"topBar", "height"}, {"topBar", "openWindowsFlyouts"}, {"topBar", "windowsQuickSettings"}, {"topBar", "weatherPlacement"},
-        {"topBar", "keyboardIndicator"}, {"topBar", "showNotificationAreaButton"}, {"topBar", "showBatteryPercent"},
+        {"topBar", "keyboardIndicator"}, {"topBar", "showNotificationAreaButton"}, {"topBar", "showHiddenIconsButton"}, {"topBar", "showBatteryPercent"},
         {"general", "syncTaskbarPins"}, {"general", "themeMode"}, {"general", "accentSource"},
         {"general", "animationSpeed"}};
     for (const auto& [group, key] : names) {
@@ -382,4 +383,17 @@ AETHER_TEST("settings schema: Windows Quick Settings routing is an explicit choi
     CHECK(topBar->Find("windowsQuickSettings")->AsBool() == std::optional<bool>(true));
     REQUIRE(topBar->Find("openWindowsFlyouts") != nullptr);
     CHECK(topBar->Find("openWindowsFlyouts")->AsBool() == std::optional<bool>(false));
+}
+
+AETHER_TEST("settings schema: the hidden-icons chevron is not hidden by the legacy arrow flag") {
+    // Every Alpha 2 file stores the legacy D27 flag as false and has no new key: the chevron shows.
+    const auto alpha2 = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"showNotificationAreaButton":false}})");
+    CHECK(alpha2.warnings.empty());
+    CHECK(alpha2.value.topBar.showHiddenIconsButton);
+    CHECK_FALSE(alpha2.value.topBar.showNotificationAreaButton);
+    // An explicit choice to hide it persists.
+    const auto hidden = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"showHiddenIconsButton":false}})");
+    CHECK(hidden.warnings.empty());
+    CHECK_FALSE(hidden.value.topBar.showHiddenIconsButton);
+    CHECK_FALSE(RoundTrip(hidden.value).value.topBar.showHiddenIconsButton);
 }

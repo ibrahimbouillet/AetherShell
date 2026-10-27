@@ -272,6 +272,8 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     const DWORD uiThread = ::GetCurrentThreadId(); bool wrongThread = false;
     auto keyConnection = window.KeyboardRequested.Connect([&] { ++keyboard; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     auto netConnection = window.NetworkRequested.Connect([&] { ++network; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    int hiddenIcons = 0;
+    auto hiddenConnection = window.HiddenIconsRequested.Connect([&] { ++hiddenIcons; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     auto weatherConnection = window.WeatherRequested.Connect([&] { ++weather; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     window.Show(false); RunFor(loop, 100);
     const auto click = [&](ItemKind kind) {
@@ -284,11 +286,12 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
     CHECK_EQ(keyboard, 1); CHECK_EQ(network, 1); CHECK_EQ(weather, 1);
     ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_HOME, 0);
-    for (int index = 0; index < 3; ++index) {
+    // Weather, the hidden-icons chevron (D45), the input language and the network, in reading order.
+    for (int index = 0; index < 4; ++index) {
         ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_RIGHT, 0);
         ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_RETURN, 0);
     }
-    CHECK_EQ(keyboard, 2); CHECK_EQ(network, 2); CHECK_EQ(weather, 2);
+    CHECK_EQ(keyboard, 2); CHECK_EQ(network, 2); CHECK_EQ(weather, 2); CHECK_EQ(hiddenIcons, 1);
     std::atomic<bool> finished{false}; bool passed = false;
     const HWND hwnd = window.Handle();
     std::thread client([&] {
@@ -299,7 +302,7 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
             winrt::com_ptr<IUIAutomation> automation;
             check(::CoCreateInstance(CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), automation.put_void()));
             winrt::com_ptr<IUIAutomationElement> root; check(automation->ElementFromHandle(hwnd, root.put()));
-            for (const auto kind : {ItemKind::Keyboard, ItemKind::Network, ItemKind::Weather}) {
+            for (const auto kind : {ItemKind::Keyboard, ItemKind::Network, ItemKind::Weather, ItemKind::NotificationArea}) {
                 VARIANT id{}; id.vt = VT_BSTR; id.bstrVal = ::SysAllocString((L"item-" + std::to_wstring(static_cast<int>(kind))).c_str());
                 winrt::com_ptr<IUIAutomationCondition> condition;
                 const auto created = automation->CreatePropertyCondition(UIA_AutomationIdPropertyId, id, condition.put());
@@ -320,7 +323,7 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     while (!finished.load()) RunFor(loop, 20);
     client.join(); RunFor(loop, 100);
     CHECK(passed); CHECK_FALSE(wrongThread);
-    CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
+    CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3); CHECK_EQ(hiddenIcons, 2);
     window.Hide(); click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
     CHECK_EQ(keyboard, 3); CHECK_EQ(network, 3); CHECK_EQ(weather, 3);
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
@@ -374,6 +377,9 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     auto privacyConnection = window.MicrophoneSettingsRequested.Connect([&] { ++privacy; });
     auto settingsConnection = window.SettingsRequested.Connect([&] { ++settings; });
     auto clockConnection = window.ClockRequested.Connect([&] { ++clock; });
+    int calendar = 0, hiddenIcons = 0;
+    auto calendarConnection = window.CalendarRequested.Connect([&] { ++calendar; });
+    auto hiddenIconsConnection = window.HiddenIconsRequested.Connect([&] { ++hiddenIcons; });
     auto powerConnection = window.PowerSettingsRequested.Connect([&] { ++power; });
     auto voiceConnection = window.VoiceTypingRequested.Connect([&] { ++voice; voiceHadTargetFocus &= focus.foreground == focus.target; });
     window.Show(false); RunFor(loop, 100);
@@ -386,6 +392,7 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     };
     click(ItemKind::Clock); click(ItemKind::Battery);
     CHECK_EQ(clock, 1); CHECK_EQ(power, 1);
+    menu.next = BarCommand::Calendar; click(ItemKind::Clock, true); CHECK_EQ(calendar, 1); CHECK_EQ(clock, 1);
     menu.next = BarCommand::SoundSettings; click(ItemKind::Volume, true); CHECK_EQ(sound, 1);
     menu.next = BarCommand::MicrophoneSettings; click(ItemKind::Microphone, true); CHECK_EQ(privacy, 1);
     menu.next = BarCommand::VoiceTyping; menu.previousForeground = focus.target;
@@ -398,9 +405,11 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     menu.previousForeground = nullptr;
     click(ItemKind::Microphone, true); CHECK_EQ(voice, 1);
     REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
-    CHECK(std::none_of(window.Items().begin(), window.Items().end(), [](const auto& item) {
-        return item.item.kind == ItemKind::NotificationArea;
-    })); // D27 removes the visible Windows-taskbar arrow.
+    // D45: the hidden-icons chevron asks for Windows' overflow; it never reveals or resumes the taskbar.
+    click(ItemKind::NotificationArea); CHECK_EQ(hiddenIcons, 1); CHECK_EQ(reveal, 0); CHECK_EQ(resume, 0);
+    menu.next = BarCommand::HiddenIcons; click(ItemKind::NotificationArea, true); CHECK_EQ(hiddenIcons, 2);
+    window.SetFullscreenHidden(true); click(ItemKind::NotificationArea); window.SetFullscreenHidden(false);
+    CHECK_EQ(hiddenIcons, 2);  // a suppressed bar dispatches nothing
     menu.next = BarCommand::RevealWindowsTaskbar;
     click(ItemKind::Logo, true); CHECK_EQ(reveal, 1); // recovery remains in the Top Bar menu
     REQUIRE(window.SetTaskbarReplacementState(true, false, true).ok());

@@ -221,7 +221,8 @@ void PaintFocusRingWithin(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, 
     graphics::PaintFocusRing(context, target, std::max(0.0f, cornerRadius - inset), tokens);
 }
 
-void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const DesignTokens& tokens, FormMaterial material) {
+void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const DesignTokens& tokens, FormMaterial material,
+                     const D2D1_RECT_F* frame) {
     if (!context || !Usable(area) || material == FormMaterial::Native) return;
     // The glass painter supplies the shared grain; the tint is the form's own window tint.
     DesignTokens materialTokens = tokens;
@@ -243,7 +244,18 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
         materialTokens.glass.tintAlphaWithBlur = 1.0f;
         style.noise = tokens.transparencyEnabled;
     }
-    graphics::PaintGlassPanel(context, area, materialTokens, style);
+    if (!frame || !Usable(*frame)) {
+        graphics::PaintGlassPanel(context, area, materialTokens, style);
+        return;
+    }
+    // The rounded body (painting is clipped to `area` by the caller), then a pixel-snapped rim of
+    // about one DIP along its edge - the same perimeter the window had before it was maximized.
+    style.cornerRadius = kWindowFrameRadius;
+    graphics::PaintGlassPanel(context, *frame, materialTokens, style);
+    const float pixel = PixelOf(context);
+    const float width = std::max(1.0f, std::round(1.0f / pixel)) * pixel;
+    Brush brush(context);
+    StrokeRound(context, brush, *frame, kWindowFrameRadius, tokens.form.windowRim, width);
 }
 
 void PaintCard(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const DesignTokens& tokens, FormMaterial material,

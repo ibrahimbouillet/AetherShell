@@ -6,6 +6,7 @@
 #include "diagnostics/Logger.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
+#include "graphics/SystemSymbols.h"
 #include "graphics/TextCache.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
@@ -104,6 +105,7 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::shared_ptr<ui::GlassMenuPresenter> menus;
     bool keyboardMenu = false;
     graphics::TextCache textCache;
+    graphics::SymbolRenderer symbols;  // installed Windows icon fonts (the hidden-icons chevron)
     ui::TooltipWindow tooltip;
     ui::accessibility::AccessibleSurface accessibility;
     settings::TopBarSettings settings;
@@ -266,6 +268,7 @@ Result<void> TopBarWindow::Create(std::optional<RECT> testBoundsPx) {
         if (!impl_->context.microphone) impl_->snapshots.microphone.state = status::ProviderState::Unavailable;
         if (!impl_->context.weather) impl_->snapshots.weather.snapshot.state = status::WeatherState::Unsupported;
         impl_->textCache.Initialize(Device().DWriteFactory(), impl_->tokens.fontFamily, impl_->tokens.displayFontFamily);
+        impl_->symbols.Initialize(Device().DWriteFactory());
         const auto monitor = platform::PrimaryMonitor();
         RECT bounds = testBoundsPx.value_or(RECT{monitor.workArea.left + 12, monitor.workArea.top + 6,
             monitor.workArea.right - 12, monitor.workArea.top + 38});
@@ -400,6 +403,10 @@ void TopBarWindow::Rebuild() {
     std::vector<float> widths;
     graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
     for (const auto& item : items.value()) {
+        if (item.kind == ItemKind::NotificationArea) {
+            widths.push_back(30.0f);  // a compact chevron, like Windows' own
+            continue;
+        }
         const bool glyph = item.kind != ItemKind::Keyboard && item.kind != ItemKind::Clock;
         style.weight = item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
         style.tabularFigures = item.kind == ItemKind::Clock || item.kind == ItemKind::Battery;
@@ -480,6 +487,13 @@ void TopBarWindow::Relayout() {
 }
 
 void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
+void TopBarWindow::ReportItemFailure(ItemKind item, std::wstring_view message) {
+    auto& p = *impl_;
+    if (p.destroyed || p.fullscreen || !Handle() || !IsShown() || !::IsWindowEnabled(Handle()) || message.empty()) return;
+    const int id = static_cast<int>(item);
+    const auto found = std::find_if(p.placed.begin(), p.placed.end(), [id](const auto& entry) { return entry.item.id == id; });
+    if (found != p.placed.end()) p.tooltip.ShowFor(std::wstring(message), p.ItemBounds(found->rect), ui::TooltipPlacement::Below);
+}
 void TopBarWindow::SetFullscreenHidden(bool hidden) {
     if (impl_->fullscreen == hidden) return;
     impl_->fullscreen = hidden;
@@ -509,6 +523,11 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         }
         const auto color = entry.item.unknown ? impl_->tokens.textSecondary : impl_->tokens.textPrimary;
         brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
+        if (entry.item.kind == ItemKind::NotificationArea) {
+            const float cx = (entry.rect.left + entry.rect.right) * 0.5f, cy = (entry.rect.top + entry.rect.bottom) * 0.5f;
+            impl_->symbols.Draw(context.d2d, graphics::Symbol::ChevronDown, D2D1::RectF(cx - 8, cy - 8, cx + 8, cy + 8), brush.get(), 12.0f);
+            continue;
+        }
         const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
         if(entry.item.kind==ItemKind::QuickControls){
             float x=entry.rect.left+10;
@@ -580,9 +599,8 @@ void TopBarWindow::Activate(int id) {
     } else if (id == static_cast<int>(ItemKind::Clock)) impl_->EmitRequest(ClockRequested);
     else if (id == static_cast<int>(ItemKind::Battery)) impl_->EmitRequest(PowerSettingsRequested);
     else if (id == static_cast<int>(ItemKind::NotificationArea)) {
-        if (!impl_->taskbar.available) return;
-        if (impl_->taskbar.suspended) impl_->EmitRequest(ResumeTaskbarReplacementRequested);
-        else if (impl_->taskbar.active) impl_->EmitRequest(RevealWindowsTaskbarRequested);
+        impl_->tooltip.HideTooltip();
+        impl_->EmitRequest(HiddenIconsRequested);  // Windows' overflow only; recovery lives in the logo menu
     } else if (id == static_cast<int>(ItemKind::Logo)) ShowItemMenu(id);
 }
 void TopBarWindow::ShowItemMenu(int id) { ShowItemMenu(id, impl_->keyboardMenu); }
@@ -637,6 +655,8 @@ void TopBarWindow::ShowItemMenu(int id, bool keyboard) {
             state.EmitRequest(owner.VoiceTypingRequested, std::optional<HWND>{selected->previousForeground}); break;
         case BarCommand::PowerSettings: state.EmitRequest(owner.PowerSettingsRequested); break;
         case BarCommand::Clock: state.EmitRequest(owner.ClockRequested); break;
+        case BarCommand::Calendar: state.EmitRequest(owner.CalendarRequested); break;
+        case BarCommand::HiddenIcons: state.EmitRequest(owner.HiddenIconsRequested); break;
         case BarCommand::RevealWindowsTaskbar: state.EmitRequest(owner.RevealWindowsTaskbarRequested); break;
         case BarCommand::ResumeReplacement: state.EmitRequest(owner.ResumeTaskbarReplacementRequested); break;
     }

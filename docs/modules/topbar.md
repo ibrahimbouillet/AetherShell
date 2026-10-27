@@ -2,13 +2,21 @@
 <!-- Copyright (c) 2026 Ibrahim Bouillet -->
 # topbar — native floating system status surface
 
-**Next assignment, D45/FR-038/T48 (2026-10-26):** implement genuine notifications/calendar from
-date/time and a dedicated real hidden-icons chevron following
-[the Claude brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md). Current clock routing remains
-Win+Alt+D; the model omits the old D27 arrow even when its legacy field is true. The historical
-recovery route described below is still in code but is not a visible overflow implementation.
-D45 narrows D27's arrow ban for the new hidden-icons purpose only. Source implementation and native
-hidden-taskbar/overflow verification are pending; S-053 records the source review/existing units.
+**D45/FR-038/T48, implemented in source (Claude, S-054; owner/live checks pending):** clicking the
+date/time (pointer, Enter/Space or UIA Invoke) emits `ClockRequested`; the app sends the documented
+shortcut for the running Windows version (`system_controls::NotificationsAction`: Win+N on Windows 11
+build 22000+, Win+A Action Center on Windows 10). The clock menu offers "Open notifications and
+calendar" and "Open calendar" (Win+Alt+D, `CalendarRequested`). No notification is read, cleared or
+badged. A dedicated 30-DIP chevron item (`ItemKind::NotificationArea`, "Show hidden icons", before the
+keyboard item, collapsing with weather/keyboard on narrow bars) emits `HiddenIconsRequested`; its
+menu offers the same command. Visibility is the new `topBar.showHiddenIconsButton` (default true),
+independent of the legacy D27 field, which still never shows the old arrow. The app opens Windows'
+own overflow (`app/HiddenIcons`): it invokes Explorer's overflow button through UI Automation
+(Windows 11 `SystemTray.ChevronIconView`, Windows 10 `TrayNotifyWnd` button), verifies that Explorer's
+overflow window opened, and, while Aether replaces the taskbar, shows the native taskbar until that
+window closes. Failures show the item's explanatory tooltip. The live Explorer identity is verified
+only on fakes; [the brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) and S-054 record limits.
+The older 60-second taskbar recovery command below remains as a separate recovery route.
 
 V3 source follow-up (D38/T39, S-035): native input/window region is the visible panel rectangle,
 with no expanded outer shadow region. This avoids relying on same-thread-only HTTRANSPARENT

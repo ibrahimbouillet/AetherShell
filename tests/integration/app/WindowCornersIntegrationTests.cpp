@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <atomic>
 #include <array>
+#include <string>
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
@@ -49,7 +50,7 @@ LRESULT CALLBACK CustomFrameProc(HWND window, UINT message, WPARAM wParam, LPARA
 struct OwnWindow {
     HWND window = nullptr;
     bool mainWindowBackdrop = false;
-    explicit OwnWindow(bool customFrame = false, bool micaBackdrop = false) {
+    explicit OwnWindow(bool customFrame = false, bool micaBackdrop = false, bool layered = false) {
         const auto foreground = ::GetForegroundWindow();
         WNDCLASSEXW type{sizeof(type)};
         type.hInstance = ::GetModuleHandleW(nullptr);
@@ -59,7 +60,8 @@ struct OwnWindow {
         REQUIRE(platform::RegisterWindowClassOnce(type).ok());
         // Own synthetic window only. NOACTIVATE keeps the owner's foreground unchanged, and is
         // permitted solely by the explicit own-process fixture restriction in this guard.
-        const DWORD extended = WS_EX_NOACTIVATE | (micaBackdrop ? WS_EX_NOREDIRECTIONBITMAP : 0);
+        // `layered`: like Chromium/Electron windows with transparency (D45 eligibility).
+        const DWORD extended = WS_EX_NOACTIVATE | (micaBackdrop ? WS_EX_NOREDIRECTIONBITMAP : 0) | (layered ? WS_EX_LAYERED : 0);
         window = ::CreateWindowExW(extended, type.lpszClassName, L"Aether corner guard fixture",
             WS_OVERLAPPEDWINDOW, 160, 120, 640, 480, nullptr, nullptr, type.hInstance, nullptr);
         REQUIRE(window != nullptr);
@@ -224,6 +226,8 @@ bool PrivatePatternCovers(HWND backdrop, HWND target, const RECT& crop) {
         if (!::IsWindowVisible(window)) continue;
         ::GetWindowThreadProcessId(window, &process);
         if (window == target && process == ::GetCurrentProcessId()) continue;
+        // The guard's own perimeter ring for that target (D45) runs in this test process too.
+        if (target && process == ::GetCurrentProcessId() && platform::WindowClassName(window) == L"AetherShell.WindowCornerGuard.Rim") continue;
         RECT overlap{};
         if (!::GetWindowRect(window, &bounds) || ::IntersectRect(&overlap, &bounds, &crop)) return false;
     }
@@ -259,26 +263,56 @@ std::vector<std::uint8_t> CapturePrivatePatch(HWND backdrop, HWND target, const 
     REQUIRE(PrivatePatternCovers(backdrop, target, crop));
     return pixels;
 }
-std::vector<std::uint8_t> CutoutPixels(const std::vector<std::uint8_t>& pixels, const RECT& patch,
-    const RECT& native, HRGN region) {
-    std::vector<std::uint8_t> result;
+// Pixels of a screen patch outside the target's clip, split into true cutouts (outside the rim's
+// outer edge too) and the rim band between the clip and that edge.
+struct SplitPixels { std::vector<std::uint8_t> cutout, ring; };
+SplitPixels Split(const std::vector<std::uint8_t>& pixels, const RECT& patch, const RECT& native, HRGN region,
+    const RECT& rimBounds, HRGN ring) {
+    SplitPixels result;
     std::size_t pixel = 0;
     for (LONG y = patch.top; y < patch.bottom; ++y) for (LONG x = patch.left; x < patch.right; ++x) {
-        if (!::PtInRegion(region, x - native.left, y - native.top))
-            result.insert(result.end(), pixels.begin() + pixel, pixels.begin() + pixel + 4);
+        if (!::PtInRegion(region, x - native.left, y - native.top)) {
+            auto& into = ::PtInRegion(ring, x - rimBounds.left, y - rimBounds.top) ? result.ring : result.cutout;
+            into.insert(into.end(), pixels.begin() + pixel, pixels.begin() + pixel + 4);
+        }
         pixel += 4;
     }
-    REQUIRE(!result.empty());
     return result;
 }
-void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false) {
+// Local inspection image of an own-window capture (never committed).
+void SaveInspection(const std::vector<std::uint8_t>& pixels, int width, int height, const std::wstring& name) {
+    try {
+        const auto path = std::filesystem::temp_directory_path() / L"AetherShellTests" / name;
+        std::error_code ec; std::filesystem::create_directories(path.parent_path(), ec);
+        auto factory = winrt::create_instance<IWICImagingFactory>(CLSID_WICImagingFactory);
+        winrt::com_ptr<IWICStream> stream; winrt::check_hresult(factory->CreateStream(stream.put()));
+        winrt::check_hresult(stream->InitializeFromFilename(path.c_str(), GENERIC_WRITE));
+        winrt::com_ptr<IWICBitmapEncoder> encoder; winrt::check_hresult(factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, encoder.put()));
+        winrt::check_hresult(encoder->Initialize(stream.get(), WICBitmapEncoderNoCache));
+        winrt::com_ptr<IWICBitmapFrameEncode> frame; winrt::check_hresult(encoder->CreateNewFrame(frame.put(), nullptr));
+        winrt::check_hresult(frame->Initialize(nullptr)); winrt::check_hresult(frame->SetSize(width, height));
+        WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA; winrt::check_hresult(frame->SetPixelFormat(&format));
+        winrt::check_hresult(frame->WritePixels(height, width * 4, static_cast<UINT>(pixels.size()), const_cast<BYTE*>(pixels.data())));
+        winrt::check_hresult(frame->Commit()); winrt::check_hresult(encoder->Commit());
+    } catch (...) { test::Note("inspection image unavailable"); }
+}
+HWND OwnRim() {
+    HWND found = nullptr;
+    for (HWND window = ::FindWindowExW(nullptr, nullptr, L"AetherShell.WindowCornerGuard.Rim", nullptr); window;
+         window = ::FindWindowExW(nullptr, window, L"AetherShell.WindowCornerGuard.Rim", nullptr)) {
+        DWORD process = 0; ::GetWindowThreadProcessId(window, &process);
+        if (process == ::GetCurrentProcessId() && ::IsWindowVisible(window)) found = window;
+    }
+    return found;
+}
+void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false, bool layered = false) {
     const auto foreground = ::GetForegroundWindow();
     platform::ComApartment apartment;
     REQUIRE(apartment.IsUsable());
     graphics::GraphicsDevice device;
     if (micaBackdrop) REQUIRE(device.Initialize().ok());
     OwnPattern backdrop;
-    OwnWindow target(customFrame, micaBackdrop);
+    OwnWindow target(customFrame, micaBackdrop, layered);
     if (micaBackdrop && !target.mainWindowBackdrop) {
         test::Note("SKIPPED mainwindow-backdrop fixture: this Windows build does not support the documented attribute");
         return;
@@ -342,13 +376,12 @@ void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false) {
     // Windows may retain its own ordinary frame region while hidden. Actual invisibility,
     // not the absence of any HRGN, is what makes these backdrop references safe and meaningful.
     REQUIRE(!::IsWindowVisible(target.window));
+    REQUIRE(PumpUntil([] { return OwnRim() == nullptr; }));  // the ring leaves with the clip
     std::array<std::array<std::vector<std::uint8_t>, 4>, 2> expected;
     std::array<std::vector<std::uint8_t>, 2> expectedInterior;
     for (int phase = 0; phase < 2; ++phase) {
         backdrop.Repaint(phase != 0); SettleComposition();
-        for (std::size_t i = 0; i < corners.size(); ++i)
-            expected[phase][i] = CutoutPixels(CapturePrivatePatch(backdrop.window, nullptr, corners[i]),
-                corners[i], native, region.Get());
+        for (std::size_t i = 0; i < corners.size(); ++i) expected[phase][i] = CapturePrivatePatch(backdrop.window, nullptr, corners[i]);
         expectedInterior[phase] = CapturePrivatePatch(backdrop.window, nullptr, interior);
     }
     for (std::size_t i = 0; i < corners.size(); ++i) REQUIRE(expected[0][i] != expected[1][i]);
@@ -359,21 +392,88 @@ void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false) {
     REQUIRE(PumpUntil([&] {
         platform::UniqueRegion actual(::CreateRectRgn(0, 0, 0, 0));
         return ::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") &&
-            ::GetWindowRgn(target.window, actual.Get()) != ERROR && ::EqualRgn(region.Get(), actual.Get());
+            ::GetWindowRgn(target.window, actual.Get()) != ERROR && ::EqualRgn(region.Get(), actual.Get()) && OwnRim() != nullptr;
     }));
+    // D45: the ring beneath the window fills exactly the band between the clip and the outer edge.
+    const HWND rim = OwnRim();
+    REQUIRE(rim != nullptr);
+    CHECK(::GetWindow(target.window, GW_HWNDNEXT) == rim);
+    CHECK((::GetWindowLongPtrW(rim, GWL_EXSTYLE) & WS_EX_TRANSPARENT) != 0);
+    RECT rimBounds{}; REQUIRE(::GetWindowRect(rim, &rimBounds));
+    platform::UniqueRegion ring(::CreateRectRgn(0, 0, 0, 0));
+    REQUIRE(::GetWindowRgn(rim, ring.Get()) != ERROR);
+    CHECK(rimBounds.left == clip.left - CornerRimWidthPx(::GetDpiForWindow(target.window)));
+    std::array<std::array<std::vector<std::uint8_t>, 4>, 2> rings;
+    // Edge midpoints of the band: the perimeter is continuous around the window, not only at corners.
+    const int width = CornerRimWidthPx(::GetDpiForWindow(target.window));
+    const LONG midX = (rimBounds.left + rimBounds.right) / 2, midY = (rimBounds.top + rimBounds.bottom) / 2;
+    // One pixel of the band at each edge midpoint, chosen by ring membership (GDI rounded regions
+    // leave out their last row and column, so the band is located, not assumed).
+    const auto ringPixel = [&](LONG x0, LONG y0, int dx, int dy) {
+        for (int step = 0; step <= width + 1; ++step) {
+            const LONG x = x0 + dx * step, y = y0 + dy * step;
+            if (::PtInRegion(ring.Get(), x - rimBounds.left, y - rimBounds.top)) return RECT{x, y, x + 1, y + 1};
+        }
+        return RECT{x0, y0, x0 + 1, y0 + 1};
+    };
+    const std::array<RECT, 4> edges{{ringPixel(midX, rimBounds.top, 0, 1), ringPixel(midX, rimBounds.bottom - 1, 0, -1),
+                                     ringPixel(rimBounds.left, midY, 1, 0), ringPixel(rimBounds.right - 1, midY, -1, 0)}};
+    for (const auto& edge : edges) CHECK(::PtInRegion(ring.Get(), edge.left - rimBounds.left, edge.top - rimBounds.top));
+    std::array<std::array<std::vector<std::uint8_t>, 4>, 2> edgePixels;
     for (int phase = 0; phase < 2; ++phase) {
         backdrop.Repaint(phase != 0); SettleComposition();
         for (std::size_t i = 0; i < corners.size(); ++i) {
-            const auto actual = CutoutPixels(CapturePrivatePatch(backdrop.window, target.window, corners[i]),
-                corners[i], native, region.Get());
-            if (actual != expected[phase][i])
+            const auto actual = Split(CapturePrivatePatch(backdrop.window, target.window, corners[i]), corners[i], native,
+                region.Get(), rimBounds, ring.Get());
+            const auto reference = Split(expected[phase][i], corners[i], native, region.Get(), rimBounds, ring.Get());
+            REQUIRE(!actual.cutout.empty()); REQUIRE(!actual.ring.empty());
+            if (actual.cutout != reference.cutout)
                 test::Note("Composed corner " + std::to_string(i) + ", backdrop phase " + std::to_string(phase) +
-                    " differs from the genuine opaque private backdrop");
-            CHECK(actual == expected[phase][i]);
+                    " differs from the genuine opaque private backdrop outside the rim");
+            CHECK(actual.cutout == reference.cutout);
+            CHECK(actual.ring != reference.ring);  // the rim is drawn, not the scene behind it
+            rings[phase][i] = actual.ring;
         }
+        for (std::size_t i = 0; i < edges.size(); ++i) edgePixels[phase][i] = CapturePrivatePatch(backdrop.window, target.window, edges[i]);
         CHECK(CapturePrivatePatch(backdrop.window, target.window, interior) != expectedInterior[phase]);
         CHECK(::IsZoomed(target.window));
         CHECK(::GetForegroundWindow() == foreground);
+    }
+    {
+        // Local inspection: the top edge with both corners and the caption area, phase 0.
+        backdrop.Repaint(false); SettleComposition();
+        const RECT& screen = backdrop.bounds;
+        const RECT left{std::max(screen.left, rimBounds.left - 24), std::max(screen.top, rimBounds.top - 24), rimBounds.left + 96, rimBounds.top + 72};
+        const RECT right{rimBounds.right - 360, std::max(screen.top, rimBounds.top - 24), std::min(screen.right, rimBounds.right + 24), rimBounds.top + 72};
+        const auto suffix = std::wstring(customFrame ? L"custom" : L"standard") + (micaBackdrop ? L"-mica" : L"") + (layered ? L"-layered" : L"") + L".png";
+        SaveInspection(CapturePrivatePatch(backdrop.window, target.window, left), left.right - left.left, left.bottom - left.top,
+                       L"window-rim-left-" + suffix);
+        SaveInspection(CapturePrivatePatch(backdrop.window, target.window, right), right.right - right.left, right.bottom - right.top,
+                       L"window-rim-right-" + suffix);
+    }
+    // One opaque neutral color all the way around, whatever is behind it.
+    for (std::size_t i = 0; i < corners.size(); ++i) CHECK(rings[0][i] == rings[1][i]);
+    // D46 limit: a standard caption is composed by DWM itself, which can draw it across the top of
+    // the rim band (and square) while the window is active, whatever the window region says. That
+    // edge is observed for this family, not required; the other edges and every corner are.
+    const std::size_t first = customFrame ? 0 : 1;
+    if (!customFrame && (edgePixels[0][0] != edgePixels[1][0] || edgePixels[0][0] != edgePixels[0][1]))
+        test::Note("standard caption over the top rim band: " + std::to_string(edgePixels[0][0][2]) + "/" +
+                   std::to_string(edgePixels[0][0][1]) + "/" + std::to_string(edgePixels[0][0][0]));
+    bool continuous = true;
+    for (std::size_t i = first; i < edges.size(); ++i)
+        continuous = continuous && edgePixels[0][i] == edgePixels[1][i] && edgePixels[0][i] == edgePixels[0][first];
+    for (std::size_t i = first; i < edges.size(); ++i) {
+        if (!continuous)
+            test::Note("rim edge " + std::to_string(i) + " at " + std::to_string(edges[i].left) + "," + std::to_string(edges[i].top) +
+                " phase colors " + std::to_string(edgePixels[0][i][2]) + "/" + std::to_string(edgePixels[0][i][1]) + "/" +
+                std::to_string(edgePixels[0][i][0]) + " vs " + std::to_string(edgePixels[1][i][2]) + "/" +
+                std::to_string(edgePixels[1][i][1]) + "/" + std::to_string(edgePixels[1][i][0]) + "; rim " +
+                std::to_string(rimBounds.left) + "," + std::to_string(rimBounds.top) + "-" + std::to_string(rimBounds.right) + "," +
+                std::to_string(rimBounds.bottom) + " native " + std::to_string(native.left) + "," + std::to_string(native.top) + "-" +
+                std::to_string(native.right) + "," + std::to_string(native.bottom));
+        CHECK(edgePixels[0][i] == edgePixels[1][i]);
+        CHECK(edgePixels[0][i] == edgePixels[0][first]);
     }
     REQUIRE(guard.Finish()); CHECK_EQ(guard.exitCode.load(), 0);
     if (micaBackdrop) {
@@ -403,12 +503,15 @@ AETHER_TEST("window corners native: guard preserves genuine maximize and restore
     REQUIRE(::GetWindowRgn(window.window, clipped.Get()) != ERROR);
     CHECK_FALSE(::PtInRegion(clipped.Get(), left, top));
     CHECK(::PtInRegion(clipped.Get(), left + 24, top + 24));
+    // D45: the clipped window has its rim beneath it while the guard runs, and none after it stops.
+    REQUIRE(PumpUntil([] { return OwnRim() != nullptr; }));
     REQUIRE(guard.Finish()); CHECK_EQ(guard.exitCode.load(), 0);
     platform::UniqueRegion restored(::CreateRectRgn(0, 0, 0, 0));
     const bool hasRestored = ::GetWindowRgn(window.window, restored.Get()) != ERROR;
     CHECK_EQ(hasRestored, hadOriginal);
     if (hadOriginal) CHECK(::EqualRgn(original.Get(), restored.Get()));
     CHECK(::IsZoomed(window.window));
+    CHECK(OwnRim() == nullptr);
 }
 
 AETHER_TEST("window corners native: application replacement wins and is preserved after guard exit") {
@@ -442,15 +545,15 @@ AETHER_TEST("window corners native: real fixture parent death restores without a
     CHECK(::IsZoomed(window.window));
 }
 
-AETHER_TEST("window corners pixels: standard maximized frame has live transparent cutouts at all four corners") {
+AETHER_TEST("window corners pixels: standard maximized frame has live transparent cutouts and a continuous rim at all four corners") {
     VerifyComposedCornerCutouts(false);
 }
 
-AETHER_TEST("window corners pixels: custom nonclient frame has live transparent cutouts at all four corners") {
+AETHER_TEST("window corners pixels: custom nonclient frame has live transparent cutouts and a continuous rim at all four corners") {
     VerifyComposedCornerCutouts(true);
 }
 
-AETHER_TEST("window corners pixels: custom nonclient mainwindow backdrop has live transparent cutouts at all four corners") {
+AETHER_TEST("window corners pixels: custom nonclient mainwindow backdrop has live transparent cutouts and a continuous rim at all four corners") {
     VerifyComposedCornerCutouts(true, true);
 }
 
@@ -479,4 +582,46 @@ AETHER_TEST("window corners native: an application backdrop replacement survives
     REQUIRE(::GetWindowRgn(target.window, restored.Get()) != ERROR);
     CHECK(::EqualRgn(expected.Get(), restored.Get()));
     CHECK(::IsZoomed(target.window));
+}
+
+AETHER_TEST("window corners pixels: a layered composition window with a backdrop gets cutouts and a continuous rim") {
+    // D45: the rejected external window is a layered, no-redirection Chromium-style window.
+    VerifyComposedCornerCutouts(true, true, true);
+}
+
+AETHER_TEST("window corners native: after an application replacement, only a new maximize gets a fresh attempt") {
+    OwnWindow target(true, true);
+    if (!target.mainWindowBackdrop) {
+        test::Note("SKIPPED mainwindow-backdrop fixture: this Windows build does not support the documented attribute");
+        return;
+    }
+    OwnGuard guard(target.window); REQUIRE(guard.Ready());
+    REQUIRE(PumpUntil([&] { return HasRegion(target.window) && OwnRim() != nullptr; }));
+    // The application asserts its own material: the guard gives the window back and stays away.
+    const DWM_SYSTEMBACKDROP_TYPE mine = DWMSBT_MAINWINDOW;
+    REQUIRE(SUCCEEDED(::DwmSetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &mine, sizeof(mine))));
+    REQUIRE(::RedrawWindow(target.window, nullptr, nullptr, RDW_INVALIDATE | RDW_FRAME));
+    REQUIRE(PumpUntil([&] { return !::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") && OwnRim() == nullptr; }));
+    const auto stillAway = std::chrono::steady_clock::now() + std::chrono::milliseconds(600);
+    REQUIRE(PumpUntil([&] { return std::chrono::steady_clock::now() >= stillAway; }));
+    CHECK_FALSE(::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease"));  // no fight while maximized
+    DWM_SYSTEMBACKDROP_TYPE material = DWMSBT_AUTO;
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
+    CHECK_EQ(material, DWMSBT_MAINWINDOW);
+    // Leaving the maximized presentation and maximizing again is a new presentation: one new lease.
+    ::ShowWindow(target.window, SW_SHOWNOACTIVATE);  // restores without activating this own fixture
+    REQUIRE(PumpUntil([&] { return !::IsZoomed(target.window); }));
+    const auto settle = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
+    REQUIRE(PumpUntil([&] { return std::chrono::steady_clock::now() >= settle; }));
+    ::ShowWindow(target.window, SW_SHOWMAXIMIZED);
+    REQUIRE(::IsZoomed(target.window));
+    REQUIRE(PumpUntil([&] {
+        return ::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") && HasRegion(target.window) && OwnRim() != nullptr;
+    }));
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
+    CHECK_EQ(material, DWMSBT_NONE);
+    REQUIRE(guard.Finish()); CHECK_EQ(guard.exitCode.load(), 0);
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
+    CHECK_EQ(material, DWMSBT_MAINWINDOW);
+    CHECK(OwnRim() == nullptr);
 }

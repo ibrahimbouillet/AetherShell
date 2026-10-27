@@ -52,6 +52,12 @@ constexpr DWORD kDwmSystemBackdropType = 38;
 constexpr DWORD kBackdropAuto = 0;
 constexpr DWORD kBackdropNone = 1;
 constexpr DWORD kBackdropTransient = 3;
+// DWMWA_WINDOW_CORNER_PREFERENCE / DWMWA_BORDER_COLOR (Windows 11): rounded normal windows with a neutral rim.
+constexpr DWORD kDwmCornerPreference = 33;
+constexpr DWORD kDwmBorderColor = 34;
+constexpr DWORD kCornerDefault = 0;
+constexpr DWORD kCornerRound = 2;
+constexpr DWORD kDwmColorDefault = 0xFFFFFFFFu;
 // oleacc.h declares these GUIDs without defining them unless INITGUID is set; keep local copies.
 constexpr GUID kClsidAccPropServices = {0xb5f8350b, 0x0548, 0x48b1, {0xa6, 0xee, 0x88, 0xbd, 0x00, 0xb4, 0xa5, 0xe7}};
 constexpr GUID kPropIdAccHelp = {0xc831e11f, 0x44db, 0x4a99, {0x97, 0x68, 0xcb, 0x8f, 0x97, 0x8b, 0x72, 0x31}};
@@ -252,6 +258,16 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     graphics::MotionPolicy motion;
     graphics::FrameScheduler* scheduler = nullptr;
     FormMaterial material = FormMaterial::Native;
+    // D45: the window is maximized, so DWM rounds and borders nothing; the form draws its own frame.
+    bool maximizedFrame = false;
+    // The material for the current tokens and frame. A maximized frame paints an opaque body: DWM draws
+    // its system material over the whole window rectangle, outside a window region too, so the corners
+    // would show material instead of the scene behind the window.
+    [[nodiscard]] FormMaterial ResolveMaterial() const noexcept {
+        const auto resolved = ResolveFormMaterial(tokens.mode, tokens.transparencyEnabled, SystemBackdropSupported(), renderer);
+        return maximizedFrame && resolved == FormMaterial::Acrylic ? FormMaterial::Solid : resolved;
+    }
+    [[nodiscard]] bool Framed() const noexcept { return maximizedFrame && material != FormMaterial::Native; }
     UINT dpi = platform::kDefaultDpi;
     bool renderer = false;
     bool frameRequested = false;
@@ -611,12 +627,20 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     // --- material ---
     void ApplyWindowMaterial() noexcept {
         if (!window || !::IsWindow(window)) return;
-        const MARGINS margins = material == FormMaterial::Acrylic ? MARGINS{-1, -1, -1, -1} : MARGINS{0, 0, 0, 0};
+        // A maximized frame keeps the frame extended without a system material; the owner's rounded
+        // window region shapes it.
+        const MARGINS margins = material == FormMaterial::Acrylic || Framed() ? MARGINS{-1, -1, -1, -1} : MARGINS{0, 0, 0, 0};
         ::DwmExtendFrameIntoClientArea(window, &margins);
         if (SystemBackdropSupported()) {
             const DWORD type = material == FormMaterial::Acrylic ? kBackdropTransient : kBackdropNone;
             ::DwmSetWindowAttribute(window, kDwmSystemBackdropType, &type, sizeof(type));
         }
+        // D45: a normal window is rounded by DWM with a thin neutral rim (DWM draws neither while the
+        // window is maximized; the form's own frame takes over then). High contrast keeps the system's.
+        const DWORD corner = material == FormMaterial::Native ? kCornerDefault : kCornerRound;
+        const DWORD border = material == FormMaterial::Native ? kDwmColorDefault : tokens.form.windowRim.ToColorRef();
+        (void)::DwmSetWindowAttribute(window, kDwmCornerPreference, &corner, sizeof(corner));
+        (void)::DwmSetWindowAttribute(window, kDwmBorderColor, &border, sizeof(border));
         platform::ApplyImmersiveDarkMode(window, tokens.mode == graphics::ThemeMode::Dark);
     }
 
@@ -628,6 +652,9 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             const DWORD type = kBackdropAuto;
             ::DwmSetWindowAttribute(window, kDwmSystemBackdropType, &type, sizeof(type));
         }
+        const DWORD corner = kCornerDefault, border = kDwmColorDefault;
+        (void)::DwmSetWindowAttribute(window, kDwmCornerPreference, &corner, sizeof(corner));
+        (void)::DwmSetWindowAttribute(window, kDwmBorderColor, &border, sizeof(border));
     }
 
     // --- control styles ---
@@ -1356,7 +1383,17 @@ struct FormSurface::Impl final : graphics::IFrameClient {
                                                                                                     : D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
         d2d->PushAxisAlignedClip(area, D2D1_ANTIALIAS_MODE_ALIASED);
         d2d->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
-        if (layer != SceneLayer::Content) paint::PaintBackground(d2d, area, tokens, material);
+        if (layer != SceneLayer::Content) {
+            if (Framed()) {
+                // The whole client is the rounded body; each window paints its own part of it.
+                RECT client{};
+                ::GetClientRect(window, &client);
+                const D2D1_RECT_F body = D2D1::RectF(0.0f, 0.0f, static_cast<float>(client.right) / s, static_cast<float>(client.bottom) / s);
+                paint::PaintBackground(d2d, area, tokens, material, &body);
+            } else {
+                paint::PaintBackground(d2d, area, tokens, material);
+            }
+        }
         const float fade = layer == SceneLayer::All ? FadeOf(hwnd) : 1.0f;
         const bool layered = fade < 0.999f;
         if (layered) {
@@ -2681,7 +2718,7 @@ Result<void> FormSurface::Attach(HWND window, const graphics::DesignTokens& toke
         }
         if (impl.dwrite) impl.text.Initialize(impl.dwrite.get(), tokens.fontFamily, tokens.displayFontFamily);
         impl.renderer = impl.factory && impl.dwrite && impl.EnsureTarget();
-        impl.material = ResolveFormMaterial(tokens.mode, tokens.transparencyEnabled, SystemBackdropSupported(), impl.renderer);
+        impl.material = impl.ResolveMaterial();
         const LONG_PTR style = ::GetWindowLongPtrW(window, GWL_STYLE);
         if (!(style & WS_CLIPCHILDREN)) ::SetWindowLongPtrW(window, GWL_STYLE, style | WS_CLIPCHILDREN);
         impl.CreateFonts();
@@ -2732,7 +2769,7 @@ void FormSurface::SetTheme(const graphics::DesignTokens& tokens, const graphics:
             impl.UnmaskEditors(nullptr);
             impl.DropVisualCaches();
             impl.InvalidateLayers();
-            impl.material = ResolveFormMaterial(tokens.mode, tokens.transparencyEnabled, SystemBackdropSupported(), impl.renderer);
+            impl.material = impl.ResolveMaterial();
             if (impl.dwrite) impl.text.Initialize(impl.dwrite.get(), tokens.fontFamily, tokens.displayFontFamily);
             impl.CreateFonts();
             impl.CreateBrushes();
@@ -2774,6 +2811,30 @@ void FormSurface::SetTheme(const graphics::DesignTokens& tokens, const graphics:
 const graphics::DesignTokens& FormSurface::Tokens() const noexcept { return impl_->tokens; }
 const graphics::MotionPolicy& FormSurface::Motion() const noexcept { return impl_->motion; }
 FormMaterial FormSurface::Material() const noexcept { return impl_->material; }
+
+bool FormSurface::MaximizedFrame() const noexcept { return impl_->Framed(); }
+
+void FormSurface::SetMaximizedFrame(bool maximized) {
+    auto& impl = *impl_;
+    if (!impl.Attached() || impl.maximizedFrame == maximized) return;
+    try {
+        impl.maximizedFrame = maximized;
+        const FormMaterial previous = impl.material;
+        impl.material = impl.ResolveMaterial();
+        // Retained layers and cached control visuals hold the old background (frame and material).
+        impl.UnmaskEditors(nullptr);
+        impl.DropVisualCaches();
+        impl.InvalidateLayers();
+        if (previous != impl.material) {
+            impl.CreateBrushes();
+            for (auto& control : impl.controls) impl.ApplyRole(*control);
+        }
+        impl.ApplyWindowMaterial();
+        ::RedrawWindow(impl.window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "form frame update failed");
+    }
+}
 UINT FormSurface::Dpi() const noexcept { return impl_->dpi; }
 float FormSurface::ToPx(float dip) const noexcept { return dip * impl_->Scale(); }
 float FormSurface::ToDip(float px) const noexcept { return px / impl_->Scale(); }

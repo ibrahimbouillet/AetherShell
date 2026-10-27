@@ -17,6 +17,7 @@
 
 #include <commctrl.h>
 
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
@@ -561,5 +562,195 @@ AETHER_TEST("settings design: the integrated title strip keeps native caption, r
     PumpFor(f.dispatcher, 250ms);
     ::GetWindowRect(hwnd, &frame);
     CHECK_EQ(origin().y, frame.top);
+    window.Close();
+}
+
+AETHER_TEST("settings design: a maximized window keeps rounded corners, a continuous rim and working caption buttons") {
+    // D45: DWM neither rounds nor borders a maximized window. Settings then takes a rounded window
+    // region over its visible client, paints the thin rim itself and draws the caption buttons DWM
+    // no longer shows under a region. Checked over a private two-phase backdrop.
+    Fixture f("settings-design-maximized");
+    settings::ui::SettingsWindow window(f.service, f.dispatcher);
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{});
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    const HWND hwnd = window.Handle();
+    MONITORINFO monitor{sizeof(monitor)};
+    REQUIRE(::GetMonitorInfoW(::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &monitor) != FALSE);
+    BackdropGuard backdrop;
+    backdrop.hwnd = CreateTestBackdrop(monitor.rcMonitor);
+    REQUIRE(backdrop.hwnd != nullptr);
+    const auto shoot = [&](const RECT& crop, bool phase) {
+        SetBackdropPhase(backdrop.hwnd, phase);
+        PumpFor(f.dispatcher, 250ms);
+        return CaptureWithRetry(backdrop.hwnd, crop, crop, 3);
+    };
+    // The bare backdrop at the work-area corners (the restored window sits in the middle): what a
+    // transparent corner must show exactly. A blurred material pixel changes with the phase too.
+    const int radius = ::MulDiv(8, static_cast<int>(::GetDpiForWindow(hwnd)), 96);
+    const int side = 4 * radius;
+    const RECT& work = monitor.rcWork;
+    const std::array<RECT, 4> crops{{RECT{work.left, work.top, work.left + side, work.top + side},
+                                     RECT{work.right - side, work.top, work.right, work.top + side},
+                                     RECT{work.left, work.bottom - side, work.left + side, work.bottom},
+                                     RECT{work.right - side, work.bottom - side, work.right, work.bottom}}};
+    std::array<std::array<Capture, 2>, 4> bare;
+    for (std::size_t i = 0; i < crops.size(); ++i)
+        for (const bool phase : {false, true}) bare[i][phase ? 1 : 0] = shoot(crops[i], phase);
+    ::ShowWindow(hwnd, SW_MAXIMIZE);
+    ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    PumpFor(f.dispatcher, 600ms);
+    REQUIRE(::IsZoomed(hwnd));
+    POINT origin{0, 0};
+    ::ClientToScreen(hwnd, &origin);
+    RECT client{};
+    ::GetClientRect(hwnd, &client);
+    const RECT visible{origin.x, origin.y, origin.x + client.right, origin.y + client.bottom};
+    REQUIRE(::EqualRect(&visible, &work));
+
+    // The region: the visible client, its corners rounded; nothing past the work area.
+    RECT bounds{};
+    ::GetWindowRect(hwnd, &bounds);
+    HRGN region = ::CreateRectRgn(0, 0, 0, 0);
+    REQUIRE(region != nullptr);
+    const bool shaped = ::GetWindowRgn(hwnd, region) != ERROR;
+    CHECK(shaped);
+    const auto inside = [&](LONG x, LONG y) { return shaped && ::PtInRegion(region, x - bounds.left, y - bounds.top) != FALSE; };
+    const LONG midX = (visible.left + visible.right) / 2, midY = (visible.top + visible.bottom) / 2;
+    CHECK_FALSE(inside(visible.left, visible.top));
+    CHECK_FALSE(inside(visible.right - 1, visible.top));
+    CHECK_FALSE(inside(visible.left, visible.bottom - 1));
+    CHECK_FALSE(inside(visible.right - 1, visible.bottom - 1));
+    CHECK(inside(visible.left + radius, visible.top));
+    CHECK(inside(midX, visible.top));
+    CHECK(inside(visible.left, midY));
+    CHECK(inside(visible.right - 1, midY));
+    CHECK(inside(midX, visible.bottom - 1));
+    CHECK_FALSE(inside(visible.left - 1, midY));
+    CHECK_FALSE(inside(midX, visible.top - 1));
+    ::DeleteObject(region);
+
+    // The drawn caption buttons: Windows' hit codes (Snap layouts open over HTMAXBUTTON), at the top
+    // right of the visible client, reported to the system title bar accessibility.
+    TITLEBARINFOEX info{};
+    info.cbSize = sizeof(info);
+    ::SendMessageW(hwnd, WM_GETTITLEBARINFOEX, 0, reinterpret_cast<LPARAM>(&info));
+    const auto center = [](const RECT& r) { return POINT{(r.left + r.right) / 2, (r.top + r.bottom) / 2}; };
+    const auto hit = [&](POINT p) { return ::SendMessageW(hwnd, WM_NCHITTEST, 0, MAKELPARAM(p.x, p.y)); };
+    const RECT minimize = info.rgrect[2], maximize = info.rgrect[3], close = info.rgrect[5];
+    CHECK_EQ(hit(center(minimize)), LRESULT{HTMINBUTTON});
+    CHECK_EQ(hit(center(maximize)), LRESULT{HTMAXBUTTON});
+    CHECK_EQ(hit(center(close)), LRESULT{HTCLOSE});
+    CHECK_EQ(close.right, visible.right);
+    CHECK_EQ(close.top, visible.top);
+    CHECK_EQ(maximize.right, close.left);
+    CHECK_EQ(minimize.right, maximize.left);
+    CHECK(close.bottom - close.top >= ::MulDiv(16, static_cast<int>(::GetDpiForWindow(hwnd)), 96));
+    for (const int index : {2, 3, 5}) CHECK((info.rgstate[index] & STATE_SYSTEM_INVISIBLE) == 0);
+    CHECK_EQ(hit(POINT{minimize.left - ::MulDiv(40, static_cast<int>(::GetDpiForWindow(hwnd)), 96), center(minimize).y}), LRESULT{HTCAPTION});
+    RECT title{};
+    ::GetWindowRect(::GetDlgItem(hwnd, 122), &title);
+    CHECK(title.right <= minimize.left);
+
+    // Pixels: transparent corners over both backdrop phases, an opaque rim of the windowRim color
+    // along each edge, the close glyph, and the red hover of close.
+    const auto rim = graphics::MakeDesignTokens(graphics::ThemeMode::Dark).form.windowRim;
+    const auto isRim = [&](const std::uint8_t* p) {
+        return std::abs(p[2] - static_cast<int>(rim.r * 255.0f + 0.5f)) <= 12 && std::abs(p[1] - static_cast<int>(rim.g * 255.0f + 0.5f)) <= 12 &&
+               std::abs(p[0] - static_cast<int>(rim.b * 255.0f + 0.5f)) <= 12;
+    };
+    const auto same = [](const std::uint8_t* a, const std::uint8_t* b) { return a[0] == b[0] && a[1] == b[1] && a[2] == b[2]; };
+    struct Corner { const char* name; POINT tip; POINT alongX; POINT alongY; };
+    const std::array<Corner, 4> corners{{
+        {"top-left", POINT{0, 0}, POINT{radius + 2, 0}, POINT{0, radius + 2}},
+        {"top-right", POINT{side - 1, 0}, POINT{side - radius - 3, 0}, POINT{side - 1, radius + 2}},
+        {"bottom-left", POINT{0, side - 1}, POINT{radius + 2, side - 1}, POINT{0, side - radius - 3}},
+        {"bottom-right", POINT{side - 1, side - 1}, POINT{side - radius - 3, side - 1}, POINT{side - 1, side - radius - 3}},
+    }};
+    int verified = 0;
+    for (std::size_t i = 0; i < corners.size(); ++i) {
+        const auto& corner = corners[i];
+        const auto a = shoot(crops[i], false);
+        const auto b = shoot(crops[i], true);
+        if (!a.Valid() || !b.Valid() || !bare[i][0].Valid() || !bare[i][1].Valid()) {
+            TEST_NOTE(std::string(corner.name) + " inconclusive: a foreign window overlapped the private backdrop");
+            continue;
+        }
+        ++verified;
+        CHECK(SavePng(a, InspectionPath(std::string("settings-maximized-") + corner.name)));
+        // The tip is the live scene itself in both phases: transparent, not material.
+        if (!same(a.Pixel(corner.tip.x, corner.tip.y), bare[i][0].Pixel(corner.tip.x, corner.tip.y)))
+            TEST_NOTE(std::string(corner.name) + " tip " + DescribePixel(a.Pixel(corner.tip.x, corner.tip.y)) + " vs scene " +
+                      DescribePixel(bare[i][0].Pixel(corner.tip.x, corner.tip.y)));
+        CHECK(same(a.Pixel(corner.tip.x, corner.tip.y), bare[i][0].Pixel(corner.tip.x, corner.tip.y)));
+        CHECK(same(b.Pixel(corner.tip.x, corner.tip.y), bare[i][1].Pixel(corner.tip.x, corner.tip.y)));
+        CHECK_FALSE(same(a.Pixel(corner.tip.x, corner.tip.y), b.Pixel(corner.tip.x, corner.tip.y)));
+        for (const POINT p : {corner.alongX, corner.alongY}) {
+            const bool ok = same(a.Pixel(p.x, p.y), b.Pixel(p.x, p.y)) && isRim(a.Pixel(p.x, p.y));
+            if (!ok) TEST_NOTE(std::string(corner.name) + " edge pixel " + DescribePixel(a.Pixel(p.x, p.y)) + " / " + DescribePixel(b.Pixel(p.x, p.y)));
+            CHECK(ok);
+        }
+    }
+    CHECK(verified > 0);
+    const RECT strip{minimize.left - ::MulDiv(120, static_cast<int>(::GetDpiForWindow(hwnd)), 96), visible.top, visible.right, close.bottom + 2 * radius};
+    if (const auto caption = shoot(strip, false); caption.Valid()) CHECK(SavePng(caption, InspectionPath("settings-maximized-caption")));
+    const auto glyphs = shoot(close, false);
+    if (glyphs.Valid()) {
+        int bright = 0;  // the close glyph in the text color, in the middle of the button
+        for (int y = glyphs.height / 4; y < glyphs.height * 3 / 4; ++y)
+            for (int x = glyphs.width / 4; x < glyphs.width * 3 / 4; ++x)
+                bright += glyphs.Pixel(x, y)[2] > 160 && glyphs.Pixel(x, y)[1] > 160 && glyphs.Pixel(x, y)[0] > 160 ? 1 : 0;
+        CHECK(bright > 0);
+        // The real pointer is elsewhere, so the system posts a leave at once: paint and capture
+        // the hover state before any message is dispatched.
+        ::SendMessageW(hwnd, WM_NCMOUSEMOVE, HTCLOSE, MAKELPARAM(center(close).x, center(close).y));
+        ::UpdateWindow(hwnd);
+        ::DwmFlush();
+        ::DwmFlush();
+        const auto hot = CapturePrivate(backdrop.hwnd, close, close);
+        if (!hot.Valid()) TEST_NOTE("close hover inconclusive: a foreign window overlapped the private backdrop");
+        if (hot.Valid()) {
+            const auto* p = hot.Pixel(3, hot.height / 2);
+            if (!(p[2] > 150 && p[1] < 90 && p[0] < 90)) TEST_NOTE("close hover " + DescribePixel(p));
+            CHECK(p[2] > 150 && p[1] < 90 && p[0] < 90);
+        }
+        ::SendMessageW(hwnd, WM_NCMOUSELEAVE, 0, 0);
+    } else {
+        TEST_NOTE("caption pixels inconclusive: a foreign window overlapped the private backdrop");
+    }
+
+    // A press that leaves the button does nothing; a release over the pressed button restores.
+    const POINT press = center(maximize);
+    ::SendMessageW(hwnd, WM_NCLBUTTONDOWN, HTMAXBUTTON, MAKELPARAM(press.x, press.y));
+    POINT away{center(close).x, center(close).y + ::MulDiv(80, static_cast<int>(::GetDpiForWindow(hwnd)), 96)};
+    ::ScreenToClient(hwnd, &away);
+    ::SendMessageW(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(away.x, away.y));
+    PumpFor(f.dispatcher, 150ms);
+    CHECK(::IsZoomed(hwnd));
+    ::SendMessageW(hwnd, WM_NCLBUTTONDOWN, HTMAXBUTTON, MAKELPARAM(press.x, press.y));
+    POINT release = press;
+    ::ScreenToClient(hwnd, &release);
+    ::SendMessageW(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(release.x, release.y));
+    PumpFor(f.dispatcher, 250ms);
+    CHECK_FALSE(::IsZoomed(hwnd));
+    HRGN after = ::CreateRectRgn(0, 0, 0, 0);
+    CHECK_EQ(::GetWindowRgn(hwnd, after), ERROR);  // the restored window is DWM's again
+    ::DeleteObject(after);
+    // Restored: DWM rounds the window and draws its border in the same neutral rim color.
+    ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    PumpFor(f.dispatcher, 400ms);
+    RECT frame{};
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(hwnd, DWMWA_EXTENDED_FRAME_BOUNDS, &frame, sizeof(frame))));
+    const RECT restoredCorner{frame.left, frame.top, frame.left + side, frame.top + side};
+    const auto ra = shoot(restoredCorner, false);
+    const auto rb = shoot(restoredCorner, true);
+    if (ra.Valid() && rb.Valid()) {
+        CHECK(SavePng(ra, InspectionPath("settings-restored-top-left")));
+        CHECK_FALSE(same(ra.Pixel(0, 0), rb.Pixel(0, 0)));  // rounded: the corner shows the backdrop
+        const auto* edge = ra.Pixel(0, side - 1);
+        if (!(same(edge, rb.Pixel(0, side - 1)) && isRim(edge))) TEST_NOTE("restored edge pixel " + DescribePixel(edge));
+        CHECK(same(edge, rb.Pixel(0, side - 1)) && isRim(edge));
+    } else {
+        TEST_NOTE("restored frame inconclusive: a foreign window overlapped the private backdrop");
+    }
     window.Close();
 }

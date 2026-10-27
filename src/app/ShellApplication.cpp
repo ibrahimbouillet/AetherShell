@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
 #include "app/DesktopPolicy.h"
+#include "app/HiddenIcons.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
 #include "app/WorkAreaInsets.h"
@@ -69,6 +70,27 @@ constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
 constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
 constexpr UINT_PTR kAttentionPeekTimer = 0xA374;
 constexpr UINT_PTR kLocationRefreshTimer = 0xA375;
+constexpr UINT_PTR kOverflowWatchTimer = 0xA376;  // hides the taskbar again once its overflow closes
+
+// The documented Windows keyboard shortcuts behind fixed system actions. Windows reports nothing
+// back: a submitted chord is not proof that the feature opened.
+Result<void> SendShortcut(controlcenter::SystemShortcut shortcut) {
+    using controlcenter::SystemShortcut;
+    switch (shortcut) {
+        case SystemShortcut::Accessibility: return platform::SendKeyChord({VK_LWIN, static_cast<WORD>('U')});
+        case SystemShortcut::LiveCaptions: return platform::SendKeyChord({VK_LWIN, VK_CONTROL, static_cast<WORD>('L')});
+        case SystemShortcut::Cast: return platform::SendKeyChord({VK_LWIN, static_cast<WORD>('K')});
+        case SystemShortcut::Project: return platform::SendKeyChord({VK_LWIN, static_cast<WORD>('P')});
+        case SystemShortcut::Magnifier: return platform::SendKeyChord({VK_LWIN, VK_OEM_PLUS});
+        case SystemShortcut::Narrator: return platform::SendKeyChord({VK_LWIN, VK_CONTROL, VK_RETURN});
+        case SystemShortcut::OnScreenKeyboard: return platform::SendKeyChord({VK_LWIN, VK_CONTROL, static_cast<WORD>('O')});
+        case SystemShortcut::NotificationCenter: return platform::SendKeyChord({VK_LWIN, static_cast<WORD>('N')});
+        case SystemShortcut::ActionCenter: return platform::SendKeyChord({VK_LWIN, static_cast<WORD>('A')});
+        case SystemShortcut::Calendar: return platform::SendKeyChord({VK_LWIN, VK_MENU, static_cast<WORD>('D')});
+        case SystemShortcut::None: break;
+    }
+    return MakeError(ErrorCode::Unsupported, "Windows shortcut unavailable");
+}
 struct RadioCompletionGate {
     std::mutex mutex;
     std::function<void(Result<bool>)> deliver;
@@ -92,6 +114,7 @@ struct ShellApplication::Impl {
     WorkerPool worker{{1, L"Aether application", ComApartment::SingleThreaded}};
     WorkerPool controlsWorker{{1, L"Aether quick controls", ComApartment::MultiThreaded}};
     WorkerPool locationWorker{{1,L"Aether Windows weather location",ComApartment::MultiThreaded}};
+    WorkerPool trayWorker{{1, L"Aether hidden icons", ComApartment::MultiThreaded}};  // UI Automation calls into Explorer
     CancellationSource cancellation;
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
@@ -149,6 +172,8 @@ struct ShellApplication::Impl {
     TaskbarUpdate desktopState;
     bool automaticResume = false;
     bool resumeTimerArmed = false;
+    bool hiddenIconsPending = false;  // an overflow request is with the tray worker
+    bool overflowResume = false;      // the taskbar was shown for the overflow: hide it once that closes
     std::uint64_t resumeDeadline = 0;
     bool fullscreenSuppressed = false;
     bool attentionPeekArmed = false;
@@ -323,6 +348,83 @@ struct ShellApplication::Impl {
         return taskbar->Resume();
     }
     void RequestQuit();
+    // The Top Bar date/time (FR-038, D45): Windows' own notifications through the documented shortcut
+    // for this Windows version (Win+N with the calendar on Windows 11, Action Center on Windows 10).
+    // Aether's own transient panel closes first; nothing reads, clears or badges notifications.
+    void OpenNotifications() {
+        if (closing) return;
+        if (controls) controls->Close();
+        auto action = controlcenter::NotificationsAction(platform::GetOsVersion().build);
+        const Result<void> sent = action ? SendShortcut(action->shortcut) : Result<void>(action.error());
+        if (!sent && topbar) topbar->ReportItemFailure(topbar::ItemKind::Clock, L"Windows notifications could not be opened");
+    }
+    void OpenCalendar() {
+        if (closing) return;
+        if (controls) controls->Close();
+        auto action = controlcenter::CalendarAction(platform::GetOsVersion().build);
+        const Result<void> sent = action ? SendShortcut(action->shortcut) : Result<void>(action.error());
+        if (!sent && topbar) topbar->ReportItemFailure(topbar::ItemKind::Clock, L"The Windows calendar could not be opened");
+    }
+    // The hidden-icons chevron (D45): Explorer's own notification-area overflow. While Aether hides the
+    // Windows taskbar, Explorer exposes no overflow at all, so the taskbar is shown for this (the
+    // ordinary suspension and its recovery) and hidden again once the overflow closes, at the latest
+    // by the usual automatic resume. A worker invokes the overflow button through UI Automation and
+    // success means Windows showed the overflow window; failures are reported, never imitated.
+    void OpenHiddenIcons() {
+        if (closing || hiddenIconsPending) return;
+        if (controls) controls->Close();
+        const bool reveal = nativeTaskbarAccess && OverflowNeedsReveal(desktopState);
+        if (reveal) {
+            automaticResume = true;
+            if (!SetTaskbarReplacementSuspended(true)) {
+                automaticResume = false;
+                if (topbar) topbar->ReportItemFailure(topbar::ItemKind::NotificationArea, L"The Windows taskbar could not be shown for its hidden icons");
+                return;
+            }
+        }
+        overflowResume = reveal;
+        hiddenIconsPending = true;
+        const auto weak = std::weak_ptr<bool>(alive);
+        const auto cancel = cancellation.Token();
+        const bool posted = trayWorker.Post([this, weak, cancel] {
+            Result<void> result = MakeError(ErrorCode::Platform, "hidden icons unavailable");
+            try {
+                const auto tray = MakeSystemTrayOverflow();
+                result = OpenTrayOverflow(*tray, cancel);
+            } catch (...) {
+                result = MakeError(ErrorCode::Platform, "hidden icons failed");
+            }
+            (void)dispatcher.Post([this, weak, result = std::move(result)] {
+                const auto live = weak.lock();
+                if (!live || !*live) return;
+                hiddenIconsPending = false;
+                if (closing) return;
+                if (result) {
+                    if (overflowResume && !::SetTimer(events.Handle(), kOverflowWatchTimer, 300, nullptr)) overflowResume = false;
+                    return;
+                }
+                AETHER_LOG_WARN("app", "hidden icons unavailable: {}", result.error().Describe());
+                if (topbar) topbar->ReportItemFailure(topbar::ItemKind::NotificationArea, L"Windows did not show its hidden icons");
+                EndOverflowReveal();
+            });
+        });
+        if (!posted) {
+            hiddenIconsPending = false;
+            EndOverflowReveal();
+        }
+    }
+    // Hides the taskbar again if it was shown only for the overflow (an explicit reveal or resume in
+    // the meantime has already taken over and cleared overflowResume).
+    void EndOverflowReveal() {
+        ::KillTimer(events.Handle(), kOverflowWatchTimer);
+        if (!overflowResume) return;
+        overflowResume = false;
+        if (!desktopState.suspended || closing) return;
+        ::KillTimer(events.Handle(), kTaskbarResumeTimer);
+        automaticResume = false;
+        resumeTimerArmed = false;
+        (void)SetTaskbarReplacementSuspended(false);
+    }
     void OpenSettings(settings::ui::SettingsPage page = settings::ui::SettingsPage::Dock) {
         if (!closing && !updateHandoffPending && settingsWindow) (void)settingsWindow->Show(page);
     }
@@ -553,13 +655,7 @@ void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) 
             if(action->minimumWindowsBuild&&!platform::IsBuildOrGreater(action->minimumWindowsBuild)){ReportControl(MakeError(ErrorCode::Unsupported,"Windows feature unavailable"));return;}
             if(action->kind==SystemActionKind::Settings){open(action->settingsUri);return;}
             controls->Close();Result<void> result=MakeError(ErrorCode::Unsupported,"Windows shortcut unavailable");
-            switch(action->shortcut){
-                case SystemShortcut::Magnifier:result=platform::SendKeyChord({VK_LWIN,VK_OEM_PLUS});break;
-                case SystemShortcut::Narrator:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,VK_RETURN});break;
-                case SystemShortcut::OnScreenKeyboard:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('O')});break;
-                case SystemShortcut::LiveCaptions:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('L')});break;
-                default:break;
-            }
+            result=SendShortcut(action->shortcut);
             if(!result&&settingsWindow)settingsWindow->ReportActionStatus(L"The Windows accessibility feature could not be started");
             return;
         }
@@ -604,13 +700,7 @@ void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) 
             if(action->minimumWindowsBuild&&!platform::IsBuildOrGreater(action->minimumWindowsBuild)){ReportControl(MakeError(ErrorCode::Unsupported,"Windows feature unavailable"));return;}
             if(action->kind==SystemActionKind::Settings){open(action->settingsUri);return;}
             controls->Close();Result<void> result=MakeError(ErrorCode::Unsupported,"Windows shortcut unavailable");
-            switch(action->shortcut){
-                case SystemShortcut::Accessibility:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('U')});break;
-                case SystemShortcut::LiveCaptions:result=platform::SendKeyChord({VK_LWIN,VK_CONTROL,static_cast<WORD>('L')});break;
-                case SystemShortcut::Cast:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('K')});break;
-                case SystemShortcut::Project:result=platform::SendKeyChord({VK_LWIN,static_cast<WORD>('P')});break;
-                case SystemShortcut::None:break;
-            }
+            result=SendShortcut(action->shortcut);
             if(!result&&settingsWindow)settingsWindow->ReportActionStatus(L"The Windows control could not be opened");
             return;
         }
@@ -809,15 +899,18 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->SoundSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:sound"); }));
     connections.push_back(topbar->PowerSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:powersleep"); }));
-    connections.push_back(topbar->ClockRequested.Connect([this]{
-        if (!closing && !platform::SendKeyChord({VK_LWIN,VK_MENU,static_cast<WORD>('D')}) && settingsWindow) settingsWindow->ReportActionStatus(L"Windows calendar could not be opened");
-    }));
+    connections.push_back(topbar->ClockRequested.Connect([this]{ OpenNotifications(); }));
+    connections.push_back(topbar->CalendarRequested.Connect([this]{ OpenCalendar(); }));
+    connections.push_back(topbar->HiddenIconsRequested.Connect([this]{ OpenHiddenIcons(); }));
     connections.push_back(topbar->RevealWindowsTaskbarRequested.Connect([this]{
         if (closing) return;
+        overflowResume = false;  // an explicit reveal keeps its own 60 seconds
+        ::KillTimer(events.Handle(), kOverflowWatchTimer);
         automaticResume = true;
         if (!SetTaskbarReplacementSuspended(true)) { automaticResume = false; if(settingsWindow)settingsWindow->ReportActionStatus(L"Windows taskbar could not be revealed"); }
     }));
     connections.push_back(topbar->ResumeTaskbarReplacementRequested.Connect([this]{
+        overflowResume = false; ::KillTimer(events.Handle(), kOverflowWatchTimer);
         ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
         if (!SetTaskbarReplacementSuspended(false) && settingsWindow) settingsWindow->ReportActionStatus(L"Taskbar replacement could not resume; Windows remains available");
     }));
@@ -1077,6 +1170,7 @@ void ShellApplication::Impl::Stop() noexcept {
     *alive = false; cancellation.Cancel();locationCancellation->Cancel();
     ::KillTimer(events.Handle(),kLocationRefreshTimer); controlActionCancellation->Cancel(); ++*controlEpoch;
     ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
+    ::KillTimer(events.Handle(), kOverflowWatchTimer); overflowResume = false;  // shutdown restores the taskbar anyway
     ::KillTimer(events.Handle(), kTaskbarPollTimer);
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
@@ -1169,6 +1263,16 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             if(delay&&*delay>0)impl_->attentionPeekArmed=::SetTimer(impl_->events.Handle(),kAttentionPeekTimer,static_cast<UINT>(std::min<std::uint64_t>(*delay,6000)),nullptr)!=0;
             else impl_->attentionPeekArmed=false;
             impl_->ApplyDockSuppression();return true;
+        }
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kOverflowWatchTimer) {
+            // The overflow is Explorer's window: once it has closed, the taskbar shown for it is hidden again.
+            if (!impl_->overflowResume || impl_->closing) {
+                ::KillTimer(impl_->events.Handle(), kOverflowWatchTimer);
+                impl_->overflowResume = false;
+            } else if (!MakeSystemTrayOverflow()->OverflowOpen()) {
+                impl_->EndOverflowReveal();
+            }
+            return true;
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarResumeTimer) {
             const auto delay = TaskbarRevealDelay(impl_->automaticResume, impl_->resumeTimerArmed,

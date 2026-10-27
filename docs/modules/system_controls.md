@@ -20,3 +20,10 @@ reread confirms the requested state. `ActionFor(AccessibilityFeature)` maps Magn
 On-screen keyboard and Live captions (build 22621+) to their documented Windows shortcuts and the
 accessibility page to `ms-settings:easeofaccess`. Unit tests cover the pure mappings and the Sticky
 Keys reading; no automated test changes an accessibility setting.
+
+D45 additions (T48, 2026-10-26): `SystemShortcut` gains `NotificationCenter` (Win+N),
+`ActionCenter` (Win+A) and `Calendar` (Win+Alt+D). `NotificationsAction(build)` returns the
+Windows 11 notification center/calendar for build 22000+, Action Center for Windows 10 (10240+)
+and `Unsupported` below; `CalendarAction(build)` returns the calendar chord for 10240+. The app
+sends every chord through one guarded keyboard path; nothing reads, clears or counts notifications,
+and Do Not Disturb/Focus are never toggled. Unit tests cover the version mapping only.

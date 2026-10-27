@@ -53,6 +53,12 @@ enum class Symbol {
     Mixer,          // sliders with a speaker: output and volume mixer
     ChevronRight,
     ChevronLeft,
+    ChevronDown,    // the Top Bar's hidden-icons button
+    ChevronUp,
+    ChromeMinimize, // window caption buttons (a maximized Settings window draws its own)
+    ChromeMaximize,
+    ChromeRestore,
+    ChromeClose,
     CaretDown,      // solid page arrow
     CaretUp,
     Back,

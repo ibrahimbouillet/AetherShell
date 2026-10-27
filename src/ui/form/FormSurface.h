@@ -149,6 +149,14 @@ public:
     [[nodiscard]] const graphics::DesignTokens& Tokens() const noexcept;
     [[nodiscard]] const graphics::MotionPolicy& Motion() const noexcept;
     [[nodiscard]] FormMaterial Material() const noexcept;
+    // D45: the window is genuinely maximized, so DWM no longer rounds or borders it. The form then
+    // paints its whole client as one rounded opaque body with the thin windowRim along its edge (DWM
+    // draws its system material over the whole window rectangle, even outside a window region). The
+    // owner gives the window the matching rounded window region, so the corners show the scene behind
+    // it; DWM draws no caption buttons under a region, so the owner draws those too. Native material
+    // (high contrast) keeps the system frame.
+    void SetMaximizedFrame(bool maximized);
+    [[nodiscard]] bool MaximizedFrame() const noexcept;
     [[nodiscard]] UINT Dpi() const noexcept;
     [[nodiscard]] float ToPx(float dip) const noexcept;
     [[nodiscard]] float ToDip(float px) const noexcept;

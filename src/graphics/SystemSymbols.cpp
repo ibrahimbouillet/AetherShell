@@ -49,6 +49,12 @@ constexpr char32_t FluentCodePoint(Symbol symbol) noexcept {
         case Symbol::Mixer: return 0xF4C3;
         case Symbol::ChevronRight: return 0xE76C;
         case Symbol::ChevronLeft: return 0xE76B;
+        case Symbol::ChevronDown: return 0xE70D;
+        case Symbol::ChevronUp: return 0xE70E;
+        case Symbol::ChromeMinimize: return 0xE921;
+        case Symbol::ChromeMaximize: return 0xE922;
+        case Symbol::ChromeRestore: return 0xE923;
+        case Symbol::ChromeClose: return 0xE8BB;
         case Symbol::CaretDown: return 0xEDDC;
         case Symbol::CaretUp: return 0xEDDB;
         case Symbol::Back: return 0xE72B;
@@ -307,6 +313,22 @@ void PaintSymbolVector(ID2D1DeviceContext* context, Symbol symbol, const D2D1_RE
         case Symbol::Settings: PaintGlyph(context, Glyph::Settings, g.box, brush, 1.4f); return;
         case Symbol::ChevronRight: PaintGlyph(context, Glyph::ChevronRight, g.box, brush, 1.4f); return;
         case Symbol::ChevronLeft: PaintGlyph(context, Glyph::ChevronLeft, g.box, brush, 1.4f); return;
+        case Symbol::ChevronDown: draw(Path(factory.get(), g, {{3.5f, 5.75f}, {8.0f, 10.25f}, {12.5f, 5.75f}}, false), false); return;
+        case Symbol::ChevronUp: draw(Path(factory.get(), g, {{3.5f, 10.25f}, {8.0f, 5.75f}, {12.5f, 10.25f}}, false), false); return;
+        case Symbol::ChromeMinimize: line(3.0f, 8.0f, 13.0f, 8.0f); return;
+        case Symbol::ChromeMaximize:
+            context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(g.P(3.0f, 3.0f).x, g.P(3.0f, 3.0f).y, g.P(13.0f, 13.0f).x, g.P(13.0f, 13.0f).y),
+                                                            g.unit, g.unit), brush, stroke);
+            return;
+        case Symbol::ChromeRestore:
+            context->DrawRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(g.P(3.0f, 5.5f).x, g.P(3.0f, 5.5f).y, g.P(10.5f, 13.0f).x, g.P(10.5f, 13.0f).y),
+                                                            g.unit, g.unit), brush, stroke);
+            draw(Path(factory.get(), g, {{5.5f, 3.0f}, {13.0f, 3.0f}, {13.0f, 10.5f}}, false), false);
+            return;
+        case Symbol::ChromeClose:
+            line(3.5f, 3.5f, 12.5f, 12.5f);
+            line(12.5f, 3.5f, 3.5f, 12.5f);
+            return;
         case Symbol::Back: PaintGlyph(context, Glyph::ArrowLeft, g.box, brush, 1.4f); return;
         case Symbol::OpenExternal: PaintGlyph(context, Glyph::OpenExternal, g.box, brush, 1.4f); return;
         case Symbol::Check: PaintGlyph(context, Glyph::Check, g.box, brush, 1.4f); return;

@@ -256,6 +256,18 @@ Result<SystemAction> ActionFor(AccessibilityFeature feature) {
     return MakeError(ErrorCode::InvalidArgument, "Unknown accessibility feature");
 }
 
+// https://support.microsoft.com/accessibility/windows/keyboard-shortcuts-in-windows
+Result<SystemAction> NotificationsAction(unsigned windowsBuild) {
+    if (windowsBuild >= 22000) return Shortcut(SystemShortcut::NotificationCenter, 22000);
+    if (windowsBuild >= 10240) return Shortcut(SystemShortcut::ActionCenter, 10240);
+    return MakeError(ErrorCode::Unsupported, "Windows notifications need Windows 10 or later");
+}
+
+Result<SystemAction> CalendarAction(unsigned windowsBuild) {
+    if (windowsBuild >= 10240) return Shortcut(SystemShortcut::Calendar, 10240);
+    return MakeError(ErrorCode::Unsupported, "the Windows calendar flyout needs Windows 10 or later");
+}
+
 Result<SystemAction> ActionFor(SystemControl control) {
     try {
         // Official fixed routes only. No undocumented registry, COM radio-manager or private shell API.

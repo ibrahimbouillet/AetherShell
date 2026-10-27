@@ -2287,3 +2287,74 @@ private image/content enters tracked files. This is shared-file preparation; no 
 Claude-chat transport or receipt is claimed. New feature implementation/acceptance remains pending.
 Installed Alpha 2, private runtime/recovery host, startup/device state and owner windows were not
 changed. No capture, installation, commit, push, tag or release was performed in this review turn.
+
+### S-054 — D45 notifications, hidden icons and maximized perimeter implemented (Claude, 2026-10-27)
+
+Scope: the [D45 brief](../CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md) and S-053's findings, in the
+shared `main` checkout from `4b81ba3`, build directory `build/wf-claude-fluidity` (Release, /W4 /WX).
+Owner decision taken during the work: D46 (ring window beneath maximized foreign windows,
+[ADR 0012](../decisions/0012-maximized-window-perimeter.md)). Every capture is an own test window over
+a private two-phase backdrop; no owner desktop capture, device change, installation, push, tag or
+release occurred. Private references stayed outside Git; the rejected window's diagnosis (its
+extended style) was read locally without recording titles, content, paths or process inventory.
+
+**Implemented:** FR-038 routing (Win+N on Windows 11, Win+A on Windows 10, "Open calendar"
+Win+Alt+D) through `system_controls::NotificationsAction/CalendarAction` and one guarded chord path;
+the hidden-icons chevron (`ItemKind::NotificationArea`, `topBar.showHiddenIconsButton` default on,
+legacy D27 flag ignored) opening Explorer's overflow through UI Automation (`app/HiddenIcons`), with a
+temporary taskbar reveal only while Aether replaces it and the overflow is open; the foreign ring
+window, layered-window eligibility and bounded reacquisition in `WindowCorners`; DWM rounding with
+the `windowRim` border for every form and Settings' own maximized frame (rounded region, painted rim,
+drawn caption buttons with `HTMINBUTTON`/`HTMAXBUTTON`/`HTCLOSE`, `WM_SYSCOMMAND` on release over the
+pressed button, `WM_GETTITLEBARINFOEX` rectangles, opaque material while maximized); the four S-053
+corrections.
+
+**Regressions added (each discriminating):** FormMotion "precision input held back for current/stale
+editor images adds up and resets cancel it" (three 24 px events → 72 px; a reset drops the pending
+target); ControlCenter "interrupted and rapid detail transitions continue from the composed frame",
+"media arriving at a bottom-clamped anchor keeps the whole panel on screen", "release activates only
+the target that was pressed"; HiddenIcons unit (6 cases, fake Explorer); SystemControls version
+mapping; Top Bar model/menu/layout/keyboard/UIA for the chevron and calendar; settings schema default
+and legacy-flag independence; WindowCorners native "a layered composition window with a backdrop gets
+cutouts and a continuous rim", "after an application replacement, only a new maximize gets a fresh
+attempt" and rim lifecycle/edge-continuity checks in the pixel cases; Settings "a maximized window keeps
+rounded corners, a continuous rim and working caption buttons" (region shape, hit codes, title-bar
+rectangles, hover/press/restore, corner tips equal to the bare backdrop in both phases, rim color at
+each edge, restored DWM corner and rim).
+
+**Measured platform constraints (owned windows, Windows 11 build 26300, 150 %):** a region on a
+maximized custom-frame window removes DWM's caption buttons (also with forced non-client rendering;
+DWM then reports empty caption-button bounds); without a region, transparent corners of a
+frame-extended window show DWM's frame fill; DWM draws Acrylic outside a window region (a kept-Acrylic
+experiment failed the strict corner-tip comparison; the opaque body passes it); a standard-frame window
+under a region alternates between the basic caption and DWM's own caption drawn across the top of the
+region while active. The last is recorded as a D46 limit: the standard-frame native case requires
+all corners and the bottom/left/right rim edges and notes the top edge.
+
+**Executed (Release, /W4 /WX, warnings as errors on):**
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-claude-fluidity -Jobs 6 -Test `
+  -TestExclude 'network|integration' -JUnitFile build/wf-claude-fluidity/unit-results.xml
+```
+
+Two complete builds (the second after the last source change) were warning-free; **24/24 unit
+suites pass** both times (49.2 s, then 28.3 s; app unit 64 cases). Native suites, run sequentially
+from the built executables with the private trial running:
+
+| Suite | Result on final binaries | Notes |
+| --- | --- | --- |
+| settings_ui | **33/33** | maximized frame case: top corners and caption verified; bottom corners inconclusive once (trial Dock overlapped the private backdrop) |
+| app | **14/14** | all corner/rim pixel cases; standard caption observed over the top rim band (244/244/237), as scoped |
+| topbar | **5/5** | chevron keyboard walk, UIA, menus, suppression |
+| search_ui | **10/10** | the first aggregate's exit-timing case failed once and passed on rerun (module untouched) |
+| installer | **13/13** | |
+| dock, accessibility, ui, install | **12/12, 7/7, 27/27, 7/7** | first aggregate, before the final Settings/form-surface frame and app adjustments (not rerun) |
+| ui_form | 14/16 | both moving-frame cases: **0 incoherent frames**, 45–50 rows checked, UI move cadence p50 ≈ 17 ms, but the capture thread obtained one screen copy per ≈ 80 ms (S-052: 16.6 ms), so only 17–18 distinct frames fit in the motion against the ≥ 20 sufficiency threshold. New precision-input cases pass. |
+| controlcenter | 13/14 | "keyboard opening …": a local diagnostic showed another application's window taking the foreground right after the test's UI Automation query, so the panel closed on deactivation as designed (unchanged path); the new continuity, refit and press-ownership cases pass |
+
+The ui_form and controlcenter failures are attributed to this live desktop (capture rate, foreground
+taken by an external application), not to the product, but they were not rerun on an idle desktop or
+on the baseline and stay open. No assistant-operated real-desktop capture or live Explorer overflow
+invocation was made; the overflow identity, the pictured application, Windows 10, Explorer restart,
+192 DPI and physical multi-monitor behavior remain unverified, as does owner visual acceptance.
