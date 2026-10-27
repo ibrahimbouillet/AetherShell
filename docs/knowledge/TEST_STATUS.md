@@ -2536,3 +2536,14 @@ authored and committed with the public GitHub no-reply identity and add no binar
 Their 29,316 added lines contain no user path, machine name, private address, MAC, SID or secret
 pattern; the only hits are the relative name of the ignored trial folder and generic application names
 in an existing owner brief. The private reference images and runtime receipts remain untracked.
+
+**Pushed revision and private runtime (2026-10-27, 15:22 CET):** `git fetch` showed `main` 42 ahead and
+0 behind `origin/main`; `git push origin main` fast-forwarded `d9095f5..c4592d5`
+(`c4592d5ae72713a85dde74c854959872aa134c00`). From the owner's terminal, the bounded trial procedure
+quit the previous trial, its host restored Alpha 2, and the Alpha 3 build started with source
+`c4592d5` and the audited app hash above: product version `0.3.0-alpha.3`; Dock/Top Bar, taskbar
+replacement and exactly one corner-guard child acknowledged; no warning or error logged; installed
+Alpha 2 preferences, startup entry and binary unchanged; both Auto-Hide choices carried over (on).
+Windows CI for `c4592d5`: [run 40520376651](https://github.com/ibrahimbouillet/AetherShell/actions/runs/40520376651)
+**success** (fresh Release build and unit tests, test report, manual-install package preparation and
+the installer upload for review as a workflow artifact; no tag or GitHub Release).

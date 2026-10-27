@@ -23,7 +23,11 @@ new designs. Done in this checkpoint:
 - **Not done (not authorized):** tag `v0.3.0-alpha.3`, a GitHub Release or assets, installation over
   the owner's Alpha 2. The installed Alpha 2 and its preferences/startup are unchanged.
 
-Gate evidence, the pushed revision and its Windows CI result: TEST_STATUS S-058.
+**Pushed:** `main` fast-forwarded `d9095f5..c4592d5`; Windows CI
+[run 40520376651](https://github.com/ibrahimbouillet/AetherShell/actions/runs/40520376651) passed on
+`c4592d5`. The owner's private trial runs that Alpha 3 build with both Auto-Hide choices on. Next
+owner decisions: try Auto-Hide, the chevron toggle and rounded windows in the trial, then approve or
+defer a tag/GitHub Release. Gate evidence: TEST_STATUS S-058.
 
 **Private trial lifetime (lesson from this session).** A trial started from an assistant's tool shell
 was ended together with that tool session: the trial and its host stopped without the host's restore
