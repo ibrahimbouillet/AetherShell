@@ -48,8 +48,8 @@ sends the entered place name to Open-Meteo; forecasts send the chosen coarse coo
 not infer location from a Wi-Fi name or raw IP. Cached forecasts disappear after six hours.
 Data attribution: Open-Meteo.com, CC BY 4.0.
 
-General contains startup consent, motion preferences and shortcut editing. Fresh interactive Alpha 2
-setup visibly selects sign-in startup; clear that option before installation to opt out. Existing
+General contains startup consent, motion preferences and shortcut editing. Fresh interactive setup
+(since Alpha 2) visibly selects sign-in startup; clear that option before installation to opt out. Existing
 choices are preserved. Silent setup requires the explicit startup flag. Startup is per-user and
 optional; Settings → General → Apply can change it, and Task Manager can independently disable it.
 Windows controls the launch order and delay after sign-in; it may show the native desktop/taskbar

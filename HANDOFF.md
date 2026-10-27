@@ -7,7 +7,29 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 3 (`0.3.0-alpha.3`) pushed to `main` by Claude (S-058, 2026-10-27)
+## Current checkpoint — Alpha 3 released as Latest by Claude (S-059, 2026-10-27)
+
+**Published:** [Aether Shell Alpha 3 — 0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
+at 15:06:24 UTC, marked **Latest** (not a draft or prerelease). The owner first asked for a draft
+(D49), then accepted the version as version 3 and asked for direct publication as Latest (D50).
+Tag `v0.3.0-alpha.3` points exactly to `4835641abef7b6f019bfeec042859cb645554a5d`;
+[Windows CI 40523528710](https://github.com/ibrahimbouillet/AetherShell/actions/runs/40523528710)
+passed for that revision. Later documentation receipts do not move the tag.
+
+- Fresh Release `/W4 /WX` build of that revision in a new build directory: 24/24 unit suites; built
+  version `0.3.0-alpha.3`. `scripts/package.ps1` passed the privacy/freshness audit.
+- Assets are only `AetherShell-0.3.0-alpha.3-win-x64-setup.exe` (6,369,792 bytes, SHA-256
+  `1db099ecba2e2c88ac525506468e0e4483bb63707b9f3aa1865b6e04bb573e93`) and
+  `AetherShell-0.3.0-alpha.3-checksums.txt` (110 bytes, SHA-256
+  `c2c8fa25a271dfa0ab4d0a4026e75c1dd092031737f60e39f92ea6be1f658716`). Downloaded assets match the
+  local files byte for byte. The unsigned manifest stayed local; automatic updates remain unavailable.
+- README, INSTALLATION, KNOWN_LIMITATIONS, PROJECT_CONTEXT/SPEC, AGENTS, TASKS and the changelog now
+  describe Alpha 3 as the current release.
+- **Not done:** the owner's machine still runs the installed Alpha 2 (plus the private Alpha 3 trial
+  build). Installing the published setup over Alpha 2 needs the owner's approval. No Alpha 3 gallery
+  media exists yet (T38, D36 readiness required).
+
+## Previous checkpoint — Alpha 3 (`0.3.0-alpha.3`) pushed to `main` by Claude (S-058, 2026-10-27)
 
 **Owner instruction (D48):** commit and push the project as AetherShell Alpha 3 (v3), including all
 new designs. Done in this checkpoint:

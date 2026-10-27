@@ -1,15 +1,15 @@
 # Installation
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
-The second public alpha, [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2), is a manual-install preview; wider Version 1 qualification remains open.
-Alpha 3 (`0.3.0-alpha.3`) is on `main` as source only; until its setup is published, build it with
-[BUILDING.md](BUILDING.md) and `scripts/package.ps1`.
+The current release, Alpha 3 [0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3),
+is a manual-install preview; wider Version 1 qualification remains open. The earlier
+[0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) remains available.
 
 Run setup as your ordinary Windows user. The wizard explains the product, displays the MIT license,
 and lets you choose a folder (default `%LOCALAPPDATA%\Programs\AetherShell`), shortcuts and optional
 startup. It installs a stable launcher, a maintenance setup and versioned program files. It can
 create a Start Menu shortcut and a per-user entry in Windows Installed apps. No administrator
-rights or Explorer replacement are used. On a fresh interactive Alpha 2 installation, **Start at
+rights or Explorer replacement are used. On a fresh interactive installation (since Alpha 2), **Start at
 sign-in** is visibly selected: clear it to opt out before installing. Accepting setup saves that
 choice; an existing saved choice and Task Manager disable are respected. Silent setup enables
 startup only with the explicit `--start-with-windows` flag; `--no-start-with-windows` selects off.
@@ -25,7 +25,7 @@ Unsigned application/setup binaries can trigger SmartScreen. This alpha has no A
 publisher certificate. Check the exact release source and SHA-256 before deciding to run it:
 
 ```powershell
-Get-FileHash .\AetherShell-0.2.0-alpha.2-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\AetherShell-0.3.0-alpha.3-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Compare with the corresponding checksums asset. A checksum alone does not authenticate a publisher.

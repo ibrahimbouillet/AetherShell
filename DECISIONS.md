@@ -6,12 +6,10 @@ chosen design). Product requirements and their IDs: [PROJECT_SPEC.md](PROJECT_SP
 Approval and implementation verification are separate: ADRs 0002, 0003 and 0005 are accepted choices;
 D3/D4/D6 retain their existing provisional qualification status until platform/behavior tests run.
 
-**Current delivery:** D48 (2026-10-27) names the current V3 source **Aether Shell Alpha 3,
-`0.3.0-alpha.3`**, and authorizes committing and pushing it to the official `main`. D49 (same day)
-adds tag `v0.3.0-alpha.3` and a **draft** GitHub prerelease carrying only the audited x64 setup and
-its checksums, for the owner's review. Publishing that draft, switching README downloads to it and
-installing over the owner's Alpha 2 remain separate owner approvals. The latest published release is
-still **0.2.0-alpha.2** (D29:
+**Current delivery:** **Aether Shell Alpha 3, `0.3.0-alpha.3`**, is the latest public release
+(D48–D50, 2026-10-27): source pushed to `main`, tag `v0.3.0-alpha.3`, and a published GitHub Release
+marked Latest that carries only the audited x64 setup and its checksums. Installing Alpha 3 over the
+owner's Alpha 2 is a separate owner approval. The previous release is **0.2.0-alpha.2** (D29:
 reviewed `main`, tag `v0.2.0-alpha.2` and its GitHub Release, 2026-10-22). Do not infer approval for
 unrelated repository or account settings. Check HANDOFF for the exact pushed commits and receipts.
 
@@ -111,6 +109,19 @@ Record and qualify any necessary compatible custom-control strategy before subst
 Windows-owned and pre-renderer emergency UI retain honest documented native exceptions. No
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
+
+### D50 — The owner accepts Alpha 3 as version 3 and publishes it directly as Latest
+
+Owner instruction, 2026-10-27, given to Claude while D49's package was building: the owner counts
+the latest version as valid, as version 3 of the application, so no draft is needed; publish it
+directly as the Latest release. This supersedes D49's draft-only scope. Following the Alpha 2
+precedent (a published, non-prerelease release marked Latest; GitHub never marks a prerelease as
+Latest), the release is published as a normal release with exactly the setup and checksums, and the
+README download links move to it. The tag stays on the CI-verified revision; later documentation
+receipts do not move it. The acceptance covers the Alpha 3 build as a whole; checks that were never
+executed (for example Windows 10, multi-monitor/DPI and other window-rendering families) stay listed
+as limitations rather than becoming passes. Installing Alpha 3 over the owner's Alpha 2 is not part
+of this instruction. Evidence: TEST_STATUS S-059.
 
 ### D49 — Tag `v0.3.0-alpha.3` and prepare a draft GitHub prerelease for owner review
 

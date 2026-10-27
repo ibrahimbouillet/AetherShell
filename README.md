@@ -1,7 +1,7 @@
 ![Aether Shell — a modular native desktop interface for Windows](resources/branding/png/readme-banner.png)
 
 <p align="center">
-  <a href="https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2">Download Alpha 2</a>
+  <a href="https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3">Download Alpha 3</a>
   · <a href="USER_GUIDE.md">User guide</a>
   · <a href="KNOWN_LIMITATIONS.md">Known limitations</a>
   · <a href="docs/knowledge/TEST_STATUS.md">Test evidence</a>
@@ -21,9 +21,8 @@ A native Windows desktop interface by **Ibrahim Bouillet**. Aether Shell pairs a
 a compact Top Status Bar, using a softly blurred, translucent material. It is built in C++20 with
 Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under the MIT License.
 
-> **Alpha software:** the source on `main` is **Alpha 3 (0.3.0-alpha.3)**; the latest published
-> setup is Alpha 2 (0.2.0-alpha.2). Neither is a fully qualified Windows shell replacement. Save your
-> work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
+> **Alpha software:** 0.3.0-alpha.3 (Alpha 3) is an early public preview. It is not a fully qualified
+> Windows shell replacement. Save your work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
 
 ## What it does
 
@@ -47,8 +46,8 @@ Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under th
 
 Alpha 3 brings the V3 design and interaction work: Auto-Hide, notifications and hidden icons from the
 Top Bar, Aether's own Quick Settings, Dock window previews, rounded maximized windows and a unified
-glass design for every Aether window. Read the [draft release notes](docs/releases/0.3.0-alpha.3.md)
-and the [changelog](CHANGELOG.md). Alpha 3 has no published setup yet; build it from source to try it.
+glass design for every Aether window. Read the [release notes](docs/releases/0.3.0-alpha.3.md)
+and the [changelog](CHANGELOG.md).
 
 ## Replacing the Windows taskbar
 
@@ -61,7 +60,7 @@ trying the alpha.
 
 ## Download and install
 
-Download the **x64 setup executable** from the [0.2.0-alpha.2 GitHub Release](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2)
+Download the **x64 setup executable** from the [0.3.0-alpha.3 GitHub Release](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
 and compare its SHA-256 with the release's checksums file. Run setup as your regular Windows user.
 The installer explains the taskbar behavior and does not require administrator rights. Fresh setup
 visibly selects **start at sign-in**; you can clear that option before accepting. Existing saved
@@ -86,7 +85,7 @@ limitations](KNOWN_LIMITATIONS.md).
 ## Visual preview
 
 Fresh screenshots and recordings of Alpha 2 and Alpha 3 will be added to the [versioned gallery](docs/media/README.md)
-after capture and privacy review. Alpha 2 is available from the release linked above. Earlier component
+after capture and privacy review. Alpha 3 is available from the release linked above. Earlier component
 fixtures are not presented as this version's appearance.
 
 ## Build and test

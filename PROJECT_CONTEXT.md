@@ -8,10 +8,9 @@ Status details: `TASKS.md`; executed evidence: `docs/knowledge/TEST_STATUS.md`; 
 A reliable, beautiful, modular native Windows application ("Aether Shell") with two desktop surfaces
 (Dock, Top Status Bar), supporting search/settings/update UI, a per-user installer, signed GitHub
 Releases updates with rollback, reproducible builds and honest documentation. Current product version
-string: `0.3.0-alpha.3` (Alpha 3, D48; pushed to `main`, not yet packaged or released). The latest
-published release is `0.2.0-alpha.2` (second public alpha); exact build, package and publication
-receipts are in HANDOFF and `docs/knowledge/TEST_STATUS.md`. The prior `0.1.0-alpha.1`
-manual-install alpha remains available in Releases.
+string: `0.3.0-alpha.3` (Alpha 3, third public alpha, D48–D50, released 2026-10-27); exact build,
+package and publication receipts are in HANDOFF and `docs/knowledge/TEST_STATUS.md`. The prior
+`0.2.0-alpha.2` and `0.1.0-alpha.1` manual-install alphas remain available in Releases.
 
 ## Architecture
 ```

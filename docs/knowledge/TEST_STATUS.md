@@ -2547,3 +2547,27 @@ Alpha 2 preferences, startup entry and binary unchanged; both Auto-Hide choices 
 Windows CI for `c4592d5`: [run 40520376651](https://github.com/ibrahimbouillet/AetherShell/actions/runs/40520376651)
 **success** (fresh Release build and unit tests, test report, manual-install package preparation and
 the installer upload for review as a workflow artifact; no tag or GitHub Release).
+
+### S-059 — Alpha 3 tagged and published as Latest (Claude, 2026-10-27)
+
+Owner instructions D49 (tag and a draft prerelease for review) and D50 (the owner accepts the version
+as version 3; publish directly as Latest). Release text from `docs/releases/0.3.0-alpha.3.md`,
+committed before the tag in `4835641abef7b6f019bfeec042859cb645554a5d`.
+
+- Windows CI [40523528710](https://github.com/ibrahimbouillet/AetherShell/actions/runs/40523528710)
+  **success** on `4835641` (build, unit tests, package preparation, review artifact).
+- Fresh Release `/W4 /WX` build of `4835641` in a new directory (clean tree): CMake
+  `Aether Shell 0.3.0-alpha.3 (x64)`, generated `kVersion` `0.3.0-alpha.3`, **24/24 unit suites**
+  (45.6 s). `scripts/package.ps1 -SkipBuild` into an empty version-specific folder: package privacy
+  and freshness audit passed; the unsigned manifest was kept local; setup product version
+  `0.3.0-alpha.3`.
+- Tag `v0.3.0-alpha.3` (plain tag, as for Alpha 2) on `4835641`, pushed; `git ls-remote` confirms it.
+- `gh release create --verify-tag --latest` published
+  [the release](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3) at
+  2026-10-27T15:06:24Z: not a draft, not a prerelease, and the API's latest release is
+  `v0.3.0-alpha.3`. Assets: setup 6,369,792 bytes, SHA-256
+  `1db099ecba2e2c88ac525506468e0e4483bb63707b9f3aa1865b6e04bb573e93`; checksums 110 bytes, SHA-256
+  `c2c8fa25a271dfa0ab4d0a4026e75c1dd092031737f60e39f92ea6be1f658716`. GitHub's asset digests match,
+  and a fresh download of both assets is byte-identical to the audited local files.
+- Not executed: installing the published setup on a real machine (the owner's Alpha 2 is untouched),
+  Windows 10, multi-monitor/DPI and the other qualifications listed in KNOWN_LIMITATIONS.

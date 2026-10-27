@@ -6,11 +6,12 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
-**Latest owner instruction, 2026-10-27 — D48 (Claude, S-058):** the accumulated V3 source is
-**Aether Shell Alpha 3, `0.3.0-alpha.3`**, committed and pushed to `main`, with version metadata,
-changelog, [draft release notes](docs/releases/0.3.0-alpha.3.md), README, user guide and reference
-documents updated. A tag, GitHub Release, audited public assets and installation over Alpha 2 remain
-separate owner approvals (RELEASE_PROCESS). Owner acceptance of the S-054 to S-057 behavior is still pending.
+**Delivered, 2026-10-27 — D48–D50 (Claude, S-058/S-059):**
+[Aether Shell Alpha 3, `0.3.0-alpha.3`](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
+is published as the Latest release, accepted by the owner as version 3: tag on the CI-verified
+revision `4835641`, audited setup and checksums only, [release notes](docs/releases/0.3.0-alpha.3.md),
+README downloads switched. Not done: installing Alpha 3 over the owner's Alpha 2 (needs approval),
+Alpha 3 gallery media (T38), and the unexecuted qualifications listed in KNOWN_LIMITATIONS.
 
 **Owner assignment, 2026-10-27 — D47, T49 (implemented in source by Claude, S-057):** Auto-Hide
 for the Dock and the Top Bar (independent persisted settings, edge reveal, smooth transitions, full

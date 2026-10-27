@@ -9,8 +9,8 @@ All notable changes to Aether Shell are documented here. The format follows
 ## [0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3) — 2026-10-27
 
 Third alpha, Alpha 3 (owner decisions D48 and D49): the V3 design and interaction work since Alpha 2.
-Release notes: [docs/releases/0.3.0-alpha.3.md](docs/releases/0.3.0-alpha.3.md). Owner acceptance of
-the latest behavior (S-054 to S-057) is pending.
+Release notes: [docs/releases/0.3.0-alpha.3.md](docs/releases/0.3.0-alpha.3.md). The owner accepted
+this version as Alpha 3 and published it as the Latest release (D50).
 
 ### Added
 

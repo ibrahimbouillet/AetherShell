@@ -2,8 +2,8 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The source on `main` is Alpha 3, `0.3.0-alpha.3` (D48), which has no published setup yet; the latest
-published release is `0.2.0-alpha.2`. Earlier deliveries do not qualify later versions. Build, package and CI
+The current release is Alpha 3, `0.3.0-alpha.3` (D48–D50, published 2026-10-27); `0.2.0-alpha.2`
+and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI
 receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
 
 - The corrected Dock light native fixture intermittently exposes its own HWND as UIA Pane rather
@@ -11,7 +11,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   teardown is under investigation and its relationship to this failure is unproven. Passing earlier
   runs and visual captures do not close this accessibility qualification gap.
 
-- V3 Dock window previews (T43, local source only, not in Alpha 2) show what DWM composes for each
+- V3 Dock window previews (T43, since Alpha 3) show what DWM composes for each
   window. Protected/DRM content may appear black, and some minimized windows offer only their
   caption, shown as an explicit placeholder. An elevated window can refuse the close request (UIPI);
   the card reports the refusal and keeps the window. DWM's above-content thumbnail stacking was
@@ -86,7 +86,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   targets (network/sound/power/privacy Settings and the calendar key chord). The microphone menu
   requests Windows voice typing after restoring application focus. Actual dictation availability/
   focus/permission remains a manual check; automated tests never open it.
-- The V3 Aether Quick Settings panel (D44, local source only) has no documented global switch for
+- The V3 Aether Quick Settings panel (D44, since Alpha 3) has no documented global switch for
   airplane mode, energy saver, night light, mobile hotspot or nearby sharing: those tiles open the
   matching Windows Settings page and say so. Direct output-device switching is not implemented (the
   output view offers mute, the volume mixer and Sound settings). Wi-Fi shows connection state, never a
@@ -94,12 +94,12 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   documented Windows shortcuts, whose effect is not read back. Real radio, audio, brightness,
   accessibility and media actions from this panel need owner checks; automated tests use synthetic
   state and never perform them. Owner visual/motion acceptance is pending.
-- V3 Settings (D43, local source only) integrates its title strip with the Acrylic material on
+- V3 Settings (D43, since Alpha 3) integrates its title strip with the Acrylic material on
   Windows 11 22H2+; Windows 10, transparency off and high contrast keep a standard caption. The
   inactive window shows Windows' flat Acrylic fallback. Scrolling coherence was measured on one
   Windows 11 configuration at 150 % scaling; physical multi-monitor DPI, IME composition and
   screen-reader walkthroughs remain open.
-- V3 notifications and hidden icons (D45, local source only): the Top Bar date/time sends the
+- V3 notifications and hidden icons (D45, since Alpha 3): the Top Bar date/time sends the
   documented Windows shortcut (Win+N on Windows 11, Win+A on Windows 10, whose calendar stays on
   Win+Alt+D in the clock menu). Aether reads no notifications and shows no badges. The hidden-icons
   chevron opens Windows' own notification-area overflow through UI Automation on Explorer's overflow
@@ -108,7 +108,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   below its chevron, about one frame later. Checked live on one Windows 11 build (26300); Windows 10,
   other builds and other monitors are unverified. If Explorer shows no such button (for example when no icon is hidden), the chevron
   reports that it is unavailable and nothing else happens.
-- V3 rounded maximized windows (D45/D46, local source only): an eligible maximized application is
+- V3 rounded maximized windows (D45/D46, since Alpha 3): an eligible maximized application is
   clipped about one DIP inside its rounded outline and a click-through Aether ring beneath it draws the
   thin perimeter. Applications whose caption buttons are drawn by Windows lose them while clipped,
   and for standard captions Windows may draw its own caption over the top of the outline (square
@@ -118,7 +118,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   Aether Settings draws its own caption buttons and turns opaque while maximized. Broad application
   compatibility, physical multi-monitor and 192 DPI behavior still need checks.
 
-- V3 Auto-Hide (D47, local source only, off by default): the Dock and the Top Bar hide while an
+- V3 Auto-Hide (D47, since Alpha 3, off by default): the Dock and the Top Bar hide while an
   application window overlaps them and return at the bottom or top edge of the primary monitor. An
   auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
   than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the

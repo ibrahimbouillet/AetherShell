@@ -6,7 +6,7 @@ Owner/author: Ibrahim Bouillet. License: MIT. Baseline: 2026-10-18, existing pro
 module work orders, plus the owner's request for one traceable specification. The first
 `0.1.0-alpha.1` manual-install alpha is public. The owner-approved V2 prerelease is
 `0.2.0-alpha.2`; its exact build/delivery evidence is recorded separately when executed. The owner
-named the V3 source Alpha 3, `0.3.0-alpha.3` (D48, 2026-10-27); it is pushed to `main` but not released.
+named the V3 source Alpha 3, `0.3.0-alpha.3`, accepted it and released it (D48–D50, 2026-10-27).
 
 **Sources of requirements, in order of authority.** (1) Explicit owner instructions recorded as
 owner-approved decisions in [DECISIONS.md](DECISIONS.md) (including D15, D18, D19, D21 and D23). (2) The owner's original
