@@ -32,7 +32,13 @@ shared `main` checkout:
 - **S-053 corrections:** deferred precision scroll accumulates and resets cancel it; interrupted
   Quick Settings detail transitions continue from the composed frame; media arrival refits the panel;
   a release activates only the target that was pressed. Each has a discriminating regression.
-- **Evidence and limits:** TEST_STATUS S-054; [known limitations](KNOWN_LIMITATIONS.md).
+- **Evidence and limits:** TEST_STATUS S-054; [known limitations](KNOWN_LIMITATIONS.md). Source
+  `c30ef53`; two warning-free Release builds, 24/24 unit suites; native settings_ui 33/33, app 14/14,
+  topbar 5/5, search_ui 10/10, installer 13/13; ui_form 14/16 and controlcenter 13/14 fail only on
+  this live desktop's capture rate and foreground theft (diagnosed, still open).
+- **Private runtime:** the `c30ef53` candidate replaced the `bccd572` trial through the same bounded
+  procedure (installed Alpha 2 preferences, startup and binary unchanged). Nothing was installed,
+  pushed, tagged or released.
 
 ## Previous assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
 

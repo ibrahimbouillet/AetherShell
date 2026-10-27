@@ -2358,3 +2358,18 @@ taken by an external application), not to the product, but they were not rerun o
 on the baseline and stay open. No assistant-operated real-desktop capture or live Explorer overflow
 invocation was made; the overflow identity, the pictured application, Windows 10, Explorer restart,
 192 DPI and physical multi-monitor behavior remain unverified, as does owner visual acceptance.
+
+**Verified source commit and private runtime (2026-10-27, 02:25 CET):** `c30ef5326b5f96c7bcbbacbc0f0cfa4f517560aa`;
+a post-commit build reports `ninja: no work to do` and
+`python scripts/release/audit_package.py build/wf-claude-fluidity/modules/installer/AetherShellSetup.exe
+--source-root . --check-freshness --version 0.2.0-alpha.2` passes. SHA-256: app
+`ba517529c6aea9dbb9ae2d79d9d9711f938d2367fa19ead4765475f04492a9f7`, launcher
+`0b22657ba42873c37bd6d92ea4b7301b859cea0b42d0a7507133e76e05d3f9df`, setup
+`a7f9f0ca57f3dd5ef0a69e1ca46ac0de474bd6833df58076cd5bb314afd58abb`. The `bccd572` trial quit through
+its own data directory and its host restored installed Alpha 2; the same bounded procedure then
+started the new candidate (private clone, five pins, explicit `windowsQuickSettings=false`, new
+fields at their defaults): Dock/Top Bar, taskbar replacement and exactly one corner-guard child
+acknowledged, no warning or error in its log; installed preferences, startup entry and installed
+binary unchanged. A forwarded `--settings` request showed the window (the first, cold open later
+than a 10 s observation window; a second request visible after 0.8 s); it was closed again. No
+desktop capture, notification/overflow invocation or device action was made on the live desktop.
