@@ -273,7 +273,10 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     auto keyConnection = window.KeyboardRequested.Connect([&] { ++keyboard; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     auto netConnection = window.NetworkRequested.Connect([&] { ++network; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     int hiddenIcons = 0;
-    auto hiddenConnection = window.HiddenIconsRequested.Connect([&] { ++hiddenIcons; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    RECT hiddenAnchor{};
+    auto hiddenConnection = window.HiddenIconsRequested.Connect([&](RECT anchor) {
+        ++hiddenIcons; hiddenAnchor = anchor; wrongThread |= ::GetCurrentThreadId() != uiThread;
+    });
     auto weatherConnection = window.WeatherRequested.Connect([&] { ++weather; wrongThread |= ::GetCurrentThreadId() != uiThread; });
     window.Show(false); RunFor(loop, 100);
     const auto click = [&](ItemKind kind) {
@@ -379,7 +382,8 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     auto clockConnection = window.ClockRequested.Connect([&] { ++clock; });
     int calendar = 0, hiddenIcons = 0;
     auto calendarConnection = window.CalendarRequested.Connect([&] { ++calendar; });
-    auto hiddenIconsConnection = window.HiddenIconsRequested.Connect([&] { ++hiddenIcons; });
+    RECT hiddenAnchor{};
+    auto hiddenIconsConnection = window.HiddenIconsRequested.Connect([&](RECT anchor) { ++hiddenIcons; hiddenAnchor = anchor; });
     auto powerConnection = window.PowerSettingsRequested.Connect([&] { ++power; });
     auto voiceConnection = window.VoiceTypingRequested.Connect([&] { ++voice; voiceHadTargetFocus &= focus.foreground == focus.target; });
     window.Show(false); RunFor(loop, 100);
@@ -407,7 +411,19 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
     REQUIRE(window.SetTaskbarReplacementState(true, true, false).ok());
     // D45: the hidden-icons chevron asks for Windows' overflow; it never reveals or resumes the taskbar.
     click(ItemKind::NotificationArea); CHECK_EQ(hiddenIcons, 1); CHECK_EQ(reveal, 0); CHECK_EQ(resume, 0);
+    {
+        // The request carries the chevron's own screen bounds: the overflow is placed below it.
+        const auto chevron = std::find_if(window.Items().begin(), window.Items().end(),
+            [](const auto& item) { return item.item.kind == ItemKind::NotificationArea; });
+        REQUIRE(chevron != window.Items().end());
+        const RECT bar = window.BoundsPx();
+        CHECK_EQ(hiddenAnchor.left, bar.left + static_cast<LONG>(std::lround(window.ToPx(chevron->rect.left))));
+        CHECK_EQ(hiddenAnchor.bottom, bar.top + static_cast<LONG>(std::lround(window.ToPx(chevron->rect.bottom))));
+        CHECK(hiddenAnchor.right > hiddenAnchor.left);
+        hiddenAnchor = RECT{};
+    }
     menu.next = BarCommand::HiddenIcons; click(ItemKind::NotificationArea, true); CHECK_EQ(hiddenIcons, 2);
+    CHECK(hiddenAnchor.right > hiddenAnchor.left);  // the menu command anchors the same way
     window.SetFullscreenHidden(true); click(ItemKind::NotificationArea); window.SetFullscreenHidden(false);
     CHECK_EQ(hiddenIcons, 2);  // a suppressed bar dispatches nothing
     menu.next = BarCommand::RevealWindowsTaskbar;

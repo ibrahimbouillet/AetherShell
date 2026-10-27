@@ -81,11 +81,29 @@ public:
         return Activate(*button);
     }
 
-    bool OverflowOpen() override {
+    bool OverflowOpen() override { return ShownOverflow() != nullptr; }
+
+    std::optional<RECT> OverflowBounds() override {
+        RECT bounds{};
+        const HWND overflow = ShownOverflow();
+        if (!overflow || !::GetWindowRect(overflow, &bounds)) return std::nullopt;
+        return bounds;
+    }
+
+    // Position and z-order only; asynchronous, so a busy Explorer never blocks the worker.
+    bool MoveOverflow(POINT topLeft) override {
+        const HWND overflow = ShownOverflow();
+        return overflow && ::SetWindowPos(overflow, HWND_TOPMOST, topLeft.x, topLeft.y, 0, 0,
+                                          SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_ASYNCWINDOWPOS) != FALSE;
+    }
+
+private:
+    // Explorer's overflow window while it is shown (visible, uncloaked, non-empty), else null.
+    static HWND ShownOverflow() {
         const HWND taskbar = ::FindWindowW(kTaskbarClass, nullptr);
         DWORD explorer = 0;
-        if (!taskbar || !::GetWindowThreadProcessId(taskbar, &explorer) || !explorer) return false;
-        struct Search { DWORD explorer; bool found = false; } search{explorer};
+        if (!taskbar || !::GetWindowThreadProcessId(taskbar, &explorer) || !explorer) return nullptr;
+        struct Search { DWORD explorer; HWND found = nullptr; } search{explorer};
         ::EnumWindows([](HWND window, LPARAM parameter) -> BOOL {
             auto& state = *reinterpret_cast<Search*>(parameter);
             DWORD process = 0;
@@ -98,13 +116,12 @@ public:
             if ((SUCCEEDED(::DwmGetWindowAttribute(window, DWMWA_CLOAKED, &cloaked, sizeof(cloaked))) && cloaked) ||
                 !::GetWindowRect(window, &bounds) || ::IsRectEmpty(&bounds))
                 return TRUE;
-            state.found = true;
+            state.found = window;
             return FALSE;
         }, reinterpret_cast<LPARAM>(&search));
         return search.found;
     }
 
-private:
     // Windows 11: among the system tray buttons (one shared automation id) inside this taskbar's
     // content, the actionable one whose text element shows a chevron glyph.
     static winrt::com_ptr<IUIAutomationElement> Windows11Button(IUIAutomation& automation, HWND taskbar) {
@@ -177,16 +194,55 @@ Result<void> OpenTrayOverflow(ITrayOverflow& tray, const CancellationToken& canc
             wait(timing.interval);
             continue;
         }
-        // Invoked once: the overflow must now appear; never invoke again (that would close it).
-        for (auto waited = std::chrono::milliseconds{0}; waited < timing.openWait; waited += timing.interval) {
+        // Invoked once: the overflow must now appear; never invoke again (that would close it). Short
+        // checks let the placement follow Windows' own within a frame or two.
+        const auto step = std::max(std::chrono::milliseconds{1}, timing.poll);
+        for (auto waited = std::chrono::milliseconds{0}; waited < timing.openWait; waited += step) {
             if (cancel.IsCancelled()) return MakeError(ErrorCode::Cancelled, "hidden icons cancelled");
             if (tray.OverflowOpen()) return Ok();
-            wait(timing.interval);
+            wait(step);
         }
         return tray.OverflowOpen() ? Ok() : Result<void>(MakeError(ErrorCode::Unavailable, "Windows did not show the hidden icons"));
     }
     if (last) return *last;
     return MakeError(ErrorCode::Unavailable, "the Windows taskbar is unavailable");
+}
+
+POINT OverflowPlacement(const RECT& anchor, SIZE overflow, const RECT& work, int gapPx, int marginPx) noexcept {
+    const LONG width = std::max<LONG>(0, overflow.cx), height = std::max<LONG>(0, overflow.cy);
+    const LONG centre = anchor.left + (anchor.right - anchor.left) / 2;
+    const LONG left = std::clamp<LONG>(centre - width / 2, work.left + marginPx, std::max<LONG>(work.left + marginPx, work.right - marginPx - width));
+    const LONG top = std::min<LONG>(anchor.bottom + gapPx, std::max<LONG>(work.top + marginPx, work.bottom - marginPx - height));
+    return POINT{left, top};
+}
+
+Result<void> PlaceTrayOverflow(ITrayOverflow& tray, const RECT& anchor, const RECT& work, UINT dpi, const CancellationToken& cancel,
+                               const OverflowTiming& timing, const std::function<void(std::chrono::milliseconds)>& sleep) {
+    const auto wait = [&](std::chrono::milliseconds duration) {
+        if (sleep) sleep(duration);
+        else std::this_thread::sleep_for(duration);
+    };
+    const int scale = static_cast<int>(dpi ? dpi : 96);
+    const int gap = ::MulDiv(6, scale, 96), margin = ::MulDiv(8, scale, 96);  // as the Quick Settings panel
+    const auto step = std::max(std::chrono::milliseconds{1}, timing.poll);
+    int moves = 0;
+    for (auto held = std::chrono::milliseconds{0}; held <= timing.hold; held += step) {
+        if (cancel.IsCancelled()) return MakeError(ErrorCode::Cancelled, "hidden icons cancelled");
+        const auto bounds = tray.OverflowBounds();
+        if (!bounds) return Ok();  // dismissed already: nothing to hold
+        const POINT target = OverflowPlacement(anchor, SIZE{bounds->right - bounds->left, bounds->bottom - bounds->top}, work, gap, margin);
+        if (bounds->left != target.x || bounds->top != target.y) {
+            // Explorer placed (or re-placed) it by its hidden taskbar; a few corrections at most.
+            if (moves >= timing.moves) return MakeError(ErrorCode::Unavailable, "Windows kept the hidden icons in its own place");
+            if (!tray.MoveOverflow(target)) return Ok();
+            ++moves;
+            wait(3 * step);  // the move is asynchronous: give Explorer a moment before checking again
+            held += 3 * step;
+            continue;
+        }
+        wait(step);
+    }
+    return Ok();
 }
 
 std::unique_ptr<ITrayOverflow> MakeSystemTrayOverflow() { return std::make_unique<SystemTrayOverflow>(); }

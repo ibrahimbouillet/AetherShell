@@ -30,6 +30,7 @@
 #include "install/Install.h"
 #include "platform/net/WinHttpClient.h"
 #include "platform/windows/MessageLoop.h"
+#include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/OsVersion.h"
 #include "platform/windows/SingleInstance.h"
 #include "platform/windows/SystemEvents.h"
@@ -366,26 +367,38 @@ struct ShellApplication::Impl {
     // The hidden-icons chevron (D45): Explorer's own notification-area overflow. A worker invokes the
     // taskbar's overflow button through UI Automation - also while Aether hides the taskbar, which stays
     // hidden: the overflow is a window of its own. Success means Windows showed the overflow window;
-    // failures are reported, never imitated.
-    void OpenHiddenIcons() {
+    // failures are reported, never imitated. The overflow is then moved directly below the chevron
+    // (`anchor`), in front of other topmost windows such as the Dock, on the chevron's monitor.
+    void OpenHiddenIcons(RECT anchor) {
         if (closing || hiddenIconsPending) return;
         if (controls) controls->Close();
         hiddenIconsPending = true;
+        const auto monitor = platform::QueryMonitor(::MonitorFromRect(&anchor, MONITOR_DEFAULTTONEAREST)).value_or(platform::PrimaryMonitor());
+        const RECT work = monitor.workArea;
+        const UINT dpi = monitor.dpi;
         const auto weak = std::weak_ptr<bool>(alive);
         const auto cancel = cancellation.Token();
-        const bool posted = trayWorker.Post([this, weak, cancel] {
+        const bool posted = trayWorker.Post([this, weak, cancel, anchor, work, dpi] {
             Result<void> result = MakeError(ErrorCode::Platform, "hidden icons unavailable");
+            Result<void> placed = Ok();
             try {
                 const auto tray = MakeSystemTrayOverflow();
                 result = OpenTrayOverflow(*tray, cancel);
+                if (result) placed = PlaceTrayOverflow(*tray, anchor, work, dpi, cancel);
             } catch (...) {
                 result = MakeError(ErrorCode::Platform, "hidden icons failed");
             }
-            (void)dispatcher.Post([this, weak, result = std::move(result)] {
+            (void)dispatcher.Post([this, weak, result = std::move(result), placed = std::move(placed)] {
                 const auto live = weak.lock();
                 if (!live || !*live) return;
                 hiddenIconsPending = false;
-                if (closing || result) return;
+                if (closing) return;
+                if (result) {
+                    // Shown, only not where Aether wanted it: worth a log line, not an error for the person.
+                    if (!placed && placed.error().code != ErrorCode::Cancelled)
+                        AETHER_LOG_WARN("app", "hidden icons left where Windows placed them: {}", placed.error().Describe());
+                    return;
+                }
                 AETHER_LOG_WARN("app", "hidden icons unavailable: {}", result.error().Describe());
                 if (topbar) topbar->ReportItemFailure(topbar::ItemKind::NotificationArea, L"Windows did not show its hidden icons");
             });
@@ -868,7 +881,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->PowerSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:powersleep"); }));
     connections.push_back(topbar->ClockRequested.Connect([this]{ OpenNotifications(); }));
     connections.push_back(topbar->CalendarRequested.Connect([this]{ OpenCalendar(); }));
-    connections.push_back(topbar->HiddenIconsRequested.Connect([this]{ OpenHiddenIcons(); }));
+    connections.push_back(topbar->HiddenIconsRequested.Connect([this](RECT anchor){ OpenHiddenIcons(anchor); }));
     connections.push_back(topbar->RevealWindowsTaskbarRequested.Connect([this]{
         if (closing) return;
         automaticResume = true;

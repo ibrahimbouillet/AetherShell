@@ -69,8 +69,9 @@ public:
     Signal<> KeyboardRequested, NetworkRequested, WeatherRequested, MicrophoneSettingsRequested;
     // ClockRequested: Windows' notifications with their calendar; CalendarRequested: the calendar alone.
     Signal<> ClockRequested, CalendarRequested, PowerSettingsRequested, SoundSettingsRequested;
-    // The hidden-icons chevron (D45): the host opens Windows' own notification-area overflow.
-    Signal<> HiddenIconsRequested;
+    // The hidden-icons chevron (D45): the host opens Windows' own notification-area overflow below
+    // the chevron (its screen bounds, physical pixels).
+    Signal<RECT> HiddenIconsRequested;
     Signal<> VoiceTypingRequested;
     // Observed output state changed on the UI thread; never an instruction to change a device.
     // Emitted after the Top Bar model/render update, allowing listeners to destroy the surface.

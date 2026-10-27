@@ -599,8 +599,10 @@ void TopBarWindow::Activate(int id) {
     } else if (id == static_cast<int>(ItemKind::Clock)) impl_->EmitRequest(ClockRequested);
     else if (id == static_cast<int>(ItemKind::Battery)) impl_->EmitRequest(PowerSettingsRequested);
     else if (id == static_cast<int>(ItemKind::NotificationArea)) {
+        // Windows' overflow only (recovery lives in the logo menu), placed below this chevron.
         impl_->tooltip.HideTooltip();
-        impl_->EmitRequest(HiddenIconsRequested);  // Windows' overflow only; recovery lives in the logo menu
+        try { HiddenIconsRequested.Emit(impl_->ItemBounds(item->rect)); }
+        catch (...) { AETHER_LOG_ERROR("topbar", "request listener threw an exception"); }
     } else if (id == static_cast<int>(ItemKind::Logo)) ShowItemMenu(id);
 }
 void TopBarWindow::ShowItemMenu(int id) { ShowItemMenu(id, impl_->keyboardMenu); }
@@ -656,7 +658,7 @@ void TopBarWindow::ShowItemMenu(int id, bool keyboard) {
         case BarCommand::PowerSettings: state.EmitRequest(owner.PowerSettingsRequested); break;
         case BarCommand::Clock: state.EmitRequest(owner.ClockRequested); break;
         case BarCommand::Calendar: state.EmitRequest(owner.CalendarRequested); break;
-        case BarCommand::HiddenIcons: state.EmitRequest(owner.HiddenIconsRequested); break;
+        case BarCommand::HiddenIcons: owner.Activate(static_cast<int>(ItemKind::NotificationArea)); break;
         case BarCommand::RevealWindowsTaskbar: state.EmitRequest(owner.RevealWindowsTaskbarRequested); break;
         case BarCommand::ResumeReplacement: state.EmitRequest(owner.ResumeTaskbarReplacementRequested); break;
     }
