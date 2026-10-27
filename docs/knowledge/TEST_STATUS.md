@@ -2445,3 +2445,7 @@ unchanged). Invoking the trial's chevron: Explorer showed the overflow above its
 physical pixels at 150 %), 9 px below it, no overlap with the Dock window, above the Top Bar in
 z-order, no warning logged. Still open: the owner's own look at the placement (including the
 one-frame appearance at Windows' position) and a second chevron click while the overflow is open.
+
+**Owner acceptance (2026-10-27):** after trying the `448b883` trial, the owner confirmed that the
+overflow now appears below the chevron and looks right. A second chevron click while the overflow is
+open was not reported on; Windows 10, Explorer restart and other monitors remain unverified.

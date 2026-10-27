@@ -41,8 +41,8 @@ shared `main` checkout:
   and binary unchanged). Nothing was installed, pushed, tagged or released.
 - **Live hidden-icons check (S-055/S-056, owner-approved):** verified end to end on Windows 11 build
   26300. After the owner reported the overflow at the bottom right behind the Dock, Aether moves it
-  centred below the Top Bar chevron, in front (`448b883`). The owner's look at the new placement and
-  at a second chevron click while the overflow is open is still pending.
+  centred below the Top Bar chevron, in front (`448b883`); the owner confirmed the placement looks
+  right. A second chevron click while the overflow is open has not been reported on.
 
 ## Previous assignment — notifications, hidden icons and rounded frames (D45, 2026-10-26)
 
