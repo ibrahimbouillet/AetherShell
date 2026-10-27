@@ -2449,3 +2449,49 @@ one-frame appearance at Windows' position) and a second chevron click while the 
 **Owner acceptance (2026-10-27):** after trying the `448b883` trial, the owner confirmed that the
 overflow now appears below the chevron and looks right. A second chevron click while the overflow is
 open was not reported on; Windows 10, Explorer restart and other monitors remain unverified.
+
+### S-057 — Chevron toggle, focus cues, Mica reacquisition and Auto-Hide (Claude, 2026-10-27)
+
+Owner feedback on the `448b883` trial (screenshots kept private; their content is not transcribed):
+the chevron must toggle (arrow up while open, a second click closes), its white click outline must go,
+some maximized windows were not really rounded or showed content beyond the rim, and a new Auto-Hide
+mode for the Dock and the Top Bar (D47/FR-039/T49), with bars kept visible on an uncovered desktop.
+
+**Diagnosis (read-only, local; classes, process image names, regions and styles only, nothing
+recorded beyond this summary):** the trial Top Bar held keyboard focus on its thread with the chevron
+as focused item, and the ring was drawn whenever that was true. One maximized Chromium window had its
+Mica back and no lease (the guard had treated the re-applied material as the application's choice),
+while its siblings were clipped with rings beneath them; through the cut corners of the windows above,
+its square content looked like content past the rim.
+
+**Changes:** `3bfbc0be151c2c9724a31005347821e5ecd5e9bb` (toggle via `CloseTrayOverflow` and a 100 ms
+watch timer, a 0.5 s window for a press that itself dismissed the overflow, arrow state
+`SetHiddenIconsOpen`; focus ring only with keyboard cues; `CornerReplacement` and `CornerRetryDelay`:
+a re-asserted previous material is clipped again after 0.25 s doubling to 8 s, at most eight times per
+maximize) and `8134984` (Auto-Hide: settings, `AutoHideState`, `ApplicationWindowCovers`, the 50 ms
+sampler, bar `SetAutoHidden`/`Engaged`, no reservation while auto-hiding, side margins released with
+both).
+
+**Executed:** complete Release /W4 /WX builds after each change, **24/24 unit suites** (18.8 s, then
+27.0 s; app unit 74 cases including 4 Auto-Hide decisions, 20 corner and 10 hidden-icons cases;
+settings 57 including the Auto-Hide schema/persistence case). Native: app **14/14** (all corner/rim
+pixel cases and the new "re-asserted material is clipped again; another choice waits for a new
+maximize"), Top Bar **6/6** (focus cues, arrow state; auto-hide hide/show, full-screen priority,
+motion), Dock **13/13** (auto-hide: menu use, full-screen priority, motion), both as whole-suite reruns
+on the final binaries, Settings UI 31/33 in the full run
+with the dropdown and theme-change cases passing on an isolated rerun (the S-052 foreground
+flakiness), app integration 14/14.
+
+**Verified source commit and private runtime (2026-10-27, 10:40 CET):**
+`81349847bb4cf02cd6f305be96e95823c274dac5`; a post-commit build reports `ninja: no work to do` and
+`python scripts/release/audit_package.py build/wf-claude-fluidity/modules/installer/AetherShellSetup.exe
+--source-root . --check-freshness --version 0.2.0-alpha.2` passes. SHA-256: app
+`0bff278e225beadbddf4a6e16e17ddba70c8bacf34643cf36105beb264f98a93`, launcher
+`96451909583b74166399c35ea4068b49215260ee2fe41a8c2de9e59dbcea1186`, setup
+`250d802fbe2fe4a1c214577312af474251306c931ffd60037d76987efc2e02c1`. The `3bfbc0b` trial quit through
+its own data directory, its host restored installed Alpha 2, and the same bounded procedure started
+`8134984` (installed preferences, startup entry and binary unchanged; Dock/Top Bar, replacement and
+exactly one corner-guard child acknowledged; no warning or error logged). The trial's private settings
+clone has no Auto-Hide keys, so Auto-Hide is off there until the owner turns it on in Settings. Live
+edge reveal, animation, the toggle on the real overflow and real applications with Auto-Hide await
+the owner's check.
