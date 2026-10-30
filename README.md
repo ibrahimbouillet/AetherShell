@@ -11,6 +11,11 @@
   <a href="https://github.com/ibrahimbouillet/AetherShell/actions/workflows/ci.yml"><img alt="Windows CI" src="https://github.com/ibrahimbouillet/AetherShell/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-2ea44f.svg"></a>
   <img alt="Windows x64" src="https://img.shields.io/badge/platform-Windows%20x64-0078D4.svg">
+  <a href="https://www.youtube.com/@IbrahimBouillet">
+  <img alt="YouTube Channel" src="https://img.shields.io/badge/YouTube-Subscribe-red?logo=youtube&logoColor=white">
+</a>
+
+
 </p>
 
 ![Aether Shell Demo](./resources/branding/gif/AetherShell.gif)
