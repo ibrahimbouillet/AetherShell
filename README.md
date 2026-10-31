@@ -29,6 +29,18 @@ Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under th
 > **Alpha software:** 0.3.0-alpha.3 (Alpha 3) is an early public preview. It is not a fully qualified
 > Windows shell replacement. Save your work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
 
+<h2 align="center">A New Desktop. A New Atmosphere.</h2>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="./resources/preview/setup_preview-1.png" alt="Aether Shell Desktop Preview 1" width="100%">
+    </td>
+    <td width="50%">
+      <img src="./resources/preview/setup_preview-2.png" alt="Aether Shell Desktop Preview 2" width="100%">
+    </td>
+  </tr>
+</table>
 ## What it does
 
 - **Dock:** launch and switch between applications, keep favorites, reorder pinned icons, see running
