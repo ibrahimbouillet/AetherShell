@@ -2902,3 +2902,7 @@ at 52 px, out exactly one second later; passing through does nothing.
 Other native suites were not repeated: only the Auto-Hide zone and the version changed.
 
 **Not executed:** the owner's hand on this build, and whether a browser's tabs now get in the way (D58's price).
+
+**Test build 3.2:** `AetherShell-0.3.2-alpha.3-win-x64-setup.exe`, 6696960 bytes, SHA-256
+`d0cb9e6ebfb69a0cf5cb479e8a5b7160f3d3b84813f791e7c478368c4f95b824`, built by `scripts/package.ps1` from commit `a037841`; the
+package privacy audit passed. Not pushed, tagged or published, and the setup itself has not been run.
