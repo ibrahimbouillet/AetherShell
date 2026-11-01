@@ -2,8 +2,12 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "ui/form/FormScrollView.h"
 
+#include <commctrl.h>
+
 #include "diagnostics/Logger.h"
 #include "graphics/FrameScheduler.h"
+#include "graphics/ScrollPhysics.h"
+#include "platform/windows/PointerInput.h"
 #include "platform/windows/WindowUtilities.h"
 #include "ui/form/FormInternal.h"
 #include "ui/form/FormPaint.h"
@@ -16,6 +20,8 @@
 #include <functional>
 #include <new>
 #include <optional>
+#include <string_view>
+#include <vector>
 
 namespace aether::ui::form {
 namespace {
@@ -26,6 +32,9 @@ constexpr wchar_t kIndicatorClass[] = L"AetherShell.FormScroll.Indicator";
 constexpr UINT_PTR kAnimationTimer = 0x5343524Cu;  // "SCRL"
 constexpr float kWheelLineDip = 16.0f;              // one wheel "line"
 constexpr float kLineDip = 48.0f;                   // SB_LINEUP / SB_LINEDOWN and UIA small steps
+constexpr UINT_PTR kTouchTimer = 0x54434855u;        // "TCHU": contact liveness while a finger is down
+constexpr float kTouchSlopDip = 8.0f;               // movement that turns a press into a pan (FR-040)
+constexpr float kTouchOverscrollDip = 120.0f;       // largest elastic displacement past either end
 constexpr float kMinThumbDip = 24.0f;
 constexpr float kRevealMarginDip = 12.0f;
 
@@ -192,7 +201,22 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     RECT frame{};
     int content = 0;
     int position = 0;
-    int wheelRemainder = 0;
+    int wheelRemainder = 0;    // page-mode notches (WHEEL_PAGESCROLL)
+    double wheelPixels = 0.0;  // AS4-13: the fraction of a pixel carried to the next wheel packet
+    // FR-040 touch: the content follows the finger, flings and springs back past either end. The
+    // logical position stays within [0, Range()]; `elastic` is a temporary visual displacement.
+    graphics::TouchGesture gesture;
+    graphics::ScrollPhysics physics;
+    HWND touchTarget = nullptr;
+    HWND touchSlider = nullptr;   // the slider a sideways pan was handed to
+    POINT touchSliderLast{};      // where that finger was last, in screen pixels
+    POINT touchPointPx{};               // the contact in touchTarget client pixels at the press
+    bool touchPanning = false;          // a finger is moving the content
+    bool touchMoving = false;           // fling or spring after the finger lifted
+    bool touchCaughtMotion = false;     // the press stopped a moving view: it is not a tap
+    bool touchTimer = false;
+    int elastic = 0;
+    std::optional<int> deferredElastic;
     // Animated scrolling follows a critically damped spring: new wheel notches retarget it without
     // resetting its velocity, a reversal decelerates through zero instead of jumping, and it never
     // overshoots the content.
@@ -260,7 +284,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             scrolling = false;
             spring.SnapTo(static_cast<float>(position));
         }
-        ::SetWindowPos(canvas, nullptr, 0, -position, width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+        ::SetWindowPos(canvas, nullptr, 0, -(position + elastic), width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
         const int gutter = Gutter();
         ::SetWindowPos(indicator, HWND_TOP, width - gutter, 0, gutter, client.bottom,
                        SWP_NOACTIVATE | (Range() > 0 ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));
@@ -299,37 +323,53 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         if (masking == Masking::None) return;
         masking = Masking::None;
         deferred.reset();
+        deferredElastic.reset();
         if (surface) surface->UnmaskEditors(viewport);
     }
 
     // `continuous`: part of a motion (spring, drag, touchpad) - masked next to editors. An isolated jump
     // (keyboard, UI Automation, focus reveal) lands coherently in one composition and moves at once.
-    void Apply(int next, bool continuous = true) {
+    void Apply(int next, bool continuous = true, int nextElastic = 0) {
         next = std::clamp(next, 0, Range());
         if (!viewport) return;
-        if (next == position) {
+        if (next == position && nextElastic == elastic) {
             deferred.reset();  // back where the view already is (Home, a reset): nothing may land later
+            deferredElastic.reset();
             return;
         }
         if (masking == Masking::Imaging || masking == Masking::Holding) {
             deferred = next;
+            deferredElastic = nextElastic;
             return;
         }
         if ((continuous || masking != Masking::None) && !ReadyToMove()) {
             deferred = next;
+            deferredElastic = nextElastic;
             return;
         }
-        ApplyNow(next);
+        ApplyNow(next, nextElastic);
         if (masking != Masking::None) RequestFrame();  // reveal once the motion has settled
     }
 
-    void ApplyNow(int next) {
+    // Lands a held-back move (with its elastic displacement) once the editors are masked.
+    void ApplyDeferred() {
+        if (!deferred) return;
+        const int target = *deferred;
+        const int stretch = deferredElastic.value_or(0);
+        deferred.reset();
+        deferredElastic.reset();
+        ApplyNow(target, stretch);
+    }
+
+    void ApplyNow(int next, int nextElastic = 0) {
         next = std::clamp(next, 0, Range());
-        if (next == position || !viewport) return;
+        if (!viewport || (next == position && nextElastic == elastic)) return;
         movedSinceTick = true;
         const double before = VerticalPercent();
-        const int previous = position;
+        const int previous = position + elastic;
+        const bool logical = next != position;
         position = next;
+        elastic = nextElastic;
         RECT client{};
         ::GetClientRect(viewport, &client);
         // The whole visible scene - material, cards and every control at the new offset - is
@@ -338,13 +378,14 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         // one painted. The grain stays anchored to the form because every visible pixel comes from
         // the scene.
         const auto move = [&] {
-            ::SetWindowPos(canvas, nullptr, 0, -position, client.right, std::max<int>(client.bottom, content),
+            ::SetWindowPos(canvas, nullptr, 0, -(position + elastic), client.right, std::max<int>(client.bottom, content),
                            SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
         };
-        if (!surface->PresentMove(viewport, canvas, previous - next, move)) {
+        if (!surface->PresentMove(viewport, canvas, previous - (position + elastic), move)) {
             move();
             ::RedrawWindow(viewport, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
         }
+        if (!logical) return;  // an elastic displacement alone is not a scroll (UIA, owners)
         RaiseScrolled(before);
         if (owner && owner->scrolled) {
             const std::weak_ptr<int> alive = life;
@@ -371,6 +412,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
 
     void ScrollTo(int target, bool animate) {
         if (!viewport || !surface) return;
+        StopTouchMotion();
         target = std::clamp(target, 0, Range());
         const auto& motion = surface->Motion();
         const int from = scrolling ? static_cast<int>(std::lround(spring.Value())) : Pending();
@@ -396,6 +438,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     // Continuous input (precision touchpads, high-resolution wheels) already arrives smoothly: it
     // moves the view at once, carrying any notch animation in flight along with it.
     void ScrollImmediately(int delta) {
+        StopTouchMotion();
         if (!scrolling) {
             Apply(Pending() + delta);
             return;
@@ -443,9 +486,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             if (surface->MaskEditors(viewport)) {
                 masking = surface->EditorsMasked(viewport) ? Masking::Holding : Masking::None;
                 if (masking == Masking::None && deferred) {
-                    const int target = *deferred;
-                    deferred.reset();
-                    ApplyNow(target);
+                    ApplyDeferred();
                     if (alive.expired()) return;
                 }
             }
@@ -456,12 +497,16 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             masking = Masking::Moving;
             lastStep = now;
             if (deferred) {
-                const int target = *deferred;
-                deferred.reset();
-                ApplyNow(target);
+                ApplyDeferred();
                 if (alive.expired()) return;
             }
             again = true;
+        } else if (touchMoving) {
+            const bool running = physics.Step(now);
+            ApplyPhysics();
+            if (alive.expired()) return;
+            touchMoving = running;
+            again = running;
         } else if (scrolling) {
             spring.Step(std::clamp(now - lastStep, 0.0, 0.05));
             lastStep = now;
@@ -476,7 +521,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         movedSinceTick = false;
         if (masking == Masking::Revealing && !moved) {
             EndMasking();
-        } else if (masking == Masking::Moving && wasMoving && !moved && !scrolling && !dragging) {
+        } else if (masking == Masking::Moving && wasMoving && !moved && !scrolling && !dragging && !touchPanning && !touchMoving) {
             masking = Masking::Revealing;  // one still frame first, then the editors return
             again = true;
         } else if (masking != Masking::None) {
@@ -497,6 +542,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
 
     void PolicyChanged() {
         if (surface->Motion().AllowsMovement() && surface->Material() != FormMaterial::Native) return;
+        StopTouchMotion();
         const int target = deferred.value_or(Goal());
         scrolling = false;
         EndMasking();
@@ -641,6 +687,187 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
         }
     }
 
+    // --- touch (FR-040) ---
+    // Live scroll views of this thread, for the message-loop router (RoutePointer).
+    static std::vector<Impl*>& Views() {
+        thread_local std::vector<Impl*> views;
+        return views;
+    }
+    [[nodiscard]] bool Contains(HWND hwnd) const noexcept {
+        return viewport && hwnd && (hwnd == viewport || ::IsChild(viewport, hwnd)) && ::IsWindowVisible(viewport);
+    }
+    // Native editors, lists and scroll bars keep their own touch handling (selection, IME, nested
+    // scrolling); the indicator keeps its own drag. A slider is decided by direction, below.
+    [[nodiscard]] bool OwnsTouch(HWND hwnd) const {
+        if (hwnd == indicator) return false;
+        const auto name = platform::WindowClassName(hwnd);
+        constexpr std::wstring_view native[]{L"Edit", L"ComboBox", L"ComboLBox", L"ListBox",
+            L"ScrollBar", L"SysListView32", L"SysTreeView32", L"msctls_updown32"};
+        for (const auto excluded : native) if (::CompareStringOrdinal(name.c_str(), static_cast<int>(name.size()),
+            excluded.data(), static_cast<int>(excluded.size()), TRUE) == CSTR_EQUAL) return false;
+        return !name.starts_with(L"RichEdit") && !name.starts_with(L"RICHEDIT");
+    }
+    [[nodiscard]] static bool IsSlider(HWND hwnd) {
+        return hwnd && platform::WindowClassName(hwnd) == TRACKBAR_CLASSW;
+    }
+    // A sideways pan that began on a slider is the slider's, through the same input as the mouse, starting
+    // from where the finger went down. An up or down pan on it still scrolls the page, and a tap moves it.
+    void BeginSliderTouch(double time) {
+        if (!touchTarget || !::IsWindow(touchTarget) || !::IsWindowEnabled(touchTarget) || !IsSlider(touchTarget)) return;
+        if (physics.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+            physics.Release(time);
+            touchMoving = physics.Moving();
+            if (touchMoving) { lastStep = Now(); RequestFrame(); }
+        }
+        touchSlider = touchTarget;
+        (void)::SendMessageW(touchSlider, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(touchPointPx.x, touchPointPx.y));
+    }
+    void SendSliderTouch(UINT message, POINT screen) {
+        if (!touchSlider || !::IsWindow(touchSlider)) { touchSlider = nullptr; return; }
+        POINT client = screen;
+        ::ScreenToClient(touchSlider, &client);
+        (void)::SendMessageW(touchSlider, message, message == WM_LBUTTONUP ? 0 : MK_LBUTTON, MAKELPARAM(client.x, client.y));
+        if (message == WM_LBUTTONUP) touchSlider = nullptr;
+    }
+    void ConfigurePhysics() {
+        graphics::ScrollPhysicsParameters parameters;
+        const double scale = surface ? surface->ToPx(1.0f) : 1.0;
+        parameters.minimumFling *= scale;
+        parameters.maximumVelocity *= scale;
+        parameters.stopVelocity *= scale;
+        parameters.restVelocity *= scale;
+        parameters.maximumOverscroll = Px(kTouchOverscrollDip);
+        physics.SetParameters(parameters);
+        physics.SetReducedMotion(!surface || !surface->Motion().AllowsMovement() || surface->Material() == FormMaterial::Native);
+        physics.SetExtent(Range(), std::max(1, Page()));
+        gesture.SetParameters({static_cast<double>(Px(kTouchSlopDip)), 0.5});
+        gesture.SetAxis(graphics::TouchAxis::Vertical);
+    }
+    // Places the content where the physics says: the logical part scrolls, the rest is elastic.
+    void ApplyPhysics() {
+        const int visual = static_cast<int>(std::lround(physics.Visual()));
+        const int logical = std::clamp(visual, 0, Range());
+        Apply(logical, true, visual - logical);
+    }
+    void StopTouchMotion() {
+        if (touchPanning) { gesture.Cancel(); touchPanning = false; EndTouch(); }
+        if (!touchMoving && elastic == 0) return;
+        touchMoving = false;
+        physics.JumpTo(position);
+        if (elastic != 0) ApplyNow(position, 0);
+    }
+    void EndTouch() noexcept {
+        if (touchTimer && viewport) ::KillTimer(viewport, kTouchTimer);
+        touchTimer = false;
+        touchTarget = nullptr;
+    }
+    bool TouchDown(const MSG& message) {
+        const auto contact = platform::ReadPointer(message.wParam);
+        if (!contact) return false;
+        if (gesture.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+            // A second finger never taps; the first one keeps panning.
+            (void)gesture.Down(contact->id, contact->screenPx.x, contact->screenPx.y, contact->time);
+            return true;
+        }
+        if (Range() <= 0 && !IsSlider(message.hwnd)) return false;  // nothing to scroll: the control keeps its native touch
+        ConfigurePhysics();
+        touchCaughtMotion = touchMoving || scrolling || elastic != 0;
+        if (scrolling) { scrolling = false; spring.SnapTo(static_cast<float>(Pending())); }
+        if (!touchMoving) physics.JumpTo(position + elastic);
+        if (touchMoving) physics.Grab(contact->screenPx.y, contact->time);  // catch the fling where it is
+        touchMoving = false;
+        (void)gesture.Down(contact->id, contact->screenPx.x, contact->screenPx.y, contact->time);
+        touchTarget = message.hwnd;
+        touchPointPx = contact->screenPx;
+        ::ScreenToClient(touchTarget, &touchPointPx);
+        touchTimer = ::SetTimer(viewport, kTouchTimer, 100, nullptr) != 0;
+        return true;
+    }
+    bool TouchMove(const MSG& message) {
+        const auto contact = platform::ReadPointer(message.wParam);
+        if (!contact || !gesture.Tracking(contact->id)) return false;
+        if (contact->canceled) { TouchCancel(); return true; }
+        const auto event = gesture.Move(contact->id, contact->screenPx.x, contact->screenPx.y, contact->time);
+        if (event == graphics::TouchGesture::Event::Canceled) BeginSliderTouch(contact->time);
+        if (touchSlider) {
+            touchSliderLast = contact->screenPx;
+            SendSliderTouch(WM_MOUSEMOVE, contact->screenPx);
+            return true;
+        }
+        if (event == graphics::TouchGesture::Event::PanStarted) {
+            touchPanning = true;
+            // From where the finger is now: the slop is not added as a jump.
+            if (physics.CurrentPhase() != graphics::ScrollPhysics::Phase::Tracking) physics.Grab(contact->screenPx.y, contact->time);
+        }
+        if (touchPanning) {
+            physics.Drag(contact->screenPx.y, contact->time);
+            ApplyPhysics();
+        }
+        return true;
+    }
+    bool TouchUp(const MSG& message) {
+        const auto contact = platform::ReadPointer(message.wParam);
+        if (!contact || !gesture.Tracking(contact->id)) return false;
+        if (contact->canceled) { TouchCancel(); return true; }
+        const auto event = gesture.Up(contact->id, contact->screenPx.x, contact->screenPx.y, contact->time);
+        const HWND target = touchTarget;
+        const POINT point = touchPointPx;
+        const bool caught = touchCaughtMotion;
+        EndTouch();
+        if (touchSlider) {
+            SendSliderTouch(WM_LBUTTONUP, contact->screenPx);
+            return true;
+        }
+        if (touchPanning) {
+            touchPanning = false;
+            physics.Release(contact->time);
+            touchMoving = physics.Moving();
+            lastStep = Now();
+            ApplyPhysics();
+            if (touchMoving || masking != Masking::None) RequestFrame();
+        } else if (physics.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+            physics.Release(contact->time);  // a caught fling held still: rests (or springs back)
+            touchMoving = physics.Moving();
+            if (touchMoving) { lastStep = Now(); RequestFrame(); }
+        }
+        if (event == graphics::TouchGesture::Event::Tap && !caught) Tap(target, point);
+        return true;
+    }
+    void TouchCancel() {
+        (void)gesture.Cancel();
+        EndTouch();
+        if (touchSlider) {
+            SendSliderTouch(WM_LBUTTONUP, touchSliderLast);  // it stays where the finger had it
+            return;
+        }
+        if (touchPanning || physics.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+            touchPanning = false;
+            physics.Cancel(Now());
+            touchMoving = physics.Moving();
+            lastStep = Now();
+            ApplyPhysics();
+            if (touchMoving || masking != Masking::None) RequestFrame();
+        }
+    }
+    // The contact disappeared without an up we routed (capture moved, a system gesture took it).
+    void TouchWatch() {
+        const auto pointer = gesture.Pointer();
+        const auto contact = pointer ? platform::ReadPointer(MAKEWPARAM(*pointer, 0)) : std::nullopt;
+        if (!contact || !contact->inContact || contact->canceled) TouchCancel();
+    }
+    // A still press released on a control: the same messages a mouse click delivers, so the control
+    // presses, captures and activates itself exactly as it does for the mouse.
+    static void Tap(HWND target, POINT point) {
+        if (!target || !::IsWindow(target) || !::IsWindowVisible(target) || !::IsWindowEnabled(target)) return;
+        RECT client{};
+        if (!::GetClientRect(target, &client) || !::PtInRect(&client, point)) return;
+        const LPARAM at = MAKELPARAM(point.x, point.y);
+        (void)::SendMessageW(target, WM_MOUSEMOVE, 0, at);
+        if (!::IsWindow(target)) return;
+        (void)::SendMessageW(target, WM_LBUTTONDOWN, MK_LBUTTON, at);
+        if (::IsWindow(target)) (void)::SendMessageW(target, WM_LBUTTONUP, 0, at);
+    }
+
     // --- input ---
     bool Wheel(WPARAM wParam) {
         if (Range() <= 0) return false;
@@ -654,10 +881,14 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             wheelRemainder -= pages * WHEEL_DELTA;
             delta = -pages * Page();
         } else {
-            // Precision touchpads send fractions of a notch: scroll them proportionally.
-            const double pixels = static_cast<double>(wheelRemainder) / WHEEL_DELTA * lines * Px(kWheelLineDip);
-            delta = -static_cast<int>(pixels);
-            if (delta != 0) wheelRemainder = 0;
+            // Precision touchpads send fractions of a notch: scroll them proportionally. AS4-13: the
+            // fraction of a pixel left over is carried (with its sign), so equal totals travel equally
+            // far whether they arrive as one notch or as many small packets.
+            wheelRemainder = 0;
+            wheelPixels += static_cast<double>(raw) / WHEEL_DELTA * lines * Px(kWheelLineDip);
+            const double whole = std::trunc(wheelPixels);
+            wheelPixels -= whole;
+            delta = -static_cast<int>(whole);
         }
         if (delta == 0) return true;
         if (raw % WHEEL_DELTA != 0) ScrollImmediately(delta);  // continuous source: follow it directly
@@ -783,6 +1014,10 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
     }
 
     void DestroyWindows() noexcept {
+        std::erase(Views(), this);
+        (void)gesture.Cancel();
+        touchPanning = touchMoving = false;
+        EndTouch();
         if (surface) {
             if (auto* scheduler = surface->Scheduler()) scheduler->Cancel(this);
         }
@@ -835,6 +1070,13 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
                         self->Tick(self->Now());
                         return 0;
                     }
+                    if (wParam == kTouchTimer) {
+                        self->TouchWatch();
+                        return 0;
+                    }
+                    break;
+                case WM_CANCELMODE:
+                    self->TouchCancel();
                     break;
                 case WM_SIZE:
                     self->Layout();
@@ -845,6 +1087,9 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
                     }
                     break;
                 case WM_DESTROY:
+                    (void)self->gesture.Cancel();
+                    self->touchPanning = self->touchMoving = false;
+                    self->EndTouch();
                     self->Disconnect();
                     self->StopTimer();
                     break;
@@ -953,6 +1198,7 @@ Result<void> FormScrollView::Create(FormSurface& surface, HWND parent, int id) {
             impl.viewport, [&impl](ID2D1DeviceContext* target, const graphics::DesignTokens& tokens) { impl.DrawThumbOverlay(target, tokens); },
             impl.indicator);
         impl.Layout();
+        Impl::Views().push_back(&impl);
         return Ok();
     } catch (...) {
         impl.DestroyWindows();
@@ -1049,6 +1295,40 @@ bool FormScrollView::HandleScrollCode(int code, int thumbPositionPx) {
     } catch (...) {
         return false;
     }
+}
+
+}  // namespace aether::ui::form
+
+namespace aether::ui::form {
+
+bool FormScrollView::RoutePointer(MSG& message) {
+    try {
+        if (!platform::IsPointerMessage(message.message) || message.message == WM_POINTERCAPTURECHANGED) return false;
+        auto& views = Impl::Views();
+        if (message.message == WM_POINTERDOWN) {
+            for (auto* view : views) {
+                if (view->gesture.Pointer()) {
+                    // A tracked contact elsewhere in this view: a second finger is consumed, never a tap.
+                    if (view->Contains(message.hwnd)) return view->TouchDown(message);
+                    continue;
+                }
+            }
+            if (!platform::IsTouchPointer(message.wParam)) return false;
+            for (auto* view : views) {
+                if (!view->Contains(message.hwnd) || !view->OwnsTouch(message.hwnd)) continue;
+                return view->TouchDown(message);
+            }
+            return false;
+        }
+        const UINT32 id = GET_POINTERID_WPARAM(message.wParam);
+        for (auto* view : views) {
+            if (!view->gesture.Tracking(id)) continue;
+            return message.message == WM_POINTERUP ? view->TouchUp(message) : view->TouchMove(message);
+        }
+    } catch (...) {
+        AETHER_LOG_ERROR("ui_form", "touch routing failed");
+    }
+    return false;
 }
 
 }  // namespace aether::ui::form

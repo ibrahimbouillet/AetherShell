@@ -23,7 +23,10 @@
 #include <atomic>
 #include <memory>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
 using namespace aether;
 using namespace aether::ui::form;
@@ -955,6 +958,49 @@ ConfirmChoice RunDialog(const ConfirmRequest& request, const graphics::DesignTok
 }
 
 }  // namespace
+
+// D56: joining a Wi-Fi network. A masked native field; what was typed reaches only the caller, only on Connect.
+AETHER_TEST("form confirmation: the password field is masked, and answers only to the primary button") {
+    platform::ComApartment com{COINIT_APARTMENTTHREADED};
+    const auto tokens = graphics::MakeDesignTokens(graphics::ThemeMode::Dark);
+    const auto ask = [&](const wchar_t* typed, int button) {
+        std::wstring password = L"left over";
+        ConfirmRequest request;
+        request.title = L"Connect to a network";
+        request.message = L"Enter this network's password.";
+        request.primary = L"&Connect";
+        request.defaultChoice = ConfirmChoice::Primary;
+        request.password = &password;
+        bool masked = false;
+        SetConfirmationTestHook([&](HWND dialog) {
+            HWND field = nullptr;
+            ::EnumChildWindows(dialog, [](HWND child, LPARAM out) -> BOOL {
+                wchar_t name[16]{};
+                ::GetClassNameW(child, name, 16);
+                if (std::wstring_view(name) != L"Edit") return TRUE;
+                *reinterpret_cast<HWND*>(out) = child;
+                return FALSE;
+            }, reinterpret_cast<LPARAM>(&field));
+            if (field) {
+                // Focus goes straight to the field once the dialog is active (another application may own the foreground).
+                masked = (::GetWindowLongPtrW(field, GWL_STYLE) & ES_PASSWORD) != 0 && (::GetActiveWindow() != dialog || ::GetFocus() == field);
+                ::SetWindowTextW(field, typed);
+            }
+            ::PostMessageW(dialog, WM_COMMAND, MAKEWPARAM(button, BN_CLICKED), 0);
+        });
+        const auto choice = ShowConfirmation(request, tokens, graphics::MotionPolicy{});
+        SetConfirmationTestHook({});
+        REQUIRE(choice.ok());
+        CHECK(masked);
+        return std::pair{*choice, password};
+    };
+    const auto connected = ask(L"correct horse", IDOK);
+    CHECK(connected.first == ConfirmChoice::Primary);
+    CHECK_EQ(connected.second, std::wstring(L"correct horse"));
+    const auto canceled = ask(L"correct horse", IDCANCEL);
+    CHECK(canceled.first == ConfirmChoice::Cancel);
+    CHECK(canceled.second.empty());
+}
 
 AETHER_TEST("ui_form integration: confirmation dialog keyboard, buttons, owner and quit") {
     platform::ComApartment com(COINIT_APARTMENTTHREADED);

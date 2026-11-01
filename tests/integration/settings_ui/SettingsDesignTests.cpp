@@ -193,6 +193,34 @@ AETHER_TEST("settings design: every page lays out without overlap at default, sm
     window.Close();
 }
 
+// The owner's report: sliders that lag. Applying re-themes and lays out every surface on the UI thread,
+// and it used to run in the middle of a drag whenever the hand paused for a moment.
+AETHER_TEST("settings design: a held slider only stages its value, and letting go applies it at once") {
+    Fixture f("settings-design-slider-hold");
+    REQUIRE(f.service.Update([](settings::Settings& s) { s.dock.opacity = 0.8; }).ok());
+    REQUIRE(PumpUntil(f.dispatcher, [&] { return !f.service.Dirty(); }));
+    settings::ui::SettingsWindow window(f.service, f.dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    HWND slider = window.Control(404);
+    REQUIRE(slider != nullptr);
+    RECT thumb{}, channel{};
+    ::SendMessageW(slider, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&thumb));
+    ::SendMessageW(slider, TBM_GETCHANNELRECT, 0, reinterpret_cast<LPARAM>(&channel));
+    const int y = (thumb.top + thumb.bottom) / 2;
+    ::SendMessageW(slider, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM((thumb.left + thumb.right) / 2, y));
+    ::SendMessageW(slider, WM_MOUSEMOVE, MK_LBUTTON, MAKELPARAM(channel.right + 40, y));
+    CHECK_EQ(TextOf(window.Control(204)), std::wstring(L"100"));  // the field follows at once
+    ::SendMessageW(window.Handle(), WM_TIMER, 19, 0);             // the pause that used to apply it
+    PumpFor(f.dispatcher, 50ms);
+    CHECK(std::fabs(f.service.Current().dock.opacity - 0.8) < 1e-9);
+    CHECK_EQ(::SendMessageW(slider, TBM_GETPOS, 0, 0), LRESULT{70});
+    ::SendMessageW(slider, WM_LBUTTONUP, 0, MAKELPARAM(channel.right + 40, y));
+    REQUIRE(PumpUntil(f.dispatcher, [&] { return std::fabs(f.service.Current().dock.opacity - 1.0) < 1e-9 && !f.service.Dirty(); }));
+    CHECK_EQ(::SendMessageW(slider, TBM_GETPOS, 0, 0), LRESULT{70});  // and it stays there
+    CHECK_EQ(TextOf(window.Control(204)), std::wstring(L"100"));
+    window.Close();
+}
+
 AETHER_TEST("settings design: numbers show for people, store exactly and follow their sliders") {
     Fixture f("settings-design-numbers");
     REQUIRE(f.service.Update([](settings::Settings& s) { s.dock.opacity = 0.8; s.dock.magnification = 1.45; }).ok());

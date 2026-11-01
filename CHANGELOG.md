@@ -6,6 +6,49 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Handwritten welcome** (FR-041, D53, D54): an optional greeting after sign-in and unlock, filling the screen
+  with original strokes and a calligrapher's pen over your blurred desktop picture, with the bars held back until it ends, in French or English, with an optional local
+  name. On by default, skippable. After a lock it is already there when you unlock, before the desktop.
+- **Wi-Fi networks in Quick Settings** (D56): see the networks around you and their signal, and join one, with its
+  password if it needs one. Windows keeps the password. Names and passwords are never logged or sent.
+- **Complete touch** (FR-040): direct pan, fling and elastic return across Settings, menus and Search,
+  tap, hold and page gestures, and a swipe from the screen edge for hidden bars. Not yet tried on a
+  physical touchscreen.
+
+### Fixed
+
+- A window that stops responding can no longer hold up rounded corners on other windows, and is not
+  written to while unresponsive (AS4-03). A maximized window filling the monitor keeps its corners when
+  both bars auto-hide (AS4-06). Far less work on window events and work-area changes (AS4-07, AS4-08).
+- A release acts only on what was pressed in the Top Bar and Search; wheels and touchpads travel equally
+  far whatever their packet size (AS4-11–AS4-15).
+- Startup: Settings says what Windows will really do at sign-in and Apply repairs a lost registration; a failed save
+  puts it back (AS4-18, AS4-21). Installed sessions can change sign-in startup after setup, over-long startup commands and
+  custom data folders are refused visibly, the launcher can no longer wait forever for a child, and session
+  notifications recover from an early failure (AS4-16, AS4-17, AS4-19, AS4-20, AS4-22).
+- Graphics: reattached surfaces are sized correctly and idle surfaces recover from a lost device with a
+  bounded retry (AS4-24, AS4-25).
+
+The reported blank application windows and unreliable sign-in startup are **not** confirmed fixed: their
+causes have not been reproduced.
+
+### Changed
+
+- **Sliders go where the hand goes** (D55): a press anywhere on a Settings slider moves it there and keeps
+  dragging, a finger moves it sideways, and a pan up or down over it scrolls the page. A held slider applies
+  when you let go, so a slow setting no longer interrupts the movement. Brightness follows the thumb, and a
+  value you asked for no longer returns to the old one while Windows catches up.
+- **Quick Settings scrolls under the finger** (D55): the pages follow a pan up and down, and settle on release.
+- **Rounded corners only between the bars** (D56): with both bars hidden, a maximized window takes the whole screen,
+  square. Browsers keep their rounded corners between the bars instead of losing them for good.
+- **Top Bar Auto-Hide waits a second at the screen edge** (D52, D54, D56): the pointer must rest at the top
+  edge for a second before the bar returns, and moving away sooner cancels it, so a quick visit to
+  a button near the top no longer puts the bar over it. A small movement of a resting hand does not restart
+  the wait. A monitor above the primary one no longer counts as that edge. The Dock's reveal and the Top
+  Bar's other reasons to show are unchanged.
+
 ## [0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3) — 2026-10-27
 
 Third alpha, Alpha 3 (owner decisions D48 and D49): the V3 design and interaction work since Alpha 2.

@@ -168,3 +168,19 @@ AETHER_TEST("platform: dispatcher exception details never enter public diagnosti
     CHECK(log->find("SYNTHETIC_PRIVATE_EXCEPTION_MARKER")==std::string::npos);
     std::filesystem::remove_all(directory);
 }
+
+AETHER_TEST("platform: data roots compare by folder, not spelling of the separator or case (AS4-16)") {
+    using aether::platform::SameDataRoot;
+    const std::wstring root = LR"(C:\Users\Example\AppData\Local\AetherShell)";
+    CHECK(SameDataRoot(root, LR"(c:\users\example\appdata\local\aethershell)"));
+    CHECK(SameDataRoot(LR"(C:\Users\Example\AppData\Local\AetherShell\)", root));
+    CHECK(SameDataRoot(LR"(C:\Users\Example\AppData\Local\Temp\..\AetherShell)", root));
+    CHECK(SameDataRoot(L"C:/Users/Example/AppData/Local/AetherShell", root));
+    CHECK_FALSE(SameDataRoot(LR"(C:\Users\Example\AppData\Local\AetherShell-Private)", root));
+    CHECK_FALSE(SameDataRoot(LR"(D:\Profiles\AetherShell)", root));
+    CHECK_FALSE(SameDataRoot(L"AetherShell", L"AetherShell"));  // relative roots are never trusted
+    auto standard = aether::platform::DefaultDataRoot();
+    REQUIRE(standard.ok());
+    CHECK(standard->is_absolute());
+    CHECK(SameDataRoot(*standard, *standard));
+}

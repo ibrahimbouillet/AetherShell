@@ -80,7 +80,7 @@ constexpr wchar_t kMitLicense[] =
     L"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE "
     L"SOFTWARE.";
 
-enum class FieldKind { Check, Number, Choice, Key };
+enum class FieldKind { Check, Number, Choice, Key, Text };
 struct Binding {
     FieldKind kind;
     std::wstring label;
@@ -227,6 +227,11 @@ struct SettingsWindow::Impl {
     bool building = false;
     bool livePending = false;
     bool syncing = false;      // a slider and its value field are being synchronized
+    bool sliderHeld = false;   // a slider is being dragged: its value is applied when it is let go
+    std::size_t startupBinding = static_cast<std::size_t>(-1);  // the sign-in startup switch on this page
+    std::optional<settings::StartupState> startupState;         // what Windows will really do (AS4-18)
+    bool startupUnreadable = false;
+    bool startupReverting = false;
     std::uint64_t applyGeneration = 0;
     std::vector<std::function<void()>> closeWaiters;
     // Page model
@@ -588,6 +593,13 @@ struct SettingsWindow::Impl {
         CreateBinding(bindings.size() - 1);
     }
     template <class Get, class Set>
+    void Text(std::wstring label, std::wstring helper, Get get, Set set) {
+        bindings.push_back(Binding{FieldKind::Text, std::move(label), std::move(helper),
+            [get](const Settings& s) { return std::wstring(get(s)); },
+            [set](Settings& s, std::wstring value) { set(s, std::move(value)); }, {}, false, {}});
+        CreateBinding(bindings.size() - 1);
+    }
+    template <class Get, class Set>
     void Key(std::wstring label, std::wstring helper, Get get, Set set) {
         bindings.push_back(Binding{FieldKind::Key, std::move(label), std::move(helper),
             [get](const Settings& s) { return std::to_wstring(get(s)); },
@@ -637,6 +649,16 @@ struct SettingsWindow::Impl {
             Style(hotkey, spec);
             row.trailing = {hotkey};
             row.widths = {tokens.form.comboMinWidth};
+        } else if (binding.kind == FieldKind::Text) {
+            HWND edit = Make(canvas, L"EDIT", value, WS_TABSTOP | ES_AUTOHSCROLL, id);
+            ::SendMessageW(edit, EM_SETLIMITTEXT, kMaximumDisplayNameLength, 0);
+            form::ControlSpec spec;
+            spec.role = ControlRole::Field;
+            spec.accessibleName = binding.label;
+            spec.description = binding.helper;
+            Style(edit, spec);
+            row.trailing = {edit};
+            row.widths = {tokens.form.comboMinWidth};
         } else {
             const auto& format = binding.number;
             HWND slider = Make(canvas, TRACKBAR_CLASSW, binding.label, WS_TABSTOP | TBS_HORZ | TBS_NOTICKS, kFirstSlider + static_cast<int>(index));
@@ -685,6 +707,8 @@ struct SettingsWindow::Impl {
     float LayoutRow(Row& row, float left, float top, float width, std::vector<form::FormDivider>& dividers, bool separated);
     void Apply(bool explicitConsent);
     void ScheduleLive();
+    void ReadStartupState();
+    [[nodiscard]] std::wstring StartupStatusText() const;
     void SetStartupBusy(bool busy);
     std::vector<std::wstring> ReadFields() const;
     void RestoreFields(const std::vector<std::wstring>& values);
@@ -713,6 +737,8 @@ struct SettingsWindow::Impl {
 };
 
 void SettingsWindow::Impl::BuildPage() {
+    sliderHeld = false;
+    startupBinding = static_cast<std::size_t>(-1);
     building = true;
     for (HWND control : pageControls) if (::IsWindow(control)) ::DestroyWindow(control);
     pageControls.clear();
@@ -855,6 +881,8 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Startup");
         Check(L"Start Aether Shell when I sign in", L"Changing this needs Apply. Task Manager can also turn it off.",
               [](const Settings& s){return s.general.startWithWindows;}, [](Settings& s,bool v){s.general.startWithWindows=v;}, true);
+        startupBinding = bindings.size() - 1;
+        ReadStartupState();
         BeginSection(L"Motion");
         Choice(L"Motion", L"Reduced motion removes decorative movement everywhere.", {L"Follow Windows",L"Reduced",L"Full"},
                [](const Settings& s){return s.general.motion;}, [](Settings& s,int v){s.general.motion=static_cast<MotionPreference>(v);});
@@ -875,6 +903,16 @@ void SettingsWindow::Impl::BuildPage() {
                 L"and Windows build only - no logs or personal data.");
         ButtonsRow({Button(canvas, L"Open &log folder", kOpenLogs, ButtonStyle::Secondary, Glyph::Folder),
                     Button(canvas, L"&Export diagnostics...", kExport, ButtonStyle::Secondary, Glyph::Download)});
+    } else if (page == SettingsPage::Welcome) {
+        header(L"Welcome", L"A short handwritten greeting on your desktop after you sign in or unlock your PC.");
+        BeginSection(L"Greeting");
+        Check(L"Show the welcome at sign-in and unlock", L"It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.",
+              [](const Settings& s){return s.welcome.enabled;}, [](Settings& s,bool v){s.welcome.enabled=v;});
+        Choice(L"Greeting language", L"Salut in French, Hello in English.", {L"Follow Windows",L"Français",L"English"},
+               [](const Settings& s){return s.welcome.language;}, [](Settings& s,int v){s.welcome.language=static_cast<GreetingLanguage>(v);});
+        BeginSection(L"Your name");
+        Text(L"Name to greet you with", L"Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.",
+             [](const Settings& s){return s.welcome.displayName;}, [](Settings& s,std::wstring v){s.welcome.displayName=std::move(v);});
     } else if (page == SettingsPage::Appearance) {
         header(L"Appearance", L"Color mode, accent, motion speed and the look of the Dock and Top Bar.");
         BeginSection(L"Theme");
@@ -1498,10 +1536,34 @@ void SettingsWindow::Impl::RefreshConsentHint(std::size_t index) {
     const bool staged = index < fieldBaseline.size() && value != fieldBaseline[index];
     form::ControlSpec spec = surface.Spec(control) ? *surface.Spec(control) : form::ControlSpec{};
     spec.role = ControlRole::Switch;
-    spec.description = bindings[index].helper + (staged ? std::wstring(L" ") + kApplyHint : std::wstring());
+    spec.description = bindings[index].helper + (index == startupBinding ? StartupStatusText() : std::wstring()) + (staged ? std::wstring(L" ") + kApplyHint : std::wstring());
     surface.SetSpec(control, spec);
     if (staged) Message(kApplyHint, StatusTone::Info);
     LayoutCanvas();
+}
+void SettingsWindow::Impl::ReadStartupState() {
+    if (!callbacks.readStartup) return;
+    const auto weak = std::weak_ptr<bool>(alive);
+    try {
+        callbacks.readStartup([this, weak](Result<settings::StartupState> state) {
+            if (const auto live = weak.lock(); !live || !*live) return;
+            startupUnreadable = !state;
+            if (state) startupState = *state; else startupState.reset();
+            if (startupBinding < bindings.size() && surfaceReady) RefreshConsentHint(startupBinding);
+        });
+    } catch (...) { startupUnreadable = true; }
+}
+std::wstring SettingsWindow::Impl::StartupStatusText() const {
+    if (startupUnreadable) return L" Windows' startup state could not be read in this session.";
+    if (!startupState) return {};
+    switch (*startupState) {
+        case settings::StartupState::Enabled: return L" Windows will start it at your next sign-in.";
+        case settings::StartupState::Disabled: return L" Right now it will not start at sign-in.";
+        case settings::StartupState::DisabledByUser: return L" It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.";
+        case settings::StartupState::DifferentTarget: return L" Windows would start another copy of Aether Shell.";
+        case settings::StartupState::UnknownApproval: return L" Windows reports a startup state this version cannot read.";
+    }
+    return {};
 }
 void SettingsWindow::Impl::ScheduleLive() {
     if (building || startupBusy) return;
@@ -1547,11 +1609,35 @@ void SettingsWindow::Impl::Apply(bool explicitConsent) {
     catch (...) { Message(L"Enter a complete number before saving; the field marked in red is not one.", StatusTone::Warning); return; }
     if (auto validated = Validate(next); !validated) { Message(L"Settings could not be validated.", StatusTone::Error); return; }
     const auto generation = ++applyGeneration;
-    const bool startupChange = explicitConsent && next.general.startWithWindows != service.Current().general.startWithWindows;
-    const auto commit = [this, weak = std::weak_ptr<bool>(alive), mutate, generation, startupChange, acceptedFields, values] {
-        auto result = service.Update(mutate, [this, weak, generation, startupChange](Result<void> persisted) {
+    // AS4-18: the stored choice can be right while Windows' registration went missing or points elsewhere.
+    // Apply repairs that. A turn-off made in Task Manager stays Windows' to change.
+    const bool registrationAdrift = next.general.startWithWindows && startupState &&
+        (*startupState == settings::StartupState::Disabled || *startupState == settings::StartupState::DifferentTarget);
+    const bool startupChange = explicitConsent && (next.general.startWithWindows != service.Current().general.startWithWindows || registrationAdrift);
+    const bool startupBefore = service.Current().general.startWithWindows;
+    const auto commit = [this, weak = std::weak_ptr<bool>(alive), mutate, generation, startupChange, startupBefore, acceptedFields, values] {
+        auto result = service.Update(mutate, [this, weak, generation, startupChange, startupBefore](Result<void> persisted) {
             if (const auto live = weak.lock(); live && *live) {
                 if (startupChange) SetStartupBusy(false);
+                if (startupChange && !persisted && callbacks.setStartup && !startupReverting) {
+                    // AS4-21: Windows' registration changed first and the choice could not be kept. They
+                    // go back together, so the next sign-in and these settings cannot disagree.
+                    startupReverting = true;
+                    SetStartupBusy(true);
+                    callbacks.setStartup(startupBefore, [this, weak, startupBefore](Result<void> undone) {
+                        if (const auto alive2 = weak.lock(); !alive2 || !*alive2) return;
+                        startupReverting = false;
+                        SetStartupBusy(false);
+                        (void)service.Update([startupBefore](Settings& value) { value.general.startWithWindows = startupBefore; }, {});
+                        RefreshCleanFields();
+                        ReadStartupState();
+                        Message(undone ? L"Sign-in startup was left as it was, because settings could not be saved."
+                                       : L"Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.",
+                                StatusTone::Error);
+                    });
+                    return;
+                }
+                if (startupChange) ReadStartupState();
                 if (generation == applyGeneration) {
                     if (persisted) Message(L"Settings saved.", StatusTone::Success);
                     else Message(L"Settings changed in memory; saving failed. Apply again to retry.", StatusTone::Error);
@@ -1791,13 +1877,20 @@ LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam)
         const int id = ::GetDlgCtrlID(reinterpret_cast<HWND>(lParam));
         if (id >= kFirstSlider && static_cast<std::size_t>(id - kFirstSlider) < bindings.size() && !building) {
             SyncFieldFromSlider(static_cast<std::size_t>(id - kFirstSlider));
+            // Applying re-themes and lays out every surface on this thread, which a moving hand would feel.
+            sliderHeld = LOWORD(wParam) == TB_THUMBTRACK;
+            if (LOWORD(wParam) == TB_ENDTRACK && livePending) Apply(false);
         }
         return 0;
     }
     if (message == WM_HSCROLL) return 0;  // no horizontal scrolling: the content reflows to the width
     if (message == WM_VSCROLL) { if (surfaceReady) scroll.HandleScrollCode(LOWORD(wParam), static_cast<short>(HIWORD(wParam))); return 0; }
     if (message == WM_MOUSEWHEEL) { if (surfaceReady) ::SendMessageW(scroll.Viewport(), WM_MOUSEWHEEL, wParam, lParam); return 0; }
-    if (message == WM_TIMER && wParam == kLiveApplyTimer) { Apply(false); return 0; }
+    if (message == WM_TIMER && wParam == kLiveApplyTimer) {
+        if (sliderHeld) ::KillTimer(window, kLiveApplyTimer);  // still pending: its release applies it
+        else Apply(false);
+        return 0;
+    }
     if (message == WM_CLOSE) { if (livePending) Apply(false); DiscardPageDrafts(); ::ShowWindow(window, SW_HIDE); owner.Closed.Emit(); return 0; }
     if (message == WM_GETMINMAXINFO) {
         auto* info = reinterpret_cast<MINMAXINFO*>(lParam);
@@ -1901,10 +1994,10 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         // so the strip still drags the window). The window text stays the accessible/Alt+Tab title.
         impl.captionTitle = impl.Label(window, L"Aether Shell Settings", TextRole::Caption, kCaptionTitle, Severity::None, false);
         impl.navigation = impl.Make(window, L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT, kNavigation);
-        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance"}) ::SendMessageW(impl.navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
+        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance",L"Welcome"}) ::SendMessageW(impl.navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
         { form::ControlSpec spec; spec.role = ControlRole::Navigation; impl.Style(impl.navigation, spec); }
         impl.surface.SetNavigationGlyphs(impl.navigation, {Glyph::Dock, Glyph::TopBar, Glyph::Weather, Glyph::Updates, Glyph::General,
-                                                          Glyph::About, Glyph::Desktop, Glyph::Appearance});
+                                                          Glyph::About, Glyph::Desktop, Glyph::Appearance, Glyph::General});
         if (auto created = impl.scroll.Create(impl.surface, window, kScrollView); !created) {
             ::DestroyWindow(window);
             impl.window = nullptr;
@@ -1936,6 +2029,7 @@ bool SettingsWindow::PreTranslate(MSG& message) {
     auto& impl = *impl_;
     if (!impl.window || !::IsWindowVisible(impl.window)) return false;
     if (message.hwnd != impl.window && !::IsChild(impl.window, message.hwnd)) return false;
+    if (ui::form::FormScrollView::RoutePointer(message)) return true;  // FR-040 touch pan/fling/tap
     impl.RememberFocus();
     if (message.message == WM_KEYDOWN && (::GetKeyState(VK_CONTROL) & 0x8000)) {
         const bool shift = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;

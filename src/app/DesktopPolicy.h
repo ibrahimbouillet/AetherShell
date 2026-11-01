@@ -4,6 +4,8 @@
 
 #include "app/TaskbarController.h"
 
+#include <windows.h>
+
 #include <string_view>
 #include <cstdint>
 #include <optional>
@@ -37,6 +39,13 @@ inline constexpr std::wstring_view kProductionInstanceName = L"AetherShell";
     bool hasAttention, std::uint64_t now, std::uint64_t deadline) noexcept;
 [[nodiscard]] bool ShouldAutomaticallyImportPins(bool replacement, bool sync, bool imported,
                                                 bool explorerApplied) noexcept;
+
+// AS4-08: what a WM_SETTINGCHANGE broadcast means for the application. Work-area notifications
+// (each AppBar reservation change, Auto-Hide included) are handled by the surfaces' own relayout
+// and must not re-apply the whole configuration; locale changes refresh the clock and keyboard;
+// everything else may change appearance (theme, contrast, animations, metrics) and is coalesced.
+enum class SettingChangeScope { WorkArea, Locale, Appearance };
+[[nodiscard]] SettingChangeScope ClassifySettingChange(UINT action, std::wstring_view section) noexcept;
 
 // A killed Win32 timer may still have a queued message. Only an armed reveal may resume, and a
 // message from an earlier reveal must wait for the current monotonic deadline (milliseconds).

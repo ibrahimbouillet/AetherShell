@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
+#include "FakeTouch.h"
 
 #include "core/FileSystem.h"
 #include "dock/DockWindow.h"
@@ -746,4 +747,90 @@ AETHER_TEST("dock integration: captured drag follows continuously and neighbour 
     CHECK(std::abs(geometry().items[3].icon.top - reduced.items[3].icon.top) < 0.01f);
     RECT workAfter{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workAfter, 0)); CHECK(::EqualRect(&workBefore, &workAfter));
     window.Destroy(); loop.RemoveMessageFilter(filter);
+}
+
+AETHER_TEST("dock integration: touch taps activate once, pans do nothing, a hold opens the menu or reorders (FR-040)") {
+    class FakeMenu final : public ui::IMenuPresenter {
+    public:
+        int shown = 0;
+        Result<ui::MenuSelection> Show(std::span<const ui::MenuEntry>, const ui::MenuRequest&) override {
+            ++shown;
+            return MakeError(ErrorCode::Cancelled, "synthetic menu dismissed");
+        }
+    } menu;
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok()); ManualDispatcher dispatcher;
+    settings::SettingsService settings(test::MakeTempDirectory("dock-touch") / L"settings.json", dispatcher);
+    REQUIRE(settings.Load({}).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 5s;
+    while (!settings.Loaded() && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(settings.Loaded());
+    REQUIRE(settings.Update([](settings::Settings& value) {
+        value.dock.showStartButton = false; value.dock.showTaskViewButton = false;
+        value.dock.magnification = 1;
+        for (const auto* name : {L"A", L"B", L"C"}) {
+            settings::PinnedApp pin; pin.id = std::wstring(L"exe:touch-") + name;
+            pin.displayName = std::wstring(L"Synthetic ") + name; pin.parsingName = std::wstring(L"Synthetic.Touch.") + name;
+            value.dock.pinned.push_back(std::move(pin));
+        }
+    }).ok());
+    FakeLauncher launcher; FakeIcons icons;
+    const RECT area{0, 0, 1000, 600}; Backdrop backdrop(area); REQUIRE(backdrop.hwnd);
+    dock::DockWindowContext touchContext{device, scheduler, dispatcher, launcher, icons, settings};
+    touchContext.menuPresenter = &menu;
+    dock::DockWindow window(touchContext);
+    dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
+    REQUIRE(window.Create(options).ok());
+    graphics::MotionPolicy reduced; reduced.reduced = true;
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), reduced, settings.Current().dock).ok());
+    window.Show(false); RunFor(loop, 150);
+    const auto iconAt = [&](std::size_t index) {
+        auto layout = window.Geometry(); REQUIRE(layout.ok());
+        const auto& icon = layout->items.at(index).icon;
+        POINT at{static_cast<LONG>(std::lround(window.ToPx((icon.left + icon.right) / 2))), static_cast<LONG>(std::lround(window.ToPx((icon.top + icon.bottom) / 2)))};
+        REQUIRE(::ClientToScreen(window.Handle(), &at) != FALSE);
+        return at;
+    };
+    const HWND hwnd = window.Handle();
+    test::FakeTouch touch;
+    const POINT first = iconAt(1);  // the first pin; item 0 is the fixed search item
+    const int launches = launcher.launches;
+    // A pan across the Dock, a second finger and a cancel activate nothing.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{first.x + 40, first.y});
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{first.x + 40, first.y});
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    touch.Send(hwnd, WM_POINTERDOWN, 2, iconAt(2));
+    touch.Send(hwnd, WM_POINTERUP, 2, iconAt(2));
+    touch.Send(hwnd, WM_POINTERUP, 1, first);
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    touch.Send(hwnd, WM_POINTERUP, 1, first, /*canceled*/ true);
+    CHECK_EQ(launcher.launches, launches);
+    CHECK_FALSE(window.Engaged());
+    // A tap activates once.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    touch.Send(hwnd, WM_POINTERUP, 1, first);
+    CHECK_EQ(launcher.launches, launches + 1);
+    // A hold and release opens the menu and activates nothing.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    RunFor(loop, 650);
+    touch.Send(hwnd, WM_POINTERUP, 1, first);
+    CHECK_EQ(menu.shown, 1);
+    CHECK_EQ(launcher.launches, launches + 1);
+    // A hold then a move reorders: no menu, no activation.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, first);
+    RunFor(loop, 650);
+    const POINT beyond = iconAt(3);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{first.x + 20, first.y});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{beyond.x + 20, first.y});
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{beyond.x + 20, first.y});
+    RunFor(loop, 100);
+    dispatcher.RunPending();
+    CHECK_EQ(menu.shown, 1);
+    CHECK_EQ(launcher.launches, launches + 1);
+    REQUIRE_EQ(settings.Current().dock.pinned.size(), 3u);
+    CHECK(settings.Current().dock.pinned.front().id != std::wstring(L"exe:touch-A"));
+    window.Destroy();
+    dispatcher.RunPending();
 }

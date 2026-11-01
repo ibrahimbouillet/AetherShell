@@ -6,6 +6,7 @@
 #include "app/HiddenIcons.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
+#include "app/TouchEdgeReveal.h"
 #include "app/WorkAreaInsets.h"
 #include "app/WindowCorners.h"
 
@@ -53,9 +54,12 @@
 #include "weather/GeocodingClient.h"
 #include "weather/WeatherProvider.h"
 #include "weather_location/WindowsLocation.h"
+#include "welcome/WelcomeController.h"
+#include "welcome/WelcomeWindow.h"
 
 #include <shellapi.h>
 #include <shobjidl.h>
+#include <wtsapi32.h>
 #include <future>
 #include <atomic>
 #include <set>
@@ -76,6 +80,11 @@ constexpr UINT_PTR kOverflowWatchTimer = 0xA376;     // the chevron follows Wind
 constexpr ULONGLONG kOverflowDismissWindowMs = 500;  // a click that itself dismissed the overflow
 constexpr UINT_PTR kAutoHideTimer = 0xA377;          // D47: edge and cover sampling while Auto-Hide is on
 constexpr UINT kAutoHideTickMs = 50;
+constexpr UINT_PTR kWelcomeTimer = 0xA378;           // FR-041: readiness and the deadline while a greeting shows
+constexpr int kWelcomeEscapeHotkey = 3;              // Escape skips the greeting without it taking focus
+constexpr std::uint64_t kWelcomeBackdropWaitMs = 400; // for the desktop picture, before going on without it
+constexpr std::uint64_t kBrightnessSettleMs = 4000;   // the panel keeps showing a request about this long
+constexpr std::uint64_t kWiFiRescanMs = 20000;        // while the Wi-Fi view stays open
 
 // The documented Windows keyboard shortcuts behind fixed system actions. Windows reports nothing
 // back: a submitted chord is not proof that the feature opened.
@@ -120,6 +129,7 @@ struct ShellApplication::Impl {
     WorkerPool controlsWorker{{1, L"Aether quick controls", ComApartment::MultiThreaded}};
     WorkerPool locationWorker{{1,L"Aether Windows weather location",ComApartment::MultiThreaded}};
     WorkerPool trayWorker{{1, L"Aether hidden icons", ComApartment::MultiThreaded}};  // UI Automation calls into Explorer
+    WorkerPool wifiWorker{{1, L"Aether Wi-Fi", ComApartment::MultiThreaded}};         // a scan takes seconds
     CancellationSource cancellation;
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
@@ -152,6 +162,20 @@ struct ShellApplication::Impl {
     std::unique_ptr<TaskbarController> taskbar;
     std::unique_ptr<WindowCorners> windowCorners;
     std::unique_ptr<WorkAreaInsets> sideInsets;
+    std::unique_ptr<welcome::WelcomeWindow> welcomeWindow;
+    welcome::WelcomeController welcomeController;
+    std::shared_ptr<const welcome::BackdropImage> welcomeBackdrop;
+    std::uint64_t welcomeBackdropRequest = 0, welcomeBackdropAsked = 0;
+    std::uint64_t brightnessSettleUntil = 0;
+    std::uint64_t launchedAt = ::GetTickCount64();
+    std::uint64_t lastWiFiScan = 0;
+    bool wifiScanning = false, wifiPromptOpen = false;
+    RECT controlsAnchor{};
+    bool welcomeBackdropPending = false;
+    bool welcomeHoldsBars = false;
+    Connection welcomeSkip;
+    graphics::DesignTokens shellTokens;
+    graphics::MotionPolicy shellMotion;
     std::unique_ptr<controlcenter::ControlCenterWindow> controls;
     std::unique_ptr<controlcenter::MediaBrightness> mediaBrightness;
     controlcenter::ControlCenterState controlState;
@@ -181,7 +205,9 @@ struct ShellApplication::Impl {
     bool hiddenIconsOpen = false;       // Windows' overflow is open after the chevron opened it
     ULONGLONG hiddenIconsClosedAt = 0;  // when it was last seen closing on its own
     // D47 Auto-Hide: one decision per bar, fed by a short timer that runs only while a bar has it on.
-    AutoHideState topAutoHide, dockAutoHide;
+    AutoHideState topAutoHide{kTopBarAutoHideTiming}, dockAutoHide;
+    TouchDigitizerWatcher touchEdges;           // FR-040: a swipe from the edge reaches a hidden bar
+    std::uint64_t topTouchUntil = 0, dockTouchUntil = 0;
     bool topCovered = false, dockCovered = false;
     bool autoHideArmed = false;
     unsigned autoHideTick = 0;
@@ -193,6 +219,10 @@ struct ShellApplication::Impl {
     bool taskbarReservationFailed = false;
     bool closing = false;
     bool ready = false;
+    // AS4-08: configuration already in effect, so repeated notifications cause no churn.
+    std::optional<std::tuple<bool, UINT, UINT, UINT, UINT>> registeredHotkeys;
+    std::optional<std::tuple<bool, long long, int, std::string>> appliedUpdatePolicy;
+    bool applyQueued = false;
     bool stopped = false;
     bool updateHandoffPending = false;
     platform::UniqueHandle updaterProcess;
@@ -200,6 +230,174 @@ struct ShellApplication::Impl {
 
     Result<void> StartSurfaces();
     void ApplySettings();
+    // FR-041. Only a production-instance session greets, private --data-dir trials included; test
+    // instances never do.
+    [[nodiscard]] bool WelcomeEnabled() const {
+        return nativeTaskbarAccess && settings && settings->Loaded() && settings->Current().welcome.enabled && !closing;
+    }
+    // An application in full screen is a reason to stay out of the way. The state the bars keep is no
+    // guide here: Windows' own lock screen is a borderless full-screen window too, and the foreground
+    // around a lock or an unlock.
+    [[nodiscard]] bool ApplicationFullScreen() const {
+        const HWND foreground = ::GetForegroundWindow();
+        if (!foreground) return false;
+        try { if (platform::WindowClassName(foreground) == L"Windows.UI.Core.CoreWindow") return false; } catch (...) { return false; }
+        return platform::IsFullscreenWindow(foreground, platform::PrimaryMonitor());
+    }
+    [[nodiscard]] bool WelcomeAllowed() const { return WelcomeEnabled() && !ApplicationFullScreen(); }
+    // Essential readiness is a first successful present of each bar that is meant to be on screen
+    // (AS4-style health signals only say that they were created). Optional providers play no part.
+    [[nodiscard]] bool EssentialSurfacesPresented() const {
+        const auto drawn = [](const ui::SurfaceWindow* surface) { return surface && (!surface->IsShown() || surface->HasPresented()); };
+        return drawn(dock.get()) && drawn(topbar.get());
+    }
+    void EndWelcomeInput() {
+        ::KillTimer(events.Handle(), kWelcomeTimer);
+        ::UnregisterHotKey(events.Handle(), kWelcomeEscapeHotkey);
+    }
+    // D54: the desktop picture is decoded away from the UI thread, once per lock or greeting.
+    void RequestWelcomeBackdrop() {
+        const auto request = ++welcomeBackdropRequest;
+        welcomeBackdropPending = true;
+        welcomeBackdropAsked = ::GetTickCount64();
+        const auto bounds = platform::PrimaryMonitor().bounds;
+        const auto weak = std::weak_ptr<bool>(alive);
+        worker.Post([this, weak, request, bounds] {
+            auto picture = welcome::LoadDesktopBackdrop(bounds);
+            dispatcher.Post([this, weak, request, picture = std::move(picture)]() mutable {
+                if (const auto live = weak.lock(); !live || !*live || request != welcomeBackdropRequest) return;
+                welcomeBackdropPending = false;
+                if (picture) welcomeBackdrop = std::make_shared<const welcome::BackdropImage>(std::move(*picture));
+                if (welcomeWindow) welcomeWindow->SetBackdrop(welcomeBackdrop);
+                ShowWelcomeWhenReady();
+            });
+        });
+    }
+    // The cover or the writing, once the picture is here, or without it after a short wait: a slow
+    // file only ever means the plain desktop colour until it arrives.
+    void ShowWelcomeWhenReady() {
+        const bool covering = welcomeController.Covering();
+        if (!welcomeWindow || (!covering && !welcomeController.Presenting())) return;
+        if (welcomeBackdropPending && ::GetTickCount64() - welcomeBackdropAsked < kWelcomeBackdropWaitMs) return;
+        const auto failed = [this](ErrorCode code) {
+            // Never an obstacle: the desktop simply appears. The cause is logged, the name never is.
+            AETHER_LOG_WARN("app", "welcome unavailable ({})", ToString(code));
+            welcomeController.PresentationFailed();
+            welcomeWindow->Dismiss(false);
+            HoldBarsForWelcome();
+        };
+        try {
+            const auto monitor = platform::PrimaryMonitor();
+            if (covering) {
+                if (welcomeWindow->Covering()) return;
+                if (auto shown = welcomeWindow->ShowCover(shellTokens, shellMotion, monitor.bounds); !shown) failed(shown.error().code);
+                return;
+            }
+            if (welcomeWindow->Presenting()) return;
+            const auto& value = settings->Current().welcome;
+            const auto word = welcome::GreetingWord(value.language, ::GetUserDefaultUILanguage());
+            if (auto shown = welcomeWindow->Present(word, value.displayName, shellTokens, shellMotion, monitor.bounds); !shown) {
+                failed(shown.error().code);
+                return;
+            }
+            (void)::RegisterHotKey(events.Handle(), kWelcomeEscapeHotkey, 0, VK_ESCAPE);
+        } catch (...) {
+            failed(ErrorCode::Internal);
+        }
+    }
+    // The welcome has the screen to itself: the bars, ready underneath, come out when it ends (D56).
+    void HoldBarsForWelcome() {
+        const bool hold = !closing && (welcomeController.Presenting() || welcomeController.Covering());
+        if (hold == welcomeHoldsBars) return;
+        welcomeHoldsBars = hold;
+        if (topbar) topbar->SetHeldBack(hold);
+        ApplyDockSuppression();
+    }
+    void ApplyWelcome(welcome::WelcomeController::Action action) {
+        ApplyWelcomeAction(action);
+        HoldBarsForWelcome();
+    }
+    void ApplyWelcomeAction(welcome::WelcomeController::Action action) {
+        using Action = welcome::WelcomeController::Action;
+        if (action == Action::None) return;
+        if (action != Action::Present) ::UnregisterHotKey(events.Handle(), kWelcomeEscapeHotkey);
+        if (action == Action::DismissAnimated || action == Action::DismissNow) {
+            ++welcomeBackdropRequest;
+            welcomeBackdropPending = false;
+            welcomeBackdrop.reset();
+            if (welcomeWindow) welcomeWindow->Dismiss(action == Action::DismissAnimated);
+            return;  // the timer keeps running until the window has hidden, then releases it
+        }
+        try {
+            if (!welcomeWindow) {
+                welcomeWindow = std::make_unique<welcome::WelcomeWindow>(graphics, scheduler);
+                welcomeSkip = welcomeWindow->SkipRequested.Connect([this] { ApplyWelcome(welcomeController.Skipped()); });
+            }
+            if (!welcomeBackdrop && !welcomeBackdropPending) RequestWelcomeBackdrop();
+            // Without its timer a greeting is not allowed to stay. The surface is simply kept hidden
+            // for the next time, since nothing would release it. The cover only waits, and rarely checks.
+            if (!::SetTimer(events.Handle(), kWelcomeTimer, action == Action::Cover ? 500 : 50, nullptr)) {
+                ApplyWelcome(welcomeController.Canceled());
+                return;
+            }
+            ShowWelcomeWhenReady();
+        } catch (...) {
+            AETHER_LOG_WARN("app", "welcome unavailable");
+            welcomeController.PresentationFailed();
+        }
+    }
+    void WelcomeTick() {
+        if (!welcomeWindow) { EndWelcomeInput(); return; }
+        const auto now = ::GetTickCount64();
+        if (welcomeController.Covering()) {
+            // Windows' own answer, independent of its notifications: a missed unlock cannot leave the
+            // cover in front of the desktop, and an unknown answer is not a reason to keep it up.
+            if (platform::CurrentSessionLockState() == platform::SessionLockState::Locked) ShowWelcomeWhenReady();
+            else ApplyWelcome(welcomeController.Unlocked(WelcomeAllowed(), now));
+            return;
+        }
+        if (!welcomeController.Presenting()) {
+            // Gone from the screen: a rarely used full-screen surface does not stay allocated.
+            if (!welcomeWindow->IsShown()) { EndWelcomeInput(); welcomeSkip.Disconnect(); welcomeWindow.reset(); }
+            return;
+        }
+        ShowWelcomeWhenReady();
+        if (!welcomeWindow) return;
+        ApplyWelcome(welcomeController.Update(welcomeWindow->Presenting() && welcomeWindow->WritingFinished(graphics::FrameScheduler::Now()),
+                                              EssentialSurfacesPresented(), now));
+    }
+    void OnSessionChanged(WPARAM change) {
+        const auto now = ::GetTickCount64();
+        switch (change) {
+            case WTS_SESSION_LOCK:
+                ApplyWelcome(welcomeController.Locked(WelcomeEnabled(), now));
+                break;
+            case WTS_CONSOLE_DISCONNECT:
+            case WTS_REMOTE_DISCONNECT:
+            case WTS_SESSION_LOGOFF:
+                // A cover already behind the lock screen simply stays for the return.
+                if (!welcomeController.Covering()) ApplyWelcome(welcomeController.Locked(false, now));
+                break;
+            case WTS_SESSION_UNLOCK:
+                ApplyWelcome(welcomeController.Unlocked(WelcomeAllowed(), now));
+                break;
+            default: break;
+        }
+    }
+    // Appearance broadcasts arrive in bursts (theme, contrast, colors); one re-application each burst.
+    void QueueApplySettings() {
+        if (applyQueued || closing) return;
+        const auto weak = std::weak_ptr<bool>(alive);
+        applyQueued = dispatcher.Post([this, weak] {
+            if (const auto live = weak.lock(); !live || !*live) return;
+            applyQueued = false;
+            ApplySettings();
+        });
+    }
+    void UnregisterHotkeys() {
+        ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
+        registeredHotkeys.reset();
+    }
     bool ConfirmQuitWithoutSaving();
     void ImportTaskbarPins(bool manual = false, unsigned retry = 0);
     void ApplyWeather();
@@ -209,6 +407,112 @@ struct ShellApplication::Impl {
     void HandleControl(controlcenter::ControlIntent intent);
     void QueueControl(controlcenter::ControlIntent intent);
     void ReportControl(Result<void> result);
+    [[nodiscard]] Result<settings::StartupState> ReadStartupRegistration() const {
+        auto registry = settings::MakeWindowsStartupRegistry();
+        if (!registry) return registry.error();
+        return settings::StartupRegistration(*registry).IsEnabled(paths.executableDir.parent_path().parent_path() / L"AetherShell.exe");
+    }
+    // AS4-02: enough to read back why a sign-in did or did not bring Aether up: nothing private.
+    void LogStartupDiagnostics() {
+        const auto now = ::GetTickCount64();
+        AETHER_LOG_INFO("app", "startup: autostart {}, {} s after boot, surfaces up {} ms after launch", command.autostart, now / 1000, now - launchedAt);
+        const auto standardRoot = platform::DefaultDataRoot();
+        if (command.dataDirectory && (!standardRoot || !platform::SameDataRoot(paths.dataRoot, *standardRoot))) return;
+        const bool stored = settings && settings->Current().general.startWithWindows;
+        worker.Post([this, stored] {
+            const auto state = ReadStartupRegistration();
+            static constexpr const char* names[] = {"off", "on", "off in Windows", "for another copy", "unreadable"};
+            AETHER_LOG_INFO("app", "sign-in startup: chosen {}, registered {}", stored ? "on" : "off", state ? names[static_cast<int>(*state)] : "could not be read");
+        });
+    }
+    // D56: the networks around, read in two steps: what Windows last saw at once, then a fresh look.
+    void ScanWiFi() {
+        if (closing || wifiScanning || !nativeTaskbarAccess) return;
+        wifiScanning = true;
+        lastWiFiScan = ::GetTickCount64();
+        controlState.wifi.scanning = true;
+        PublishControls();
+        const auto weak = std::weak_ptr<bool>(alive);
+        const auto cancel = cancellation.Token();
+        const auto publish = [this, weak](controlcenter::WiFiList list, bool last) {
+            dispatcher.Post([this, weak, list = std::move(list), last]() mutable {
+                if (const auto live = weak.lock(); !live || !*live || closing) return;
+                controlState.wifi.access = list.access;
+                if (list.access == controlcenter::WiFiAccess::Allowed) controlState.wifi.networks = std::move(list.networks);
+                else controlState.wifi.networks.clear();
+                if (last) { wifiScanning = false; controlState.wifi.scanning = false; }
+                PublishControls();
+            });
+        };
+        if (!wifiWorker.Post([publish, cancel] {
+            publish(controlcenter::ReadWiFiNetworks(false, cancel), false);
+            publish(controlcenter::ReadWiFiNetworks(true, cancel), true);
+        })) {
+            wifiScanning = false;
+            controlState.wifi.scanning = false;
+            PublishControls();
+        }
+    }
+    void ConnectWiFi(std::wstring ssid, std::wstring password) {
+        if (closing || !controlState.wifi.connecting.empty()) { ::SecureZeroMemory(password.data(), password.size() * sizeof(wchar_t)); return; }
+        controlState.wifi.connecting = ssid;
+        controlState.wifi.message.clear();
+        PublishControls();
+        const auto weak = std::weak_ptr<bool>(alive);
+        const auto cancel = cancellation.Token();
+        const bool offered = !password.empty();
+        if (!wifiWorker.Post([this, weak, cancel, ssid, offered, password = std::move(password)]() mutable {
+            const auto outcome = controlcenter::ConnectWiFiNetwork(ssid, password, cancel);
+            ::SecureZeroMemory(password.data(), password.size() * sizeof(wchar_t));
+            dispatcher.Post([this, weak, ssid, offered, outcome] {
+                if (const auto live = weak.lock(); live && *live) OnWiFiConnection(ssid, offered, outcome);
+            });
+        })) OnWiFiConnection(ssid, offered, controlcenter::WiFiConnection::Failed);
+    }
+    void OnWiFiConnection(const std::wstring& ssid, bool offered, controlcenter::WiFiConnection outcome) {
+        using Connection = controlcenter::WiFiConnection;
+        if (closing) return;
+        controlState.wifi.connecting.clear();
+        switch (outcome) {
+            case Connection::Connected:
+                controlState.wifi.message = L"Connected to " + ssid;
+                if (providers) providers->network->Refresh();
+                ScanWiFi();
+                break;
+            case Connection::NeedsPassword:
+            case Connection::WrongPassword:
+                PublishControls();
+                PromptWiFiPassword(ssid, offered);
+                return;
+            case Connection::NotInRange: controlState.wifi.message = ssid + L" is out of range"; break;
+            case Connection::TimedOut: controlState.wifi.message = L"Connecting to " + ssid + L" took too long"; break;
+            case Connection::Unsupported: controlState.wifi.message = L"Use Windows to join " + ssid; break;
+            case Connection::Denied: controlState.wifi.message = L"Windows did not allow this connection"; break;
+            case Connection::Failed: controlState.wifi.message = L"Could not connect to " + ssid; break;
+        }
+        PublishControls();
+    }
+    // Windows keeps the password in its own profile once the connection succeeds; nothing here does.
+    void PromptWiFiPassword(const std::wstring& ssid, bool rejected) {
+        if (closing || wifiPromptOpen) return;
+        wifiPromptOpen = true;
+        ui::form::ConfirmRequest request;
+        request.title = L"Connect to " + ssid;
+        request.message = rejected ? L"That password was not accepted. Check it and try again." : L"Enter this network's password.";
+        request.severity = rejected ? ui::form::Severity::Warning : ui::form::Severity::None;
+        request.primary = L"&Connect";
+        request.defaultChoice = ui::form::ConfirmChoice::Primary;
+        std::wstring password;
+        request.password = &password;
+        const auto choice = ui::form::ShowConfirmation(request, appTokens, appMotion, &scheduler);
+        wifiPromptOpen = false;
+        if (choice && *choice == ui::form::ConfirmChoice::Primary && !password.empty() && !closing) {
+            // The dialog took activation, which closes the panel: back to it, to follow the outcome.
+            if (controls) (void)controls->ShowWiFi(controlsAnchor);
+            ConnectWiFi(ssid, std::move(password));
+        }
+        ::SecureZeroMemory(password.data(), password.size() * sizeof(wchar_t));
+    }
     void PublishControls() {
         if (!controls || closing) return;
         if (providers) { controlState.network = providers->network->Current(); controlState.battery = providers->battery->Current(); }
@@ -244,8 +548,9 @@ struct ShellApplication::Impl {
         if (closing || !settings || !settings->Loaded()) return;
         const auto& value = settings->Current();
         const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
-        if (!topOn) { topAutoHide = AutoHideState{}; if (topbar) topbar->SetAutoHidden(false); }
-        if (!dockOn) { dockAutoHide = AutoHideState{}; if (dock) dock->SetAutoHidden(false); }
+        if (!topOn) { topAutoHide.Reset(); if (topbar) topbar->SetAutoHidden(false); }
+        if (!dockOn) { dockAutoHide.Reset(); if (dock) dock->SetAutoHidden(false); }
+        touchEdges.SetEnabled(events.Handle(), topOn || dockOn);
         if (!topOn && !dockOn) {
             if (autoHideArmed) ::KillTimer(events.Handle(), kAutoHideTimer);
             autoHideArmed = false;
@@ -259,7 +564,7 @@ struct ShellApplication::Impl {
         if (autoHideArmed) AutoHideTick();
     }
     // One sample: the pointer position (the screen edges reveal; nothing intercepts input there) every
-    // tick, which application windows cover each bar four times a second.
+    // tick, which application windows cover each bar twice a second: walking every window is the costly part.
     void AutoHideTick() {
         if (closing || !settings || !autoHideArmed) return;
         const auto& value = settings->Current();
@@ -269,7 +574,7 @@ struct ShellApplication::Impl {
         POINT cursor{};
         const bool pointer = ::GetCursorPos(&cursor) != FALSE && cursor.x >= monitor.bounds.left && cursor.x < monitor.bounds.right;
         const auto now = ::GetTickCount64();
-        if (autoHideTick++ % 5 == 0) {
+        if (autoHideTick++ % 10 == 0) {
             topCovered = topOn && ApplicationWindowCovers(topbar->BoundsPx());
             dockCovered = dockOn && ApplicationWindowCovers(dock->PanelBoundsPx());
         }
@@ -277,25 +582,38 @@ struct ShellApplication::Impl {
             AutoHideSample sample;
             sample.enabled = true;
             sample.covered = topCovered;
-            sample.engaged = topbar->Engaged() || (controls && controls->IsShown()) || hiddenIconsOpen || hiddenIconsPending;
-            sample.atEdge = pointer && cursor.y <= monitor.bounds.top;
+            sample.engaged = topbar->Engaged() || (controls && controls->IsShown()) || hiddenIconsOpen || hiddenIconsPending || now < topTouchUntil;
+            sample.atEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi);
+            sample.nearEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, kTopEdgeHoldDip);
             sample.now = now;
-            topbar->SetAutoHidden(topAutoHide.Update(sample));
+            const bool wasHidden = topAutoHide.Hidden();
+            const bool hidden = topAutoHide.Update(sample);
+            if (wasHidden && !hidden && !sample.engaged) AETHER_LOG_INFO("app", "top bar revealed after {} ms on its edge", topAutoHide.EdgeRestMs(now));
+            topbar->SetAutoHidden(hidden);
         }
         if (dockOn) {
             AutoHideSample sample;
             sample.enabled = true;
             sample.covered = dockCovered;
             // An application asking for attention reveals the Dock for a moment, as over full screen.
-            sample.engaged = dock->Engaged() || (attentionPeekArmed && !attentionApplications.empty() && now < attentionDeadline);
+            sample.engaged = dock->Engaged() || (attentionPeekArmed && !attentionApplications.empty() && now < attentionDeadline) || now < dockTouchUntil;
             sample.atEdge = pointer && cursor.y >= monitor.bounds.bottom - 1;
             sample.now = now;
             dock->SetAutoHidden(dockAutoHide.Update(sample));
         }
     }
+    // A swipe in from a screen edge is deliberate: its bar comes out at once and waits a moment for the
+    // finger, which then keeps it out by using it. Everything else about Auto-Hide is unchanged.
+    void OnRawTouch(LPARAM input) {
+        const auto edge = touchEdges.OnRawInput(input);
+        if (!edge || closing) return;
+        const auto until = ::GetTickCount64() + 2500;
+        (*edge == ScreenEdge::Top ? topTouchUntil : dockTouchUntil) = until;
+        if (autoHideArmed) AutoHideTick();
+    }
     void ApplyDockSuppression() {
         const bool peek=attentionPeekArmed&&!attentionApplications.empty()&&::GetTickCount64()<attentionDeadline&&!closing;
-        if(dock)(void)dock->SetSuppressed(ShouldSuppressDock(fullscreenSuppressed,desktopState,peek));
+        if(dock)(void)dock->SetSuppressed(welcomeHoldsBars||ShouldSuppressDock(fullscreenSuppressed,desktopState,peek));
     }
     void OnRunningApplications(const std::vector<apps::RunningApplication>& running) {
         if(closing)return;
@@ -756,6 +1074,21 @@ void ShellApplication::Impl::QueueControl(controlcenter::ControlIntent intent) {
 void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) {
     using namespace controlcenter;
     if(closing||!nativeTaskbarAccess||!controls||!controls->IsShown())return;
+    if(intent.kind==ControlIntentKind::Brightness)brightnessSettleUntil=::GetTickCount64()+kBrightnessSettleMs;
+    if(intent.kind==ControlIntentKind::WiFiConnect){ConnectWiFi(intent.ssid,{});return;}
+    if(intent.kind==ControlIntentKind::WiFiDisconnect){
+        const auto weak=std::weak_ptr<bool>(alive);const auto cancel=cancellation.Token();
+        if(wifiWorker.Post([this,weak,cancel]{
+            const auto done=controlcenter::DisconnectWiFi(cancel);
+            dispatcher.Post([this,weak,failed=!done]{
+                if(const auto live=weak.lock();!live||!*live||closing)return;
+                controlState.wifi.message=failed?L"Could not disconnect":L"";
+                if(providers)providers->network->Refresh();
+                ScanWiFi();
+            });
+        }))return;
+        return;
+    }
     const auto open=[this](std::wstring uri){controls->Close();OpenWindowsSettings(std::move(uri));};
     switch(intent.kind){
         case ControlIntentKind::AllSettings:open(L"ms-settings:");return;
@@ -841,6 +1174,8 @@ void ShellApplication::Impl::ApplySettings() {
         }
     }
     if (topbar) { topbar->SetTheme(tokens, motion); topbar->SetSettings(value.topBar, value.weather.enabled); }
+    shellTokens = tokens;
+    shellMotion = motion;
     UpdateSideInsets();
     UpdateAutoHide();
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
@@ -869,13 +1204,18 @@ void ShellApplication::Impl::ApplySettings() {
         (syncJustEnabled || !value.general.taskbarPinsImported || !value.dock.explorerDefaultApplied)) ImportTaskbarPins();
     if (providers && providers->clock) providers->clock->SetResolution(value.topBar.showSeconds ? status::ClockResolution::Seconds : status::ClockResolution::Minutes);
     ApplyWeather();
-    ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
-    hotkeyStatus = L"Keyboard shortcuts disabled";
-    if (value.general.hotkeysEnabled && !closing) {
-        const auto& searchKey = value.general.searchHotkey; const auto& dockKey = value.general.focusDockHotkey;
-        const bool first = ::RegisterHotKey(events.Handle(), 1, searchKey.modifiers | MOD_NOREPEAT, searchKey.virtualKey) != FALSE;
-        const bool second = ::RegisterHotKey(events.Handle(), 2, dockKey.modifiers | MOD_NOREPEAT, dockKey.virtualKey) != FALSE;
-        hotkeyStatus = first && second ? L"Both keyboard shortcuts registered" : L"A keyboard shortcut is already in use by another application";
+    const auto& searchKey = value.general.searchHotkey; const auto& dockKey = value.general.focusDockHotkey;
+    const auto hotkeys = std::tuple{value.general.hotkeysEnabled && !closing, searchKey.modifiers, searchKey.virtualKey,
+                                    dockKey.modifiers, dockKey.virtualKey};
+    if (registeredHotkeys != hotkeys) {
+        UnregisterHotkeys();
+        hotkeyStatus = L"Keyboard shortcuts disabled";
+        if (std::get<0>(hotkeys)) {
+            const bool first = ::RegisterHotKey(events.Handle(), 1, searchKey.modifiers | MOD_NOREPEAT, searchKey.virtualKey) != FALSE;
+            const bool second = ::RegisterHotKey(events.Handle(), 2, dockKey.modifiers | MOD_NOREPEAT, dockKey.virtualKey) != FALSE;
+            hotkeyStatus = first && second ? L"Both keyboard shortcuts registered" : L"A keyboard shortcut is already in use by another application";
+        }
+        registeredHotkeys = hotkeys;
     }
     if (updates) {
         updates::UpdatePolicy policy; policy.enabled = value.updates.automaticChecks;
@@ -883,7 +1223,13 @@ void ShellApplication::Impl::ApplySettings() {
         policy.channel = value.updates.channel == settings::UpdateChannel::Stable ? updates::UpdateChannel::Stable : updates::UpdateChannel::Prerelease;
         policy.replaceSkippedVersion = true;
         if (!value.updates.skippedVersion.empty()) { auto skipped = updates::SemanticVersion::Parse(value.updates.skippedVersion); if (skipped) policy.skippedVersion = *skipped; }
-        (void)updates->StartAutomaticChecks(policy);
+        // Restarting the schedule cancels a running check; only a changed policy restarts it.
+        const auto applied = std::tuple{policy.enabled, static_cast<long long>(policy.interval.count()),
+                                        static_cast<int>(policy.channel), value.updates.skippedVersion};
+        if (appliedUpdatePolicy != applied) {
+            (void)updates->StartAutomaticChecks(policy);
+            appliedUpdatePolicy = applied;
+        }
         RefreshUpdateOffer(updates->Snapshot());
     }
 }
@@ -920,10 +1266,24 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.requestWindowsLocation=[this]{RequestWindowsWeatherLocation();};
     actions.openLocationSettings=[this]{OpenWindowsSettings(L"ms-settings:privacy-location");};
     actions.weatherLocationStatus=[this]{return locationStatus;};
+    actions.readStartup = [this](std::function<void(Result<settings::StartupState>)> completion) {
+        const auto standardRoot = platform::DefaultDataRoot();
+        if (closing || (command.dataDirectory && (!standardRoot || !platform::SameDataRoot(paths.dataRoot, *standardRoot)))) {
+            if (completion) completion(MakeError(ErrorCode::Unsupported, "Sign-in startup is unavailable in a private data profile."));
+            return;
+        }
+        const auto weak = std::weak_ptr<bool>(alive);
+        worker.Post([this, weak, completion = std::move(completion)]() mutable {
+            auto state = ReadStartupRegistration();
+            dispatcher.Post([weak, completion = std::move(completion), state = std::move(state)]() mutable { if (auto live = weak.lock(); live && *live && completion) completion(std::move(state)); });
+        });
+    };
     actions.setStartup = [this](bool enabled, std::function<void(Result<void>)> completion) {
         if (closing) { if (completion) completion(MakeError(ErrorCode::InvalidState, "application is closing")); return; }
-        // Development/test profiles never register a private candidate for sign-in startup.
-        if (command.dataDirectory) {
+        // Development/test profiles never register a private candidate for sign-in startup. AS4-16:
+        // setup passes the ordinary per-user root explicitly; only another root is a private profile.
+        const auto standardRoot = platform::DefaultDataRoot();
+        if (command.dataDirectory && (!standardRoot || !platform::SameDataRoot(paths.dataRoot, *standardRoot))) {
             if (completion) completion(MakeError(ErrorCode::Unsupported, "Sign-in startup is unavailable in a private data profile."));
             return;
         }
@@ -960,7 +1320,15 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         ++*controlEpoch;controlActionCancellation->Cancel();
         controlActionCancellation=std::make_shared<CancellationSource>();nextControlAction.reset();
     }));
-    connections.push_back(controls->RefreshRequested.Connect([this] { RefreshControls(); }));
+    // A display can take a moment to report a new brightness: read it again until the request has settled.
+    connections.push_back(controls->RefreshRequested.Connect([this] {
+        RefreshControls(::GetTickCount64() < brightnessSettleUntil);
+        if (controls->WiFiViewShown() && ::GetTickCount64() - lastWiFiScan >= kWiFiRescanMs) ScanWiFi();
+    }));
+    connections.push_back(controls->WiFiListRequested.Connect([this] {
+        controlState.wifi.message.clear();
+        ScanWiFi();
+    }));
     connections.push_back(topbar->AudioObservedChanged.Connect([this] {
         // Read the provider's actual current state; an observation never queues an audio intent.
         // The media/radio refresh timer remains independent, and hidden panels request no frames.
@@ -968,6 +1336,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
         if (closing || !controls) return;
+        controlsAnchor = anchor;
         // D44: Aether's own panel unless the person explicitly chose Windows' Quick Settings. The
         // legacy always-true openWindowsFlyouts flag of Alpha 2 files is deliberately not consulted.
         if (nativeTaskbarAccess && settings->Current().topBar.windowsQuickSettings && platform::IsWindows11OrGreater()) {
@@ -1030,14 +1399,26 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
-    connections.push_back(events.ThemeChanged.Connect([this]{ ApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
-    connections.push_back(events.ResumedFromSleep.Connect(clockChanged));
+    connections.push_back(events.ResumedFromSleep.Connect([this, clockChanged]{
+        graphics.ResetRecovery(); clockChanged();
+        // Waking without a lock is the same moment for the person as an unlock.
+        if (!welcomeController.SessionLocked()) ApplyWelcome(welcomeController.Unlocked(WelcomeAllowed(), ::GetTickCount64()));
+    }));
     connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
-    connections.push_back(events.SettingChanged.Connect([this](UINT, const std::wstring& section){ if(section==L"intl"){providers->clock->NotifyTimeChanged();providers->keyboard->Refresh();} ApplySettings(); }));
+    connections.push_back(events.SettingChanged.Connect([this](UINT action, const std::wstring& section){
+        // AS4-08: a work-area broadcast (every AppBar change, Auto-Hide included) is answered by the
+        // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
+        switch (ClassifySettingChange(action, section)) {
+            case SettingChangeScope::WorkArea: return;
+            case SettingChangeScope::Locale: providers->clock->NotifyTimeChanged(); providers->keyboard->Refresh(); return;
+            case SettingChangeScope::Appearance: QueueApplySettings(); return;
+        }
+    }));
     if (updates) connections.push_back(updates->Subscribe([this](const updates::UpdateSnapshot& snapshot){ if(settingsWindow)settingsWindow->SetUpdateSnapshot(snapshot); RefreshUpdateOffer(snapshot); }));
     (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ OnRunningApplications(running); });
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
@@ -1053,7 +1434,14 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         taskbarStatus = L"Windows taskbar replacement is unavailable in this session";
     }
     ApplySettings();
-    dock->Show(); topbar->Show(); ready = true;
+    // At sign-in the greeting goes up first; the bars, ready underneath, come out when it ends.
+    const bool signInGreeting = command.autostart && command.action == StartupAction::None;
+    const auto greeting = signInGreeting ? welcomeController.SignedIn(WelcomeAllowed(), ::GetTickCount64()) : welcome::WelcomeController::Action::None;
+    if (greeting == welcome::WelcomeController::Action::None) { dock->Show(); topbar->Show(); }
+    ready = true;
+    connections.push_back(events.SessionChanged.Connect([this](WPARAM change) { OnSessionChanged(change); }));
+    connections.push_back(events.RawInput.Connect([this](LPARAM input) { OnRawTouch(input); }));
+    ApplyWelcome(greeting);
     if (!command.healthToken.empty()) { const auto token = text::Narrow(command.healthToken); worker.Post([token]{ (void)install::SignalHealthy(token); }); }
     worker.Post([this, weak, cancel] {
         auto discovered = catalog->DiscoverApplications(cancel);
@@ -1069,6 +1457,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     if (command.action == StartupAction::OpenSearch) searchWindow->Open();
     else if (command.action == StartupAction::OpenSettings) OpenSettings();
     AETHER_LOG_INFO("app", "native Dock and Top Status Bar started");
+    LogStartupDiagnostics();
     return Ok();
 }
 
@@ -1202,12 +1591,13 @@ void ShellApplication::Impl::InstallUpdate() {
 
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
+    ApplyWelcome(welcomeController.Canceled());
     if(controls)controls->Close();
     locationCancellation->Cancel();++locationGeneration;locationPolicy.reset();
     ::KillTimer(events.Handle(),kLocationRefreshTimer);
     ::KillTimer(events.Handle(),kAttentionPeekTimer);attentionPeekArmed=false;
     ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
-    ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
+    UnregisterHotkeys();
     if (dock) ::EnableWindow(dock->Handle(), FALSE);
     if (topbar) ::EnableWindow(topbar->Handle(), FALSE);
     if (searchWindow) searchWindow->Close();
@@ -1288,8 +1678,10 @@ void ShellApplication::Impl::Stop() noexcept {
     ::KillTimer(events.Handle(), kTaskbarResumeTimer);
     ::KillTimer(events.Handle(), kOverflowWatchTimer);
     ::KillTimer(events.Handle(), kAutoHideTimer); autoHideArmed = false;
+    EndWelcomeInput();
+    touchEdges.SetEnabled(nullptr, false);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
-    ::UnregisterHotKey(events.Handle(), 1); ::UnregisterHotKey(events.Handle(), 2);
+    UnregisterHotkeys();
     { std::lock_guard lock(radioGate->mutex); radioGate->deliver = {}; }
     {std::lock_guard lock(locationGate->mutex);locationGate->deliver={};}
     connections.clear(); channel.Close();
@@ -1301,12 +1693,14 @@ void ShellApplication::Impl::Stop() noexcept {
     if (topbar) topbar.reset();
     if (providers) providers->StopAll();
     if (audio) audio->Stop(); if (microphone) microphone->Stop(); if (weather) weather->Stop();
+    welcomeSkip.Disconnect(); welcomeWindow.reset();
     dock.reset(); searchWindow.reset(); settingsWindow.reset();
     // Remove our AppBars on their UI thread before joining shell restoration. Explorer can notify
     // AppBars synchronously; no owned AppBar may wait on this same shutdown join.
     if (taskbar) taskbar->Stop();
     taskbar.reset();
     locationWorker.Shutdown();
+    wifiWorker.Shutdown();
     controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();
@@ -1379,6 +1773,10 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             else impl_->attentionPeekArmed=false;
             impl_->ApplyDockSuppression();return true;
         }
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kWelcomeTimer) {
+            impl_->WelcomeTick();
+            return true;
+        }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kAutoHideTimer) {
             impl_->AutoHideTick();
             return true;
@@ -1406,12 +1804,16 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kTaskbarPollTimer) {
             if (impl_->taskbar && !impl_->closing) (void)impl_->taskbar->Refresh();
+            // The corner helper is wanted only while replacement is active, which this timer covers:
+            // a helper that died or failed to start is noticed and retried with a bounded back-off.
+            if (impl_->windowCorners && !impl_->closing) impl_->windowCorners->Poll();
             return true;
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kUpdaterPollTimer) {
             impl_->ObserveUpdateHandoff();
             return true;
         }
+        if (message.message == WM_HOTKEY && message.wParam == kWelcomeEscapeHotkey) { impl_->ApplyWelcome(impl_->welcomeController.Skipped()); return true; }
         if (message.message == WM_HOTKEY) { if(impl_->closing)return true; if(message.wParam==1 && impl_->searchWindow)impl_->searchWindow->Toggle(); else if(message.wParam==2 && impl_->dock)(void)impl_->dock->FocusDock(); return true; }
         return impl_->settingsWindow && impl_->settingsWindow->PreTranslate(message);
     });
@@ -1424,7 +1826,7 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         // Documented native fallback: the surfaces (and so the shared presentation) failed to start.
         if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,L"Aether Shell could not start its desktop surfaces.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
         else if(result->status==settings::LoadStatus::Defaults&&impl_->nativeTaskbarAccess&&impl_->command.action==StartupAction::None)
-            impl_->OpenSettings(settings::ui::SettingsPage::Weather);
+            impl_->OpenSettings(settings::ui::SettingsPage::Welcome);  // first run: explains the optional name
     }); !loading) return loading.error();
     return impl_->loop.Run();
 }

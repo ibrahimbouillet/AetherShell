@@ -4,6 +4,8 @@
 #include "install/InstallInternal.h"
 #include "core/Strings.h"
 
+#include <algorithm>
+
 namespace aether::install {
 namespace {
 Result<std::wstring> Name(const InstallLayout& layout) {
@@ -16,6 +18,18 @@ Result<DWORD> Timeout(std::chrono::milliseconds timeout) {
         return MakeError(ErrorCode::InvalidArgument,"invalid supervisor wait timeout");
     return static_cast<DWORD>(timeout.count());
 }
+}
+ControlReadiness AwaitControlReadiness(HANDLE child, const std::function<bool()>& listening,
+    std::chrono::milliseconds timeout, std::chrono::milliseconds interval) {
+    const auto step = static_cast<DWORD>(std::clamp<long long>(interval.count(), 1, 1000));
+    const auto deadline = ::GetTickCount64() + static_cast<ULONGLONG>(std::max<long long>(timeout.count(), 0));
+    for (;;) {
+        try { if (listening && listening()) return ControlReadiness::Listening; } catch (...) {}
+        const auto now = ::GetTickCount64();
+        if (now >= deadline) return ControlReadiness::TimedOut;
+        const auto wait = static_cast<DWORD>(std::min<ULONGLONG>(step, deadline - now));
+        if (::WaitForSingleObject(child, wait) != WAIT_TIMEOUT) return ControlReadiness::Exited;
+    }
 }
 LauncherSupervisor::LauncherSupervisor(LauncherSupervisor&& other) noexcept
     :lease_(std::move(other.lease_)),stop_(std::move(other.stop_)),held_(std::exchange(other.held_,false)) {}

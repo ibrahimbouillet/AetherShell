@@ -31,4 +31,11 @@ struct AppPaths {
 [[nodiscard]] Result<std::filesystem::path> KnownFolder(const GUID& folderId);
 [[nodiscard]] std::filesystem::path CurrentExecutablePath();
 
+// The ordinary per-user data root, %LOCALAPPDATA%\AetherShell (created if missing).
+[[nodiscard]] Result<std::filesystem::path> DefaultDataRoot();
+// AS4-16/AS4-20: whether two absolute data roots name the same folder, compared lexically and
+// case-insensitively (trailing separators and "." / ".." segments ignored). Different spellings of
+// one folder (8.3 names, links) compare unequal, which callers treat as a private profile.
+[[nodiscard]] bool SameDataRoot(const std::filesystem::path& first, const std::filesystem::path& second) noexcept;
+
 }  // namespace aether::platform

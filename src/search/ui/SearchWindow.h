@@ -12,6 +12,7 @@
 #include "applications/ApplicationTypes.h"
 #include "graphics/Animation.h"
 #include "graphics/BitmapCache.h"
+#include "graphics/ScrollPhysics.h"
 #include "graphics/TextCache.h"
 #include "graphics/Theme.h"
 #include "search/SearchService.h"
@@ -38,6 +39,7 @@ public:
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     [[nodiscard]] HWND EditHandle() const noexcept { return edit_; }
     [[nodiscard]] const std::vector<SearchResult>& Results() const noexcept { return results_; }
+    [[nodiscard]] std::size_t SelectedIndex() const noexcept { return selected_; }
     [[nodiscard]] const std::wstring& ErrorText() const noexcept { return error_; }
     [[nodiscard]] std::size_t QueryCount() const noexcept { return queryCount_; }
     [[nodiscard]] HWND PreviousForegroundWindow() const noexcept { return previousFocus_; }
@@ -70,6 +72,10 @@ protected:
     void OnPointerUp(aether::ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;
     void OnWheel(float notches, D2D1_POINT_2F point) override;
+    bool OnTouchDown(const aether::ui::TouchContact& contact) override;
+    void OnTouchMove(const aether::ui::TouchContact& contact) override;
+    void OnTouchUp(const aether::ui::TouchContact& contact) override;
+    void OnTouchCancel() override;
     std::optional<LRESULT> OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
     void OnDestroying() override;
     void OnDpiChanged(UINT dpi, const RECT& suggested) override;
@@ -126,6 +132,17 @@ private:
     std::uint64_t renderedFrames_ = 0;
     float inputScroll_ = 0.0f;
     std::optional<UINT32> selectionAnchor_;
+    graphics::PressTarget press_;       // AS4-12: a release launches only the row its press started on
+    graphics::WheelSteps wheelSteps_;   // AS4-15: equal wheel totals move the selection equally far
+    // FR-040: the rows follow the finger; `rowShift_` is the part of a row (or the elastic stretch)
+    // the list is displaced beyond `firstVisible_`.
+    graphics::TouchGesture touch_;
+    graphics::ScrollPhysics rowScroll_;
+    std::optional<std::size_t> touchRow_;
+    bool touchCaughtMotion_ = false;
+    float rowShift_ = 0.0f;
+    void ApplyRowScroll();
+    void ResetRowScroll() noexcept;
     RECT appliedRegion_{};
     bool queryPending_ = false, caretVisible_ = true;
     bool closing_ = false;

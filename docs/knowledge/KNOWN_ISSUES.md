@@ -1,5 +1,15 @@
 # Known issues and limitations
 
+## Current owner-reported blockers — D51, 2026-10-28
+
+External maximized pages reportedly become blank/unresponsive after Auto-Hide/work-area changes;
+installed sign-in startup is unreliable and touch scrolling incomplete. Read
+[AS4-01–AS4-26](../specs/v4-stability-audit.md) for prioritized source evidence, hypotheses and
+discriminating regressions, then [Claude's work order](../CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md).
+Codex prepared the audit; no product corrections or independent reproduction of these incidents
+are claimed. S-061 records the source corrections made since; the incidents remain unreproduced. T50–T52/FR-040–FR-041 track implementation and real-device/owner acceptance; S-060
+records executed baseline checks separately.
+
 ## Platform limitations (by design, documented APIs only)
 - Backdrop blur needs Windows 11; Windows 10 gets a more opaque tint (ADR 0001/0002).
 - "Microphone in use" has no documented cross-version API → reported as unsupported.

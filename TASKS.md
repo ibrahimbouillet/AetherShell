@@ -6,6 +6,21 @@ Requirements and definitions: [PROJECT_SPEC.md](PROJECT_SPEC.md). Test evidence:
 (privacy, safe tests and continuity); listed links below identify its main product contribution.
 
 ## Current priority
+
+**Owner assignment, 2026-10-28 — D51 (Codex audits/prepares; Claude implements):** resolve the
+reported blank/unresponsive maximized apps after Auto-Hide changes and unreliable sign-in startup,
+then complete touch/physical scrolling and the handwritten personalized sign-in/unlock welcome.
+Read [the compact Claude prompt](docs/CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md) and
+[the prioritized audit](docs/specs/v4-stability-audit.md). Source findings are not runtime diagnoses;
+no product corrections or installed-app changes were made by this preparation. Evidence: S-060.
+
+| Task | Requirement/decision links | State |
+| --- | --- | --- |
+| T50 — Alpha 3 reliability audit and next-candidate stabilization | FR-017, FR-024, FR-036, FR-039; NFR-002–NFR-008, NFR-011; D51 | Codex prepared AS4-01–AS4-26, distinguishing reports/source defects/risks/gaps and an observed benchmark failure. Fresh baseline build passes; combined unit gate 23/24, Search scoped recheck 7/7 (S-060), no product fix. Claude implemented the corrections listed in the audit's status table (S-061): AS4-06 reproduced and fixed; AS4-03/04/07/08/16/17/19/20/22/24/25 corrected in source. **Still open:** AS4-01/02 not reproduced, AS4-05/18/21/23 not implemented, startup diagnostics, measurements and the wider security review not done; real-application and owner acceptance pending. |
+| T51 — Complete touch and coherent scroll physics | FR-040, FR-011, FR-012, FR-015, FR-026, FR-034, FR-037, FR-039; D51 | Requirements and surface/gesture matrix prepared. Implemented in source (S-061): shared gesture/physics model, pointer plumbing, and Settings/forms, menus, Search, Quick Settings, Dock, previews, Top Bar and an edge swipe for hidden bars; AS4-11–15 corrected. Exercised with synthetic contacts only. **Physical touch, including the edge swipe's HID path, has never run on a device;** owner acceptance pending. |
+| T51 owner trial correction (D55) | FR-040; D53, D55 | In source, S-063: Quick Settings pages follow a vertical pan, form sliders go where the hand goes and apply on release, brightness requests hold until Windows reports them. Synthetic contacts only; owner's retest pending. |
+| T52 — Handwritten personalized session welcome | FR-041, FR-014–FR-017, FR-024, FR-037; D34, D51; ADR 0013 | Implemented in source (S-061, D53): original strokes, pen timing, FR/EN, optional local name, Settings → Welcome, lifecycle, first-present readiness, skip, deadline. Own-window frames inspected. The owner tried it at an unlock, approved the moving strokes and redirected the rest (D54): blurred desktop picture, up at lock ahead of the unlock, larger and longer, in source (S-062). **The cover has not run at a real lock, and no greeting at a real sign-in;** owner acceptance pending. The setup wizard offers no name field (first-run Settings does). |
+
 **Delivered, 2026-10-27 — D48–D50 (Claude, S-058/S-059):**
 [Aether Shell Alpha 3, `0.3.0-alpha.3`](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
 is published as the Latest release, accepted by the owner as version 3: tag on the CI-verified

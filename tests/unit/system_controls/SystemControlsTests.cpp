@@ -2,11 +2,14 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
 #include "system_controls/SystemControls.h"
+#include "system_controls/WiFiNetworks.h"
 
 #include <windows.h>
 
 #include <array>
 #include <chrono>
+#include <string>
+#include <vector>
 
 namespace {
 using namespace aether;
@@ -215,4 +218,34 @@ AETHER_TEST("system_controls date and time open the notifications of the running
     ExpectError(NotificationsAction(0), ErrorCode::Unsupported);
     ExpectError(NotificationsAction(9600), ErrorCode::Unsupported);
     ExpectError(CalendarAction(0), ErrorCode::Unsupported);
+}
+
+AETHER_TEST("system_controls Wi-Fi: one entry per name with its strongest signal, connected first, then by signal") {
+    const auto merged = MergeWiFiNetworks({
+        {L"Cafe", 1, true, true, false}, {L"", 4, true, true, false}, {L"Home", 2, true, true, false},
+        {L"Cafe", 3, true, true, false}, {L"Home", 1, true, true, true}, {L"Attic", 3, false, true, false},
+        {L"Loud", 9, true, true, false}, {L"Faint", -2, true, true, false}});
+    REQUIRE_EQ(merged.size(), 5u);
+    CHECK(merged[0].ssid == L"Home");   // connected, though others are stronger
+    CHECK(merged[0].connected);
+    CHECK_EQ(merged[0].bars, 2);
+    CHECK(merged[1].ssid == L"Loud");
+    CHECK_EQ(merged[1].bars, 4);        // what Windows reports stays in range
+    CHECK(merged[2].ssid == L"Attic");  // equal signal: by name
+    CHECK(merged[3].ssid == L"Cafe");
+    CHECK_EQ(merged[3].bars, 3);
+    CHECK(merged[4].ssid == L"Faint");
+    CHECK_EQ(merged[4].bars, 0);
+    std::vector<WiFiNetwork> many;
+    for (int i = 0; i < 100; ++i) many.push_back({L"N" + std::to_wstring(i), 1, true, true, false});
+    CHECK_EQ(MergeWiFiNetworks(std::move(many)).size(), kMaxWiFiNetworks);
+    CHECK(MergeWiFiNetworks({}).empty());
+}
+
+AETHER_TEST("system_controls Wi-Fi: the signal in words") {
+    CHECK(WiFiSignalWord(4) == L"Excellent signal");
+    CHECK(WiFiSignalWord(3) == L"Good signal");
+    CHECK(WiFiSignalWord(2) == L"Fair signal");
+    CHECK(WiFiSignalWord(1) == L"Weak signal");
+    CHECK(WiFiSignalWord(0) == L"Weak signal");
 }

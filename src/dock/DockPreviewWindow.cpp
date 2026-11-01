@@ -518,6 +518,35 @@ void DockPreviewWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F poin
     if (pressed && hit && pressed->tile == hit->tile && pressed->part == hit->part) Invoke(*hit);
 }
 
+bool DockPreviewWindow::OnTouchDown(const ui::TouchContact& contact) {
+    if (touch_.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+        if (touch_.Down(contact.id, contact.dip.x, contact.dip.y, contact.time) == graphics::TouchGesture::Event::Canceled) OnPointerCaptureLost();
+        return true;
+    }
+    if (!IsPresenting()) return false;
+    (void)touch_.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    OnPointerMove(contact.dip);  // keeps the card up while the finger is on it
+    OnPointerDown(ui::PointerButton::Left, contact.dip);
+    return true;
+}
+
+void DockPreviewWindow::OnTouchMove(const ui::TouchContact& contact) {
+    if (touch_.Move(contact.id, contact.dip.x, contact.dip.y, contact.time) != graphics::TouchGesture::Event::None) OnPointerCaptureLost();
+}
+
+void DockPreviewWindow::OnTouchUp(const ui::TouchContact& contact) {
+    const auto event = touch_.Up(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    if (event == graphics::TouchGesture::Event::Tap) OnPointerUp(ui::PointerButton::Left, contact.dip);
+    else OnPointerCaptureLost();
+    if (Handle()) OnPointerLeave();
+}
+
+void DockPreviewWindow::OnTouchCancel() {
+    (void)touch_.Cancel();
+    OnPointerCaptureLost();
+    if (Handle()) OnPointerLeave();
+}
+
 void DockPreviewWindow::OnPointerCaptureLost() {
     if (!pressed_) return;
     pressed_.reset();

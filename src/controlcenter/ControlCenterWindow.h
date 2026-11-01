@@ -4,6 +4,7 @@
 
 #include "media_controls/MediaBrightness.h"
 #include "system_controls/SystemControls.h"
+#include "system_controls/WiFiNetworks.h"
 #include "core/Dispatcher.h"
 #include "core/Signal.h"
 #include "graphics/Theme.h"
@@ -16,6 +17,15 @@
 
 namespace aether::controlcenter {
 
+// What the Wi-Fi view lists (D56): real networks only, supplied by the host.
+struct WiFiPanelState {
+    WiFiAccess access = WiFiAccess::Allowed;
+    std::vector<WiFiNetwork> networks;
+    bool scanning = false;
+    std::wstring connecting;  // the name of the network being connected to
+    std::wstring message;     // the outcome to show, in place of the usual status
+};
+
 struct ControlCenterState {
     status::NetworkSnapshot network;
     status::AudioSnapshot audio;
@@ -26,6 +36,7 @@ struct ControlCenterState {
     bool mediaAvailable = false;
     bool loading = false;
     std::wstring message;
+    WiFiPanelState wifi;
 };
 
 enum class ControlIntentKind { SystemTile, SystemSettings, Volume, Brightness, ToggleMute,
@@ -33,7 +44,9 @@ enum class ControlIntentKind { SystemTile, SystemSettings, Volume, Brightness, T
     NetworkList,          // Windows' own list of available networks (ms-availablenetworks:)
     Accessibility,        // `feature`: a Windows accessibility start/stop shortcut or its settings page
     StickyKeys,           // `enabled`: the documented Sticky Keys setting
-    VolumeMixer };        // Windows' volume mixer page
+    VolumeMixer,          // Windows' volume mixer page
+    WiFiConnect,          // `ssid`: connect to this network, asking for a password if it needs one
+    WiFiDisconnect };     // leave the connected network
 struct ControlIntent {
     ControlIntentKind kind = ControlIntentKind::SystemTile;
     SystemControl control = SystemControl::Settings;
@@ -41,6 +54,7 @@ struct ControlIntent {
     std::optional<bool> enabled;
     std::optional<int> percent;
     std::uint64_t session = 0;
+    std::wstring ssid;
 };
 
 // The Aether-owned quick-controls panel (D44): a compact Windows-style panel of split radio tiles,
@@ -72,10 +86,20 @@ public:
         float offsetDip = 0.0f;
     };
     [[nodiscard]] std::vector<ComposedView> ComposedViews(double now) const;
+    // Diagnostics seam: the pages' position at `now` (0 the first page, 1 the second, between while they move).
+    [[nodiscard]] float PagePosition(double now) const noexcept;
+    // Diagnostics seam: the value a slider shows at `now`, whether held, requested or read from Windows.
+    [[nodiscard]] std::optional<int> ShownSliderValue(bool volume, double now) const;
+    // Diagnostics seam: how far the Wi-Fi list is scrolled (DIPs).
+    [[nodiscard]] float WiFiScrollOffset() const noexcept;
+    // Opens the panel at its Wi-Fi view, or moves an open panel there.
+    [[nodiscard]] Result<void> ShowWiFi(const RECT& anchorPx);
+    [[nodiscard]] bool WiFiViewShown() const noexcept;
     void SetState(ControlCenterState state);
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     Signal<ControlIntent> Requested;
     Signal<> RefreshRequested;
+    Signal<> WiFiListRequested;  // the Wi-Fi view opened: the host reads the networks around
     Signal<> Closed;
 
 protected:
@@ -86,6 +110,10 @@ protected:
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;
+    bool OnTouchDown(const ui::TouchContact& contact) override;
+    void OnTouchMove(const ui::TouchContact& contact) override;
+    void OnTouchUp(const ui::TouchContact& contact) override;
+    void OnTouchCancel() override;
     bool OnKeyDown(UINT key) override;
     void OnFocusChanged(bool focused) override;
     void OnDpiChanged(UINT dpi, const RECT& suggested) override;

@@ -564,6 +564,22 @@ AETHER_TEST("settings startup: invalid or missing launcher paths never write reg
     CHECK(MakeWindowsStartupRegistry({L"Software\\AetherShellTests\\Run", L"Software\\AetherShellTests\\Approval"}).ok());
 }
 
+AETHER_TEST("settings startup: a command beyond the Run key limit is refused before any write (AS4-19)") {
+    const auto folder = NewFile().parent_path();
+    // The serialized command is the quoted path plus " --autostart": 14 characters around the path.
+    const auto stem = std::wstring(kMaxRunCommandCharacters - 14 - folder.native().size() - 1 - 4, L'a');
+    const auto exact = folder / (stem + L".exe");
+    auto registry = std::make_shared<MemoryRegistry>(); StartupRegistration startup(registry);
+    registry->run = L"\"" + exact.native() + L"\" --autostart";
+    CHECK_EQ(registry->run->size(), kMaxRunCommandCharacters);
+    CHECK_EQ(*startup.IsEnabled(exact), StartupState::Enabled);
+    const auto longer = folder / (stem + L"b.exe");
+    CHECK_EQ(startup.IsEnabled(longer).error().code, ErrorCode::InvalidArgument);
+    // Refused before the file system or the registry is touched.
+    CHECK_EQ(startup.Enable(longer).error().code, ErrorCode::InvalidArgument);
+    CHECK_EQ(registry->writes, 0);
+}
+
 AETHER_TEST("settings startup: setup opt-out removes only its owned Run target and preserves approval") {
     const auto file=NewFile().parent_path()/L"launcher.exe";
     auto registry=std::make_shared<MemoryRegistry>();StartupRegistration startup(registry);
@@ -583,4 +599,37 @@ AETHER_TEST("weather location settings: preserve legacy manual coordinates and d
     auto encoded=ToJson(automatic);REQUIRE(encoded.ok());auto roundtrip=FromJson(*encoded);REQUIRE(roundtrip.ok());
     CHECK(roundtrip->value.weather.useWindowsLocation);CHECK(roundtrip->value.weather.windowsLocationConsent);
     CHECK_FALSE(roundtrip->value.weather.latitude.has_value());
+}
+
+AETHER_TEST("welcome settings: defaults, round trip and a bounded name without control characters (FR-041)") {
+    const Settings defaults;
+    CHECK(defaults.welcome.enabled);
+    CHECK(defaults.welcome.displayName.empty());
+    CHECK(defaults.welcome.language == GreetingLanguage::Automatic);
+    Settings chosen;
+    chosen.welcome.enabled = false;
+    chosen.welcome.displayName = L"Noëlle";
+    chosen.welcome.language = GreetingLanguage::French;
+    auto document = ToJson(chosen); REQUIRE(document.ok());
+    auto parsed = FromJson(*document); REQUIRE(parsed.ok());
+    CHECK_FALSE(parsed->value.welcome.enabled);
+    CHECK_EQ(parsed->value.welcome.displayName, std::wstring(L"Noëlle"));
+    CHECK(parsed->value.welcome.language == GreetingLanguage::French);
+    // A file from before this feature keeps working, with the defaults.
+    auto older = json::Parse(R"({"schemaVersion":1,"dock":{"iconSize":40}})"); REQUIRE(older.ok());
+    auto migrated = FromJson(*older); REQUIRE(migrated.ok());
+    CHECK(migrated->value.welcome.enabled);
+    CHECK(migrated->value.welcome.displayName.empty());
+    Settings odd;
+    odd.welcome.displayName = std::wstring(L"Ann\nA\t\x7F") + std::wstring(200, L'b');
+    auto warnings = Validate(odd); REQUIRE(warnings.ok());
+    CHECK_EQ(odd.welcome.displayName.size(), kMaximumDisplayNameLength);
+    CHECK(odd.welcome.displayName.find(L'\n') == std::wstring::npos);
+    CHECK(odd.welcome.displayName.find(L'\t') == std::wstring::npos);
+    // Warnings name the field, never the value: the name must not reach a log through them.
+    Settings secret;
+    secret.welcome.displayName = std::wstring(100, L'Q');
+    auto named = Validate(secret); REQUIRE(named.ok());
+    REQUIRE_FALSE(named->empty());
+    for (const auto& warning : *named) CHECK(warning.find("QQQ") == std::string::npos);
 }

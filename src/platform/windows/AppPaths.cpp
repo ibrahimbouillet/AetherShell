@@ -9,6 +9,8 @@
 #include <knownfolders.h>
 #include <shlobj.h>
 
+#include <climits>
+
 namespace aether::platform {
 
 Result<std::filesystem::path> KnownFolder(const GUID& folderId) {
@@ -37,14 +39,34 @@ std::filesystem::path CurrentExecutablePath() {
     }
 }
 
+Result<std::filesystem::path> DefaultDataRoot() {
+    auto local = KnownFolder(FOLDERID_LocalAppData);
+    if (!local) return local.error();
+    return local.value() / L"AetherShell";
+}
+
+bool SameDataRoot(const std::filesystem::path& first, const std::filesystem::path& second) noexcept {
+    try {
+        if (!first.is_absolute() || !second.is_absolute()) return false;
+        auto normalize = [](const std::filesystem::path& value) {
+            auto text = value.lexically_normal().native();
+            while (text.size() > 3 && (text.back() == L'\\' || text.back() == L'/')) text.pop_back();
+            return text;
+        };
+        const auto a = normalize(first), b = normalize(second);
+        if (a.size() > INT_MAX || b.size() > INT_MAX) return false;
+        return ::CompareStringOrdinal(a.c_str(), static_cast<int>(a.size()), b.c_str(), static_cast<int>(b.size()), TRUE) == CSTR_EQUAL;
+    } catch (...) { return false; }
+}
+
 Result<AppPaths> AppPaths::Resolve(const std::optional<std::filesystem::path>& overrideRoot) {
     AppPaths paths;
     if (overrideRoot && !overrideRoot->empty()) {
         paths.dataRoot = std::filesystem::absolute(*overrideRoot);
     } else {
-        auto local = KnownFolder(FOLDERID_LocalAppData);
-        if (!local) return local.error();
-        paths.dataRoot = local.value() / L"AetherShell";
+        auto root = DefaultDataRoot();
+        if (!root) return root.error();
+        paths.dataRoot = std::move(*root);
     }
     paths.configDir = paths.dataRoot / L"config";
     paths.logDir = paths.dataRoot / L"logs";

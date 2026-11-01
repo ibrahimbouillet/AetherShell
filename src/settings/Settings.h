@@ -7,6 +7,7 @@
 // clamped and reported as warnings, never silently discarded.
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -149,6 +150,16 @@ struct GeneralSettings {
     std::string logLevel = "info";  // trace|debug|info|warning|error
 };
 
+// FR-041: the optional greeting after sign-in and unlock. The name is entered by the person, stays in
+// this file on this PC, and is never logged, transmitted or read from the Windows account.
+enum class GreetingLanguage { Automatic, French, English };
+inline constexpr std::size_t kMaximumDisplayNameLength = 64;
+struct WelcomeSettings {
+    bool enabled = true;
+    std::wstring displayName;
+    GreetingLanguage language = GreetingLanguage::Automatic;
+};
+
 struct Settings {
     int schemaVersion = kCurrentSchemaVersion;
     DockSettings dock;
@@ -156,6 +167,7 @@ struct Settings {
     WeatherSettings weather;
     UpdateSettings updates;
     GeneralSettings general;
+    WelcomeSettings welcome;
 };
 
 }  // namespace aether::settings

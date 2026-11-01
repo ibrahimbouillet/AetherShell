@@ -11,6 +11,7 @@
 #include "graphics/BitmapCache.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
+#include "graphics/ScrollPhysics.h"
 #include "graphics/Transition.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/Win32Error.h"
@@ -37,6 +38,7 @@ constexpr UINT_PTR kTooltipTimer = 1;
 constexpr UINT_PTR kErrorTimer = 2;
 constexpr UINT_PTR kLongPressTimer = 3;
 constexpr UINT_PTR kHoverTimer = 4;
+constexpr UINT_PTR kTouchHoldTimer = 5;
 
 template <class F> Result<void> Guard(F&& function) {
     try { return function(); }
@@ -84,6 +86,11 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<D2D1_POINT_2F> pointer;
     std::optional<std::size_t> hovered;
     std::optional<std::size_t> pressed;
+    // FR-040 touch: a tap activates, a hold then release opens the item's menu, a hold then move
+    // reorders it, and any other movement does nothing. No touch path depends on hover.
+    graphics::TouchGesture touch{{}, graphics::TouchAxis::Both};
+    std::optional<std::size_t> touchItem;
+    bool touchHeld = false;
     D2D1_POINT_2F pressPoint{};
     std::wstring dragId;
     float dragCenter = 0;
@@ -1125,6 +1132,61 @@ void DockWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
     if (button == ui::PointerButton::Right) impl_->MenuAt(*hit);
     else { const auto item = impl_->fitted.items[*hit]; (void)impl_->ActivateItem(item, button == ui::PointerButton::Middle, *hit); }
 }
+bool DockWindow::OnTouchDown(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.touch.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+        // A further finger ends a pending tap or hold; a drag in progress is kept.
+        if (!p.dragging && p.touch.Down(contact.id, contact.dip.x, contact.dip.y, contact.time) == graphics::TouchGesture::Event::Canceled) {
+            ::KillTimer(Handle(), kTouchHoldTimer);
+            p.touchHeld = false;
+            p.FinishDrag(false);
+        }
+        return true;
+    }
+    if (!Handle() || p.suppressed || !IsShown() || IsTransitioning() || !::IsWindowEnabled(Handle())) return false;
+    (void)p.touch.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    p.touchItem = HitTest(p.layout, contact.dip);
+    p.touchHeld = false;
+    OnPointerDown(ui::PointerButton::Left, contact.dip);
+    ::SetTimer(Handle(), kTouchHoldTimer, 550, nullptr);  // past the 0.5 s hold: timers can fire a tick early
+    return true;
+}
+void DockWindow::OnTouchMove(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.touchHeld) {
+        OnPointerMove(contact.dip);  // reorders once the movement passes the drag threshold
+        return;
+    }
+    (void)p.touch.Move(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    if (p.touch.CurrentPhase() != graphics::TouchGesture::Phase::Pending) {
+        ::KillTimer(Handle(), kTouchHoldTimer);
+        p.FinishDrag(false);
+        (void)p.Arrange(); Invalidate();
+    }
+}
+void DockWindow::OnTouchUp(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    ::KillTimer(Handle(), kTouchHoldTimer);
+    const auto event = p.touch.Up(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    const bool held = p.touchHeld, dragged = p.dragging;
+    const auto item = p.touchItem;
+    p.touchHeld = false;
+    p.touchItem.reset();
+    if (dragged || event == graphics::TouchGesture::Event::Tap) OnPointerUp(ui::PointerButton::Left, contact.dip);
+    else { p.FinishDrag(false); (void)p.Arrange(); Invalidate(); }
+    OnPointerLeave();  // touch has no leave of its own: the Dock is no longer engaged
+    if (held && !dragged && item && *item < p.fitted.items.size()) p.MenuAt(*item);
+}
+void DockWindow::OnTouchCancel() {
+    auto& p = *impl_;
+    if (Handle()) ::KillTimer(Handle(), kTouchHoldTimer);
+    (void)p.touch.Cancel();
+    p.touchHeld = false;
+    p.touchItem.reset();
+    p.FinishDrag(false);
+    OnPointerLeave();
+    (void)p.Arrange(); Invalidate();
+}
 void DockWindow::OnPointerCaptureLost() {
     impl_->FinishDrag();
     (void)impl_->Arrange(); Invalidate();
@@ -1204,6 +1266,11 @@ std::optional<LRESULT> DockWindow::OnMessage(UINT message, WPARAM wParam, LPARAM
         impl_->armedHover.reset();
         impl_->hover.Advance(graphics::FrameScheduler::Now());
         impl_->ApplyHover();
+        return 0;
+    }
+    if (message == WM_TIMER && wParam == kTouchHoldTimer) {
+        ::KillTimer(Handle(), kTouchHoldTimer);
+        if (impl_->touch.Tick(graphics::FrameScheduler::Now()) == graphics::TouchGesture::Event::HoldStarted && impl_->touchItem) impl_->touchHeld = true;
         return 0;
     }
     if (message == WM_TIMER && wParam == kLongPressTimer) {

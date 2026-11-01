@@ -9,7 +9,7 @@
 set(AETHER_MODULE_ORDER
     core diagnostics platform net graphics accessibility ui ui_form showcase
     status status_audio weather weather_location applications search settings updates install
-    dock topbar search_ui settings_ui system_controls media_controls controlcenter
+    dock topbar search_ui settings_ui system_controls media_controls controlcenter welcome
     app launcher updater installer)
 
 macro(aether_declare_module name directory)
@@ -44,9 +44,10 @@ aether_declare_module(settings_ui   src/settings/ui       ui ui_form settings up
 aether_declare_module(system_controls src/system_controls core platform status)
 aether_declare_module(media_controls src/media_controls   core platform)
 aether_declare_module(controlcenter src/controlcenter     ui accessibility status status_audio system_controls media_controls)
+aether_declare_module(welcome       src/welcome           ui settings)
 aether_declare_module(app           src/app
     core diagnostics platform net graphics accessibility ui ui_form status status_audio weather weather_location
-    applications search settings updates install dock topbar search_ui settings_ui controlcenter)
+    applications search settings updates install dock topbar search_ui settings_ui controlcenter welcome)
 aether_declare_module(launcher      launcher              core diagnostics platform updates install)
 aether_declare_module(updater       updater               core diagnostics platform graphics ui_form updates install)
 aether_declare_module(installer     installer             core diagnostics platform graphics ui_form updates install settings app launcher updater)

@@ -111,6 +111,165 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D57 — Every finished piece of work ends in a commit and a test build
+
+Owner instruction, 2026-11-01. When work is finished: commit it and hand over a setup executable. That
+executable is a **test build**, not the release everyone gets. The numbering follows the alpha: Alpha N is
+version N, and N.M is its test M, so `0.3.1-alpha.3` is "Alpha 3, test 3.1" (the patch number counts test
+builds, starting from the published `0.3.0-alpha.3`). A test build goes to the owner from `dist/` and is not
+published. Putting one on GitHub as a pre-release is rare and the owner's call each time, as is a full release.
+The instruction covers commit and the executable: not push, tag, release or installation over the owner's copy.
+
+### D56 — Second round of the owner's trial: bar timing, corners, a real pen, Wi-Fi networks
+
+Owner instruction, 2026-11-01, after trying D54 and D55:
+
+- **The Top Bar waits one second, and the wait starts sooner.** The owner still felt five seconds. The
+  log the last round added shows the old wait ran exactly as written (eleven reveals, the timed ones
+  2000-2016 ms), so the difference lay before the timer: it only started on the last rows of pixels. It now starts
+  in the top 6 DIPs and holds through the top 16, and the wait is 1000 ms. This changes D52's number, the owner's
+  own, because the owner's complaint is the wait as it feels. One constant, if it needs changing again.
+- **Rounded corners belong between the bars.** A maximized window that covers the whole monitor, which is what
+  both bars hidden gives, takes the screen and is left square. The AS4-06 correction of S-061 had this the wrong
+  way round and is reverted: what the audit called a defect was what the owner wants.
+- **Chromium keeps its corners between the bars.** A browser re-asserts a plain rectangular region or its
+  material, which ended the rounding for that whole maximize, or after eight re-assertions. A plain rectangle or no
+  region is now a re-assertion and not a shape of its own, and the retry budget limits a burst, refilling after a
+  quiet minute. An application's real shape still wins until the next maximize. The cause is established from
+  Chromium's documented behavior and this source; the owner's Chrome has not been observed through it.
+- **The welcome has the screen to itself.** The Dock and Top Bar stay off the screen while the cover or the greeting
+  is up, ready underneath, and come out when it ends.
+- **A calligrapher's pen.** The owner called the writing childish. The authored paths are unchanged, but the pen now
+  leans forward, long letters reach well above small ones, down strokes swell while up strokes are hairlines, strokes
+  enter and leave on a fine point and a dot is a dab. Writing fills the room given (88 % of the width or 82 % of the
+  height), on one line or two, whichever is larger. A doubled point at a letter join, which knotted the spline, is gone.
+- **The Wi-Fi view lists the networks around, and joins them.** Names and signal strength, the connected one first; a
+  scrolling list by finger and wheel. Choosing one connects; a network that needs it asks for its password in a masked
+  native field. Windows keeps the password in its own profile; Aether keeps nothing and logs neither names nor
+  passwords. An enterprise network goes to Windows' own dialog. **This changes FR-008 at the owner's request:** network
+  names are read and shown only here, only once this view is opened; the Top Bar still shows none.
+
+Also done from the handoff: AS4-18 (Settings says what Windows will really do at sign-in, and Apply repairs a lost
+registration while a Task Manager turn-off stays Windows'); AS4-21 (a failed save puts the registration back); AS4-05 (a
+new guard takes over the exact clip of a guard that died, and removes it on release); startup diagnostics for AS4-02; and
+the idle cost: the UI thread's largest share is Auto-Hide walking every window, now twice a second instead of four
+times. AS4-23 stays open: its update path is dormant while signed updates are unavailable.
+
+Unchanged and recorded: Aether's own Settings window keeps its rounded frame when maximized, whatever the bars do.
+Evidence and limits: TEST_STATUS S-064.
+
+### D55 — Quick Settings scrolls under the finger, and sliders go where the hand goes
+
+Owner report, 2026-11-01, from the first trial: the second Quick Settings page (Project, All settings) could
+not be reached by touch, and some sliders are slow or return to where they started.
+
+- **The pages move with the finger, up and down.** They are stacked vertically, but T51 listened only for a
+  sideways swipe, so a vertical pan was ignored: an implementation error, and D53's "pages turn on release"
+  no longer holds. A pan moves them continuously; on release they settle on the nearest page, or the next one
+  after a quarter of a page or a flick. Past the first or last page they give a little and return, without
+  wrapping around. The sideways swipe is gone. Buttons, dots, keys and the wheel are unchanged.
+- **A form slider goes where the hand goes.** The native trackbar drags only from its small thumb and answers
+  any other press with one page step (reproduced: a press at 80 % moved it from 20 to 40 and no further).
+  Mouse presses on a slider are now handled by the form surface: on the thumb it takes hold without jumping,
+  anywhere else it goes there at once, and either way the drag continues. The control keeps its value, range,
+  keyboard and accessibility. By touch, direction decides: sideways moves the slider, up or down scrolls the
+  page, a tap goes to the finger.
+- **A held slider only stages its value.** Applying re-themes and lays out every surface on the UI thread, and it
+  used to run whenever the hand paused for 350 ms. It now runs when the slider is let go.
+- **A requested value holds until Windows reports a change.** A display's brightness reading can lag. After
+  1.5 s the panel returned to the stale reading, and nothing read it again until it reopened, so the thumb went
+  back and stayed there. This is the source-established cause found for "returns to where it started". The panel
+  now holds a request for up to 4 s, settles when a reading has really moved to about that value, and the
+  application re-reads brightness meanwhile. Brightness also follows the thumb during a drag, at a slower pace
+  than volume. A native return was tested for the mouse and not found: a thumb drag with the old control stayed.
+
+Evidence and limits: TEST_STATUS S-063. Synthetic contacts only; **nothing here has run under a real finger,
+and the real brightness path has only compiled.**
+
+### D54 — After the first trial: a Top Bar wait a hand can hold, and a welcome on the desktop picture
+
+Owner instruction, 2026-11-01, after trying a private build on the real machine. The owner approved the
+moving-stroke writing itself and rejected the rest of the greeting's presentation:
+
+- **The Top Bar took "almost five seconds", not two.** The decision logic does wait exactly two seconds,
+  but only while the pointer stays on one exact pixel row, so one pixel of movement of a resting hand
+  restarted it. Now the wait starts within the top 2 DIPs and continues within the top 12; a real move away
+  still cancels it. This refines D52's "exactly the top pixel row"; a monitor above still does not count.
+  The cause is established from source, not measured: a recording made during this work caught no visit to
+  the edge. Each reveal now logs its wait, so the next trial measures it.
+- **The greeting arrived late, after the desktop.** The background now goes up when the session locks,
+  behind Windows' lock screen, so an unlock reveals it instead of the desktop, and the writing starts at the
+  unlock. Waking without a lock greets too, but the desktop shows first there. At sign-in it can appear
+  no earlier than Windows starts Aether; a different startup mechanism would need its own decision.
+- **The black background is gone.** The background is the person's own desktop picture, opaque and softly
+  blurred, under a veil only as dark as the ink needs (4.5:1 on the picture's average). A plain-colour desktop
+  uses that colour. High contrast keeps its system colours. The picture is read locally, only while a
+  greeting is due, and is never logged, stored or sent.
+- **Much larger, and longer.** The writing takes up to 86 % of the screen's width and 3.6-6.2 s, then the
+  finished words stay 1.4 s and the screen eases back to the desktop in 0.5 s. The hard deadline is 12 s.
+
+Engineering choices within this, open to the owner's view: the blur's strength (1.2 % of the picture's width),
+the veil, the pale ink with a soft shadow, and the primary monitor only. Windows' lock screen is itself a
+full-screen window, so the greeting now judges full screen from the foreground window, ignoring that class,
+rather than from the state the bars keep. A cover is removed if Windows reports the session unlocked, or
+cannot say, even without a notification, and any click or touch removes it.
+
+Evidence and limits: TEST_STATUS S-062; ADR 0013. **The cover has not run at a real lock.**
+
+### D53 — Engineering choices for T51/T52, open to the owner's review
+
+Claude, 2026-11-01, implementing D51 where the work order left the choice open. None of these was
+decided by the owner, and each is easy to change:
+
+- **The welcome is on by default**, with no name until one is entered. The owner asked for the feature;
+  it is brief and skippable, and Settings → Welcome turns it off. Default off is the alternative.
+- **First run opens Settings → Welcome** instead of Weather, to offer the optional name with its
+  explanation. The setup wizard itself gained no name field.
+- **Hidden bars are reached by a swipe in from the screen edge, read passively from raw digitizer
+  input.** A visible handle would be simpler but would intercept other windows' input at the edge,
+  which FR-039 forbids. Windows' own edge gestures still receive the same touch.
+- **In forms, a tap acts on release, with no pressed state before it,** so a pan can never click.
+  Native editors, lists, sliders and scroll bars keep their own touch handling.
+- **Quick Settings pages turn on release** rather than following the finger; sliders do follow it.
+  Superseded by D55 after the owner's trial.
+
+Evidence and limits: TEST_STATUS S-061; ADR 0013.
+
+### D52 — The Top Bar's Auto-Hide edge reveal waits two seconds
+
+Owner instruction, 2026-11-01: an accidental visit to the top edge revealed the Top Bar at once and
+could put it over a control being used near the top of a maximized application. The pointer must now
+stay on the top edge for two seconds; leaving earlier cancels the wait and the next visit starts it
+again. This refines FR-039 for the Top Bar only: the Dock keeps its 40 ms dwell because the owner
+reported, and scoped the change to, the top edge. The wait guards only a hidden bar, so a bar already
+shown is not hidden while the pointer rests on its edge. Use, panels, keyboard, an uncovered desktop
+and turning the setting off still show the bar at once. The edge is now exactly the primary monitor's
+top pixel row, so working on a monitor above no longer counts as resting on it. The Dock's bottom
+check keeps the equivalent behavior for a monitor below; that is recorded, not changed here. Evidence:
+pure decision tests; the owner's check with real applications is pending.
+
+### D51 — Audit Alpha 3, stabilize the next batch, add complete touch and a transient welcome
+
+Owner instruction, 2026-10-28, given to Codex: prepare an efficient technical English prompt for
+Claude, and independently search the current source for defects beyond the reported blank/grey
+maximized application windows after Auto-Hide changes, startup failures and poor fluidity. Codex
+audits/prepares; Claude implements the fixes and continues discovery. T50 records stabilization;
+FR-040/T51 adds complete touch pan/fling/elastic return and input arbitration. FR-041/T52 adds
+original handwritten FR/EN greetings with an optional, explained local display name after sign-in
+and unlock, while essential Aether surfaces prepare. The secure Windows authentication desktop is
+untouched; this is transient supporting UI (ADR 0013), with immediate skip and a fail-safe deadline.
+
+The owner calls the next development batch version 4 and expects substantially stronger release
+quality and fewer dangerous/reachable defects. No specific version string, new tag/publication,
+installation, changed startup mechanism or Windows/macOS port is approved by this preparation.
+Future macOS adaptation is a direction, not current implementation. D50's Latest publication does
+not waive missing qualification; this report explicitly reopens the reported reliability issues.
+The audit distinguishes owner reports, source-established defects, risks and missing features;
+neither exhaustive bug freedom nor security certification is claimed. Source implementation,
+physical touch, actual reboot/unlock timing and owner acceptance remain pending. Work order:
+[Claude prompt](docs/CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md),
+[prioritized audit](docs/specs/v4-stability-audit.md); evidence: TEST_STATUS S-060.
+
 ### D50 — The owner accepts Alpha 3 as version 3 and publishes it directly as Latest
 
 Owner instruction, 2026-10-27, given to Claude while D49's package was building: the owner counts

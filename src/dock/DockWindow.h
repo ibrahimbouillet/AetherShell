@@ -85,6 +85,10 @@ protected:
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;
+    bool OnTouchDown(const ui::TouchContact& contact) override;
+    void OnTouchMove(const ui::TouchContact& contact) override;
+    void OnTouchUp(const ui::TouchContact& contact) override;
+    void OnTouchCancel() override;
     bool OnKeyDown(UINT virtualKey) override;
     void OnFocusChanged(bool focused) override;
     void OnDeviceReplaced() override;

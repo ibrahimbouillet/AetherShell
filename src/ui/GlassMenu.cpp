@@ -9,6 +9,8 @@
 #include "graphics/Transition.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
+#include "graphics/ScrollPhysics.h"
+#include "platform/windows/PointerInput.h"
 #include "ui/SurfaceWindow.h"
 #include "ui/ThemedMenu.h"
 #include "ui/accessibility/AccessibleSurface.h"
@@ -35,6 +37,9 @@ constexpr UINT kReleaseMessage = WM_APP + 0x48;     // host: a closing level fin
 constexpr UINT_PTR kSubmenuTimer = 1;               // hover delay before a submenu opens
 constexpr UINT_PTR kIntentTimer = 2;                // re-evaluates hover after travel towards a submenu
 constexpr UINT_PTR kScrollTimer = 3;                // repeats while the pointer rests on an edge arrow
+constexpr UINT_PTR kTouchTimer = 4;                 // watches a contact whose end may never reach this loop
+constexpr double kTouchSlopDip = 8.0;               // movement that turns a press into a pan (FR-040)
+constexpr double kTouchOverscrollDip = 72.0;        // largest elastic displacement of a long menu
 constexpr UINT kScrollRepeatMs = 50;
 constexpr float kScrollStrip = 16.0f;    // DIPs: edge-arrow strip of an overflowing level
 constexpr float kSubmenuOverlap = 4.0f;  // DIPs a submenu panel overlaps its parent panel
@@ -178,6 +183,15 @@ public:
     [[nodiscard]] const graphics::DesignTokens& Tokens() const noexcept { return tokens_; }
     [[nodiscard]] const graphics::MotionPolicy& Motion() const noexcept { return motion_; }
     [[nodiscard]] graphics::TextCache& Text() noexcept { return text_; }
+    // FR-040: a touch message reaching a level directly (or a capture change, which is always sent).
+    [[nodiscard]] bool RouteTouch(UINT message, WPARAM wParam, HWND window) {
+        if (message == WM_POINTERCAPTURECHANGED) {
+            if (touch_.Tracking(GET_POINTERID_WPARAM(wParam))) CancelTouch();
+            return false;
+        }
+        MSG routed{}; routed.hwnd = window; routed.message = message; routed.wParam = wParam;
+        return Active() && OnTouch(routed);
+    }
     [[nodiscard]] bool Instant() const noexcept {
         return !motion_.AllowsMovement() || tokens_.mode == graphics::ThemeMode::HighContrast;
     }
@@ -229,6 +243,9 @@ private:
     void OnKey(const MSG& message);
     void OnMnemonic(wchar_t character);
     void OnMouse(const MSG& message);
+    [[nodiscard]] bool OnTouch(const MSG& message);
+    void CancelTouch() noexcept;
+    void EndTouch() noexcept;
     void UpdateHover(POINT previous, bool forced);
     [[nodiscard]] bool TowardsSubmenu(POINT previous, POINT current, std::size_t depth) const;
     [[nodiscard]] Hit HitTest(POINT screen) const;
@@ -288,6 +305,12 @@ private:
     std::size_t pendingRow_ = kNone;
     std::size_t scrollDepth_ = kNone;
     int scrollDirection_ = 0;
+    // FR-040: one contact at a time. A pan scrolls a long level directly and never chooses; a tap
+    // chooses the row it started on; a second finger or a lost contact chooses nothing.
+    graphics::TouchGesture touch_{{}, graphics::TouchAxis::Vertical};
+    Hit touchHit_{};
+    std::size_t touchPanDepth_ = kNone;
+    float touchScale_ = 1.0f;
 };
 
 // One menu level: a composition SurfaceWindow that never activates, holding the glass panel and
@@ -328,6 +351,13 @@ public:
     void SelectEdge(bool last) { Select(NextMenuRow(entries_, kNone, last ? -1 : 1), true); }
     void Page(int direction);
     void ScrollBy(float deltaDip) { ScrollTo(scroll_.Target() + deltaDip, true); }
+    // FR-040 touch: the rows follow the finger, fling and return from a bounded elastic displacement.
+    [[nodiscard]] bool Overflows() const noexcept { return overflow_; }
+    void GrabTouch(double finger, double time);
+    void DragTouch(double finger, double time);
+    void ReleaseTouch(double time, bool canceled);
+    [[nodiscard]] bool TouchMoving() const noexcept { return touchScroll_.Moving(); }
+    void ApplyTouchScroll();
     [[nodiscard]] bool CanScroll(int direction) const noexcept {
         return direction < 0 ? scroll_.Target() > 0.5f : scroll_.Target() < MaxScroll() - 0.5f;
     }
@@ -411,6 +441,7 @@ private:
     graphics::Tween pill_{0.0f};     // opacity of the selected row's pill
     graphics::Tween fading_{0.0f};   // opacity of the previously selected row's pill
     graphics::Tween scroll_{0.0f};   // DIPs scrolled
+    graphics::ScrollPhysics touchScroll_;
     graphics::Tween upArrow_{0.0f};
     graphics::Tween downArrow_{0.0f};
 };
@@ -681,7 +712,35 @@ void MenuLevel::Page(int direction) {
     }
 }
 
+void MenuLevel::GrabTouch(double finger, double time) {
+    if (!touchScroll_.Moving()) {
+        graphics::ScrollPhysicsParameters parameters;
+        parameters.maximumOverscroll = kTouchOverscrollDip;
+        touchScroll_.SetParameters(parameters);
+        touchScroll_.SetReducedMotion(controller_.Instant());
+        touchScroll_.SetExtent(MaxScroll(), std::max(1.0f, ViewportHeight()));
+        touchScroll_.JumpTo(scroll_.Value(graphics::FrameScheduler::Now()));
+    }
+    touchScroll_.Grab(finger, time);
+}
+void MenuLevel::DragTouch(double finger, double time) {
+    touchScroll_.Drag(finger, time);
+    ApplyTouchScroll();
+}
+void MenuLevel::ReleaseTouch(double time, bool canceled) {
+    if (canceled) touchScroll_.Cancel(time);
+    else touchScroll_.Release(time);
+    ApplyTouchScroll();
+}
+void MenuLevel::ApplyTouchScroll() {
+    scroll_.SnapTo(static_cast<float>(touchScroll_.Visual()));
+    UpdateArrows(false);
+    Invalidate();
+    if (touchScroll_.Moving()) RequestAnimationFrame();
+    else if (touchScroll_.CurrentPhase() == graphics::ScrollPhysics::Phase::Idle) ScrollTo(scroll_.Value(graphics::FrameScheduler::Now()), false);  // whole pixels
+}
 void MenuLevel::ScrollTo(float target, bool animate) {
+    if (touchScroll_.Moving()) touchScroll_.JumpTo(scroll_.Value(graphics::FrameScheduler::Now()));  // the wheel or keyboard takes over
     target = std::clamp(target, 0.0f, MaxScroll());
     target = ToDip(std::round(ToPx(target)));  // rest on whole pixels so text stays crisp
     if (std::fabs(target - scroll_.Target()) < 0.01f) return;
@@ -950,11 +1009,17 @@ void MenuLevel::OnRender(const RenderContext& context) {
 }
 
 bool MenuLevel::OnAnimate(double now) {
+    if (touchScroll_.Moving()) {
+        (void)touchScroll_.Step(now);
+        ApplyTouchScroll();
+        if (touchScroll_.Moving()) return true;
+    }
     return pill_.IsAnimating(now) || fading_.IsAnimating(now) || scroll_.IsAnimating(now) || upArrow_.IsAnimating(now) ||
            downArrow_.IsAnimating(now);
 }
 
 std::optional<LRESULT> MenuLevel::OnMessage(UINT message, WPARAM wParam, LPARAM lParam) {
+    if (platform::IsPointerMessage(message) && controller_.RouteTouch(message, wParam, Handle())) return 0;
     switch (message) {
         case WM_GETOBJECT: {
             LRESULT result = 0;
@@ -1255,6 +1320,9 @@ bool MenuController::Intercept(MSG& message) {
     const UINT id = message.message;
     const bool keyboard = IsKeyboardMessage(id);
     const bool mouse = !keyboard && IsMouseMessage(id);
+    if (id == WM_POINTERDOWN || id == WM_POINTERUPDATE || id == WM_POINTERUP) {
+        try { return Active() && OnTouch(message); } catch (...) { CancelTouch(); return true; }
+    }
     if (!keyboard && !mouse) return false;
     try {
         if (Active()) {
@@ -1378,6 +1446,95 @@ MenuController::Hit MenuController::HitTest(POINT screen) const {
         if (hit.kind != HitKind::None) return Hit{depth, hit};
     }
     return {};
+}
+
+bool MenuController::OnTouch(const MSG& message) {
+    const UINT id = message.message;
+    const UINT32 pointer = GET_POINTERID_WPARAM(message.wParam);
+    if (id != WM_POINTERDOWN && !touch_.Tracking(pointer)) return false;  // not this menu's contact
+    if (id == WM_POINTERDOWN && !platform::IsTouchPointer(message.wParam)) return false;
+    const auto contact = platform::ReadPointer(message.wParam);
+    if (!contact) return false;
+    if (contact->canceled) { CancelTouch(); return true; }
+    if (id == WM_POINTERDOWN && touch_.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+        (void)touch_.Down(pointer, contact->screenPx.x, contact->screenPx.y, contact->time);  // a further finger chooses nothing
+        return true;
+    }
+    const Hit pressedHit = id == WM_POINTERDOWN ? HitTest(contact->screenPx) : Hit{};
+    if (id == WM_POINTERDOWN) {
+        if (pressedHit.depth == kNone) { Dismiss(); return true; }  // as a press outside every level does
+        touchScale_ = levels_[pressedHit.depth]->ToDip(1.0f);       // this level's DIPs from here on
+    }
+    const double x = static_cast<double>(contact->screenPx.x) * touchScale_, y = static_cast<double>(contact->screenPx.y) * touchScale_;
+    if (id == WM_POINTERDOWN) {
+        const Hit& hit = pressedHit;
+        touch_.SetParameters({kTouchSlopDip, 0.5});
+        (void)touch_.Down(pointer, x, y, contact->time);
+        touchHit_ = hit;
+        touchPanDepth_ = kNone;
+        pressSeen_ = true;
+        (void)::SetTimer(host_, kTouchTimer, 100, nullptr);
+        MenuLevel& level = *levels_[hit.depth];
+        if (level.TouchMoving()) {
+            // The press catches a moving list: it stops it and is not a tap.
+            level.GrabTouch(y, contact->time);
+            touchPanDepth_ = hit.depth;
+            touchHit_ = {};
+        } else if (hit.target.kind == HitKind::Row && level.Row(hit.target.row).Selectable()) {
+            level.Select(hit.target.row, false);  // press feedback, without opening anything yet
+        }
+        return true;
+    }
+    if (id == WM_POINTERUPDATE) {
+        const auto event = touch_.Move(pointer, x, y, contact->time);
+        if (event == graphics::TouchGesture::Event::PanStarted || event == graphics::TouchGesture::Event::Canceled) {
+            if (touchHit_.depth < levels_.size()) {
+                MenuLevel& level = *levels_[touchHit_.depth];
+                if (level.OpenChild() == kNone) level.Select(kNone, false);
+                if (event == graphics::TouchGesture::Event::PanStarted && level.Overflows()) {
+                    level.GrabTouch(y, contact->time);
+                    touchPanDepth_ = touchHit_.depth;
+                }
+            }
+            touchHit_ = {};
+        }
+        if (touchPanDepth_ < levels_.size()) levels_[touchPanDepth_]->DragTouch(y, contact->time);
+        return true;
+    }
+    const auto event = touch_.Up(pointer, x, y, contact->time);
+    const Hit started = touchHit_;
+    const std::size_t panned = touchPanDepth_;
+    EndTouch();
+    if (panned < levels_.size()) levels_[panned]->ReleaseTouch(contact->time, false);
+    if (event != graphics::TouchGesture::Event::Tap || started.depth >= levels_.size()) return true;
+    const Hit now = HitTest(contact->screenPx);
+    if (now.depth != started.depth || now.target.kind != started.target.kind || now.target.row != started.target.row) return true;
+    MenuLevel& level = *levels_[started.depth];
+    if (started.target.kind == HitKind::ScrollUp || started.target.kind == HitKind::ScrollDown) {
+        level.ScrollBy((started.target.kind == HitKind::ScrollUp ? -0.8f : 0.8f) * level.ViewportHeight());
+    } else if (started.target.kind == HitKind::Row && level.Row(started.target.row).Selectable()) {
+        if (started.target.row != level.OpenChild()) CloseLevelsAbove(started.depth);
+        level.Select(started.target.row, false);
+        Activate(started.depth, started.target.row, false);
+    }
+    return true;
+}
+
+void MenuController::EndTouch() noexcept {
+    touchHit_ = {};
+    touchPanDepth_ = kNone;
+    if (host_) ::KillTimer(host_, kTouchTimer);
+}
+
+void MenuController::CancelTouch() noexcept {
+    const std::size_t panned = touchPanDepth_;
+    (void)touch_.Cancel();
+    const Hit started = touchHit_;
+    EndTouch();
+    try {
+        if (started.depth < levels_.size() && levels_[started.depth]->OpenChild() == kNone) levels_[started.depth]->Select(kNone, false);
+        if (panned < levels_.size()) levels_[panned]->ReleaseTouch(graphics::FrameScheduler::Now(), true);
+    } catch (...) {}
 }
 
 void MenuController::OnMouse(const MSG& message) {
@@ -1609,6 +1766,13 @@ void MenuController::OnTimer(UINT_PTR id) {
             ::KillTimer(host_, kIntentTimer);
             if (Active()) UpdateHover(lastPointer_, true);
             return;
+        case kTouchTimer: {
+            // The contact ended without an up reaching this loop (a system gesture, lost capture).
+            const auto pointer = touch_.Pointer();
+            const auto contact = pointer ? platform::ReadPointer(MAKEWPARAM(*pointer, 0)) : std::nullopt;
+            if (!contact || !contact->inContact || contact->canceled) CancelTouch();
+            return;
+        }
         case kScrollTimer:
             if (!Active() || scrollDepth_ >= levels_.size() || !levels_[scrollDepth_]->CanScroll(scrollDirection_)) {
                 StopAutoScroll();

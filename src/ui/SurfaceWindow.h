@@ -24,6 +24,7 @@
 
 #include <windows.h>
 
+#include <cstdint>
 #include <optional>
 #include <span>
 #include <string>
@@ -50,6 +51,13 @@ struct RenderContext {
 
 enum class PointerButton { Left, Right, Middle };
 
+// FR-040: one touch contact of the window, in client DIPs. `time` is on the FrameScheduler::Now clock.
+struct TouchContact {
+    std::uint32_t id = 0;
+    D2D1_POINT_2F dip{};
+    double time = 0.0;
+};
+
 class SurfaceWindow : private graphics::IFrameClient {
 public:
     SurfaceWindow(graphics::GraphicsDevice& device, graphics::FrameScheduler& scheduler);
@@ -64,6 +72,8 @@ public:
     [[nodiscard]] HWND Handle() const noexcept { return hwnd_; }
     [[nodiscard]] UINT Dpi() const noexcept { return dpi_; }
     [[nodiscard]] bool IsShown() const noexcept { return shown_; }
+    // Whether a frame has actually been drawn and presented, not merely requested (FR-041 readiness).
+    [[nodiscard]] bool HasPresented() const noexcept { return presented_; }
     [[nodiscard]] RECT BoundsPx() const noexcept { return bounds_; }
 
     void SetBoundsPx(const RECT& boundsPx);
@@ -119,6 +129,16 @@ protected:
     // up; that release is followed by OnPointerUp instead.
     virtual void OnPointerCaptureLost() {}
     virtual void OnWheel(float /*notches*/, D2D1_POINT_2F /*dip*/) {}
+    // FR-040 touch. Returning true from OnTouchDown owns the contact: its moves and end arrive here and
+    // no promoted mouse input follows. False leaves it to Windows, so a tap arrives as an ordinary click.
+    // A further finger during an owned contact also reaches OnTouchDown (it must not act on its own);
+    // its moves and end are consumed. A canceled or lost contact ends in OnTouchCancel, never OnTouchUp.
+    virtual bool OnTouchDown(const TouchContact& /*contact*/) { return false; }
+    virtual void OnTouchMove(const TouchContact& /*contact*/) {}
+    virtual void OnTouchUp(const TouchContact& /*contact*/) {}
+    virtual void OnTouchCancel() {}
+    // Ends an owned contact now (hidden, deactivated, disabled): OnTouchCancel runs if one was owned.
+    void CancelTouch() noexcept;
     // Return true when the key was handled.
     virtual bool OnKeyDown(UINT /*virtualKey*/) { return false; }
     virtual void OnFocusChanged(bool /*focused*/) {}
@@ -137,6 +157,7 @@ private:
     void Render(double now);
     void ApplyInputRegion();
     [[nodiscard]] D2D1_POINT_2F PointFromLParam(LPARAM lParam) const noexcept;
+    [[nodiscard]] bool RouteTouch(UINT message, WPARAM wParam);
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
     LRESULT HandleMessage(UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -150,13 +171,17 @@ private:
     RECT bounds_{};
     std::vector<RECT> inputRegion_;
     std::vector<RECT> visualRegion_;
+    std::vector<RECT> appliedRegion_;      // what the window currently has (AS4-08)
+    HWND appliedRegionWindow_ = nullptr;
     D2D1_RECT_F backdropPanelDip_{};
     float backdropRadiusDip_ = 0.0f;
     float backdropOpacity_ = 1.0f;
     bool backdropBlurRequested_ = false;
     bool hiding_ = false;
     bool shown_ = false;
+    bool presented_ = false;
     bool trackingLeave_ = false;
+    std::optional<std::uint32_t> touchPointer_;  // the owned contact (FR-040)
     bool releasingCapture_ = false;
     bool renderPending_ = false;
     bool animationPending_ = false;

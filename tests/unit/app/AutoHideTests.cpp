@@ -3,6 +3,9 @@
 // D47 Auto-Hide decisions for one bar, sample by sample (50 ms apart, as the host samples).
 #include "AetherTest.h"
 #include "app/AutoHide.h"
+#include "app/TouchEdgeReveal.h"
+
+#include <limits>
 
 using namespace aether;
 using namespace aether::app;
@@ -77,4 +80,161 @@ AETHER_TEST("auto-hide: a bar in use when a window comes over it is not pulled a
     // Turning the setting off brings it back at once and forgets the reveal.
     CHECK_FALSE(bar.Step(true, false, false, false));
     CHECK(bar.Step(true));
+}
+
+// D52, D56: the Top Bar's own timing. Samples are 50 ms apart, so index 20 is one second after index 0.
+AETHER_TEST("auto-hide: the Top Bar reveals only after a second on its edge") {
+    Bar bar{AutoHideState{kTopBarAutoHideTiming}};
+    REQUIRE(bar.Step(true));
+    for (int i = 0; i < 20; ++i) CHECK(bar.Step(true, false, true));  // 0 to 950 ms on the edge
+    CHECK_FALSE(bar.Step(true, false, true));                         // 1000 ms: revealed
+    CHECK_FALSE(bar.Step(true, false, true));                         // and it stays while the pointer rests there
+}
+
+AETHER_TEST("auto-hide: leaving the edge before the second is up cancels the Top Bar's reveal") {
+    Bar bar{AutoHideState{kTopBarAutoHideTiming}};
+    REQUIRE(bar.Step(true));
+    for (int i = 0; i < 20; ++i) REQUIRE(bar.Step(true, false, true));  // 950 ms: just short of it
+    CHECK(bar.Step(true));                                              // moved away: still hidden
+    // Coming back starts a whole new wait, not the remaining 50 ms.
+    for (int i = 0; i < 20; ++i) CHECK(bar.Step(true, false, true));
+    CHECK_FALSE(bar.Step(true, false, true));
+}
+
+AETHER_TEST("auto-hide: the Top Bar in use does not flicker when the pointer moves up onto its edge") {
+    Bar bar{AutoHideState{kTopBarAutoHideTiming}};
+    REQUIRE(bar.Step(true));
+    REQUIRE_FALSE(bar.Step(true, true));  // the pointer is on the bar
+    // Up onto the edge above it, for longer than the hide delay and the dwell together: never hidden
+    // when the 700 ms delay ends with the dwell still running.
+    for (int i = 0; i < 70; ++i) CHECK_FALSE(bar.Step(true, false, true));
+    // Away from both: the ordinary hide delay, then hidden.
+    int shown = 0;
+    while (!bar.Step(true) && shown < 100) ++shown;
+    CHECK(shown >= 12);
+    CHECK(shown <= 15);
+    CHECK(bar.Hidden());
+}
+
+AETHER_TEST("auto-hide: the Top Bar's wait does not gate its other reasons to show") {
+    Bar bar{AutoHideState{kTopBarAutoHideTiming}};
+    REQUIRE(bar.Step(true));
+    CHECK_FALSE(bar.Step(true, true));                 // a panel or keyboard use: at once
+    for (int i = 0; i < 15; ++i) (void)bar.Step(true);
+    REQUIRE(bar.Hidden());
+    CHECK_FALSE(bar.Step(false));                      // the desktop shows: at once
+    CHECK(bar.Step(true));                             // covered again: hidden at once
+    CHECK_FALSE(bar.Step(true, false, false, false));  // setting off: at once
+}
+
+AETHER_TEST("auto-hide: resetting a bar forgets its state but keeps its own timing") {
+    AutoHideState top{kTopBarAutoHideTiming};
+    const auto sample = [](std::uint64_t now, bool atEdge) {
+        AutoHideSample value;
+        value.enabled = true; value.covered = true; value.atEdge = atEdge; value.now = now;
+        return value;
+    };
+    (void)top.Update(sample(1000, true));
+    top.Reset();
+    CHECK(top.Update(sample(2000, true)));          // the wait restarted here
+    CHECK(top.Update(sample(2950, true)));          // a default 40 ms dwell would have revealed long ago
+    CHECK_FALSE(top.Update(sample(3000, true)));
+}
+
+AETHER_TEST("auto-hide: the Dock keeps its short dwell") {
+    CHECK_EQ(AutoHideTiming{}.revealDwellMs, 40u);
+    CHECK_EQ(kTopBarAutoHideTiming.revealDwellMs, 1000u);
+    CHECK_EQ(kTopBarAutoHideTiming.hideDelayMs, AutoHideTiming{}.hideDelayMs);
+}
+
+AETHER_TEST("auto-hide: the Top Bar's edge is the top of its monitor, at any scale") {
+    const RECT monitor{-1920, 200, 0, 1280};  // negative and offset coordinates
+    CHECK(PointerOnTopEdge(POINT{-960, 200}, monitor, 96));
+    CHECK(PointerOnTopEdge(POINT{-1920, 200}, monitor, 96));
+    CHECK(PointerOnTopEdge(POINT{-960, 205}, monitor, 96));          // six DIPs at 100 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 206}, monitor, 96));
+    CHECK(PointerOnTopEdge(POINT{-960, 208}, monitor, 144));         // nine rows at 150 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 209}, monitor, 144));
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 96));    // on a monitor above: it left the edge
+    CHECK_FALSE(PointerOnTopEdge(POINT{0, 200}, monitor, 96));       // right is exclusive
+    CHECK_FALSE(PointerOnTopEdge(POINT{-1921, 200}, monitor, 96));
+    CHECK(PointerOnTopEdge(POINT{-960, 223}, monitor, 144, kTopEdgeHoldDip));        // 24 rows at 150 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 224}, monitor, 144, kTopEdgeHoldDip));
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 144, kTopEdgeHoldDip));
+}
+
+// D54: with the pointer resting by hand, one pixel of movement used to restart the wait. Here the hand
+// wobbles every 300 ms throughout it.
+AETHER_TEST("auto-hide: a wobbling hand still reveals the Top Bar on time, not later") {
+    AutoHideState top{kTopBarAutoHideTiming};
+    const auto sample = [](std::uint64_t now, bool atEdge, bool nearEdge) {
+        AutoHideSample value;
+        value.enabled = true; value.covered = true; value.atEdge = atEdge; value.nearEdge = nearEdge; value.now = now;
+        return value;
+    };
+    std::uint64_t revealedAt = 0;
+    for (std::uint64_t now = 1000; now < 9000 && !revealedAt; now += 50) {
+        const bool wobbled = (now / 100) % 6 == 5;  // briefly a few pixels down, still by the edge
+        if (!top.Update(sample(now, !wobbled, true))) revealedAt = now;
+    }
+    CHECK_EQ(revealedAt, 2000u);
+    CHECK_EQ(top.EdgeRestMs(2000), 1000u);
+}
+
+AETHER_TEST("auto-hide: moving really away still cancels, and being near never starts the wait") {
+    AutoHideState top{kTopBarAutoHideTiming};
+    const auto sample = [](std::uint64_t now, bool atEdge, bool nearEdge) {
+        AutoHideSample value;
+        value.enabled = true; value.covered = true; value.atEdge = atEdge; value.nearEdge = nearEdge; value.now = now;
+        return value;
+    };
+    for (std::uint64_t now = 0; now < 4000; now += 50) CHECK(top.Update(sample(now, false, true)));  // a tab just below the edge
+    CHECK_EQ(top.EdgeRestMs(4000), 0u);
+    CHECK(top.Update(sample(4000, true, true)));
+    CHECK(top.Update(sample(4900, false, true)));   // the wait is still running
+    CHECK(top.Update(sample(4950, false, false)));  // gone, just before the end
+    CHECK_EQ(top.EdgeRestMs(4950), 0u);
+    CHECK(top.Update(sample(5000, false, true)));   // near again does not resume it
+    CHECK(top.Update(sample(5050, true, true)));    // a whole new wait
+    CHECK(top.Update(sample(6000, true, true)));
+    CHECK_FALSE(top.Update(sample(6050, true, true)));
+    // The Dock passes no near state: its behaviour is unchanged.
+    AutoHideState dock;
+    CHECK(dock.Update(sample(0, true, false)));
+    CHECK(dock.Update(sample(20, false, false)));
+    CHECK(dock.Update(sample(40, true, false)));
+    CHECK_FALSE(dock.Update(sample(80, true, false)));
+}
+
+AETHER_TEST("touch edges: a swipe in from either edge reveals once; ordinary touches never do (FR-040)") {
+    const double height = 720.0;
+    EdgeSwipeRecognizer edges;
+    // In from the top.
+    CHECK_FALSE(edges.Contact(1, true, 500, 4, height, 1000).has_value());
+    CHECK_FALSE(edges.Contact(1, true, 502, 30, height, 1050).has_value());
+    const auto top = edges.Contact(1, true, 504, 60, height, 1100);
+    REQUIRE(top.has_value());
+    CHECK(*top == ScreenEdge::Top);
+    CHECK_FALSE(edges.Contact(1, true, 504, 200, height, 1200).has_value());  // one contact, one reveal
+    CHECK_FALSE(edges.Contact(1, false, 504, 200, height, 1300).has_value());
+    // In from the bottom.
+    CHECK_FALSE(edges.Contact(2, true, 500, 716, height, 2000).has_value());
+    const auto bottom = edges.Contact(2, true, 500, 660, height, 2100);
+    REQUIRE(bottom.has_value());
+    CHECK(*bottom == ScreenEdge::Bottom);
+    (void)edges.Contact(2, false, 500, 660, height, 2200);
+    // A touch in the middle of the screen, however far it moves, is the application's.
+    CHECK_FALSE(edges.Contact(3, true, 500, 300, height, 3000).has_value());
+    CHECK_FALSE(edges.Contact(3, true, 500, 500, height, 3100).has_value());
+    (void)edges.Contact(3, false, 500, 500, height, 3200);
+    // A drag along the edge, a touch held too long and one moving outward are not swipes.
+    CHECK_FALSE(edges.Contact(4, true, 100, 6, height, 4000).has_value());
+    CHECK_FALSE(edges.Contact(4, true, 400, 60, height, 4100).has_value());
+    (void)edges.Contact(4, false, 400, 60, height, 4200);
+    CHECK_FALSE(edges.Contact(5, true, 500, 6, height, 5000).has_value());
+    CHECK_FALSE(edges.Contact(5, true, 500, 80, height, 6000).has_value());
+    (void)edges.Contact(5, false, 500, 80, height, 6100);
+    // Invalid reports change nothing; lost lifts cannot accumulate without bound.
+    CHECK_FALSE(edges.Contact(6, true, std::numeric_limits<double>::quiet_NaN(), 6, height, 7000).has_value());
+    for (std::uint32_t id = 10; id < 200; ++id) CHECK_FALSE(edges.Contact(id, true, 100, 2, height, 8000).has_value());
 }

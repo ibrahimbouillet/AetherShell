@@ -6,21 +6,31 @@
 
 #include <dwmapi.h>
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <string>
 #include <string_view>
 
 namespace aether::app {
 
+bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor, UINT dpi, float heightDip) noexcept {
+    const auto rows = std::max(1L, std::lround(heightDip * static_cast<float>(dpi) / 96.0f));
+    return pointer.y >= monitor.top && pointer.y < monitor.top + rows && pointer.x >= monitor.left && pointer.x < monitor.right;
+}
+
 bool AutoHideState::Update(const AutoHideSample& sample) noexcept {
-    if (!sample.atEdge) edgeSince_.reset();
+    const bool resting = sample.atEdge || (sample.nearEdge && edgeSince_);
+    if (!resting) edgeSince_.reset();
     else if (!edgeSince_) edgeSince_ = sample.now;
     if (!sample.enabled || !sample.covered) {
         // Off, or the desktop shows behind the bar: it stays, and a later cover starts afresh.
         revealed_ = false;
         return hidden_ = false;
     }
-    const bool edgeReveal = edgeSince_ && sample.now - *edgeSince_ >= timing_.revealDwellMs;
+    // The dwell only guards a hidden bar: one still shown stays while the pointer rests on its edge,
+    // rather than hiding when its delay ends and returning when the dwell does.
+    const bool edgeReveal = resting && (revealed_ || sample.now - *edgeSince_ >= timing_.revealDwellMs);
     if (sample.engaged || edgeReveal) {
         revealed_ = true;
         lastUse_ = sample.now;

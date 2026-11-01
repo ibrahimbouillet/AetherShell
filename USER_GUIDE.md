@@ -20,7 +20,9 @@ one window to close normally; the app decides whether to close (for example afte
 The Top Bar displays snapshots from documented Windows APIs. Unknown status remains unknown.
 A desktop PC without a battery can hide the battery item. A microphone-in-use indicator is
 unsupported; device availability/mute information is separate. Click available audio controls to
-change output volume or mute only when you intend to do so. Network details never show an SSID.
+change output volume or mute only when you intend to do so. The Top Bar never shows a network name. Next version:
+in Quick Settings, the arrow on the Wi-Fi tile lists the networks around you with their signal. Choose one to join it;
+Aether asks for its password if it needs one, and Windows keeps it. Names and passwords are never logged or sent.
 Alpha 2 adds input-language switching through Win+Space from the keyboard item and Weather settings
 from its visible weather item. The grouped network/audio/battery action opens Aether's quick controls,
 including media transport when Windows provides an active session, volume, supported brightness and
@@ -66,12 +68,30 @@ windows may still need moving. The status message shows whether replacement is a
 Windows Settings retains its native taskbar page; change Aether Shell's behavior here.
 In Alpha 3 replacement mode, eligible maximized windows get rounded corners and a thin rim, without
 changing their size or maximize state; Aether undoes this when it exits. Some applications and
-window types keep square corners.
+window types keep square corners. Next version: only between the bars. With both bars hidden, a maximized
+window takes the whole screen, square.
+
+**Welcome** (next version): after you sign in or unlock, Aether Shell writes a short greeting by hand,
+filling the screen, over your blurred desktop picture, and the bars come out when it ends: "Salut" or "Hello", with your name if you entered one. When you
+unlock, it is already there, in place of the desktop. Touch, click or press Escape to skip it. Settings →
+Welcome turns it off and sets the language and the name. The name and your picture stay on this PC; neither
+is ever sent anywhere or logged, and clearing the field removes the name. It appears only after Windows has
+signed you in; the Windows sign-in screen itself is not changed. At sign-in it appears as soon as Windows
+starts Aether, which can be after the desktop.
+
+**Touch** (next version): pan any long list or page with your finger; it follows directly, glides on
+when you let go and eases back past either end. A tap acts when you lift your finger, a pan never
+acts, and holding an item in the Top Bar or Dock opens its menu (hold and move to reorder the Dock).
+Swipe in from the top or bottom edge of the screen to bring back a bar that is hidden. In Quick Settings,
+pan up or down to move between its pages. On a slider, move sideways to change it or tap where you want it;
+a pan up or down there scrolls the page instead. A Settings slider takes effect when you let go.
 
 **Auto-Hide** (Alpha 3) is set separately for each bar: Settings → Dock → **Automatically hide the
 Dock** and Settings → Top Bar → **Automatically hide the Top Bar**. Both are off by default. An
 auto-hiding bar slides away while an application window covers it. Rest the pointer on the bottom
-(Dock) or top (Top Bar) edge of the screen to bring it back. It stays while you use it or one of its
+edge of the screen to bring the Dock back, or at the top edge for a second to bring the Top Bar
+back; moving away sooner cancels it, so reaching for a button near the top does not open the bar.
+It stays while you use it or one of its
 menus or panels is open, and hides again shortly after. On the desktop, with no window over it, the
 bar stays visible. An auto-hiding bar reserves no screen space, so maximized windows fill the screen
 and the revealed bar appears over them, like Windows' own auto-hide taskbar.

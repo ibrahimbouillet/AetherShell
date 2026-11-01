@@ -217,7 +217,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
             { std::lock_guard lock(progress.mutex); progress.succeeded=result.ok(); progress.outcome=result?L"Update completed.":L"Update did not complete. See the updater log or use Repair."; }
             outcome=result?0:1; progress.busy=false; ::PostMessageW(window,WM_APP+1,0,0);
         });
-        MSG message{}; while(::GetMessageW(&message,nullptr,0,0)>0) { if(!::IsDialogMessageW(window,&message)) { ::TranslateMessage(&message); ::DispatchMessageW(&message); } }
+        MSG message{}; while(::GetMessageW(&message,nullptr,0,0)>0) { if(!aether::ui::form::FormScrollView::RoutePointer(message) && !::IsDialogMessageW(window,&message)) { ::TranslateMessage(&message); ::DispatchMessageW(&message); } }
         worker.join(); return outcome;
     } catch(...) { return 4; }
 }

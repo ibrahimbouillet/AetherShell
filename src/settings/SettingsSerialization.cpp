@@ -62,6 +62,9 @@ void Fields(S& s, F&& f) {
     f("topBar", "showNotificationAreaButton", s.topBar.showNotificationAreaButton);
     f("topBar", "showHiddenIconsButton", s.topBar.showHiddenIconsButton);
     f("topBar", "showBatteryPercent", s.topBar.showBatteryPercent);
+    f("welcome", "enabled", s.welcome.enabled);
+    f("welcome", "displayName", s.welcome.displayName);
+    f("welcome", "language", s.welcome.language);
     f("weather", "enabled", s.weather.enabled);
     f("weather", "locationName", s.weather.locationName);
     f("weather", "latitude", s.weather.latitude);
@@ -109,6 +112,10 @@ template <> struct EnumNames<TemperatureUnit> {
 template <> struct EnumNames<UpdateChannel> {
     static constexpr std::array values{std::pair{UpdateChannel::Stable, "stable"},
         std::pair{UpdateChannel::Prerelease, "prerelease"}};
+};
+template <> struct EnumNames<GreetingLanguage> {
+    static constexpr std::array values{std::pair{GreetingLanguage::Automatic, "automatic"},
+        std::pair{GreetingLanguage::French, "french"}, std::pair{GreetingLanguage::English, "english"}};
 };
 template <> struct EnumNames<ThemePreference> {
     static constexpr std::array values{std::pair{ThemePreference::System, "system"},
@@ -324,6 +331,13 @@ Result<std::vector<std::string>> Validate(Settings& s) {
             Clamp(*s.weather.longitude, -180.0, 180.0, 0.0, warnings, "longitude");
         }
         Limit(s.weather.locationName, warnings, "locationName");
+        // FR-041: a short name, without control characters. The warning names the field, never the value.
+        std::erase_if(s.welcome.displayName, [](wchar_t c) { return c < 0x20 || c == 0x7F; });
+        if (s.welcome.displayName.size() > kMaximumDisplayNameLength) {
+            s.welcome.displayName.resize(kMaximumDisplayNameLength);
+            if (s.welcome.displayName.back() >= 0xD800 && s.welcome.displayName.back() <= 0xDBFF) s.welcome.displayName.pop_back();
+            Warn(warnings, "displayName", "limited to 64 UTF-16 code units");
+        }
         Fields(s, [&](const char*, const char* name, auto& value) {
             using T = std::remove_cvref_t<decltype(value)>;
             if constexpr (std::is_enum_v<T>) {
@@ -398,7 +412,7 @@ Result<json::Value> ToJson(const Settings& settings) {
         if (auto checked = Validate(validated); !checked) return checked.error();
         auto root = json::Value::MakeObject();
         root.Set("schemaVersion", kCurrentSchemaVersion);
-        for (const char* name : {"dock", "topBar", "weather", "updates", "general"}) root.Set(name, json::Value::MakeObject());
+        for (const char* name : {"dock", "topBar", "weather", "updates", "general", "welcome"}) root.Set(name, json::Value::MakeObject());
         Fields(validated, [&](const char* group, const char* key, const auto& value) { root.Find(group)->Set(key, Write(value)); });
         return root;
     } catch (...) { return MakeError(ErrorCode::Internal, "settings serialization failed"); }
@@ -408,9 +422,9 @@ Result<ParsedSettings> FromJson(const json::Value& root) {
     try {
         if (!root.IsObject()) return MakeError(ErrorCode::Parse, "settings must be a JSON object");
         ParsedSettings parsed;
-        UnknownMembers(root, {"schemaVersion", "dock", "topBar", "weather", "updates", "general"}, parsed.warnings);
+        UnknownMembers(root, {"schemaVersion", "dock", "topBar", "weather", "updates", "general", "welcome"}, parsed.warnings);
         std::set<std::string> badGroups;
-        for (const char* name : {"dock", "topBar", "weather", "updates", "general"}) {
+        for (const char* name : {"dock", "topBar", "weather", "updates", "general", "welcome"}) {
             if (const auto* group = root.Find(name); group && !group->IsObject()) {
                 Warn(parsed.warnings, name, "expected an object; used defaults");
                 badGroups.insert(name);
@@ -434,7 +448,7 @@ Result<ParsedSettings> FromJson(const json::Value& root) {
         if(weather&&!weather->Find("useWindowsLocation")&&parsed.value.weather.latitude)
             parsed.value.weather.useWindowsLocation=false;
         MigrateDockMetrics(parsed.value.dock, parsed.warnings);
-        for (const char* group : {"dock", "topBar", "weather", "updates", "general"}) {
+        for (const char* group : {"dock", "topBar", "weather", "updates", "general", "welcome"}) {
             std::set<std::string> known;
             Fields(parsed.value, [&](const char* name, const char* key, auto&) { if (std::string_view(group) == name) known.insert(key); });
             if (const auto* object = root.Find(group)) UnknownMembers(*object, known, parsed.warnings);

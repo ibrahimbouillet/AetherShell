@@ -9,6 +9,7 @@
 // only screen areas covered by this test's windows over the private backdrop and are saved under
 // %TEMP%\AetherShellTests for inspection.
 #include "AetherTest.h"
+#include "FakeTouch.h"
 
 #include "graphics/FrameScheduler.h"
 #include "graphics/GraphicsDevice.h"
@@ -1412,4 +1413,102 @@ AETHER_TEST("glass menu: invalid menus are rejected and high contrast uses the n
     CHECK(presenter.LastPresentation() == GlassMenuPresenter::Presentation::Native);
     CHECK(std::find(harness.ops.log.begin(), harness.ops.log.end(), "track") != harness.ops.log.end());
     CHECK_FALSE(presenter.IsOpen());
+}
+
+namespace {
+// One long-menu touch scenario: `script` runs once the level is up; the watchdog ends a stuck menu.
+Result<MenuSelection> RunLongMenu(Harness& harness, GlassMenuPresenter& presenter, LoopTimers& timers,
+                                  const Stage& stage, const std::function<void(HWND)>& script) {
+    std::vector<MenuEntry> entries;
+    for (std::uint32_t id = 1; id <= 250; ++id) entries.push_back(MenuEntry::Command(id, L"Item " + std::to_wstring(id)));
+    GlassMenuPresenter::TestHooks hooks;
+    hooks.opened = [&](HWND level, std::size_t) { timers.After(80, [&, level] { script(level); }); };
+    presenter.SetTestHooks(hooks);
+    auto selection = presenter.Show(entries, RequestFor(harness, stage));
+    presenter.SetTestHooks({});
+    return selection;
+}
+}  // namespace
+
+AETHER_TEST("glass menu touch: a pan scrolls a long menu and chooses nothing; a further finger chooses nothing (FR-040)") {
+    Harness harness;
+    if (SkipForHighContrast()) return;
+    const Stage stage = MakeStage();
+    GlassMenuPresenter presenter(harness.device, harness.scheduler, graphics::MakeDesignTokens(graphics::ThemeMode::Dark),
+                                 graphics::MotionPolicy{}, harness.ops);
+    LoopTimers timers(harness.loop);
+    bool timedOut = false;
+    Watchdog(timers, presenter, timedOut, 15'000);
+    test::FakeTouch touch;
+    bool scrolled = false, reachedLast = false;
+    auto selection = RunLongMenu(harness, presenter, timers, stage, [&](HWND level) {
+        const auto first = presenter.RowBoundsPx(0, 1);
+        if (!first) { PostKey(harness.owner.hwnd, VK_ESCAPE); return; }
+        const POINT at = Center(*first);
+        const int rowPx = first->bottom - first->top;
+        touch.Send(level, WM_POINTERDOWN, 1, at);
+        touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y + 1});
+        touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y + 3 * rowPx});  // pulls past the top: elastic
+        touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y - 12});
+        touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y - 12 - 5 * rowPx});
+        touch.Advance(0.3);
+        touch.Send(level, WM_POINTERUP, 1, POINT{at.x, at.y - 12 - 5 * rowPx});
+        timers.After(250, [&, level, at, rowPx] {
+            scrolled = !presenter.RowBoundsPx(0, 0).has_value();
+            // A second finger during a press, and a pan that keeps going to the very end.
+            touch.Send(level, WM_POINTERDOWN, 1, at);
+            touch.Send(level, WM_POINTERDOWN, 2, POINT{at.x, at.y + rowPx});
+            touch.Send(level, WM_POINTERUP, 2, POINT{at.x, at.y + rowPx});
+            touch.Send(level, WM_POINTERUP, 1, at);
+            for (int i = 0; i < 80; ++i) {
+                touch.Send(level, WM_POINTERDOWN, 1, at);
+                touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y - 12});
+                touch.Send(level, WM_POINTERUPDATE, 1, POINT{at.x, at.y - 12 - 8 * rowPx});
+                touch.Advance(0.3);
+                touch.Send(level, WM_POINTERUP, 1, POINT{at.x, at.y - 12 - 8 * rowPx});
+            }
+            timers.After(500, [&] {
+                reachedLast = presenter.RowBoundsPx(0, 249).has_value();
+                PostKey(harness.owner.hwnd, VK_ESCAPE);
+            });
+        });
+    });
+    REQUIRE(selection.ok());
+    CHECK_FALSE(timedOut);
+    CHECK(scrolled);
+    CHECK(reachedLast);
+    CHECK_EQ(selection->command, 0u);  // nothing was chosen by any of it
+}
+
+AETHER_TEST("glass menu touch: a tap chooses the row it started on; a canceled or lost contact does not") {
+    Harness harness;
+    if (SkipForHighContrast()) return;
+    const Stage stage = MakeStage();
+    GlassMenuPresenter presenter(harness.device, harness.scheduler, graphics::MakeDesignTokens(graphics::ThemeMode::Dark),
+                                 graphics::MotionPolicy{}, harness.ops);
+    LoopTimers timers(harness.loop);
+    bool timedOut = false;
+    Watchdog(timers, presenter, timedOut, 15'000);
+    test::FakeTouch touch;
+    bool stillOpen = false;
+    auto selection = RunLongMenu(harness, presenter, timers, stage, [&](HWND level) {
+        const auto row = presenter.RowBoundsPx(0, 2);
+        if (!row) { PostKey(harness.owner.hwnd, VK_ESCAPE); return; }
+        const POINT at = Center(*row);
+        touch.Send(level, WM_POINTERDOWN, 1, at);
+        touch.Send(level, WM_POINTERUP, 1, at, /*canceled*/ true);
+        touch.Send(level, WM_POINTERDOWN, 2, at);
+        timers.After(40, [&, level, at] {
+            touch.Lift(2);  // gone without an up; the watch timer ends it
+            timers.After(220, [&, level, at] {
+                stillOpen = presenter.RowBoundsPx(0, 2).has_value();
+                touch.Send(level, WM_POINTERDOWN, 3, at);
+                touch.Send(level, WM_POINTERUP, 3, at);
+            });
+        });
+    });
+    REQUIRE(selection.ok());
+    CHECK_FALSE(timedOut);
+    CHECK(stillOpen);
+    CHECK_EQ(selection->command, 3u);  // row index 2 has command id 3
 }

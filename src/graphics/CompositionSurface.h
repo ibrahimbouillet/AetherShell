@@ -43,6 +43,8 @@ public:
 
     // Resizes the drawing surface to the window's client size in pixels.
     [[nodiscard]] Result<void> Resize(int widthPx, int heightPx);
+    // The attached drawing surface's actual size (diagnostics/tests); {0, 0} when detached.
+    [[nodiscard]] SIZE DrawingSizePx() const noexcept;
 
     // Finite compositor-owned entrance (decelerate curve) and exit (accelerate curve); no UI frame loop.
     // Zero duration applies the end state immediately. Wrappers over Animate().
@@ -91,8 +93,8 @@ private:
     bool transitionPending_ = false;
     std::shared_ptr<bool> alive_ = std::make_shared<bool>(true);
     BackdropKind backdropKind_ = BackdropKind::None;
-    int widthPx_ = 1;
-    int heightPx_ = 1;
+    int widthPx_ = 0;   // 0: the attached drawing surface has not been sized yet (AS4-24)
+    int heightPx_ = 0;
 };
 
 }  // namespace aether::graphics

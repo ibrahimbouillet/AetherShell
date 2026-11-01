@@ -63,6 +63,8 @@ public:
     // touching full-screen suppression, which always wins. An auto-hidden bar keeps its state.
     void SetAutoHidden(bool hidden);
     [[nodiscard]] bool AutoHidden() const noexcept;
+    // Off the screen while the welcome holds it, whatever Auto-Hide says; it returns with an entrance.
+    void SetHeldBack(bool held);
     // In use: the pointer is over the bar, one of its menus is open or it has keyboard navigation.
     [[nodiscard]] bool Engaged() const noexcept;
     // A host action started from `item` failed: a short explanation below that item, never over a
@@ -98,7 +100,13 @@ protected:
     bool OnAnimate(double now) override;
     void OnPointerMove(D2D1_POINT_2F point) override;
     void OnPointerLeave() override;
+    void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
+    void OnPointerCaptureLost() override;
+    bool OnTouchDown(const ui::TouchContact& contact) override;
+    void OnTouchMove(const ui::TouchContact& contact) override;
+    void OnTouchUp(const ui::TouchContact& contact) override;
+    void OnTouchCancel() override;
     void OnWheel(float notches, D2D1_POINT_2F point) override;
     bool OnKeyDown(UINT key) override;
     void OnFocusChanged(bool focused) override;

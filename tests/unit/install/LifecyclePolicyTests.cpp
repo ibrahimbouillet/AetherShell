@@ -93,3 +93,19 @@ AETHER_TEST("install lifecycle: changed journal is rejected before recovery or c
     CHECK_EQ(*fs::ReadFile(layout->Journal(),64*1024),*before);
     std::error_code ignored;std::filesystem::remove_all(root,ignored);
 }
+
+AETHER_TEST("install lifecycle: control handoff waits are bounded for a child that never listens (AS4-17)") {
+    // A manual-reset event stands in for a live child process handle: unsignaled means running.
+    platform::UniqueHandle child(::CreateEventW(nullptr,TRUE,FALSE,nullptr));REQUIRE(child);
+    const auto started=std::chrono::steady_clock::now();
+    CHECK_EQ(install::AwaitControlReadiness(child.Get(),[]{return false;},150ms,10ms),install::ControlReadiness::TimedOut);
+    const auto waited=std::chrono::steady_clock::now()-started;
+    CHECK(waited>=140ms);CHECK(waited<2s);
+    int polls=0;
+    CHECK_EQ(install::AwaitControlReadiness(child.Get(),[&]{return ++polls>=3;},5s,5ms),install::ControlReadiness::Listening);
+    CHECK_EQ(polls,3);
+    REQUIRE(::SetEvent(child.Get()));
+    CHECK_EQ(install::AwaitControlReadiness(child.Get(),[]{return false;},5s,5ms),install::ControlReadiness::Exited);
+    // A throwing probe is treated as "not yet listening", never as an escape from the bound.
+    CHECK_EQ(install::AwaitControlReadiness(child.Get(),[]()->bool{throw 1;},5s,5ms),install::ControlReadiness::Exited);
+}

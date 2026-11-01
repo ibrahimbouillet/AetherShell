@@ -158,6 +158,76 @@ AETHER_TEST("settings UI: configurable shortcut uses native hotkey control witho
     CHECK_FALSE(service.Current().general.startWithWindows);
 }
 
+namespace {
+// The real store, whose saves can be made to fail.
+struct FlakyStore final : settings::ISettingsStore {
+    std::shared_ptr<settings::ISettingsStore> real;
+    std::atomic<bool> fail{false};
+    Result<settings::LoadedSettings> Load() override { return real->Load(); }
+    Result<void> Save(const settings::Settings& value, bool reset) override {
+        if (fail) return MakeError(ErrorCode::Platform, "synthetic save failure");
+        return real->Save(value, reset);
+    }
+};
+}  // namespace
+
+// AS4-21: Windows' registration changes first; a failed save must not leave the two disagreeing.
+AETHER_TEST("settings UI: a failed save puts Windows' sign-in startup back as it was") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    ManualDispatcher dispatcher;
+    auto store = std::make_shared<FlakyStore>();
+    auto real = settings::MakeFileSettingsStore(test::MakeTempDirectory("settings-ui-startup-save")/L"settings.json");
+    REQUIRE(real.ok());
+    store->real = *real;
+    settings::SettingsService service(store,dispatcher);
+    REQUIRE(service.Load({}).ok()); REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+    int calls=0; bool desired=false; std::function<void(Result<void>)> complete;
+    settings::ui::SettingsCallbacks callbacks;
+    callbacks.setStartup=[&](bool enabled, auto completion){++calls;desired=enabled;complete=std::move(completion);};
+    settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));
+    REQUIRE(window.Show(settings::ui::SettingsPage::General).ok());
+    store->fail=true;
+    ::SendMessageW(window.Control(200),BM_CLICK,0,0);
+    ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+    REQUIRE_EQ(calls,1); CHECK(desired);
+    complete(Ok());                                   // Windows said yes; now the save fails
+    REQUIRE(Pump(dispatcher,[&]{return calls==2;}));
+    CHECK_FALSE(desired);                             // so Windows is asked to put it back
+    complete(Ok());
+    REQUIRE(Pump(dispatcher,[&]{return ::IsWindowEnabled(window.Control(101))!=FALSE;}));
+    CHECK_FALSE(service.Current().general.startWithWindows);
+    CHECK_EQ(::SendMessageW(window.Control(200),BM_GETCHECK,0,0),LRESULT{BST_UNCHECKED});
+    store->fail=false;
+    window.Close();
+}
+
+// AS4-18: the stored choice alone can be wrong; a missing registration is what Apply repairs.
+AETHER_TEST("settings UI: Apply repairs a sign-in startup Windows lost, and respects one turned off in Windows") {
+    platform::ComApartment apartment;
+    INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
+    for (const auto state : {settings::StartupState::Disabled, settings::StartupState::DifferentTarget, settings::StartupState::DisabledByUser, settings::StartupState::Enabled}) {
+        ManualDispatcher dispatcher;
+        settings::SettingsService service(test::MakeTempDirectory("settings-ui-startup-state")/L"settings.json",dispatcher);
+        REQUIRE(service.Load({}).ok()); REQUIRE(Pump(dispatcher,[&]{return service.Loaded();}));
+        REQUIRE(service.Update([](auto& value){value.general.startWithWindows=true;}).ok());
+        REQUIRE(Pump(dispatcher,[&]{return !service.Dirty();}));
+        int calls=0, reads=0; bool desired=false;
+        settings::ui::SettingsCallbacks callbacks;
+        callbacks.setStartup=[&](bool enabled, auto completion){++calls;desired=enabled;completion(Ok());};
+        callbacks.readStartup=[&](auto completion){++reads;completion(Result<settings::StartupState>(state));};
+        settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));
+        REQUIRE(window.Show(settings::ui::SettingsPage::General).ok());
+        CHECK(reads>=1);
+        ::SendMessageW(window.Control(101),BM_CLICK,0,0);
+        (void)Pump(dispatcher,[&]{return ::IsWindowEnabled(window.Control(101))!=FALSE && !service.Dirty();});
+        const bool adrift=state==settings::StartupState::Disabled||state==settings::StartupState::DifferentTarget;
+        CHECK_EQ(calls,adrift?1:0);
+        if (adrift) CHECK(desired);
+        window.Close();
+    }
+}
+
 AETHER_TEST("settings UI: delayed startup consent runs once and preserves concurrent Dock pins") {
     platform::ComApartment apartment;
     INITCOMMONCONTROLSEX common{sizeof(common),ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS};::InitCommonControlsEx(&common);
@@ -296,7 +366,7 @@ AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh 
     };
     settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));editor=&window;
     REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
-    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),8);
+    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),9);
     CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCURSEL,0,0),6);
     CHECK_EQ(ControlText(window.Control(318)),desktopStatus);
     REQUIRE(window.Control(200));CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);

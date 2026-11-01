@@ -53,6 +53,14 @@ Claude implemented it in source (S-054); D46/ADR 0012 record the owner-chosen ri
 maximized foreign windows. S-055 checked and corrected the overflow route live; foreign-application
 and owner acceptance remain pending.
 
+Latest owner assignment D51 (2026-10-28): Codex audits/prepares; Claude implements the next
+stability, touch and welcome batch. Read `docs/CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md` and
+`docs/specs/v4-stability-audit.md` (T50–T52; FR-040/FR-041; ADR 0013). Reported blank external
+windows/startup failure require diagnosis; source review is not a runtime fix. The optional welcome
+is transient UI only after Windows authentication, with local-name consent, skip and a hard
+dismissal deadline. Keep installed Alpha 3 usable; no new release/installation or macOS port is
+authorized by this preparation.
+
 ## This repository is PUBLIC
 Everything committed here will be published in the public GitHub repository. Never write private
 information into code, comments, tests, fixtures, logs, documentation or commit messages: no
@@ -117,6 +125,9 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
   `git status` first; never discard or overwrite uncommitted work you did not create.
 - No force-push, history rewriting or indiscriminate resets. Commit only verified, coherent changes;
   end commit messages with the attribution line your environment requires.
+- **D57: when work is finished, commit it and give the owner a test build** (`scripts/package.ps1`, the setup in
+  `dist/`), raising the patch number of the version first: `0.3.1-alpha.3` is "Alpha 3, test 3.1". A test build is
+  not a release: no push, tag, GitHub Release or installation follows from this rule.
 - Pushing verified milestones to the official repository is covered by the owner's instructions once
   the repository exists; publishing a GitHub Release or changing repository settings needs the owner's
   explicit approval.

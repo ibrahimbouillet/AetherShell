@@ -14,6 +14,8 @@
 namespace aether::settings {
 
 enum class StartupState { Disabled, Enabled, DisabledByUser, DifferentTarget, UnknownApproval };
+// Documented limit of a Run-key command line, in characters, for the whole serialized command.
+inline constexpr std::size_t kMaxRunCommandCharacters = 260;
 struct StartupRegistryPaths {
     std::wstring run = L"Software\\Microsoft\\Windows\\CurrentVersion\\Run";
     std::wstring approval = L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run";

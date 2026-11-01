@@ -7,6 +7,7 @@
 // through Control(id) exactly as before the visual redesign.
 #pragma once
 
+#include "settings/StartupRegistration.h"
 #include "applications/ApplicationTypes.h"
 #include "core/Dispatcher.h"
 #include "core/Signal.h"
@@ -28,7 +29,7 @@ class FrameScheduler;
 
 namespace aether::settings::ui {
 
-enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop, Appearance };
+enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop, Appearance, Welcome };
 
 // Tone of a footer status message (drawn as a status badge; high contrast keeps the text alone).
 enum class StatusTone { Neutral, Info, Success, Warning, Error, Busy };
@@ -45,6 +46,8 @@ struct SettingsCallbacks {
     std::function<void()> checkForUpdates, downloadAndInstall, postpone, skip, disableNotifications;
     // Explicit consent only. Implementation performs registry work on a worker and completes on UI.
     std::function<void(bool, std::function<void(Result<void>)>)> setStartup;
+    // AS4-18: what Windows will really do at sign-in, read on a worker and completed on UI.
+    std::function<void(std::function<void(Result<settings::StartupState>)>)> readStartup;
     std::function<std::wstring()> hotkeyStatus;
     std::function<void()> openLogFolder, exportDiagnostics;
     std::function<std::vector<apps::ApplicationInfo>()> catalog;

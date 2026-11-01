@@ -6,6 +6,7 @@
 // window with a fake catalog, a fake launcher and a private placement area; messages are sent only to
 // that window. Nothing is captured and no application is launched.
 #include "AetherTest.h"
+#include "FakeTouch.h"
 
 #include "graphics/TextCache.h"
 #include "platform/windows/ComApartment.h"
@@ -281,4 +282,107 @@ AETHER_TEST("search UI: a policy change cancels an entrance immediately") {
     CHECK(window.IsOpen());
     window.Close();
     CHECK_FALSE(window.IsShown());
+}
+
+AETHER_TEST("search UI: a release launches only the row its press started on (AS4-12)") {
+    Fixture fixture;
+    auto& window = *fixture.window;
+    graphics::MotionPolicy reduced; reduced.reduced = true;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), reduced);
+    window.Open();
+    fixture.Query(L"Test Application");
+    REQUIRE(window.Results().size() > 3u);
+    const auto bounds = window.BoundsPx();
+    const auto rowPoint = [&](int row) {
+        const auto rect = window.Item(static_cast<std::size_t>(row)).boundsPx;
+        return MAKELPARAM((rect.left + rect.right) / 2 - bounds.left, (rect.top + rect.bottom) / 2 - bounds.top);
+    };
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, MK_LBUTTON, rowPoint(0));
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, rowPoint(2));
+    CHECK_EQ(fixture.launcher.launches, 0);
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, rowPoint(2));  // a release with no press
+    CHECK_EQ(fixture.launcher.launches, 0);
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, MK_LBUTTON, rowPoint(1));
+    ::SendMessageW(window.Handle(), WM_CAPTURECHANGED, 0, 0);
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, rowPoint(1));
+    CHECK_EQ(fixture.launcher.launches, 0);
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, MK_LBUTTON, rowPoint(1));
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, rowPoint(1));
+    CHECK_EQ(fixture.launcher.launches, 1);
+}
+
+AETHER_TEST("search UI: equal wheel totals move the selection equally far (AS4-15)") {
+    Fixture fixture;
+    auto& window = *fixture.window;
+    graphics::MotionPolicy reduced; reduced.reduced = true;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), reduced);
+    window.Open();
+    fixture.Query(L"Test Application");
+    REQUIRE(window.Results().size() > 5u);
+    const auto wheel = [&](int delta) { ::SendMessageW(window.Handle(), WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<SHORT>(delta))), 0); };
+    const auto selected = [&] { return window.SelectedIndex(); };
+    wheel(-WHEEL_DELTA);
+    CHECK_EQ(selected(), 1u);
+    for (int i = 0; i < 12; ++i) wheel(-10);  // one notch in twelve precision packets: one row, not twelve
+    CHECK_EQ(selected(), 2u);
+    wheel(-3 * WHEEL_DELTA);                  // three notches in one packet: three rows
+    CHECK_EQ(selected(), 5u);
+    for (int i = 0; i < 24; ++i) wheel(10);   // reversed
+    CHECK_EQ(selected(), 3u);
+    wheel(0);
+    CHECK_EQ(selected(), 3u);
+}
+
+AETHER_TEST("search UI: touch pans the rows, a tap launches its own row, a pan or cancel launches nothing (FR-040)") {
+    Fixture fixture;
+    auto& window = *fixture.window;
+    graphics::MotionPolicy reduced; reduced.reduced = true;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), reduced);
+    // Results are capped at eight: a short placement area is what makes them overflow and scroll.
+    const auto monitor = platform::PrimaryMonitor();
+    window.SetPlacementArea(RECT{monitor.workArea.left + 40, monitor.workArea.top + 40, monitor.workArea.left + 840, monitor.workArea.top + 40 + static_cast<LONG>(window.ToPx(430.0f))});
+    window.Open();
+    fixture.Query(L"Test Application");
+    REQUIRE_EQ(window.Results().size(), 8u);
+    REQUIRE(window.Item(7).isOffscreen);
+    REQUIRE_FALSE(window.Item(1).isOffscreen);
+    test::FakeTouch touch;
+    const HWND hwnd = window.Handle();
+    const auto center = [&](std::size_t row) {
+        const auto rect = window.Item(row).boundsPx;
+        return POINT{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2};
+    };
+    const POINT from = center(1);
+    const int rowPx = window.Item(1).boundsPx.top - window.Item(0).boundsPx.top;
+    REQUIRE(rowPx > 0);
+    // A pan by two rows: the list follows the finger, and nothing launches.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - 20});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - 20 - 2 * rowPx});
+    CHECK(window.Item(0).isOffscreen);
+    CHECK(window.Item(1).isOffscreen);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - 20 - 2 * rowPx});
+    CHECK_EQ(fixture.launcher.launches, 0);
+    // The rows reach their last entry by touch, without launching.
+    for (int i = 0; i < 6; ++i) {
+        touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+        touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - 20});
+        touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - 20 - 2 * rowPx});
+        touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - 20 - 2 * rowPx});
+    }
+    CHECK_FALSE(window.Item(window.Results().size() - 1).isOffscreen);
+    CHECK_EQ(fixture.launcher.launches, 0);
+    // A second finger or a canceled contact launches nothing.
+    const POINT visible = center(window.Results().size() - 1);
+    touch.Send(hwnd, WM_POINTERDOWN, 1, visible);
+    touch.Send(hwnd, WM_POINTERDOWN, 2, POINT{visible.x, visible.y - rowPx});
+    touch.Send(hwnd, WM_POINTERUP, 2, POINT{visible.x, visible.y - rowPx});
+    touch.Send(hwnd, WM_POINTERUP, 1, visible);
+    touch.Send(hwnd, WM_POINTERDOWN, 1, visible);
+    touch.Send(hwnd, WM_POINTERUP, 1, visible, /*canceled*/ true);
+    CHECK_EQ(fixture.launcher.launches, 0);
+    // A tap launches once.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, visible);
+    touch.Send(hwnd, WM_POINTERUP, 1, visible);
+    CHECK_EQ(fixture.launcher.launches, 1);
 }

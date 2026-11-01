@@ -5,6 +5,7 @@
 #include "diagnostics/Logger.h"
 #include "platform/windows/DpiUtilities.h"
 #include "platform/windows/Handles.h"
+#include "platform/windows/PointerInput.h"
 #include "platform/windows/Win32Error.h"
 #include "platform/windows/WindowUtilities.h"
 #include "core/Strings.h"
@@ -12,6 +13,7 @@
 #include <dwmapi.h>
 #include <windowsx.h>
 
+#include <algorithm>
 #include <exception>
 
 namespace aether::ui {
@@ -131,8 +133,15 @@ void SurfaceWindow::SetVisualRegionPx(std::span<const RECT> rects) {
 void SurfaceWindow::ApplyInputRegion() {
     if (!hwnd_) return;
     const auto& region = visualRegion_.empty() ? inputRegion_ : visualRegion_;
+    // AS4-08: an unchanged region is not written again. Every SetWindowRgn sends position messages
+    // (and, for a registered AppBar, a shell notification) although nothing changed.
+    const auto same = [](const std::vector<RECT>& a, const std::vector<RECT>& b) {
+        return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(),
+            [](const RECT& x, const RECT& y) { return ::EqualRect(&x, &y) != FALSE; });
+    };
+    if (appliedRegionWindow_ == hwnd_ && same(appliedRegion_, region)) return;
     if (region.empty()) {
-        ::SetWindowRgn(hwnd_, nullptr, TRUE);
+        if (::SetWindowRgn(hwnd_, nullptr, TRUE)) { appliedRegion_.clear(); appliedRegionWindow_ = hwnd_; }
         return;
     }
     platform::UniqueRegion combined(::CreateRectRgn(0, 0, 0, 0));
@@ -141,7 +150,10 @@ void SurfaceWindow::ApplyInputRegion() {
         ::CombineRgn(combined.Get(), combined.Get(), part.Get(), RGN_OR);
     }
     // On success the system owns the region.
-    if (::SetWindowRgn(hwnd_, combined.Get(), TRUE)) (void)combined.Release();
+    if (::SetWindowRgn(hwnd_, combined.Get(), TRUE)) {
+        (void)combined.Release();
+        appliedRegion_ = region; appliedRegionWindow_ = hwnd_;
+    }
 }
 
 void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity) {
@@ -173,6 +185,7 @@ void SurfaceWindow::Show(bool activate) {
 }
 
 void SurfaceWindow::Hide() {
+    CancelTouch();
     if (!hwnd_) return;
     hiding_ = false;
     ::ShowWindow(hwnd_, SW_HIDE);
@@ -201,6 +214,7 @@ void SurfaceWindow::ShowAnimated(const graphics::Transition& transition, bool ac
 }
 
 void SurfaceWindow::HideAnimated(const graphics::Transition& transition) {
+    CancelTouch();
     if (!hwnd_) return;
     if (!shown_ || transition.IsInstant()) {
         Hide();
@@ -260,11 +274,12 @@ void SurfaceWindow::Render(double now) {
         OnRender(context);
     });
     inRender_ = false;
+    if (result) presented_ = true;
     if (!result) {
         if (result.error().code == ErrorCode::Unavailable) {
-            if (auto recovered = device_.HandleDeviceLost(); !recovered) {
-                AETHER_LOG_ERROR("ui", "device recovery failed: {}", recovered.error().Describe());
-            }
+            // AS4-25: one shared, bounded recovery for every surface; it retries on its own timer,
+            // so an idle surface is redrawn without waiting for unrelated input.
+            device_.RequestRecovery();
             // DeviceReplaced invalidates every window, including this one.
         } else {
             AETHER_LOG_ERROR("ui", "render failed: {}", result.error().Describe());
@@ -278,10 +293,54 @@ D2D1_POINT_2F SurfaceWindow::PointFromLParam(LPARAM lParam) const noexcept {
     return D2D1::Point2F(ToDip(static_cast<float>(GET_X_LPARAM(lParam))), ToDip(static_cast<float>(GET_Y_LPARAM(lParam))));
 }
 
+bool SurfaceWindow::RouteTouch(UINT message, WPARAM wParam) {
+    if (!hwnd_ || !platform::IsTouchPointer(wParam)) return false;
+    const auto contact = platform::ReadPointer(wParam);
+    if (!contact) return false;
+    POINT client = contact->screenPx;
+    ::ScreenToClient(hwnd_, &client);
+    const TouchContact touch{contact->id, D2D1::Point2F(ToDip(static_cast<float>(client.x)), ToDip(static_cast<float>(client.y))), contact->time};
+    if (message == WM_POINTERDOWN) {
+        if (touchPointer_ && *touchPointer_ != contact->id) {
+            (void)OnTouchDown(touch);  // a further finger of the owned gesture
+            return true;
+        }
+        if (!OnTouchDown(touch)) return false;
+        touchPointer_ = contact->id;
+        return true;
+    }
+    if (!touchPointer_) return false;
+    if (*touchPointer_ != contact->id) return true;
+    if (contact->canceled) { CancelTouch(); return true; }
+    if (message == WM_POINTERUPDATE) OnTouchMove(touch);
+    else { touchPointer_.reset(); OnTouchUp(touch); }
+    return true;
+}
+
+void SurfaceWindow::CancelTouch() noexcept {
+    if (!touchPointer_) return;
+    touchPointer_.reset();
+    try { OnTouchCancel(); } catch (...) { AETHER_LOG_ERROR("ui", "touch cancellation threw an exception"); }
+}
+
 LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam) {
     if (auto handled = OnMessage(message, wParam, lParam)) return *handled;
 
     switch (message) {
+        case WM_POINTERDOWN:
+        case WM_POINTERUPDATE:
+        case WM_POINTERUP:
+            if (RouteTouch(message, wParam)) return 0;
+            break;
+        case WM_POINTERCAPTURECHANGED:
+            if (touchPointer_ && GET_POINTERID_WPARAM(wParam) == *touchPointer_) CancelTouch();
+            break;
+        case WM_POINTERACTIVATE:
+            if (options_.noActivate) return PA_NOACTIVATE;
+            break;
+        case WM_CANCELMODE:
+            CancelTouch();
+            break;
         case WM_NCHITTEST: {
             if (visualRegion_.empty() || inputRegion_.empty()) break;
             POINT point{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
@@ -364,6 +423,7 @@ LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
         case WM_SETFOCUS: OnFocusChanged(true); return 0;
         case WM_KILLFOCUS: OnFocusChanged(false); return 0;
         case WM_DESTROY:
+            CancelTouch();
             OnDestroying();
             scheduler_.Cancel(this);
             surface_.Detach();

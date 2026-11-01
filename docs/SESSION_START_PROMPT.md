@@ -9,9 +9,15 @@ For the Settings quality follow-up under D43/T47, use
 order below. It supplements the earlier full visual-unification brief; current progress stays in HANDOFF.
 Its section 14 now carries D44's complete Aether-owned Quick Settings assignment and private image
 references, superseding the earlier native-panel relocation investigation. Claude implements it.
-The next D45 assignment is [CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md](CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md):
+The historical D45 assignment is [CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md](CLAUDE_V3_NOTIFICATIONS_TRAY_FRAME_PROMPT.md):
 real notifications, hidden notification-area icons and rounded maximized frames with a fine continuous
 perimeter, plus Codex's S-052 review findings. Claude implements; current evidence stays in HANDOFF.
+
+The latest D51 assignment is [CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md](CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md)
+with [the prioritized audit](specs/v4-stability-audit.md): T50–T52, FR-040/FR-041. Codex prepares;
+Claude diagnoses/fixes stability and startup, completes touch and implements the transient
+handwritten authenticated-session welcome. Installed Alpha 3 remains usable; current evidence and
+pending owner/device checks stay in HANDOFF. No release/install or macOS port follows from this brief.
 
 The owner pastes the text below (everything under the line) as the first message of every new
 session, whichever assistant takes over (Claude, ChatGPT/Codex or another). It is deliberately

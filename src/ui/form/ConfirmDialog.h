@@ -46,6 +46,8 @@ struct ConfirmRequest {
     std::wstring cancel = L"Cancel";  // empty: no cancel button (Escape then chooses the last button)
     bool dangerousPrimary = false;    // Danger style for destructive primary actions
     ConfirmChoice defaultChoice = ConfirmChoice::Cancel;
+    std::wstring* password = nullptr; // asks for a password too: filled only when Primary is chosen. Without
+                                      // a surface to ask with, the answer is Cancel: never a plain-text box.
 };
 
 // Fallback MessageBox flags and the mapping back to a choice (exposed for tests).

@@ -6,6 +6,7 @@
 #include "diagnostics/Logger.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
+#include "graphics/ScrollPhysics.h"
 #include "graphics/SystemSymbols.h"
 #include "graphics/TextCache.h"
 #include "graphics/Transition.h"
@@ -30,6 +31,7 @@ namespace {
 constexpr UINT kAppBarMessage = WM_APP + 101;
 constexpr UINT kForegroundChanged = WM_APP + 102;
 constexpr UINT kDeferredInvoke = WM_APP + 103;
+constexpr UINT_PTR kTouchHoldTimer = 0x5448;
 thread_local std::vector<HWND> watchedWindows;
 
 void CALLBACK ForegroundEvent(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {
@@ -132,10 +134,14 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     bool pointerInside = false;    // the pointer is over the bar's window
     bool menuOpen = false;         // one of the bar's menus is running its modal loop
     bool hiddenIconsOpen = false;  // Windows' overflow is open: the chevron points up
+    graphics::PressTarget press;   // AS4-11: a release activates only the item its press started on
+    graphics::TouchGesture touch{{}, graphics::TouchAxis::Both};
+    std::optional<int> touchItem;
     bool registered = false;
     std::optional<RECT> reservedBounds;
     bool relayouting = false;
     bool fullscreen = false;
+    bool heldBack = false;
     bool destroyed = false;
     HWINEVENTHOOK foregroundHook = nullptr;
     UINT explorerMessage = 0;
@@ -498,7 +504,8 @@ void TopBarWindow::SetAutoHidden(bool hidden) {
     auto& p = *impl_;
     if (p.autoHidden == hidden || p.destroyed) return;
     p.autoHidden = hidden;
-    if (!Handle() || p.fullscreen) return;  // full-screen suppression already hides it; it decides showing
+    if (hidden) p.press.Cancel();
+    if (!Handle() || p.fullscreen || p.heldBack) return;  // something else already hides it; it decides showing
     // Slides by the panel's own extent so it leaves (and returns over) the screen's top edge.
     graphics::TransitionShape shape;
     shape.offsetY = -(p.panel.bottom + 8.0f);
@@ -512,8 +519,23 @@ void TopBarWindow::SetAutoHidden(bool hidden) {
     }
 }
 bool TopBarWindow::AutoHidden() const noexcept { return impl_->autoHidden; }
+void TopBarWindow::SetHeldBack(bool held) {
+    auto& p = *impl_;
+    if (p.heldBack == held || p.destroyed) return;
+    p.heldBack = held;
+    if (!Handle() || p.fullscreen || p.autoHidden) return;
+    if (held) {
+        p.press.Cancel(); p.hover.reset(); p.pointerInside = false; p.tooltip.HideTooltip();
+        Hide();
+    } else {
+        graphics::TransitionShape shape;
+        shape.offsetY = -(p.panel.bottom + 8.0f);
+        ShowAnimated(graphics::MakeEnterTransition(shape, p.tokens, p.motion));
+    }
+}
 bool TopBarWindow::Engaged() const noexcept {
-    return impl_->pointerInside || impl_->menuOpen || (impl_->focusedWindow && impl_->keyboardCues);
+    return impl_->pointerInside || impl_->menuOpen || (impl_->focusedWindow && impl_->keyboardCues) ||
+           impl_->touch.CurrentPhase() != graphics::TouchGesture::Phase::Idle;
 }
 
 void TopBarWindow::SetHiddenIconsOpen(bool open) {
@@ -536,8 +558,8 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
     impl_->fullscreen = hidden;
     // State transitions only: never log foreground identities, titles, paths or repeated probes.
     AETHER_LOG_INFO("topbar", "fullscreen suppression {}", hidden);
-    if (hidden) { impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
-    else if (!impl_->autoHidden) Show(false);
+    if (hidden) { impl_->press.Cancel(); impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
+    else if (!impl_->autoHidden && !impl_->heldBack) Show(false);
     try { FullscreenChanged.Emit(hidden); }
     catch (...) { AETHER_LOG_ERROR("topbar", "fullscreen listener threw an exception"); }
 }
@@ -603,13 +625,48 @@ void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
     const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [&](const auto& item) { return item.item.id == *hovered; });
     if (found != impl_->placed.end()) impl_->tooltip.ShowFor(found->item.tooltip, impl_->ItemBounds(found->rect), ui::TooltipPlacement::Below);
 }
-void TopBarWindow::OnPointerLeave() { impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); Invalidate(); }
+void TopBarWindow::OnPointerLeave() { impl_->press.Cancel(); impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); Invalidate(); }
+void TopBarWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
+    impl_->press.Press(static_cast<int>(button), HitTest(impl_->placed, point));
+}
 void TopBarWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) {
     if (impl_->keyboardCues) { impl_->keyboardCues = false; Invalidate(); }  // a click hides the focus ring
-    if (const auto id = HitTest(impl_->placed, point)) {
+    if (const auto id = impl_->press.Release(static_cast<int>(button), HitTest(impl_->placed, point))) {
         if (button == ui::PointerButton::Left) Activate(*id);
         else if (button == ui::PointerButton::Right) ShowItemMenu(*id);
     }
+}
+void TopBarWindow::OnPointerCaptureLost() { impl_->press.Cancel(); }
+// FR-040: a tap activates the item it started on, a hold opens that item's menu, any pan does nothing.
+bool TopBarWindow::OnTouchDown(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.destroyed || !Handle() || !IsShown() || p.fullscreen || !::IsWindowEnabled(Handle())) return false;
+    const bool first = p.touch.CurrentPhase() == graphics::TouchGesture::Phase::Idle;
+    (void)p.touch.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    if (first) {
+        p.touchItem = HitTest(p.placed, contact.dip);
+        ::SetTimer(Handle(), kTouchHoldTimer, 550, nullptr);  // past the 0.5 s hold: timers can fire a tick early
+    } else ::KillTimer(Handle(), kTouchHoldTimer);
+    return true;
+}
+void TopBarWindow::OnTouchMove(const ui::TouchContact& contact) {
+    (void)impl_->touch.Move(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    if (impl_->touch.CurrentPhase() != graphics::TouchGesture::Phase::Pending) ::KillTimer(Handle(), kTouchHoldTimer);
+}
+void TopBarWindow::OnTouchUp(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    ::KillTimer(Handle(), kTouchHoldTimer);
+    const auto event = p.touch.Up(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    const auto started = p.touchItem;
+    p.touchItem.reset();
+    if (event != graphics::TouchGesture::Event::Tap || !started || started != HitTest(p.placed, contact.dip)) return;
+    if (p.keyboardCues) { p.keyboardCues = false; Invalidate(); }
+    Activate(*started);
+}
+void TopBarWindow::OnTouchCancel() {
+    (void)impl_->touch.Cancel();
+    impl_->touchItem.reset();
+    if (Handle()) ::KillTimer(Handle(), kTouchHoldTimer);
 }
 void TopBarWindow::OnWheel(float notches, D2D1_POINT_2F point) {
     if (impl_->destroyed || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle()) ||
@@ -761,6 +818,12 @@ std::optional<LRESULT> TopBarWindow::OnMessage(UINT message, WPARAM wParam, LPAR
         return 0;
     }
     if (message == kDeferredInvoke) { Activate(static_cast<int>(wParam)); return 0; }
+    if (message == WM_TIMER && wParam == kTouchHoldTimer) {
+        ::KillTimer(Handle(), kTouchHoldTimer);
+        if (impl_->touch.Tick(graphics::FrameScheduler::Now()) == graphics::TouchGesture::Event::HoldStarted && impl_->touchItem)
+            ShowItemMenu(*impl_->touchItem);
+        return 0;
+    }
     if (impl_->explorerMessage && message == impl_->explorerMessage) { OnExplorerRestarted(); return 0; }
     if (message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE) Relayout();
     if (impl_->registered && (message == WM_ACTIVATE || message == WM_WINDOWPOSCHANGED)) {

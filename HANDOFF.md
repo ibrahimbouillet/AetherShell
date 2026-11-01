@@ -7,7 +7,100 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 3 released as Latest by Claude (S-059, 2026-10-27)
+## Current checkpoint — Alpha 3, test 3.1 (`0.3.1-alpha.3`, S-064, 2026-11-01)
+
+**Committed on `main`, not pushed. The setup is a test build in `dist/`, handed to the owner, not a release (D57).**
+From now on finished work ends in a commit and a test build, with the patch number raised each time.
+
+The owner tried two private builds; read D54-D56 for what that changed. In short: the Top Bar waits 1 s from the top
+6 DIPs; corners round only between the bars, and Chromium no longer loses them for good; the welcome is a full-screen
+cover up from the lock, with the bars held back and a calligraphic pen; Quick Settings pages and form sliders follow the
+hand; the Wi-Fi view lists and joins networks. AS4-05, AS4-18 and AS4-21 are done, and startup now logs its stages.
+
+**Sign-in startup is off on this machine** (S-061): the greeting at power-on cannot appear until the owner turns it on.
+
+**Next:** whatever the owner reports from 3.1. Open: AS4-23; real checks listed under "Not executed" in S-064; the
+blank-window incident (AS4-01), still not reproduced and not yet reported on by the owner since these builds.
+
+## Previous checkpoint — V4 stability, touch and welcome implemented in source (S-061, 2026-11-01)
+
+**Claude implemented the D51 work order in the shared checkout; S-064 committed it.**
+
+- **The two reported incidents are not diagnosed.** No fixture reproduced blank windows and no reboot
+  was performed. Do not describe either as fixed. Read the status table at the top of
+  [the audit](docs/specs/v4-stability-audit.md), which classifies every AS4 entry.
+- **AS4-06** was first "fixed" here, then reversed by the owner (D56): a maximize filling the monitor stays square.
+- **Corrected in source with regressions:** AS4-03/04/07/08/11-17/19/20/22/24/25. A hung target no longer
+  holds up the corner guard; fixtures keep healthy targets served within 95 ms.
+- **Touch (T51):** a shared model in `graphics/ScrollPhysics`, plumbing in `platform/PointerInput` and
+  `SurfaceWindow`, on forms, menus, Search, Quick Settings, Dock, previews and Top Bar. Tests use
+  synthetic contacts (`tests/framework/FakeTouch.h`), because Windows does not deliver posted pointer
+  messages. **Nothing has run on the physical touchscreen this machine has (10 contacts), and the edge
+  swipe's HID parsing has never seen a real report.**
+- **Welcome (T52):** new module `src/welcome` and Settings → Welcome. Strokes are authored in
+  `tools/handwriting/strokes.py`. Production-instance sessions greet, private `--data-dir` trials included;
+  test instances never do. The owner saw it at an unlock in the first trial, approved the moving strokes and
+  redirected the rest (D54): it is now large and longer, on the blurred desktop picture, and goes up at lock.
+  **That version has not run at a real lock, and no greeting has run at a real sign-in.**
+- **Top Bar delay (D52, D54):** two seconds at the top edge before a hidden bar returns. The owner found
+  almost five in the first trial. The corrected wait survives a resting hand's wobble, but the cause comes
+  from source, not from a measurement; each reveal now logs its wait.
+- **Open:** AS4-05, AS4-18, AS4-21, AS4-23, startup stage diagnostics, every performance measurement in
+  the work order, the wider security review. D53 lists engineering choices awaiting the owner's view,
+  notably that the welcome defaults to on.
+
+- **Sign-in startup is off on this machine (read-only finding, cause unknown):** the installed settings say
+  off and there is no Run entry or StartupApproved value, although S-059 recorded it on and a settings
+  backup from 2026-10-29 still had it on. That alone would produce "does not appear after reboot" here.
+  Nothing was changed; turning it back on is the owner's choice (Alpha 3 Settings → General → Apply).
+
+- **Touch and sliders after the first trial (D55, S-063):** T51 had Quick Settings listening for a sideways
+  swipe although its pages are stacked vertically, so the second page was unreachable by finger; corrected, and
+  the pages now follow it. Form sliders go where the hand goes and apply on release. A stale brightness reading
+  no longer pulls a slider back. Tested with synthetic contacts only.
+
+**Next step:** the owner tries D54 and D55 in a new private trial (TEST_STATUS S-062, S-063): Quick Settings and
+the sliders by finger, brightness above all; the Top Bar wait, with its measure in the log; lock and unlock for the
+cover; then the real browser/Electron scenario from AS4-01, which the owner's reports have not reached. Quit from
+the logo menu returns to the installed Alpha 3. The ignored trial host refuses a candidate older than the source.
+The owner also reports "still many things to improve", so expect more direction. Installing or releasing needs
+explicit approval.
+
+Lessons worth keeping: repeat native tests before trusting them (one race only showed in about a third of
+runs); compare against the baseline binary before calling a failure environmental (`ui_form motion` is
+environmental here, shown by comparison); and Windows can give a standard frame region shapes of its own,
+so tests must not read "has a region" as "has our clip".
+
+## Previous checkpoint — V4 audit and Claude work order prepared (S-060, 2026-10-28)
+
+**Next implementation writer: Claude.** The owner reports blank/unresponsive external maximized
+windows after enabling Auto-Hide for both bars, unreliable sign-in startup, inadequate fluidity and
+missing touch scrolling. They request an independently researched defect list, fixes by Claude,
+complete touch/fling/elastic scrolling and a personalized handwritten FR/EN welcome at sign-in and
+unlock. Codex prepared [the compact English work order](docs/CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md)
+and [AS4-01–AS4-26](docs/specs/v4-stability-audit.md); read both. D51, FR-040/FR-041, T50–T52 and
+ADR 0013 record scope and acceptance, including post-authentication-only welcome, optional local
+name, skip/deadline/privacy and preservation of intentional Quit.
+
+Reviewed source: `ce59649`, in the canonical shared checkout, official origin, `main`. Three
+read-only reviewers covered foreign windows/recovery, touch/motion and startup/security. Important
+source findings: synchronous restore into known-unresponsive windows, helper failure/recovery
+ownership, full-monitor maximize classification, redundant work-area/settings processing,
+press/release mismatch, lost precision deltas, installed/private-profile confusion and startup
+state/persistence/readiness gaps. **The cause of the owner's blank windows and reboot startup
+failure is not independently reproduced or established.** No remote exploit is demonstrated.
+
+Changes are documentation only. Installed Alpha 3, running processes, real settings/startup and
+desktop are untouched; no capture, lock/reboot, candidate launch, install, commit/push, tag or new
+release. Existing untracked `.agents/` is preserved. Fresh Release `/W4 /WX` build passed in
+`build/wf-codex-v4-audit`; the combined non-network unit gate passed **23/24 suites**, failing Search's
+2,000-app p95 target (2.547 ms, <2 ms required). One unchanged-binary scoped Search recheck passed
+7/7, p95 0.540 ms; the failed aggregate is preserved, no performance fix is claimed (AS4-26/S-060).
+No native-suite rerun occurred. No external Claude delivery/read is claimed: the work order is available locally
+for the owner to give Claude. Implementation, physical touch, real-app/sign-in/unlock checks and
+owner acceptance remain pending.
+
+## Previous checkpoint — Alpha 3 released as Latest by Claude (S-059, 2026-10-27)
 
 **Published:** [Aether Shell Alpha 3 — 0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3)
 at 15:06:24 UTC, marked **Latest** (not a draft or prerelease). The owner first asked for a draft
@@ -1048,6 +1141,15 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
   before preparing a package. The old b87be0d setup is historical and must not be presented as Alpha 2.
 
 ## NEXT SESSION START HERE
+
+**Current assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
+the status table in `docs/specs/v4-stability-audit.md`. The source work is in the working tree,
+uncommitted. Next: owner trial of a private build, then whatever it shows; the open AS4 entries; the
+measurements. Preserve the usable installed Alpha 3 and the single shared checkout. Source findings do
+not close runtime/device/owner acceptance; installation and publication need explicit approval.
+
+**Historical continuation below:** the older S-052/Alpha 2 trial steps are superseded by the
+current checkpoint and S-059 installation receipt. They do not identify the current runtime.
 
 **Current state (S-052):** Claude implemented the Settings fluidity brief (D43/T47) and the owned
 Quick Settings panel (D44/T41); read the current checkpoint at the top, TEST_STATUS S-052 and the

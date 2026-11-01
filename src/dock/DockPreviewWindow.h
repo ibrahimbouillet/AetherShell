@@ -23,6 +23,7 @@
 #include "graphics/BitmapCache.h"
 #include "graphics/TextCache.h"
 #include "graphics/Theme.h"
+#include "graphics/ScrollPhysics.h"
 #include "ui/SurfaceWindow.h"
 #include "ui/accessibility/AccessibleSurface.h"
 
@@ -100,6 +101,10 @@ protected:
     void OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;
+    bool OnTouchDown(const ui::TouchContact& contact) override;
+    void OnTouchMove(const ui::TouchContact& contact) override;
+    void OnTouchUp(const ui::TouchContact& contact) override;
+    void OnTouchCancel() override;
     void OnDeviceReplaced() override;
     std::optional<LRESULT> OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
     void OnDestroying() override;
@@ -161,6 +166,7 @@ private:
     RECT anchorPx_{};
     std::optional<Element> hover_;
     std::optional<Element> pressed_;
+    graphics::TouchGesture touch_{{}, graphics::TouchAxis::Both};  // FR-040: a pan or second finger never invokes
     std::size_t focus_ = 0;  // tiles_.size() * 2 means the focused identity disappeared; navigation rearms
     bool keyboard_ = false;
     bool inside_ = false;

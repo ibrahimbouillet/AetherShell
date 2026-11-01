@@ -4,6 +4,7 @@
 
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
+#include "graphics/ScrollPhysics.h"
 #include "graphics/SystemSymbols.h"
 #include "graphics/TextCache.h"
 #include "platform/windows/MonitorUtilities.h"
@@ -39,8 +40,12 @@ constexpr float kDetailRowTop = 68.0f, kDetailRowHeight = 42.0f;
 
 constexpr UINT kInvoke = WM_APP + 211;
 constexpr UINT kRange = WM_APP + 212;
-constexpr UINT_PTR kRefresh = 41, kVolumeCommit = 42, kPendingExpiry = 43;
-constexpr double kPendingSeconds = 1.5;  // an unconfirmed slider request is shown at most this long
+constexpr UINT_PTR kRefresh = 41, kSliderCommit = 42, kPendingExpiry = 43;
+constexpr double kPendingSeconds = 4.0;  // an unconfirmed slider request is shown at most this long: long enough
+                                         // for a display's slow brightness path, so a stale reading never pulls it back
+constexpr int kLevelTolerance = 5;       // a display's brightness levels can be coarser than one percent
+constexpr float kPageTurnShare = 0.25f;  // of a page's height: a pan this long turns it on release
+constexpr float kPageElastic = 0.3f, kPageElasticLimit = 0.18f;  // past the first or last page
 
 // Stable item identities (also UI Automation ids "item-N").
 constexpr int kTile = 100, kChevron = 200;
@@ -49,6 +54,8 @@ constexpr int kPrevious = 400, kPlay = 401, kNext = 402, kSession = 403;
 constexpr int kBattery = 500, kSettings = 501;
 constexpr int kNextPage = 600, kPageDot = 601;
 constexpr int kBack = 700, kDetailSwitch = 711, kDetailRow = 720;
+constexpr int kDisconnect = 799, kNetworkRow = 800;  // then one per network
+constexpr float kNetworkRowHeight = 46.0f;
 
 constexpr std::array<SystemControl, 12> kTiles{SystemControl::WiFi, SystemControl::Bluetooth,
     SystemControl::FlightMode, SystemControl::Accessibility, SystemControl::EnergySaver,
@@ -149,6 +156,7 @@ struct Target {
 struct Pending {
     int value = 0;
     double since = 0.0;
+    std::optional<int> from;  // the reading when it was requested
 };
 
 // Main/detail fade-through with mirrored curves: the leaving view is gone at 60 % of the slide and
@@ -174,7 +182,17 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     float scale = 1.0f;  // fit into a small work area
     int page = 0;
     Detail detail = Detail::None, fromView = Detail::None;  // the current view and the one it replaced
-    std::optional<int> hovered, focused, pressedId, dragging, dragValue, volumePending;
+    std::optional<int> hovered, focused, pressedId, dragging, dragValue, sliderPending;
+    graphics::WheelSteps sliderWheel, pageWheel;  // AS4-14: equal wheel totals change equally much
+    // FR-040 touch: a slider tracks the finger directly (no inertia); elsewhere a vertical pan moves the
+    // pages with the finger, as they are laid out, and settles on one on release; only a still tap activates.
+    graphics::TouchGesture touch{{}, graphics::TouchAxis::Vertical};
+    graphics::VelocityTracker swipe;
+    bool touchSlider = false;
+    std::optional<float> pageDrag;     // the pages' position while a finger holds them
+    graphics::ScrollPhysics wifiScroll;
+    bool wifiTouch = false;            // a finger is moving the Wi-Fi list
+    float pageDragOrigin = 0.0f;       // the finger's height (DIPs) when it took hold of them
     bool cues = false;  // keyboard focus cues
     std::map<int, Pending> requested;
     std::map<int, graphics::Tween> hover, press, on, thumbs;
@@ -185,7 +203,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     graphics::Tween residualFade{0.0f};
     float residualOffset = 0.0f;
     RECT anchor{};                     // the Top Bar group the panel opened from (screen pixels)
-    bool destroyed = false, volumeTimerArmed = false, closing = false;
+    bool destroyed = false, sliderTimerArmed = false, closing = false;
     std::uint64_t renders = 0;
 
     explicit Impl(ControlCenterWindow& window, IUiDispatcher& ui) : owner(window), dispatcher(ui) {}
@@ -202,6 +220,18 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         return D2D1::RectF(x, y, x + kTileWidth, y + kTileHeight);
     }
     [[nodiscard]] float SliderCenter(int id) const { return BodyTop() + kGridHeight + (id == kBrightness ? kBrightnessRow : kVolumeRow); }
+    [[nodiscard]] float WiFiListTop() const { return BodyTop() + kDetailRowTop; }
+    [[nodiscard]] float WiFiListBottom() const { return BodyTop() + kGridHeight + kSliderHeight - kDetailRowHeight - 4.0f; }
+    [[nodiscard]] D2D1_RECT_F WiFiRow(int index) const {
+        const float top = WiFiListTop() + static_cast<float>(index) * kNetworkRowHeight - static_cast<float>(wifiScroll.Visual());
+        return D2D1::RectF(kMargin + 10.0f, top, kMargin + kPanelWidth - 10.0f, top + kNetworkRowHeight - 2.0f);
+    }
+    void UpdateWiFiExtent() {
+        const float view = WiFiListBottom() - WiFiListTop();
+        const float content = static_cast<float>(state.wifi.networks.size()) * kNetworkRowHeight;
+        wifiScroll.SetReducedMotion(motion.reduced);
+        wifiScroll.SetExtent(std::max(0.0f, content - view), view);
+    }
     [[nodiscard]] D2D1_RECT_F DetailRow(int index) const {
         const float top = BodyTop() + kDetailRowTop + static_cast<float>(index) * kDetailRowHeight;
         return D2D1::RectF(kMargin + 10.0f, top, kMargin + kPanelWidth - 10.0f, top + kDetailRowHeight - 2.0f);
@@ -264,7 +294,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     }
     std::optional<int> Displayed(int id, std::optional<int> observed, double now) const {
         if (dragging == id && dragValue) return dragValue;
-        // An in-flight request is shown until Windows reports it (or for 1.5 s); never claimed done.
+        // An in-flight request is shown until Windows reports it (or for a few seconds); never claimed done.
         if (const auto found = requested.find(id); found != requested.end() && now - found->second.since < kPendingSeconds) return found->second.value;
         return observed;
     }
@@ -357,8 +387,21 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 toggle.radius = 12.0f;
                 out.push_back(toggle);
                 if (view == Detail::WiFi) {
-                    row(0, L"Show available networks");
-                    row(1, L"More Wi-Fi settings");
+                    // The connected network first, then by signal. Windows' own list stays for what this one
+                    // cannot show or join.
+                    for (std::size_t i = 0; i < state.wifi.networks.size(); ++i) {
+                        const auto& network = state.wifi.networks[i];
+                        std::wstring name = network.ssid + L", " + WiFiSignalWord(network.bars) + (network.secured ? L", secured" : L", open");
+                        if (network.connected) name += L", connected";
+                        Add(kNetworkRow + static_cast<int>(i), WiFiRow(static_cast<int>(i)), std::move(name), state.wifi.connecting.empty(), 6.0f);
+                        if (network.connected) {
+                            const auto r = WiFiRow(static_cast<int>(i));
+                            Add(kDisconnect, D2D1::RectF(r.right - 92.0f, r.top + 8.0f, r.right - 6.0f, r.bottom - 8.0f), L"Disconnect", state.wifi.connecting.empty(), 6.0f);
+                        }
+                    }
+                    if (state.wifi.networks.empty() && !state.wifi.scanning) row(0, L"Show available networks");
+                    const float bottom = WiFiListBottom();
+                    Add(kDetailRow + 1, D2D1::RectF(kMargin + 10.0f, bottom + 2.0f, kMargin + kPanelWidth - 10.0f, bottom + kDetailRowHeight), L"More Wi-Fi settings", true, 6.0f);
                 } else {
                     row(0, L"Bluetooth and devices settings");
                 }
@@ -428,6 +471,8 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         point.x /= scale;
         point.y /= scale;
         for (auto it = targets.rbegin(); it != targets.rend(); ++it) {
+            // Rows scrolled out of the list are not there to be pressed.
+            if ((it->id == kDisconnect || it->id >= kNetworkRow) && (point.y < WiFiListTop() || point.y >= WiFiListBottom())) continue;
             if (Contains(it->rect, point)) return it->id;
         }
         return std::nullopt;
@@ -483,6 +528,14 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         if (!target || !target->enabled) return;
         focused = id;
         if (keyboard) cues = true;
+        if (id >= kNetworkRow) {
+            // Keyboard focus brings its row into the list.
+            const float rowTop = target->rect.top, rowBottom = target->rect.bottom;
+            double offset = wifiScroll.Visual();
+            if (rowTop < WiFiListTop()) offset -= WiFiListTop() - rowTop;
+            else if (rowBottom > WiFiListBottom()) offset += rowBottom - WiFiListBottom();
+            if (offset != wifiScroll.Visual()) { wifiScroll.JumpTo(offset); Rebuild(); }
+        }
         owner.Invalidate();
         (void)accessible.NotifyFocusChanged(id);
     }
@@ -541,6 +594,12 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         }
         owner.RequestAnimationFrame();
         owner.Invalidate();
+        if (next == Detail::WiFi) {
+            UpdateWiFiExtent();
+            wifiScroll.JumpTo(0.0);
+            Rebuild();
+            try { owner.WiFiListRequested.Emit(); } catch (...) {}
+        }
     }
     // The views composed at `now`, bottom to top, with their opacity and horizontal offset (DIPs).
     struct Layer {
@@ -582,6 +641,30 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         owner.RequestAnimationFrame();
         owner.Invalidate();
         (void)accessible.NotifyStructureChanged();
+    }
+    // Where the pages sit with the finger `travel` DIPs from where it took hold (up is negative).
+    [[nodiscard]] float DraggedPages(float travel) const {
+        const float raw = static_cast<float>(page) - travel / scale / (2.0f * kRowPitch);
+        const float last = static_cast<float>(kPages - 1);
+        if (raw < 0.0f) return -std::min(-raw * kPageElastic, kPageElasticLimit);
+        if (raw > last) return last + std::min((raw - last) * kPageElastic, kPageElasticLimit);
+        return raw;
+    }
+    // A finger let go of the pages: they continue from where it left them, to `next`.
+    void SettlePages(int next) {
+        if (!pageDrag) return;
+        pageMotion.SnapTo(*pageDrag);
+        pageDrag.reset();
+        const bool turned = next != page;
+        page = next;
+        pageMotion.AnimateTo(static_cast<float>(page), graphics::FrameScheduler::Now(), motion.Scale(0.24), tokens.curves.decelerate);
+        if (turned) {
+            Rebuild();
+            SyncTileStates(true);
+            (void)accessible.NotifyStructureChanged();
+        }
+        owner.RequestAnimationFrame();
+        owner.Invalidate();
     }
     void RadioIntent(SystemControl control) {
         ControlIntent intent;
@@ -650,6 +733,21 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             ShowPage(id - kPageDot);
             return;
         }
+        if (id == kDisconnect) {
+            intent.kind = ControlIntentKind::WiFiDisconnect;
+            Emit(intent);
+            return;
+        }
+        if (id >= kNetworkRow) {
+            const auto index = static_cast<std::size_t>(id - kNetworkRow);
+            if (index >= state.wifi.networks.size() || state.wifi.networks[index].connected) return;
+            // An enterprise network needs more than a password: Windows' own dialog asks for it.
+            if (!state.wifi.networks[index].personal) { intent.kind = ControlIntentKind::NetworkList; Emit(intent); return; }
+            intent.kind = ControlIntentKind::WiFiConnect;
+            intent.ssid = state.wifi.networks[index].ssid;
+            Emit(intent);
+            return;
+        }
         if (id >= kDetailRow && id < kDetailRow + 8) {
             const int row = id - kDetailRow;
             if (detail == Detail::WiFi) {
@@ -694,7 +792,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         percent = std::clamp(percent, 0, 100);
         dragValue = percent;
         if (commit) {
-            requested.insert_or_assign(id, Pending{percent, graphics::FrameScheduler::Now()});
+            requested.insert_or_assign(id, Pending{percent, graphics::FrameScheduler::Now(), target->value});
             // One timer ends the display of an unconfirmed request; no frames run while waiting.
             ::SetTimer(owner.Handle(), kPendingExpiry, static_cast<UINT>(kPendingSeconds * 1000.0) + 20, nullptr);
             ControlIntent intent;
@@ -944,7 +1042,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         const float top = BodyTop();
         const auto zone = D2D1::RectF(kMargin, top, kMargin + kPanelWidth, top + kGridHeight);
         g.dc->PushAxisAlignedClip(zone, D2D1_ANTIALIAS_MODE_ALIASED);
-        const float position = pageMotion.Value(g.now);
+        const float position = pageDrag ? *pageDrag : pageMotion.Value(g.now);
         const float pitch = 2.0f * kRowPitch;
         for (int shown = 0; shown < kPages; ++shown) {
             const float shift = (static_cast<float>(shown) - position) * pitch;
@@ -1046,6 +1144,37 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         PaintSliders(g);
     }
 
+    void PaintNetworks(Painter& g) {
+        g.dc->PushAxisAlignedClip(D2D1::RectF(kMargin, WiFiListTop(), kMargin + kPanelWidth, WiFiListBottom()), D2D1_ANTIALIAS_MODE_ALIASED);
+        for (const auto& target : painting ? *painting : targets) {
+            if (target.id < kNetworkRow) continue;
+            const auto index = static_cast<std::size_t>(target.id - kNetworkRow);
+            if (index >= state.wifi.networks.size()) continue;
+            const auto& r = target.rect;
+            if (r.bottom <= WiFiListTop() || r.top >= WiFiListBottom()) continue;
+            const auto& network = state.wifi.networks[index];
+            g.Highlight(target);
+            const float cy = (r.top + r.bottom) / 2.0f;
+            const Color glyph = g.TextColor(target.enabled);
+            // The measured level over the whole arc set, dimmed: the same picture as the Wi-Fi tile.
+            g.Glyph(Symbol::WiFi, r.left + 20.0f, cy, 16.0f, glyph.WithAlpha(glyph.a * 0.35f));
+            const Symbol level = network.bars >= 4 ? Symbol::WiFi : network.bars == 3 ? Symbol::WiFiLevel3 : network.bars == 2 ? Symbol::WiFiLevel2 : Symbol::WiFiLevel1;
+            g.Glyph(level, r.left + 20.0f, cy, 16.0f, glyph);
+            const float textRight = network.connected ? r.right - 96.0f : r.right - 12.0f;
+            g.Text(network.ssid, D2D1::RectF(r.left + 42.0f, r.top + 4.0f, textRight, r.top + 24.0f), glyph, 13.0f, network.connected);
+            std::wstring caption = network.connected ? L"Connected" : WiFiSignalWord(network.bars);
+            caption += network.personal ? (network.secured ? L" - secured" : L" - open") : L" - opens in Windows";
+            g.Text(caption, D2D1::RectF(r.left + 42.0f, r.top + 24.0f, textRight, r.bottom), tokens.textSecondary, 11.0f);
+            g.Focus(target);
+        }
+        if (const auto* disconnect = Find(kDisconnect)) {
+            g.Highlight(*disconnect);
+            g.Text(L"Disconnect", disconnect->rect, g.TextColor(disconnect->enabled), 12.0f, false, DWRITE_TEXT_ALIGNMENT_CENTER);
+            g.Focus(*disconnect);
+        }
+        g.dc->PopAxisAlignedClip();
+    }
+
     void PaintDetail(Painter& g, Detail kind) {
         const float top = BodyTop();
         const float left = kMargin, right = kMargin + kPanelWidth;
@@ -1067,6 +1196,13 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 if (state.network.signalBars) status += L" - signal " + std::to_wstring(*state.network.signalBars) + L" of 5";
                 if (state.network.connectivity == status::InternetConnectivity::LocalOnly) status += L", no internet";
             } else status = L"On - not connected";
+            if (radio.enabled == true) {
+                if (state.wifi.access == WiFiAccess::Denied) status = L"Windows is not letting apps list networks: check Location in Privacy settings";
+                else if (state.wifi.access == WiFiAccess::NoAdapter) status = L"No Wi-Fi adapter found";
+                else if (!state.wifi.connecting.empty()) status = L"Connecting to " + state.wifi.connecting + L"...";
+                else if (!state.wifi.message.empty()) status = state.wifi.message;
+                else if (state.wifi.scanning) status += L" - looking for networks";
+            }
         } else if (kind == Detail::Bluetooth) {
             title = L"Bluetooth";
             const auto& radio = state.system.bluetooth;
@@ -1088,6 +1224,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                      kDetailSwitch, toggle->enabled);
             g.Focus(*toggle);
         }
+        if (kind == Detail::WiFi) PaintNetworks(g);
         for (const auto& target : painting ? *painting : targets) {
             if (target.id < kDetailRow || target.id >= kDetailRow + 8) continue;
             const int row = target.id - kDetailRow;
@@ -1286,6 +1423,26 @@ bool ControlCenterWindow::PlaceAt(const RECT& anchor) {
 
 std::uint64_t ControlCenterWindow::RenderCount() const noexcept { return impl_->renders; }
 
+float ControlCenterWindow::WiFiScrollOffset() const noexcept { return static_cast<float>(impl_->wifiScroll.Visual()); }
+bool ControlCenterWindow::WiFiViewShown() const noexcept { return IsShown() && impl_->detail == Detail::WiFi; }
+Result<void> ControlCenterWindow::ShowWiFi(const RECT& anchorPx) {
+    if (!IsShown()) {
+        if (auto opened = Toggle(anchorPx, false); !opened) return opened;
+    }
+    impl_->Open(Detail::WiFi);
+    return Ok();
+}
+
+float ControlCenterWindow::PagePosition(double now) const noexcept {
+    return impl_->pageDrag ? *impl_->pageDrag : impl_->pageMotion.Value(now);
+}
+
+std::optional<int> ControlCenterWindow::ShownSliderValue(bool volume, double now) const {
+    const int id = volume ? kVolume : kBrightness;
+    const auto* target = impl_->Find(id);
+    return target ? impl_->Displayed(id, target->value, now) : std::nullopt;
+}
+
 std::vector<ControlCenterWindow::ComposedView> ControlCenterWindow::ComposedViews(double now) const {
     std::vector<ComposedView> views;
     for (const auto& layer : impl_->Composed(now)) views.push_back({static_cast<int>(layer.view), layer.opacity, layer.offset});
@@ -1308,13 +1465,13 @@ void ControlCenterWindow::Close() {
     const bool shown = IsShown();
     if (Handle()) {
         ::KillTimer(Handle(), kRefresh);
-        ::KillTimer(Handle(), kVolumeCommit);
+        ::KillTimer(Handle(), kSliderCommit);
         ::KillTimer(Handle(), kPendingExpiry);
-        impl_->volumeTimerArmed = false;
+        impl_->sliderTimerArmed = false;
     }
     impl_->dragging.reset();
     impl_->dragValue.reset();
-    impl_->volumePending.reset();
+    impl_->sliderPending.reset();
     impl_->requested.clear();
     impl_->hovered.reset();
     impl_->pressedId.reset();
@@ -1352,11 +1509,16 @@ void ControlCenterWindow::SetState(ControlCenterState state) {
     auto& p = *impl_;
     const bool mediaBefore = p.MediaShown();
     p.state = std::move(state);
+    p.UpdateWiFiExtent();
     const double now = graphics::FrameScheduler::Now();
     // A request is settled once Windows reports it (or its readback is overdue).
     std::erase_if(p.requested, [&](const auto& pending) {
         const std::optional<int> observed = pending.first == kVolume ? p.Volume() : p.state.brightness.percent;
-        return observed == pending.second.value || now - pending.second.since >= kPendingSeconds || !p.state.message.empty();
+        // A reading that has not moved yet says nothing about the request; one that moved to about the
+        // requested value settles it, on the display's nearest level.
+        const bool reached = observed && (*observed == pending.second.value ||
+            (*observed != pending.second.from && std::abs(*observed - pending.second.value) <= kLevelTolerance));
+        return reached || now - pending.second.since >= kPendingSeconds || !p.state.message.empty();
     });
     p.Rebuild();
     p.SyncTileStates(false);
@@ -1438,6 +1600,10 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context) {
 bool ControlCenterWindow::OnAnimate(double now) {
     auto& p = *impl_;
     bool running = p.pageMotion.IsAnimating(now) || p.viewMotion.IsAnimating(now) || p.residualFade.IsAnimating(now);
+    if (p.wifiScroll.Moving()) {
+        running = p.wifiScroll.Step(now) || running;
+        p.Rebuild();
+    }
     for (const auto* tweens : {&p.hover, &p.press, &p.on, &p.thumbs})
         for (const auto& [id, tween] : *tweens) running = running || tween.IsAnimating(now);
     return running;
@@ -1447,10 +1613,9 @@ void ControlCenterWindow::OnPointerMove(D2D1_POINT_2F point) {
     auto& p = *impl_;
     if (p.dragging) {
         p.SetSlider(*p.dragging, p.PointerValue(*p.dragging, point), false);
-        if (*p.dragging == kVolume) {
-            p.volumePending = p.dragValue;
-            if (!p.volumeTimerArmed) p.volumeTimerArmed = ::SetTimer(Handle(), kVolumeCommit, 40, nullptr) != 0;
-        }
+        // Windows follows the thumb as it moves: volume closely, brightness at the pace of its slower path.
+        p.sliderPending = p.dragValue;
+        if (!p.sliderTimerArmed) p.sliderTimerArmed = ::SetTimer(Handle(), kSliderCommit, *p.dragging == kVolume ? 40 : 120, nullptr) != 0;
         return;
     }
     const auto hit = p.Hit(point);
@@ -1489,9 +1654,9 @@ void ControlCenterWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F po
     p.SetPressed(std::nullopt);
     if (p.dragging) {
         const int id = *p.dragging;
-        ::KillTimer(Handle(), kVolumeCommit);
-        p.volumeTimerArmed = false;
-        p.volumePending.reset();
+        ::KillTimer(Handle(), kSliderCommit);
+        p.sliderTimerArmed = false;
+        p.sliderPending.reset();
         p.SetSlider(id, p.PointerValue(id, point), true);
         p.dragging.reset();
         p.dragValue.reset();
@@ -1501,14 +1666,100 @@ void ControlCenterWindow::OnPointerUp(ui::PointerButton button, D2D1_POINT_2F po
     if (const auto hit = p.Hit(point); hit && pressed == hit) p.Activate(*hit);
 }
 
+bool ControlCenterWindow::OnTouchDown(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.touchSlider) return true;  // a further finger never moves or commits the slider
+    if (p.touch.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+        if (p.touch.Down(contact.id, contact.dip.x, contact.dip.y, contact.time) == graphics::TouchGesture::Event::Canceled) p.SetPressed(std::nullopt);
+        return true;
+    }
+    if (!IsShown()) return false;
+    const auto hit = p.Hit(contact.dip);
+    const auto* target = hit ? p.Find(*hit) : nullptr;
+    p.touchSlider = target && target->enabled && target->slider;
+    OnPointerDown(ui::PointerButton::Left, contact.dip);  // press feedback and, on a slider, its value
+    if (!p.touchSlider) {
+        (void)p.touch.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+        p.swipe.Reset();
+        p.swipe.Add(contact.time, contact.dip.y);
+    }
+    return true;
+}
+
+void ControlCenterWindow::OnTouchMove(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.touchSlider) { OnPointerMove(contact.dip); return; }
+    const auto event = p.touch.Move(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    p.swipe.Add(contact.time, contact.dip.y);
+    if (event == graphics::TouchGesture::Event::PanStarted || event == graphics::TouchGesture::Event::Canceled) p.SetPressed(std::nullopt);
+    if (event == graphics::TouchGesture::Event::PanStarted && p.detail == Detail::None) {
+        // From where the finger is now: the slop is not added as a jump.
+        p.pageDragOrigin = contact.dip.y;
+        p.pageDrag = static_cast<float>(p.page);
+    }
+    if (p.pageDrag && p.touch.Tracking(contact.id)) {
+        p.pageDrag = p.DraggedPages(contact.dip.y - p.pageDragOrigin);
+        Invalidate();
+    }
+    if (event == graphics::TouchGesture::Event::PanStarted && p.detail == Detail::WiFi) {
+        p.UpdateWiFiExtent();
+        p.wifiScroll.Grab(contact.dip.y / p.scale, contact.time);
+        p.wifiTouch = true;
+    }
+    if (p.wifiTouch && p.touch.Tracking(contact.id)) {
+        p.wifiScroll.Drag(contact.dip.y / p.scale, contact.time);
+        p.Rebuild();
+        Invalidate();
+    }
+}
+
+void ControlCenterWindow::OnTouchUp(const ui::TouchContact& contact) {
+    auto& p = *impl_;
+    if (p.touchSlider) {
+        p.touchSlider = false;
+        OnPointerUp(ui::PointerButton::Left, contact.dip);
+        return;
+    }
+    const auto event = p.touch.Up(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    if (event == graphics::TouchGesture::Event::Tap) { OnPointerUp(ui::PointerButton::Left, contact.dip); return; }
+    p.SetPressed(std::nullopt);
+    if (p.wifiTouch) {
+        p.wifiTouch = false;
+        p.wifiScroll.Release(contact.time);
+        RequestAnimationFrame();
+        return;
+    }
+    if (!p.pageDrag) return;
+    if (event != graphics::TouchGesture::Event::PanEnded) { p.SettlePages(p.page); return; }
+    const float travel = (contact.dip.y - p.pageDragOrigin) / p.scale;
+    const auto newest = p.swipe.NewestTime();
+    const bool flick = newest && contact.time - *newest <= 0.08 && std::abs(p.swipe.Velocity()) >= 450.0;  // a rested contact has no speed
+    int next = p.page;
+    if (std::abs(travel) >= 2.0f * kRowPitch * kPageTurnShare || flick) next += travel < 0.0f ? 1 : -1;
+    p.SettlePages(std::clamp(next, 0, kPages - 1));
+}
+
+void ControlCenterWindow::OnTouchCancel() {
+    auto& p = *impl_;
+    p.touchSlider = false;
+    (void)p.touch.Cancel();
+    p.SettlePages(p.page);
+    if (p.wifiTouch) {
+        p.wifiTouch = false;
+        p.wifiScroll.Cancel(graphics::FrameScheduler::Now());
+        RequestAnimationFrame();
+    }
+    OnPointerCaptureLost();
+}
+
 void ControlCenterWindow::OnPointerCaptureLost() {
     auto& p = *impl_;
     p.dragging.reset();
     p.dragValue.reset();
-    p.volumePending.reset();
+    p.sliderPending.reset();
     p.SetPressed(std::nullopt);
-    if (Handle()) ::KillTimer(Handle(), kVolumeCommit);
-    p.volumeTimerArmed = false;
+    if (Handle()) ::KillTimer(Handle(), kSliderCommit);
+    p.sliderTimerArmed = false;
     Invalidate();
 }
 
@@ -1596,13 +1847,13 @@ std::optional<LRESULT> ControlCenterWindow::OnMessage(UINT message, WPARAM wPara
         }
         return 0;
     }
-    if (message == WM_TIMER && wParam == kVolumeCommit) {
-        ::KillTimer(Handle(), kVolumeCommit);
-        p.volumeTimerArmed = false;
-        if (p.dragging == kVolume && p.volumePending) {
-            const int value = *p.volumePending;
-            p.volumePending.reset();
-            p.SetSlider(kVolume, value, true);
+    if (message == WM_TIMER && wParam == kSliderCommit) {
+        ::KillTimer(Handle(), kSliderCommit);
+        p.sliderTimerArmed = false;
+        if (p.dragging && p.sliderPending) {
+            const int value = *p.sliderPending;
+            p.sliderPending.reset();
+            p.SetSlider(*p.dragging, value, true);
         }
         return 0;
     }
@@ -1618,6 +1869,13 @@ std::optional<LRESULT> ControlCenterWindow::OnMessage(UINT message, WPARAM wPara
         Invalidate();  // the observed reading returns
         return 0;
     }
+    if (message == WM_MOUSEWHEEL && p.detail == Detail::WiFi && IsShown()) {
+        p.UpdateWiFiExtent();
+        p.wifiScroll.JumpTo(std::clamp(p.wifiScroll.Visual() - static_cast<double>(GET_WHEEL_DELTA_WPARAM(wParam)) / WHEEL_DELTA * kNetworkRowHeight, 0.0, p.wifiScroll.Maximum()));
+        p.Rebuild();
+        Invalidate();
+        return 0;
+    }
     if (message == WM_MOUSEWHEEL && p.detail == Detail::None && IsShown()) {
         // The wheel over the tiles turns pages, like Windows' panel; over a slider it adjusts it.
         POINT point{static_cast<short>(LOWORD(lParam)), static_cast<short>(HIWORD(lParam))};
@@ -1629,11 +1887,14 @@ std::optional<LRESULT> ControlCenterWindow::OnMessage(UINT message, WPARAM wPara
             if (const auto* target = p.Find(*hit); target && target->enabled && target->value) {
                 const auto pending = p.requested.find(*hit);
                 const int current = pending != p.requested.end() ? pending->second.value : *target->value;
-                p.SetSlider(*hit, current + (delta > 0 ? 2 : -2), true);
-                p.dragValue.reset();
+                // One notch is two percent, whatever packets it arrives in; zero packets change nothing.
+                if (const int steps = p.sliderWheel.Add(static_cast<double>(delta) / (WHEEL_DELTA / 2.0), graphics::FrameScheduler::Now())) {
+                    p.SetSlider(*hit, current + steps, true);
+                    p.dragValue.reset();
+                }
             }
-        } else if (std::abs(delta) >= WHEEL_DELTA / 2) {
-            p.ShowPage(p.page + (delta < 0 ? 1 : -1));
+        } else if (const int pages = p.pageWheel.Add(static_cast<double>(delta) / WHEEL_DELTA, graphics::FrameScheduler::Now())) {
+            p.ShowPage(p.page - pages);
         }
         return 0;
     }
@@ -1652,9 +1913,9 @@ void ControlCenterWindow::OnDestroying() {
     impl_->destroyed = true;
     impl_->accessible.Disconnect();
     ::KillTimer(Handle(), kRefresh);
-    ::KillTimer(Handle(), kVolumeCommit);
+    ::KillTimer(Handle(), kSliderCommit);
     ::KillTimer(Handle(), kPendingExpiry);
-    impl_->volumeTimerArmed = false;
+    impl_->sliderTimerArmed = false;
 }
 
 }  // namespace aether::controlcenter

@@ -287,6 +287,10 @@ void SearchWindow::RefreshResults() {
     if (!edit_) return;
     ::KillTimer(Handle(), QueryTimer); queryPending_ = false; ReadQuery(); ++queryCount_;
     auto queried = search_.Query(query_);
+    press_.Cancel();  // the rows under a press are about to change
+    (void)touch_.Cancel();
+    touchRow_.reset();
+    ResetRowScroll();
     results_ = queried ? std::move(queried.value()) : std::vector<SearchResult>{};
     selected_ = firstVisible_ = 0;
     if (!queried) error_ = L"Search could not be completed.";
@@ -407,9 +411,9 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
                             D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
     graphics::TextStyle nameStyle; nameStyle.size = tokens_.type.body * textScale;
     graphics::TextStyle kindStyle; kindStyle.size = tokens_.type.caption * textScale;
-    const std::size_t lastVisible = std::min(results_.size(), firstVisible_ + VisibleRows());
+    const std::size_t lastVisible = std::min(results_.size(), firstVisible_ + VisibleRows() + (rowShift_ != 0.0f ? 1u : 0u));
     for (std::size_t i = firstVisible_; i < lastVisible; ++i) {
-        const float top = panel.top + kRowTop + static_cast<float>(i - firstVisible_) * kRowHeight;
+        const float top = panel.top + kRowTop + static_cast<float>(i - firstVisible_) * kRowHeight - rowShift_;
         const auto row = D2D1::RectF(panel.left + kRowInset, top, panel.right - kRowInset, top + kRowPill);
         const bool selected = i == selected_;
         if (selected) graphics::PaintSelectionPill(dc, row, tokens_.radii.overlay, tokens_, true, false);
@@ -442,7 +446,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
                    D2D1::RectF(textLeft, top + kRowPill / 2.0f, row.right - 12.0f, top + kRowPill - 4.0f), kindStyle, brush.get());
     }
     if (!results_.empty() && selected_ >= firstVisible_ && selected_ < lastVisible) {
-        const float centre = panel.top + indicatorY_.Value(context.now);
+        const float centre = panel.top + indicatorY_.Value(context.now) - rowShift_;
         graphics::PaintAccentIndicator(dc, D2D1::RectF(panel.left + kRowInset + 2.0f, centre - kIndicatorHeight / 2.0f,
                                                        panel.left + kRowInset + 2.0f + kIndicatorWidth, centre + kIndicatorHeight / 2.0f),
                                        tokens_);
@@ -487,6 +491,10 @@ bool SearchWindow::OnAnimate(double now) {
         moving = !panelHeight_.IsSettled();
     }
     if (indicatorY_.IsAnimating(now)) moving = true;
+    if (rowScroll_.Moving()) {
+        if (rowScroll_.Step(now)) moving = true;
+        ApplyRowScroll();
+    }
     if (!moving) lastAnimate_ = 0.0;
     return moving;
 }
@@ -528,7 +536,12 @@ void SearchWindow::OnPointerDown(aether::ui::PointerButton button, D2D1_POINT_2F
     if (!IsOpen() || IsTransitioning() || button != aether::ui::PointerButton::Left) return;
     const auto margin = Margin();
     const auto field = D2D1::RectF(margin + kPadding, margin + kPadding, margin + PanelWidthDip() - kPadding, margin + kPadding + kFieldHeight);
-    if (!Contains(field, point)) return;
+    if (!Contains(field, point)) {
+        const auto row = Hit(point);
+        press_.Press(0, row ? std::optional<int>(static_cast<int>(*row)) : std::nullopt);
+        return;
+    }
+    press_.Cancel();
     ::SetFocus(edit_);
     // Caret placement uses the drawn DirectWrite layout, so it matches the visible glyphs.
     const auto index = CaretIndexAt(point);
@@ -550,6 +563,7 @@ std::size_t SearchWindow::RowCapacity() const {
     return available > 0 ? static_cast<std::size_t>(available / kRowHeight) : 0;
 }
 void SearchWindow::EnsureVisible() {
+    ResetRowScroll();
     const auto rows = RowCapacity();
     if (selected_ < firstVisible_) firstVisible_ = selected_;
     if (rows && selected_ >= firstVisible_ + rows) firstVisible_ = selected_ - rows + 1;
@@ -567,8 +581,10 @@ std::optional<std::size_t> SearchWindow::Hit(D2D1_POINT_2F p) const {
     const float margin = Margin();
     const float x = p.x - margin, y = p.y - margin;
     if (y < kRowTop || x < kRowInset || x > PanelWidthDip() - kRowInset) return {};
-    const auto row = static_cast<std::size_t>((y - kRowTop) / kRowHeight);
-    if (row >= VisibleRows() || y - kRowTop - static_cast<float>(row) * kRowHeight >= kRowPill) return {};
+    const float content = y - kRowTop + rowShift_;
+    if (content < 0.0f) return {};
+    const auto row = static_cast<std::size_t>(content / kRowHeight);
+    if (row >= VisibleRows() + (rowShift_ != 0.0f ? 1u : 0u) || content - static_cast<float>(row) * kRowHeight >= kRowPill) return {};
     const auto index = firstVisible_ + row;
     return index < results_.size() ? std::optional(index) : std::nullopt;
 }
@@ -583,14 +599,90 @@ void SearchWindow::OnPointerMove(D2D1_POINT_2F p) {
 void SearchWindow::OnWheel(float notches, D2D1_POINT_2F) {
     if (!IsOpen()) return;
     FlushQuery(); if (results_.empty() || notches == 0) return;
-    UpdateSelection(notches > 0 ? (selected_ ? selected_ - 1 : 0) : std::min(selected_ + 1, results_.size() - 1));
+    const int steps = wheelSteps_.Add(static_cast<double>(notches), graphics::FrameScheduler::Now());
+    if (steps == 0) return;
+    const auto target = static_cast<std::int64_t>(selected_) - steps;
+    UpdateSelection(static_cast<std::size_t>(std::clamp<std::int64_t>(target, 0, static_cast<std::int64_t>(results_.size()) - 1)));
 }
 void SearchWindow::OnPointerUp(aether::ui::PointerButton button, D2D1_POINT_2F p) {
     if (button != aether::ui::PointerButton::Left) return;
     if (selectionAnchor_) { selectionAnchor_.reset(); return; }
-    if (const auto hit = Hit(p)) Launch(*hit);
+    const auto hit = Hit(p);
+    const auto row = press_.Release(0, hit ? std::optional<int>(static_cast<int>(*hit)) : std::nullopt);
+    if (row) Launch(static_cast<std::size_t>(*row));
 }
-void SearchWindow::OnPointerCaptureLost() { selectionAnchor_.reset(); }
+void SearchWindow::OnPointerCaptureLost() { selectionAnchor_.reset(); press_.Cancel(); }
+// FR-040 touch. The field keeps Windows' promoted input (caret, selection, native editor and IME); the
+// rows pan directly, fling and spring back, and a tap launches only the row it started on.
+bool SearchWindow::OnTouchDown(const aether::ui::TouchContact& contact) {
+    if (touch_.CurrentPhase() != graphics::TouchGesture::Phase::Idle) {
+        (void)touch_.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+        return true;
+    }
+    if (!IsOpen() || IsTransitioning()) return false;
+    const auto margin = Margin();
+    const auto field = D2D1::RectF(margin + kPadding, margin + kPadding, margin + PanelWidthDip() - kPadding, margin + kPadding + kFieldHeight);
+    if (Contains(field, contact.dip)) return false;
+    FlushQuery();
+    touch_.SetParameters({8.0, 0.5});
+    touch_.SetAxis(graphics::TouchAxis::Vertical);
+    (void)touch_.Down(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    touchRow_ = Hit(contact.dip);
+    touchCaughtMotion_ = rowScroll_.Moving();
+    if (touchCaughtMotion_) rowScroll_.Grab(contact.dip.y, contact.time);  // stops the fling where it is
+    return true;
+}
+void SearchWindow::OnTouchMove(const aether::ui::TouchContact& contact) {
+    const auto event = touch_.Move(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    const float view = static_cast<float>(RowCapacity()) * kRowHeight;
+    const float range = static_cast<float>(results_.size()) * kRowHeight - view;
+    if (event == graphics::TouchGesture::Event::PanStarted && range > 0.0f &&
+        rowScroll_.CurrentPhase() != graphics::ScrollPhysics::Phase::Tracking) {
+        rowScroll_.SetReducedMotion(Instant());
+        rowScroll_.SetExtent(range, std::max(1.0f, view));
+        rowScroll_.JumpTo(static_cast<double>(firstVisible_) * kRowHeight + rowShift_);
+        rowScroll_.Grab(contact.dip.y, contact.time);
+    }
+    if (touch_.CurrentPhase() == graphics::TouchGesture::Phase::Panning &&
+        rowScroll_.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+        rowScroll_.Drag(contact.dip.y, contact.time);
+        ApplyRowScroll();
+    }
+}
+void SearchWindow::OnTouchUp(const aether::ui::TouchContact& contact) {
+    const auto event = touch_.Up(contact.id, contact.dip.x, contact.dip.y, contact.time);
+    const auto started = touchRow_;
+    touchRow_.reset();
+    if (rowScroll_.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+        rowScroll_.Release(contact.time);
+        ApplyRowScroll();
+        if (rowScroll_.Moving()) RequestAnimationFrame();
+    }
+    if (event == graphics::TouchGesture::Event::Tap && !touchCaughtMotion_ && started && started == Hit(contact.dip)) Launch(*started);
+}
+void SearchWindow::OnTouchCancel() {
+    (void)touch_.Cancel();
+    touchRow_.reset();
+    if (rowScroll_.CurrentPhase() == graphics::ScrollPhysics::Phase::Tracking) {
+        rowScroll_.Cancel(graphics::FrameScheduler::Now());
+        ApplyRowScroll();
+        if (rowScroll_.Moving()) RequestAnimationFrame();
+    }
+}
+void SearchWindow::ApplyRowScroll() {
+    const double logical = rowScroll_.Logical();
+    const auto capacity = RowCapacity();
+    const std::size_t last = results_.size() > capacity ? results_.size() - capacity : 0;
+    firstVisible_ = std::min(static_cast<std::size_t>(logical / kRowHeight), last);
+    rowShift_ = static_cast<float>(rowScroll_.Visual() - static_cast<double>(firstVisible_) * kRowHeight);
+    if (std::abs(rowShift_) < 0.01f) rowShift_ = 0.0f;
+    MoveIndicator(false);
+    Invalidate();
+}
+void SearchWindow::ResetRowScroll() noexcept {
+    rowScroll_.JumpTo(0.0);
+    rowShift_ = 0.0f;
+}
 void SearchWindow::Launch(std::size_t index) {
     if (!IsOpen() || index >= results_.size()) return;
     const auto weak = std::weak_ptr<bool>(alive_);
@@ -644,7 +736,7 @@ aether::ui::accessibility::AccessibleItem SearchWindow::Item(std::size_t index) 
     if (item.isOffscreen) return item;
     const auto b = BoundsPx();
     const float margin = Margin();
-    const int top = b.top + static_cast<int>(ToPx(margin + kRowTop + static_cast<float>(index - firstVisible_) * kRowHeight));
+    const int top = b.top + static_cast<int>(ToPx(margin + kRowTop + static_cast<float>(index - firstVisible_) * kRowHeight - rowShift_));
     item.boundsPx = RECT{b.left + static_cast<int>(ToPx(margin + kRowInset)), top, b.right - static_cast<int>(ToPx(margin + kRowInset)),
                          top + static_cast<int>(ToPx(kRowPill))};
     return item;

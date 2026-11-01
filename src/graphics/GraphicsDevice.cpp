@@ -8,6 +8,7 @@
 #include "platform/windows/OsVersion.h"
 #include "platform/windows/Win32Error.h"
 
+#include <algorithm>
 #include <iterator>
 
 namespace aether::graphics {
@@ -107,7 +108,49 @@ Result<void> GraphicsDevice::HandleDeviceLost() {
     return Ok();
 }
 
+std::optional<unsigned> DeviceRecoveryPolicy::Failed() noexcept {
+    if (failures_ < maximum_) ++failures_;
+    if (failures_ >= maximum_) return std::nullopt;
+    return std::min(8000u, first_ << std::min(failures_ - 1, 5u));
+}
+
+namespace {
+// Thread timers carry no window; at most one device recovers per UI thread.
+thread_local GraphicsDevice* recoveringDevice = nullptr;
+}
+
+void CALLBACK GraphicsDevice::RecoveryTimer(HWND, UINT, UINT_PTR id, DWORD) noexcept {
+    auto* device = recoveringDevice;
+    ::KillTimer(nullptr, id);
+    if (!device || device->recoveryTimer_ != id) return;
+    device->recoveryTimer_ = 0;
+    device->RequestRecovery();
+}
+
+void GraphicsDevice::RequestRecovery() noexcept {
+    if (recoveryTimer_ || recovery_.Exhausted()) return;  // already scheduled, or waiting for a reset
+    Result<void> recovered = MakeError(ErrorCode::Internal, "device recovery failed");
+    try { recovered = HandleDeviceLost(); } catch (...) {}
+    if (recovered) { recovery_.Succeeded(); return; }
+    const auto delay = recovery_.Failed();
+    if (!delay) {
+        AETHER_LOG_ERROR("graphics", "rendering device could not be recovered after {} attempts", recovery_.Failures());
+        return;
+    }
+    AETHER_LOG_WARN("graphics", "rendering device recovery failed; retrying in {} ms", *delay);
+    recoveringDevice = this;
+    recoveryTimer_ = ::SetTimer(nullptr, 0, *delay, &GraphicsDevice::RecoveryTimer);
+}
+
+void GraphicsDevice::ResetRecovery() noexcept {
+    const bool exhausted = recovery_.Exhausted();
+    recovery_.Reset();
+    if (exhausted) RequestRecovery();
+}
+
 void GraphicsDevice::Shutdown() noexcept {
+    if (recoveryTimer_) { ::KillTimer(nullptr, recoveryTimer_); recoveryTimer_ = 0; }
+    if (recoveringDevice == this) recoveringDevice = nullptr;
     ReleaseGlassResources();
     ReleaseGlyphResources();
     compositionDevice_ = nullptr;

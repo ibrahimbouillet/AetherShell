@@ -267,6 +267,15 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
     if(options.testNoRegistration)applyStartup=false;
 #endif
     std::string taskbarNote;
+    // AS4-20: sign-in startup always opens the ordinary per-user data folder. A custom data folder
+    // would silently be replaced by another profile at the next sign-in, so startup stays off.
+    if(policy.startWithWindows && !options.uninstall) {
+        const auto standard=platform::DefaultDataRoot();
+        if(!standard || !platform::SameDataRoot(options.data,*standard)) {
+            policy.startWithWindows=false;
+            taskbarNote="Sign-in startup was left off: it would open the default data folder, not the custom one chosen.\n";
+        }
+    }
     if(applyStartup) {
         auto registry=settings::MakeWindowsStartupRegistry({policy.registry.run,policy.registry.startupApproval});if(!registry)return registry.error();startupRegistry=registry.value();
         auto previous=startupRegistry->ReadRun();if(!previous)return previous.error();previousRun=std::move(previous.value());
@@ -375,7 +384,7 @@ public:
         RECT initial{};::GetWindowRect(window_,&initial);Constrain(initial);Build();::ShowWindow(window_,SW_SHOWNORMAL);
         // IsDialogMessage claims every message of the window; only keyboard input may move the page to
         // the focus, so a wheel or scroll-bar position survives the next mouse move.
-        loop_.AddMessageFilter([this](MSG& msg){const bool handled=::IsDialogMessageW(window_,&msg)!=FALSE;if(handled && (msg.message==WM_KEYDOWN || msg.message==WM_SYSKEYDOWN))EnsureFocusVisible();return handled;});
+        loop_.AddMessageFilter([this](MSG& msg){if(ui::form::FormScrollView::RoutePointer(msg))return true;const bool handled=::IsDialogMessageW(window_,&msg)!=FALSE;if(handled && (msg.message==WM_KEYDOWN || msg.message==WM_SYSKEYDOWN))EnsureFocusVisible();return handled;});
         return loop_.Run();
     }
 private:

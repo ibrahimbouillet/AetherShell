@@ -32,6 +32,10 @@
 
 namespace aether::ui::form {
 namespace {
+constexpr float kSliderGrabDip = 6.0f;  // around the thumb, a press still takes hold of it where it is
+}  // namespace
+
+namespace {
 
 constexpr UINT_PTR kSubclassId = 0x464F524Du;      // "FORM"
 constexpr UINT_PTR kAnimationTimer = 0x464F524Du;  // timer id on the form window (no scheduler)
@@ -223,6 +227,8 @@ struct ControlState {
     bool namePublished = false;
     bool bypass = false;  // the surface itself is sending a message that it would otherwise intercept
     bool hotkey = false;  // a HOTKEY Field: painted by the surface (the control ignores WM_CTLCOLOR*)
+    bool sliderHeld = false;  // a Slider being dragged, by the surface's own input handling
+    LONG sliderGrab = 0;      // how far from the thumb's centre it was taken hold of
     // Navigation and List
     std::vector<graphics::Glyph> glyphs;
     bool compact = false;
@@ -2430,6 +2436,70 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         controls.erase(it);
     }
 
+    // The native trackbar drags only from its small thumb and answers a press anywhere else with one page
+    // step, which is slow with a mouse and useless under a finger. Where a slider is pressed and dragged is
+    // decided here; the control keeps its value, range, keyboard and accessibility.
+    void SliderTo(ControlState& c, LONG x) {
+        RECT channel{}, thumb{};
+        ::SendMessageW(c.hwnd, TBM_GETCHANNELRECT, 0, reinterpret_cast<LPARAM>(&channel));
+        ::SendMessageW(c.hwnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&thumb));
+        const auto thumbWidth = static_cast<float>(thumb.right - thumb.left);
+        const float travel = std::max(1.0f, static_cast<float>(channel.right - channel.left) - thumbWidth);
+        const float share = std::clamp((static_cast<float>(x - c.sliderGrab - channel.left) - thumbWidth / 2.0f) / travel, 0.0f, 1.0f);
+        const auto minimum = static_cast<int>(::SendMessageW(c.hwnd, TBM_GETRANGEMIN, 0, 0));
+        const auto maximum = static_cast<int>(::SendMessageW(c.hwnd, TBM_GETRANGEMAX, 0, 0));
+        const int position = minimum + static_cast<int>(std::lround(share * static_cast<float>(maximum - minimum)));
+        if (position == static_cast<int>(::SendMessageW(c.hwnd, TBM_GETPOS, 0, 0))) return;
+        ::SendMessageW(c.hwnd, TBM_SETPOS, TRUE, position);
+        ::SendMessageW(::GetParent(c.hwnd), WM_HSCROLL, MAKEWPARAM(TB_THUMBTRACK, position), reinterpret_cast<LPARAM>(c.hwnd));
+        ::UpdateWindow(c.hwnd);  // under the hand now, not when the queue is next empty
+    }
+    void SliderRelease(ControlState& c) {
+        if (!c.sliderHeld) return;
+        c.sliderHeld = false;
+        RefreshPressed(c, false);
+        ::SendMessageW(::GetParent(c.hwnd), WM_HSCROLL, MAKEWPARAM(TB_ENDTRACK, 0), reinterpret_cast<LPARAM>(c.hwnd));
+    }
+    std::optional<LRESULT> SliderMessage(ControlState& c, UINT message, WPARAM wParam, LPARAM lParam) {
+        const auto x = static_cast<LONG>(static_cast<short>(LOWORD(lParam)));
+        switch (message) {
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONDBLCLK: {
+                if (!::IsWindowEnabled(c.hwnd)) return 0;
+                RECT thumb{};
+                ::SendMessageW(c.hwnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&thumb));
+                const auto reach = static_cast<LONG>(kSliderGrabDip * Scale());
+                // On the thumb it does not jump to the pointer; anywhere else it goes there at once.
+                c.sliderGrab = x >= thumb.left - reach && x < thumb.right + reach ? x - (thumb.left + thumb.right) / 2 : 0;
+                c.sliderHeld = true;
+                ::SetFocus(c.hwnd);
+                ::SetCapture(c.hwnd);
+                RefreshPressed(c, true);
+                SliderTo(c, x);
+                ::InvalidateRect(c.hwnd, nullptr, FALSE);
+                return 0;
+            }
+            case WM_MOUSEMOVE:
+                if (!c.sliderHeld) return std::nullopt;
+                // Windows also sends moves of its own, without the button: capturing a window produces one,
+                // and a finger holds no button at all. Only the hand that holds the slider moves it.
+                if (wParam & MK_LBUTTON) SliderTo(c, x);
+                return 0;
+            case WM_LBUTTONUP:
+                if (!c.sliderHeld) return std::nullopt;
+                SliderTo(c, x);
+                SliderRelease(c);
+                if (::GetCapture() == c.hwnd) ::ReleaseCapture();
+                ::InvalidateRect(c.hwnd, nullptr, FALSE);
+                return 0;
+            case WM_CAPTURECHANGED:
+                SliderRelease(c);  // the value stays where it was: nothing returns by itself
+                return std::nullopt;
+            default:
+                return std::nullopt;
+        }
+    }
+
     std::optional<LRESULT> ControlMessage(ControlState& c, UINT message, WPARAM wParam, LPARAM lParam) {
         if (c.bypass) return std::nullopt;
         const bool styled = Styled();
@@ -2525,6 +2595,10 @@ struct FormSurface::Impl final : graphics::IFrameClient {
                 break;
             default:
                 break;
+        }
+
+        if (role == ControlRole::Slider) {
+            if (auto handled = SliderMessage(c, message, wParam, lParam)) return handled;
         }
 
         if (role == ControlRole::Progress && message == WM_TIMER && styled) {
@@ -2635,7 +2709,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         } else if (role == ControlRole::ComboBox) {
             RefreshPressed(c, ::SendMessageW(c.hwnd, CB_GETDROPPEDSTATE, 0, 0) != 0);
         } else if (role == ControlRole::Slider) {
-            RefreshPressed(c, ::GetCapture() == c.hwnd);
+            RefreshPressed(c, c.sliderHeld);
         } else if (role == ControlRole::Navigation) {
             RefreshNavigation(c);
         } else if (role == ControlRole::Progress) {
@@ -2652,7 +2726,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             if (frameChange) InvalidateFrame(c);
             return;
         }
-        if (message == WM_MOUSEMOVE && !(role == ControlRole::Slider && ::GetCapture() == c.hwnd)) return;
+        if (message == WM_MOUSEMOVE && !(role == ControlRole::Slider && c.sliderHeld)) return;
         if (Styled()) ::InvalidateRect(c.hwnd, nullptr, FALSE);
     }
 

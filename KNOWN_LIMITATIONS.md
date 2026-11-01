@@ -6,6 +6,24 @@ The current release is Alpha 3, `0.3.0-alpha.3` (D48–D50, published 2026-10-27
 and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI
 receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
 
+- Test build 3.1 (D56, S-064): joining a Wi-Fi network has not been run for real, because tests never change the real
+  connection; reading the list was checked once by count. Listing can fail when Windows' Location privacy setting is off,
+  which the panel says. Rounding of Chrome is established from source and not yet observed.
+- V4 source state (S-061, not released): touch has only been exercised with synthetic contacts, and the
+  hidden-bar edge swipe's digitizer path has never run on a device. The welcome's lock-time cover has not
+  run at a real lock, and no greeting has run at a real sign-in; its 12 s deadline runs on the UI thread. It
+  covers the primary monitor only, so other monitors show the desktop. At sign-in it cannot appear before
+  Windows starts Aether, and waking without a lock shows the desktop first. The picture is always shown as
+  "Fill", whatever the desktop's own setting, and a photo that relies on rotation metadata may appear turned;
+  a picture Windows cannot read here means its plain desktop colour. Not done: performance measurements beyond idle CPU, and AS4-23's dormant update path. A form control shows no pressed state before a tap's release, and a Settings
+  slider's effect on the Dock and bars appears when it is let go, not during the drag.
+- Owner report, 2026-10-28 (D51): external maximized application content can become blank or stop
+  repainting, notably after both bars' Auto-Hide choices change; sign-in startup is also reported
+  unreliable. Causes and fixes are pending. The [source audit](docs/specs/v4-stability-audit.md)
+  separates reported incidents, established code defects and unverified risks; T50 gates the next
+  candidate. Complete direct-touch scrolling/inertia and touch access to hidden bars are not yet
+  implemented (FR-040/T51). Baseline unit success does not qualify these real-use scenarios.
+
 - The corrected Dock light native fixture intermittently exposes its own HWND as UIA Pane rather
   than the required Toolbar (S-024); root-type/invoke assertions remain strict. Synchronous provider
   teardown is under investigation and its relationship to this failure is unproven. Passing earlier
@@ -89,7 +107,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
 - The V3 Aether Quick Settings panel (D44, since Alpha 3) has no documented global switch for
   airplane mode, energy saver, night light, mobile hotspot or nearby sharing: those tiles open the
   matching Windows Settings page and say so. Direct output-device switching is not implemented (the
-  output view offers mute, the volume mixer and Sound settings). Wi-Fi shows connection state, never a
+  output view offers mute, the volume mixer and Sound settings). Outside its Wi-Fi view (D56), the panel shows connection state, never a
   network name (FR-008). Narrator/Magnifier/On-screen keyboard/Live captions are started with their
   documented Windows shortcuts, whose effect is not read back. Real radio, audio, brightness,
   accessibility and media actions from this panel need owner checks; automated tests use synthetic
@@ -122,7 +140,9 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   application window overlaps them and return at the bottom or top edge of the primary monitor. An
   auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
   than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the
-  primary one, that edge is not a hard stop: the pointer has to rest on it briefly. The pointer and
+  primary one, that edge is not a hard stop: the pointer has to rest on it briefly (D52, D54: the Top Bar
+  needs a second at the primary monitor's top edge, which a monitor above makes harder to
+  hold; the Dock's check still counts a monitor below as its edge). The pointer and
   window bounds are sampled every 50 ms only while Auto-Hide is on. Edge reveal, animation and real
   applications still need the owner's check; multi-monitor setups are unverified.
 

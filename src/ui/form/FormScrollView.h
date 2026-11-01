@@ -78,6 +78,13 @@ public:
     // Called on the UI thread after the position changed (layout-dependent owners, tests).
     std::function<void()> scrolled;
 
+    // FR-040 touch. Every message loop that pumps a form calls this before IsDialogMessage. A touch
+    // contact landing in a scroll view (outside native editors, lists, sliders and scroll bars) is
+    // consumed: a still press releases as a click on the control under it, a vertical pan moves the
+    // content directly, a release flings and an overscroll springs back. A pan, a second contact or a
+    // canceled/lost contact never clicks. Mouse, pen, touchpad and keyboard input are not affected.
+    static bool RoutePointer(MSG& message);
+
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;

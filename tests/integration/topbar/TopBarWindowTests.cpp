@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
+#include "FakeTouch.h"
 #include "topbar/TopBarWindow.h"
 #include "topbar/TopBarMenu.h"
 #include "core/Strings.h"
@@ -284,6 +285,7 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
         REQUIRE(found != window.Items().end()); REQUIRE(found->item.actionable);
         const auto x = static_cast<int>(std::lround(window.ToPx((found->rect.left + found->rect.right) / 2)));
         const auto y = static_cast<int>(std::lround(window.ToPx((found->rect.top + found->rect.bottom) / 2)));
+        ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(x, y));
         ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, MAKELPARAM(x, y));
     };
     click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
@@ -404,6 +406,7 @@ AETHER_TEST("topbar integration: fake menus route actions and reject stale taskb
         REQUIRE(found != window.Items().end());
         const auto x = static_cast<int>(std::lround(window.ToPx((found->rect.left + found->rect.right) * 0.5f)));
         const auto y = static_cast<int>(std::lround(window.ToPx((found->rect.top + found->rect.bottom) * 0.5f)));
+        ::SendMessageW(window.Handle(), right ? WM_RBUTTONDOWN : WM_LBUTTONDOWN, right ? MK_RBUTTON : MK_LBUTTON, MAKELPARAM(x, y));
         ::SendMessageW(window.Handle(), right ? WM_RBUTTONUP : WM_LBUTTONUP, 0, MAKELPARAM(x, y));
     };
     click(ItemKind::Clock); click(ItemKind::Battery);
@@ -595,4 +598,87 @@ AETHER_TEST("topbar integration: real providers publish read-only items for thre
     window.Destroy(); providers.value().StopAll(); audio.Stop(); microphone.Stop();
     dispatcher.Shutdown(); scheduler.Shutdown(); device.Shutdown();
     CHECK(status::FinalizeStatusRuntime().ok());
+}
+
+AETHER_TEST("topbar integration: a release acts only on the pressed item and touch acts only on a tap or hold (AS4-11, FR-040)") {
+    class FakeMenu final : public ui::IMenuPresenter {
+    public:
+        int shown = 0;
+        Result<ui::MenuSelection> Show(std::span<const ui::MenuEntry>, const ui::MenuRequest&) override {
+            ++shown;
+            return MakeError(ErrorCode::Cancelled, "synthetic menu dismissed");
+        }
+    } menu;
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false; context.menu = &menu;
+    TopBarWindow window(context); REQUIRE(window.Create(RECT{80, 180, 1180, 228}).ok());
+    settings::TopBarSettings config; config.reserveSpace = false;
+    window.SetSettings(config, true); window.SetSnapshots(Synthetic());
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    int keyboard = 0, network = 0;
+    auto keyConnection = window.KeyboardRequested.Connect([&] { ++keyboard; });
+    auto netConnection = window.NetworkRequested.Connect([&] { ++network; });
+    window.Show(false); RunFor(loop, 100);
+    const auto center = [&](ItemKind kind) {
+        const auto found = std::find_if(window.Items().begin(), window.Items().end(), [kind](const auto& item) { return item.item.kind == kind; });
+        REQUIRE(found != window.Items().end());
+        return POINT{static_cast<LONG>(std::lround(window.ToPx((found->rect.left + found->rect.right) / 2))),
+                     static_cast<LONG>(std::lround(window.ToPx((found->rect.top + found->rect.bottom) / 2)))};
+    };
+    const POINT a = center(ItemKind::Keyboard), b = center(ItemKind::Network);
+    const auto mouse = [&](UINT message, POINT at) { ::SendMessageW(window.Handle(), message, message == WM_LBUTTONDOWN ? MK_LBUTTON : 0, MAKELPARAM(at.x, at.y)); };
+    // Mouse: pressed A, released on B acts on neither; a release with no press acts on nothing.
+    mouse(WM_LBUTTONDOWN, a); mouse(WM_LBUTTONUP, b);
+    CHECK_EQ(keyboard, 0); CHECK_EQ(network, 0);
+    mouse(WM_LBUTTONUP, b);
+    CHECK_EQ(network, 0);
+    // Pressed blank space, released on an item.
+    mouse(WM_LBUTTONDOWN, POINT{0, 0}); mouse(WM_LBUTTONUP, b);
+    CHECK_EQ(network, 0);
+    // A press canceled by capture loss, then released on the same item.
+    mouse(WM_LBUTTONDOWN, b);
+    ::ReleaseCapture();
+    mouse(WM_LBUTTONUP, b);
+    CHECK_EQ(network, 0);
+    // A right press on one item and release on another shows no menu.
+    mouse(WM_RBUTTONDOWN, a); mouse(WM_RBUTTONUP, b);
+    CHECK_EQ(menu.shown, 0);
+    // One ordinary click acts once.
+    mouse(WM_LBUTTONDOWN, b); mouse(WM_LBUTTONUP, b);
+    CHECK_EQ(network, 1);
+
+    test::FakeTouch touch;
+    const auto screen = [&](POINT client) { REQUIRE(::ClientToScreen(window.Handle(), &client) != FALSE); return client; };
+    const HWND hwnd = window.Handle();
+    // A tap, and it never also arrives as promoted mouse input (the contact is consumed).
+    CHECK_EQ(touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b)), 0);
+    CHECK(window.Engaged());
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b));
+    CHECK_EQ(network, 2);
+    // A pan across items, a second finger and a canceled contact do nothing.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b));
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, screen(POINT{b.x + 60, b.y}));
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b));
+    touch.Send(hwnd, WM_POINTERDOWN, 2, screen(a));
+    touch.Send(hwnd, WM_POINTERUP, 2, screen(a));
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b));
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b), /*canceled*/ true);
+    touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b));
+    ::SendMessageW(hwnd, WM_CANCELMODE, 0, 0);
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b));
+    CHECK_EQ(network, 2); CHECK_EQ(keyboard, 0); CHECK_EQ(menu.shown, 0);
+    CHECK_FALSE(window.Engaged());
+    // A hold opens that item's menu and its release activates nothing.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, screen(b));
+    RunFor(loop, 650);
+    CHECK_EQ(menu.shown, 1);
+    touch.Send(hwnd, WM_POINTERUP, 1, screen(b));
+    CHECK_EQ(network, 2);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
 }

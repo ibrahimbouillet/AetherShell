@@ -104,7 +104,7 @@ public:
         DWORD foregroundProcess = 0;
         if (HWND foreground = ::GetForegroundWindow()) ::GetWindowThreadProcessId(foreground, &foregroundProcess);
         const bool activate = foregroundProcess == ::GetCurrentProcessId();
-        focusTarget_ = ::GetDlgItem(hwnd_, IdOf(EffectiveDefault(request_)));
+        focusTarget_ = field_ ? field_ : ::GetDlgItem(hwnd_, IdOf(EffectiveDefault(request_)));
         ::ShowWindow(hwnd_, activate ? SW_SHOW : SW_SHOWNA);
         ::UpdateWindow(hwnd_);
         // SetFocus would activate the dialog (and, on close, its owner) even without the foreground:
@@ -190,6 +190,16 @@ private:
         message_ = AddStatic(request_.message, TextRole::Body);
         if (!request_.detail.empty()) detail_ = AddStatic(request_.detail, TextRole::Helper);
         if (!title_ || !message_ || (!request_.detail.empty() && !detail_)) return false;
+        if (request_.password) {
+            // A native password field: Windows masks it, keeps it out of the clipboard and shows the touch keyboard.
+            field_ = ::CreateWindowExW(0, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_PASSWORD | ES_AUTOHSCROLL, 0, 0, 0, 0,
+                                       scroll_.Canvas(), nullptr, ::GetModuleHandleW(nullptr), nullptr);
+            if (!field_) return false;
+            ControlSpec spec;
+            spec.role = ControlRole::Field;
+            spec.accessibleName = L"Password";
+            if (!surface_.Register(field_, spec)) return false;
+        }
         const ConfirmChoice def = EffectiveDefault(request_);
         buttons_.clear();
         const auto add = [&](const std::wstring& text, int id, ButtonStyle style, ConfirmChoice choice) {
@@ -269,6 +279,11 @@ private:
             surface_.SetFrame(detail_, PxRect(textLeft, y, textLeft + textWidth, y + detailHeight));
             y += detailHeight;
         }
+        if (field_) {
+            y += f.relatedGap;
+            surface_.SetFrame(field_, PxRect(textLeft, y, textLeft + textWidth, y + f.controlHeight));
+            y += f.controlHeight;
+        }
         if (badge) y = std::max(y, badgeTop_ + kBadge);
         const float contentHeight = y + f.outer;
         footerTop_ = std::min(contentHeight, availableHeight - footerHeight);
@@ -337,6 +352,16 @@ private:
 
     void Choose(ConfirmChoice choice) {
         if (done_) return;
+        if (field_ && request_.password) {
+            request_.password->clear();
+            if (choice == ConfirmChoice::Primary) {
+                std::wstring text(static_cast<std::size_t>(::GetWindowTextLengthW(field_)) + 1, L'\0');
+                text.resize(static_cast<std::size_t>(::GetWindowTextW(field_, text.data(), static_cast<int>(text.size()))));
+                *request_.password = text;
+                ::SecureZeroMemory(text.data(), text.size() * sizeof(wchar_t));
+            }
+            ::SetWindowTextW(field_, L"");
+        }
         choice_ = choice;
         done_ = true;
         if (hwnd_) ::PostMessageW(hwnd_, WM_NULL, 0, 0);  // wake the modal loop
@@ -354,6 +379,7 @@ private:
 
     bool Intercept(MSG& message) {
         if (!hwnd_ || !::IsWindow(hwnd_) || (message.hwnd != hwnd_ && !::IsChild(hwnd_, message.hwnd))) return false;
+        if (FormScrollView::RoutePointer(message)) return true;  // FR-040: touch scrolling of long details
         if (message.message == WM_KEYDOWN && message.wParam == VK_RETURN) {
             // Enter activates the focused push button (it is the default one in a dialog), else the default.
             const auto focused = ChoiceOfButton(::GetFocus());
@@ -478,6 +504,7 @@ private:
     HWND title_ = nullptr;
     HWND message_ = nullptr;
     HWND detail_ = nullptr;
+    HWND field_ = nullptr;
     HWND icon_ = nullptr;
     std::vector<HWND> buttons_;
     RECT work_{};
@@ -553,6 +580,7 @@ Result<ConfirmChoice> ShowConfirmation(const ConfirmRequest& request, const grap
     } catch (...) {
         AETHER_LOG_ERROR("ui_form", "confirmation presentation failed; asking with a message box");
     }
+    if (request.password) return ConfirmChoice::Cancel;
     const std::wstring text = FallbackText(request);
     const int result = ::MessageBoxW(request.owner && ::IsWindow(request.owner) ? request.owner : nullptr, text.c_str(),
                                      request.windowTitle.c_str(), FallbackMessageBoxFlags(request));

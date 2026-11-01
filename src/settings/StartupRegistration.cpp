@@ -90,13 +90,18 @@ Result<std::wstring> Command(const std::filesystem::path& launcher, bool require
     auto extension = launcher.extension().wstring();
     for (auto& c : extension) c = static_cast<wchar_t>(std::towlower(c));
     if (extension != L".exe") return MakeError(ErrorCode::InvalidArgument, "startup launcher must have an exe extension");
+    auto command = L"\"" + native + L"\" --autostart";
+    // AS4-19: the whole serialized Run command, quotes and argument included, must fit the documented
+    // Run-key command-line limit; a longer value would be written but never started by Windows.
+    if (command.size() > kMaxRunCommandCharacters)
+        return MakeError(ErrorCode::InvalidArgument, "startup command exceeds the Windows Run key limit");
     if (requireFile) {
         std::error_code error;
         if (!std::filesystem::is_regular_file(launcher, error) || error) {
             return MakeError(ErrorCode::NotFound, "startup launcher file does not exist");
         }
     }
-    return L"\"" + native + L"\" --autostart";
+    return command;
 }
 
 StartupState ApprovalState(const std::vector<std::uint8_t>& bytes) {

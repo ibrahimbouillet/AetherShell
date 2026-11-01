@@ -7,6 +7,7 @@
 #include "diagnostics/Logger.h"
 #include "platform/windows/DpiUtilities.h"
 #include "platform/windows/Handles.h"
+#include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "settings/ui/MaximizedCornerPrototype.h"
 
@@ -19,13 +20,19 @@
 #include <cstring>
 #include <map>
 #include <mutex>
+#include <set>
 #include <string>
+#include <thread>
 
 namespace aether::app {
 namespace {
 constexpr wchar_t kLeaseProperty[] = L"AetherShell.WindowCornerGuard.Lease";
+constexpr wchar_t kLeaseOwnerProperty[] = L"AetherShell.WindowCornerLeaseOwner";
 constexpr UINT_PTR kRefreshTimer = 71;
 constexpr std::size_t kMaxLeases = 128;
+// An application can re-assert its material without any window event, so leased windows are also
+// looked at on this slow schedule (D46). Other windows cost nothing between events (AS4-07).
+constexpr ULONGLONG kLeaseCheckMs = 2000;
 Error NativeError(const char* text) { return MakeError(ErrorCode::Platform, text, ::GetLastError()); }
 
 Result<CornerRegion> SerializeRegion(HRGN region) {
@@ -237,10 +244,45 @@ bool SafeUserProcess(DWORD process, bool testOnly) {
     return count && *::GetSidSubAuthority(level, count - 1) <= SECURITY_MANDATORY_MEDIUM_RID;
 }
 
+// A region write runs on its own short-lived thread: SetWindowRgn sends the target synchronous
+// position messages, so a target that stops answering inside the write must cost the guard at most
+// kRegionWriteWaitMs, never every other lease (AS4-03). The record outlives a pending write.
+constexpr DWORD kRegionWriteWaitMs = 250;
+struct RegionWrite {
+    platform::UniqueHandle done{::CreateEventW(nullptr, TRUE, FALSE, nullptr)};
+    std::atomic<bool> finished{false};
+    BOOL result = FALSE;
+    DWORD error = 0;
+};
+void Count(std::atomic<std::uint64_t>* counter) noexcept { if (counter) counter->fetch_add(1, std::memory_order_relaxed); }
+
 class NativeBackend final : public IWindowCornerBackend {
 public:
     explicit NativeBackend(DWORD excluded, const WindowCornerGuardOptions& options)
         : excluded_(excluded), options_(options) {}
+    // AS4-07: a process's identity and token do not change during its life, so one validation per
+    // process instance is enough. The creation time guards against a reused process id.
+    bool SafeProcess(DWORD process, bool testOnly) {
+        platform::UniqueHandle handle(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, process));
+        FILETIME created{}, exited{}, kernel{}, user{};
+        if (!handle || !::GetProcessTimes(handle.Get(), &created, &exited, &kernel, &user)) return false;
+        const auto stamp = (static_cast<std::uint64_t>(created.dwHighDateTime) << 32) | created.dwLowDateTime;
+        if (const auto known = processes_.find(process); known != processes_.end() && known->second.created == stamp) return known->second.safe;
+        const bool safe = SafeUserProcess(process, testOnly);
+        if (processes_.size() >= 512) processes_.clear();
+        processes_[process] = KnownProcess{stamp, safe};
+        return safe;
+    }
+    bool Responsive(HWND window) noexcept override {
+        if (const auto pending = writes_.find(window); pending != writes_.end()) {
+            if (!pending->second->finished.load(std::memory_order_acquire)) return false;
+            writes_.erase(pending);
+        }
+        if (::IsHungAppWindow(window)) return false;
+        // WM_NULL checks responsiveness without invoking an application command.
+        DWORD_PTR ignored = 0;
+        return ::SendMessageTimeoutW(window, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &ignored) != 0;
+    }
     Result<CornerWindowObservation> Observe(HWND window) override {
         CornerWindowObservation result;
         result.thread = ::GetWindowThreadProcessId(window, &result.process);
@@ -259,20 +301,17 @@ public:
         // overlays stay excluded through WS_EX_TRANSPARENT and the caption/frame requirement.
         const auto excludedExtended = WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_LAYOUTRTL |
             (options_.onlyProcess ? 0 : WS_EX_NOACTIVATE);
+        // Responsiveness is not eligibility (AS4-03): a busy page stays clipped; only mutations wait.
         if ((style & WS_CAPTION) != WS_CAPTION || !(style & WS_THICKFRAME) || (style & WS_CHILD) ||
             (extended & excludedExtended) ||
-            platform::IsWindowCloaked(window) || !SafeUserProcess(result.process, options_.onlyProcess != 0) ||
-            ::IsHungAppWindow(window)) return result;
-        // WM_NULL checks responsiveness without invoking an application command. SetWindowRgn
-        // itself is synchronous and can still stall if the target hangs after this check.
-        DWORD_PTR ignored = 0;
-        if (!::SendMessageTimeoutW(window, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &ignored)) return result;
+            platform::IsWindowCloaked(window) || !SafeProcess(result.process, options_.onlyProcess != 0)) return result;
         if (!::GetWindowRect(window, &result.bounds) || FAILED(::DwmGetWindowAttribute(window,
             DWMWA_EXTENDED_FRAME_BOUNDS, &result.frame, sizeof(result.frame)))) return result;
         MONITORINFO monitor{sizeof(monitor)};
         if (!::GetMonitorInfoW(::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor)) return result;
         result.work = monitor.rcWork;
-        // Full-monitor/borderless presentations are not altered, even if an app retains MAXIMIZE.
+        // D56, the owner's rule: rounding belongs to a maximized window sitting between the bars. One that
+        // covers the whole monitor (both bars auto-hidden) simply takes the screen, as does full screen.
         if (result.frame.left <= monitor.rcMonitor.left && result.frame.top <= monitor.rcMonitor.top &&
             result.frame.right >= monitor.rcMonitor.right && result.frame.bottom >= monitor.rcMonitor.bottom) return result;
         result.dpi = ::GetDpiForWindow(window);
@@ -286,15 +325,35 @@ public:
         auto data = SerializeRegion(region.Get()); if (!data) return data.error();
         return std::optional<CornerRegion>{std::move(*data)};
     }
-    Result<void> WriteRegion(HWND window, const std::optional<CornerRegion>& region) override {
+    Result<void> WriteRegion(HWND window, const std::optional<CornerRegion>& region) override try {
+        std::erase_if(writes_, [](const auto& entry) { return entry.second->finished.load(std::memory_order_acquire); });
+        if (writes_.contains(window)) return MakeError(ErrorCode::Timeout, "Window corner region update is still pending");
         platform::UniqueRegion native;
         if (region) {
             native = DeserializeRegion(*region);
             if (!native) return NativeError("Window corner region reconstruction failed");
         }
-        if (!::SetWindowRgn(window, native.Get(), TRUE)) return NativeError("Window corner region update failed");
-        (void)native.Release(); return Ok();
-    }
+        auto write = std::make_shared<RegionWrite>();
+        if (!write->done) return NativeError("Window corner region update event unavailable");
+        HRGN handle = native.Get();
+        std::thread([write, window, handle] {
+            const BOOL set = ::SetWindowRgn(window, handle, TRUE);
+            write->error = set ? 0 : ::GetLastError();
+            if (!set && handle) ::DeleteObject(handle);  // the system owns only an installed region
+            write->result = set;
+            write->finished.store(true, std::memory_order_release);
+            (void)::SetEvent(write->done.Get());
+        }).detach();
+        (void)native.Release();  // now the writer thread's
+        if (::WaitForSingleObject(write->done.Get(), kRegionWriteWaitMs) == WAIT_OBJECT_0) {
+            if (!write->result) return MakeError(ErrorCode::Platform, "Window corner region update failed", write->error);
+            Count(options_.statistics ? &options_.statistics->regionWrites : nullptr);
+            return Ok();
+        }
+        writes_[window] = std::move(write);
+        Count(options_.statistics ? &options_.statistics->pendingWrites : nullptr);
+        return MakeError(ErrorCode::Timeout, "Window corner region update is still pending");
+    } catch (...) { return MakeError(ErrorCode::Internal, "Window corner region writer unavailable"); }
     Result<std::optional<DWORD>> ReadBackdrop(HWND window) override {
         DWORD value = 0;
         const auto hr = ::DwmGetWindowAttribute(window, DWMWA_SYSTEMBACKDROP_TYPE, &value, sizeof(value));
@@ -313,18 +372,38 @@ public:
     bool Owns(HWND window, std::uintptr_t token) noexcept override {
         return ::GetPropW(window, kLeaseProperty) == reinterpret_cast<HANDLE>(token);
     }
+    bool ClearAbandonedClaim(HWND window) noexcept override {
+        if (!::GetPropW(window, kLeaseProperty)) return false;
+        const auto owner = static_cast<DWORD>(reinterpret_cast<std::uintptr_t>(::GetPropW(window, kLeaseOwnerProperty)));
+        if (!owner || owner == ::GetCurrentProcessId()) return false;
+        // Only a guard that is really gone: a process of that id that still runs keeps its claim.
+        if (const HANDLE process = ::OpenProcess(SYNCHRONIZE, FALSE, owner)) {
+            const bool running = ::WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+            ::CloseHandle(process);
+            if (running) return false;
+        } else if (::GetLastError() != ERROR_INVALID_PARAMETER) {
+            return false;
+        }
+        (void)::RemovePropW(window, kLeaseProperty);
+        (void)::RemovePropW(window, kLeaseOwnerProperty);
+        return true;
+    }
     Result<void> Claim(HWND window, std::uintptr_t token) override {
         if (::GetPropW(window, kLeaseProperty)) return MakeError(ErrorCode::AlreadyExists, "Window corner lease already exists");
+        (void)::SetPropW(window, kLeaseOwnerProperty, reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(::GetCurrentProcessId())));
         if (!::SetPropW(window, kLeaseProperty, reinterpret_cast<HANDLE>(token)))
             return NativeError("Window corner lifetime marker could not be installed");
         return Ok();
     }
     void Release(HWND window, std::uintptr_t token) noexcept override {
-        if (Owns(window, token)) (void)::RemovePropW(window, kLeaseProperty);
+        if (Owns(window, token)) { (void)::RemovePropW(window, kLeaseProperty); (void)::RemovePropW(window, kLeaseOwnerProperty); }
     }
 private:
     DWORD excluded_;
     const WindowCornerGuardOptions& options_;
+    std::map<HWND, std::shared_ptr<RegionWrite>> writes_;
+    struct KnownProcess { std::uint64_t created = 0; bool safe = false; };
+    std::map<DWORD, KnownProcess> processes_;
 };
 
 struct Observer {
@@ -335,13 +414,26 @@ struct Observer {
     // clipped again (0: not before the window is maximized anew).
     struct Abandoned { DWORD process = 0; DWORD thread = 0; ULONGLONG retryAt = 0; };
     std::map<HWND, Abandoned> abandoned;
-    std::map<HWND, int> materialRetries;  // per maximized presentation (D46)
+    struct Retries { int attempts = 0; ULONGLONG last = 0; };
+    std::map<HWND, Retries> materialRetries;  // re-assertions of a maximized window (D46, D56)
     std::map<HWND, std::unique_ptr<RimWindow>> rims;  // D45: one perimeter ring per clipped window
+    // AS4-03: a target that did not answer waits out a growing delay while the others proceed.
+    struct Deferral { ULONGLONG until = 0; int attempts = 0; };
+    std::map<HWND, Deferral> deferred;
+    // AS4-07: events mark the windows they concern; only display/settings broadcasts (and the
+    // first pass) enumerate every top-level window.
+    std::set<HWND> dirty;
+    bool fullSweep = true;
+    bool allLeases = false;           // activation can change every leased window's stacking and material
+    ULONGLONG nextLeaseCheck = 0;
     std::uintptr_t nextToken = 1;
     UINT_PTR timer = 0;
     ULONGLONG timerDue = 0;
     bool stopping = false;
     Observer(DWORD excluded, const WindowCornerGuardOptions& value) : backend(excluded, value), options(value) {}
+    std::atomic<std::uint64_t>* Statistic(std::atomic<std::uint64_t> WindowCornerGuardStatistics::* field) const noexcept {
+        return options.statistics ? &(options.statistics->*field) : nullptr;
+    }
     // One pending refresh; an earlier request replaces a later one.
     void Queue(UINT delay = 40) noexcept {
         if (stopping) return;
@@ -351,72 +443,141 @@ struct Observer {
         timer = ::SetTimer(nullptr, kRefreshTimer, delay, nullptr);
         timerDue = due;
     }
+    void MarkDirty(HWND window, UINT delay = 40) noexcept {
+        try { dirty.insert(window); } catch (...) { fullSweep = true; }
+        Queue(delay);
+    }
+    void MarkAll() noexcept { fullSweep = true; Queue(); }
+    static UINT DeferralDelay(int attempts) noexcept { return static_cast<UINT>(std::min(4000, 250 << std::min(attempts, 4))); }
+    // Acquires a lease for a new candidate, or honours the application's own choice (D46).
+    void Visit(HWND window, std::set<HWND>& again) {
+        const bool presented = ::IsZoomed(window) && !::IsIconic(window) && ::IsWindowVisible(window);
+        if (!presented) materialRetries.erase(window);
+        if (leases.size() >= kMaxLeases || leases.contains(window)) return;
+        if (const auto old = abandoned.find(window); old != abandoned.end()) {
+            DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
+            if (old->second.process == process && old->second.thread == thread) {
+                // The application's own region/material wins for as long as this maximized presentation
+                // lasts. Once the window leaves it (restored or minimized), its next maximize is a new
+                // presentation and gets one fresh attempt. D46: a merely re-asserted previous material
+                // is clipped again once its bounded delay has passed; never immediately.
+                if (!presented) { abandoned.erase(old); return; }
+                if (!old->second.retryAt) return;
+                const ULONGLONG now = ::GetTickCount64();
+                if (now < old->second.retryAt) { MarkDirty(window, static_cast<UINT>(old->second.retryAt - now)); return; }
+            }
+            abandoned.erase(old);
+        }
+        if (!presented) return;
+        auto lease = WindowCornerLease::Acquire(backend, window, ++nextToken);
+        if (lease) {
+            leases.emplace(window, std::move(*lease));
+            // Also revisit a first application that retained a material snapshot after a
+            // failed region write. Do not rely on that failed write raising a WinEvent.
+            again.insert(window);
+        } else if (lease.error().code == ErrorCode::InvalidState) {
+            // A synchronous application replacement during first application wins too.
+            // Its own WinEvents must not cause repeated acquisition/material writes.
+            DWORD process = 0;
+            const auto thread = ::GetWindowThreadProcessId(window, &process);
+            if (thread) abandoned[window] = Abandoned{process, thread, 0};
+        } else if (lease.error().code == ErrorCode::Timeout) {
+            again.insert(window);  // the target did not answer before its first clip; try again later
+        }
+    }
     void Refresh() {
         if (timer) { ::KillTimer(nullptr, timer); timer = 0; }
-        bool retry = false;
+        LARGE_INTEGER started{}, finished{}, frequency{};
+        (void)::QueryPerformanceCounter(&started);
+        Count(Statistic(&WindowCornerGuardStatistics::sweeps));
+        const bool full = fullSweep;
+        fullSweep = false;
+        std::set<HWND> targets;
+        targets.swap(dirty);
+        std::set<HWND> again;
+        const ULONGLONG now = ::GetTickCount64();
+        const bool everyLease = full || allLeases || now >= nextLeaseCheck;
+        allLeases = false;
+        if (everyLease) nextLeaseCheck = now + kLeaseCheckMs;
         for (auto it = leases.begin(); it != leases.end();) {
+            const auto window = it->first;
+            if (!everyLease && !targets.contains(window)) { ++it; continue; }
+            if (const auto wait = deferred.find(window); wait != deferred.end() && now < wait->second.until) {
+                MarkDirty(window, static_cast<UINT>(wait->second.until - now));
+                ++it; continue;
+            }
+            Count(Statistic(&WindowCornerGuardStatistics::leaseRefreshes));
             auto refreshed = it->second->Refresh();
-            if (refreshed && *refreshed) { ++it; continue; }
+            if (refreshed && *refreshed) { deferred.erase(window); ++it; continue; }
             if (!refreshed) {
                 // A temporary observation/allocation/native-write failure must not discard the
                 // only prior-region snapshot while this guard still owns a clipped window.
-                if (it->second->HasOwnership()) { retry = true; ++it; continue; }
-                DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(it->first, &process);
+                if (it->second->HasOwnership()) {
+                    if (refreshed.error().code == ErrorCode::Timeout) {
+                        auto& wait = deferred[window];
+                        const UINT delay = DeferralDelay(wait.attempts++);
+                        wait.until = ::GetTickCount64() + delay;
+                        Count(Statistic(&WindowCornerGuardStatistics::deferrals));
+                        MarkDirty(window, delay);
+                    } else again.insert(window);
+                    ++it; continue;
+                }
+                DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
                 if (thread) {
                     Abandoned entry{process, thread, 0};
-                    int& attempts = materialRetries[it->first];
-                    if (const auto delay = CornerRetryDelay(it->second->Replacement(), attempts)) {
-                        ++attempts;
-                        entry.retryAt = ::GetTickCount64() + static_cast<ULONGLONG>(delay->count());
-                        Queue(static_cast<UINT>(delay->count()));
+                    auto& retry = materialRetries[window];
+                    const ULONGLONG at = ::GetTickCount64();  // from now: the restoration itself takes time
+                    // D56: the budget limits a burst, not a whole session. A browser re-asserts on every
+                    // activation; left at one budget per maximize it ends up square for good.
+                    if (at - retry.last >= kCornerRetryRestMs) retry.attempts = 0;
+                    retry.last = at;
+                    const auto replacement = it->second->Replacement();
+                    if (const auto delay = CornerRetryDelay(replacement, retry.attempts)) {
+                        ++retry.attempts;
+                        entry.retryAt = at + static_cast<ULONGLONG>(delay->count());
+                        MarkDirty(window, static_cast<UINT>(delay->count()));
+                    } else if (CornerRetryDelay(replacement, 0)) {
+                        entry.retryAt = at + kCornerRetryRestMs;
+                        MarkDirty(window, kCornerRetryRestMs);
                     }
-                    abandoned[it->first] = entry;
+                    abandoned[window] = entry;
                 }
             }
+            deferred.erase(window);
             it = leases.erase(it);
         }
-        auto visit = [&](HWND window) {
-            const bool presented = ::IsZoomed(window) && !::IsIconic(window) && ::IsWindowVisible(window);
-            if (!presented) materialRetries.erase(window);
-            if (leases.size() >= kMaxLeases || leases.contains(window)) return;
-            if (const auto old = abandoned.find(window); old != abandoned.end()) {
-                DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (old->second.process == process && old->second.thread == thread) {
-                    // The application's own region/material wins for as long as this maximized presentation
-                    // lasts. Once the window leaves it (restored or minimized), its next maximize is a new
-                    // presentation and gets one fresh attempt. D46: a merely re-asserted previous material
-                    // is clipped again once its bounded delay has passed; never immediately.
-                    if (!presented) { abandoned.erase(old); return; }
-                    if (!old->second.retryAt) return;
-                    const ULONGLONG now = ::GetTickCount64();
-                    if (now < old->second.retryAt) { Queue(static_cast<UINT>(old->second.retryAt - now)); return; }
-                }
-                abandoned.erase(old);
+        if (full) {
+            Count(Statistic(&WindowCornerGuardStatistics::fullSweeps));
+            if (options.onlyProcess) { for (const auto window : options.onlyWindows) Visit(window, again); }
+            else {
+                struct Context { Observer* self; std::set<HWND>* again; } context{this, &again};
+                (void)::EnumWindows([](HWND window, LPARAM value) noexcept -> BOOL {
+                    auto& state = *reinterpret_cast<Context*>(value);
+                    try { state.self->Visit(window, *state.again); return TRUE; }
+                    catch (...) { return FALSE; }
+                }, reinterpret_cast<LPARAM>(&context));
             }
-            auto lease = WindowCornerLease::Acquire(backend, window, ++nextToken);
-            if (lease) {
-                leases.emplace(window, std::move(*lease));
-                // Also revisit a first application that retained a material snapshot after a
-                // failed region write. Do not rely on that failed write raising a WinEvent.
-                retry = true;
-            } else if (lease.error().code == ErrorCode::InvalidState) {
-                // A synchronous application replacement during first application wins too.
-                // Its own WinEvents must not cause repeated acquisition/material writes.
-                DWORD process = 0;
-                const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (thread) abandoned[window] = Abandoned{process, thread, 0};
+        } else {
+            for (const auto window : targets) {
+                if (leases.contains(window) || !::IsWindow(window)) continue;
+                // The test restriction also bounds dirty-only passes to the fixture windows.
+                if (options.onlyProcess && std::find(options.onlyWindows.begin(), options.onlyWindows.end(), window) == options.onlyWindows.end()) continue;
+                Visit(window, again);
             }
-        };
-        if (options.onlyProcess) { for (const auto window : options.onlyWindows) visit(window); }
-        else {
-            using Visitor = decltype(visit);
-            (void)::EnumWindows([](HWND window, LPARAM context) noexcept -> BOOL {
-                try { (*reinterpret_cast<Visitor*>(context))(window); return TRUE; }
-                catch (...) { return FALSE; }
-            }, reinterpret_cast<LPARAM>(&visit));
         }
-        if (retry) Queue(250);
+        for (const auto window : again) MarkDirty(window, 250);
         SyncRims();
+        if (!leases.empty()) {
+            const ULONGLONG current = ::GetTickCount64();
+            Queue(static_cast<UINT>(nextLeaseCheck > current ? nextLeaseCheck - current : 1));
+        }
+        (void)::QueryPerformanceCounter(&finished);
+        (void)::QueryPerformanceFrequency(&frequency);
+        if (auto* longest = Statistic(&WindowCornerGuardStatistics::longestSweepMicros); longest && frequency.QuadPart > 0) {
+            const auto micros = static_cast<std::uint64_t>((finished.QuadPart - started.QuadPart) * 1000000 / frequency.QuadPart);
+            auto previous = longest->load(std::memory_order_relaxed);
+            while (micros > previous && !longest->compare_exchange_weak(previous, micros, std::memory_order_relaxed)) {}
+        }
     }
     // Rings follow their leases: shown, reshaped, recolored and kept directly beneath each clipped
     // window; removed with the clip. A ring that cannot be shown leaves the clip as it is.
@@ -462,19 +623,38 @@ struct Observer {
 };
 thread_local Observer* currentObserver = nullptr;
 LRESULT CALLBACK BroadcastProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
-    if ((message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE || message == WM_DPICHANGED) && currentObserver)
-        currentObserver->Queue();
+    if ((message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE || message == WM_DPICHANGED) && currentObserver) {
+        Count(currentObserver->Statistic(&WindowCornerGuardStatistics::events));
+        currentObserver->MarkAll();
+    }
     return ::DefWindowProcW(window, message, wParam, lParam);
 }
 void CALLBACK EventHook(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LONG child, DWORD, DWORD) noexcept {
-    if (!currentObserver) return;
-    // The guard's own rings move with their targets; their events must not schedule more work.
-    if (window && object == OBJID_WINDOW && platform::WindowClassName(window) == kRimClass) return;
-    if (event == EVENT_OBJECT_DESTROY && object == OBJID_WINDOW && child == CHILDID_SELF && !::IsWindow(window)) {
-        currentObserver->abandoned.erase(window);
-        currentObserver->materialRetries.erase(window);
+    if (!currentObserver || !window) return;
+    auto& observer = *currentObserver;
+    if (event >= EVENT_OBJECT_CREATE && (object != OBJID_WINDOW || child != CHILDID_SELF)) return;
+    Count(observer.Statistic(&WindowCornerGuardStatistics::events));
+    if (event == EVENT_OBJECT_DESTROY && !::IsWindow(window)) {
+        observer.abandoned.erase(window);
+        observer.materialRetries.erase(window);
+        observer.deferred.erase(window);
+        if (observer.leases.contains(window)) observer.MarkDirty(window);
+        return;
     }
-    if (event < EVENT_OBJECT_CREATE || (object == OBJID_WINDOW && child == CHILDID_SELF)) currentObserver->Queue();
+    if (observer.leases.contains(window)) {
+        if (event == EVENT_SYSTEM_FOREGROUND) observer.allLeases = true;
+        observer.MarkDirty(window);
+        return;
+    }
+    // Activation restacks windows: the rings must stay directly beneath their targets. It is also
+    // when applications tend to re-assert their material.
+    if (event == EVENT_SYSTEM_FOREGROUND && !observer.leases.empty()) { observer.allLeases = true; observer.Queue(); }
+    // Child windows never qualify, and the guard's own rings move with their targets.
+    if (::GetAncestor(window, GA_ROOT) != window || platform::WindowClassName(window) == kRimClass) return;
+    // A maximized top-level window may be a new candidate; a window the guard gave back must be
+    // seen leaving its presentation. Ordinary moves of restored windows are not the guard's concern.
+    if (::IsZoomed(window) || observer.abandoned.contains(window) || observer.materialRetries.contains(window))
+        observer.MarkDirty(window);
 }
 
 struct GuardSession {
@@ -540,7 +720,8 @@ Result<std::unique_ptr<GuardSession>> StartGuard(const std::filesystem::path& ex
 int CornerRimWidthPx(UINT dpi) noexcept { return std::max(1, ::MulDiv(1, static_cast<int>(dpi ? dpi : 96), 96)); }
 
 std::optional<std::chrono::milliseconds> CornerRetryDelay(CornerReplacement replacement, int attempt) noexcept {
-    if (replacement != CornerReplacement::MaterialReasserted || attempt < 0 || attempt >= kCornerMaterialRetries) return std::nullopt;
+    const bool reasserted = replacement == CornerReplacement::MaterialReasserted || replacement == CornerReplacement::RegionReasserted;
+    if (!reasserted || attempt < 0 || attempt >= kCornerMaterialRetries) return std::nullopt;
     return std::chrono::milliseconds{std::min(8000, 250 << std::min(attempt, 5))};  // 0.25, 0.5, 1, 2, 4, 8 s, ...
 }
 
@@ -554,11 +735,22 @@ Result<std::unique_ptr<WindowCornerLease>> WindowCornerLease::Acquire(IWindowCor
     if (!observed->eligible || !observed->process || !observed->thread)
         return MakeError(ErrorCode::Unsupported, "Window corner target is not eligible");
     auto original = backend.ReadRegion(window); if (!original) return original.error();
-    if (*original && !SimpleRegionContainsClip(**original, *observed))
+    // AS4-05: a guard that died took its memory of what it replaced with it. If the window still has exactly
+    // the clip that guard would have left, this one takes it over, with no region to put back; eligible windows
+    // only ever had none or a plain rectangle, so that is the fail-open choice. Anything else is the
+    // application's and stays untouched.
+    bool adopted = false;
+    if (backend.ClearAbandonedClaim(window) && *original) {
+        const auto rounded = RoundedRegion(*observed, std::nullopt);
+        adopted = rounded && *rounded == **original;
+    }
+    if (*original && !adopted && !SimpleRegionContainsClip(**original, *observed))
         return MakeError(ErrorCode::Unsupported, "Window owns a nonstandard custom region");
     auto lease = std::unique_ptr<WindowCornerLease>(new WindowCornerLease(backend, window, token,
         observed->process, observed->thread));
-    lease->original_ = *original; lease->installed_ = *original;
+    lease->original_ = adopted ? std::optional<CornerRegion>{} : *original;
+    lease->installed_ = *original;
+    lease->applied_ = adopted;
     auto backdrop = backend.ReadBackdrop(window); if (!backdrop) return backdrop.error();
     lease->originalBackdrop_ = *backdrop;
     if (auto claim = backend.Claim(window, token); !claim) return claim.error();
@@ -567,7 +759,7 @@ Result<std::unique_ptr<WindowCornerLease>> WindowCornerLease::Acquire(IWindowCor
     if (!applied) {
         // A material write may have succeeded before the region write failed. Keep that lease
         // in the observer so a failed rollback cannot discard its only recovery snapshot.
-        if (lease->claimed_ && (lease->applied_ || lease->backdropApplied_)) return lease;
+        if (lease->claimed_ && (lease->applied_ || lease->backdropApplied_ || lease->uncertain_)) return lease;
         return applied.error();
     }
     if (!*applied) return MakeError(ErrorCode::Unavailable, "Window corner target changed before application");
@@ -589,13 +781,50 @@ Result<CornerWindowObservation> WindowCornerLease::ObserveOwned() {
     }
     return observed;
 }
+namespace {
+Error Deferred() { return MakeError(ErrorCode::Timeout, "Window corner target is not responding; change deferred"); }
+}
+// A region write that outlived its bounded wait may still land. Its outcome is read back once the
+// target answers again: the requested value, the previous one (it failed), or the application's own.
+Result<void> WindowCornerLease::Reconcile() {
+    if (!uncertain_) return Ok();
+    if (!backend_.Responsive(window_)) return Deferred();
+    auto current = backend_.ReadRegion(window_); if (!current) return current.error();
+    if (*current == *uncertain_) {
+        installed_ = std::move(*uncertain_);
+        applied_ = installed_ != original_;
+    }
+    uncertain_.reset();
+    return Ok();
+}
+// Every region mutation goes through here: never into a target that is not answering (AS4-03). The
+// result is read back, because a successful call on another thread's window has been observed not to
+// have landed yet: ownership must not end on a clip that is still there. Anything other than the old
+// value (the wanted one, or a shape the application or Windows gave the window) means it did land.
+Result<void> WindowCornerLease::WriteOwnedRegion(const std::optional<CornerRegion>& value) {
+    if (!backend_.Responsive(window_)) return Deferred();
+    if (auto written = backend_.WriteRegion(window_, value); !written) {
+        if (written.error().code == ErrorCode::Timeout) uncertain_ = value;
+        return written;
+    }
+    auto landed = backend_.ReadRegion(window_);
+    if (!landed || (*landed != value && *landed == installed_)) {
+        uncertain_ = value;
+        return Deferred();
+    }
+    return Ok();
+}
 Result<bool> WindowCornerLease::Refresh() try {
     auto observed = ObserveOwned(); if (!observed) return observed.error();
+    if (auto reconciled = Reconcile(); !reconciled) return reconciled.error();
     auto current = backend_.ReadRegion(window_); if (!current) return current.error();
     if (*current != installed_) {
-        // The app's region wins, but our separately leased material still needs restoration.
+        // The app's region wins, but our separately leased material still needs restoration. D56: no region,
+        // or a plain rectangle around the clip (Chromium keeps a maximized window to the work area this
+        // way), is no shape of its own: like a re-asserted material, it does not end the rounding.
+        const bool plain = !*current || SimpleRegionContainsClip(**current, *observed);
         auto restored = Restore(); if (!restored) return restored.error();
-        replacement_ = CornerReplacement::Region;
+        replacement_ = plain ? CornerReplacement::RegionReasserted : CornerReplacement::Region;
         return MakeError(ErrorCode::InvalidState, "Application replaced its window region");
     }
     if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
@@ -612,6 +841,7 @@ Result<bool> WindowCornerLease::Refresh() try {
         if (*originalBackdrop_ >= DWMSBT_MAINWINDOW && !backdropApplied_) {
             // DWM's system material fills the full rectangular bounds independently of the
             // window region. Lease NONE while clipped; do not disable non-client rendering.
+            if (!backend_.Responsive(window_)) return Deferred();
             if (auto written = backend_.WriteBackdrop(window_, DWMSBT_NONE); !written) return written.error();
             backdropApplied_ = true;
             // The material change may recalculate the visible frame; use a fresh observation.
@@ -637,7 +867,7 @@ Result<bool> WindowCornerLease::Refresh() try {
     std::optional<CornerRegion> next{std::move(*rounded)};
     rim_ = RimFor(*observed);  // also follows a same-size move to another position or monitor
     if (next == installed_) return true;
-    if (auto written = backend_.WriteRegion(window_, next); !written) return written.error();
+    if (auto written = WriteOwnedRegion(next); !written) return written.error();
     installed_ = std::move(next); applied_ = true;
     if (!backend_.Owns(window_, token_)) {
         claimed_ = false;
@@ -649,14 +879,16 @@ Result<void> WindowCornerLease::Restore() try {
     rim_.reset();  // the rim leaves with the clip, never stays around an unclipped window
     if (!claimed_) return Ok();
     // Before a successful clip there is no region mutation to undo. This also releases a claim
-    // if allocation or the first native write failed during Acquire.
-    if (!applied_ && !backdropApplied_) { backend_.Release(window_, token_); claimed_ = false; return Ok(); }
+    // if allocation or the first native write failed during Acquire. A write still in flight is
+    // a mutation that may yet land, so it keeps the claim until it is reconciled.
+    if (!applied_ && !backdropApplied_ && !uncertain_) { backend_.Release(window_, token_); claimed_ = false; return Ok(); }
     auto observed = ObserveOwned();
     if (!observed) return observed.error();
+    if (auto reconciled = Reconcile(); !reconciled) return reconciled.error();
     if (applied_) {
         auto current = backend_.ReadRegion(window_); if (!current) return current.error();
         if (*current == installed_) {
-            if (auto written = backend_.WriteRegion(window_, original_); !written) return written;
+            if (auto written = WriteOwnedRegion(original_); !written) return written;
             installed_ = original_;
         }
         applied_ = false;
@@ -665,6 +897,7 @@ Result<void> WindowCornerLease::Restore() try {
         auto backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
         if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop restoration unavailable");
         if (**backdrop == DWMSBT_NONE) {
+            if (!backend_.Responsive(window_)) return Deferred();
             if (auto written = backend_.WriteBackdrop(window_, *originalBackdrop_); !written) return written;
         }
         backdropApplied_ = false;
@@ -764,41 +997,102 @@ Result<std::optional<int>> DispatchWindowCornerGuard(const std::vector<std::wstr
 struct WindowCorners::Impl {
     bool allowed;
     std::filesystem::path executable;
+    WindowCornersOptions options;
     std::atomic<bool> cancelled{false};
     std::atomic<bool> wanted{false};
+    std::atomic<CornerGuardState> state{CornerGuardState::Off};
+    std::atomic<unsigned> failures{0};
+    std::atomic<ULONGLONG> retryAt{0};
+    std::atomic<bool> scheduled{false};
     std::unique_ptr<GuardSession> session; // worker only
+    ULONGLONG readyAt = 0;                 // worker only
     WorkerPool worker{{1, L"Aether window corner recovery", ComApartment::None}};
-    Impl(bool value, std::filesystem::path path) : allowed(value), executable(std::move(path)) {}
+    Impl(bool value, std::filesystem::path path, WindowCornersOptions chosen)
+        : allowed(value), executable(std::move(path)), options(chosen) {}
+    bool Exhausted() const noexcept { return failures.load() >= std::max(1u, options.maximumAttempts); }
+    void Fail(const char* what) {
+        const auto count = failures.fetch_add(1) + 1;
+        const auto shift = std::min(count - 1, 6u);
+        retryAt = ::GetTickCount64() + static_cast<ULONGLONG>(options.firstRetryDelay.count()) * (1ull << shift);
+        state = CornerGuardState::Failed;
+        if (Exhausted()) AETHER_LOG_WARN("app", "window corner guard {}; giving up after {} attempts", what, count);
+        else AETHER_LOG_WARN("app", "window corner guard {}; retrying", what);
+    }
+    // Worker only. Brings the helper in line with the wanted state, one bounded step at a time.
+    void Reconcile() {
+        if (cancelled.load() || !wanted.load()) {
+            session.reset();
+            state = CornerGuardState::Off;
+            return;
+        }
+        if (session) {
+            if (::WaitForSingleObject(session->process.Get(), 0) == WAIT_TIMEOUT) { state = CornerGuardState::Ready; return; }
+            // The helper exited on its own: its leases restored themselves unless it crashed (AS4-05).
+            session.reset();
+            if (::GetTickCount64() - readyAt > 5 * 60 * 1000) failures = 0;  // a long healthy run starts a new budget
+            Fail("exited unexpectedly");
+            return;
+        }
+        if (Exhausted() || ::GetTickCount64() < retryAt.load()) { if (failures.load()) state = CornerGuardState::Failed; return; }
+        state = CornerGuardState::Starting;
+        auto created = StartGuard(executable, cancelled);
+        if (created && !cancelled.load() && wanted.load()) {
+            session = std::move(*created);
+            readyAt = ::GetTickCount64();
+            state = CornerGuardState::Ready;
+            AETHER_LOG_INFO("app", "window corner guard started");
+        } else if (!created && !cancelled.load()) {
+            Fail("unavailable");
+        } else {
+            state = CornerGuardState::Off;  // cancelled or no longer wanted while starting
+        }
+    }
+    bool Schedule() {
+        if (scheduled.exchange(true)) return true;
+        const bool posted = worker.Post([this] {
+            scheduled = false;
+            try { Reconcile(); } catch (...) { state = CornerGuardState::Failed; AETHER_LOG_WARN("app", "window corner guard unavailable"); }
+        });
+        if (!posted) scheduled = false;
+        return posted;
+    }
 };
-WindowCorners::WindowCorners(bool allowNativeAccess, std::filesystem::path hostExecutable)
-    : impl_(std::make_unique<Impl>(allowNativeAccess, std::move(hostExecutable))) {}
+WindowCorners::WindowCorners(bool allowNativeAccess, std::filesystem::path hostExecutable, WindowCornersOptions options)
+    : impl_(std::make_unique<Impl>(allowNativeAccess, std::move(hostExecutable), options)) {}
 WindowCorners::~WindowCorners() { Stop(); }
 Result<void> WindowCorners::Request(bool enabled) noexcept try {
     if (impl_->cancelled.load()) return MakeError(ErrorCode::InvalidState, "Window corner controller has stopped");
     if (enabled && !impl_->allowed) return MakeError(ErrorCode::AccessDenied, "Window corners are disabled in isolated sessions");
-    if (impl_->wanted.exchange(enabled) == enabled) return Ok();
-    if (!impl_->worker.Post([state = impl_.get()] {
-        try {
-            if (state->cancelled.load() || !state->wanted.load()) { state->session.reset(); return; }
-            if (state->session && ::WaitForSingleObject(state->session->process.Get(), 0) == WAIT_TIMEOUT) return;
-            state->session.reset();
-            auto created = StartGuard(state->executable, state->cancelled);
-            if (created && !state->cancelled.load() && state->wanted.load()) {
-                state->session = std::move(*created);
-                AETHER_LOG_INFO("app", "window corner guard started");
-            } else if (!created && !state->cancelled.load()) AETHER_LOG_WARN("app", "window corner guard unavailable");
-        } catch (...) { AETHER_LOG_WARN("app", "window corner guard unavailable"); }
-    })) {
+    const bool previous = impl_->wanted.exchange(enabled);
+    if (enabled && !previous) { impl_->failures = 0; impl_->retryAt = 0; }  // a fresh request gets a fresh budget
+    // Identical requests are cheap; a failed guard with budget left is retried by Poll's back-off.
+    if (previous == enabled && !(enabled && impl_->state.load() == CornerGuardState::Failed && !impl_->Exhausted())) return Ok();
+    if (!impl_->Schedule()) {
         impl_->wanted.store(false);
         return MakeError(ErrorCode::Unavailable, "Window corner worker is stopping");
     }
     return Ok();
 } catch (...) { return MakeError(ErrorCode::Internal, "Window corner request failed"); }
+void WindowCorners::Poll() noexcept {
+    try {
+        if (!impl_ || impl_->cancelled.load() || !impl_->wanted.load()) return;
+        const auto state = impl_->state.load();
+        // Ready: the worker checks that the helper still runs. Failed: retry once the back-off elapsed.
+        if (state == CornerGuardState::Ready ||
+            (state == CornerGuardState::Failed && !impl_->Exhausted() && ::GetTickCount64() >= impl_->retryAt.load()))
+            (void)impl_->Schedule();
+    } catch (...) {}
+}
+CornerGuardHealth WindowCorners::Health() const noexcept {
+    if (!impl_) return {};
+    return CornerGuardHealth{impl_->wanted.load(), impl_->state.load(), impl_->failures.load()};
+}
 void WindowCorners::Stop() noexcept {
     if (!impl_ || impl_->cancelled.exchange(true)) return;
     impl_->wanted.store(false);
     impl_->worker.Shutdown();
     impl_->session.reset();
+    impl_->state = CornerGuardState::Off;
 }
 
 } // namespace aether::app

@@ -225,6 +225,18 @@ void CompositionSurface::Detach() noexcept {
     device_ = nullptr;
     hwnd_ = nullptr;
     backdropKind_ = BackdropKind::None;
+    // AS4-24: the cached size described the released drawing surface. A later Attach creates a new
+    // 1x1 surface, which the next Resize must size even when the requested size is unchanged.
+    widthPx_ = 0;
+    heightPx_ = 0;
+}
+
+SIZE CompositionSurface::DrawingSizePx() const noexcept {
+    try {
+        if (!surface_) return SIZE{};
+        const auto size = surface_.SizeInt32();
+        return SIZE{size.Width, size.Height};
+    } catch (...) { return SIZE{}; }
 }
 
 Result<void> CompositionSurface::Resize(int widthPx, int heightPx) {

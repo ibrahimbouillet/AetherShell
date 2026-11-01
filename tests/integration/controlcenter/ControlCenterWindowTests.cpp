@@ -4,6 +4,7 @@
 // The Aether-owned quick-controls panel (D44) with synthetic snapshots only: no host, provider or
 // action route is connected, so every intent ends in the fixture and no system setting changes.
 #include "AetherTest.h"
+#include "FakeTouch.h"
 #include "controlcenter/ControlCenterWindow.h"
 #include "platform/windows/ComApartment.h"
 #include "platform/windows/MessageLoop.h"
@@ -966,5 +967,311 @@ AETHER_TEST("controlcenter integration: release activates only the target that w
     REQUIRE_EQ(fixture.intents.size(), 1u);
     CHECK(fixture.intents[0].kind == ControlIntentKind::SystemTile);
     CHECK(fixture.intents[0].control == SystemControl::WiFi);
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+AETHER_TEST("controlcenter integration: touch taps act once, pans and second fingers never, sliders track directly (FR-040)") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    window.Close();
+    REQUIRE(window.Toggle(fixture.anchor, true).ok());
+    test::FakeTouch touch;
+    const HWND hwnd = window.Handle();
+    const POINT wifi = CenterOf(Bounds(fixture, 100));
+    // A pan starting on a tile, a second finger and a cancel leave the system untouched.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, wifi);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{wifi.x, wifi.y + 30});
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{wifi.x, wifi.y + 30});
+    touch.Send(hwnd, WM_POINTERDOWN, 1, wifi);
+    touch.Send(hwnd, WM_POINTERDOWN, 2, POINT{wifi.x + 20, wifi.y});
+    touch.Send(hwnd, WM_POINTERUP, 2, POINT{wifi.x + 20, wifi.y});
+    touch.Send(hwnd, WM_POINTERUP, 1, wifi);
+    touch.Send(hwnd, WM_POINTERDOWN, 1, wifi);
+    touch.Send(hwnd, WM_POINTERUP, 1, wifi, /*canceled*/ true);
+    CHECK(fixture.intents.empty());
+    // A tap acts once.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, wifi);
+    touch.Send(hwnd, WM_POINTERUP, 1, wifi);
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].kind == ControlIntentKind::SystemTile);
+    fixture.intents.clear();
+    // A slider follows the finger with no inertia: its end commits exactly the finger's value.
+    const RECT slider = Bounds(fixture, 300);
+    const POINT start{slider.left + (slider.right - slider.left) / 4, (slider.top + slider.bottom) / 2};
+    const POINT end{slider.left + (slider.right - slider.left) * 3 / 4, start.y};
+    touch.Send(hwnd, WM_POINTERDOWN, 1, start);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{(start.x + end.x) / 2, start.y});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, end);
+    touch.Send(hwnd, WM_POINTERDOWN, 2, POINT{start.x, start.y + 80});  // a further finger is ignored
+    touch.Send(hwnd, WM_POINTERUP, 2, POINT{start.x, start.y + 80});
+    touch.Send(hwnd, WM_POINTERUP, 1, end);
+    REQUIRE_FALSE(fixture.intents.empty());
+    const auto committed = fixture.intents.back();
+    CHECK(committed.kind == ControlIntentKind::Brightness || committed.kind == ControlIntentKind::Volume);
+    REQUIRE(committed.percent.has_value());
+    CHECK(*committed.percent > 50);
+    const auto count = fixture.intents.size();
+    RunFor(fixture.loop, 120);
+    CHECK_EQ(fixture.intents.size(), count);  // nothing keeps moving after the finger lifted
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+// The owner's report: the second page (Project, All settings) could not be reached by finger. The pages
+// are stacked vertically and the gesture listened only for sideways swipes.
+AETHER_TEST("controlcenter integration: the pages follow a finger up and down, and every tile can be reached (FR-040)") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    test::FakeTouch touch;
+    const HWND hwnd = window.Handle();
+    const POINT from = CenterOf(Bounds(fixture, 100));
+    const auto firstPage = Ids(fixture);
+    const auto position = [&] { return window.PagePosition(graphics::FrameScheduler::Now()); };
+    const auto settle = [&] { RunFor(fixture.loop, 420); };
+    const int quarter = Px(window, 48.0f), half = Px(window, 97.0f);
+    // The finger moves the pages with it, continuously, and nothing is invoked.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    CHECK_EQ(position(), 0.0f);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f)});   // the slop
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f) - half});
+    CHECK(std::fabs(position() - 0.5f) < 0.03f);
+    CHECK(Ids(fixture) == firstPage);                  // actions stay with the page at rest until it settles
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f) - half / 2});
+    CHECK(std::fabs(position() - 0.25f) < 0.03f);      // and back, under the same finger
+    touch.Advance(0.3);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - Px(window, 10.0f) - half / 2 + 1});
+    settle();
+    CHECK(fixture.intents.empty());
+    // A short, rested drag returns to the page it came from.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f)});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 30.0f)});
+    touch.Advance(0.5);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - Px(window, 30.0f)});
+    settle();
+    CHECK(Ids(fixture) == firstPage);
+    CHECK_EQ(position(), 0.0f);
+    // A long enough pan up turns it. The second page's tiles work by touch: its last one is All settings.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f)});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f) - quarter * 2});
+    touch.Advance(0.3);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - Px(window, 10.0f) - quarter * 2});
+    settle();
+    CHECK(Ids(fixture) != firstPage);
+    CHECK(fixture.intents.empty());
+    CHECK_EQ(position(), 1.0f);
+    const POINT all = CenterOf(Bounds(fixture, 111));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, all);
+    touch.Send(hwnd, WM_POINTERUP, 1, all);
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].control == SystemControl::Settings);
+    fixture.intents.clear();
+    // Past the last page it gives a little and comes back; it does not wrap around to the first.
+    const POINT onSecond = CenterOf(Bounds(fixture, 106));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, onSecond);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{onSecond.x, onSecond.y - Px(window, 10.0f)});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{onSecond.x, onSecond.y - Px(window, 300.0f)});
+    CHECK(position() > 1.0f);
+    CHECK(position() <= 1.2f);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{onSecond.x, onSecond.y - Px(window, 300.0f)});
+    settle();
+    CHECK_EQ(position(), 1.0f);
+    CHECK(Has(Ids(fixture), 106));
+    // A quick flick down turns it back, however short.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, onSecond);
+    touch.Advance(0.01);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{onSecond.x, onSecond.y + Px(window, 10.0f)});
+    touch.Advance(0.01);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{onSecond.x, onSecond.y + Px(window, 24.0f)});
+    touch.Advance(0.01);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{onSecond.x, onSecond.y + Px(window, 24.0f)});
+    settle();
+    CHECK(Ids(fixture) == firstPage);
+    CHECK_EQ(position(), 0.0f);
+    // A pan that is taken away settles on the page it came from.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f)});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - half});
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - half}, /*canceled*/ true);
+    settle();
+    CHECK(Ids(fixture) == firstPage);
+    CHECK_EQ(position(), 0.0f);
+    CHECK(fixture.intents.empty());
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+// The owner's report: sliders returning to where they started. Windows' reading of a display's brightness
+// can lag well behind the request, and it used to win after 1.5 s, with nothing to correct it afterwards.
+AETHER_TEST("controlcenter integration: a requested slider value holds until Windows really reports a change") {
+    auto state = Synthetic(false);
+    state.brightness.percent = 30;
+    state.brightness.canSet = true;
+    Fixture fixture; fixture.Initialize(state);
+    auto& window = *fixture.window;
+    test::FakeTouch touch;
+    const HWND hwnd = window.Handle();
+    const auto shown = [&] { return window.ShownSliderValue(false, graphics::FrameScheduler::Now()); };
+    const RECT slider = Bounds(fixture, 300);
+    const POINT start{slider.left + (slider.right - slider.left) * 3 / 10, (slider.top + slider.bottom) / 2};
+    const POINT end{slider.left + (slider.right - slider.left) * 7 / 10, start.y};
+    touch.Send(hwnd, WM_POINTERDOWN, 1, start);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, end);
+    const int wanted = *shown();
+    CHECK(wanted > 55);
+    RunFor(fixture.loop, 160);
+    CHECK_FALSE(fixture.intents.empty());      // Windows follows while the finger is still down
+    touch.Send(hwnd, WM_POINTERUP, 1, end);
+    CHECK_EQ(*shown(), wanted);
+    // Windows' answer comes back unchanged at first: the thumb stays with the request.
+    window.SetState(state);
+    CHECK_EQ(*shown(), wanted);
+    RunFor(fixture.loop, 1700);                // past the old 1.5 s limit
+    window.SetState(state);
+    CHECK_EQ(*shown(), wanted);
+    // A nearby level, once it really moved, settles it on the truth.
+    auto level = state;
+    level.brightness.percent = wanted - 3;
+    window.SetState(level);
+    CHECK_EQ(*shown(), wanted - 3);
+    // A failure is not held: the reading returns.
+    touch.Send(hwnd, WM_POINTERDOWN, 1, start);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, end);
+    touch.Send(hwnd, WM_POINTERUP, 1, end);
+    auto failed = state;
+    failed.message = L"Windows could not complete this action. Review its settings.";
+    window.SetState(failed);
+    CHECK_EQ(*shown(), 30);
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+namespace {
+ControlCenterState WithNetworks(int count) {
+    auto state = Synthetic(false);
+    state.system.wifi.present = true;
+    state.system.wifi.enabled = true;
+    state.wifi.networks.push_back({L"Home", 4, true, true, true});
+    state.wifi.networks.push_back({L"Office", 2, false, true, false});
+    state.wifi.networks.push_back({L"Campus", 3, true, false, false});
+    for (int i = 3; i < count; ++i) state.wifi.networks.push_back({L"Network " + std::to_wstring(i), 1, true, true, false});
+    return state;
+}
+}  // namespace
+
+// The owner's request: see the networks around and their strength, and join one, as in Windows.
+AETHER_TEST("controlcenter integration: the Wi-Fi view lists networks and asks for what each one needs (D56)") {
+    Fixture fixture; fixture.Initialize(WithNetworks(3));
+    auto& window = *fixture.window;
+    int asked = 0;
+    auto connection = window.WiFiListRequested.Connect([&] { ++asked; });
+    InvokeIds(fixture, {200});                 // the Wi-Fi tile's arrow
+    CHECK(window.WiFiViewShown());
+    CHECK_EQ(asked, 1);                        // opening the view is what reads them, and nothing else does
+    const auto ids = Ids(fixture);
+    for (const int id : {800, 801, 802, 799, 721}) CHECK(Has(ids, id));
+    CHECK_FALSE(Has(ids, 720));                // Windows' own list only when this one has nothing to show
+    std::vector<std::wstring> names;
+    Client(fixture, [&](IUIAutomation& automation, HWND hwnd) {
+        auto root = Root(automation, hwnd);
+        for (const int id : {800, 801, 802}) names.push_back(Name(*Item(automation, *root, id)));
+    });
+    REQUIRE_EQ(names.size(), 3u);
+    CHECK(names[0] == L"Home, Excellent signal, secured, connected");
+    CHECK(names[1] == L"Office, Fair signal, open");
+    CHECK(names[2] == L"Campus, Good signal, secured");
+    fixture.intents.clear();
+    InvokeIds(fixture, {801});                 // an open network: join it
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].kind == ControlIntentKind::WiFiConnect);
+    CHECK(fixture.intents[0].ssid == L"Office");
+    fixture.intents.clear();
+    InvokeIds(fixture, {800});                 // already connected: nothing to do
+    CHECK(fixture.intents.empty());
+    InvokeIds(fixture, {799});
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].kind == ControlIntentKind::WiFiDisconnect);
+    fixture.intents.clear();
+    InvokeIds(fixture, {802});                 // an enterprise network goes to Windows' own dialog
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].kind == ControlIntentKind::NetworkList);
+    fixture.intents.clear();
+    // While a connection is under way, no second one can start.
+    auto busy = WithNetworks(3);
+    busy.wifi.connecting = L"Office";
+    window.SetState(busy);
+    const POINT campus = CenterOf(Bounds(fixture, 802));
+    PointerAt(window, WM_LBUTTONDOWN, campus);
+    PointerAt(window, WM_LBUTTONUP, campus);
+    CHECK(fixture.intents.empty());
+    // Nothing to list: Windows' own list is one touch away.
+    auto none = WithNetworks(3);
+    none.wifi.networks.clear();
+    none.wifi.access = WiFiAccess::Denied;
+    window.SetState(none);
+    CHECK(Has(Ids(fixture), 720));
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+AETHER_TEST("controlcenter integration: a long Wi-Fi list follows a finger and the wheel, and pressed rows stay exact") {
+    Fixture fixture; fixture.Initialize(WithNetworks(20));
+    auto& window = *fixture.window;
+    test::FakeTouch touch;
+    const HWND hwnd = window.Handle();
+    InvokeIds(fixture, {200});
+    RunFor(fixture.loop, 300);
+    CHECK_EQ(window.WiFiScrollOffset(), 0.0f);
+    fixture.intents.clear();
+    const POINT from = CenterOf(Bounds(fixture, 802));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, from);
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 10.0f)});
+    touch.Send(hwnd, WM_POINTERUPDATE, 1, POINT{from.x, from.y - Px(window, 90.0f)});
+    CHECK(std::fabs(window.WiFiScrollOffset() - 80.0f) < 4.0f);
+    touch.Advance(0.3);
+    touch.Send(hwnd, WM_POINTERUP, 1, POINT{from.x, from.y - Px(window, 90.0f)});
+    RunFor(fixture.loop, 200);
+    CHECK(std::fabs(window.WiFiScrollOffset() - 80.0f) < 4.0f);  // a rested release does not fling
+    CHECK(fixture.intents.empty());            // a pan never joins a network
+    // A row that moved is pressed where it now is.
+    const POINT row = CenterOf(Bounds(fixture, 804));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, row);
+    touch.Send(hwnd, WM_POINTERUP, 1, row);
+    REQUIRE_EQ(fixture.intents.size(), 1u);
+    CHECK(fixture.intents[0].ssid == L"Network 4");
+    fixture.intents.clear();
+    // The wheel moves it too, and stops at the end. Rows outside the list cannot be pressed.
+    for (int i = 0; i < 40; ++i) ::SendMessageW(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(-WHEEL_DELTA)), MAKELPARAM(from.x, from.y));
+    const float end = window.WiFiScrollOffset();
+    CHECK(end > 400.0f);
+    ::SendMessageW(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(-WHEEL_DELTA)), MAKELPARAM(from.x, from.y));
+    CHECK_EQ(window.WiFiScrollOffset(), end);
+    const POINT hidden = CenterOf(Bounds(fixture, 800));
+    touch.Send(hwnd, WM_POINTERDOWN, 1, hidden);
+    touch.Send(hwnd, WM_POINTERUP, 1, hidden);
+    CHECK(fixture.intents.empty());
+    CHECK_FALSE(fixture.wrongThread);
+}
+
+AETHER_TEST("controlcenter integration: equal wheel totals act equally on a slider (AS4-14)") {
+    Fixture fixture; fixture.Initialize(Synthetic(false));
+    auto& window = *fixture.window;
+    const HWND hwnd = window.Handle();
+    // Wheel over a slider: one notch and the same total in small packets change it equally.
+    window.Close(); REQUIRE(window.Toggle(fixture.anchor, true).ok());
+    const POINT overSlider = CenterOf(Bounds(fixture, 300));
+    const auto wheel = [&](int delta) { ::SendMessageW(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<SHORT>(delta))), MAKELPARAM(overSlider.x, overSlider.y)); };
+    fixture.intents.clear();
+    wheel(0);
+    CHECK(fixture.intents.empty());        // a zero packet changes nothing (it used to step down)
+    for (int i = 0; i < 12; ++i) wheel(10);
+    REQUIRE_FALSE(fixture.intents.empty());
+    REQUIRE(fixture.intents.back().percent.has_value());
+    const int afterPackets = *fixture.intents.back().percent;
+    window.Close(); REQUIRE(window.Toggle(fixture.anchor, true).ok());
+    fixture.intents.clear();
+    RunFor(fixture.loop, 700);             // past the carried remainder's lifetime
+    const auto overAgain = CenterOf(Bounds(fixture, 300));
+    ::SendMessageW(hwnd, WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<SHORT>(WHEEL_DELTA))), MAKELPARAM(overAgain.x, overAgain.y));
+    REQUIRE_FALSE(fixture.intents.empty());
+    REQUIRE(fixture.intents.back().percent.has_value());
+    CHECK_EQ(*fixture.intents.back().percent, afterPackets);
     CHECK_FALSE(fixture.wrongThread);
 }

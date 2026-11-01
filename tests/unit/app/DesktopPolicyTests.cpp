@@ -93,3 +93,16 @@ AETHER_TEST("desktop attention: bounded Dock peek cannot reveal native bar or ov
     CHECK(AttentionPeekDelay(true,false,true,200,200)==0);
     CHECK(AttentionPeekDelay(true,false,true,250,200)==0);
 }
+
+AETHER_TEST("desktop policy: work-area broadcasts never re-apply the configuration (AS4-08)") {
+    // Explorer's AppBar/Auto-Hide notification: SPI_SETWORKAREA, with or without a section name.
+    CHECK(ClassifySettingChange(SPI_SETWORKAREA, L"") == SettingChangeScope::WorkArea);
+    CHECK(ClassifySettingChange(SPI_SETWORKAREA, L"Environment") == SettingChangeScope::WorkArea);
+    CHECK(ClassifySettingChange(0, L"intl") == SettingChangeScope::Locale);
+    CHECK(ClassifySettingChange(0, L"ImmersiveColorSet") == SettingChangeScope::Appearance);
+    CHECK(ClassifySettingChange(SPI_SETHIGHCONTRAST, L"") == SettingChangeScope::Appearance);
+    CHECK(ClassifySettingChange(SPI_SETCLIENTAREAANIMATION, L"") == SettingChangeScope::Appearance);
+    // Unknown notifications stay conservative (coalesced re-application), never ignored.
+    CHECK(ClassifySettingChange(0, L"WindowsThemeElement") == SettingChangeScope::Appearance);
+    CHECK(ClassifySettingChange(0x1234, L"") == SettingChangeScope::Appearance);
+}

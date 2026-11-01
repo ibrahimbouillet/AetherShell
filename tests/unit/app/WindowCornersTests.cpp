@@ -21,6 +21,12 @@ public:
     bool denyBackdropRead = false;
     bool denyBackdropWrite = false;
     bool replaceBackdropOnWrite = false;
+    // AS4-03: a target that stops answering, and a write that outlives its bounded wait.
+    bool responsive = true;
+    bool stallWrites = false;
+    std::optional<std::optional<CornerRegion>> stalled;
+    unsigned probes = 0;
+    bool Responsive(HWND) noexcept override { ++probes; return responsive; }
     Result<CornerWindowObservation> Observe(HWND) override {
         if (denyObserve) return MakeError(ErrorCode::Unavailable, "synthetic observation failure");
         return observed;
@@ -31,6 +37,7 @@ public:
     }
     Result<void> WriteRegion(HWND, const std::optional<CornerRegion>& value) override {
         if (denyWrite) return MakeError(ErrorCode::Platform, "synthetic region failure");
+        if (stallWrites) { stalled = value; return MakeError(ErrorCode::Timeout, "synthetic pending write"); }
         region = value; ++writes; return Ok();
     }
     Result<std::optional<DWORD>> ReadBackdrop(HWND) override {
@@ -47,6 +54,8 @@ public:
         owner = token; return Ok();
     }
     void Release(HWND, std::uintptr_t token) noexcept override { if (owner == token) owner = 0; }
+    bool abandoned = false;
+    bool ClearAbandonedClaim(HWND) noexcept override { const bool was = abandoned; if (was) owner = 0; abandoned = false; return was; }
 };
 const auto window = reinterpret_cast<HWND>(std::uintptr_t{17});
 }
@@ -80,6 +89,36 @@ AETHER_TEST("window corners: custom existing and replaced application regions ar
     CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
     REQUIRE((*lease)->Restore().ok());
     CHECK(backend.region == custom); CHECK_EQ(backend.writes, 1u); CHECK_EQ(backend.owner, 0u);
+}
+// AS4-05: the helper's memory of the original region dies with it. Windows must not stay stranded.
+AETHER_TEST("window corners: a dead guard's clip is taken over and removed; anything else is left alone") {
+    FakeCorners backend;
+    {
+        auto first = WindowCornerLease::Acquire(backend, window, 3);
+        REQUIRE(first.ok());
+        REQUIRE(backend.region.has_value());
+        const auto clip = backend.region;
+        // The guard dies here: its lease never restores, and its claim stays on the window.
+        const auto surviving = backend.owner;
+        CHECK(surviving != 0u);
+        backend.abandoned = true;
+        auto second = WindowCornerLease::Acquire(backend, window, 4);
+        REQUIRE(second.ok());
+        CHECK(backend.region == clip);          // no flicker: the clip stays as it is
+        CHECK_EQ(backend.owner, 4u);
+        REQUIRE((*second)->Restore().ok());
+        CHECK_FALSE(backend.region.has_value()); // and is gone when the new guard lets go
+        CHECK_EQ(backend.owner, 0u);
+    }
+    // A claim of a dead guard over a shape that is not its clip: that shape is the application's.
+    FakeCorners other;
+    const CornerRegion custom{std::byte{1}, std::byte{2}};
+    other.region = custom;
+    other.owner = 9;
+    other.abandoned = true;
+    CHECK_FALSE(WindowCornerLease::Acquire(other, window, 5).ok());
+    CHECK(other.region == custom);
+    CHECK_EQ(other.writes, 0u);
 }
 AETHER_TEST("window corners: lost lifetime and changed process identity never restore another window") {
     for (bool lifetimeLost : {false, true}) {
@@ -251,4 +290,104 @@ AETHER_TEST("window corners: only a re-asserted previous material is clipped aga
     CHECK_FALSE(CornerRetryDelay(CornerReplacement::MaterialReasserted, -1).has_value());
     for (const auto other : {CornerReplacement::None, CornerReplacement::Region, CornerReplacement::Material})
         CHECK_FALSE(CornerRetryDelay(other, 0).has_value());  // the application's own choice wins
+}
+
+AETHER_TEST("window corners: an unresponsive target keeps its clip and snapshot; changes wait (AS4-03)") {
+    FakeCorners backend;
+    auto lease = WindowCornerLease::Acquire(backend, window, 40); REQUIRE(lease.ok());
+    const auto clipped = backend.region; REQUIRE(clipped.has_value());
+    REQUIRE_EQ(backend.writes, 1u);
+    backend.responsive = false;
+    // A busy page is not given back: unchanged geometry needs no mutation and is not a deferral.
+    auto steady = (*lease)->Refresh(); REQUIRE(steady.ok()); CHECK(*steady);
+    // A geometry change waits instead of writing into the unresponsive target.
+    backend.observed.dpi = 144;
+    auto changed = (*lease)->Refresh(); REQUIRE_FALSE(changed.ok());
+    CHECK_EQ(changed.error().code, ErrorCode::Timeout);
+    CHECK((*lease)->HasOwnership()); CHECK_EQ(backend.writes, 1u); CHECK(backend.region == clipped);
+    // Restoration (the window left its maximize while hung) waits too; the snapshot is retained.
+    backend.observed.eligible = false;
+    auto restore = (*lease)->Refresh(); REQUIRE_FALSE(restore.ok());
+    CHECK_EQ(restore.error().code, ErrorCode::Timeout);
+    CHECK((*lease)->HasOwnership()); CHECK_EQ(backend.writes, 1u); CHECK(backend.region == clipped);
+    // Once it answers again the recovery completes exactly once, conditionally.
+    backend.responsive = true;
+    auto recovered = (*lease)->Refresh(); REQUIRE(recovered.ok()); CHECK_FALSE(*recovered);
+    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u); CHECK_EQ(backend.writes, 2u);
+}
+AETHER_TEST("window corners: first acquisition of an unresponsive target writes nothing and keeps no claim") {
+    FakeCorners backend;
+    backend.responsive = false;
+    auto lease = WindowCornerLease::Acquire(backend, window, 41);
+    REQUIRE_FALSE(lease.ok()); CHECK_EQ(lease.error().code, ErrorCode::Timeout);
+    CHECK_EQ(backend.writes, 0u); CHECK_EQ(backend.owner, 0u); CHECK_FALSE(backend.region.has_value());
+}
+AETHER_TEST("window corners: a pending write is reconciled from what actually landed") {
+    FakeCorners backend;
+    auto lease = WindowCornerLease::Acquire(backend, window, 42); REQUIRE(lease.ok());
+    const auto first = backend.region;
+    backend.stallWrites = true;
+    backend.observed.dpi = 144;
+    auto pending = (*lease)->Refresh(); REQUIRE_FALSE(pending.ok());
+    CHECK_EQ(pending.error().code, ErrorCode::Timeout); CHECK((*lease)->HasOwnership());
+    REQUIRE(backend.stalled.has_value()); REQUIRE(backend.stalled->has_value());
+    // The stalled write lands later: it is adopted, not mistaken for an application replacement.
+    backend.region = *backend.stalled;
+    backend.stallWrites = false;
+    auto adopted = (*lease)->Refresh(); REQUIRE(adopted.ok()); CHECK(*adopted);
+    CHECK_EQ(backend.writes, 1u);  // no further write: the landed region is the wanted one
+    CHECK((*lease)->HasOwnership());
+    // A pending write that never landed is retried from the unchanged region.
+    backend.stallWrites = true;
+    backend.observed.dpi = 192;
+    REQUIRE_FALSE((*lease)->Refresh().ok());
+    backend.stallWrites = false;
+    auto retried = (*lease)->Refresh(); REQUIRE(retried.ok()); CHECK(*retried);
+    CHECK_EQ(backend.writes, 2u); CHECK(backend.region != first);
+    REQUIRE((*lease)->Restore().ok()); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: restoration with a write still pending keeps the claim until it is known") {
+    FakeCorners backend;
+    auto lease = WindowCornerLease::Acquire(backend, window, 43); REQUIRE(lease.ok());
+    backend.stallWrites = true;
+    auto restore = (*lease)->Restore(); REQUIRE_FALSE(restore.ok());
+    CHECK_EQ(restore.error().code, ErrorCode::Timeout); CHECK((*lease)->HasOwnership());
+    backend.responsive = false;
+    CHECK_EQ((*lease)->Restore().error().code, ErrorCode::Timeout);
+    backend.responsive = true;
+    backend.region = *backend.stalled;  // the restoration landed meanwhile
+    backend.stallWrites = false;
+    REQUIRE((*lease)->Restore().ok());
+    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+}
+AETHER_TEST("window corners: helper start failures are bounded, reported and retried only with budget (AS4-04)") {
+    WindowCornersOptions options; options.firstRetryDelay = std::chrono::milliseconds(5); options.maximumAttempts = 3;
+    const auto missing = std::filesystem::temp_directory_path() / L"aether-missing-corner-helper" / L"AetherShellApp.exe";
+    WindowCorners corners(true, missing, options);
+    CHECK(corners.Health().state == CornerGuardState::Off);
+    REQUIRE(corners.Request(true).ok());
+    const auto wait = [&](auto predicate) {
+        const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!predicate() && std::chrono::steady_clock::now() < end) { corners.Poll(); ::Sleep(5); }
+        return predicate();
+    };
+    REQUIRE(wait([&] { return corners.Health().failures >= 3; }));
+    const auto health = corners.Health();
+    CHECK(health.wanted); CHECK(health.state == CornerGuardState::Failed); CHECK_EQ(health.failures, 3u);
+    // The budget is spent: further supervision and identical requests do not start it again.
+    for (int i = 0; i < 20; ++i) { corners.Poll(); REQUIRE(corners.Request(true).ok()); ::Sleep(2); }
+    CHECK_EQ(corners.Health().failures, 3u);
+    // A fresh request (off, then on) gets a fresh budget.
+    REQUIRE(corners.Request(false).ok());
+    REQUIRE(wait([&] { return corners.Health().state == CornerGuardState::Off; }));
+    REQUIRE(corners.Request(true).ok());
+    REQUIRE(wait([&] { return corners.Health().failures >= 1 && corners.Health().state == CornerGuardState::Failed; }));
+    corners.Stop();
+    CHECK(corners.Health().state == CornerGuardState::Off);
+    CHECK_FALSE(corners.Request(true).ok());
+}
+AETHER_TEST("window corners: isolated sessions never start a helper") {
+    WindowCorners corners(false, std::filesystem::temp_directory_path() / L"AetherShellApp.exe");
+    CHECK_EQ(corners.Request(true).error().code, ErrorCode::AccessDenied);
+    CHECK(corners.Health().state == CornerGuardState::Off);
 }

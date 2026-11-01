@@ -34,8 +34,11 @@ bool Transient(const std::vector<std::wstring>& arguments) {
 void AwaitControlReadiness(const aether::install::ActiveVersionProcess& child) {
     // Do not abandon a just-created child before Quit/maintenance can address it. Requesters have
     // their own bounded lease wait and fail safely if startup hangs; we never terminate the child.
-    while(::WaitForSingleObject(child.process.Get(),100)==WAIT_TIMEOUT &&
-          aether::platform::InstanceChannel::FindListenerProcessId(L"AetherShell")!=child.processId) {}
+    // AS4-17: bounded, so a child that never opens its channel cannot keep the supervisor (and its
+    // installation lease) waiting forever.
+    (void)aether::install::AwaitControlReadiness(child.process.Get(), [&child] {
+        return aether::platform::InstanceChannel::FindListenerProcessId(L"AetherShell")==child.processId;
+    }, std::chrono::seconds(30));
 }
 }
 
@@ -118,6 +121,8 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
             auto delay=restarts.NextDelay(code);if(!delay)return 0;
             const auto identity=launched->child.stateDigest;
             auto stopped=supervisor->StopRequested(*delay);if(!stopped || *stopped)return 0;
+            // A restart after a crash is not a sign-in: the same arguments, without greeting again (FR-041).
+            std::erase(arguments,std::wstring(L"--autostart"));
             auto next=StartSupervised(*layout,arguments,identity);
             // Missing/changed journals, maintenance lock contention and launch failure stop the
             // supervisor. The independent taskbar guard already restores the native taskbar.

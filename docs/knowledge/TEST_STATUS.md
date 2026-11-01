@@ -2591,3 +2591,276 @@ afterwards:
   stay on; the HKCU Run entry is byte-identical; no StartupApproved value was created.
 - Not covered: sign-in timing after a reboot, and Auto-Hide in the installed copy (off until the owner
   turns it on; the trial's choices were not copied into installed preferences).
+
+### S-060 — Alpha 3 source audit and V4 Claude work order (Codex, 2026-10-28)
+
+Reviewed baseline: `ce59649` on shared `main`, official origin; release tag remains on `4835641`.
+Initial working tree: only pre-existing untracked `.agents/`, preserved. Codex and three read-only
+reviewers inspected foreign-window/recovery/Auto-Hide, touch/motion, startup/session/update/security
+paths. Findings and exact baseline source references: [AS4-01–AS4-26](../specs/v4-stability-audit.md).
+The owner-reported blank/grey external windows and reboot-startup failure were not independently
+reproduced. No demonstrated remote/cross-user exploitable vulnerability or security certification.
+
+Prepared [the English Claude work order](../CLAUDE_V4_STABILITY_TOUCH_WELCOME_PROMPT.md), D51,
+FR-040/FR-041, T50–T52 and ADR 0013. Touch wording/source findings received independent peer review.
+Microsoft primary references for region ownership/events, Run length/timing, session registration/
+events and touch/inertia were checked; links are in the audit. No C++ implementation or fixes.
+
+Documentation checks: all new relative links resolve; the worklist contains 26 unique AS4 IDs;
+`git diff --check` passes. A bounded scan of changed/new documentation found no user-specific
+absolute path or tested secret pattern. This is scoped hygiene, not a general secret/security scan.
+A PowerShell arithmetic replication of AS4-13's existing conversion produced 40 px for 120
+raw-delta-1 packets versus 48 px for one raw-delta-120 packet (96 DPI, three 16-DIP lines).
+That verifies the packetization arithmetic only, not a physical touchscreen or a product test.
+
+Fresh baseline verification executed:
+
+```powershell
+./scripts/build.ps1 -Config release -BuildDir build/wf-codex-v4-audit `
+    -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON' -Test -TestExclude 'network|integration'
+```
+
+- **Build passed:** fresh Release, `AETHER_WARNINGS_AS_ERRORS:BOOL=ON`, version `0.3.0-alpha.3`.
+- **Combined unit gate failed:** 23/24 executable suites passed, 46.06 s; only `aether_search_tests`
+  failed (6 cases pass, 1 fails). At `tests/unit/search/SearchTests.cpp:129`, 2,000 synthetic apps:
+  p50 **1.095 ms**, p95 **2.547 ms**, required `<2 ms`; 5,000 apps: p50 **2.123 ms**, p95 **4.554 ms**.
+  This was immediately after the fresh build; system load was not independently characterized.
+  The script exits with the CTest failure; it is not a green aggregate.
+- The original `Testing/Temporary/LastTest.log` was copied before any rerun to
+  `build/wf-codex-v4-audit/evidence/unit-first-run.log` (ignored).
+- **One scoped unchanged-binary Search rerun passed:**
+  `ctest --test-dir build/wf-codex-v4-audit -R '^aether_search_tests$' --output-on-failure --output-junit evidence/search-recheck.xml`;
+  7/7 cases, CTest 0.42 s. 2,000 apps p50 **0.451 ms**, p95 **0.540 ms**; 5,000 apps p50 **0.970 ms**,
+  p95 **1.229 ms**. Report: `<build>/evidence/search-recheck.xml` and current LastTest.log.
+  No code changed or threshold relaxed; the cause of the difference is unestablished. AS4-26 keeps
+  this qualification open; the passing scoped recheck does not erase the failing combined run.
+
+No real-desktop capture, app/candidate launch, lock/reboot, real settings/startup/device mutation,
+installation, commit/push, tag or new release. Build output remains ignored. Actual native-suite,
+foreign-application, physical touch, reboot/unlock, normal-speed handwriting and owner acceptance
+remain pending for Claude's candidate. Source findings and analytical wheel arithmetic are not
+runtime reproduction of the reported incidents, and baseline unit passes would not close them.
+
+### S-061 — V4 stability, touch and welcome in source (Claude, 2026-11-01)
+
+Windows 11 build 26300, MSVC 14.51, fresh Release `/W4 /WX` in `build/wf-claude-v4`, on `1f66148` plus the
+uncommitted working tree. Own fixture windows on the owner's live desktop, whose work area currently fills
+the monitor (both bars auto-hidden by the installed Alpha 3). No installed file, setting, startup entry or
+owner application was changed; no lock, reboot, install, commit, push or release.
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | **25/25 suites** (new: `welcome`) |
+| Native: welcome 4/4, topbar 7/7, search_ui 13/13, controlcenter 16/16, dock 14/14, ui 30/30, install 7/7, installer 13/13, settings_ui 35/35 | Pass |
+| Native: form touch 8/8 and equal wheel totals, within ui_form | Pass |
+| Native: `window corners native`, including the new hung-target, stalled-write and full-monitor cases, repeated 15 times on the final build | 14 of 15 clean; the one failure was a fixture precondition (below) |
+
+**Failures kept visible:**
+
+- `ui_form motion` dark and light frame registration fail (2 of 25 in that suite). Compared directly over 4
+  rounds of both cases: baseline `ce59649` failed 8 of 8, this tree 6 of 8. Environmental here and no worse
+  than baseline, but moving-frame coherence is therefore **not** confirmed on this desktop.
+- `window corners pixels` (4 tests) stop at their privacy precondition: another visible window overlaps the
+  crop, so they fail closed and read no pixels. The baseline fails these too, earlier, because it never clips
+  on this desktop. **The rim and cutout pixels of the new behavior are unverified.**
+- `an application backdrop replacement survives guard restoration` failed 1 of 15, and 1 of 40 when repeated
+  alone, at the fixture's `GetForegroundWindow` precondition, before the guard is involved. Someone was
+  using the machine.
+
+**Measurements actually taken (fixtures, not real applications):**
+
+- With one target hung or stalled, the healthy target was served in at most 95 ms on the final fixture (25 and
+  15 repeats). With a themed fixture, before its frame shapes were excluded, at most 491 ms.
+- AS4-06: the baseline binary never clipped a framed maximize on this desktop, 40 of 40 runs.
+- A read-back caught a write that had not landed yet in 3 of 30 runs of the stalled-write test.
+- Guard counters for one hung-target run: 33 events, 6 sweeps, 1 full sweep, 5 lease refreshes, 6 region
+  writes, longest sweep 39 ms.
+- Welcome window: 155 frames in 2.65 s of writing, in a small own window. Offscreen frames were inspected by
+  eye: partial words, moving tip, the pen returning for accents. Ink pixels grow monotonically.
+
+**Corrected along the way, each found by these runs:** a settings save crash from the new section (would have
+crashed the app); a hold lost when a timer fired early; a rested swipe still turning a page; a retry delay
+shortened by a slow restore; a spring stalled by a future input timestamp.
+
+**Observed, unexplained:** Windows can give a standard frame region shapes of its own (one rectangle while
+maximized, a few matching the window once restored). The guard yields to them. Effect on real applications
+unknown.
+
+**Not executed, so not claimed:** any physical touch, including the edge swipe's HID parsing; any real sign-in
+or unlock; the `ShellApplication` welcome wiring (it has only compiled);
+the launcher end to end; helper death after readiness; device-loss injection; any real browser or Electron
+application; reproduction of the blank-window or startup incidents; first-usable startup, unlock, touch
+latency, frame p50/p95, idle CPU/memory and resource growth; the wider security review; Windows 10;
+multi-monitor; owner acceptance of anything, including the D52 Top Bar delay.
+
+**Private trial started (2026-11-01, 12:32 CET, owner request).** The installed Alpha 3 was quit through its
+own data directory, exited and left no recovery baseline. The candidate, byte-identical to the final build
+with its adjacent recovery guard, then started from the app's terminal panel with a private data directory,
+cloned settings (both Auto-Hide choices on, as installed), no startup registration and no update checks.
+Read back from the candidate's log and the system: surfaces, taskbar replacement and corner guard started
+within a second, no warning or error lines at that point. Installed settings hash, installed binary hash and
+startup state were unchanged. Starting it exercises none of the behavior below; the owner's findings are pending.
+
+A private `--data-dir` session uses the production instance name, so it does greet at unlock. An earlier
+note here and in the module document said otherwise; corrected. It cannot show the sign-in greeting, because
+it has no startup registration.
+
+The terminal panel's job object does not kill on close (limit flags: breakaway only), so closing that tab
+or the app should not end the trial's processes, but it would end the host, and then nothing returns to the
+installed version automatically. That closure itself was not tried.
+
+**Startup state found while preparing the trial (read-only, nothing changed).** The installed settings have
+sign-in startup off, and there is no Run entry or StartupApproved value. The running installed session had
+been started without `--autostart`. S-059 recorded sign-in startup through the stable launcher, and a settings
+backup from 2026-10-29 still had it on, so it changed between then and 2026-11-01; how is unknown. This alone
+would produce the reported "does not appear after reboot" on this machine. It does not establish that the
+earlier reports had the same cause.
+
+### S-062 — First owner trial and its corrections (Claude, 2026-11-01)
+
+**The owner's report from the private trial of S-061.** The moving-stroke writing is right ("a program that
+really writes"). Everything else about the greeting's presentation was rejected: it arrives after the desktop
+is visible, its black background is ugly, it is too small and too short. The Top Bar takes "almost five
+seconds" instead of two. This was the first real unlock the greeting has run at. The corrections below are not in
+that trial, so the owner has not seen them.
+
+**Corrected in source (D54), on `1f66148` plus the uncommitted working tree, fresh Release `/W4 /WX`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites (app 91, welcome 15) |
+| Native: welcome 9/9, topbar 7/7, ui 30/30, dock 14/14 | Pass, on the owner's desktop with the trial running |
+
+Other native suites were not repeated: only the welcome module, Auto-Hide, the session query, one graphics
+accessor and the application's wiring changed.
+
+**Top Bar:** a new regression holds the pointer at the edge with a wobble every 300 ms and reveals at exactly
+2000 ms; a real move away still cancels, and being near never starts the wait. The old logic restarted on each
+wobble. **This cause comes from reading the source; the "almost five seconds" was not measured.** A read-only
+recording of the pointer's height ran for eight minutes during this work and caught
+no visit to the edge. Each reveal now logs how long it waited, so the next trial measures it.
+
+**Welcome, in the test's own windows and with the test's own pictures:** the background is opaque edge to
+edge, has no rim, and turns a hard edge into a ramp; ink added piece by piece matches ink written at once to
+within 0.2 % (13061 and 13087 pixels); the cover draws its first frame before it shows, draws nothing while it
+waits, and turns into writing without an entrance. 213 frames in 3.6 s in a small window. A 1280 x 720 frame
+over a synthetic landscape was inspected by eye. "Salut Ibrahim" fills 1100 x 305 of it, at 6.2 s of writing.
+
+**Not executed, so not claimed:** the cover at a real lock, including whether composition keeps presenting
+while Windows' lock screen is up, which is the whole point of it; `ShellApplication`'s wiring of all this, which
+has only compiled; the real desktop picture being read; any greeting at a real sign-in (sign-in startup is off
+on this machine); waking from sleep; a full-screen application across a lock; physical touch; multi-monitor;
+frame rate at full-screen size on this machine's own GPU; and the owner's view of any of it.
+
+**Observed, not yet explained:** the first trial's application process used about 7 % of one core in a
+six-second sample with nothing visibly moving. There is no Alpha 3 figure to compare it with.
+
+### S-063 — Touch and sliders after the owner's report (Claude, 2026-11-01)
+
+**The owner's report:** Project and All settings on the second Quick Settings page cannot be reached by touch;
+some sliders take too long or return to where they started. **Corrected in source (D55),** on `1f66148` plus the
+uncommitted working tree, fresh Release `/W4 /WX`.
+
+**What the unchanged code did, tested before changing it:**
+
+| Probe of the old slider, own window | Result |
+| --- | --- |
+| Thumb dragged to 75 %, pointer far above and below the track | Stayed: no native snap-back |
+| Capture lost, Escape or cancel mode during a drag | Stayed at 75 |
+| Press on the track at 80 %, from 20 | Moved to 40, one page step, and no further |
+| Synthetic finger on the slider | Did not move: that path never reached it |
+
+So a native return to the start was ruled out, though real finger promotion through Windows cannot be
+reproduced with synthetic contacts. The return that **was** found is in Quick Settings: a stale brightness
+reading won after 1.5 s, and nothing re-read it until the panel reopened.
+
+**Executed:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites |
+| Native: ui_form 30/30, settings_ui 34/34, controlcenter 18/18 (3 rounds), installer 13/13, welcome 9/9, topbar 7/7 | Pass |
+
+`ui_form motion`'s two frame-registration cases passed in this run, after failing in an earlier one today and at
+baseline in S-061: they are intermittent here, not fixed. The ui and dock suites last ran before the final
+slider change, which they do not use.
+
+Two panel failures appeared in one run (`optional own-backdrop` at its UI Automation client, `release activates
+only the target that was pressed`). Neither recurred in 3 following full runs of that suite. The cause was not
+established.
+
+**New regressions:** the pages follow a finger continuously in both directions; a short rested drag returns; a
+longer one turns; a flick turns; no wrap past either end; All settings on the second page works by tap; a canceled
+pan returns. A requested value survives an unchanged reading past the old 1.5 s, settles on a nearby level once the
+reading moves, and yields to a reported failure. A slider follows a press anywhere, a far-off pointer, and a finger
+sideways; a second finger and a lost contact change nothing; a vertical pan over it scrolls the page and leaves it
+alone; a held Settings slider applies nothing until it is let go.
+
+**Corrected along the way, found by these runs:** the first version released a held slider on any move without
+the button, and Windows produces such moves itself (one follows every capture), which would have ended every
+touch drag at once on real hardware.
+
+**Not executed, so not claimed:** anything under a real finger, including whether Windows delivers these
+contacts to the sliders as the synthetic ones arrive; the real brightness path, including the repeated re-reads and
+whether a live drag is smooth on this display, because automated tests never change real brightness; the 7 % CPU
+question from S-062; multi-monitor; and the owner's view of any of it. The trial the owner has open predates all of
+this.
+
+**Second private trial started (2026-11-01, 13:44 CET, owner request),** with D54 and D55, byte-identical to the
+final build. The first trial was quit through its own data directory and its host really did restore the installed
+Alpha 3, with no warning or error in its log, which is the first executed proof of that way back. The new one read
+back ready: surfaces, replacement and corner guard started, installed settings, binary and startup state unchanged.
+Starting it exercises none of the above; the owner's findings are pending.
+
+### S-064 — Second round of the owner's trial (Claude, 2026-11-01)
+
+**Measured from the trial's own log, first:** eleven reveals in about two hours. The timed ones took 2000-2016 ms on
+the edge (2015, 2016, 2016, 2000, 2015). The owner's "almost five seconds" is therefore not the timer itself: the timer
+did not start until the pointer was on the last rows of pixels. This is an inference, and no second measure of the
+hand's path exists. The rule is now 1000 ms from the top 6 DIPs (D56), and each reveal keeps logging its wait.
+
+**Executed, fresh Release `/W4 /WX`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites (welcome 16, system_controls 15 before the Wi-Fi additions counted below) |
+| Native: ui_form 31/31, settings_ui 36/36, welcome 9/9, topbar 7/7, dock 14/14, installer 13/13 | Pass |
+| Native: `window corners native`, on a desktop with both bars auto-hidden | 9/9 |
+| Native: controlcenter | 20/20, and 4 of 20 in two earlier runs of the same binary (below) |
+
+**Failures kept visible:** the controlcenter suite failed 16 of 20 twice, fast and at its UI Automation client, then
+passed 20 of 20 with the same binary. These fixtures need their panel to stay active, the machine was in use, and the
+panel closes when it loses activation; that explanation is likely, not proven. `window corners pixels` still stop at
+their privacy precondition on this desktop, so the rim and cutout pixels remain unverified. Those fixtures were
+moved between bars for D56, since a window filling the monitor is now left alone.
+
+`aether_search_tests` failed once in the unit gate, in the run right after a rebuild; it then passed 3 of 3 alone and in 2
+further gates. The cause was not established.
+
+**Real reads, printing counts only, no names:** an unpackaged process was allowed to list networks here: 1 adapter,
+a scan of 8.7 s, 4 reports of 2 names, signal bars 2 and 3, kinds RSNA-PSK and WPA3-SAE. **No connection was made.**
+
+**Inspected by eye:** the whole greeting at 1280 x 720 over a synthetic landscape: "Salut" over "Ibrahim", stacked
+because that is larger, pen 11 DIPs. A prototype of the same model showed tiny knots at letter joins from doubled
+points; those are merged in the composer and pinned by a test.
+
+**New regressions:** a plain rectangle or no region put back is clipped again; a maximize filling the monitor stays square;
+a dead guard's exact clip is taken over and later removed, another shape left alone; down strokes heavier than up
+strokes by more than 2:1, forward lean, no spline knots, dots with body, writing touching the limit that binds first;
+network merge and order; the Wi-Fi view's names, join, disconnect, enterprise hand-off and busy state; a long list by
+finger and wheel, with hidden rows not pressable; the password field masked and answering only to Connect; a save failure
+restoring the registration; Apply repairing a lost registration and leaving a Windows turn-off alone.
+
+**Idle CPU, before the change:** 4.3 % of one core on the UI thread over 8 s, 5.5 % for the process, 7 % over 155 minutes.
+The Auto-Hide timer's window walk was halved in frequency for that reason; the effect has **not** been measured.
+
+**Not executed, so not claimed:** joining a real network or a wrong-password path; the bars held back at a real lock; the
+cover at a real lock; a real sign-in; Chrome or YouTube observed keeping their corners; killing a real helper for AS4-05;
+the real registry path of AS4-18/21, which a private session refuses by design; the reduced CPU; physical touch, except
+what the owner has reported. The trial open on the owner's machine predates all of this.
+
+**Owner direction D57:** from here on, finished work ends in a commit and a test build.

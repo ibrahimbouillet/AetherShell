@@ -14,6 +14,13 @@ bool ShouldForceDockReservation(bool reservationFailed, bool replacementWanted,
     return update.active || (replacementWanted && !update.suspended && update.scheduled);
 }
 
+SettingChangeScope ClassifySettingChange(UINT action, std::wstring_view section) noexcept {
+    // Explorer's AppBar/work-area broadcast carries SPI_SETWORKAREA; nothing else uses that value.
+    if (action == SPI_SETWORKAREA) return SettingChangeScope::WorkArea;
+    if (section == L"intl") return SettingChangeScope::Locale;
+    return SettingChangeScope::Appearance;
+}
+
 bool ShouldObserveTaskbar(const TaskbarUpdate& update) noexcept {
     return update.active || update.scheduled;
 }

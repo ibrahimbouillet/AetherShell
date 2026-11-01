@@ -8,6 +8,7 @@
 #include "platform/windows/WindowUtilities.h"
 
 #include <dwmapi.h>
+#include <uxtheme.h>
 #include <algorithm>
 #include <atomic>
 #include <array>
@@ -19,9 +20,25 @@
 #include <thread>
 #include <vector>
 
+#pragma comment(lib, "uxtheme.lib")
+
 using namespace aether;
 using namespace aether::app;
 namespace {
+
+// D56: rounding belongs to a maximized window between the bars; one that fills the monitor, as every maximize
+// does on a desktop with both bars auto-hidden, is left alone. A fixture takes the place it would have between
+// bars, on this one window only: the real work area is never touched.
+void BetweenBars(HWND window) {
+    MONITORINFO monitor{sizeof(monitor)};
+    RECT bounds{}, frame{};
+    if (!::GetMonitorInfoW(::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor) || !::GetWindowRect(window, &bounds) ||
+        FAILED(::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &frame, sizeof(frame)))) return;
+    if (frame.left > monitor.rcMonitor.left || frame.top > monitor.rcMonitor.top ||
+        frame.right < monitor.rcMonitor.right || frame.bottom < monitor.rcMonitor.bottom) return;
+    (void)::SetWindowPos(window, nullptr, bounds.left + 18, bounds.top + 60, bounds.right - bounds.left - 36, bounds.bottom - bounds.top - 120, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
 bool PumpUntil(const std::function<bool()>& predicate, std::chrono::milliseconds timeout = std::chrono::seconds(5)) {
     const auto end = std::chrono::steady_clock::now() + timeout;
     do {
@@ -76,6 +93,7 @@ struct OwnWindow {
         // throughout; the guard must observe real WINDOWPLACEMENT/IsZoomed state without moving
         // or activating any existing owner application.
         ::ShowWindow(window, SW_SHOWMAXIMIZED);
+        BetweenBars(window);
         (void)::UpdateWindow(window);
         REQUIRE(::IsZoomed(window));
         REQUIRE(::GetForegroundWindow() == foreground);
@@ -92,7 +110,8 @@ struct OwnGuard {
     std::atomic<bool> finished{false};
     std::atomic<int> exitCode{-1};
     std::thread thread;
-    explicit OwnGuard(HWND window, HANDLE parentProcess = nullptr) {
+    explicit OwnGuard(HWND window, HANDLE parentProcess = nullptr) : OwnGuard(std::vector<HWND>{window}, parentProcess) {}
+    OwnGuard(std::vector<HWND> windows, HANDLE parentProcess, WindowCornerGuardStatistics* statistics = nullptr) {
         if (parentProcess) {
             HANDLE copied = nullptr;
             REQUIRE(::DuplicateHandle(::GetCurrentProcess(), parentProcess, ::GetCurrentProcess(), &copied,
@@ -100,7 +119,7 @@ struct OwnGuard {
             parent.Reset(copied);
         } else parent.Reset(::OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, ::GetCurrentProcessId()));
         REQUIRE(parent && ready && stop);
-        const WindowCornerGuardOptions restriction{::GetCurrentProcessId(), {window}};
+        const WindowCornerGuardOptions restriction{::GetCurrentProcessId(), std::move(windows), statistics};
         thread = std::thread([this, restriction] {
             const auto result = RunWindowCornerGuard(parent.Get(), ready.Get(), stop.Get(), restriction);
             exitCode = result ? *result : 1; finished = true;
@@ -387,6 +406,7 @@ void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false, bo
     for (std::size_t i = 0; i < corners.size(); ++i) REQUIRE(expected[0][i] != expected[1][i]);
     backdrop.Repaint(false);
     ::ShowWindow(target.window, SW_SHOWMAXIMIZED);
+    BetweenBars(target.window);
     REQUIRE(::SetWindowPos(target.window, HWND_TOPMOST, 0, 0, 0, 0,
         SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE));
     REQUIRE(PumpUntil([&] {
@@ -486,6 +506,9 @@ void VerifyComposedCornerCutouts(bool customFrame, bool micaBackdrop = false, bo
 
 AETHER_TEST("window corners native: guard preserves genuine maximize and restores the exact prior region on stop") {
     OwnWindow window;
+    // Without theming: Windows can give a themed frame a shape of its own once the clip is gone
+    // (observed intermittently), which is not the prior region this test compares against.
+    (void)::SetWindowTheme(window.window, L"", L"");
     WINDOWPLACEMENT before{sizeof(before)}; REQUIRE(::GetWindowPlacement(window.window, &before));
     platform::UniqueRegion original(::CreateRectRgn(0, 0, 0, 0));
     const bool hadOriginal = ::GetWindowRgn(window.window, original.Get()) != ERROR;
@@ -626,6 +649,7 @@ AETHER_TEST("window corners native: a re-asserted material is clipped again; ano
     const auto settle = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
     REQUIRE(PumpUntil([&] { return std::chrono::steady_clock::now() >= settle; }));
     ::ShowWindow(target.window, SW_SHOWMAXIMIZED);
+    BetweenBars(target.window);
     REQUIRE(::IsZoomed(target.window));
     REQUIRE(PumpUntil([&] {
         return ::GetPropW(target.window, L"AetherShell.WindowCornerGuard.Lease") && HasRegion(target.window) && OwnRim() != nullptr;
@@ -636,4 +660,218 @@ AETHER_TEST("window corners native: a re-asserted material is clipped again; ano
     REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_SYSTEMBACKDROP_TYPE, &material, sizeof(material))));
     CHECK_EQ(material, DWMSBT_TABBEDWINDOW);  // the application's latest own choice, restored exactly
     CHECK(OwnRim() == nullptr);
+}
+
+// --- AS4-01/AS4-03 reproduction fixtures -----------------------------------------------------------
+// A disposable maximized target on its own thread: it repaints changing content continuously, and on
+// request stops answering its messages or handles position messages slowly, as a page's busy UI
+// thread does. Separate threads make SetWindowRgn truly synchronous with the target, the property
+// that lets one stalled application hold up the guard. Own windows only; never activated.
+namespace {
+constexpr UINT kHang = WM_APP + 40;
+constexpr UINT kResizeWithStall = WM_APP + 41;
+constexpr UINT_PTR kRepaintTimer = 9;
+struct BusyTarget {
+    HWND window = nullptr;
+    std::atomic<int> paints{0};
+    std::atomic<bool> stallNextPosition{false};
+    std::atomic<int> stalledPositions{0};
+    platform::UniqueHandle resume{::CreateEventW(nullptr, TRUE, FALSE, nullptr)};
+    platform::UniqueHandle created{::CreateEventW(nullptr, TRUE, FALSE, nullptr)};
+    std::thread thread;
+    BusyTarget() {
+        thread = std::thread([this] {
+            WNDCLASSEXW type{sizeof(type)};
+            type.hInstance = ::GetModuleHandleW(nullptr);
+            type.lpszClassName = L"AetherShell.Test.WindowCornerBusyTarget";
+            type.lpfnWndProc = &BusyTarget::Proc;
+            (void)platform::RegisterWindowClassOnce(type);
+            HWND handle = ::CreateWindowExW(WS_EX_NOACTIVATE, type.lpszClassName, L"Aether busy target", WS_OVERLAPPEDWINDOW,
+                                            200, 160, 640, 480, nullptr, nullptr, type.hInstance, this);
+            if (handle) {
+                (void)::SetWindowTheme(handle, L"", L"");  // no frame shapes of Windows' own in this fixture
+                ::ShowWindow(handle, SW_SHOWMAXIMIZED);
+                BetweenBars(handle);
+                ::SetTimer(handle, kRepaintTimer, 16, nullptr);
+            }
+            window = handle;
+            (void)::SetEvent(created.Get());
+            MSG message{};
+            while (handle && ::GetMessageW(&message, nullptr, 0, 0) > 0) { ::TranslateMessage(&message); ::DispatchMessageW(&message); }
+        });
+        (void)::WaitForSingleObject(created.Get(), 5000);
+        REQUIRE(window != nullptr);
+        REQUIRE(::IsZoomed(window));
+    }
+    ~BusyTarget() {
+        (void)::SetEvent(resume.Get());
+        if (window) ::PostMessageW(window, WM_CLOSE, 0, 0);
+        if (thread.joinable()) thread.join();
+    }
+    void Hang() { (void)::ResetEvent(resume.Get()); REQUIRE(::PostMessageW(window, kHang, 0, 0)); }
+    void Resume() { (void)::SetEvent(resume.Get()); }
+    static LRESULT CALLBACK Proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+        if (message == WM_NCCREATE) ::SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(reinterpret_cast<CREATESTRUCTW*>(lParam)->lpCreateParams));
+        auto* self = reinterpret_cast<BusyTarget*>(::GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+        if (!self) return ::DefWindowProcW(hwnd, message, wParam, lParam);
+        switch (message) {
+            // A client-drawn frame like Chromium's. A standard frame also works, but Windows may give it
+            // shapes of its own on resize (observed), which would replace the clip under test.
+            case WM_NCCALCSIZE: if (wParam) return 0; break;
+            case kHang: (void)::WaitForSingleObject(self->resume.Get(), 30000); return 0;
+            case kResizeWithStall: {
+                RECT bounds{}; ::GetWindowRect(hwnd, &bounds);
+                ::SetWindowPos(hwnd, nullptr, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top - 60, SWP_NOZORDER | SWP_NOACTIVATE);
+                self->stallNextPosition = true;
+                return 0;
+            }
+            case WM_WINDOWPOSCHANGING:
+                if (self->stallNextPosition.exchange(false)) { ++self->stalledPositions; ::Sleep(1200); }
+                break;
+            case WM_TIMER: ::InvalidateRect(hwnd, nullptr, FALSE); return 0;
+            case WM_PAINT: {
+                PAINTSTRUCT paint{}; HDC dc = ::BeginPaint(hwnd, &paint);
+                const int value = ++self->paints;
+                if (HBRUSH brush = ::CreateSolidBrush(RGB(value * 7 % 256, value * 13 % 256, 60))) { RECT client{}; ::GetClientRect(hwnd, &client); ::FillRect(dc, &client, brush); ::DeleteObject(brush); }
+                ::EndPaint(hwnd, &paint);
+                return 0;
+            }
+            case WM_DESTROY: ::PostQuitMessage(0); return 0;
+            default: break;
+        }
+        return ::DefWindowProcW(hwnd, message, wParam, lParam);
+    }
+};
+// The guard's rounded clip, as opposed to no region or a shape Windows gives a frame of its own
+// (observed: one rectangle while maximized, four matching the window's size once restored). Rounded
+// corners make the clip dozens of rectangles.
+bool Clipped(HWND window) {
+    platform::UniqueRegion region(::CreateRectRgn(0, 0, 0, 0));
+    if (::GetWindowRgn(window, region.Get()) == ERROR) return false;
+    const DWORD size = ::GetRegionData(region.Get(), 0, nullptr);
+    std::vector<std::byte> bytes(size);
+    if (!size || ::GetRegionData(region.Get(), size, reinterpret_cast<RGNDATA*>(bytes.data())) != size) return false;
+    return reinterpret_cast<const RGNDATAHEADER*>(bytes.data())->nCount >= 8;
+}
+void Note(const WindowCornerGuardStatistics& statistics) {
+    TEST_NOTE("guard counters: events=" + std::to_string(statistics.events.load()) + " sweeps=" + std::to_string(statistics.sweeps.load()) +
+              " fullSweeps=" + std::to_string(statistics.fullSweeps.load()) + " leaseRefreshes=" + std::to_string(statistics.leaseRefreshes.load()) +
+              " regionWrites=" + std::to_string(statistics.regionWrites.load()) + " pendingWrites=" + std::to_string(statistics.pendingWrites.load()) +
+              " deferrals=" + std::to_string(statistics.deferrals.load()) + " longestSweepMs=" + std::to_string(statistics.longestSweepMicros.load() / 1000));
+}
+}  // namespace
+
+AETHER_TEST("window corners native: a hung target keeps its clip while a healthy changing target stays served (AS4-03)") {
+    BusyTarget hung, healthy;
+    WindowCornerGuardStatistics statistics;
+    OwnGuard guard(std::vector<HWND>{hung.window, healthy.window}, nullptr, &statistics);
+    REQUIRE(guard.Ready());
+    REQUIRE(PumpUntil([&] { return Clipped(hung.window) && Clipped(healthy.window); }));
+    hung.Hang();
+    REQUIRE(PumpUntil([&] { const int before = hung.paints.load(); ::Sleep(60); return hung.paints.load() == before; }));
+    // The healthy target changes while the other one does not answer. Before the correction the guard
+    // wrote into the hung target and blocked, so this restore never completed.
+    const auto started = std::chrono::steady_clock::now();
+    ::ShowWindow(healthy.window, SW_RESTORE);
+    CHECK(PumpUntil([&] { return !Clipped(healthy.window); }, std::chrono::seconds(3)));
+    const auto served = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+    TEST_NOTE("healthy target restored after " + std::to_string(served) + " ms with another target hung");
+    ::ShowWindow(healthy.window, SW_SHOWMAXIMIZED);
+    BetweenBars(healthy.window);
+    CHECK(PumpUntil([&] { return Clipped(healthy.window); }, std::chrono::seconds(3)));
+    const int healthyPaints = healthy.paints.load();
+    CHECK(PumpUntil([&] { return healthy.paints.load() > healthyPaints + 5; }, std::chrono::seconds(2)));  // its content keeps changing
+    CHECK(Clipped(hung.window));  // nothing was written into, or taken away from, the hung target
+    Note(statistics);
+    // Once it answers again its restoration completes, conditionally and exactly once.
+    hung.Resume();
+    const int hungPaints = hung.paints.load();
+    CHECK(PumpUntil([&] { return hung.paints.load() > hungPaints; }, std::chrono::seconds(3)));
+    ::ShowWindow(hung.window, SW_RESTORE);
+    CHECK(PumpUntil([&] { return !Clipped(hung.window); }, std::chrono::seconds(6)));
+    REQUIRE(guard.Finish());
+    CHECK_EQ(guard.exitCode.load(), 0);
+    CHECK(PumpUntil([&] { return !Clipped(healthy.window); }, std::chrono::seconds(2)));  // the target applies it on its own thread
+    Note(statistics);
+}
+
+AETHER_TEST("window corners native: a target stalling inside a region write costs the others only a bounded wait (AS4-03)") {
+    BusyTarget slow, healthy;
+    WindowCornerGuardStatistics statistics;
+    OwnGuard guard(std::vector<HWND>{slow.window, healthy.window}, nullptr, &statistics);
+    REQUIRE(guard.Ready());
+    REQUIRE(PumpUntil([&] { return Clipped(slow.window) && Clipped(healthy.window); }));
+    // A resize only reaches the guard's writer when it changes the clip; a few tries always do.
+    for (int attempt = 0; attempt < 5 && !slow.stalledPositions.load(); ++attempt) {
+        REQUIRE(::PostMessageW(slow.window, kResizeWithStall, 0, 0));
+        (void)PumpUntil([&] { return slow.stalledPositions.load() >= 1; }, std::chrono::seconds(1));
+    }
+    REQUIRE(slow.stalledPositions.load() >= 1);
+    if (statistics.pendingWrites.load() + statistics.deferrals.load() == 0) {
+        // Windows gave the resized frame a shape of its own, so the stall was never the guard's write.
+        (void)PumpUntil([&] { return statistics.pendingWrites.load() + statistics.deferrals.load() > 0; }, std::chrono::milliseconds(300));
+    }
+    const bool stalledTheGuard = statistics.pendingWrites.load() + statistics.deferrals.load() > 0;
+    const auto started = std::chrono::steady_clock::now();
+    ::ShowWindow(healthy.window, SW_RESTORE);
+    const auto shown = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+    CHECK(PumpUntil([&] { return !Clipped(healthy.window); }, std::chrono::seconds(8)));
+    const auto served = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+    TEST_NOTE("ShowWindow returned after " + std::to_string(shown) + " ms");
+    CHECK(served < 1200);  // not held up for the slow target's whole stall
+    TEST_NOTE("healthy target restored after " + std::to_string(served) + " ms beside a stalled write");
+    if (!stalledTheGuard) {
+        test::Note("this run's stall did not reach the guard: the healthy-target bound above still held");
+        REQUIRE(guard.Finish());
+        return;
+    }
+    // The stalled write lands and is adopted: the slow target stays clipped and owned, without a retry storm.
+    CHECK(PumpUntil([&] { return Clipped(slow.window); }, std::chrono::seconds(4)));
+    REQUIRE(PumpUntil([&] { const auto writes = statistics.regionWrites.load(); ::Sleep(300); return statistics.regionWrites.load() == writes; }, std::chrono::seconds(6)));
+    Note(statistics);
+    REQUIRE(guard.Finish());
+    CHECK_EQ(guard.exitCode.load(), 0);
+    CHECK(PumpUntil([&] { return !Clipped(slow.window); }, std::chrono::seconds(2)));
+}
+
+// D56: the owner's rule. Rounding belongs to a maximized window between the bars; with both bars hidden it
+// takes the whole screen. (The earlier AS4-06 correction had this the wrong way round.)
+AETHER_TEST("window corners native: a maximize filling the monitor stays square and rounds again between the bars") {
+    BusyTarget target;
+    OwnGuard guard(std::vector<HWND>{target.window}, nullptr);
+    REQUIRE(guard.Ready());
+    REQUIRE(PumpUntil([&] { return Clipped(target.window); }));
+    // What both bars auto-hidden gives a maximized window: its visible frame covers the whole monitor.
+    // Simulated on this one window, so the real work area and other windows are never touched.
+    RECT native{}, frame{}; REQUIRE(::GetWindowRect(target.window, &native));
+    REQUIRE(SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_EXTENDED_FRAME_BOUNDS, &frame, sizeof(frame))));
+    MONITORINFO monitor{sizeof(monitor)}; REQUIRE(::GetMonitorInfoW(::MonitorFromWindow(target.window, MONITOR_DEFAULTTONEAREST), &monitor));
+    const RECT full{monitor.rcMonitor.left - (frame.left - native.left), monitor.rcMonitor.top - (frame.top - native.top),
+                    monitor.rcMonitor.right + (native.right - frame.right), monitor.rcMonitor.bottom + (native.bottom - frame.bottom)};
+    REQUIRE(::SetWindowPos(target.window, nullptr, full.left, full.top, full.right - full.left, full.bottom - full.top, SWP_NOZORDER | SWP_NOACTIVATE));
+    REQUIRE(PumpUntil([&] {
+        RECT now{}; return SUCCEEDED(::DwmGetWindowAttribute(target.window, DWMWA_EXTENDED_FRAME_BOUNDS, &now, sizeof(now))) && now.top <= monitor.rcMonitor.top && now.bottom >= monitor.rcMonitor.bottom;
+    }));
+    REQUIRE(::IsZoomed(target.window));
+    CHECK(PumpUntil([&] { return !Clipped(target.window); }, std::chrono::seconds(3)));
+    REQUIRE(guard.Finish());
+}
+
+// D56: Chromium keeps a maximized window to the work area with a plain rectangular region, which ended the
+// rounding for as long as the window stayed maximized.
+AETHER_TEST("window corners native: a plain rectangle or no region put back is clipped again") {
+    BusyTarget target;
+    OwnGuard guard(std::vector<HWND>{target.window}, nullptr);
+    REQUIRE(guard.Ready());
+    REQUIRE(PumpUntil([&] { return Clipped(target.window); }));
+    RECT bounds{}; REQUIRE(::GetWindowRect(target.window, &bounds));
+    HRGN plain = ::CreateRectRgn(0, 0, bounds.right - bounds.left, bounds.bottom - bounds.top);
+    REQUIRE(plain != nullptr);
+    REQUIRE(::SetWindowRgn(target.window, plain, TRUE) != 0);
+    CHECK_FALSE(Clipped(target.window));
+    CHECK(PumpUntil([&] { return Clipped(target.window); }, std::chrono::seconds(4)));
+    REQUIRE(::SetWindowRgn(target.window, nullptr, TRUE) != 0);
+    CHECK_FALSE(Clipped(target.window));
+    CHECK(PumpUntil([&] { return Clipped(target.window); }, std::chrono::seconds(4)));
+    REQUIRE(guard.Finish());
 }
