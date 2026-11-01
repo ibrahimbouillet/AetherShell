@@ -2933,3 +2933,10 @@ publication as 3.3, Latest. **Executed, fresh Release `/W4 /WX`, `0.3.3-alpha.3`
 the bars' return after a real Show desktop, which automated tests do not trigger on the owner's desktop; joining a real network;
 the welcome at a real sign-in; a real browser's corners. The owner reported 3.1 as "very good" apart from the Top Bar, which is
 not a qualification of 3.3. The blank-window report (AS4-01) has still not been reproduced.
+
+**Published (2026-11-01):** commit `d99a501` pushed to `main`; Windows CI run 41330908438 succeeded on that exact commit before
+anything was released. Release [`v0.3.3-alpha.3`](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.3-alpha.3),
+tagged at `d99a501`, marked Latest and not pre-release, with exactly two assets: `AetherShell-0.3.3-alpha.3-win-x64-setup.exe`,
+6696960 bytes, SHA-256 `dea9ed815d43123501c6d5a93fbed73f3967e1f6056c35bccb5ec27459609e52`, and its checksums file. No manifest
+was uploaded. The package privacy audit passed. Downloaded back from the release, the setup matches its checksums file and the local
+build. The API reports this tag as latest. Alpha 3 and the earlier releases remain available.
