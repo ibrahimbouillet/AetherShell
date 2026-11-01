@@ -2864,3 +2864,8 @@ the real registry path of AS4-18/21, which a private session refuses by design; 
 what the owner has reported. The trial open on the owner's machine predates all of this.
 
 **Owner direction D57:** from here on, finished work ends in a commit and a test build.
+
+**Test build 3.1:** `AetherShell-0.3.1-alpha.3-win-x64-setup.exe`, 6696448 bytes, SHA-256
+`8443491772d6523129020c17d921561c97fc6c906108a214b704ff5e8c50f349`, built by `scripts/package.ps1` from commit `bb353f7`
+in a fresh directory with warnings as errors; the package privacy audit passed. Not pushed, tagged or published. The setup
+itself has not been run: installing it, and going back from it to the published Alpha 3, are untested.
