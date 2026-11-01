@@ -34,8 +34,8 @@ const Tables& Data() {
 constexpr int kCedilla = 0x0327;
 constexpr float kBaseline = 0.0f;       // grid height of the line the letters stand on
 constexpr float kXHeight = 50.0f;       // grid height of a lowercase letter
-constexpr float kMinimumDuration = 3.6f, kMaximumDuration = 6.2f;  // seconds of writing
-constexpr float kGridSpeed = 170.0f;                               // grid units per second of a calm hand
+constexpr float kWritingSeconds = 1.5f;                            // D59: the whole writing, whatever the name's length
+constexpr float kGridSpeed = 170.0f;                               // the pace within it: only proportions matter
 constexpr float kSpacing = 2.5f;                                   // DIPs between sampled points
 constexpr float kLineGap = 12.0f;                                  // grid units between two lines
 constexpr float kJoinMerge = 5.0f;      // grid units: a letter starting this close to the last one's end joins it
@@ -299,8 +299,7 @@ void AnimatePen(WelcomeScene& scene, float unit) {
         ++strokeIndex;
     }
     scene.inkLength = inkTotal;
-    // The whole writing stays within a comfortable, bounded time, whatever the name's length.
-    const float wanted = std::clamp(inkTotal / speed, kMinimumDuration, kMaximumDuration);
+    const float wanted = kWritingSeconds;
     const float scale = clock > 0.0f ? wanted / clock : 1.0f;
     for (auto& stroke : scene.strokes) for (auto& point : stroke.points) point.time *= scale;
     scene.inkDuration = clock > 0.0f ? wanted : 0.0f;

@@ -7,7 +7,13 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 3, test 3.2 (`0.3.2-alpha.3`, S-065, 2026-11-01)
+## Current checkpoint — 3.3 published as Latest (`0.3.3-alpha.3`, S-066, D59, 2026-11-01)
+
+Receipts of the push, CI and release are at the end of TEST_STATUS S-066. The owner's installed copy is still Alpha 3 unless
+the owner has installed since. Sign-in startup is off there. Next: the new features the owner announced and has not named yet,
+and whatever real use of 3.3 shows. Test builds after this one count from `0.3.4-alpha.3` (D57).
+
+## Earlier today — Alpha 3, test 3.2 (`0.3.2-alpha.3`, S-065, 2026-11-01)
 
 The owner reports that everything in 3.1 is very good except the Top Bar's timing. The cause was measured for the first time and
 corrected (D58): the one second now starts anywhere in the place the bar appears. Watch for its price: a pointer resting on a

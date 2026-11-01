@@ -11,9 +11,9 @@
 
 namespace aether::welcome {
 namespace {
-constexpr double kStillReadingSeconds = 3.0;  // without motion: long enough to read two words
-constexpr double kReadingHoldSeconds = 1.4;   // the finished words stay a moment before they leave
-constexpr double kFadeOutSeconds = 0.5;       // the whole screen eases back to the desktop
+constexpr double kStillReadingSeconds = 2.0;  // without motion: the same two seconds
+constexpr double kReadingHoldSeconds = 0.5;   // D59: two seconds in all, the writing included
+constexpr double kFadeOutSeconds = 0.3;       // the whole screen eases back to the desktop
 
 D2D1_COLOR_F SystemColor(int index) {
     const COLORREF color = ::GetSysColor(index);

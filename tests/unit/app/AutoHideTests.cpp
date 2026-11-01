@@ -82,22 +82,22 @@ AETHER_TEST("auto-hide: a bar in use when a window comes over it is not pulled a
     CHECK(bar.Step(true));
 }
 
-// D52, D56: the Top Bar's own timing. Samples are 50 ms apart, so index 20 is one second after index 0.
-AETHER_TEST("auto-hide: the Top Bar reveals only after a second on its edge") {
+// D52, D59: the Top Bar's own timing. Samples are 50 ms apart, so index 10 is half a second after index 0.
+AETHER_TEST("auto-hide: the Top Bar reveals only after half a second in its place") {
     Bar bar{AutoHideState{kTopBarAutoHideTiming}};
     REQUIRE(bar.Step(true));
-    for (int i = 0; i < 20; ++i) CHECK(bar.Step(true, false, true));  // 0 to 950 ms on the edge
-    CHECK_FALSE(bar.Step(true, false, true));                         // 1000 ms: revealed
+    for (int i = 0; i < 10; ++i) CHECK(bar.Step(true, false, true));  // 0 to 450 ms there
+    CHECK_FALSE(bar.Step(true, false, true));                         // 500 ms: revealed
     CHECK_FALSE(bar.Step(true, false, true));                         // and it stays while the pointer rests there
 }
 
-AETHER_TEST("auto-hide: leaving the edge before the second is up cancels the Top Bar's reveal") {
+AETHER_TEST("auto-hide: leaving before the wait is up cancels the Top Bar's reveal") {
     Bar bar{AutoHideState{kTopBarAutoHideTiming}};
     REQUIRE(bar.Step(true));
-    for (int i = 0; i < 20; ++i) REQUIRE(bar.Step(true, false, true));  // 950 ms: just short of it
+    for (int i = 0; i < 10; ++i) REQUIRE(bar.Step(true, false, true));  // 450 ms: just short of it
     CHECK(bar.Step(true));                                              // moved away: still hidden
     // Coming back starts a whole new wait, not the remaining 50 ms.
-    for (int i = 0; i < 20; ++i) CHECK(bar.Step(true, false, true));
+    for (int i = 0; i < 10; ++i) CHECK(bar.Step(true, false, true));
     CHECK_FALSE(bar.Step(true, false, true));
 }
 
@@ -137,13 +137,13 @@ AETHER_TEST("auto-hide: resetting a bar forgets its state but keeps its own timi
     (void)top.Update(sample(1000, true));
     top.Reset();
     CHECK(top.Update(sample(2000, true)));          // the wait restarted here
-    CHECK(top.Update(sample(2950, true)));          // a default 40 ms dwell would have revealed long ago
-    CHECK_FALSE(top.Update(sample(3000, true)));
+    CHECK(top.Update(sample(2450, true)));          // a default 40 ms dwell would have revealed long ago
+    CHECK_FALSE(top.Update(sample(2500, true)));
 }
 
 AETHER_TEST("auto-hide: the Dock keeps its short dwell") {
     CHECK_EQ(AutoHideTiming{}.revealDwellMs, 40u);
-    CHECK_EQ(kTopBarAutoHideTiming.revealDwellMs, 1000u);
+    CHECK_EQ(kTopBarAutoHideTiming.revealDwellMs, 500u);
     CHECK_EQ(kTopBarAutoHideTiming.hideDelayMs, AutoHideTiming{}.hideDelayMs);
 }
 
@@ -170,8 +170,8 @@ AETHER_TEST("auto-hide: the Top Bar's zone is where the bar appears, at any scal
 
 // D58, the path measured on the owner's machine: at 150 % the hand stopped 52 pixels from the top, in the
 // middle of where the bar appears, and rested there 2.6 s before going on to the very top. The bar came out
-// 4.9 s after the hand arrived. It must come out one second after, wherever in that place the hand stopped.
-AETHER_TEST("auto-hide: a hand stopping where the bar appears gets it one second later") {
+// 4.9 s after the hand arrived. It must come out half a second after, wherever in that place the hand stopped.
+AETHER_TEST("auto-hide: a hand stopping where the bar appears gets it half a second later") {
     const RECT monitor{0, 0, 1920, 1080};
     const float reach = TopBarReachDip(6, 32);
     AutoHideState top{kTopBarAutoHideTiming};
@@ -186,9 +186,9 @@ AETHER_TEST("auto-hide: a hand stopping where the bar appears gets it one second
     CHECK(at(0, 127));           // on its way, rested just below: not yet
     CHECK(at(1950, 127));
     CHECK(at(2000, 52));         // there
-    CHECK(at(2950, 52));
-    CHECK_FALSE(at(3000, 52));   // and one second later, out
-    CHECK_EQ(top.EdgeRestMs(3000), 1000u);
+    CHECK(at(2450, 52));
+    CHECK_FALSE(at(2500, 52));   // and half a second later, out
+    CHECK_EQ(top.EdgeRestMs(2500), 500u);
     // Passing through on the way to something below is no reason to come out.
     AutoHideState passing{kTopBarAutoHideTiming};
     const auto through = [&](std::uint64_t now, LONG y) {
@@ -199,9 +199,17 @@ AETHER_TEST("auto-hide: a hand stopping where the bar appears gets it one second
         value.nearEdge = PointerOnTopEdge(pointer, monitor, 144, reach + kTopEdgeWobbleDip);
         return passing.Update(value);
     };
-    for (std::uint64_t now = 0; now < 900; now += 50) CHECK(through(now, 30));
-    CHECK(through(900, 200));
+    for (std::uint64_t now = 0; now < 450; now += 50) CHECK(through(now, 30));
+    CHECK(through(450, 200));
     CHECK(through(5000, 200));
+}
+
+// D59: back on the desktop, both bars return, with windows still behind it. What counts as the desktop:
+AETHER_TEST("auto-hide: only the desktop's own windows count as being back on the desktop") {
+    CHECK(IsDesktopWindowClass(L"Progman"));
+    CHECK(IsDesktopWindowClass(L"WorkerW"));
+    for (const auto* other : {L"", L"Chrome_WidgetWin_1", L"ApplicationFrameWindow", L"Shell_TrayWnd", L"CabinetWClass", L"progman"})
+        CHECK_FALSE(IsDesktopWindowClass(other));
 }
 
 // D54: with the pointer resting by hand, one pixel of movement used to restart the wait. Here the hand
@@ -218,8 +226,8 @@ AETHER_TEST("auto-hide: a wobbling hand still reveals the Top Bar on time, not l
         const bool wobbled = (now / 100) % 6 == 5;  // briefly a few pixels down, still by the edge
         if (!top.Update(sample(now, !wobbled, true))) revealedAt = now;
     }
-    CHECK_EQ(revealedAt, 2000u);
-    CHECK_EQ(top.EdgeRestMs(2000), 1000u);
+    CHECK_EQ(revealedAt, 1500u);
+    CHECK_EQ(top.EdgeRestMs(1500), 500u);
 }
 
 AETHER_TEST("auto-hide: moving really away still cancels, and being near never starts the wait") {
@@ -232,13 +240,13 @@ AETHER_TEST("auto-hide: moving really away still cancels, and being near never s
     for (std::uint64_t now = 0; now < 4000; now += 50) CHECK(top.Update(sample(now, false, true)));  // a tab just below the edge
     CHECK_EQ(top.EdgeRestMs(4000), 0u);
     CHECK(top.Update(sample(4000, true, true)));
-    CHECK(top.Update(sample(4900, false, true)));   // the wait is still running
-    CHECK(top.Update(sample(4950, false, false)));  // gone, just before the end
-    CHECK_EQ(top.EdgeRestMs(4950), 0u);
-    CHECK(top.Update(sample(5000, false, true)));   // near again does not resume it
-    CHECK(top.Update(sample(5050, true, true)));    // a whole new wait
-    CHECK(top.Update(sample(6000, true, true)));
-    CHECK_FALSE(top.Update(sample(6050, true, true)));
+    CHECK(top.Update(sample(4400, false, true)));   // the wait is still running
+    CHECK(top.Update(sample(4450, false, false)));  // gone, just before the end
+    CHECK_EQ(top.EdgeRestMs(4450), 0u);
+    CHECK(top.Update(sample(4500, false, true)));   // near again does not resume it
+    CHECK(top.Update(sample(4550, true, true)));    // a whole new wait
+    CHECK(top.Update(sample(5000, true, true)));
+    CHECK_FALSE(top.Update(sample(5050, true, true)));
     // The Dock passes no near state: its behaviour is unchanged.
     AutoHideState dock;
     CHECK(dock.Update(sample(0, true, false)));

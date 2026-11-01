@@ -137,6 +137,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - **D48–D50 (2026-10-27):** Alpha 3 (`0.3.0-alpha.3`) is published: `main`, tag `v0.3.0-alpha.3`
   and its GitHub Release (Latest, setup and checksums only), installed by the owner over Alpha 2. Do
   not move the tag or republish; a later release or installation needs the owner's explicit approval.
+- **D59 (2026-11-01):** 3.3 (`0.3.3-alpha.3`) is published: `main`, tag `v0.3.3-alpha.3` and its GitHub Release (Latest, setup
+  and checksums only). Do not move the tag or republish; the owner's installed copy is still Alpha 3 until the owner installs.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.

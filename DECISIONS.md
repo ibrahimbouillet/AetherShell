@@ -111,6 +111,22 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D59 — Version 3.3 is published as the Latest release; half a second, two seconds, and the desktop
+
+Owner instruction, 2026-11-01. The source goes public as **3.3**, version `0.3.3-alpha.3`, a normal GitHub Release marked
+Latest, in place of Alpha 3 for new downloads. It is not called Alpha 4 and is not presented as the end of the next version.
+The owner first asked for a pre-release, then settled on this in the same exchange. Work continues on top of it.
+
+- **Top Bar:** half a second in its place (D58). The owner also said "le prochain raccordement, tu mets à 0.25", whose
+  object is not certain; 0.5 s is what the owner said of the bar itself. A smaller number brings the bar over a browser's tabs sooner.
+- **Back on the desktop, both bars return,** even with windows behind it: nothing counts as covering a bar while the desktop
+  itself is in front (Show desktop, a click on it). The covering check returns to four times a second, because halving it
+  did not lower the idle cost and it delays the bars' return.
+- **The welcome takes about two seconds:** 1.5 s of writing whatever the length, 0.5 s to read, then a 0.3 s fade. The hard
+  deadline falls to 6 s. Its font and look stay as they are, at the owner's word.
+
+The owner also announced new features to come; none was named, so none is in 3.3.
+
 ### D58 — The Top Bar comes out one second after the pointer reaches its place
 
 Owner instruction, 2026-11-01: one second, not two ("au bout de la seconde, le top bar s'affiche"). Test build 3.1 already
@@ -166,8 +182,7 @@ Owner instruction, 2026-11-01, after trying D54 and D55:
 Also done from the handoff: AS4-18 (Settings says what Windows will really do at sign-in, and Apply repairs a lost
 registration while a Task Manager turn-off stays Windows'); AS4-21 (a failed save puts the registration back); AS4-05 (a
 new guard takes over the exact clip of a guard that died, and removes it on release); and startup diagnostics for AS4-02.
-Auto-Hide now walks every window twice a second instead of four times, which did not visibly lower the idle cost (S-064), so
-that remains open. AS4-23 stays open: its update path is dormant while signed updates are unavailable.
+Walking the windows less often did not visibly lower the idle cost (S-064), so that remains open. AS4-23 stays open: its update path is dormant while signed updates are unavailable.
 
 Unchanged and recorded: Aether's own Settings window keeps its rounded frame when maximized, whatever the bars do.
 Evidence and limits: TEST_STATUS S-064.

@@ -2,14 +2,14 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The current release is Alpha 3, `0.3.0-alpha.3` (D48–D50, published 2026-10-27); `0.2.0-alpha.2`
+The current release is 3.3, `0.3.3-alpha.3` (D59, published 2026-11-01); `0.3.0-alpha.3`, `0.2.0-alpha.2`
 and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI
 receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
 
-- Test build 3.1 (D56, S-064): joining a Wi-Fi network has not been run for real, because tests never change the real
+- 3.3 (D56, D59, S-064, S-066): joining a Wi-Fi network has not been run for real, because tests never change the real
   connection; reading the list was checked once by count. Listing can fail when Windows' Location privacy setting is off,
   which the panel says. Rounding of Chrome is established from source and not yet observed.
-- V4 source state (S-061, not released): touch has only been exercised with synthetic contacts, and the
+- Since 3.3 (S-061): touch has only been exercised with synthetic contacts, and the
   hidden-bar edge swipe's digitizer path has never run on a device. The welcome's lock-time cover has not
   run at a real lock, and no greeting has run at a real sign-in; its 12 s deadline runs on the UI thread. It
   covers the primary monitor only, so other monitors show the desktop. At sign-in it cannot appear before
@@ -141,7 +141,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
   than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the
   primary one, that edge is not a hard stop: the pointer has to rest on it briefly (D52, D54: the Top Bar
-  needs a second at the top of the primary monitor, where it appears, which a monitor above makes harder to
+  needs half a second at the top of the primary monitor, where it appears, which a monitor above makes harder to
   hold; the Dock's check still counts a monitor below as its edge). The pointer and
   window bounds are sampled every 50 ms only while Auto-Hide is on. Edge reveal, animation and real
   applications still need the owner's check; multi-monitor setups are unverified.

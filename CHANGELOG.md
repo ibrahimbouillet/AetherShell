@@ -6,11 +6,16 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.3-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.3-alpha.3) — 2026-11-01
+
+Version 3.3, published as the Latest release (D59). Release notes:
+[docs/releases/0.3.3-alpha.3.md](docs/releases/0.3.3-alpha.3.md).
+
 ### Added
 
 - **Handwritten welcome** (FR-041, D53, D54): an optional greeting after sign-in and unlock, filling the screen
   with original strokes and a calligrapher's pen over your blurred desktop picture, with the bars held back until it ends, in French or English, with an optional local
-  name. On by default, skippable. After a lock it is already there when you unlock, before the desktop.
+  name. It takes about two seconds. On by default, skippable. After a lock it is already there when you unlock, before the desktop.
 - **Wi-Fi networks in Quick Settings** (D56): see the networks around you and their signal, and join one, with its
   password if it needs one. Windows keeps the password. Names and passwords are never logged or sent.
 - **Complete touch** (FR-040): direct pan, fling and elastic return across Settings, menus and Search,
@@ -43,8 +48,9 @@ causes have not been reproduced.
 - **Quick Settings scrolls under the finger** (D55): the pages follow a pan up and down, and settle on release.
 - **Rounded corners only between the bars** (D56): with both bars hidden, a maximized window takes the whole screen,
   square. Browsers keep their rounded corners between the bars instead of losing them for good.
-- **Top Bar Auto-Hide comes out after a second** (D52, D54, D56, D58): the pointer must rest for a second where the
-  bar appears, at the top of the screen, before the bar returns, and moving away sooner cancels it, so a quick visit to
+- **Back on the desktop, both bars return** (D59), even with windows still behind it.
+- **Top Bar Auto-Hide comes out after half a second** (D52, D54, D56, D58, D59): the pointer must rest for half a second
+  where the bar appears, at the top of the screen, before the bar returns, and moving away sooner cancels it, so a quick visit to
   a button near the top no longer puts the bar over it. A small movement of a resting hand does not restart
   the wait. A monitor above the primary one no longer counts as that edge. The Dock's reveal and the Top
   Bar's other reasons to show are unchanged.

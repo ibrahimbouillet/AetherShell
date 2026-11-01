@@ -15,7 +15,7 @@
 namespace aether::welcome {
 
 struct WelcomeTiming {
-    std::uint64_t deadlineMs = 12000;        // the hard limit on any presentation
+    std::uint64_t deadlineMs = 6000;         // the hard limit on any presentation
     std::uint64_t duplicateWindowMs = 3000;  // a repeat notification this soon is the same event
 };
 

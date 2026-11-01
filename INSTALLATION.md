@@ -1,7 +1,7 @@
 # Installation
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
-The current release, Alpha 3 [0.3.0-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.0-alpha.3),
+The current release, 3.3 [0.3.3-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.3-alpha.3),
 is a manual-install preview; wider Version 1 qualification remains open. The earlier
 [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) remains available.
 
@@ -25,7 +25,7 @@ Unsigned application/setup binaries can trigger SmartScreen. This alpha has no A
 publisher certificate. Check the exact release source and SHA-256 before deciding to run it:
 
 ```powershell
-Get-FileHash .\AetherShell-0.3.0-alpha.3-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\AetherShell-0.3.3-alpha.3-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Compare with the corresponding checksums asset. A checksum alone does not authenticate a publisher.

@@ -50,8 +50,14 @@ constexpr std::array<std::wstring_view, 8> kShellClasses{
 
 }  // namespace
 
+bool IsDesktopWindowClass(std::wstring_view name) noexcept { return name == L"Progman" || name == L"WorkerW"; }
+
 bool ApplicationWindowCovers(const RECT& zone) noexcept {
     if (zone.right <= zone.left || zone.bottom <= zone.top) return false;
+    try {
+        if (const HWND front = ::GetForegroundWindow(); front && IsDesktopWindowClass(platform::WindowClassName(front))) return false;
+    } catch (...) {
+    }
     struct Search { RECT zone; DWORD self; bool found = false; } search{zone, ::GetCurrentProcessId()};
     ::EnumWindows([](HWND window, LPARAM parameter) -> BOOL {
         auto& state = *reinterpret_cast<Search*>(parameter);

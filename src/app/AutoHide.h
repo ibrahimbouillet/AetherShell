@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <string_view>
 
 namespace aether::app {
 
@@ -22,10 +23,10 @@ struct AutoHideTiming {
     std::uint64_t revealDwellMs = 40;  // on the edge this long: sweeping across the edge does not reveal
     std::uint64_t hideDelayMs = 700;   // after the last use, before hiding again
 };
-// D56, D58: one second, the owner's number.
-inline constexpr AutoHideTiming kTopBarAutoHideTiming{.revealDwellMs = 1000};
+// D56, D58, D59: half a second, the owner's number.
+inline constexpr AutoHideTiming kTopBarAutoHideTiming{.revealDwellMs = 500};
 
-// D58: the second starts when the pointer reaches the place where the bar appears, its margin and height
+// D58: the wait starts when the pointer reaches the place where the bar appears, its margin and height
 // from the top of the screen. Measured on the owner's machine, a hand going to the bar stopped there, in the
 // middle of it, for 2.6 s: when only the last rows of pixels counted, that time did not count at all. A
 // wobble of the hand just below that place does not restart the wait; a real move away cancels it (D54).
@@ -71,6 +72,9 @@ private:
 // Whether a visible application window overlaps `zone` (physical screen pixels): not minimized,
 // cloaked, click-through, a tool window, the desktop, the shell's own windows or this process.
 // Only window classes, styles and bounds are read.
+// D59: nothing covers a bar while the desktop itself is in front (Show desktop, a click on it), even with
+// windows still behind it: back on the desktop, both bars return.
 [[nodiscard]] bool ApplicationWindowCovers(const RECT& zone) noexcept;
+[[nodiscard]] bool IsDesktopWindowClass(std::wstring_view name) noexcept;
 
 }  // namespace aether::app

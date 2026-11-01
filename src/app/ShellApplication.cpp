@@ -564,7 +564,7 @@ struct ShellApplication::Impl {
         if (autoHideArmed) AutoHideTick();
     }
     // One sample: the pointer position (the screen edges reveal; nothing intercepts input there) every
-    // tick, which application windows cover each bar twice a second: walking every window is the costly part.
+    // tick, which application windows cover each bar four times a second.
     void AutoHideTick() {
         if (closing || !settings || !autoHideArmed) return;
         const auto& value = settings->Current();
@@ -574,7 +574,7 @@ struct ShellApplication::Impl {
         POINT cursor{};
         const bool pointer = ::GetCursorPos(&cursor) != FALSE && cursor.x >= monitor.bounds.left && cursor.x < monitor.bounds.right;
         const auto now = ::GetTickCount64();
-        if (autoHideTick++ % 10 == 0) {
+        if (autoHideTick++ % 5 == 0) {
             topCovered = topOn && ApplicationWindowCovers(topbar->BoundsPx());
             dockCovered = dockOn && ApplicationWindowCovers(dock->PanelBoundsPx());
         }

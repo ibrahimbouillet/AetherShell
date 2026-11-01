@@ -56,8 +56,7 @@ AETHER_TEST("welcome ink: the pen moves continuously, with pen lifts, varying sp
     }
     CHECK(slowest > fastest * 2.0f);        // not a constant-speed plotter
     CHECK(thickest > thinnest * 1.15f);     // and not a constant-width line
-    CHECK(scene.inkDuration >= 3.6f);
-    CHECK(scene.inkDuration <= 6.2f);
+    CHECK_EQ(scene.inkDuration, 1.5f);      // D59: the whole writing
     // Word first, then its dots and crossbars: the i's dot is written after everything else.
     const auto& last = scene.strokes.back().points;
     CHECK(last.front().time > scene.inkDuration * 0.5f);
@@ -73,7 +72,7 @@ AETHER_TEST("welcome ink: writing is deterministic and stays inside the bounds, 
         const auto scene = Scene(greeting, name, 1000.0f, 500.0f);
         CHECK(scene.width <= 1000.5f);
         CHECK(scene.height <= 500.5f);
-        CHECK(scene.inkDuration <= 6.2f);
+        CHECK_EQ(scene.inkDuration, 1.5f);  // whatever the name's length
         for (const auto& stroke : scene.strokes) for (const auto& point : stroke.points) {
             CHECK(point.x >= -30.0f); CHECK(point.x <= 1030.0f);
             CHECK(std::isfinite(point.y)); CHECK(point.width > 0.0f);
@@ -112,9 +111,9 @@ AETHER_TEST("welcome ink: the pen tip follows the line, lifts between strokes an
         longest = std::max(longest, std::hypot(pen->x - previousX, pen->y - previousY));
         previousX = pen->x; previousY = pen->y;
     }
-    CHECK(down > 100);
+    CHECK(down > 60);
     CHECK(lifted > 0);           // "Salut": the t's crossbar is a real lift
-    CHECK(longest < 60.0f);      // it travels, it does not jump
+    CHECK(longest < scene.width * 0.15f);  // it travels, quickly, without jumping across the word
 }
 
 AETHER_TEST("welcome greeting: the explicit language wins, otherwise the Windows display language") {
@@ -219,8 +218,8 @@ AETHER_TEST("welcome lifecycle: nothing can leave the cover in the way") {
     REQUIRE(failed.Locked(true, 1000) == Action::Cover);
     failed.PresentationFailed();
     CHECK_FALSE(failed.Covering());
-    CHECK(WelcomeTiming{}.deadlineMs >= 10000u);  // room for the longest writing and the time to read it
-    CHECK(WelcomeTiming{}.deadlineMs <= 15000u);
+    CHECK(WelcomeTiming{}.deadlineMs >= 3000u);   // room for the writing and the time to read it
+    CHECK(WelcomeTiming{}.deadlineMs <= 8000u);
 }
 
 // D54: "bien plus en grand". A 1280 x 720 DIP screen offers about 1100 x 576 of it.
@@ -235,8 +234,7 @@ AETHER_TEST("welcome ink: it writes large: a word or two fills the room it is gi
     CHECK(Scene(L"Salut", L"Ibrahim", 700.0f, 700.0f).height > Scene(L"Salut", L"Ibrahim", 2000.0f, 300.0f).height);
     // The same hand at any size: writing twice as large takes about the same time, not twice as long.
     const auto tiny = Scene(L"Salut", L"", 500.0f, 240.0f);
-    CHECK(word.inkDuration >= 3.6f);
-    CHECK(std::abs(word.inkDuration - tiny.inkDuration) <= 2.6f);
+    CHECK_EQ(word.inkDuration, tiny.inkDuration);
     CHECK(word.penWidth > tiny.penWidth * 1.8f);
 }
 

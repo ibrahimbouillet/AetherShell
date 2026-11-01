@@ -321,6 +321,9 @@ AETHER_TEST("search UI: equal wheel totals move the selection equally far (AS4-1
     REQUIRE(window.Results().size() > 5u);
     const auto wheel = [&](int delta) { ::SendMessageW(window.Handle(), WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<SHORT>(delta))), 0); };
     const auto selected = [&] { return window.SelectedIndex(); };
+    // From the first row, wherever the real pointer happens to rest: a row under it is selected on opening.
+    wheel(8 * WHEEL_DELTA);
+    REQUIRE_EQ(selected(), 0u);
     wheel(-WHEEL_DELTA);
     CHECK_EQ(selected(), 1u);
     for (int i = 0; i < 12; ++i) wheel(-10);  // one notch in twelve precision packets: one row, not twelve

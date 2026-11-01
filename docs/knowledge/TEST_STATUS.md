@@ -2906,3 +2906,30 @@ Other native suites were not repeated: only the Auto-Hide zone and the version c
 **Test build 3.2:** `AetherShell-0.3.2-alpha.3-win-x64-setup.exe`, 6696960 bytes, SHA-256
 `d0cb9e6ebfb69a0cf5cb479e8a5b7160f3d3b84813f791e7c478368c4f95b824`, built by `scripts/package.ps1` from commit `a037841`; the
 package privacy audit passed. Not pushed, tagged or published, and the setup itself has not been run.
+
+### S-066 — Version 3.3 (Claude, 2026-11-01)
+
+**Owner direction (D59):** half a second for the Top Bar, both bars back on the desktop, about two seconds of welcome, and
+publication as 3.3, Latest. **Executed, fresh Release `/W4 /WX`, `0.3.3-alpha.3`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites |
+| Native: search_ui 13/13, installer 13/13, install 7/7, `window corners native` 9/9 | Pass, on the final build |
+| Native: welcome 9/9, topbar 7/7, controlcenter 20/20, ui 30/30, dock 14/14, settings_ui 36/36 | Pass, before two test-only corrections |
+| Native: ui_form | 31/31 in the last of three runs (below) |
+
+**Failures kept visible:**
+
+- `ui_form` failed 4 of 31, then 1 of 31, then passed 31 of 31 with the same binary, a different case each time (a UI Automation
+  combo, the two motion cases already known from S-061, an acrylic pixel check). All need the desktop undisturbed while it was in
+  use; this is likely and not proven.
+- `search UI: equal wheel totals` failed every time with the real pointer resting on the panel, because a row under the pointer
+  is selected on opening and the test assumed the first row. A test defect: it now starts from the first row itself.
+- The pen tip test's limit was absolute and the pen is faster now: it is now a share of the writing's width.
+
+**Not executed, so not claimed:** the setup itself, including an upgrade over Alpha 3 (temporary-root installer suites only);
+the bars' return after a real Show desktop, which automated tests do not trigger on the owner's desktop; joining a real network;
+the welcome at a real sign-in; a real browser's corners. The owner reported 3.1 as "very good" apart from the Top Bar, which is
+not a qualification of 3.3. The blank-window report (AS4-01) has still not been reproduced.

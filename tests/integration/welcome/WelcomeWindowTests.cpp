@@ -142,7 +142,7 @@ AETHER_TEST("welcome window: it writes with continuous frames, then requests non
     const auto started = graphics::FrameScheduler::Now();
     (void)stage.Pump([&] { return stage.window->WritingFinished(graphics::FrameScheduler::Now()); }, 10000);
     const auto frames = stage.window->RenderedFrames();
-    CHECK(graphics::FrameScheduler::Now() - started >= static_cast<double>(duration) + 1.0);  // and time to read it
+    CHECK(graphics::FrameScheduler::Now() - started >= static_cast<double>(duration) + 0.4);  // and time to read it
     CHECK(frames > static_cast<std::uint64_t>(duration * 20.0f));   // a moving line, not a few steps
     TEST_NOTE("rendered " + std::to_string(frames) + " frames in " + std::to_string(duration) + " s of writing");
     CHECK(stage.window->HasPresented());
