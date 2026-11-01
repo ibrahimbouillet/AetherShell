@@ -22,19 +22,22 @@ struct AutoHideTiming {
     std::uint64_t revealDwellMs = 40;  // on the edge this long: sweeping across the edge does not reveal
     std::uint64_t hideDelayMs = 700;   // after the last use, before hiding again
 };
-// D56: measured on the owner's machine, the old two seconds ran exactly, and still felt like five: the
-// wait only began on the very last rows of pixels, wherever the hand had actually stopped before that.
+// D56, D58: one second, the owner's number.
 inline constexpr AutoHideTiming kTopBarAutoHideTiming{.revealDwellMs = 1000};
 
-// The Top Bar's edge as a hand meets it: the wait starts in the top six DIPs and survives a wobble of
-// the hand within the top sixteen. Only a real move away cancels it (D54, D56).
-inline constexpr float kTopEdgeArrivalDip = 6.0f;
-inline constexpr float kTopEdgeHoldDip = 16.0f;
+// D58: the second starts when the pointer reaches the place where the bar appears, its margin and height
+// from the top of the screen. Measured on the owner's machine, a hand going to the bar stopped there, in the
+// middle of it, for 2.6 s: when only the last rows of pixels counted, that time did not count at all. A
+// wobble of the hand just below that place does not restart the wait; a real move away cancels it (D54).
+inline constexpr float kTopEdgeWobbleDip = 10.0f;
+[[nodiscard]] constexpr float TopBarReachDip(int topMargin, int height) noexcept {
+    return static_cast<float>(topMargin + height);
+}
 
 // Whether the pointer is within `heightDip` of the top of `monitor` (physical pixels; `dpi` is the
 // monitor's). A pointer that went on to a monitor above has left this edge, even though its y
 // coordinate is smaller.
-[[nodiscard]] bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor, UINT dpi, float heightDip = kTopEdgeArrivalDip) noexcept;
+[[nodiscard]] bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor, UINT dpi, float heightDip) noexcept;
 
 // One periodic observation of a bar (the host samples about twenty times a second).
 struct AutoHideSample {

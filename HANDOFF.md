@@ -7,13 +7,18 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 3, test 3.1 (`0.3.1-alpha.3`, S-064, 2026-11-01)
+## Current checkpoint — Alpha 3, test 3.2 (`0.3.2-alpha.3`, S-065, 2026-11-01)
+
+The owner reports that everything in 3.1 is very good except the Top Bar's timing. The cause was measured for the first time and
+corrected (D58): the one second now starts anywhere in the place the bar appears. Watch for its price: a pointer resting on a
+browser's tabs for a second brings the bar over them. The rest of the checkpoint below still holds.
+
+## Earlier today — Alpha 3, test 3.1 (`0.3.1-alpha.3`, S-064, 2026-11-01)
 
 **Committed on `main`, not pushed. The setup is a test build in `dist/`, handed to the owner, not a release (D57).**
 From now on finished work ends in a commit and a test build, with the patch number raised each time.
 
-The owner tried two private builds; read D54-D56 for what that changed. In short: the Top Bar waits 1 s from the top
-6 DIPs; corners round only between the bars, and Chromium no longer loses them for good; the welcome is a full-screen
+The owner tried two private builds; read D54-D56 for what that changed. In short: the Top Bar waits 1 s; corners round only between the bars, and Chromium no longer loses them for good; the welcome is a full-screen
 cover up from the lock, with the bars held back and a calligraphic pen; Quick Settings pages and form sliders follow the
 hand; the Wi-Fi view lists and joins networks. AS4-05, AS4-18 and AS4-21 are done, and startup now logs its stages.
 

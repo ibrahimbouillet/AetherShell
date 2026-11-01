@@ -111,6 +111,20 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D58 — The Top Bar comes out one second after the pointer reaches its place
+
+Owner instruction, 2026-11-01: one second, not two ("au bout de la seconde, le top bar s'affiche"). Test build 3.1 already
+waited one second, but only from the top 6 DIPs. A recording of the pointer's height on the owner's machine showed why it
+still felt long: on one reveal the hand rested 2.6 s at 52 pixels (150 %), the middle of where the bar appears, and the bar
+came out 4.9 s after the hand entered that place. On the top row itself it took about a second every time (998-1172 ms, 7 of 7).
+
+The second now starts anywhere in the place the bar appears, its margin and height from the top of the screen (38 DIPs by
+default), and a wobble within 10 DIPs below it does not restart it. Leaving cancels it, so passing through does nothing.
+
+**The price, and the owner's to judge:** D52 asked for a wait so that the bar would not come over controls near the top of
+a maximized application. A browser's tabs are in this place, so a pointer resting on them for a second brings the bar over
+them. If that is a nuisance, the alternatives are a smaller place or a longer wait; both are one constant.
+
 ### D57 — Every finished piece of work ends in a commit and a test build
 
 Owner instruction, 2026-11-01. When work is finished: commit it and hand over a setup executable. That

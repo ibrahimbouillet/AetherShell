@@ -141,7 +141,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
   than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the
   primary one, that edge is not a hard stop: the pointer has to rest on it briefly (D52, D54: the Top Bar
-  needs a second at the primary monitor's top edge, which a monitor above makes harder to
+  needs a second at the top of the primary monitor, where it appears, which a monitor above makes harder to
   hold; the Dock's check still counts a monitor below as its edge). The pointer and
   window bounds are sampled every 50 ms only while Auto-Hide is on. Edge reveal, animation and real
   applications still need the owner's check; multi-monitor setups are unverified.

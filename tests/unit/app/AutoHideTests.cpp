@@ -147,20 +147,61 @@ AETHER_TEST("auto-hide: the Dock keeps its short dwell") {
     CHECK_EQ(kTopBarAutoHideTiming.hideDelayMs, AutoHideTiming{}.hideDelayMs);
 }
 
-AETHER_TEST("auto-hide: the Top Bar's edge is the top of its monitor, at any scale") {
+AETHER_TEST("auto-hide: the Top Bar's zone is where the bar appears, at any scale") {
     const RECT monitor{-1920, 200, 0, 1280};  // negative and offset coordinates
-    CHECK(PointerOnTopEdge(POINT{-960, 200}, monitor, 96));
-    CHECK(PointerOnTopEdge(POINT{-1920, 200}, monitor, 96));
-    CHECK(PointerOnTopEdge(POINT{-960, 205}, monitor, 96));          // six DIPs at 100 %
-    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 206}, monitor, 96));
-    CHECK(PointerOnTopEdge(POINT{-960, 208}, monitor, 144));         // nine rows at 150 %
-    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 209}, monitor, 144));
-    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 96));    // on a monitor above: it left the edge
-    CHECK_FALSE(PointerOnTopEdge(POINT{0, 200}, monitor, 96));       // right is exclusive
-    CHECK_FALSE(PointerOnTopEdge(POINT{-1921, 200}, monitor, 96));
-    CHECK(PointerOnTopEdge(POINT{-960, 223}, monitor, 144, kTopEdgeHoldDip));        // 24 rows at 150 %
-    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 224}, monitor, 144, kTopEdgeHoldDip));
-    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 144, kTopEdgeHoldDip));
+    const float reach = TopBarReachDip(6, 32);
+    CHECK_EQ(reach, 38.0f);
+    CHECK(PointerOnTopEdge(POINT{-960, 200}, monitor, 96, reach));
+    CHECK(PointerOnTopEdge(POINT{-1920, 200}, monitor, 96, reach));
+    CHECK(PointerOnTopEdge(POINT{-960, 237}, monitor, 96, reach));          // 38 DIPs at 100 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 238}, monitor, 96, reach));
+    CHECK(PointerOnTopEdge(POINT{-960, 256}, monitor, 144, reach));         // 57 rows at 150 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 257}, monitor, 144, reach));
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 96, reach));    // on a monitor above: it left the edge
+    CHECK_FALSE(PointerOnTopEdge(POINT{0, 200}, monitor, 96, reach));       // right is exclusive
+    CHECK_FALSE(PointerOnTopEdge(POINT{-1921, 200}, monitor, 96, reach));
+    CHECK(PointerOnTopEdge(POINT{-960, 271}, monitor, 144, reach + kTopEdgeWobbleDip));        // 72 rows at 150 %
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 272}, monitor, 144, reach + kTopEdgeWobbleDip));
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 199}, monitor, 144, reach + kTopEdgeWobbleDip));
+    // The bar's own settings move the zone with it.
+    CHECK(PointerOnTopEdge(POINT{-960, 257}, monitor, 96, TopBarReachDip(10, 48)));
+    CHECK_FALSE(PointerOnTopEdge(POINT{-960, 258}, monitor, 96, TopBarReachDip(10, 48)));
+}
+
+// D58, the path measured on the owner's machine: at 150 % the hand stopped 52 pixels from the top, in the
+// middle of where the bar appears, and rested there 2.6 s before going on to the very top. The bar came out
+// 4.9 s after the hand arrived. It must come out one second after, wherever in that place the hand stopped.
+AETHER_TEST("auto-hide: a hand stopping where the bar appears gets it one second later") {
+    const RECT monitor{0, 0, 1920, 1080};
+    const float reach = TopBarReachDip(6, 32);
+    AutoHideState top{kTopBarAutoHideTiming};
+    const auto at = [&](std::uint64_t now, LONG y) {
+        const POINT pointer{960, y};
+        AutoHideSample value;
+        value.enabled = true; value.covered = true; value.now = now;
+        value.atEdge = PointerOnTopEdge(pointer, monitor, 144, reach);
+        value.nearEdge = PointerOnTopEdge(pointer, monitor, 144, reach + kTopEdgeWobbleDip);
+        return top.Update(value);
+    };
+    CHECK(at(0, 127));           // on its way, rested just below: not yet
+    CHECK(at(1950, 127));
+    CHECK(at(2000, 52));         // there
+    CHECK(at(2950, 52));
+    CHECK_FALSE(at(3000, 52));   // and one second later, out
+    CHECK_EQ(top.EdgeRestMs(3000), 1000u);
+    // Passing through on the way to something below is no reason to come out.
+    AutoHideState passing{kTopBarAutoHideTiming};
+    const auto through = [&](std::uint64_t now, LONG y) {
+        const POINT pointer{960, y};
+        AutoHideSample value;
+        value.enabled = true; value.covered = true; value.now = now;
+        value.atEdge = PointerOnTopEdge(pointer, monitor, 144, reach);
+        value.nearEdge = PointerOnTopEdge(pointer, monitor, 144, reach + kTopEdgeWobbleDip);
+        return passing.Update(value);
+    };
+    for (std::uint64_t now = 0; now < 900; now += 50) CHECK(through(now, 30));
+    CHECK(through(900, 200));
+    CHECK(through(5000, 200));
 }
 
 // D54: with the pointer resting by hand, one pixel of movement used to restart the wait. Here the hand

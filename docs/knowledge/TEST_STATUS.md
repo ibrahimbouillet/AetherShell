@@ -2879,3 +2879,26 @@ read back ready, with installed settings, binary and startup state unchanged.
   kept running without it, as S-061 expected and had not tried. Nothing then returned to the installed version by itself.
 - **Corrects S-064:** the idle cost did not visibly fall. 6.1 % of one core over 8 s, against 5.5 % before halving the window
   walk, so that walk is not the main cost. The cause is still open.
+
+### S-065 — The Top Bar's wait, measured (Claude, 2026-11-01)
+
+**The owner's report on test 3.1:** everything is very good except the Top Bar, which takes too long; one second is the wish.
+**The first real measure of the hand:** a read-only recording of the pointer's height and the bar's visibility on the owner's
+machine, 150 %, during seven reveals with the 3.1 rule (one second from the top 6 DIPs, 9 pixels):
+
+| Reveal | Within 66 pixels of the top | Within 8 pixels | Longest rests |
+| --- | --- | --- | --- |
+| 1 | **4942 ms** | 1084 ms | **52 px: 2647 ms**, 127 px: 2009 ms, 0 px: 1067 ms |
+| 2-7 | 1015-1631 ms | 998-1544 ms | top row: 998-1172 ms |
+
+So the timer did what it said every time, and the long wait came from a hand stopping in the middle of where the bar appears,
+which did not count. That matches the owner's "almost five seconds" in one reveal of seven; the other six went straight to the
+top and took about a second. S-064's inference is supported; S-062's wobble explanation is not what this recording shows.
+
+**Corrected (D58):** the second starts anywhere in the bar's place. A regression replays the measured path: rest at 127 px, stop
+at 52 px, out exactly one second later; passing through does nothing.
+
+**Executed, fresh Release `/W4 /WX`:** unit gate 25/25 suites, Auto-Hide 14/14, native topbar 7/7, `window corners native` 9/9.
+Other native suites were not repeated: only the Auto-Hide zone and the version changed.
+
+**Not executed:** the owner's hand on this build, and whether a browser's tabs now get in the way (D58's price).

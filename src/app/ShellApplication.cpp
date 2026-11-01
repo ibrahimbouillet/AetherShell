@@ -583,8 +583,9 @@ struct ShellApplication::Impl {
             sample.enabled = true;
             sample.covered = topCovered;
             sample.engaged = topbar->Engaged() || (controls && controls->IsShown()) || hiddenIconsOpen || hiddenIconsPending || now < topTouchUntil;
-            sample.atEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi);
-            sample.nearEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, kTopEdgeHoldDip);
+            const float reach = TopBarReachDip(value.topBar.topMargin, value.topBar.height);
+            sample.atEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, reach);
+            sample.nearEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, reach + kTopEdgeWobbleDip);
             sample.now = now;
             const bool wasHidden = topAutoHide.Hidden();
             const bool hidden = topAutoHide.Update(sample);

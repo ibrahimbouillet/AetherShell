@@ -43,8 +43,8 @@ causes have not been reproduced.
 - **Quick Settings scrolls under the finger** (D55): the pages follow a pan up and down, and settle on release.
 - **Rounded corners only between the bars** (D56): with both bars hidden, a maximized window takes the whole screen,
   square. Browsers keep their rounded corners between the bars instead of losing them for good.
-- **Top Bar Auto-Hide waits a second at the screen edge** (D52, D54, D56): the pointer must rest at the top
-  edge for a second before the bar returns, and moving away sooner cancels it, so a quick visit to
+- **Top Bar Auto-Hide comes out after a second** (D52, D54, D56, D58): the pointer must rest for a second where the
+  bar appears, at the top of the screen, before the bar returns, and moving away sooner cancels it, so a quick visit to
   a button near the top no longer puts the bar over it. A small movement of a resting hand does not restart
   the wait. A monitor above the primary one no longer counts as that edge. The Dock's reveal and the Top
   Bar's other reasons to show are unchanged.

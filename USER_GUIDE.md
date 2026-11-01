@@ -89,7 +89,7 @@ a pan up or down there scrolls the page instead. A Settings slider takes effect 
 **Auto-Hide** (Alpha 3) is set separately for each bar: Settings → Dock → **Automatically hide the
 Dock** and Settings → Top Bar → **Automatically hide the Top Bar**. Both are off by default. An
 auto-hiding bar slides away while an application window covers it. Rest the pointer on the bottom
-edge of the screen to bring the Dock back, or at the top edge for a second to bring the Top Bar
+edge of the screen to bring the Dock back, or where the Top Bar appears, at the top, for a second to bring it
 back; moving away sooner cancels it, so reaching for a button near the top does not open the bar.
 It stays while you use it or one of its
 menus or panels is open, and hides again shortly after. On the desktop, with no window over it, the
