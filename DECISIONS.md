@@ -151,9 +151,9 @@ Owner instruction, 2026-11-01, after trying D54 and D55:
 
 Also done from the handoff: AS4-18 (Settings says what Windows will really do at sign-in, and Apply repairs a lost
 registration while a Task Manager turn-off stays Windows'); AS4-21 (a failed save puts the registration back); AS4-05 (a
-new guard takes over the exact clip of a guard that died, and removes it on release); startup diagnostics for AS4-02; and
-the idle cost: the UI thread's largest share is Auto-Hide walking every window, now twice a second instead of four
-times. AS4-23 stays open: its update path is dormant while signed updates are unavailable.
+new guard takes over the exact clip of a guard that died, and removes it on release); and startup diagnostics for AS4-02.
+Auto-Hide now walks every window twice a second instead of four times, which did not visibly lower the idle cost (S-064), so
+that remains open. AS4-23 stays open: its update path is dormant while signed updates are unavailable.
 
 Unchanged and recorded: Aether's own Settings window keeps its rounded frame when maximized, whatever the bars do.
 Evidence and limits: TEST_STATUS S-064.

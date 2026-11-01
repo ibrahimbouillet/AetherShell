@@ -2869,3 +2869,13 @@ what the owner has reported. The trial open on the owner's machine predates all 
 `8443491772d6523129020c17d921561c97fc6c906108a214b704ff5e8c50f349`, built by `scripts/package.ps1` from commit `bb353f7`
 in a fresh directory with warnings as errors; the package privacy audit passed. Not pushed, tagged or published. The setup
 itself has not been run: installing it, and going back from it to the published Alpha 3, are untested.
+
+**Private trial of 3.1 started (2026-11-01, 17:18 CET, owner request).** The owner reported problems from the trial still
+open, which was the older build: its log showed the old 2 s wait at 17:11, and the setup had not been installed. So those
+reports may already be corrected, and they are not evidence about 3.1. The new trial is byte-identical to the 3.1 build and
+read back ready, with installed settings, binary and startup state unchanged.
+
+- **Observed:** the terminal tab holding the host had closed when the app restarted its session, and the trial's processes
+  kept running without it, as S-061 expected and had not tried. Nothing then returned to the installed version by itself.
+- **Corrects S-064:** the idle cost did not visibly fall. 6.1 % of one core over 8 s, against 5.5 % before halving the window
+  walk, so that walk is not the main cost. The cause is still open.
