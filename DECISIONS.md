@@ -111,6 +111,29 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D62 — Alpha 4: Liquid Glass, then fluidity, then a trusted setup; first, the welcome bubble
+
+Owner direction, 2026-11-05, after publishing 3.5. The next major version is **Alpha 4**, in parts, in this order:
+
+1. **Design: Liquid Glass.** Aether Shell is a bubble of water and everything it shows belongs to it, divides from
+   it and behaves physically. A new feature is also announced, not yet named.
+2. **Fluidity:** recompute the application's motion and rendering for the least memory and graphics work, and make
+   it rebuild its graphics reliably.
+3. **A setup Windows trusts:** SmartScreen treats every new setup as suspect; the last step is a code-signing
+   identity (Authenticode), which needs a certificate the owner obtains.
+
+**First step, the welcome element.** After the greeting writes "Salut", the arrival plays, 3 to 5 s: a round drop
+of water appears with the Aether mark, light above and its reflection below, semi-transparent with a grain layer;
+it floats and deforms as water does in weightlessness, swells, divides in two; one drop strikes the top of the
+screen and one the bottom, they bounce, and spread into the Top Bar (thinner) and the Dock (taller) at their
+current sizes, which stay customizable. The same arrival will follow Close in the setup when it launches Aether.
+Later, in Settings: faster, off, and detail. **The bubble has no colour of its own, never blue: water shows only the
+colours of what is behind it** (owner, while reviewing the first frames).
+
+The owner judges it first as a prototype outside the product, without reinstalling: `tools/liquid-glass/welcome-bubble.html`,
+a web page used as a design tool only, written to be ported (motion as pure functions of time, material as one
+shader). Nothing enters the shell or the setup before the owner validates it.
+
 ### D61 — Test 3.5: the welcome's name in setup, its picture always, a lighter pen; a README gallery
 
 Owner instruction, 2026-11-05, before deciding whether to publish what D60 prepared. **Correction first:** D60's publication never

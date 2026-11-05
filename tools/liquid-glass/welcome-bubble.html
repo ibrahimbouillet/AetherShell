@@ -1,0 +1,580 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Copyright (c) 2026 Ibrahim Bouillet -->
+<!--
+  Alpha 4, Liquid Glass: the welcome bubble (D62), a prototype outside the product.
+  A drop of water appears, floats as in weightlessness, divides in two; one drop strikes the top of the
+  screen and becomes the Top Bar, the other strikes the bottom and becomes the Dock.
+  Open this file in a browser (double-click). No network, no installation. Space replays it.
+  The motion is pure functions of time (stateAt) and the material is one fragment shader, so that both
+  can be ported to the shell (C++ motion model, Direct2D/HLSL effect) once the owner validates the look.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aether welcome bubble</title>
+<style>
+  :root { color-scheme: dark; --hud-bg: rgba(18, 20, 26, 0.62); --hud-fg: #eef1f6; --hud-dim: #a9b0bd; --hud-line: rgba(255,255,255,0.14); }
+  html, body { margin: 0; height: 100%; background: #0b0d12; overflow: hidden; font: 13px/1.4 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #ui { pointer-events: none; }
+  #hud { position: fixed; left: 16px; top: 50%; transform: translateY(-50%); width: 248px; padding: 14px 14px 12px; border-radius: 16px;
+         background: var(--hud-bg); color: var(--hud-fg); border: 1px solid var(--hud-line); backdrop-filter: blur(18px) saturate(1.3);
+         -webkit-backdrop-filter: blur(18px) saturate(1.3); transition: opacity .35s ease; z-index: 2; }
+  #hud.hidden { opacity: 0; pointer-events: none; }
+  #hud h1 { font-size: 13px; font-weight: 600; margin: 0 0 2px; }
+  #hud .sub { color: var(--hud-dim); font-size: 12px; margin-bottom: 10px; }
+  #hud .row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+  #hud .readout { font-variant-numeric: tabular-nums; display: flex; justify-content: space-between; color: var(--hud-dim); font-size: 12px; }
+  #hud .readout b { color: var(--hud-fg); font-weight: 600; }
+  #hud input[type=range] { width: 100%; accent-color: #6fd3ff; }
+  #hud button, #hud select, #hud label.btn { font: inherit; color: var(--hud-fg); background: rgba(255,255,255,0.09); border: 1px solid var(--hud-line);
+         border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+  #hud button:hover, #hud label.btn:hover { background: rgba(255,255,255,0.16); }
+  #hud button:focus-visible, #hud select:focus-visible, #hud input:focus-visible, #hud label.btn:focus-within { outline: 2px solid #6fd3ff; outline-offset: 1px; }
+  #hud label.check { display: flex; align-items: center; gap: 6px; color: var(--hud-dim); font-size: 12px; cursor: pointer; }
+  #hud .keys { color: var(--hud-dim); font-size: 11px; margin-top: 10px; border-top: 1px solid var(--hud-line); padding-top: 8px; }
+  #hud kbd { font: 11px/1 Consolas, monospace; padding: 2px 4px; border-radius: 4px; background: rgba(255,255,255,0.1); }
+  #drop { position: fixed; inset: 0; display: none; place-items: center; color: #fff; font-size: 18px; background: rgba(10,14,22,.55); z-index: 3; }
+  #fail { position: fixed; inset: 0; display: none; place-items: center; color: #fff; padding: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<canvas id="ui"></canvas>
+
+<div id="hud" role="region" aria-label="Animation controls">
+  <h1>Aether · welcome bubble</h1>
+  <div class="sub">Alpha 4 Liquid Glass prototype</div>
+  <div class="readout"><span>Time <b id="time">0.00 s</b></span><span><b id="phase">appear</b></span></div>
+  <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Animation time">
+  <div class="row">
+    <button id="replay" title="Replay (Space)">Replay</button>
+    <button id="pause" title="Pause or play (P)">Pause</button>
+    <select id="speed" aria-label="Speed" title="Speed (1 to 4)">
+      <option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option>
+      <option value="1.5">1.5×</option><option value="2">2×</option>
+    </select>
+  </div>
+  <div class="row">
+    <label class="btn" title="Your own wallpaper (B), or drop a picture on the page">Picture…<input id="file" type="file" accept="image/*" hidden></label>
+    <button id="scene" title="The built-in picture">Built-in</button>
+    <button id="full" title="Full screen (F)">Full</button>
+  </div>
+  <label class="check"><input id="cover" type="checkbox" checked> Start from the welcome cover</label>
+  <label class="check"><input id="loop" type="checkbox"> Loop</label>
+  <div class="keys"><kbd>Space</kbd> replay · <kbd>P</kbd> pause · <kbd>←</kbd><kbd>→</kbd> step · <kbd>F</kbd> full screen · <kbd>H</kbd> hide this</div>
+</div>
+<div id="drop">Drop the picture to use it as the wallpaper</div>
+<div id="fail">This prototype needs WebGL 2. Open it in a recent Chrome, Edge or Firefox.</div>
+
+<script>
+"use strict";
+
+// ---------------------------------------------------------------------------------------------------
+// Geometry, in DIPs, from Aether's own defaults (src/settings/Settings.h).
+// ---------------------------------------------------------------------------------------------------
+const TOP_BAR = { height: 32, topMargin: 6, sideMargin: 12, radius: 11 };
+const DOCK = { iconSize: 40, icons: 8, gap: 8, padX: 14, padY: 11.5, bottomMargin: 4, radius: 21 };
+const END = 4.2;   // seconds at 1x: the owner asked for 3 to 5
+
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+// A damped spring released at t = 0 from 0 towards 1 (frequency in Hz, damping ratio z).
+function spring(t, f, z) {
+  if (t <= 0) return 0;
+  const w = 2 * Math.PI * f;
+  if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t));
+}
+// The same spring struck once: starts at 0, swings, dies away.
+function ring(t, f, z) {
+  if (t <= 0) return 0;
+  const w = 2 * Math.PI * f;
+  return Math.exp(-z * w * t) * Math.sin(w * Math.sqrt(1 - z * z) * t);
+}
+
+function geometry(W, H) {
+  const R0 = clamp(Math.min(W, H) * 0.085, 54, 118);   // the floating drop's radius
+  const Rbig = R0 * 1.16;                              // it swells before it divides
+  const dockW = DOCK.icons * DOCK.iconSize + (DOCK.icons - 1) * DOCK.gap + DOCK.padX * 2;
+  const dockH = DOCK.iconSize + DOCK.padY * 2;
+  return {
+    W, H, R0, Rbig,
+    top: { cy: TOP_BAR.topMargin + TOP_BAR.height / 2, hx: W / 2 - TOP_BAR.sideMargin, hy: TOP_BAR.height / 2, r: TOP_BAR.radius, edge: TOP_BAR.topMargin },
+    dock: { cy: H - DOCK.bottomMargin - dockH / 2, hx: dockW / 2, hy: dockH / 2, r: DOCK.radius, edge: DOCK.bottomMargin, w: dockW, h: dockH },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------------
+// The motion: everything is a function of time, so that it can be scrubbed and ported as it is.
+// Two bodies (0 the upper drop / Top Bar, 1 the lower drop / Dock) and a small satellite drop (2).
+// While the bodies coincide, their smooth union is the single floating drop; as they move apart the
+// union keeps a neck that thins and snaps, as a real drop divides.
+// ---------------------------------------------------------------------------------------------------
+const SMOOTH = 0.9;       // union smoothness, as a share of a lobe's radius
+const SWELL = 1 + SMOOTH / 4;   // two coincident lobes of radius r make one drop of r * SWELL
+const TRAVEL_START = 1.45, TRAVEL_UP = 0.75, TRAVEL_DOWN = 0.80, STRETCH = 0.22;
+
+function dropAt(t, G) {
+  // The single drop before it divides: appears from a point, floats and wobbles, then swells.
+  const env = smooth(0.35, 0.9, t) * (1 - smooth(1.05, 1.45, t));
+  const cx = G.W / 2 + Math.sin(2 * Math.PI * 0.55 * t) * G.R0 * 0.12 * env;
+  const cy = G.H / 2 + Math.sin(2 * Math.PI * 0.41 * t + 1.1) * G.R0 * 0.08 * env;
+  const R = G.R0 * spring(t, 1.55, 0.5) + (G.Rbig - G.R0) * smooth(1.2, 1.45, t);
+  const live = smooth(0.12, 0.45, t) * (1 - smooth(1.35, 1.55, t));
+  // Weightless water: its surface rings slowly in its second and third modes.
+  const a2 = (0.065 * Math.sin(2 * Math.PI * 1.7 * t + 0.5) + 0.16 * ring(t, 1.4, 0.35)) * live;
+  const a3 = 0.026 * Math.sin(2 * Math.PI * 2.6 * t + 1.9) * live;
+  return { cx, cy, R, a2, p2: 0.35 * t + 0.4, a3, p3: -0.5 * t };
+}
+
+// How far each lobe has travelled from the centre: slowly while the neck holds, then fast (ease-in).
+function travel(t, distance, duration) { const u = clamp((t - TRAVEL_START) / duration, 0, 1); return { s: distance * u * u * u, u, v: 3 * u * u }; }
+
+// The moment the neck snaps: the lobes' gap reaches half the union's reach.
+function breakTime(G) {
+  const rl = G.Rbig / SWELL;
+  const up = G.H / 2 - rl * (1 + STRETCH), down = G.H / 2 - rl * (1 + STRETCH);
+  for (let t = TRAVEL_START; t < TRAVEL_START + TRAVEL_DOWN; t += 0.002)
+    if (travel(t, up, TRAVEL_UP).s + travel(t, down, TRAVEL_DOWN).s >= 2 * rl * SWELL) return t;
+  return TRAVEL_START + 0.5;
+}
+
+// A lobe after it strikes its edge: it flattens against it, bounces off, and spreads into its bar.
+function settle(t, impact, rl, bar, up, G) {
+  const tau = t - impact;
+  const hyStart = rl * (1 + STRETCH), hxStart = rl / (1 + STRETCH);
+  const squash = ring(tau, 3.4, 0.32);                                  // the splash: flatter, then rounder
+  let hy = lerp(hyStart, bar.hy, spring(tau, 3.0, 0.62)) * (1 - 0.38 * squash);
+  hy = Math.max(hy, bar.hy * 0.6);
+  const spread = up ? spring(tau - 0.03, 1.45, 0.82) : spring(tau - 0.02, 2.1, 0.52);   // the Top Bar never overshoots the screen
+  let hx = lerp(hxStart, bar.hx, spread) + rl * 0.42 * Math.max(0, squash);
+  hx = Math.min(hx, G.W / 2 - 2);
+  const away = bar.edge * spring(tau, 2.6, 0.55) + (up ? 15 : 20) * ring(tau, 2.1, 0.33);   // rebound from the screen's edge
+  const cy = up ? away + hy : G.H - away - hy;
+  const round = smooth(0.0, 0.55, tau);
+  const r = Math.min(lerp(Math.min(hx, hy), bar.r, round), hx, hy);
+  return { cx: G.W / 2, cy, hx, hy, r, a2: 0.05 * ring(tau, 2.8, 0.3) * (1 - round), p2: 0, a3: 0, p3: 0 };
+}
+
+function stateAt(t, G, options) {
+  const S = { bodies: [null, null, null], k: 0, kc: 0, mat: smooth(2.2, 3.15, t), logo: null, content: 0, veil: 0, blur: 0, phase: "" };
+  const D = dropAt(Math.min(t, TRAVEL_START + 0.2), G);
+  const rl = (t < TRAVEL_START ? D.R : G.Rbig) / SWELL;
+  S.k = SMOOTH * rl;
+  const up = travel(t, G.H / 2 - rl * (1 + STRETCH), TRAVEL_UP);
+  const down = travel(t, G.H / 2 - rl * (1 + STRETCH), TRAVEL_DOWN);
+  const tb = breakTime(G);
+  const impactUp = TRAVEL_START + TRAVEL_UP, impactDown = TRAVEL_START + TRAVEL_DOWN;
+  const lobe = (i, moved, impact, bar) => {
+    if (t >= impact) return settle(t, impact, rl, bar, i === 0, G);
+    const stretch = 1 + STRETCH * moved.v / 3 * smooth(tb, tb + 0.12, t);   // round until the neck snaps, then drawn out by speed
+    const recoil = 0.11 * ring(t - tb, 3.0, 0.28);   // the snapped neck pulls back into the lobe
+    const wob = t < TRAVEL_START + 0.15 ? 1 - smooth(TRAVEL_START - 0.1, TRAVEL_START + 0.15, t) : 0;
+    return { cx: D.cx, cy: D.cy + (i === 0 ? -moved.s : moved.s), hx: rl / stretch, hy: rl * stretch, r: rl * Math.max(stretch, 1),
+             a2: D.a2 * wob + recoil, p2: Math.PI / 2 * (recoil !== 0 ? 1 : 0) + D.p2 * wob, a3: D.a3 * wob, p3: D.p3 };
+  };
+  S.bodies[0] = lobe(0, up, impactUp, G.top);
+  S.bodies[1] = lobe(1, down, impactDown, G.dock);
+  if (t <= 0.0001) S.bodies[0].hx = S.bodies[0].hy = S.bodies[1].hx = S.bodies[1].hy = 0.01;
+  // A small satellite drop is left where the neck snapped, and falls into the lower lobe.
+  if (t > tb && t < tb + 0.32) {
+    const u = (t - tb) / 0.32;
+    const neckY = D.cy + (travel(tb, G.H / 2 - rl * (1 + STRETCH), TRAVEL_DOWN).s - travel(tb, G.H / 2 - rl * (1 + STRETCH), TRAVEL_UP).s) / 2;
+    const cy = lerp(neckY, S.bodies[1].cy - S.bodies[1].hy * 0.4, smooth(0, 1, u) * smooth(0, 1, u));
+    const rr = rl * 0.13 * (1 - smooth(0.55, 1, u));
+    S.bodies[2] = { cx: D.cx, cy, hx: rr, hy: rr, r: rr, a2: 0, p2: 0, a3: 0, p3: 0 };
+    S.kc = rl * lerp(0.08, 0.45, smooth(0.35, 0.9, u));   // apart at first, so that the neck stays broken; then it melts in
+  }
+  // The logo floats inside the drop until it swells to divide.
+  const logoAlpha = smooth(0.12, 0.42, t) * (1 - smooth(1.15, 1.42, t));
+  if (logoAlpha > 0) S.logo = { cx: D.cx, cy: D.cy, half: D.R * 0.56 * (1 + 0.08 * smooth(1.0, 1.42, t)), alpha: logoAlpha };
+  // After the greeting, the welcome cover clears to the desktop while the drop appears.
+  if (options.cover) { const c = 1 - smooth(0.0, 0.75, t); S.veil = 0.5 * c; S.blur = 4.2 * c; }
+  S.content = t;
+  S.phase = t < 0.45 ? "appear" : t < 1.25 ? "float" : t < tb ? "divide" : t < impactDown ? "travel" : t < 3.15 ? "spread" : t < END - 0.05 ? "contents" : "done";
+  return S;
+}
+
+// ---------------------------------------------------------------------------------------------------
+// The material: one fragment shader. The shape is a signed distance field; its surface is a dome over
+// the field, which refracts, lights and grains the picture behind it. Water at first (mat 0: clear,
+// strong lens, bright highlights), then Aether's Liquid Glass bars (mat 1: frosted, edge lens).
+// ---------------------------------------------------------------------------------------------------
+const VERTEX = `#version 300 es
+void main() { vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2); gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0); }`;
+
+const FRAGMENT = `#version 300 es
+precision highp float;
+uniform vec2 uRes;           // device pixels
+uniform float uDpr;
+uniform vec4 uB[3];          // centre x, y, half width, half height (device pixels)
+uniform vec4 uS[3];          // corner radius, presence, bevel, unused
+uniform vec4 uW[3];          // surface waves: mode 2 amplitude and angle, mode 3 amplitude and angle
+uniform float uK, uKC;       // union smoothness: the two lobes, the satellite
+uniform float uMat, uTime, uVeil, uBlur;
+uniform sampler2D uBg;       // the wallpaper, mipmapped, at the canvas' size
+uniform sampler2D uLogo;
+uniform vec4 uLogoRect;      // centre, half size; alpha in uLogoA
+uniform float uLogoA;
+out vec4 outColor;
+
+float sdRoundBox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
+float smin(float a, float b, float k) { if (k <= 0.0) return min(a, b); float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0); return mix(b, a, h) - k * h * (1.0 - h); }
+float body(int i, vec2 p) {
+  vec4 B = uB[i]; vec4 S = uS[i];
+  if (S.y <= 0.0) return 1e5;
+  vec2 q = p - B.xy;
+  float m = min(B.z, B.w);
+  float d = sdRoundBox(q, B.zw, min(S.x, m));
+  vec4 W = uW[i];
+  if (W.x != 0.0 || W.z != 0.0) { float a = atan(q.y, q.x); d -= (W.x * cos(2.0 * (a - W.y)) + W.z * cos(3.0 * (a - W.w))) * m; }
+  return d;
+}
+float field(vec2 p) { return smin(smin(body(0, p), body(1, p), uK), body(2, p), uKC); }
+// The centre and size of the water around a point: a blend of the bodies by nearness, so that a lens
+// follows the drop, then each lobe, without a seam across the neck.
+void lensCentre(vec2 p, out vec2 centre, out float size) {
+  float total = 0.0; vec2 c = vec2(0.0); float r = 0.0;
+  for (int i = 0; i < 3; i++) {
+    if (uS[i].y <= 0.0) continue;
+    float m = max(min(uB[i].z, uB[i].w), 1.0);
+    float w = exp(-max(body(i, p), -m) / (0.3 * m));
+    c += w * uB[i].xy; r += w * m; total += w;
+  }
+  centre = c / max(total, 1e-6); size = r / max(total, 1e-6);
+}
+float bevelAt(vec2 p) { float best = 1e5; float bevel = 12.0; for (int i = 0; i < 3; i++) { float d = body(i, p); if (d < best) { best = d; bevel = uS[i].z; } } return bevel; }
+float hash(vec2 p) { p = fract(p * vec2(443.897, 441.423)); p += dot(p, p.yx + 19.19); return fract((p.x + p.y) * p.x); }
+vec3 picture(vec2 px, float lod) {
+  vec2 uv = clamp(px / uRes, vec2(0.0), vec2(1.0));
+  vec2 t = 0.6 * exp2(lod) / uRes;   // four taps soften the mip steps
+  return 0.25 * (textureLod(uBg, uv + vec2(t.x, t.y), lod).rgb + textureLod(uBg, uv + vec2(-t.x, t.y), lod).rgb +
+                 textureLod(uBg, uv + vec2(t.x, -t.y), lod).rgb + textureLod(uBg, uv + vec2(-t.x, -t.y), lod).rgb);
+}
+
+void main() {
+  vec2 p = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);   // top-left origin, as the shell's DIPs
+  vec3 color = picture(p, uBlur);
+  color *= 1.0 - uVeil;
+  float d = field(p);
+  // A soft shadow below the water and the bars, outside them only.
+  float ds = field(p - vec2(0.0, mix(5.0, 3.0, uMat) * uDpr));
+  float shadow = (1.0 - smoothstep(-6.0 * uDpr, mix(30.0, 18.0, uMat) * uDpr, ds)) * mix(0.22, 0.3, uMat);
+  color *= 1.0 - shadow * smoothstep(-1.0, 1.0, d);
+  float coverage = clamp(0.5 - d / max(uDpr, 1.0), 0.0, 1.0);
+  if (coverage > 0.0) {
+    float e = uDpr;
+    vec2 g = vec2(field(p + vec2(e, 0.0)) - field(p - vec2(e, 0.0)), field(p + vec2(0.0, e)) - field(p - vec2(0.0, e)));
+    g = dot(g, g) > 1e-10 ? normalize(g) : vec2(0.0);   // outward
+    float bevel = max(bevelAt(p), 1.0);
+    float s = 1.0 - clamp(-d / bevel, 0.0, 1.0);        // 1 at the edge, 0 where the dome is flat
+    float z = sqrt(max(1.0 - s * s, 0.0));
+    vec3 n = normalize(vec3(g * s / max(z, 0.12), 1.0));
+    // Refraction. A ball of water is a lens that turns the picture behind it over and takes in a wide
+    // view of it, wider towards its rim; the bars bend the picture only at their edges. A little colour
+    // separation where the light bends most.
+    vec2 lc; float lr; lensCentre(p, lc, lr);
+    vec2 q = p - lc;
+    float rn = clamp(length(q) / max(lr, 1.0), 0.0, 1.0);
+    vec2 ball = -q * (1.0 + mix(1.5, 2.6, rn * rn));
+    vec2 off = mix(ball, -n.xy * bevel * 1.1, uMat);
+    float spread = mix(0.015, 0.035, uMat);
+    float lod = mix(0.4, 2.6, uMat) + uBlur * 0.5;
+    vec3 inside = vec3(picture(p + off, lod).r, picture(p + off * (1.0 + spread), lod).g, picture(p + off * (1.0 + 2.0 * spread), lod).b);
+    inside *= 1.0 - uVeil;
+    // The logo, inside the water, has no colour of its own (D62): a lighter, frosted shape that bends with
+    // the water and shows the same picture, a little brighter and softer.
+    if (uLogoA > 0.0) {
+      vec2 lu = (p - uLogoRect.xy) * (1.0 - 0.12 * rn * rn) / uLogoRect.zw * 0.5 + 0.5;   // upright, swelling with the water
+      if (all(greaterThan(lu, vec2(0.0))) && all(lessThan(lu, vec2(1.0)))) {
+        float logo = texture(uLogo, lu).a * uLogoA;
+        vec3 frosted = picture(p + off, lod + 2.5) * (1.0 - uVeil);
+        inside = mix(inside, frosted * 1.22 + vec3(0.14), logo * 0.9);
+      }
+    }
+    // Water has no colour: only the picture's, a touch brighter. The glass is frosted, with a neutral shade.
+    inside = mix(inside * 1.03, mix(inside, vec3(0.14), 0.24), uMat);
+    // Light from above and to the left: a sharp highlight and a broad sheen on top, the light gathered
+    // at the bottom of the inner rim, and a brighter edge (Fresnel).
+    vec3 L = normalize(vec3(-0.42, -0.78, 0.6));
+    vec3 Hh = normalize(L + vec3(0.0, 0.0, 1.0));
+    float spec = pow(max(dot(n, Hh), 0.0), mix(70.0, 110.0, uMat)) * mix(1.25, 0.7, uMat);
+    float top = clamp(-dot(g, normalize(vec2(0.35, 1.0))), 0.0, 1.0);
+    float bottom = clamp(dot(g, normalize(vec2(0.25, 1.0))), 0.0, 1.0);
+    float sheen = smoothstep(0.6, 0.97, s) * top * mix(0.16, 0.1, uMat);
+    float caustic = smoothstep(0.7, 0.93, s) * (1.0 - smoothstep(0.95, 1.0, s)) * bottom * bottom * mix(0.42, 0.22, uMat);
+    float fresnel = pow(s, 6.0) * mix(0.34, 0.2, uMat);   // only at the very edge: water stays clear
+    float rim = 1.0 - smoothstep(0.0, 1.25 * uDpr, -d);   // a hairline that draws the edge
+    vec3 c = inside + spec + sheen + fresnel + caustic + rim * mix(0.2, 0.28, uMat);   // white light only: no colour added
+    // The grain: a fine, slowly changing layer on the water and the glass.
+    c += (hash(floor(p / max(uDpr, 1.0)) + floor(uTime * 12.0) * 17.31) - 0.5) * mix(0.05, 0.035, uMat);
+    color = mix(color, c, coverage);
+  }
+  outColor = vec4(color, 1.0);
+}`;
+
+// ---------------------------------------------------------------------------------------------------
+// The page: WebGL, the wallpaper, the logo, the bar contents and the controls.
+// ---------------------------------------------------------------------------------------------------
+const glCanvas = document.getElementById("gl"), uiCanvas = document.getElementById("ui");
+const gl = glCanvas.getContext("webgl2", { antialias: false, alpha: false, premultipliedAlpha: false });
+if (!gl) { document.getElementById("fail").style.display = "grid"; document.getElementById("hud").style.display = "none"; throw new Error("WebGL 2 unavailable"); }
+const ui = uiCanvas.getContext("2d");
+
+function compile(type, source) {
+  const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  return shader;
+}
+const program = gl.createProgram();
+gl.attachShader(program, compile(gl.VERTEX_SHADER, VERTEX));
+gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAGMENT));
+gl.linkProgram(program);
+if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
+gl.useProgram(program);
+gl.bindVertexArray(gl.createVertexArray());
+const U = {};
+for (const name of ["uRes", "uDpr", "uB", "uS", "uW", "uK", "uKC", "uMat", "uTime", "uVeil", "uBlur", "uBg", "uLogo", "uLogoRect", "uLogoA"])
+  U[name] = gl.getUniformLocation(program, name);
+
+function texture(unit) {
+  const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  return t;
+}
+const bgTexture = texture(0), logoTexture = texture(1);
+gl.uniform1i(U.uBg, 0); gl.uniform1i(U.uLogo, 1);
+function upload(unit, tex, source) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source); gl.generateMipmap(gl.TEXTURE_2D); }
+
+// The Aether mark (resources/branding/svg/aether-mark.svg), drawn from its paths: no file to load.
+// In the water it is only a shape (its alpha); in the Top Bar it keeps its colours, as the shell draws it.
+const MARK = ["M150 610 C260 340 445 170 810 240 L700 390 C500 350 365 425 280 640 Z", "M245 770 L345 600 C485 655 615 575 725 375 L850 375 C715 700 515 850 245 770 Z"];
+function drawMark(ctx, x, y, size, alpha = 1, colour = true) {
+  ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(x - size / 2, y - size / 2); ctx.scale(size / 1000, size / 1000);
+  const grad = ctx.createLinearGradient(0, 0, 1000, 350); grad.addColorStop(0, "#5B6CFF"); grad.addColorStop(1, "#3DD9E8");
+  ctx.fillStyle = colour ? grad : "#ffffff"; for (const d of MARK) ctx.fill(new Path2D(d)); ctx.restore();
+}
+{
+  const c = document.createElement("canvas"); c.width = c.height = 512;
+  drawMark(c.getContext("2d"), 256, 256, 512, 1, false);
+  upload(1, logoTexture, c);
+}
+
+// The built-in wallpaper: a dusk lake with enough lines in it to show the lens.
+let userPicture = null;
+function rand(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function drawScene(ctx, w, h) {
+  // Warm on purpose: the water only shows what is behind it, and a blue picture would make it look blue.
+  const sky = ctx.createLinearGradient(0, 0, 0, h * 0.62);
+  sky.addColorStop(0, "#1c1426"); sky.addColorStop(0.42, "#59384f"); sky.addColorStop(0.78, "#d27a5a"); sky.addColorStop(1, "#f6c27a");
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+  const r = rand(7);
+  for (let i = 0; i < 220; i++) { ctx.fillStyle = `rgba(255,255,255,${0.15 + r() * 0.6})`; const s = r() * 1.6 * (w / 1600) + 0.4; ctx.fillRect(r() * w, r() * h * 0.38, s, s); }
+  const sun = ctx.createRadialGradient(w * 0.66, h * 0.585, 0, w * 0.66, h * 0.585, h * 0.16);
+  sun.addColorStop(0, "rgba(255,236,200,1)"); sun.addColorStop(0.25, "rgba(255,205,150,.9)"); sun.addColorStop(1, "rgba(255,170,120,0)");
+  ctx.fillStyle = sun; ctx.fillRect(0, 0, w, h);
+  const ridge = (base, amp, color, seed, step) => {
+    const q = rand(seed); ctx.beginPath(); ctx.moveTo(0, h);
+    let y = base; for (let x = 0; x <= w + step; x += step) { y = clamp(y + (q() - 0.5) * amp, base - amp * 2.2, base + amp); ctx.lineTo(x, y); }
+    ctx.lineTo(w, h); ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+  };
+  ridge(h * 0.5, h * 0.035, "#8a5a62", 11, w / 90);
+  ridge(h * 0.56, h * 0.03, "#4e3448", 23, w / 70);
+  ridge(h * 0.6, h * 0.018, "#24182a", 37, w / 50);
+  const lake = ctx.createLinearGradient(0, h * 0.62, 0, h);
+  lake.addColorStop(0, "#d99a74"); lake.addColorStop(0.2, "#6a4658"); lake.addColorStop(1, "#140c18");
+  ctx.fillStyle = lake; ctx.fillRect(0, h * 0.62, w, h * 0.38);
+  for (let i = 0; i < 60; i++) {   // light on the water
+    const y = h * 0.63 + Math.pow(r(), 1.6) * h * 0.34, len = (0.02 + r() * 0.1) * w * (1 - (y - h * 0.62) / (h * 0.5));
+    ctx.fillStyle = `rgba(255,214,170,${0.08 + r() * 0.3})`; ctx.fillRect(w * 0.66 - len / 2 + (r() - 0.5) * w * 0.08, y, len, Math.max(1, h * 0.0025));
+  }
+  ctx.fillStyle = "#1a0f1c"; ctx.fillRect(0, h * 0.618, w, h * 0.006);
+}
+function rebuildPicture() {
+  const c = document.createElement("canvas"); c.width = glCanvas.width; c.height = glCanvas.height;
+  const ctx = c.getContext("2d");
+  if (userPicture) {   // "Fill", as Windows shows it
+    const s = Math.max(c.width / userPicture.width, c.height / userPicture.height);
+    ctx.drawImage(userPicture, (c.width - userPicture.width * s) / 2, (c.height - userPicture.height * s) / 2, userPicture.width * s, userPicture.height * s);
+  } else drawScene(ctx, c.width, c.height);
+  upload(0, bgTexture, c);
+}
+
+// The bars' contents, as placeholders for the shell's own: they come once the glass has settled.
+const ICONS = [["#3b82f6", "#1d4ed8", "grid"], ["#6b7280", "#374151", "search"], ["#64748b", "#334155", "windows"], ["#fbbf24", "#d97706", "folder"],
+               ["#22c55e", "#15803d", "globe"], ["#a855f7", "#7e22ce", "chat"], ["#f43f5e", "#be123c", "note"], ["#94a3b8", "#475569", "gear"]];
+function glyph(ctx, kind, s) {
+  ctx.strokeStyle = ctx.fillStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = s * 0.08; ctx.lineCap = ctx.lineJoin = "round";
+  const q = s * 0.22;
+  switch (kind) {
+    case "grid": for (const [x, y] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { ctx.beginPath(); ctx.roundRect(x * q * 0.62 - q * 0.5, y * q * 0.62 - q * 0.5, q, q, q * 0.25); ctx.fill(); } break;
+    case "search": ctx.beginPath(); ctx.arc(-q * 0.2, -q * 0.2, q * 0.75, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.moveTo(q * 0.35, q * 0.35); ctx.lineTo(q * 0.95, q * 0.95); ctx.stroke(); break;
+    case "windows": ctx.beginPath(); ctx.roundRect(-q, -q * 0.6, q * 1.3, q * 1.3, q * 0.2); ctx.stroke(); ctx.beginPath(); ctx.roundRect(-q * 0.4, -q, q * 1.4, q * 1.3, q * 0.2); ctx.stroke(); break;
+    case "folder": ctx.beginPath(); ctx.roundRect(-q * 1.05, -q * 0.6, q * 2.1, q * 1.5, q * 0.2); ctx.fill(); break;
+    case "globe": ctx.beginPath(); ctx.arc(0, 0, q, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.ellipse(0, 0, q * 0.45, q, 0, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-q, 0); ctx.lineTo(q, 0); ctx.stroke(); break;
+    case "chat": ctx.beginPath(); ctx.roundRect(-q, -q * 0.8, q * 2, q * 1.4, q * 0.5); ctx.fill(); ctx.beginPath(); ctx.moveTo(-q * 0.5, q * 0.5); ctx.lineTo(-q * 0.7, q * 1.05); ctx.lineTo(0, q * 0.55); ctx.fill(); break;
+    case "note": ctx.beginPath(); ctx.arc(-q * 0.35, q * 0.55, q * 0.38, 0, 7); ctx.fill(); ctx.beginPath(); ctx.moveTo(0, q * 0.55); ctx.lineTo(0, -q); ctx.lineTo(q * 0.75, -q * 0.7); ctx.stroke(); break;
+    case "gear": ctx.beginPath(); ctx.arc(0, 0, q * 0.42, 0, 7); ctx.stroke(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; ctx.beginPath(); ctx.moveTo(Math.cos(a) * q * 0.7, Math.sin(a) * q * 0.7); ctx.lineTo(Math.cos(a) * q, Math.sin(a) * q); ctx.stroke(); } break;
+  }
+}
+function drawContents(S, G) {
+  const dpr = window.devicePixelRatio || 1;
+  ui.setTransform(dpr, 0, 0, dpr, 0, 0); ui.clearRect(0, 0, G.W, G.H);
+  const t = S.content, start = 3.05;
+  if (t < start) return;
+  const top = S.bodies[0], dock = S.bodies[1];
+  // Top Bar: the mark on the left, the status and the clock on the right.
+  const a = smooth(start, start + 0.35, t);
+  drawMark(ui, G.W / 2 - top.hx + 22, top.cy, 18, a);
+  ui.save(); ui.globalAlpha = a; ui.fillStyle = "rgba(255,255,255,.95)"; ui.font = "600 13px 'Segoe UI Variable Text','Segoe UI',system-ui,sans-serif";
+  ui.textAlign = "right"; ui.textBaseline = "middle";
+  const now = new Date();
+  const clock = now.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) + "   " + now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  const right = G.W / 2 + top.hx - 16;
+  ui.fillText(clock, right, top.cy + 0.5);
+  const w = ui.measureText(clock).width;
+  ui.strokeStyle = "rgba(255,255,255,.92)"; ui.lineWidth = 1.6; ui.lineCap = "round";
+  let x = right - w - 26;   // battery, volume, network
+  ui.beginPath(); ui.roundRect(x - 9, top.cy - 5, 18, 10, 2.5); ui.stroke(); ui.fillRect(x - 7, top.cy - 3, 9, 6); ui.fillRect(x + 9.5, top.cy - 2, 1.8, 4);
+  x -= 30; ui.beginPath(); ui.moveTo(x - 6, top.cy - 3); ui.lineTo(x - 3, top.cy - 3); ui.lineTo(x + 1, top.cy - 6.5); ui.lineTo(x + 1, top.cy + 6.5); ui.lineTo(x - 3, top.cy + 3); ui.lineTo(x - 6, top.cy + 3); ui.closePath(); ui.fill();
+  ui.beginPath(); ui.arc(x + 2, top.cy, 5.5, -0.7, 0.7); ui.stroke();
+  x -= 30; for (const rr of [3, 6.5, 10]) { ui.beginPath(); ui.arc(x, top.cy + 5, rr, -2.35, -0.79); ui.stroke(); }
+  ui.restore();
+  // Dock: the icons pop in from left to right, each on its own spring.
+  const left = G.W / 2 - G.dock.w / 2 + DOCK.padX + DOCK.iconSize / 2;
+  ICONS.forEach(([c1, c2, kind], i) => {
+    const local = t - start - 0.05 - i * 0.045;
+    if (local <= 0) return;
+    const sc = 0.55 + 0.45 * spring(local, 3.2, 0.5), al = smooth(0, 0.16, local);
+    const cx = left + i * (DOCK.iconSize + DOCK.gap), cy = dock.cy, s = DOCK.iconSize * sc;
+    ui.save(); ui.globalAlpha = al; ui.translate(cx, cy);
+    const grad = ui.createLinearGradient(0, -s / 2, 0, s / 2); grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+    ui.fillStyle = grad; ui.beginPath(); ui.roundRect(-s / 2, -s / 2, s, s, s * 0.24); ui.fill();
+    ui.fillStyle = "rgba(255,255,255,.18)"; ui.beginPath(); ui.roundRect(-s / 2, -s / 2, s, s * 0.5, [s * 0.24, s * 0.24, 0, 0]); ui.fill();
+    glyph(ui, kind, s); ui.restore();
+  });
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Frames: only while something moves. Once the animation has ended, the page draws nothing.
+// ---------------------------------------------------------------------------------------------------
+const hud = document.getElementById("hud"), scrub = document.getElementById("scrub");
+const options = { cover: true, loop: false, speed: 1 };
+let G = null, time = 0, playing = true, last = 0, frame = 0, holdUntil = 0;
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const W = window.innerWidth, H = window.innerHeight;
+  for (const c of [glCanvas, uiCanvas]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+  G = geometry(W, H);
+  rebuildPicture();
+  render();
+}
+
+function render() {
+  const dpr = window.devicePixelRatio || 1;
+  const S = stateAt(time, G, options);
+  const B = new Float32Array(12), Sh = new Float32Array(12), Wv = new Float32Array(12);
+  S.bodies.forEach((b, i) => {
+    if (!b) return;
+    B.set([b.cx * dpr, b.cy * dpr, Math.max(b.hx, 0.01) * dpr, Math.max(b.hy, 0.01) * dpr], i * 4);
+    const bevel = lerp(Math.min(b.hx, b.hy) * 0.95, 13, S.mat);
+    Sh.set([b.r * dpr, 1, Math.max(bevel, 1) * dpr, 0], i * 4);
+    Wv.set([b.a2, b.p2, b.a3, b.p3], i * 4);
+  });
+  gl.uniform2f(U.uRes, glCanvas.width, glCanvas.height);
+  gl.uniform1f(U.uDpr, dpr);
+  gl.uniform4fv(U.uB, B); gl.uniform4fv(U.uS, Sh); gl.uniform4fv(U.uW, Wv);
+  gl.uniform1f(U.uK, S.k * dpr); gl.uniform1f(U.uKC, S.kc * dpr);
+  gl.uniform1f(U.uMat, S.mat); gl.uniform1f(U.uTime, time); gl.uniform1f(U.uVeil, S.veil); gl.uniform1f(U.uBlur, S.blur);
+  if (S.logo) { gl.uniform4f(U.uLogoRect, S.logo.cx * dpr, S.logo.cy * dpr, S.logo.half * dpr, S.logo.half * dpr); gl.uniform1f(U.uLogoA, S.logo.alpha); }
+  else gl.uniform1f(U.uLogoA, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  drawContents(S, G);
+  document.getElementById("time").textContent = time.toFixed(2) + " s";
+  document.getElementById("phase").textContent = S.phase;
+  scrub.value = String(Math.round(time / END * 1000));
+}
+
+function tick(now) {
+  frame = 0;
+  const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+  last = now;
+  if (playing) {
+    if (holdUntil) { if (now >= holdUntil) { holdUntil = 0; time = 0; } }
+    else {
+      time += dt * options.speed;
+      if (time >= END) { time = END; if (options.loop) holdUntil = now + 1200; else playing = false; }
+    }
+  }
+  render();
+  if (playing) frame = requestAnimationFrame(tick); else { last = 0; updatePauseLabel(); }
+}
+function play() { if (!frame) { last = 0; frame = requestAnimationFrame(tick); } }
+function replay() { time = 0; holdUntil = 0; playing = true; updatePauseLabel(); play(); }
+function togglePause() { if (time >= END && !playing) return replay(); playing = !playing; updatePauseLabel(); if (playing) play(); }
+function updatePauseLabel() { document.getElementById("pause").textContent = playing ? "Pause" : "Play"; }
+function step(by) { playing = false; updatePauseLabel(); time = clamp(time + by, 0, END); render(); }
+
+// Controls
+document.getElementById("replay").onclick = replay;
+document.getElementById("pause").onclick = togglePause;
+document.getElementById("speed").onchange = (e) => { options.speed = Number(e.target.value); };
+document.getElementById("cover").onchange = (e) => { options.cover = e.target.checked; render(); };
+document.getElementById("loop").onchange = (e) => { options.loop = e.target.checked; if (options.loop && !playing && time >= END) replay(); };
+document.getElementById("full").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+document.getElementById("scene").onclick = () => { userPicture = null; rebuildPicture(); render(); };
+scrub.oninput = () => { playing = false; updatePauseLabel(); time = Number(scrub.value) / 1000 * END; render(); };
+function usePicture(file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => { userPicture = img; rebuildPicture(); replay(); };
+  img.src = url;
+}
+document.getElementById("file").onchange = (e) => usePicture(e.target.files[0]);
+const dropHint = document.getElementById("drop");
+addEventListener("dragover", (e) => { e.preventDefault(); dropHint.style.display = "grid"; });
+addEventListener("dragleave", (e) => { if (e.target === dropHint || !e.relatedTarget) dropHint.style.display = "none"; });
+addEventListener("drop", (e) => { e.preventDefault(); dropHint.style.display = "none"; usePicture(e.dataTransfer.files[0]); });
+addEventListener("keydown", (e) => {
+  if (e.target instanceof HTMLInputElement && e.target.type !== "checkbox" && e.target.type !== "range") return;
+  const keys = { " ": replay, p: togglePause, P: togglePause, ArrowLeft: () => step(-0.05), ArrowRight: () => step(0.05),
+                 f: () => document.getElementById("full").click(), F: () => document.getElementById("full").click(),
+                 h: toggleHud, H: toggleHud, b: () => document.getElementById("file").click(),
+                 "1": () => setSpeed("0.5"), "2": () => setSpeed("1"), "3": () => setSpeed("1.5"), "4": () => setSpeed("2") };
+  if (keys[e.key]) { e.preventDefault(); keys[e.key](); }
+});
+function setSpeed(v) { const s = document.getElementById("speed"); s.value = v; options.speed = Number(v); }
+function toggleHud() { hud.dataset.user = hud.dataset.user === "hidden" ? "" : "hidden"; hud.classList.toggle("hidden", hud.dataset.user === "hidden"); }
+// The controls step aside while the animation plays, and come back with the pointer.
+let idle = 0;
+addEventListener("pointermove", () => { if (hud.dataset.user !== "hidden") hud.classList.remove("hidden"); clearTimeout(idle); idle = setTimeout(() => { if (playing) hud.classList.add("hidden"); }, 2200); });
+hud.addEventListener("keydown", () => clearTimeout(idle));
+
+addEventListener("resize", resize);
+resize();
+hud.classList.add("hidden");
+// ?t=1.9 shows that moment, still, without the controls: for screenshots and for talking about one frame.
+// ?picture=path uses a picture served beside the page (a file chosen with Picture… works everywhere).
+const query = new URLSearchParams(location.search);
+const still = Number.parseFloat(query.get("t"));
+function start() {
+  if (Number.isFinite(still)) { hud.dataset.user = "hidden"; playing = false; time = clamp(still, 0, END); updatePauseLabel(); render(); }
+  else replay();
+}
+if (query.get("picture")) {
+  const img = new Image();
+  img.onload = () => { userPicture = img; rebuildPicture(); start(); };
+  img.onerror = start;
+  img.src = query.get("picture");
+} else start();
+</script>
+</body>
+</html>

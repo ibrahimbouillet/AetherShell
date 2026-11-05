@@ -7,7 +7,18 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — 3.5 published as Latest (`0.3.5-alpha.3`, S-067, D61, 2026-11-05)
+## Current checkpoint — Alpha 4 begins: the welcome bubble prototype (D62, 2026-11-05)
+
+The owner set Alpha 4's plan (D62): Liquid Glass design (Aether as a bubble of water), then fluidity (memory, graphics,
+rebuilding graphics), then a code-signed setup so that SmartScreen stops flagging it. First piece: the arrival after the
+greeting, a drop that divides into the Top Bar and the Dock. It exists only as a prototype for the owner's judgement,
+`tools/liquid-glass/welcome-bubble.html` (README beside it), not in the shell or setup. **The water has no colour of its own,
+never blue** (owner). Frames were checked in headless Chrome (software WebGL) on the built-in picture and two of the owner's
+wallpapers; the owner has not seen it moving yet. **Next:** the owner's verdict on the motion and the material, iterate in the
+prototype, then port (C++ motion model beside `WelcomeController`, Direct2D/HLSL effect) and plan Alpha 4's version numbers
+(`0.4.0-alpha.4` for the first Alpha 4 build unless the owner says otherwise). The shell is unchanged since 3.5, so no test build.
+
+## Earlier today — 3.5 published as Latest (`0.3.5-alpha.3`, S-067, D61, 2026-11-05)
 
 **3.4 was never published.** The previous session wrote this section as "3.4 published as Latest" before doing it, built and installed
 its setup on the owner's machine (the installed copy is `0.3.4-alpha.3`, sign-in startup off), and stopped with everything uncommitted.
