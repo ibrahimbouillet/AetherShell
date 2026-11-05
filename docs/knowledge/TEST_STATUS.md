@@ -2986,3 +2986,13 @@ blank pages (AS4-01) and a disappearing Claude window, neither reproduced. Commi
 **Pushed (2026-11-05):** commits `8ac3a6b` and `e1e14ce` pushed to `main` (`8af10b2..e1e14ce`). Windows CI run
 [42025384210](https://github.com/ibrahimbouillet/AetherShell/actions/runs/42025384210) succeeded on `e1e14ce`. No tag and no GitHub
 Release were created; 3.3 stays the Latest release.
+
+**Published (2026-11-05, at the owner's word "Yes, publish 3.5"):** documentation commit `98c37dd` pushed; Windows CI run
+[42028568650](https://github.com/ibrahimbouillet/AetherShell/actions/runs/42028568650) succeeded on it. A fresh Release `/W4 /WX`
+build of that clean tree in a new build directory passed the unit gate (25/25 suites) and embeds revision `98c37dd4af8e`; the validated
+test setup (`203ee2ab…`) embeds `8af10b2`, the commit before it, and is kept locally. `scripts/package.ps1` passed its privacy audit.
+Release [`v0.3.5-alpha.3`](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3), tagged at `98c37dd`, marked
+Latest and not pre-release, with exactly two assets: `AetherShell-0.3.5-alpha.3-win-x64-setup.exe`, 6742528 bytes, SHA-256
+`35f3f419440ae44f3574372e5bb39d75f8f15a7009911b4673fa7f48ffd6ebb5`, and its checksums file. No manifest was uploaded. Downloaded back
+from the release, the setup matches its checksums file and is byte-identical to the local build. The API reports this tag as latest;
+3.3 and the earlier releases remain available. The owner's installed copy is the validated test setup, same source.
