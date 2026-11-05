@@ -7,7 +7,7 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 3.5 (`0.3.5-alpha.3`, S-067, D61, 2026-11-05)
+## Current checkpoint — 3.5 published as Latest (`0.3.5-alpha.3`, S-067, D61, 2026-11-05)
 
 **3.4 was never published.** The previous session wrote this section as "3.4 published as Latest" before doing it, built and installed
 its setup on the owner's machine (the installed copy is `0.3.4-alpha.3`, sign-in startup off), and stopped with everything uncommitted.
@@ -20,10 +20,10 @@ test build in `dist/`, not installed, pushed or published.
 
 **Validated by the owner (2026-11-05):** "everything pleases me, I see no bug for now"; commit and push to `main` approved and done
 (receipts in TEST_STATUS S-067). Still open, for real diagnosis later: the blank page (AS4-01) and a newly reported Claude window that
-disappears (not reproduced, nothing known yet). A GitHub Release of 3.5 was not mentioned: if the owner asks, tag `v0.3.5-alpha.3` on the
-pushed commit, release setup and checksums only, then switch INSTALLATION and KNOWN_LIMITATIONS' "current release" lines and the
-changelog heading. **Next:** the owner will name the next batch, announced as version 4 ("very advanced"). Ask before choosing its
-version number; test builds otherwise count from `0.3.6-alpha.3` (D57).
+disappears (not reproduced, nothing known yet). **Published as Latest at the owner's word** (tag `v0.3.5-alpha.3`, setup and
+checksums only; receipts at the end of S-067); the owner's installed copy is 3.5 (installed over the 3.4 test build). **Next:** the
+owner will name the next batch, announced as version 4 ("very advanced"). Ask before choosing its version number; test builds
+otherwise count from `0.3.6-alpha.3` (D57).
 
 ## Earlier today — 3.3 published as Latest (`0.3.3-alpha.3`, S-066, D59, 2026-11-01)
 
@@ -1171,7 +1171,7 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**Current state: test 3.5 validated by the owner and pushed (D61, S-067, 2026-11-05); version 4 to be named**; read the checkpoint at the top first. Older assignment
+**Current state: 3.5 validated and published as Latest (D61, S-067, 2026-11-05); version 4 to be named**; read the checkpoint at the top first. Older assignment
 text follows. **Assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
 the status table in `docs/specs/v4-stability-audit.md`. The source work is in the working tree,
 uncommitted. Next: owner trial of a private build, then whatever it shows; the open AS4 entries; the

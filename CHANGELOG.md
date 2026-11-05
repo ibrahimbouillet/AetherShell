@@ -6,10 +6,11 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-## [0.3.5-alpha.3] — test build, not yet published
+## [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3) — 2026-11-05
 
-Alpha 3, test 3.5 (D57, D61). It contains everything prepared as 3.4 (D60), which was built and installed as a test build on
-2026-11-01 but never published. Release notes, for its publication: [docs/releases/0.3.5-alpha.3.md](docs/releases/0.3.5-alpha.3.md).
+Alpha 3, version 3.5, validated by the owner and published as the Latest release (D61). It contains everything prepared as 3.4 (D60),
+which was built and installed as a test build on 2026-11-01 but never published. Release notes:
+[docs/releases/0.3.5-alpha.3.md](docs/releases/0.3.5-alpha.3.md).
 
 ### Added
 

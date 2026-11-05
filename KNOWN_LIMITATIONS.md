@@ -2,9 +2,8 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The current release is 3.3, `0.3.3-alpha.3` (D59, published 2026-11-01); `0.3.0-alpha.3`, `0.2.0-alpha.2` and `0.1.0-alpha.1`
-remain available. The source describes test build 3.5, `0.3.5-alpha.3` (D61), which includes the 3.4 work (D60) and is not published.
-Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
+The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which includes the 3.4 work (D60, never published on its own);
+`0.3.3-alpha.3`, `0.3.0-alpha.3`, `0.2.0-alpha.2` and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
 `docs/knowledge/TEST_STATUS.md`.
 
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop

@@ -137,7 +137,10 @@ and under which number it is published is the owner's call after trying it.
   project's license.
 - **Validated (owner, 2026-11-05):** after trying test 3.5, "everything pleases me, I see no bug for now"; commit and push to `main`
   approved. Not fixed and left for later investigation: the blank page (AS4-01) and a newly reported disappearing Claude window. The next
-  batch is announced as version 4 ("very advanced"), not 3.6; its content is still to be named. A GitHub Release of 3.5 was not mentioned.
+  batch is announced as version 4 ("very advanced"), not 3.6; its content is still to be named.
+- **Published (owner, 2026-11-05: "Yes, publish 3.5"):** a normal GitHub Release marked Latest, tag `v0.3.5-alpha.3`, setup and
+  checksums only. The release's setup is rebuilt from the tagged commit, because the validated test setup was built before its commit
+  and embeds the previous revision (`8af10b2`); the source of both is the same, the Markdown aside.
 
 ### D60 — Version 3.4: the top pixel only, a quarter of a second, a flowing pen, panels that close, a complete search
 
