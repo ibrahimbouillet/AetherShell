@@ -8,6 +8,8 @@
 
 #include "applications/ApplicationTypes.h"
 
+#include <functional>
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -32,7 +34,7 @@ enum class CatalogDecision {
     SkipInvalid,      // no display name, no launchable target or no usable identity
     SkipUninstaller,  // uninstallers and Windows Installer maintenance shortcuts
     SkipHelp,         // help viewers and help/readme documents
-    SkipDocument,     // non-executable targets (documents, MMC consoles, folders...)
+    SkipDocument,     // non-executable targets (documents, folders...)
     SkipUrl,          // web links and other URL protocols
 };
 
@@ -73,6 +75,8 @@ inline constexpr std::wstring_view kAppsFolderParsingPrefix = L"::{4234D49B-0245
 //  * .exe targets (help viewers excluded)                                         -> Include, Desktop
 //  * shell namespace targets and target-less Apps-folder items with an explicit
 //    AUMID, both only when they come from the Apps folder (launchable by name)    -> Include, Other
+//  * D60: management consoles and Control Panel applets (.msc, .cpl) from the
+//    Apps folder or a shortcut, which launch them                                  -> Include, Other
 //  * URLs, help files, documents and everything else                              -> Skip*
 // The AUMID is kept only when it is packaged or explicit (IsExplicitAumid); the Apps folder's own
 // synthesized IDs never identify running windows.
@@ -88,9 +92,26 @@ inline constexpr std::wstring_view kAppsFolderParsingPrefix = L"::{4234D49B-0245
 // entry it describes (fills shortcutPath, and executablePath/arguments/AUMID when missing) instead of
 // creating a duplicate. It describes an entry when both carry the same AUMID, or, without an AUMID on
 // the shortcut, when both start the same executable with the same arguments (several candidates are
-// disambiguated by display name, then by the first one without a shortcut). Unmatched shortcuts are
-// added. The result is merged by id and sorted by display name (case-insensitive, user locale), then id.
+// disambiguated by display name, then by the first one without a shortcut). A shortcut with neither (a
+// console's) describes the entry of the same name. Unmatched shortcuts are added. The result is merged
+// by id and sorted by display name (case-insensitive, user locale), then id.
 [[nodiscard]] std::vector<ApplicationInfo> CombineCatalog(std::vector<ApplicationInfo> appsFolderEntries,
                                                           std::vector<ApplicationInfo> shortcutEntries);
+
+// D60: Windows' own tools that neither Start nor the Apps folder list, which Windows' search still finds:
+// Device Manager only exists among the Control Panel items, Disk Management only as a file in System32.
+// Their parsing names are absolute and are the only ones besides the Apps folder's that open anything.
+inline constexpr wchar_t kControlPanelItemsFolder[] = L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0";
+[[nodiscard]] bool IsControlPanelItemName(std::wstring_view parsingName) noexcept;
+// "Microsoft.DeviceManager" -> "Device Manager": the English name, also on a Windows in another language.
+[[nodiscard]] std::wstring WordsOfCanonicalName(std::wstring_view canonicalName);
+[[nodiscard]] CatalogClassification ClassifyControlPanelItem(std::wstring_view displayName, std::wstring_view parsingName,
+                                                             std::wstring_view canonicalName);
+// The file of a listed tool named "system32:<file>" (ignoring case); nullopt for any other name.
+[[nodiscard]] std::optional<std::wstring_view> SystemToolFile(std::wstring_view parsingName) noexcept;
+// The listed tools whose file `exists`, named in French or English; the other name stays searchable.
+[[nodiscard]] std::vector<ApplicationInfo> SystemToolApplications(bool french, const std::function<bool(std::wstring_view file)>& exists);
+// Adds the entries whose name the catalog does not have yet, and keeps its order.
+[[nodiscard]] std::vector<ApplicationInfo> AddSystemEntries(std::vector<ApplicationInfo> catalog, std::vector<ApplicationInfo> entries);
 
 }  // namespace aether::apps

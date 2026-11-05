@@ -8,6 +8,7 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <array>
 #include <initializer_list>
 #include <cstddef>
 #include <optional>
@@ -115,6 +116,38 @@ int CompareDisplayNames(const std::wstring& a, const std::wstring& b) noexcept {
     return result - CSTR_EQUAL;
 }
 
+void SortByName(std::vector<ApplicationInfo>& entries) {
+    std::stable_sort(entries.begin(), entries.end(), [](const ApplicationInfo& a, const ApplicationInfo& b) {
+        const int order = CompareDisplayNames(a.displayName, b.displayName);
+        if (order != 0) return order < 0;
+        return a.id < b.id;
+    });
+}
+
+constexpr std::wstring_view kSystemToolPrefix = L"system32:";
+
+struct SystemTool { std::wstring_view file, english, french, keywords; };
+// Only what is in no other list on a standard Windows 11; the rest arrives through the Apps folder.
+constexpr std::array<SystemTool, 17> kSystemTools{{
+    {L"diskmgmt.msc", L"Disk Management", L"Gestion des disques", L"partition volume format"},
+    {L"lusrmgr.msc", L"Local Users and Groups", L"Utilisateurs et groupes locaux", L"accounts comptes"},
+    {L"gpedit.msc", L"Local Group Policy Editor", L"Éditeur de stratégie de groupe locale", L"gpedit policy"},
+    {L"certmgr.msc", L"Manage User Certificates", L"Gérer les certificats utilisateur", L"certificates certificats"},
+    {L"certlm.msc", L"Manage Computer Certificates", L"Gérer les certificats de l'ordinateur", L"certificates certificats"},
+    {L"fsmgmt.msc", L"Shared Folders", L"Dossiers partagés", L"shares partages"},
+    {L"tpm.msc", L"TPM Management", L"Gestion du module de plateforme sécurisée", L"trusted platform module"},
+    {L"ncpa.cpl", L"Network Connections", L"Connexions réseau", L"adapter carte ethernet wifi"},
+    {L"sysdm.cpl", L"System Properties", L"Propriétés système", L"computer name nom ordinateur"},
+    {L"winver.exe", L"About Windows", L"À propos de Windows", L"winver version build"},
+    {L"dxdiag.exe", L"DirectX Diagnostic Tool", L"Outil de diagnostic DirectX", L"dxdiag graphics"},
+    {L"optionalfeatures.exe", L"Windows Features", L"Fonctionnalités de Windows", L"optional features facultatives"},
+    {L"rstrui.exe", L"System Restore", L"Restauration du système", L"restore point restauration"},
+    {L"SystemPropertiesAdvanced.exe", L"Advanced System Settings", L"Paramètres système avancés", L"environment variables environnement"},
+    {L"sndvol.exe", L"Volume Mixer", L"Mélangeur de volume", L"sound son audio"},
+    {L"mmc.exe", L"Microsoft Management Console", L"Console de gestion Microsoft", L"mmc snap-in"},
+    {L"netplwiz.exe", L"User Accounts (Advanced)", L"Comptes d'utilisateurs (avancé)", L"netplwiz sign-in connexion"},
+}};
+
 }  // namespace
 
 bool IsUninstallerName(std::wstring_view displayName) noexcept {
@@ -212,6 +245,11 @@ CatalogClassification ClassifyDiscoveredItem(const DiscoveredItem& item) {
 
     const auto extension = ExtensionOf(target);
     if (text::EqualsIgnoreCase(extension, L".url")) return Skip(CatalogDecision::SkipUrl);
+    // D60: Services or Event Viewer are consoles, and to the person looking for them, applications.
+    if (IsOneOf(extension, {L".msc", L".cpl"}) && (fromAppsFolder || !app.shortcutPath.empty())) {
+        app.kind = ApplicationKind::Other;
+        return Finish(std::move(app));
+    }
     if (!text::EqualsIgnoreCase(extension, L".exe")) {
         return Skip(IsHelpDocument(extension) ? CatalogDecision::SkipHelp : CatalogDecision::SkipDocument);
     }
@@ -303,6 +341,11 @@ std::vector<ApplicationInfo> CombineCatalog(std::vector<ApplicationInfo> appsFol
                     }
                 }
             }
+        } else {
+            // A console's shortcut: only its name says which entry it describes.
+            for (std::size_t i = 0; i < appsFolderCount && !match; ++i) {
+                if (text::EqualsIgnoreCase(combined[i].displayName, shortcut.displayName)) match = i;
+            }
         }
         if (match) {
             enrich(combined[*match], shortcut);
@@ -312,12 +355,74 @@ std::vector<ApplicationInfo> CombineCatalog(std::vector<ApplicationInfo> appsFol
     }
 
     auto result = MergeDuplicateApplications(std::move(combined));
-    std::stable_sort(result.begin(), result.end(), [](const ApplicationInfo& a, const ApplicationInfo& b) {
-        const int order = CompareDisplayNames(a.displayName, b.displayName);
-        if (order != 0) return order < 0;
-        return a.id < b.id;
-    });
+    SortByName(result);
     return result;
+}
+
+bool IsControlPanelItemName(std::wstring_view parsingName) noexcept {
+    const std::wstring_view folder = kControlPanelItemsFolder;
+    return parsingName.size() > folder.size() + 1 && StartsWithIgnoreCase(parsingName, folder) && parsingName[folder.size()] == L'\\';
+}
+
+std::wstring WordsOfCanonicalName(std::wstring_view canonicalName) {
+    const auto dot = canonicalName.find_last_of(L'.');
+    const auto name = dot == std::wstring_view::npos ? canonicalName : canonicalName.substr(dot + 1);
+    std::wstring words;
+    for (std::size_t i = 0; i < name.size(); ++i) {
+        const bool upper = name[i] >= L'A' && name[i] <= L'Z';
+        const bool afterLower = i > 0 && name[i - 1] >= L'a' && name[i - 1] <= L'z';
+        if (upper && afterLower) words += L' ';
+        words += name[i];
+    }
+    return words;
+}
+
+CatalogClassification ClassifyControlPanelItem(std::wstring_view displayName, std::wstring_view parsingName,
+                                               std::wstring_view canonicalName) {
+    const auto name = text::Trim(displayName);
+    const auto parsing = text::Trim(parsingName);
+    if (name.empty() || !IsControlPanelItemName(parsing)) return Skip(CatalogDecision::SkipInvalid);
+    ApplicationInfo app;
+    app.kind = ApplicationKind::Other;
+    app.displayName = std::wstring(name);
+    app.parsingName = std::wstring(parsing);
+    const auto words = WordsOfCanonicalName(text::Trim(canonicalName));
+    if (!text::EqualsIgnoreCase(words, name)) app.keywords = words;
+    return Finish(std::move(app));
+}
+
+std::optional<std::wstring_view> SystemToolFile(std::wstring_view parsingName) noexcept {
+    if (!StartsWithIgnoreCase(parsingName, kSystemToolPrefix)) return std::nullopt;
+    const auto file = parsingName.substr(kSystemToolPrefix.size());
+    const auto tool = std::find_if(kSystemTools.begin(), kSystemTools.end(), [file](const SystemTool& entry) { return text::EqualsIgnoreCase(entry.file, file); });
+    if (tool == kSystemTools.end()) return std::nullopt;
+    return tool->file;
+}
+
+std::vector<ApplicationInfo> SystemToolApplications(bool french, const std::function<bool(std::wstring_view file)>& exists) {
+    std::vector<ApplicationInfo> tools;
+    for (const auto& tool : kSystemTools) {
+        if (!exists(tool.file)) continue;
+        ApplicationInfo app;
+        app.kind = ApplicationKind::Other;
+        app.displayName = std::wstring(french ? tool.french : tool.english);
+        app.parsingName = std::wstring(kSystemToolPrefix) + std::wstring(tool.file);
+        app.keywords = std::wstring(french ? tool.english : tool.french) + L" " + std::wstring(StemOf(tool.file)) + L" " + std::wstring(tool.keywords);
+        auto finished = Finish(std::move(app));
+        if (finished.decision == CatalogDecision::Include) tools.push_back(std::move(finished.app));
+    }
+    return tools;
+}
+
+std::vector<ApplicationInfo> AddSystemEntries(std::vector<ApplicationInfo> catalog, std::vector<ApplicationInfo> entries) {
+    for (auto& entry : entries) {
+        const bool known = std::any_of(catalog.begin(), catalog.end(), [&](const ApplicationInfo& app) {
+            return text::EqualsIgnoreCase(app.id, entry.id) || text::EqualsIgnoreCase(app.displayName, entry.displayName);
+        });
+        if (!known) catalog.push_back(std::move(entry));
+    }
+    SortByName(catalog);
+    return catalog;
 }
 
 }  // namespace aether::apps

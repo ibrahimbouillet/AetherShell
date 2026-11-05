@@ -34,8 +34,12 @@ const Tables& Data() {
 constexpr int kCedilla = 0x0327;
 constexpr float kBaseline = 0.0f;       // grid height of the line the letters stand on
 constexpr float kXHeight = 50.0f;       // grid height of a lowercase letter
-constexpr float kWritingSeconds = 1.5f;                            // D59: the whole writing, whatever the name's length
+constexpr float kWritingSeconds = 2.2f;                            // D60: the whole writing, whatever the name's length
 constexpr float kGridSpeed = 170.0f;                               // the pace within it: only proportions matter
+constexpr float kPaceSeconds = 0.08f;                              // the time over which that pace changes: a hand, not a nervous one
+constexpr float kPaceDepth = 0.6f;                                 // how much of those changes is kept
+constexpr float kGestureEase = 0.2f;                               // the share of the ink over which the writing sets off and lands
+constexpr float kGestureStart = 0.62f;                             // the pace at its very start and end
 constexpr float kSpacing = 2.5f;                                   // DIPs between sampled points
 constexpr float kLineGap = 12.0f;                                  // grid units between two lines
 constexpr float kJoinMerge = 5.0f;      // grid units: a letter starting this close to the last one's end joins it
@@ -222,12 +226,42 @@ void Blur(std::vector<float>& values, int passes) {
     }
 }
 
+// Three running averages come close to a Gaussian of about this radius, at any reach, in linear time.
+void SmoothAlong(std::vector<float>& values, int radius) {
+    const int count = static_cast<int>(values.size());
+    if (count < 3 || radius < 1) return;
+    std::vector<float> sums(values.size() + 1, 0.0f);
+    for (int pass = 0; pass < 3; ++pass) {
+        for (int i = 0; i < count; ++i) sums[static_cast<std::size_t>(i) + 1] = sums[static_cast<std::size_t>(i)] + values[static_cast<std::size_t>(i)];
+        for (int i = 0; i < count; ++i) {
+            const int low = std::max(0, i - radius), high = std::min(count - 1, i + radius);
+            values[static_cast<std::size_t>(i)] = (sums[static_cast<std::size_t>(high) + 1] - sums[static_cast<std::size_t>(low)]) / static_cast<float>(high - low + 1);
+        }
+    }
+}
+
+float SmoothStep(float t) noexcept {
+    const float x = std::clamp(t, 0.0f, 1.0f);
+    return x * x * (3.0f - 2.0f * x);
+}
+
+// D60: one gesture over the whole writing. It sets off gently, flows, and lands gently.
+float GesturePace(float progress) noexcept {
+    return kGestureStart + (1.0f - kGestureStart) * SmoothStep(std::min(progress, 1.0f - progress) / kGestureEase);
+}
+
 // Timing and width from the shape of the line: the part of the model that makes it read as a hand.
+// D60: compressed to a couple of seconds, a hand's letter-by-letter changes of pace became a nervous flicker
+// of speed. They now change slowly and less, so that the writing is quick and still visibly draws each shape.
 void AnimatePen(WelcomeScene& scene, float unit) {
     const float speed = kGridSpeed * unit;
     // Smoothing has the same reach along a letter at any size.
     const float gridStep = kSpacing / unit;
     const int passes = std::clamp(static_cast<int>(2.0f * (kWidthReach / gridStep) * (kWidthReach / gridStep)), 3, 64);
+    float allInk = 0.0f;
+    for (const auto& stroke : scene.strokes)
+        for (std::size_t i = 1; i < stroke.points.size(); ++i) allInk += std::hypot(stroke.points[i].x - stroke.points[i - 1].x, stroke.points[i].y - stroke.points[i - 1].y);
+    const int paceRadius = std::max(1, static_cast<int>(allInk / kWritingSeconds * kPaceSeconds / kSpacing));
     const float turnScale = unit;  // a turn per sample shrinks as the writing grows; the model reads it per grid step
     const float axisX = kSlant / std::hypot(kSlant, 1.0f), axisY = 1.0f / std::hypot(kSlant, 1.0f);
     scene.penWidth = std::max(2.0f, kThickWidth * unit);
@@ -242,7 +276,7 @@ void AnimatePen(WelcomeScene& scene, float unit) {
         if (hasPrevious) {
             // A real lift: the pen pauses, travels above the page and lands.
             const float travel = std::hypot(points.front().x - previousEnd.x, points.front().y - previousEnd.y);
-            clock += 0.07f + travel / (speed * 2.6f);
+            clock += 0.16f + travel / (speed * 2.2f);
             ++scene.penLifts;
         }
         float length = 0.0f;
@@ -272,7 +306,8 @@ void AnimatePen(WelcomeScene& scene, float unit) {
             pace[i] *= 0.55f + 0.45f * std::clamp(fromEdge / (14.0f * unit), 0.0f, 1.0f);  // it starts and lands gently
         }
         // Smooth them so the ink's width and speed change like a hand's, not point by point.
-        Blur(pace, passes);
+        SmoothAlong(pace, paceRadius);
+        for (auto& value : pace) value = 1.0f + (value - 1.0f) * kPaceDepth;
         Blur(swell, passes);
         points.front().time = clock;
         along = 0.0f;
@@ -281,7 +316,7 @@ void AnimatePen(WelcomeScene& scene, float unit) {
         for (std::size_t i = 0; i < points.size(); ++i) {
             if (i > 0) {
                 const float step = std::hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-                clock += step / (speed * std::max(0.12f, pace[i]));
+                clock += step / (speed * std::max(0.12f, pace[i] * GesturePace(allInk > 0.0f ? inkTotal / allInk : 0.5f)));
                 inkTotal += step;
                 along += step;
                 points[i].time = clock;
@@ -399,7 +434,7 @@ std::optional<PenPosition> PenAt(const WelcomeScene& scene, float time) noexcept
             if (!before) return std::nullopt;
             const auto& next = stroke.points.front();
             const float span = next.time - before->time;
-            const float t = span > 0.0f ? (time - before->time) / span : 1.0f;
+            const float t = SmoothStep(span > 0.0f ? (time - before->time) / span : 1.0f);  // above the page, it glides
             return PenPosition{before->x + (next.x - before->x) * t, before->y + (next.y - before->y) * t, true};
         }
         if (time <= stroke.points.back().time) {

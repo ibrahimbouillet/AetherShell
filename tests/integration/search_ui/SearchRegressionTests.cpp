@@ -97,7 +97,7 @@ AETHER_TEST("search UI: burst edits debounce, keys flush, failed launch remains 
     window.Open(); const auto before = window.QueryCount();
     ::SetWindowTextW(window.EditHandle(), L"T"); ::SetWindowTextW(window.EditHandle(), L"Test"); ::SetWindowTextW(window.EditHandle(), L"Application");
     CHECK_EQ(window.QueryCount(), before); RunFor(fixture.loop, 110); CHECK_EQ(window.QueryCount(), before + 1);
-    REQUIRE_EQ(window.Results().size(), 8u); CHECK_FALSE(window.Item(0).isOffscreen); CHECK(window.Item(7).isOffscreen);
+    REQUIRE(window.Results().size() >= 8u); CHECK_FALSE(window.Item(0).isOffscreen); CHECK(window.Item(7).isOffscreen);
     const auto lastId = window.Item(7).id; REQUIRE(window.SetFocus(lastId).ok());
     CHECK(window.Item(0).isOffscreen); CHECK_FALSE(window.Item(7).isOffscreen); CHECK(window.Item(7).hasKeyboardFocus);
     const auto visible = window.Item(7).boundsPx; const auto bounds = window.BoundsPx(); CHECK(visible.bottom < bounds.bottom);

@@ -17,6 +17,16 @@
 namespace aether::search::ui {
 namespace {
 constexpr UINT_PTR QueryTimer = 1, CaretTimer = 2;
+constexpr UINT kQueryDelayMs = 30;          // gathers a burst of keys; a query itself takes well under a millisecond
+constexpr std::size_t kMaxResults = 500;    // D60: every match can be reached; only visible rows ask for an icon
+const wchar_t* KindLabel(apps::ApplicationKind kind) noexcept {
+    switch (kind) {
+        case apps::ApplicationKind::Packaged: return L"Installed application";
+        case apps::ApplicationKind::Desktop: return L"Desktop application";
+        case apps::ApplicationKind::Other: break;
+    }
+    return L"Windows tool";
+}
 // Panel layout in DIPs, relative to the panel's top-left corner.
 constexpr float kPanelWidth = 680.0f;
 constexpr float kMinPanel = 156.0f;
@@ -228,6 +238,7 @@ void SearchWindow::Open() {
     if (!Handle()) return;
     if (IsOpen()) { ::SetForegroundWindow(Handle()); ::SetFocus(edit_); return; }
     closing_ = false; ::EnableWindow(edit_, TRUE);
+    ::SetWindowTextW(edit_, L"");  // D60: what was typed goes when the panel does; every opening starts empty
     previousFocus_ = ::GetForegroundWindow(); error_.clear();
     Position(); RefreshResults();
     SetPanelTarget(false);
@@ -242,6 +253,7 @@ void SearchWindow::Open() {
     ::SetForegroundWindow(Handle()); ::SetFocus(edit_);
     const auto blink = ::GetCaretBlinkTime();
     if (blink && blink != INFINITE) ::SetTimer(Handle(), CaretTimer, blink, nullptr);
+    OpenChanged.Emit();
 }
 void SearchWindow::StopTimers() {
     if (Handle()) { ::KillTimer(Handle(), QueryTimer); ::KillTimer(Handle(), CaretTimer); }
@@ -259,8 +271,10 @@ void SearchWindow::BeginClose(bool restoreFocus) {
     HideAnimated(graphics::MakeExitTransition(to, tokens_, motion_));
     if (restoreFocus && previousFocus_ && ::IsWindow(previousFocus_)) ::SetForegroundWindow(previousFocus_);
     previousFocus_ = nullptr;
+    OpenChanged.Emit();
 }
 void SearchWindow::Close() { BeginClose(true); }
+void SearchWindow::Dismiss() { BeginClose(false); }
 void SearchWindow::Toggle() { if (IsOpen()) Close(); else Open(); }
 void SearchWindow::SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion) {
     tokens_ = tokens; motion_ = motion;
@@ -286,7 +300,7 @@ void SearchWindow::FlushQuery() { if (queryPending_) RefreshResults(); }
 void SearchWindow::RefreshResults() {
     if (!edit_) return;
     ::KillTimer(Handle(), QueryTimer); queryPending_ = false; ReadQuery(); ++queryCount_;
-    auto queried = search_.Query(query_);
+    auto queried = search_.Query(query_, kMaxResults);
     press_.Cancel();  // the rows under a press are about to change
     (void)touch_.Cancel();
     touchRow_.reset();
@@ -294,21 +308,22 @@ void SearchWindow::RefreshResults() {
     results_ = queried ? std::move(queried.value()) : std::vector<SearchResult>{};
     selected_ = firstVisible_ = 0;
     if (!queried) error_ = L"Search could not be completed.";
-    const auto weak = std::weak_ptr<bool>(alive_);
-    const auto iconPx = static_cast<std::uint32_t>(std::lround(ToPx(kIconSize)));
     for (const auto& result : results_) {
         if (!accessibleIds_.contains(result.application.id)) accessibleIds_.emplace(result.application.id, nextAccessibleId_++);
-        if (images_.contains(result.application.id)) continue;
-        images_[result.application.id] = nullptr;
-        icons_.RequestIcon(apps::IconRequest{result.application.id, result.application, iconPx},
-            [this, weak](const std::wstring& key, std::shared_ptr<const apps::IconImage> image) {
-                if (const auto live = weak.lock(); live && *live) { images_[key] = std::move(image); Invalidate(); }
-            });
     }
     EnsureVisible();
     SetPanelTarget(true);
     MoveIndicator(false);
     (void)accessible_.NotifyStructureChanged(); Invalidate();
+}
+
+void SearchWindow::RequestRowIcon(const apps::ApplicationInfo& application) {
+    images_[application.id] = nullptr;
+    const auto weak = std::weak_ptr<bool>(alive_);
+    icons_.RequestIcon(apps::IconRequest{application.id, application, static_cast<std::uint32_t>(std::lround(ToPx(kIconSize)))},
+        [this, weak](const std::wstring& key, std::shared_ptr<const apps::IconImage> image) {
+            if (const auto live = weak.lock(); live && *live) { images_[key] = std::move(image); Invalidate(); }
+        });
 }
 
 // --- Rendering ---
@@ -420,6 +435,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
         const auto& app = results_[i].application;
         const float iconTop = top + (kRowPill - kIconSize) / 2.0f;
         const auto icon = D2D1::RectF(row.left + 12.0f, iconTop, row.left + 12.0f + kIconSize, iconTop + kIconSize);
+        if (!images_.contains(app.id)) RequestRowIcon(app);  // D60: only the rows on screen cost an icon
         const auto image = images_.find(app.id);
         ID2D1Bitmap1* bitmap = bitmaps_.Find(app.id);
         if (!bitmap && image != images_.end() && image->second) bitmap = bitmaps_.Put(dc, app.id, image->second->width, image->second->height, image->second->pixels);
@@ -442,8 +458,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
             dc->DrawTextLayout(D2D1::Point2F(textLeft, top + 4.0f), layout.get(), brush.get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
         }
         brush->SetColor((inverse ? tokens_.surface.selectedText : tokens_.textSecondary).ToD2D());
-        text_.Draw(dc, app.kind == apps::ApplicationKind::Packaged ? L"Installed application" : L"Desktop application",
-                   D2D1::RectF(textLeft, top + kRowPill / 2.0f, row.right - 12.0f, top + kRowPill - 4.0f), kindStyle, brush.get());
+        text_.Draw(dc, KindLabel(app.kind), D2D1::RectF(textLeft, top + kRowPill / 2.0f, row.right - 12.0f, top + kRowPill - 4.0f), kindStyle, brush.get());
     }
     if (!results_.empty() && selected_ >= firstVisible_ && selected_ < lastVisible) {
         const float centre = panel.top + indicatorY_.Value(context.now) - rowShift_;
@@ -503,7 +518,7 @@ bool SearchWindow::OnAnimate(double now) {
 
 bool SearchWindow::OnKeyDown(UINT key) {
     if (!IsOpen()) return false;
-    if (key == VK_ESCAPE) { if (!query_.empty()) { ::SetWindowTextW(edit_, L""); FlushQuery(); } else Close(); return true; }
+    if (key == VK_ESCAPE) { Close(); return true; }  // D60: Escape closes; the next opening starts empty
     if (key == VK_RETURN || key == VK_TAB || key == VK_UP || key == VK_DOWN || key == VK_HOME || key == VK_END || key == VK_PRIOR || key == VK_NEXT) FlushQuery();
     if (key == VK_RETURN && !results_.empty()) { Launch(selected_); return true; }
     if (key == VK_UP || key == VK_DOWN || key == VK_TAB || key == VK_HOME || key == VK_END || key == VK_PRIOR || key == VK_NEXT) {
@@ -708,7 +723,7 @@ std::optional<LRESULT> SearchWindow::OnMessage(UINT message, WPARAM wParam, LPAR
     if (message == WM_GETOBJECT && accessible_.HandleGetObject(Handle(), wParam, lParam, result)) return result;
     if (message == WM_COMMAND && HIWORD(wParam) == EN_CHANGE && reinterpret_cast<HWND>(lParam) == edit_) {
         error_.clear(); ReadQuery(); queryPending_ = true;
-        if (IsOpen()) ::SetTimer(Handle(), QueryTimer, 70, nullptr);
+        if (IsOpen()) ::SetTimer(Handle(), QueryTimer, kQueryDelayMs, nullptr);
         caretVisible_ = true; Invalidate(); return 0;
     }
     if (message == WM_TIMER && wParam == QueryTimer) { if (queryPending_ && IsOpen()) RefreshResults(); return 0; }
@@ -729,7 +744,7 @@ aether::ui::accessibility::AccessibleItem SearchWindow::Item(std::size_t index) 
     aether::ui::accessibility::AccessibleItem item;
     if (index >= results_.size()) return item;
     item.id = IdFor(index); item.name = results_[index].application.displayName;
-    item.helpText = results_[index].application.kind == apps::ApplicationKind::Packaged ? L"Installed application" : L"Desktop application";
+    item.helpText = KindLabel(results_[index].application.kind);
     item.controlType = UIA_ListItemControlTypeId; item.supportsInvoke = true; item.isFocusable = true; item.isEnabled = IsOpen();
     item.hasKeyboardFocus = IsOpen() && ::GetFocus() == edit_ && index == selected_;
     item.isOffscreen = !IsOpen() || index < firstVisible_ || index >= firstVisible_ + VisibleRows();

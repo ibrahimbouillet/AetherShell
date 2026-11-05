@@ -466,6 +466,12 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         }
     }
 
+    // D60: only what is shown has an update region, so a move of anything partly out of view could leave its old
+    // place in the kept pixels, and the next scroll would show the page twice over.
+    void InvalidateContent() noexcept {
+        for (auto& layer : layers) layer->contentValid = false;
+    }
+
     void ReleaseLayers() noexcept {
         layers.clear();
         composed.Release();
@@ -2502,6 +2508,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
 
     std::optional<LRESULT> ControlMessage(ControlState& c, UINT message, WPARAM wParam, LPARAM lParam) {
         if (c.bypass) return std::nullopt;
+        if (message == WM_SETTEXT) c.visual = nullptr;  // out of view it hears no WM_PAINT, and would return with its old words
         const bool styled = Styled();
         const ControlRole role = c.spec.role;
         const HWND hwnd = c.hwnd;
@@ -2993,6 +3000,7 @@ void FormSurface::SetFrame(HWND control, const RECT& framePx) {
     ControlState* c = impl.Find(control);
     if (!c) return;
     try {
+        if (!c->hasFrame || !::EqualRect(&c->frame, &framePx)) impl.InvalidateContent();
         c->frame = framePx;
         c->hasFrame = true;
         impl.ApplyFrame(*c);
@@ -3063,12 +3071,16 @@ void FormSurface::SetProgress(HWND progress, std::optional<double> fraction) {
     }
 }
 
+void FormSurface::InvalidateRetainedContent() noexcept { impl_->InvalidateContent(); }
+
 void FormSurface::SetCards(std::vector<FormCard> cards) {
+    impl_->InvalidateContent();
     impl_->cards = std::move(cards);
     if (impl_->window) ::RedrawWindow(impl_->window, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void FormSurface::SetDividers(std::vector<FormDivider> dividers) {
+    impl_->InvalidateContent();
     impl_->dividers = std::move(dividers);
     if (impl_->window) ::RedrawWindow(impl_->window, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }

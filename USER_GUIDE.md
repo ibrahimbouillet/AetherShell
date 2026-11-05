@@ -6,7 +6,8 @@ to run normally. Dock items have context menus. Select the Top Bar's logo to ope
 also offers Settings and Quit.
 
 Open Search from the Dock or with Ctrl+Alt+Space. Type an application name, use Up/Down to select,
-and Enter to open it. Escape clears the query, then closes the search window. Only discovered
+and Enter to open it. Escape closes the search window, as does using anything else, and every opening
+starts empty. Windows' own tools such as Device Manager are found too. Only discovered
 application entries can be launched; typed text is never a shell command. Ctrl+Alt+D focuses the
 Dock. Both shortcuts are configurable in Settings → General; conflicts are reported there.
 
@@ -73,8 +74,9 @@ window takes the whole screen, square.
 
 **Welcome** (since 3.3): after you sign in or unlock, Aether Shell writes a short greeting by hand,
 filling the screen, over your blurred desktop picture, and the bars come out when it ends: "Salut" or "Hello", with your name if you entered one. When you
-unlock, it is already there, in place of the desktop. Touch, click or press Escape to skip it. Settings →
-Welcome turns it off and sets the language and the name. The name and your picture stay on this PC; neither
+unlock, it is already there, in place of the desktop. Touch, click or press Escape to skip it. Setup asks for
+the name, optionally (since 3.5); Settings → Welcome turns it off and sets the language and the name. If the
+picture's file was moved or deleted, the welcome uses the copy Windows keeps of it. The name and your picture stay on this PC; neither
 is ever sent anywhere or logged, and clearing the field removes the name. It appears only after Windows has
 signed you in; the Windows sign-in screen itself is not changed. At sign-in it appears as soon as Windows
 starts Aether, which can be after the desktop.
@@ -89,8 +91,8 @@ a pan up or down there scrolls the page instead. A Settings slider takes effect 
 **Auto-Hide** (Alpha 3) is set separately for each bar: Settings → Dock → **Automatically hide the
 Dock** and Settings → Top Bar → **Automatically hide the Top Bar**. Both are off by default. An
 auto-hiding bar slides away while an application window covers it. Rest the pointer on the bottom
-edge of the screen to bring the Dock back, or where the Top Bar appears, at the top, for half a second to bring it
-back; moving away sooner cancels it, so reaching for a button near the top does not open the bar.
+edge of the screen to bring the Dock back, or on the very top edge, with no margin, for a quarter of a second to bring
+the Top Bar back; moving away sooner cancels it, so applications' tabs and close buttons stay free.
 It stays while you use it or one of its
 menus or panels is open, and hides again shortly after. On the desktop the bars come back, even with windows behind it (Show desktop). An auto-hiding bar reserves no screen space, so maximized windows fill the screen
 and the revealed bar appears over them, like Windows' own auto-hide taskbar.

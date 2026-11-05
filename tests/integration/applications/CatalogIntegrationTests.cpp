@@ -16,6 +16,7 @@
 #include <windows.h>
 #include <objbase.h>
 
+#include <algorithm>
 #include <chrono>
 #include <optional>
 #include <thread>
@@ -103,6 +104,36 @@ AETHER_TEST("catalog: discovers installed packaged and desktop applications") {
     REQUIRE(line != std::string::npos);
     const auto lineEnd = log.value().find_first_of("\r\n", line);
     TEST_NOTE("log: " + log.value().substr(line, lineEnd == std::string::npos ? std::string::npos : lineEnd - line));
+}
+
+// D60: reads the shell only; nothing is launched.
+AETHER_TEST("catalog: Windows' own tools are found, and each resolves to something that can open it") {
+    auto result = ShellApplicationCatalog().DiscoverApplications(CancellationToken{});
+    REQUIRE(result.ok());
+    const auto named = [&](std::wstring_view parsing) {
+        return std::find_if(result.value().begin(), result.value().end(), [&](const ApplicationInfo& app) {
+            return text::ToLower(app.parsingName).find(text::ToLower(parsing)) != std::wstring::npos;
+        });
+    };
+    const auto manager = named(L"{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}");  // Device Manager, in any language
+    REQUIRE(manager != result.value().end());
+    CHECK(shell::CreateApplicationItem(*manager).ok());
+    const auto disks = named(L"system32:diskmgmt.msc");
+    REQUIRE(disks != result.value().end());
+    CHECK(shell::CreateApplicationItem(*disks).ok());
+    const auto services = named(L"services.msc");
+    REQUIRE(services != result.value().end());
+    CHECK(shell::CreateApplicationItem(*services).ok());
+    std::size_t tools = 0;
+    for (const auto& app : result.value()) {
+        if (app.kind != ApplicationKind::Other) continue;
+        ++tools;
+        const auto item = shell::CreateApplicationItem(app);
+        if (!item.ok()) TEST_NOTE("unresolvable: " + text::Narrow(app.displayName) + " [" + text::Narrow(app.parsingName) + "]: " + item.error().Describe());
+        CHECK(item.ok());
+    }
+    TEST_NOTE("Windows tools in the catalog: " + std::to_string(tools) + " of " + std::to_string(result.value().size()));
+    CHECK(tools > 20);
 }
 
 AETHER_TEST("catalog: every Apps-folder entry resolves to its shell item") {

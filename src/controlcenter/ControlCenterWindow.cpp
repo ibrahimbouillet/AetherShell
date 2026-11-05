@@ -1382,6 +1382,7 @@ Result<void> ControlCenterWindow::Toggle(const RECT& anchor, bool keyboard) {
     // the window becomes visible.
     Invalidate();
     ShowAnimated(graphics::MakeEnterTransition(from, p.tokens, p.motion), true);
+    ::SetForegroundWindow(Handle());  // D60: so that its keys and its deactivation are its own
     ::SetTimer(Handle(), kRefresh, 1500, nullptr);
     try {
         RefreshRequested.Emit();

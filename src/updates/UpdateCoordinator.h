@@ -107,6 +107,9 @@ struct UpdateFailure {
     Error error;
     bool retryable = false;  // trying again later may succeed (offline, rate limit, server error, disk full)
     std::optional<std::chrono::system_clock::time_point> retryAfter;  // server-provided earliest retry
+    // D60: a newer release exists without a signed manifest. It cannot be installed from here, by policy, and
+    // nothing went wrong: the person installs it by hand from its release page.
+    std::optional<SemanticVersion> manualVersion;
 };
 
 struct UpdateSnapshot {

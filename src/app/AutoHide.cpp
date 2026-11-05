@@ -6,21 +6,18 @@
 
 #include <dwmapi.h>
 
-#include <algorithm>
 #include <array>
-#include <cmath>
 #include <string>
 #include <string_view>
 
 namespace aether::app {
 
-bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor, UINT dpi, float heightDip) noexcept {
-    const auto rows = std::max(1L, std::lround(heightDip * static_cast<float>(dpi) / 96.0f));
-    return pointer.y >= monitor.top && pointer.y < monitor.top + rows && pointer.x >= monitor.left && pointer.x < monitor.right;
+bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor) noexcept {
+    return pointer.y == monitor.top && pointer.x >= monitor.left && pointer.x < monitor.right;
 }
 
 bool AutoHideState::Update(const AutoHideSample& sample) noexcept {
-    const bool resting = sample.atEdge || (sample.nearEdge && edgeSince_);
+    const bool resting = sample.atEdge;
     if (!resting) edgeSince_.reset();
     else if (!edgeSince_) edgeSince_ = sample.now;
     if (!sample.enabled || !sample.covered) {

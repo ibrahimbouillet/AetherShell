@@ -301,6 +301,7 @@ bool SurfaceWindow::RouteTouch(UINT message, WPARAM wParam) {
     ::ScreenToClient(hwnd_, &client);
     const TouchContact touch{contact->id, D2D1::Point2F(ToDip(static_cast<float>(client.x)), ToDip(static_cast<float>(client.y))), contact->time};
     if (message == WM_POINTERDOWN) {
+        lastTouchDown_ = ::GetTickCount64();
         if (touchPointer_ && *touchPointer_ != contact->id) {
             (void)OnTouchDown(touch);  // a further finger of the owned gesture
             return true;

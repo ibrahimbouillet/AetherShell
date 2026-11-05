@@ -65,6 +65,9 @@ public:
     SurfaceWindow(const SurfaceWindow&) = delete;
     SurfaceWindow& operator=(const SurfaceWindow&) = delete;
 
+    // D60: when a touch contact last landed on this window (GetTickCount64), zero if none has.
+    [[nodiscard]] std::uint64_t LastTouchDown() const noexcept { return lastTouchDown_; }
+
     // Creates the (hidden) window at `boundsPx` in virtual-screen pixels.
     [[nodiscard]] Result<void> Create(const SurfaceWindowOptions& options, const RECT& boundsPx);
     void Destroy() noexcept;
@@ -182,6 +185,7 @@ private:
     bool presented_ = false;
     bool trackingLeave_ = false;
     std::optional<std::uint32_t> touchPointer_;  // the owned contact (FR-040)
+    std::uint64_t lastTouchDown_ = 0;
     bool releasingCapture_ = false;
     bool renderPending_ = false;
     bool animationPending_ = false;

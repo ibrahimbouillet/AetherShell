@@ -2940,3 +2940,41 @@ tagged at `d99a501`, marked Latest and not pre-release, with exactly two assets:
 6696960 bytes, SHA-256 `dea9ed815d43123501c6d5a93fbed73f3967e1f6056c35bccb5ec27459609e52`, and its checksums file. No manifest
 was uploaded. The package privacy audit passed. Downloaded back from the release, the setup matches its checksums file and the local
 build. The API reports this tag as latest. Alpha 3 and the earlier releases remain available.
+
+### S-067 — Test 3.5: the welcome's name and picture, a lighter pen, the README gallery (Claude, 2026-11-05)
+
+**Correction first:** no 3.4 receipt existed. HANDOFF, AGENTS, DECISIONS, the changelog and the install guide called 3.4 published
+(D60) while `gh release list` showed 3.3 as Latest, no `v0.3.4-alpha.3` tag existed and the work was uncommitted. The 3.4 setup had
+been built (2026-11-01 19:36) and installed on the owner's machine before the Settings and update-message corrections were written, so
+the installed `0.3.4-alpha.3` lacks those two. All of it is committed now as test 3.5 (D57, D61).
+
+**Diagnosed on the owner's machine, read-only (D61):** the welcome's black background. The desktop picture is set (`BackgroundType` 0)
+to a file since deleted; `IDesktopWallpaper::GetWallpaper` returns an empty string for the only monitor while
+`SPI_GETDESKWALLPAPER` still returns the old name, and Windows' own copy (`TranscodedWallpaper`, a JPEG) decodes through WIC. The
+old code read the empty answer as a plain colour. The logs held no welcome line, so the corrected code logs which way it went.
+
+**Executed, Release `/W4 /WX`, `0.3.5-alpha.3`, build `build/wf-claude-v4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites, including the new welcome cases (picture candidates; a picture without extension decodes) |
+| Native welcome | 10/10; new: the ink's edge kept piece by piece equals one blur of all to 1/255, at 5 % of the blur work per frame (WARP, offscreen) |
+| Native installer | 13/13; new: the name field exists, Back keeps it, a cancelled install saves nothing, a completed one saves the name trimmed in the isolated data folder, repair shows it, uninstall does not ask |
+| Native search_ui 13/13, settings_ui 38/38, ui_form 31/31, applications 22/22, controlcenter 20/20, topbar 7/7, dock 14/14, ui 30/30 | Pass, one run each, serially |
+| Native app | 21/22, three runs (below) |
+| `scripts/package.ps1` privacy and freshness audit | Pass |
+
+**Failure kept visible:** `window corners pixels: standard maximized frame` failed in 3 of 3 runs, at all four corners, comparing the
+cutout with the private backdrop. The three other corner pixel cases pass. These cases had never read pixels on this desktop before
+(S-061, S-064: privacy precondition); `WindowCorners` and its test are unchanged since 3.1, and the work area currently fills the monitor
+because the owner's running Aether hides both bars. Not investigated further; not caused by this round's files, and not proven otherwise.
+
+**Not executed, so not claimed:** the setup itself, including the upgrade over the installed 3.4 and the name field in the production
+setup; the welcome at a real lock or sign-in with the fallback picture; the pen's frame rate on the real screen (it is now logged);
+GitHub's page for the README (rendered through GitHub's own Markdown API and viewed locally with its images: the slideshow, the strip
+and the caption survive GitHub's filtering). Silent setup has no name option.
+
+**Test build 3.5:** `AetherShell-0.3.5-alpha.3-win-x64-setup.exe`, 6742528 bytes, SHA-256
+`203ee2abccd24e895302f424a28b189bf9146502a1d8688d22aabea136f57e92`, built by `scripts/package.ps1` from the tree of the commit that
+records this entry. Not pushed, tagged, published or installed.

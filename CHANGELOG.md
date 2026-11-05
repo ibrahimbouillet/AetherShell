@@ -6,6 +6,44 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.5-alpha.3] — test build, not yet published
+
+Alpha 3, test 3.5 (D57, D61). It contains everything prepared as 3.4 (D60), which was built and installed as a test build on
+2026-11-01 but never published. Release notes, for its publication: [docs/releases/0.3.5-alpha.3.md](docs/releases/0.3.5-alpha.3.md).
+
+### Added
+
+- **Setup asks for the welcome's name** (D61): an optional field on the Options page, saved in the user's own settings. Installing over
+  an existing version shows the name already saved; an unchanged name writes nothing.
+- **The welcome notes in the log how smoothly it was written** (D61): frames, frames per second, longest gap, and whether the background was
+  the picture or a plain colour. Never the words or the name.
+
+### Changed
+
+- **The welcome's pen costs a twentieth of what it did per frame** (D61): the soft dark edge under the ink is kept, and blurred again only
+  around the newest ink, instead of the whole greeting again for every frame. Compared pixel by pixel, the result is the same to 1/255.
+- **The README presents five real desktops** in a slideshow, with a strip of pictures that open at full size.
+- **The Top Bar answers only to the very top of the screen** (D60): with Auto-Hide on, the pointer must be on the top row of pixels, with no
+  margin, for a quarter of a second. One pixel lower belongs to the application: its tabs and close button stay free.
+- **The welcome's writing flows** (D60): 2.2 s instead of 1.5 s, with a speed that changes slowly, a gentle start and landing, and ink that
+  settles to its width just behind the pen. The letters are unchanged.
+- **Search shows every match** instead of the best eight, and answers sooner; only rows on screen load an icon.
+
+### Fixed
+
+- **The welcome showed a black screen when the wallpaper's file was gone** (D61): Windows names no picture for the monitor once its file is
+  moved or deleted, and Aether took that for a plain colour. It now falls back to the copy Windows keeps of the picture on screen.
+- **Every panel closes when you use anything else, and on Escape** (D60): Quick Settings could stay open over the page you were using until a
+  second click. Escape now closes at once, also from a detail view or with text typed in Search.
+- **Search finds Windows' own tools** (D60): Device Manager, Services, Event Viewer, Computer Management, Task Scheduler, Disk Management and
+  the Control Panel's items.
+- **Search forgets what you typed when it closes** (D60): every opening starts empty.
+- **Settings no longer shows a page twice over** (D60): after a check for updates, or anything else that moved a page's rows, scrolling could show them
+  doubled, with old words in their place.
+- **Updates says what is true** (D60): a newer release without a signed manifest used to read "The update could not be completed. Failure:
+  Validation". It now names the version and how to install it. Other failures are said in words.
+- **The README's pictures show on GitHub**: they had never been committed.
+
 ## [0.3.3-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.3-alpha.3) — 2026-11-01
 
 Version 3.3, published as the Latest release (D59). Release notes:

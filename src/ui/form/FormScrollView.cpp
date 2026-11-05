@@ -285,6 +285,7 @@ struct FormScrollView::Impl final : graphics::IFrameClient {
             spring.SnapTo(static_cast<float>(position));
         }
         ::SetWindowPos(canvas, nullptr, 0, -(position + elastic), width, height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+        if (surface) surface->InvalidateRetainedContent();  // the canvas may have moved without a scroll to say by how much
         const int gutter = Gutter();
         ::SetWindowPos(indicator, HWND_TOP, width - gutter, 0, gutter, client.bottom,
                        SWP_NOACTIVATE | (Range() > 0 ? SWP_SHOWWINDOW : SWP_HIDEWINDOW));

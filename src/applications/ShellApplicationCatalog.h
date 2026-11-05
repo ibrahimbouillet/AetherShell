@@ -7,6 +7,7 @@
 //   2. The Start-menu Programs folders (FOLDERID_CommonPrograms, FOLDERID_Programs), whose .lnk
 //      files enrich Apps-folder entries with their shortcut path and add the shortcuts the Apps
 //      folder does not list.
+//   3. D60: Windows' own tools in neither list: the Control Panel's items and a few files of System32.
 // Filtering and merging follow CatalogRules.h.
 //
 // Threading: DiscoverApplications blocks (typically 0.2-2 s) and must run on a worker thread. The
@@ -25,6 +26,7 @@ class ShellApplicationCatalog final : public IApplicationCatalog {
 public:
     struct Options {
         bool includeStartMenuShortcuts = true;
+        bool includeSystemTools = true;
         int maxShortcutDepth = 6;              // directory levels below each Programs folder
         std::size_t maxShortcutFiles = 5000;   // .lnk files read in total
     };

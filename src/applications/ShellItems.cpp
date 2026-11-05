@@ -12,11 +12,14 @@
 #include "applications/ShellItems.h"
 
 #include "applications/ApplicationIdentity.h"
+#include "applications/CatalogRules.h"
 #include "core/Strings.h"
 #include "platform/windows/Win32Error.h"
 
 #include <propvarutil.h>
 #include <shlobj_core.h>
+
+#include <array>
 
 namespace aether::apps::shell {
 
@@ -94,7 +97,16 @@ Result<winrt::com_ptr<IShellItem>> CreateAppsFolderItem(std::wstring_view parsin
     if (HasRelativeSegment(name)) {
         return MakeError(ErrorCode::InvalidArgument, "parsing name contains '.' or '..' segments");
     }
-    const std::wstring fullName = L"shell:AppsFolder\\" + name;
+    std::wstring fullName = L"shell:AppsFolder\\" + name;
+    // D60: Windows' tools outside the Apps folder: the Control Panel's items, and the listed files of System32.
+    if (IsControlPanelItemName(name)) {
+        fullName = name;
+    } else if (const auto tool = SystemToolFile(name)) {
+        std::array<wchar_t, MAX_PATH> system{};
+        const UINT length = ::GetSystemDirectoryW(system.data(), static_cast<UINT>(system.size()));
+        if (length == 0 || length >= system.size()) return platform::LastWin32Error("GetSystemDirectory");
+        fullName = std::wstring(system.data(), length) + L"\\" + std::wstring(*tool);
+    }
     winrt::com_ptr<IShellItem> item;
     const HRESULT hr = ::SHCreateItemFromParsingName(fullName.c_str(), nullptr, IID_PPV_ARGS(item.put()));
     if (FAILED(hr)) return platform::ErrorFromHResult(hr, "Apps folder item not found");

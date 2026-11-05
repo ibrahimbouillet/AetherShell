@@ -175,6 +175,8 @@ public:
     // Button/ComboBox/Slider windows are enlarged by focusMargin so their own paint holds the focus
     // ring; Switch/Check/Navigation rows draw their ring inside the frame. Other roles use it as is.
     void SetFrame(HWND control, const RECT& framePx);
+    // D60: what scrolling keeps of a container no longer matches its arrangement: it is drawn afresh next time.
+    void InvalidateRetainedContent() noexcept;
     [[nodiscard]] RECT Frame(HWND control) const noexcept;
     // Marks a Field/ComboBox as invalid (critical stroke) until cleared.
     void SetError(HWND control, bool invalid);

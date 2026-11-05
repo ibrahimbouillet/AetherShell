@@ -54,6 +54,19 @@ AETHER_TEST("search UI: typed names, keyboard selection, safe fake launch and st
     CHECK_FALSE(window.Invoke(window.Item(0).id).ok());
     ::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_RETURN,0);
     CHECK_EQ(launcher.launches,1);CHECK_FALSE(window.Item(0).isEnabled);
-    window.Open();::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_ESCAPE,0);
-    CHECK(window.IsOpen());::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_ESCAPE,0);CHECK_FALSE(window.IsOpen());
+    // D60: Escape closes at once, and what was typed goes with it.
+    window.Open();::SetWindowTextW(window.EditHandle(),L"Test");::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_HOME,0);
+    REQUIRE_FALSE(window.Results().empty());
+    ::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_ESCAPE,0);CHECK_FALSE(window.IsOpen());
+    window.Open();CHECK_EQ(::GetWindowTextLengthW(window.EditHandle()),0);CHECK(window.Results().empty());
+    // And when it closes because something else was used.
+    ::SetWindowTextW(window.EditHandle(),L"T");::SendMessageW(window.EditHandle(),WM_KEYDOWN,VK_HOME,0);
+    REQUIRE_FALSE(window.Results().empty());
+    int changes=0;
+    auto changed=window.OpenChanged.Connect([&]{++changes;});
+    window.Dismiss();CHECK_FALSE(window.IsOpen());CHECK_EQ(changes,1);
+    window.Open();CHECK(window.IsOpen());CHECK_EQ(changes,2);CHECK_EQ(::GetWindowTextLengthW(window.EditHandle()),0);CHECK(window.Results().empty());
+    window.Close();CHECK_EQ(changes,3);
+    window.Close();CHECK_EQ(changes,3);  // once per closing
+    changed.Disconnect();
 }

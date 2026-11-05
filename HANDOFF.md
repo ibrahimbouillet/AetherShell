@@ -7,7 +7,22 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — 3.3 published as Latest (`0.3.3-alpha.3`, S-066, D59, 2026-11-01)
+## Current checkpoint — test 3.5 (`0.3.5-alpha.3`, S-067, D61, 2026-11-05)
+
+**3.4 was never published.** The previous session wrote this section as "3.4 published as Latest" before doing it, built and installed
+its setup on the owner's machine (the installed copy is `0.3.4-alpha.3`, sign-in startup off), and stopped with everything uncommitted.
+GitHub's Latest is still 3.3; there is no `v0.3.4-alpha.3` tag. Check `gh release list` before trusting any "published" line here.
+
+Test 3.5 commits all of 3.4 plus D61: setup asks for the welcome's name; the welcome's picture falls back to Windows' own copy when the
+file is gone (cause of the owner's black welcome, measured on this machine); the ink's soft edge is blurred only around new ink, and each
+greeting logs its frame rate; the README has a five-desktop slideshow and full-size strip. Receipts in TEST_STATUS S-067. The setup is a
+test build in `dist/`, not installed, pushed or published.
+
+**Next:** the owner tries 3.5 (install over 3.4, lock and unlock with the deleted-file wallpaper, the name field), then decides
+publication and its number. If published: push, CI, tag `v0.3.5-alpha.3`, release with setup and checksums only, then switch README's
+status, INSTALLATION and KNOWN_LIMITATIONS' "current release" lines. Test builds after this one count from `0.3.6-alpha.3` (D57).
+
+## Earlier today — 3.3 published as Latest (`0.3.3-alpha.3`, S-066, D59, 2026-11-01)
 
 Receipts of the push, CI and release are at the end of TEST_STATUS S-066. The owner's installed copy is still Alpha 3 unless
 the owner has installed since. Sign-in startup is off there. Next: the new features the owner announced and has not named yet,
@@ -1153,7 +1168,8 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**Current assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
+**Current state: test 3.5 awaiting the owner's trial (D61, S-067, 2026-11-05)**; read the checkpoint at the top first. Older assignment
+text follows. **Assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
 the status table in `docs/specs/v4-stability-audit.md`. The source work is in the working tree,
 uncommitted. Next: owner trial of a private build, then whatever it shows; the open AS4 entries; the
 measurements. Preserve the usable installed Alpha 3 and the single shared checkout. Source findings do

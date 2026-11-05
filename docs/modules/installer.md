@@ -4,6 +4,10 @@
 executables build. It embeds those files, LICENSE and THIRD_PARTY_NOTICES as RCDATA and writes an
 exact payload manifest with real file sizes/SHA-256. The install library opens resources as data.
 
+The Options page also has an optional field (id 26) for the name the welcome greets with (D61): it shows the saved name on
+an upgrade or repair, and setup saves it, trimmed and within the settings' limits, only when it changed and only after a
+successful installation, into the chosen data folder. Uninstall and silent setup do not ask.
+
 The native per-user wizard has Welcome, full MIT License, Options/Browse/shortcut/startup consent,
 indeterminate Progress and Finish/Error pages. All file work runs on a worker; cancellation is
 observed while staging and before activation. Activation completes atomically after that boundary.

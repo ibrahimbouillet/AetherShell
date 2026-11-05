@@ -356,6 +356,36 @@ AETHER_TEST("coordinator: a manifest whose version differs from the tag is rejec
     CHECK_EQ(CodeOf(h.coordinator->DownloadAndPrepare()), ErrorCode::InvalidState);  // nothing to download
 }
 
+// D60: every release so far: people saw "Failure: Validation" while a newer version was simply waiting for them.
+AETHER_TEST("coordinator: a newer release without a signed manifest is named, to install by hand") {
+    CoordinatorHarness h;
+    h.Create();
+    h.Configure();
+    TestRelease release;
+    release.tag = "v1.3.0";
+    release.assets = {{"AetherShell-1.3.0-win-x64-setup.exe", 300000, {}}};
+    h.http.Set(std::string(kLatestUrl), Ok200(ReleaseBody(release)));
+    h.CheckNow();
+    auto snapshot = h.Snap();
+    CHECK(snapshot.state == UpdateState::Error);
+    CHECK_EQ(FailureCode(snapshot), ErrorCode::Validation);  // still nothing offered: the policy has not changed
+    REQUIRE(snapshot.failure->manualVersion.has_value());
+    CHECK_EQ(snapshot.failure->manualVersion->ToString(), std::string("1.3.0"));
+    CHECK(snapshot.manifest == nullptr);
+    CHECK_EQ(CodeOf(h.coordinator->DownloadAndPrepare()), ErrorCode::InvalidState);
+    // A signed manifest that fails is a real failure, and says nothing of the kind.
+    release.assets = {{"AetherShell-1.3.0-win-x64-setup.exe", 300000, {}},
+                      {ManifestName("1.3.0"), fixtures::kStable_1_2_0.manifest.size(), {}},
+                      {SignatureName("1.3.0"), fixtures::kStable_1_2_0.signature.size(), {}}};
+    h.http.Set(std::string(kLatestUrl), Ok200(ReleaseBody(release)));
+    h.http.Set(DownloadUrl("v1.3.0", ManifestName("1.3.0")), Ok200(std::string(fixtures::kStable_1_2_0.manifest)));
+    h.http.Set(DownloadUrl("v1.3.0", SignatureName("1.3.0")), Ok200(std::string(fixtures::kStable_1_2_0.signature)));
+    h.CheckNow();
+    snapshot = h.Snap();
+    CHECK(snapshot.state == UpdateState::Error);
+    CHECK_FALSE(snapshot.failure->manualVersion.has_value());
+}
+
 AETHER_TEST("coordinator: the wrong architecture or an old Windows build is unsupported") {
     {
         CoordinatorHarness h;

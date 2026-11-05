@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "welcome/WelcomeBackdrop.h"
 
+#include "diagnostics/Logger.h"
+
 #include <shlobj.h>
 #include <shobjidl.h>
 #include <wincodec.h>
@@ -30,27 +32,49 @@ std::wstring TakeString(LPWSTR value) {
     return result;
 }
 
-// Windows' answer for this monitor; empty when it shows a plain colour.
-std::wstring WallpaperFileFor(const RECT& monitor) {
+// Windows' answer for this monitor. Empty for a plain colour, but also for a picture whose file is gone.
+std::wstring MonitorPicture(const RECT& monitor) {
     winrt::com_ptr<IDesktopWallpaper> desktop;
-    if (SUCCEEDED(::CoCreateInstance(__uuidof(DesktopWallpaper), nullptr, CLSCTX_ALL, IID_PPV_ARGS(desktop.put())))) {
-        UINT count = 0;
-        if (SUCCEEDED(desktop->GetMonitorDevicePathCount(&count))) {
-            for (UINT i = 0; i < count; ++i) {
-                LPWSTR id = nullptr;
-                if (FAILED(desktop->GetMonitorDevicePathAt(i, &id))) continue;
-                const auto device = TakeString(id);
-                RECT bounds{};
-                if (FAILED(desktop->GetMonitorRECT(device.c_str(), &bounds)) || !::EqualRect(&bounds, &monitor)) continue;
-                LPWSTR path = nullptr;
-                if (SUCCEEDED(desktop->GetWallpaper(device.c_str(), &path))) return TakeString(path);
-            }
-        }
+    if (FAILED(::CoCreateInstance(__uuidof(DesktopWallpaper), nullptr, CLSCTX_ALL, IID_PPV_ARGS(desktop.put())))) return {};
+    UINT count = 0;
+    if (FAILED(desktop->GetMonitorDevicePathCount(&count))) return {};
+    for (UINT i = 0; i < count; ++i) {
+        LPWSTR id = nullptr;
+        if (FAILED(desktop->GetMonitorDevicePathAt(i, &id))) continue;
+        const auto device = TakeString(id);
+        RECT bounds{};
+        if (FAILED(desktop->GetMonitorRECT(device.c_str(), &bounds)) || !::EqualRect(&bounds, &monitor)) continue;
+        LPWSTR path = nullptr;
+        if (SUCCEEDED(desktop->GetWallpaper(device.c_str(), &path))) return TakeString(path);
     }
+    return {};
+}
+
+// The desktop-wide setting: empty only for a plain colour; it keeps a picture's name after the file is gone.
+std::wstring DesktopPicture() {
     wchar_t path[MAX_PATH]{};
     return ::SystemParametersInfoW(SPI_GETDESKWALLPAPER, MAX_PATH, path, 0) ? std::wstring(path) : std::wstring();
 }
+
+// The copy of the picture Windows shows, which it keeps itself. Empty when the folder is unknown.
+std::filesystem::path WindowsCopy() {
+    PWSTR roaming = nullptr;
+    const HRESULT found = ::SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &roaming);
+    std::wstring folder = TakeString(roaming);
+    if (FAILED(found) || folder.empty()) return {};
+    return std::filesystem::path(folder) / L"Microsoft" / L"Windows" / L"Themes" / L"TranscodedWallpaper";
+}
 }  // namespace
+
+std::vector<std::filesystem::path> BackdropCandidates(std::wstring_view monitorPicture, std::wstring_view desktopPicture,
+                                                      const std::filesystem::path& windowsCopy) {
+    std::vector<std::filesystem::path> files;
+    const std::wstring_view named = monitorPicture.empty() ? desktopPicture : monitorPicture;
+    if (named.empty()) return files;  // a plain colour: any copy Windows keeps would be an old picture
+    files.emplace_back(named);
+    if (!windowsCopy.empty() && windowsCopy != files.front()) files.push_back(windowsCopy);
+    return files;
+}
 
 float MeanBrightness(std::span<const std::uint8_t> pixels) noexcept {
     const std::size_t count = pixels.size() / 4;
@@ -109,18 +133,25 @@ Result<BackdropImage> DecodeBackdrop(const std::filesystem::path& file, UINT cov
 }
 
 std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx) {
+    // The log says which way it went, never which file: a black welcome can then be told apart from a plain colour.
     try {
-        const auto file = WallpaperFileFor(monitorPx);
-        if (file.empty()) return std::nullopt;  // a plain colour; any copy Windows keeps would be an old picture
+        const auto files = BackdropCandidates(MonitorPicture(monitorPx), DesktopPicture(), WindowsCopy());
+        if (files.empty()) {
+            AETHER_LOG_INFO("welcome", "background: the desktop is a plain colour");
+            return std::nullopt;
+        }
         const UINT width = static_cast<UINT>(std::max(1L, (monitorPx.right - monitorPx.left) / 2));
         const UINT height = static_cast<UINT>(std::max(1L, (monitorPx.bottom - monitorPx.top) / 2));
-        if (auto image = DecodeBackdrop(file, width, height)) return std::move(*image);
-        // Moved, or in the cloud: Windows keeps its own local copy of the picture it shows.
-        PWSTR roaming = nullptr;
-        if (FAILED(::SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &roaming))) { ::CoTaskMemFree(roaming); return std::nullopt; }
-        const std::filesystem::path folder = TakeString(roaming);
-        if (auto image = DecodeBackdrop(folder / L"Microsoft" / L"Windows" / L"Themes" / L"TranscodedWallpaper", width, height)) return std::move(*image);
+        // Moved, deleted or only in the cloud: Windows keeps its own local copy of the picture it shows.
+        for (std::size_t i = 0; i < files.size(); ++i) {
+            if (auto image = DecodeBackdrop(files[i], width, height)) {
+                AETHER_LOG_INFO("welcome", "background: {} ({}x{})", i == 0 ? "the desktop picture" : "Windows' copy of the desktop picture", image->width, image->height);
+                return std::move(*image);
+            }
+        }
+        AETHER_LOG_WARN("welcome", "background: the desktop picture could not be read ({} tried)", files.size());
     } catch (...) {
+        AETHER_LOG_WARN("welcome", "background: the desktop picture could not be read");
     }
     return std::nullopt;
 }

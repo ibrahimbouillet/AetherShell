@@ -34,8 +34,11 @@ public:
     Result<void> Initialize();
     void Open();
     void Close();
+    // D60: something else was used, which keeps the foreground it took.
+    void Dismiss();
     void Toggle();
     [[nodiscard]] bool IsOpen() const noexcept { return IsShown() && !closing_; }
+    Signal<> OpenChanged;
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     [[nodiscard]] HWND EditHandle() const noexcept { return edit_; }
     [[nodiscard]] const std::vector<SearchResult>& Results() const noexcept { return results_; }
@@ -83,6 +86,7 @@ protected:
 private:
     static LRESULT CALLBACK EditProc(HWND, UINT, WPARAM, LPARAM, UINT_PTR, DWORD_PTR);
     void RefreshResults();
+    void RequestRowIcon(const apps::ApplicationInfo& application);
     void ReadQuery();
     void FlushQuery();
     void UpdateSelection(std::size_t index);

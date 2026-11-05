@@ -25,6 +25,7 @@
 #include <chrono>
 #include <cstdint>
 #include <filesystem>
+#include <iterator>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -251,6 +252,45 @@ private:
     DisplayNameResolver names_;
 };
 
+// D60: the items of "All Control Panel Items", which is where Device Manager lives. Best effort: without
+// them the catalog is only shorter. The folder is read, nothing in it runs.
+std::vector<ApplicationInfo> ReadControlPanelItems(const CancellationToken& cancel) {
+    std::vector<ApplicationInfo> items;
+    winrt::com_ptr<IShellItem> folder;
+    if (FAILED(::SHCreateItemFromParsingName(kControlPanelItemsFolder, nullptr, IID_PPV_ARGS(folder.put())))) return items;
+    winrt::com_ptr<IEnumShellItems> enumerator;
+    if (FAILED(folder->BindToHandler(nullptr, BHID_EnumItems, IID_PPV_ARGS(enumerator.put())))) return items;
+    const auto canonicalKey = shell::PropertyKeyFromName(L"System.ApplicationName");
+    for (;;) {
+        if (cancel.IsCancelled()) return items;
+        winrt::com_ptr<IShellItem> item;
+        ULONG fetched = 0;
+        if (enumerator->Next(1, item.put(), &fetched) != S_OK || fetched == 0) break;
+        const auto name = shell::GetDisplayName(item.get(), SIGDN_NORMALDISPLAY).value_or(std::wstring{});
+        const auto parsing = shell::GetDisplayName(item.get(), SIGDN_DESKTOPABSOLUTEPARSING).value_or(std::wstring{});
+        // An item the shell cannot find again by that name (Fonts) could not be opened from the list.
+        winrt::com_ptr<IShellItem> again;
+        if (FAILED(::SHCreateItemFromParsingName(parsing.c_str(), nullptr, IID_PPV_ARGS(again.put())))) continue;
+        std::wstring canonical;
+        winrt::com_ptr<IShellItem2> properties;
+        if (canonicalKey && SUCCEEDED(item->QueryInterface(IID_PPV_ARGS(properties.put())))) {
+            canonical = shell::GetStringProperty(properties.get(), *canonicalKey).value_or(std::wstring{});
+        }
+        auto classified = ClassifyControlPanelItem(name, parsing, canonical);
+        if (classified.decision == CatalogDecision::Include) items.push_back(std::move(classified.app));
+    }
+    return items;
+}
+
+bool SystemFileExists(std::wstring_view file) {
+    std::array<wchar_t, MAX_PATH> system{};
+    const UINT length = ::GetSystemDirectoryW(system.data(), static_cast<UINT>(system.size()));
+    if (length == 0 || length >= system.size()) return false;
+    const std::wstring path = std::wstring(system.data(), length) + L"\\" + std::wstring(file);
+    const DWORD attributes = ::GetFileAttributesW(path.c_str());
+    return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+}
+
 // Walks one Programs folder. Returns Cancelled when cancellation was requested.
 Result<void> CollectShortcuts(const std::filesystem::path& root, const ShellApplicationCatalog::Options& options,
                               const CancellationToken& cancel, ShortcutReader& reader, std::size_t& filesRead,
@@ -347,11 +387,19 @@ Result<std::vector<ApplicationInfo>> Discover(const ShellApplicationCatalog::Opt
     const auto shortcutsMs = millisecondsSince(shortcutsStart);
 
     auto applications = CombineCatalog(std::move(appsFolderApps), std::move(shortcutApps));
+    const auto systemStart = Clock::now();
+    if (options.includeSystemTools) {
+        auto system = ReadControlPanelItems(cancel);
+        if (cancel.IsCancelled()) return CancelledError();
+        auto tools = SystemToolApplications(PRIMARYLANGID(::GetUserDefaultUILanguage()) == LANG_FRENCH, SystemFileExists);
+        system.insert(system.end(), std::make_move_iterator(tools.begin()), std::make_move_iterator(tools.end()));
+        applications = AddSystemEntries(std::move(applications), std::move(system));
+    }
     AETHER_LOG_INFO(kLog,
                     "discovered {} applications in {} ms (Apps folder: {} items in {} ms; Start menu: {} shortcuts "
-                    "in {} ms; skipped {} uninstallers, {} help, {} documents, {} URLs, {} invalid)",
+                    "in {} ms; Windows tools in {} ms; skipped {} uninstallers, {} help, {} documents, {} URLs, {} invalid)",
                     applications.size(), millisecondsSince(start), appsFolderItems, appsFolderMs, shortcutFiles,
-                    shortcutsMs,
+                    shortcutsMs, millisecondsSince(systemStart),
                     counts.Get(CatalogDecision::SkipUninstaller), counts.Get(CatalogDecision::SkipHelp),
                     counts.Get(CatalogDecision::SkipDocument), counts.Get(CatalogDecision::SkipUrl),
                     counts.Get(CatalogDecision::SkipInvalid));

@@ -7,8 +7,8 @@
 // menus, panels, drag, keyboard) and hides again a moment after that ends. An auto-hidden bar
 // reserves no work area, so maximized windows use the whole screen and the revealed bar floats over
 // them, as Windows' auto-hide taskbar does.
-// D52, D56: the Top Bar waits a moment on its edge, because controls of maximized applications live
-// right there and a quick visit must not put the bar over them. Leaving the edge cancels the wait.
+// D52, D60: the Top Bar waits a moment on the very top of the screen, because controls of maximized
+// applications live right below it and they must stay usable. Leaving that row cancels the wait.
 #pragma once
 
 #include <windows.h>
@@ -23,22 +23,13 @@ struct AutoHideTiming {
     std::uint64_t revealDwellMs = 40;  // on the edge this long: sweeping across the edge does not reveal
     std::uint64_t hideDelayMs = 700;   // after the last use, before hiding again
 };
-// D56, D58, D59: half a second, the owner's number.
-inline constexpr AutoHideTiming kTopBarAutoHideTiming{.revealDwellMs = 500};
+// D60: a quarter of a second, the owner's number.
+inline constexpr AutoHideTiming kTopBarAutoHideTiming{.revealDwellMs = 250};
 
-// D58: the wait starts when the pointer reaches the place where the bar appears, its margin and height
-// from the top of the screen. Measured on the owner's machine, a hand going to the bar stopped there, in the
-// middle of it, for 2.6 s: when only the last rows of pixels counted, that time did not count at all. A
-// wobble of the hand just below that place does not restart the wait; a real move away cancels it (D54).
-inline constexpr float kTopEdgeWobbleDip = 10.0f;
-[[nodiscard]] constexpr float TopBarReachDip(int topMargin, int height) noexcept {
-    return static_cast<float>(topMargin + height);
-}
-
-// Whether the pointer is within `heightDip` of the top of `monitor` (physical pixels; `dpi` is the
-// monitor's). A pointer that went on to a monitor above has left this edge, even though its y
-// coordinate is smaller.
-[[nodiscard]] bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor, UINT dpi, float heightDip) noexcept;
+// D60: the wait starts only on the very top row of pixels of `monitor` (physical pixels), with no margin:
+// a browser's tabs and a window's close button sit just below it and belong to the application. A pointer
+// that went on to a monitor above has left this edge, even though its y coordinate is smaller.
+[[nodiscard]] bool PointerOnTopEdge(const POINT& pointer, const RECT& monitor) noexcept;
 
 // One periodic observation of a bar (the host samples about twenty times a second).
 struct AutoHideSample {
@@ -46,7 +37,6 @@ struct AutoHideSample {
     bool covered = false;   // an application window overlaps the bar's area (otherwise the desktop shows)
     bool engaged = false;   // in use: pointer over it, a menu, panel, drag or keyboard focus of it
     bool atEdge = false;    // the pointer rests on the screen edge this bar belongs to
-    bool nearEdge = false;  // close enough that a wait already running continues (the Dock leaves it off)
     std::uint64_t now = 0;  // monotonic milliseconds
 };
 

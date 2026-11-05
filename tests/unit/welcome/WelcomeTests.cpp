@@ -14,6 +14,9 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <optional>
+#include <string>
+#include <utility>
 #include <vector>
 
 using namespace aether;
@@ -54,9 +57,9 @@ AETHER_TEST("welcome ink: the pen moves continuously, with pen lifts, varying sp
         }
         previous = stroke.points.back().time;
     }
-    CHECK(slowest > fastest * 2.0f);        // not a constant-speed plotter
+    CHECK(slowest > fastest * 1.3f);        // not a constant-speed plotter
     CHECK(thickest > thinnest * 1.15f);     // and not a constant-width line
-    CHECK_EQ(scene.inkDuration, 1.5f);      // D59: the whole writing
+    CHECK_EQ(scene.inkDuration, 2.2f);      // D60: the whole writing
     // Word first, then its dots and crossbars: the i's dot is written after everything else.
     const auto& last = scene.strokes.back().points;
     CHECK(last.front().time > scene.inkDuration * 0.5f);
@@ -72,7 +75,7 @@ AETHER_TEST("welcome ink: writing is deterministic and stays inside the bounds, 
         const auto scene = Scene(greeting, name, 1000.0f, 500.0f);
         CHECK(scene.width <= 1000.5f);
         CHECK(scene.height <= 500.5f);
-        CHECK_EQ(scene.inkDuration, 1.5f);  // whatever the name's length
+        CHECK_EQ(scene.inkDuration, 2.2f);  // whatever the name's length
         for (const auto& stroke : scene.strokes) for (const auto& point : stroke.points) {
             CHECK(point.x >= -30.0f); CHECK(point.x <= 1030.0f);
             CHECK(std::isfinite(point.y)); CHECK(point.width > 0.0f);
@@ -114,6 +117,51 @@ AETHER_TEST("welcome ink: the pen tip follows the line, lifts between strokes an
     CHECK(down > 60);
     CHECK(lifted > 0);           // "Salut": the t's crossbar is a real lift
     CHECK(longest < scene.width * 0.15f);  // it travels, quickly, without jumping across the word
+}
+
+// D60: the owner found the writing of 3.3 stressed. Seen at 60 frames a second on a full-screen size, what reads
+// as nervous is the speed along the line changing from one frame to the next, and a pen far faster in places
+// than on average. Frames in which a stroke starts or ends are not counted: the pen is partly off the page.
+AETHER_TEST("welcome ink: the pen flows: its speed never jumps from one frame to the next") {
+    for (const auto& [greeting, name] : {std::pair<std::wstring, std::wstring>{L"Salut", L""}, {L"Hello", L""}, {L"Salut", L"Ibrahim"}, {L"Hello", L"Marie-Angélique"}}) {
+        const auto scene = Scene(greeting, name, 1690.0f, 885.0f);
+        constexpr float kFrame = 1.0f / 60.0f;
+        const auto frames = static_cast<std::size_t>(scene.inkDuration / kFrame) + 2;
+        std::vector<float> along(frames, 0.0f);
+        std::vector<bool> partial(frames, false);
+        const auto frameOf = [](float time) { return static_cast<std::size_t>(time / kFrame); };
+        for (const auto& stroke : scene.strokes) {
+            partial[frameOf(stroke.points.front().time)] = true;
+            partial[frameOf(stroke.points.back().time)] = true;
+            for (std::size_t i = 1; i < stroke.points.size(); ++i) {
+                const auto& from = stroke.points[i - 1];
+                const auto& to = stroke.points[i];
+                along[frameOf((from.time + to.time) * 0.5f)] += std::hypot(to.x - from.x, to.y - from.y);
+            }
+        }
+        float total = 0.0f, peak = 0.0f, jump = 0.0f;
+        std::size_t counted = 0;
+        for (std::size_t i = 0; i < frames; ++i) {
+            if (partial[i] || along[i] <= 0.0f) continue;
+            total += along[i];
+            peak = std::max(peak, along[i]);
+            ++counted;
+            if (i > 0 && !partial[i - 1] && along[i - 1] > 0.0f) jump = std::max(jump, std::abs(along[i] - along[i - 1]));
+        }
+        REQUIRE(counted > 30u);
+        const float mean = total / static_cast<float>(counted);
+        TEST_NOTE("mean " + std::to_string(mean) + " DIP a frame, peak " + std::to_string(peak / mean) + " x mean, largest change " + std::to_string(jump / mean) + " x mean");
+        CHECK(peak < mean * 1.6f);    // never rushing far ahead of its own pace
+        CHECK(jump < mean * 0.2f);    // and picking speed up and down like a hand, not per letter (3.3: 0.66 to 0.85)
+    }
+}
+
+AETHER_TEST("welcome ink: the writing takes long enough to watch and not much more") {
+    for (const auto& [greeting, name] : {std::pair<std::wstring, std::wstring>{L"Salut", L""}, {L"Salut", L"Ibrahim"}}) {
+        const auto scene = Scene(greeting, name, 1690.0f, 885.0f);
+        CHECK(scene.inkDuration >= 2.0f);
+        CHECK(scene.inkDuration <= 2.5f);
+    }
 }
 
 AETHER_TEST("welcome greeting: the explicit language wins, otherwise the Windows display language") {
@@ -331,9 +379,31 @@ AETHER_TEST("welcome backdrop: a picture is reduced to just cover the area, neve
     std::ofstream(garbage, std::ios::binary) << "not a picture at all";
     CHECK_FALSE(DecodeBackdrop(garbage, 16, 16).ok());
     CHECK_FALSE(DecodeBackdrop(folder, 16, 16).ok());  // a folder
+    // Windows' own copy has no extension: the picture is recognised by its content.
+    const auto bare = folder / L"welcome-backdrop-TranscodedWallpaper";
+    std::filesystem::copy_file(file, bare, std::filesystem::copy_options::overwrite_existing, ignored);
+    auto fromCopy = DecodeBackdrop(bare, 16, 16);
+    REQUIRE(fromCopy.ok());
+    CHECK_EQ(fromCopy->width, 32u);
+    std::filesystem::remove(bare, ignored);
     std::filesystem::remove(file, ignored);
     std::filesystem::remove(garbage, ignored);
     CHECK_EQ(MeanBrightness({}), 0.0f);
+}
+
+AETHER_TEST("welcome backdrop: a deleted picture still comes from Windows' copy; only a plain colour has none") {
+    const std::filesystem::path copy = L"C:\\Synthetic\\Themes\\TranscodedWallpaper";
+    // D61: Windows names no file for the monitor once its picture is deleted, and still shows it from its copy.
+    const auto deleted = BackdropCandidates(L"", L"C:\\Synthetic\\Pictures\\gone.jpg", copy);
+    REQUIRE_EQ(deleted.size(), std::size_t{2});
+    CHECK(deleted[0] == std::filesystem::path(L"C:\\Synthetic\\Pictures\\gone.jpg"));
+    CHECK(deleted[1] == copy);
+    const auto named = BackdropCandidates(L"C:\\Synthetic\\Pictures\\left.jpg", L"C:\\Synthetic\\Pictures\\other.jpg", copy);
+    REQUIRE_EQ(named.size(), std::size_t{2});
+    CHECK(named[0] == std::filesystem::path(L"C:\\Synthetic\\Pictures\\left.jpg"));  // the monitor's own picture wins
+    CHECK(BackdropCandidates(L"", L"", copy).empty());  // a plain colour: the copy would be an old picture
+    CHECK_EQ(BackdropCandidates(copy.native(), L"", copy).size(), std::size_t{1});  // the copy itself, tried once
+    CHECK_EQ(BackdropCandidates(L"", L"C:\\Synthetic\\Pictures\\a.jpg", {}).size(), std::size_t{1});
 }
 
 AETHER_TEST("welcome lifecycle: it ends when written and ready, never before, and always by the deadline") {

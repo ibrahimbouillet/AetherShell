@@ -18,6 +18,7 @@
 #include "welcome/WelcomeBackdrop.h"
 
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace aether::welcome {
@@ -28,6 +29,29 @@ void PaintHandwriting(ID2D1DeviceContext* context, const WelcomeScene& scene, D2
 // Only the ink the pen lays between two moments. The window keeps what is already written in a bitmap and
 // adds this each frame, so a large greeting costs the same at its last stroke as at its first.
 void PaintHandwritingRange(ID2D1DeviceContext* context, const WelcomeScene& scene, D2D1_POINT_2F origin, float fromTime, float toTime, ID2D1Brush* ink);
+// Where that ink lies, with its width, in the scene's own coordinates; nullopt when there is none.
+[[nodiscard]] std::optional<D2D1_RECT_F> HandwritingBounds(const WelcomeScene& scene, float fromTime, float toTime);
+
+// The soft dark edge under the ink, which keeps pale ink clear over a pale picture (D61). Blurring the
+// whole greeting again for every frame cost a blur of most of the screen per frame; this keeps the edge in
+// its own bitmap and blurs again only around the ink just added. The result is the same as one blur of all.
+class InkShadow {
+public:
+    // A fresh edge for `ink`, drawn by `context` at its DPI; false when the graphics refuse it.
+    [[nodiscard]] bool Reset(ID2D1DeviceContext* context, ID2D1Bitmap1* ink, float deviation);
+    // After ink was added inside `inkRect` (DIPs of the ink bitmap): the edge there and as far around as it reaches.
+    [[nodiscard]] bool Update(ID2D1DeviceContext* context, const D2D1_RECT_F& inkRect);
+    void Clear() noexcept;
+    [[nodiscard]] ID2D1Bitmap1* Bitmap() const noexcept { return bitmap_.get(); }
+    // How far the edge's bitmap extends beyond the ink bitmap on every side, in DIPs.
+    [[nodiscard]] float Reach() const noexcept { return reach_; }
+
+private:
+    winrt::com_ptr<ID2D1Effect> effect_;
+    winrt::com_ptr<ID2D1Bitmap1> bitmap_;
+    float reach_ = 0.0f;
+    float scale_ = 1.0f;  // pixels per DIP
+};
 
 class WelcomeWindow final : public ui::SurfaceWindow {
 public:
@@ -80,6 +104,7 @@ private:
     winrt::com_ptr<ID2D1DeviceContext> inkContext_;
     winrt::com_ptr<ID2D1Bitmap1> inkLayer_;
     winrt::com_ptr<ID2D1SolidColorBrush> inkBrush_;
+    InkShadow shadow_;
     float inkUntil_ = -1.0f;
     double startedAt_ = 0.0;
     bool animated_ = true;
@@ -87,6 +112,10 @@ private:
     bool covering_ = false;
     bool skipRequested_ = false;
     std::uint64_t frames_ = 0;
+    // For the log line once a greeting is written: how smoothly it went on this PC.
+    std::uint64_t writingFrames_ = 0;
+    double lastFrameAt_ = 0.0, longestGap_ = 0.0;
+    bool writingLogged_ = true;
 };
 
 }  // namespace aether::welcome

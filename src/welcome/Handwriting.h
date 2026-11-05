@@ -5,7 +5,8 @@
 // traced from one) composed into continuous ink. A word is one line; its dots, crossbars and accents
 // follow when it is finished. Each point carries the time the pen reaches it and the line width there,
 // from a model of a hand: slower through tight curves and at the start and end of a stroke, a little
-// uneven, thicker when slow, with real pause-and-travel pen lifts. Pure, with no window or device.
+// uneven, thicker on down strokes, with real pause-and-travel pen lifts, and (D60) a speed that changes
+// slowly, over a gesture that sets off and lands gently. Pure, with no window or device.
 #pragma once
 
 #include "core/Result.h"

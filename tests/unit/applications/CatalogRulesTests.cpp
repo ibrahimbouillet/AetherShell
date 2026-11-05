@@ -133,8 +133,83 @@ AETHER_TEST("catalog rules: uninstallers, help, URLs and documents are skipped")
              CatalogDecision::SkipUrl);
     CHECK_EQ(ClassifyDiscoveredItem(Shortcut(L"Budget", L"C:\\Users\\Public\\Budget.xlsx")).decision,
              CatalogDecision::SkipDocument);
-    CHECK_EQ(ClassifyDiscoveredItem(Shortcut(L"Services", L"C:\\Windows\\System32\\services.msc")).decision,
-             CatalogDecision::SkipDocument);
+}
+
+// D60: the owner could not find them in search, though Windows lists them.
+AETHER_TEST("catalog rules: management consoles and applets are applications") {
+    const auto listed = Include(AppsFolderItem(L"Services", L"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\services.msc",
+                                               L"", L"C:\\Windows\\System32\\services.msc"));
+    CHECK_EQ(listed.kind, ApplicationKind::Other);
+    CHECK_EQ(listed.parsingName, std::wstring(L"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\\services.msc"));
+    CHECK(listed.executablePath.empty());
+    const auto shortcut = Include(Shortcut(L"Services", L"C:\\Windows\\System32\\services.msc"));
+    CHECK_EQ(shortcut.kind, ApplicationKind::Other);
+    CHECK_FALSE(shortcut.shortcutPath.empty());
+    CHECK_EQ(Include(Shortcut(L"Sound", L"C:\\Windows\\System32\\mmsys.cpl")).kind, ApplicationKind::Other);
+    // Its shortcut describes the Apps-folder entry of that name: one row, not two.
+    const auto combined = CombineCatalog({listed}, {shortcut, Include(Shortcut(L"services", L"C:\\Windows\\System32\\services.msc"))});
+    REQUIRE_EQ(combined.size(), 1u);
+    CHECK_FALSE(combined.front().shortcutPath.empty());
+    CHECK_FALSE(combined.front().parsingName.empty());
+    // Without a launchable shell item or shortcut there is nothing to open it with.
+    DiscoveredItem bare;
+    bare.displayName = L"Services";
+    bare.targetPath = L"C:\\Windows\\System32\\services.msc";
+    CHECK_EQ(ClassifyDiscoveredItem(bare).decision, CatalogDecision::SkipDocument);
+}
+
+AETHER_TEST("catalog rules: Device Manager comes from the Control Panel's items") {
+    const auto item = ClassifyControlPanelItem(L"Gestionnaire de périphériques", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
+    REQUIRE_EQ(item.decision, CatalogDecision::Include);
+    CHECK_EQ(item.app.kind, ApplicationKind::Other);
+    CHECK_EQ(item.app.keywords, std::wstring(L"Device Manager"));  // found in English on a French Windows too
+    CHECK(IsControlPanelItemName(item.app.parsingName));
+    const auto english = ClassifyControlPanelItem(L"Device Manager", L"::{26ee0668-a00a-44d7-9371-beb064c98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
+    REQUIRE_EQ(english.decision, CatalogDecision::Include);
+    CHECK(english.app.keywords.empty());
+    CHECK_EQ(ClassifyControlPanelItem(L"", item.app.parsingName, L"").decision, CatalogDecision::SkipInvalid);
+    CHECK_EQ(ClassifyControlPanelItem(L"Other", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}", L"").decision, CatalogDecision::SkipInvalid);
+    CHECK_FALSE(IsControlPanelItemName(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0"));
+    CHECK_FALSE(IsControlPanelItemName(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\08\\x"));
+    CHECK_EQ(WordsOfCanonicalName(L"Microsoft.BitLockerDriveEncryption"), std::wstring(L"Bit Locker Drive Encryption"));
+    CHECK_EQ(WordsOfCanonicalName(L"Plain"), std::wstring(L"Plain"));
+    CHECK(WordsOfCanonicalName(L"").empty());
+}
+
+AETHER_TEST("catalog rules: only listed files of System32 are tools, under the person's language") {
+    CHECK_EQ(*SystemToolFile(L"system32:DISKMGMT.msc"), std::wstring_view(L"diskmgmt.msc"));
+    CHECK_FALSE(SystemToolFile(L"system32:evil.exe").has_value());
+    CHECK_FALSE(SystemToolFile(L"system32:..\\..\\evil.exe").has_value());
+    CHECK_FALSE(SystemToolFile(L"diskmgmt.msc").has_value());
+    const auto all = [](std::wstring_view) { return true; };
+    const auto english = SystemToolApplications(false, all);
+    const auto* disks = FindByName(english, L"Disk Management");
+    REQUIRE(disks != nullptr);
+    CHECK_EQ(disks->kind, ApplicationKind::Other);
+    CHECK_EQ(disks->parsingName, std::wstring(L"system32:diskmgmt.msc"));
+    CHECK(disks->keywords.find(L"Gestion des disques") != std::wstring::npos);
+    CHECK(disks->keywords.find(L"diskmgmt") != std::wstring::npos);
+    const auto french = SystemToolApplications(true, all);
+    const auto* disques = FindByName(french, L"Gestion des disques");
+    REQUIRE(disques != nullptr);
+    CHECK(disques->keywords.find(L"Disk Management") != std::wstring::npos);
+    CHECK_EQ(disques->id, disks->id);
+    // A tool this edition of Windows does not have is not offered.
+    CHECK(SystemToolApplications(false, [](std::wstring_view file) { return file != L"gpedit.msc"; }).size() == english.size() - 1);
+    CHECK(FindByName(SystemToolApplications(false, [](std::wstring_view file) { return file != L"gpedit.msc"; }), L"Local Group Policy Editor") == nullptr);
+    for (const auto& app : english) CHECK(SystemToolFile(app.parsingName).has_value());
+}
+
+AETHER_TEST("catalog rules: Windows' tools join the catalog without doubling a name") {
+    auto catalog = CombineCatalog({Include(Shortcut(L"Zebra", L"C:\\Z\\zebra.exe")), Include(Shortcut(L"Device Manager", L"C:\\D\\dm.exe"))}, {});
+    const auto manager = ClassifyControlPanelItem(L"device manager", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"").app;
+    const auto power = ClassifyControlPanelItem(L"Power Options", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{025A5937-A6BE-4686-A844-36FE4BEC8B6D}", L"").app;
+    const auto result = AddSystemEntries(std::move(catalog), {manager, power});
+    REQUIRE_EQ(result.size(), 3u);
+    CHECK_EQ(result[0].displayName, std::wstring(L"Device Manager"));
+    CHECK(result[0].parsingName.empty());
+    CHECK_EQ(result[1].displayName, std::wstring(L"Power Options"));  // in the catalog's order
+    CHECK_EQ(result[2].displayName, std::wstring(L"Zebra"));
 }
 
 AETHER_TEST("catalog rules: invalid entries are skipped") {

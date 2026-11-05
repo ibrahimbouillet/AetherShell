@@ -10,9 +10,12 @@
 
 #include "../ui_form/FormTestSupport.h"
 
+#include "core/FileSystem.h"
+#include "core/Json.h"
 #include "core/Strings.h"
 #include "install/Install.h"
 #include "platform/windows/ComApartment.h"
+#include "settings/SettingsSerialization.h"
 
 #include <windows.h>
 
@@ -217,12 +220,14 @@ AETHER_TEST("setup design: the install journey keeps its ids, reports an invalid
     }
     wizard.Click(1);
     // Options
-    for (const int id : {2, 8, 9, 20, 21, 23, 25}) {
+    for (const int id : {2, 8, 9, 20, 21, 23, 25, 26}) {
         if (!wizard.Item(id)) TEST_NOTE("missing options control " + std::to_string(id));
         CHECK(wizard.Item(id) != nullptr);
     }
     CHECK(wizard.Item(24) == nullptr);
     CHECK(Text(wizard.Item(2)).find(L"Install") != std::wstring::npos);
+    CHECK(Text(wizard.Item(26)).empty());  // D61: a fresh installation knows no name
+    ::SendMessageW(wizard.Item(26), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(L"Zoé"));
     ::SendMessageW(wizard.Item(25), BM_SETCHECK, BST_CHECKED, 0);
     ::SendMessageW(wizard.Item(21), BM_SETCHECK, BST_UNCHECKED, 0);
     // A relative folder is refused on the page itself.
@@ -247,7 +252,9 @@ AETHER_TEST("setup design: the install journey keeps its ids, reports an invalid
     REQUIRE(wizard.Item(25) != nullptr);
     CHECK_EQ(::SendMessageW(wizard.Item(25), BM_GETCHECK, 0, 0), LRESULT{BST_CHECKED});
     CHECK_EQ(::SendMessageW(wizard.Item(21), BM_GETCHECK, 0, 0), LRESULT{BST_UNCHECKED});
+    CHECK_EQ(Text(wizard.Item(26)), std::wstring(L"Zoé"));
     CHECK_FALSE(std::filesystem::exists(wizard.temporary / L"installation"));
+    CHECK_FALSE(std::filesystem::exists(wizard.temporary / L"data" / L"config" / L"settings.json"));  // nothing saved before Install
 }
 
 AETHER_TEST("setup design: repair and uninstall journeys show their own options") {
@@ -295,6 +302,9 @@ AETHER_TEST("setup design: a cancelled isolated install can be retried successfu
     PlaceWizardOverBackdrop(wizard,backdrop);
     wizard.Click(1);
     wizard.Click(1);
+    // D61: the name for the welcome, with the spaces a hand might leave around it.
+    REQUIRE(wizard.Item(26) != nullptr);
+    ::SendMessageW(wizard.Item(26), WM_SETTEXT, 0, reinterpret_cast<LPARAM>(L"  Éloïse "));
     // Hold this test-only worker before extraction, so cancellation always wins before activation.
     REQUIRE_EQ(::SendMessageW(wizard.window, WM_APP + 74, 0, 0), LRESULT{1});
     ::SendMessageW(wizard.window, WM_COMMAND, MAKEWPARAM(2, BN_CLICKED), reinterpret_cast<LPARAM>(wizard.Item(2)));
@@ -318,9 +328,11 @@ AETHER_TEST("setup design: a cancelled isolated install can be retried successfu
     CHECK(HasText(wizard.window,L"Go back to Options to try again."));
     CHECK_FALSE(HasText(wizard.window,L"Check file access and free disk space"));
     CHECK_FALSE(std::filesystem::exists(wizard.temporary / L"installation" / L"install-state.json"));
+    CHECK_FALSE(std::filesystem::exists(wizard.temporary / L"data" / L"config" / L"settings.json"));  // a cancelled install saves no name
     SaveWizardVisual(wizard,backdrop,"setup-"+text::Narrow(theme)+"-cancelled-retry");
     wizard.Click(8);
     REQUIRE(wizard.Item(20) != nullptr);
+    CHECK_EQ(Text(wizard.Item(26)), std::wstring(L"  Éloïse "));  // Back keeps what was typed
     ::SendMessageW(wizard.window, WM_COMMAND, MAKEWPARAM(2, BN_CLICKED), reinterpret_cast<LPARAM>(wizard.Item(2)));
     waitForDone();
     CHECK(wizard.Item(8) == nullptr);  // success, rather than a second pre-cancelled attempt
@@ -329,6 +341,16 @@ AETHER_TEST("setup design: a cancelled isolated install can be retried successfu
     auto installed = install::LoadState(*layout);
     REQUIRE(installed.ok());
     CHECK_FALSE(installed->activeVersion.empty());
+    {
+        // Saved in this isolated data folder only, trimmed, for the welcome to greet with.
+        auto bytes = fs::ReadFile(wizard.temporary / L"data" / L"config" / L"settings.json", 1024 * 1024);
+        REQUIRE(bytes.ok());
+        auto parsed = json::Parse(*bytes);
+        REQUIRE(parsed.ok());
+        auto saved = settings::FromJson(*parsed);
+        REQUIRE(saved.ok());
+        CHECK(saved->value.welcome.displayName == std::wstring(L"Éloïse"));
+    }
     SaveWizardVisual(wizard,backdrop,"setup-"+text::Narrow(theme)+"-finish");
     closeDone();
     // Exercise the complete maintenance presentation against that same private installation.
@@ -339,6 +361,9 @@ AETHER_TEST("setup design: a cancelled isolated install can be retried successfu
             backdrop.area.right-backdrop.area.left-40,backdrop.area.bottom-backdrop.area.top-20,SWP_NOACTIVATE);
         wizard.Click(1);
         wizard.Click(1);
+        // Repair shows the name the welcome already uses; uninstall does not ask for one.
+        if(std::wstring_view(operation)==L"repair") CHECK_EQ(Text(wizard.Item(26)),std::wstring(L"Éloïse"));
+        else CHECK(wizard.Item(26)==nullptr);
         REQUIRE_EQ(::SendMessageW(wizard.window,WM_APP+74,0,0),LRESULT{1});
         ::SendMessageW(wizard.window,WM_COMMAND,MAKEWPARAM(2,BN_CLICKED),reinterpret_cast<LPARAM>(wizard.Item(2)));
         const bool uninstall=std::wstring_view(operation)==L"uninstall";

@@ -111,6 +111,64 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D61 — Test 3.5: the welcome's name in setup, its picture always, a lighter pen; a README gallery
+
+Owner instruction, 2026-11-05, before deciding whether to publish what D60 prepared. **Correction first:** D60's publication never
+happened. The 3.4 session built and installed its setup on the owner's machine and wrote the documents as if published, then stopped
+before any commit: there is no tag, release or S-067 receipt for 3.4. This work is test 3.5 (D57) and contains all of 3.4; whether
+and under which number it is published is the owner's call after trying it.
+
+- **The name in setup:** the welcome said only "Salut" until the name was typed in Settings, which few people find. Setup's Options page now
+  has an optional field for it (FR-041's local name), showing the saved name on an upgrade or repair, and saving it only when it changed,
+  only into the chosen data folder, trimmed and within the settings' limits. Uninstall does not ask. Silent setup has no option for it.
+- **The picture behind the welcome:** black on the owner's machine. Measured there: the desktop picture's file had been deleted from the
+  Downloads folder after it was set; Windows then reports no picture for the monitor (`IDesktopWallpaper::GetWallpaper` is empty) although
+  the desktop-wide setting still names the file and Windows still shows the picture from its own copy (`TranscodedWallpaper`, readable).
+  Aether read an empty answer as "plain colour". Now the desktop-wide name decides between picture and colour, and Windows' copy is tried
+  when the file cannot be read. The log says which way it went, never the path.
+- **A lighter pen:** every frame blurred the whole greeting's ink again for its soft dark edge, most of the screen. The edge is now kept in
+  its own bitmap and blurred again only around the ink just added, with Direct2D's exact blur so that pieces meet without a seam:
+  identical to 1/255 in an offscreen comparison, about 5 % of the blur work per frame. Each greeting logs its frames, rate and longest
+  gap, so that the next report of a jerky pen comes with a measure.
+- **README:** the owner's three new desktop captures join the two from D60. Shown as an animated slideshow (WebP, five desktops, about
+  three seconds each with a short cross-fade) and a strip of thumbnails that open each picture at full size, since GitHub runs no script.
+  The download links point at the latest release, so that they never lead to a missing page, and the stale "screenshots will be
+  added" section is gone. The pictures show the owner's desktop and third-party wallpapers; the README says these are not covered by the
+  project's license.
+
+### D60 — Version 3.4: the top pixel only, a quarter of a second, a flowing pen, panels that close, a complete search
+
+Owner instruction, 2026-11-01, after using 3.3. To be published as version 3.4 of Alpha 3, `0.3.4-alpha.3`, a normal GitHub Release marked
+Latest, right after commit and CI, without a private trial, at the owner's word. The owner first named 3.3, then 3.4; 3.3 keeps its
+tag and stays in the list. **Not done (D61):** the session stopped after building and installing the setup; nothing was committed or published.
+
+- **Top Bar, supersedes D58:** the wait starts only on the very top row of pixels of the primary monitor, with no margin, lasts
+  0.25 s, and one pixel down cancels it. D58 had extended the zone to where the bar appears, for a hand stopping there; that put the
+  bar over browsers' tabs and close buttons, the very thing Auto-Hide exists to leave free. A resting hand's wobble no longer counts.
+- **Writing, supersedes D59's 1.5 s:** 2.2 s. The owner found 1.5 s stressed and without its refinement, and still wants it quick. The
+  time alone was not the fault: squeezed into so little, a hand's letter-by-letter changes of pace became a flicker of speed, so these
+  now change slowly and less, over one gesture that sets off and lands gently. The newest ink starts fine and settles to its width just
+  behind the tip, so the line is seen being drawn. The letters and their widths are unchanged: "La police est très bien." With the reading
+  time and the fade the whole greeting takes about 3 s.
+- **Panels close when anything else is used, and on Escape:** activation was not enough, because a panel without the foreground never
+  hears of a click on the application that has it. See `src/app/PanelDismissal.h`: raw mouse presses, touch contacts, the foreground
+  moving to another process, and an Escape hotkey that exists only while a panel is open. Escape closes at once, also from a detail view
+  and with text typed in Search. Glass menus already had this and Windows owns its own flyouts.
+- **Search finds Windows' own tools:** consoles (Services, Event Viewer, Computer Management, Task Scheduler...) were in the Apps folder
+  and rejected as documents; Device Manager exists only among the Control Panel's items, which were not read at all; Disk Management and a
+  few others are only files in System32 (a closed list, the only such names that open anything). Every match can be reached, not the best
+  eight, and only rows on screen ask for an icon. What was typed goes when the panel does.
+- **Settings no longer shows a page twice over:** the owner saw it on two machines after a check for updates. To scroll without redrawing everything, a
+  form keeps what it has drawn. A check adds a progress row and takes it away, which moves what is below it, and only what is on screen is told to redraw, so
+  the kept pixels still held the old rows, and the next scroll showed both. A label that changed out of view also came back with its old words. Any change of
+  arrangement now redraws what is kept, and a change of text forgets a label's kept image. Reproduced on 0.3.0's source and on this one before the fix.
+- **A newer release without a signed manifest is announced, not a failure:** every release so far has none, because no unsigned manifest is published, so every installed copy
+  showed "The update could not be completed. Failure: Validation" with nothing to do about it, while a newer version was waiting. Settings now names that
+  version and says it installs by hand, through Release details; nothing is offered or downloaded, so the policy is unchanged. Other failures are said in words.
+- **README pictures:** `resources/preview/` had never been committed, so GitHub showed broken images. Committed at the owner's request, after
+  looking at both: no name, address or path shows. They do show the owner's desktop, its pinned applications, a small Chrome profile picture, and
+  wallpapers not made for this project (a photograph and One Piece art), which the MIT license of this repository does not cover. The owner decides whether to keep them.
+
 ### D59 — Version 3.3 is published as the Latest release; half a second, two seconds, and the desktop
 
 Owner instruction, 2026-11-01. The source goes public as **3.3**, version `0.3.3-alpha.3`, a normal GitHub Release marked

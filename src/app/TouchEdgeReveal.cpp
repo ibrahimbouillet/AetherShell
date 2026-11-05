@@ -56,10 +56,11 @@ void TouchDigitizerWatcher::SetEnabled(HWND host, bool enabled) noexcept {
         (void)::RegisterRawInputDevices(&device, 1, sizeof(device));
         host_ = nullptr;
         recognizer_.Reset();
+        contactsDown_.clear();
     }
 }
 
-std::optional<ScreenEdge> TouchDigitizerWatcher::OnRawInput(LPARAM input) noexcept {
+std::optional<ScreenEdge> TouchDigitizerWatcher::OnRawInput(LPARAM input, bool* contactLanded) noexcept {
     try {
         if (!host_) return std::nullopt;
         UINT size = 0;
@@ -106,6 +107,11 @@ std::optional<ScreenEdge> TouchDigitizerWatcher::OnRawInput(LPARAM input) noexce
                 bool down = false;
                 if (::HidP_GetUsages(HidP_Input, kDigitizerPage, link, pressed, &pressedCount, preparsed, report, reportSize) == HIDP_STATUS_SUCCESS)
                     down = std::find(pressed, pressed + pressedCount, kTipSwitch) != pressed + pressedCount;
+                if (!down) contactsDown_.erase(contactId);
+                else {
+                    if (contactsDown_.size() >= 16) contactsDown_.clear();  // lost lifts cannot accumulate
+                    if (contactsDown_.insert(contactId).second && contactLanded) *contactLanded = true;
+                }
                 const auto ratio = [](ULONG value, const HIDP_VALUE_CAPS& range) {
                     const double span = static_cast<double>(range.LogicalMax) - range.LogicalMin;
                     return span > 0.0 ? std::clamp((static_cast<double>(value) - range.LogicalMin) / span, 0.0, 1.0) : 0.0;

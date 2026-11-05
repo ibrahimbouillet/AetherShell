@@ -45,6 +45,9 @@ struct Options {
     bool silent=false, noLaunch=false, noShortcuts=false, startup=false, repair=false, uninstall=false, removeData=false, desktopShortcut=false, allowDowngrade=false;
     bool startupExplicit=false;
     bool existingInstall=false;  // presentation only: the startup choice shown comes from an existing installation
+    // D61: the name the welcome greets with. Only the wizard asks for it; `saved` is what the settings hold already.
+    std::optional<std::wstring> welcomeName;
+    std::wstring savedWelcomeName;
     std::uintptr_t maintenanceParent=0;
     std::string maintenanceToken;
 #ifdef AETHER_SETUP_TEST_MODE
@@ -155,6 +158,25 @@ Result<bool> RelocateMaintenance(const Options& options) {
     return true;
 }
 
+// Read only, and quietly: the field then shows the name the welcome already uses. Nothing is repaired or renamed.
+std::wstring SavedWelcomeName(const std::filesystem::path& data) {
+    const auto path=data/L"config"/L"settings.json";
+    std::error_code error;
+    if(!std::filesystem::is_regular_file(path,error))return {};
+    auto bytes=fs::ReadFile(path,1024*1024);if(!bytes)return {};
+    auto parsed=json::Parse(*bytes);if(!parsed)return {};
+    auto loaded=settings::FromJson(*parsed);
+    return loaded?loaded->value.welcome.displayName:std::wstring();
+}
+
+// As the welcome will hold it: no surrounding spaces, then the settings' own limits.
+std::wstring CleanWelcomeName(std::wstring_view typed) {
+    settings::Settings value;
+    value.welcome.displayName=std::wstring(text::Trim(typed));
+    (void)settings::Validate(value);
+    return value.welcome.displayName;
+}
+
 Result<void> Resolve(Options& options) {
     if(options.root.empty()) {
         // The installed maintenance copy lives beside the journal, regardless of custom root.
@@ -165,6 +187,7 @@ Result<void> Resolve(Options& options) {
     if(options.data.empty()) { auto local=platform::KnownFolder(FOLDERID_LocalAppData); if(!local)return local.error(); options.data=*local/L"AetherShell"; }
     if(options.log.empty()) options.log=options.data/L"logs"/L"setup.log";
     if(!options.root.is_absolute() || !options.data.is_absolute())return MakeError(ErrorCode::InvalidArgument,"setup directories must be absolute");
+    if(!options.silent && !options.uninstall)options.savedWelcomeName=SavedWelcomeName(options.data);
 #ifdef AETHER_SETUP_TEST_MODE
     if(options.testNoRegistration)return Ok();  // never inspect the owner's startup keys in fixtures
 #endif
@@ -298,15 +321,31 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
     }
     auto result=options.uninstall ? install::Uninstall(*layout,options.data,options.removeData,policy) :
         options.repair ? install::RepairPackage(package,*layout,policy) : install::InstallPackage(package,*layout,policy);
-    if(result && applyStartup) {
-        if(!policy.startWithWindows && !preserveStartupRun) {
+    // D61: the name typed in the wizard, when it differs from the one the settings hold. It stays in this data folder.
+    std::optional<std::wstring> welcomeName;
+    if(options.welcomeName && !options.uninstall) {
+        auto cleaned=CleanWelcomeName(*options.welcomeName);
+        if(cleaned!=options.savedWelcomeName)welcomeName=std::move(cleaned);
+    }
+    if(result && (applyStartup || welcomeName)) {
+        if(applyStartup && !policy.startWithWindows && !preserveStartupRun) {
             auto disabled=settings::StartupRegistration(startupRegistry).DisableIfOwned(layout->Launcher());
             if(!disabled)return disabled;
         }
         auto store=settings::MakeFileSettingsStore(options.data/L"config"/L"settings.json");
         Result<void> saved=store?Ok():Result<void>(store.error());
-        if(store) {auto loaded=store.value()->Load();if(!loaded)saved=loaded.error();else {loaded->value.general.startWithWindows=policy.startWithWindows;saved=store.value()->Save(loaded->value,false);}}
-        if(!saved) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;}
+        if(store) {
+            auto loaded=store.value()->Load();
+            if(!loaded)saved=loaded.error();
+            else {
+                if(applyStartup)loaded->value.general.startWithWindows=policy.startWithWindows;
+                if(welcomeName)loaded->value.welcome.displayName=*welcomeName;
+                saved=store.value()->Save(loaded->value,false);
+            }
+        }
+        if(!saved && applyStartup) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;}
+        // The installation is complete without the name; the welcome then simply says hello.
+        else if(!saved)taskbarNote+="Your name for the welcome could not be saved; add it in Settings > Welcome.\n";
     }
     // The committed installation stays usable without the shortcut, so a failure is only logged.
     if(result && (options.uninstall || !options.noShortcuts)) {
@@ -506,6 +545,12 @@ private:
         if(desktop_ && ::IsWindow(desktop_))options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;
         if(removeData_ && ::IsWindow(removeData_))options_.removeData=::SendMessageW(removeData_,BM_GETCHECK,0,0)==BST_CHECKED;
         if(launch_ && ::IsWindow(launch_))options_.noLaunch=::SendMessageW(launch_,BM_GETCHECK,0,0)!=BST_CHECKED;
+        if(name_ && ::IsWindow(name_))options_.welcomeName=WindowText(name_);
+    }
+    [[nodiscard]] static std::wstring WindowText(HWND control) {
+        std::wstring value(static_cast<std::size_t>(::GetWindowTextLengthW(control))+1,L'\0');
+        value.resize(static_cast<std::size_t>(::GetWindowTextW(control,value.data(),static_cast<int>(value.size()))));
+        return value;
     }
 
     // --- pages ---
@@ -515,7 +560,7 @@ private:
         pageControls_.clear();items_.clear();
         collecting_=true;
         struct StopCollecting{bool& flag;~StopCollecting(){flag=false;}} stop{collecting_};
-        folder_=startup_=launch_=shortcut_=desktop_=removeData_=nullptr;primary_=back_=cancel_=nullptr;folderError_=nullptr;
+        folder_=startup_=launch_=shortcut_=desktop_=removeData_=name_=nullptr;primary_=back_=cancel_=nullptr;folderError_=nullptr;
         const HWND parent=Parent();
         const auto text=[&](const std::wstring& value,form::TextRole role,form::Severity severity=form::Severity::None,std::optional<graphics::Glyph> glyph={}) {
             items_.push_back(Item{Item::Text,Label(parent,value,role,0,severity,glyph),nullptr,role});
@@ -556,6 +601,15 @@ private:
                 control(removeData_);
                 text(L"Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.",form::TextRole::Helper);
             } else {
+                // D61: the welcome greets by name from its first appearance, without a visit to Settings.
+                text(L"Your welcome",form::TextRole::Section);
+                text(L"After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.",form::TextRole::Body);
+                name_=Make(parent,L"EDIT",options_.welcomeName.value_or(options_.savedWelcomeName),WS_TABSTOP|ES_AUTOHSCROLL,26);
+                ::SendMessageW(name_,EM_SETLIMITTEXT,settings::kMaximumDisplayNameLength,0);
+                ::SendMessageW(name_,EM_SETCUEBANNER,TRUE,reinterpret_cast<LPARAM>(L"Your first name"));
+                {form::ControlSpec spec;spec.role=form::ControlRole::Field;spec.accessibleName=L"Name to greet you with";Style(name_,spec);}
+                items_.push_back(Item{Item::Field,name_,nullptr});
+                text(L"Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.",form::TextRole::Helper);
                 text(L"Shortcuts and startup",form::TextRole::Section);
                 shortcut_=Switch(parent,L"Create Start menu shortcuts",L"Aether Shell and Restore Windows taskbar.",23,!options_.noShortcuts);control(shortcut_);
                 desktop_=Switch(parent,L"Create a desktop shortcut",L"",25,options_.desktopShortcut);control(desktop_);
@@ -719,7 +773,7 @@ private:
         std::wstring path(static_cast<std::size_t>(::GetWindowTextLengthW(folder_))+1,L'\0');::GetWindowTextW(folder_,path.data(),static_cast<int>(path.size()));path.resize(path.size()-1);
         options_.root=path;
         if(options_.uninstall)options_.removeData=::SendMessageW(removeData_,BM_GETCHECK,0,0)==BST_CHECKED;
-        else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.startupExplicit=true;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;}
+        else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.startupExplicit=true;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;options_.welcomeName=WindowText(name_);}
         if(!options_.root.is_absolute()) {
             // Inline validation: the field is marked and the message stays next to it.
             ::SetWindowTextW(folderError_,L"Choose a complete folder path, for example one that starts with a drive letter.");
@@ -786,7 +840,7 @@ private:
     Options options_;WorkerPool worker_;platform::Win32UiDispatcher dispatcher_;platform::MessageLoop loop_;
     form::FormSurface surface_;form::FormScrollView scroll_;bool styled_=false;bool collecting_=false;
     graphics::DesignTokens tokens_;graphics::MotionPolicy motion_;
-    HWND window_=nullptr,folder_=nullptr,startup_=nullptr,launch_=nullptr,shortcut_=nullptr,desktop_=nullptr,removeData_=nullptr;
+    HWND window_=nullptr,folder_=nullptr,startup_=nullptr,launch_=nullptr,shortcut_=nullptr,desktop_=nullptr,removeData_=nullptr,name_=nullptr;
     HWND title_=nullptr,version_=nullptr,step_=nullptr,status_=nullptr,primary_=nullptr,back_=nullptr,cancel_=nullptr,folderError_=nullptr;
     D2D1_RECT_F brandMark_{},stepDots_{};
     int page_=0;bool success_=false;

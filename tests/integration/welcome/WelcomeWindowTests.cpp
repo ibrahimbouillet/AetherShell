@@ -264,6 +264,76 @@ AETHER_TEST("welcome pixels: ink added piece by piece is the same as ink written
     CHECK(std::abs(whole - pieces) <= whole / 50);
 }
 
+AETHER_TEST("welcome pixels: the ink's edge kept piece by piece is the edge of all the ink, for a fraction of the work") {
+    constexpr UINT kWidth = 1600, kHeight = 640;
+    auto scene = ComposeScene(L"Salut", L"Ibrahim", 1200.0f, 380.0f);
+    REQUIRE(scene.ok());
+    test::D2DCanvas canvas;
+    REQUIRE(canvas.Create(kWidth, kHeight));
+    winrt::com_ptr<ID2D1DeviceContext> context;
+    REQUIRE(SUCCEEDED(DeviceOf(canvas)->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, context.put())));
+    const float margin = scene->penWidth * 1.5f + 4.0f;
+    const auto inkSize = D2D1::SizeU(static_cast<UINT32>(std::ceil(scene->width + margin * 2.0f)), static_cast<UINT32>(std::ceil(scene->height + margin * 2.0f)));
+    const auto format = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
+    winrt::com_ptr<ID2D1Bitmap1> ink;
+    REQUIRE(SUCCEEDED(context->CreateBitmap(inkSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, format), ink.put())));
+    winrt::com_ptr<ID2D1SolidColorBrush> white;
+    REQUIRE(SUCCEEDED(context->CreateSolidColorBrush(D2D1::ColorF(0.98f, 0.98f, 0.99f), white.put())));
+    context->SetTarget(ink.get());
+    context->BeginDraw();
+    context->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
+    REQUIRE(SUCCEEDED(context->EndDraw()));
+    const float deviation = scene->penWidth * 0.9f;
+    InkShadow pieces;
+    REQUIRE(pieces.Reset(context.get(), ink.get(), deviation));
+    const auto edgeSize = pieces.Bitmap()->GetPixelSize();
+    REQUIRE(edgeSize.width <= kWidth);
+    REQUIRE(edgeSize.height <= kHeight);
+    // About sixty frames a second of writing, as the window adds them.
+    double blurredArea = 0.0;
+    float until = -1.0f;
+    for (int frame = 0; frame <= 135; ++frame) {
+        const float time = scene->inkDuration * static_cast<float>(frame) / 132.0f;
+        context->SetTarget(ink.get());
+        context->BeginDraw();
+        PaintHandwritingRange(context.get(), *scene, D2D1::Point2F(margin, margin), until, time, white.get());
+        REQUIRE(SUCCEEDED(context->EndDraw()));
+        context->SetTarget(nullptr);
+        if (const auto added = HandwritingBounds(*scene, until, time)) {
+            REQUIRE(pieces.Update(context.get(), D2D1::RectF(added->left + margin, added->top + margin, added->right + margin, added->bottom + margin)));
+            const float reach = pieces.Reach();
+            blurredArea += static_cast<double>(std::min<float>(static_cast<float>(edgeSize.width), added->right - added->left + reach * 4.0f)) *
+                           std::min<float>(static_cast<float>(edgeSize.height), added->bottom - added->top + reach * 4.0f);
+        }
+        until = time;
+    }
+    InkShadow whole;
+    REQUIRE(whole.Reset(context.get(), ink.get(), deviation));
+    REQUIRE(whole.Update(context.get(), D2D1::RectF(0.0f, 0.0f, static_cast<float>(inkSize.width), static_cast<float>(inkSize.height))));
+    const auto read = [&](const InkShadow& edge) {
+        canvas.Begin();
+        canvas.Context()->DrawBitmap(edge.Bitmap(), D2D1::RectF(0.0f, 0.0f, static_cast<float>(edgeSize.width), static_cast<float>(edgeSize.height)), 1.0f, D2D1_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+        REQUIRE(canvas.End());
+        std::vector<test::CanvasPixel> pixels;
+        for (UINT y = 0; y < edgeSize.height; ++y) for (UINT x = 0; x < edgeSize.width; ++x) pixels.push_back(canvas.At(x, y));
+        return pixels;
+    };
+    const auto kept = read(pieces), once = read(whole);
+    int largest = 0, shaded = 0;
+    for (std::size_t i = 0; i < kept.size(); ++i) {
+        largest = std::max({largest, std::abs(kept[i].a - once[i].a), std::abs(kept[i].g - once[i].g)});
+        if (once[i].a > 40) ++shaded;
+    }
+    // Each frame blurred only around its new ink, where a blur of everything would cover the whole edge.
+    const double everyFrame = 136.0 * edgeSize.width * edgeSize.height;
+    TEST_NOTE("edge " + std::to_string(edgeSize.width) + " x " + std::to_string(edgeSize.height) + ", largest difference " + std::to_string(largest) +
+              ", blurred " + std::to_string(static_cast<int>(100.0 * blurredArea / everyFrame)) + "% of a whole blur per frame");
+    CHECK(shaded > 5000);
+    CHECK(largest <= 2);
+    CHECK(blurredArea < everyFrame * 0.2);
+    CHECK_FALSE(InkShadow{}.Update(context.get(), D2D1::RectF(0.0f, 0.0f, 10.0f, 10.0f)));  // nothing to update before Reset
+}
+
 // A frame for the eye: the whole greeting as a person would see it, over the test's own picture.
 AETHER_TEST("welcome pixels: the whole greeting, saved for inspection") {
     constexpr UINT kWidth = 1280, kHeight = 720;

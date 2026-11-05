@@ -28,7 +28,7 @@ annotated as "Search applications" through the documented
 The SDK annotation GUID definitions live in `NativeEditGuids.cpp`; no third-party library is added.
 
 Up/Down, Home/End, Page Up/Down and Tab select results, Enter launches through the application
-launcher, Escape clears the query and a second Escape closes. A failed launch retains the results
+launcher, Escape closes, and every opening starts empty (D60). A failed launch retains the results
 and shows an inline error footer. The height accounts for that footer. A short work area displays
 only whole rows; keyboard, wheel and UIA focus scroll the selected result into view. Hidden rows
 report UIA `IsOffscreen` and empty bounds instead of fabricated on-screen positions. Application

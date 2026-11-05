@@ -385,7 +385,12 @@ struct UpdateCoordinator::Impl {
             return outcome;
         }
         auto offer = PrepareOffer(release, token);
-        if (!offer) return Failed(offer.error());
+        if (!offer) {
+            auto failed = Failed(offer.error());
+            const bool isSigned = release.FindAsset(ManifestAssetName(release.version)) != nullptr && release.FindAsset(SignatureAssetName(release.version)) != nullptr;
+            if (failed.failure && !isSigned) failed.failure->manualVersion = release.version;
+            return failed;
+        }
         outcome.kind = CheckOutcome::Kind::Available;
         outcome.update = std::move(offer).value();
         return outcome;

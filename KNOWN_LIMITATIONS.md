@@ -2,10 +2,17 @@
 
 This is a development alpha, not a fully qualified Version 1 release. The requirements in
 PROJECT_SPEC remain the intended acceptance criteria; this file does not waive them.
-The current release is 3.3, `0.3.3-alpha.3` (D59, published 2026-11-01); `0.3.0-alpha.3`, `0.2.0-alpha.2`
-and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI
-receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STATUS.md`.
+The current release is 3.3, `0.3.3-alpha.3` (D59, published 2026-11-01); `0.3.0-alpha.3`, `0.2.0-alpha.2` and `0.1.0-alpha.1`
+remain available. The source describes test build 3.5, `0.3.5-alpha.3` (D61), which includes the 3.4 work (D60) and is not published.
+Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
+`docs/knowledge/TEST_STATUS.md`.
 
+- 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the
+  picture was established on the owner's machine by reading what Windows reports, not yet seen at a real lock. The incremental ink edge
+  was compared with the old whole blur offscreen, on a software renderer; the pen's pace on a real screen is logged, not yet measured.
+- 3.4 (D60, S-067): closing panels on a real touch has not run on a device, only with a synthetic report of the contact. Opening Windows' tools
+  was tried once on the real desktop, Device Manager and About Windows, through the same shell call but not from the Search panel itself. With Auto-Hide on, a pointer held on the very top pixel of a maximized
+  window's close button for a quarter of a second still brings the Top Bar.
 - 3.3 (D56, D59, S-064, S-066): joining a Wi-Fi network has not been run for real, because tests never change the real
   connection; reading the list was checked once by count. Listing can fail when Windows' Location privacy setting is off,
   which the panel says. Rounding of Chrome is established from source and not yet observed.
@@ -141,7 +148,7 @@ receipts are recorded only when executed in HANDOFF and `docs/knowledge/TEST_STA
   auto-hidden bar reserves no screen space, so a revealed bar floats over maximized windows rather
   than pushing them aside (as Windows' auto-hide taskbar does). With a monitor below or above the
   primary one, that edge is not a hard stop: the pointer has to rest on it briefly (D52, D54: the Top Bar
-  needs half a second at the top of the primary monitor, where it appears, which a monitor above makes harder to
+  needs a quarter of a second on the very top pixel of the primary monitor, which a monitor above makes harder to
   hold; the Dock's check still counts a monitor below as its edge). The pointer and
   window bounds are sampled every 50 ms only while Auto-Hide is on. Edge reveal, animation and real
   applications still need the owner's check; multi-monitor setups are unverified.

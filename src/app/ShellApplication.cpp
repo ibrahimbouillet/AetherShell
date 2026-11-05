@@ -4,6 +4,7 @@
 #include "app/AutoHide.h"
 #include "app/DesktopPolicy.h"
 #include "app/HiddenIcons.h"
+#include "app/PanelDismissal.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
 #include "app/TouchEdgeReveal.h"
@@ -207,6 +208,9 @@ struct ShellApplication::Impl {
     // D47 Auto-Hide: one decision per bar, fed by a short timer that runs only while a bar has it on.
     AutoHideState topAutoHide{kTopBarAutoHideTiming}, dockAutoHide;
     TouchDigitizerWatcher touchEdges;           // FR-040: a swipe from the edge reaches a hidden bar
+    bool autoHideWatchesTouch = false;
+    PanelDismissal panelDismissal;              // D60: panels close when anything else is used
+    PressedAway controlsPressedAway, searchPressedAway;
     std::uint64_t topTouchUntil = 0, dockTouchUntil = 0;
     bool topCovered = false, dockCovered = false;
     bool autoHideArmed = false;
@@ -504,11 +508,14 @@ struct ShellApplication::Impl {
         request.defaultChoice = ui::form::ConfirmChoice::Primary;
         std::wstring password;
         request.password = &password;
+        UpdatePanelDismissal();  // the dialog is the panel's own: typing in it or Escape must not close anything else
         const auto choice = ui::form::ShowConfirmation(request, appTokens, appMotion, &scheduler);
         wifiPromptOpen = false;
+        UpdatePanelDismissal();
         if (choice && *choice == ui::form::ConfirmChoice::Primary && !password.empty() && !closing) {
             // The dialog took activation, which closes the panel: back to it, to follow the outcome.
             if (controls) (void)controls->ShowWiFi(controlsAnchor);
+            UpdatePanelDismissal();
             ConnectWiFi(ssid, std::move(password));
         }
         ::SecureZeroMemory(password.data(), password.size() * sizeof(wchar_t));
@@ -542,6 +549,49 @@ struct ShellApplication::Impl {
             AETHER_LOG_WARN("app", "maximized-window side margins unavailable");
         }
     }
+    // D60: open panels watch for anything else being used. Closing one comes back here through its signal.
+    void UpdatePanelDismissal() {
+        const bool open = !closing && !wifiPromptOpen && ((controls && controls->IsShown()) || (searchWindow && searchWindow->IsOpen()));
+        if (open != panelDismissal.Armed()) {
+            if (open) {
+                panelDismissal.Arm(PanelDismissal::Callbacks{
+                    [this](POINT point) { return PointOnOpenPanel(point); },
+                    [this](std::uint64_t since) {
+                        return (controls && controls->IsShown() && controls->LastTouchDown() >= since) ||
+                               (searchWindow && searchWindow->IsOpen() && searchWindow->LastTouchDown() >= since);
+                    },
+                    [this](PanelDismissal::Reason reason) { DismissPanels(reason); }});
+            } else {
+                panelDismissal.Disarm();
+            }
+        }
+        UpdateTouchWatch();
+    }
+    [[nodiscard]] bool PointOnOpenPanel(POINT point) const noexcept {
+        const HWND under = ::WindowFromPoint(point);
+        const HWND root = under ? ::GetAncestor(under, GA_ROOT) : nullptr;
+        if (!root) return false;
+        if (controls && controls->IsShown() && root == controls->Handle()) {
+            const RECT panel = controls->PanelBoundsPx();  // its window also holds the shadow around it
+            return ::PtInRect(&panel, point) != FALSE;
+        }
+        return searchWindow && searchWindow->IsOpen() && root == searchWindow->Handle();
+    }
+    void DismissPanels(PanelDismissal::Reason reason) {
+        const auto now = ::GetTickCount64();
+        const bool byHand = reason == PanelDismissal::Reason::Press || reason == PanelDismissal::Reason::Touch;
+        if (controls && controls->IsShown()) {
+            if (byHand) controlsPressedAway.Mark(now);
+            controls->Close();
+        }
+        if (searchWindow && searchWindow->IsOpen()) {
+            if (byHand) searchPressedAway.Mark(now);
+            // Escape goes back to what was in front; anything else has just been put in front by the person.
+            if (reason == PanelDismissal::Reason::Escape) searchWindow->Close();
+            else searchWindow->Dismiss();
+        }
+    }
+    void UpdateTouchWatch() { touchEdges.SetEnabled(events.Handle(), !closing && (autoHideWatchesTouch || panelDismissal.Armed())); }
     // D47 Auto-Hide. Arms the sampling timer while either bar has it on; a bar that turned it off
     // comes back at once.
     void UpdateAutoHide() {
@@ -550,7 +600,8 @@ struct ShellApplication::Impl {
         const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
         if (!topOn) { topAutoHide.Reset(); if (topbar) topbar->SetAutoHidden(false); }
         if (!dockOn) { dockAutoHide.Reset(); if (dock) dock->SetAutoHidden(false); }
-        touchEdges.SetEnabled(events.Handle(), topOn || dockOn);
+        autoHideWatchesTouch = topOn || dockOn;
+        UpdateTouchWatch();
         if (!topOn && !dockOn) {
             if (autoHideArmed) ::KillTimer(events.Handle(), kAutoHideTimer);
             autoHideArmed = false;
@@ -583,9 +634,7 @@ struct ShellApplication::Impl {
             sample.enabled = true;
             sample.covered = topCovered;
             sample.engaged = topbar->Engaged() || (controls && controls->IsShown()) || hiddenIconsOpen || hiddenIconsPending || now < topTouchUntil;
-            const float reach = TopBarReachDip(value.topBar.topMargin, value.topBar.height);
-            sample.atEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, reach);
-            sample.nearEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds, monitor.dpi, reach + kTopEdgeWobbleDip);
+            sample.atEdge = pointer && PointerOnTopEdge(cursor, monitor.bounds);
             sample.now = now;
             const bool wasHidden = topAutoHide.Hidden();
             const bool hidden = topAutoHide.Update(sample);
@@ -606,7 +655,9 @@ struct ShellApplication::Impl {
     // A swipe in from a screen edge is deliberate: its bar comes out at once and waits a moment for the
     // finger, which then keeps it out by using it. Everything else about Auto-Hide is unchanged.
     void OnRawTouch(LPARAM input) {
-        const auto edge = touchEdges.OnRawInput(input);
+        bool landed = false;
+        const auto edge = touchEdges.OnRawInput(input, &landed);
+        if (landed) panelDismissal.ContactLanded();
         if (!edge || closing) return;
         const auto until = ::GetTickCount64() + 2500;
         (*edge == ScreenEdge::Top ? topTouchUntil : dockTouchUntil) = until;
@@ -1318,6 +1369,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     windowCorners=std::make_unique<WindowCorners>(nativeTaskbarAccess, paths.executableDir / L"AetherShellApp.exe");
     connections.push_back(controls->Requested.Connect([this](controlcenter::ControlIntent intent) { HandleControl(intent); }));
     connections.push_back(controls->Closed.Connect([this]{
+        UpdatePanelDismissal();
         ++*controlEpoch;controlActionCancellation->Cancel();
         controlActionCancellation=std::make_shared<CancellationSource>();nextControlAction.reset();
     }));
@@ -1337,6 +1389,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->QuickControlsRequested.Connect([this](RECT anchor) {
         if (closing || !controls) return;
+        if (controlsPressedAway.Take(::GetTickCount64())) return;  // that press already closed it
         controlsAnchor = anchor;
         // D44: Aether's own panel unless the person explicitly chose Windows' Quick Settings. The
         // legacy always-true openWindowsFlyouts flag of Alpha 2 files is deliberately not consulted.
@@ -1356,8 +1409,10 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         // Activated from the keyboard (Enter/Space on the focused group): show focus cues at once.
         const bool keyboard = (::GetKeyState(VK_RETURN) & 0x8000) != 0 || (::GetKeyState(VK_SPACE) & 0x8000) != 0;
         if (auto opened = controls->Toggle(anchor, keyboard); opened && controls->IsShown()) RefreshControls(true);
+        UpdatePanelDismissal();
     }));
-    connections.push_back(dock->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
+    connections.push_back(searchWindow->OpenChanged.Connect([this]{ UpdatePanelDismissal(); }));
+    connections.push_back(dock->SearchRequested.Connect([this]{ if (!closing && !searchPressedAway.Take(::GetTickCount64())) searchWindow->Toggle(); }));
     connections.push_back(dock->SettingsRequested.Connect([this]{ OpenSettings(); }));
     connections.push_back(dock->ImportWindowsPinsRequested.Connect([this]{ ImportTaskbarPins(true); }));
     connections.push_back(dock->StartRequested.Connect([this]{
@@ -1367,7 +1422,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(dock->TaskViewRequested.Connect([this]{
         if (!closing && !apps::OpenTaskView() && settingsWindow) settingsWindow->ReportActionStatus(L"Windows Task View could not be opened");
     }));
-    connections.push_back(topbar->SearchRequested.Connect([this]{ if (!closing) searchWindow->Toggle(); }));
+    connections.push_back(topbar->SearchRequested.Connect([this]{ if (!closing && !searchPressedAway.Take(::GetTickCount64())) searchWindow->Toggle(); }));
     connections.push_back(topbar->SettingsRequested.Connect([this]{ OpenSettings(settings::ui::SettingsPage::TopBar); }));
     connections.push_back(topbar->AboutRequested.Connect([this]{ OpenSettings(settings::ui::SettingsPage::About); }));
     connections.push_back(topbar->CheckForUpdatesRequested.Connect([this]{ CheckUpdates(); }));
@@ -1680,6 +1735,7 @@ void ShellApplication::Impl::Stop() noexcept {
     ::KillTimer(events.Handle(), kOverflowWatchTimer);
     ::KillTimer(events.Handle(), kAutoHideTimer); autoHideArmed = false;
     EndWelcomeInput();
+    panelDismissal.Disarm();
     touchEdges.SetEnabled(nullptr, false);
     ::KillTimer(events.Handle(), kUpdaterPollTimer); updaterProcess.Reset(); updateLaunch.reset();
     UnregisterHotkeys();

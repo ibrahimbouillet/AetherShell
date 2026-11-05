@@ -439,6 +439,24 @@ AETHER_TEST("settings design: update states refresh in place and keep focus and 
     window.SetUpdateSnapshot(update);
     CHECK(::IsWindowVisible(window.Control(322)));  // indeterminate progress while checking
     CHECK_FALSE(::IsWindowEnabled(install));
+    // D60: a failure says what happened; a newer release without a signed manifest is no failure at all.
+    update.state = updates::UpdateState::Error;
+    update.failure = updates::UpdateFailure{MakeError(ErrorCode::Network, "offline")};
+    window.SetUpdateSnapshot(update);
+    CHECK(TextOf(summary).find(L"could not be reached") != std::wstring::npos);
+    CHECK(TextOf(window.Control(323)).find(L"could not be completed") != std::wstring::npos);
+    update.failure = updates::UpdateFailure{MakeError(ErrorCode::Validation, "no signed manifest")};
+    window.SetUpdateSnapshot(update);
+    CHECK(TextOf(summary).find(L"Validation") != std::wstring::npos);  // no sentence of its own: the plain code
+    auto newer = updates::SemanticVersion::Parse("9.8.7");
+    REQUIRE(newer.ok());
+    update.failure->manualVersion = newer.value();
+    window.SetUpdateSnapshot(update);
+    CHECK(TextOf(window.Control(323)).find(L"9.8.7 is available") != std::wstring::npos);
+    CHECK(TextOf(summary).find(L"by hand") != std::wstring::npos);
+    CHECK(TextOf(summary).find(L"Failure") == std::wstring::npos);
+    CHECK_FALSE(::IsWindowEnabled(install));  // it cannot be installed from here
+    update.failure.reset();
     update.state = updates::UpdateState::UpdateAvailable;
     update.manifest = std::make_shared<updates::UpdateManifest>();
     update.downloadSize = 4u * 1024u * 1024u;
@@ -466,6 +484,151 @@ AETHER_TEST("settings design: update states refresh in place and keep focus and 
     CHECK(::GetFocus() == window.Control(201));
     ::SendMessageW(window.Control(301), BM_CLICK, 0, 0);
     CHECK_EQ(checks, 1);
+    window.Close();
+}
+
+// The largest average difference over any small area: a line of text smoothed a fraction of a pixel differently
+// barely counts, and a control left behind counts in full.
+int WorstAreaDifference(const Capture& a, const Capture& b) {
+    constexpr int kWidth = 48, kHeight = 24;
+    int worst = 0;
+    for (int top = 0; top + kHeight <= a.height; top += kHeight / 2) {
+        for (int left = 0; left + kWidth <= a.width; left += kWidth / 2) {
+            int total = 0;
+            for (int y = top; y < top + kHeight; ++y) {
+                for (int x = left; x < left + kWidth; ++x) {
+                    const auto* p = a.Pixel(x, y);
+                    const auto* q = b.Pixel(x, y);
+                    for (int c = 0; c < 3; ++c) total += std::abs(static_cast<int>(p[c]) - static_cast<int>(q[c]));
+                }
+            }
+            worst = std::max(worst, total / (kWidth * kHeight * 3));
+        }
+    }
+    return worst;
+}
+
+// D60, the owner's report on two machines: after a check for updates, the page's rows showed two or three times over,
+// about one row apart. A check adds a progress row and takes it away, which moves everything below it. This goes the
+// way a person does, in the owner's light theme: the page's own Check now, then scrolling.
+AETHER_TEST("settings design: a check for updates leaves no trace of where the rows were") {
+    Fixture f("settings-design-update-ghost");
+    updates::UpdateSnapshot checking, failed;
+    checking.state = updates::UpdateState::Checking;
+    failed.state = updates::UpdateState::Error;
+    failed.automaticChecks = true;
+    failed.nextCheck = std::chrono::system_clock::now() + 24h;
+    failed.failure = updates::UpdateFailure{MakeError(ErrorCode::Validation, "no signed manifest")};
+    settings::ui::SettingsWindow* shown = nullptr;
+    settings::ui::SettingsCallbacks callbacks;
+    int checks = 0;
+    callbacks.checkForUpdates = [&] { ++checks; if (shown) shown->SetUpdateSnapshot(checking); };
+    settings::ui::SettingsWindow window(f.service, f.dispatcher, std::move(callbacks));
+    shown = &window;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Light), graphics::MotionPolicy{});
+    REQUIRE(window.Show(settings::ui::SettingsPage::Updates).ok());
+    const RECT safe = SafeArea();
+    const int width = std::min<int>(safe.right - safe.left - 40, ::MulDiv(1040, static_cast<int>(::GetDpiForWindow(window.Handle())), 96));
+    const int height = std::min<int>(safe.bottom - safe.top - 20, ::MulDiv(500, static_cast<int>(::GetDpiForWindow(window.Handle())), 96));
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, (safe.left + safe.right - width) / 2, safe.top + 8, width, height, SWP_NOACTIVATE);
+    RECT guard{};
+    ::GetWindowRect(window.Handle(), &guard);
+    BackdropGuard backdrop;
+    backdrop.hwnd = CreateTestBackdrop(guard);
+    REQUIRE(backdrop.hwnd != nullptr);
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    SetBackdropPhase(backdrop.hwnd, false);
+    window.SetUpdateSnapshot(failed);
+    RECT client{};
+    ::GetClientRect(window.Handle(), &client);
+    ::MapWindowPoints(window.Handle(), nullptr, reinterpret_cast<POINT*>(&client), 2);
+    // A pointer left over a control would light it up in one picture and not in another.
+    struct PointerBack {
+        POINT saved{};
+        PointerBack() { (void)::GetCursorPos(&saved); }
+        ~PointerBack() { (void)::SetCursorPos(saved.x, saved.y); }
+    } pointerBack;
+    (void)::SetCursorPos(client.left + 8, client.bottom - 8);
+    PumpFor(f.dispatcher, 800ms);
+    const auto press = [&](HWND control) {
+        ::SendMessageW(control, BM_CLICK, 0, 0);
+    };
+    // Once by hand, which leaves the button with its focus as every later round finds it.
+    press(window.Control(301));
+    PumpFor(f.dispatcher, 500ms);
+    window.SetUpdateSnapshot(failed);
+    PumpFor(f.dispatcher, 800ms);
+    REQUIRE(checks == 1);
+    const auto expected = CaptureWithRetry(backdrop.hwnd, guard, client);
+    if (!expected.Valid()) {
+        TEST_NOTE("inconclusive: a foreign window overlapped the private backdrop");
+        window.Close();
+        return;
+    }
+    CHECK(SavePng(expected, InspectionPath("settings-before-update-check")));
+    constexpr int kLeftBehind = 40;  // smoothing of text alone reaches about 25, in no fixed place; rows left behind reach 70
+    for (int round = 0; round < 3; ++round) {
+        press(window.Control(301));
+        PumpFor(f.dispatcher, 300ms + 200ms * round);
+        window.SetUpdateSnapshot(failed);
+        // What a person sees at once, and once everything has settled.
+        for (const auto wait : {60ms, 800ms}) {
+            PumpFor(f.dispatcher, wait);
+            const auto after = CaptureWithRetry(backdrop.hwnd, guard, client);
+            if (!after.Valid()) continue;
+            CHECK(SavePng(after, InspectionPath("settings-after-update-check-" + std::to_string(round) + "-" + std::to_string(wait.count()))));
+            const int difference = WorstAreaDifference(expected, after);
+            TEST_NOTE("round " + std::to_string(round) + ", after " + std::to_string(wait.count()) + " ms: worst area " + std::to_string(difference));
+            if (wait == 800ms) CHECK(difference <= kLeftBehind);
+        }
+    }
+    CHECK_EQ(checks, 4);
+    // The page is then scrolled, as anyone looks at what is under the status; once more during a check, too.
+    const auto wheel = [&](int notches) {
+        const POINT over{(client.left + client.right) / 2, (client.top + client.bottom) / 2};
+        for (int i = 0; i < std::abs(notches); ++i) {
+            ::SendMessageW(window.Control(301), WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<short>(notches > 0 ? WHEEL_DELTA : -WHEEL_DELTA))), MAKELPARAM(over.x, over.y));
+            PumpFor(f.dispatcher, 90ms);
+        }
+    };
+    // What a plain scroll shows, down and back, is what must be seen after a check, in both places.
+    wheel(-4);
+    PumpFor(f.dispatcher, 500ms);
+    const auto plainScrolled = CaptureWithRetry(backdrop.hwnd, guard, client);
+    wheel(8);
+    PumpFor(f.dispatcher, 1800ms);
+    const auto plainBack = CaptureWithRetry(backdrop.hwnd, guard, client);
+    if (!plainScrolled.Valid() || !plainBack.Valid()) {
+        TEST_NOTE("inconclusive: a foreign window overlapped the private backdrop");
+        window.Close();
+        return;
+    }
+    for (int round = 0; round < 3; ++round) {
+        wheel(-3);
+        PumpFor(f.dispatcher, 300ms);
+        if (round == 1) { window.SetUpdateSnapshot(checking); PumpFor(f.dispatcher, 120ms); }
+        if (round == 2) press(window.Control(301));
+        wheel(-1);
+        PumpFor(f.dispatcher, 200ms);
+        if (round > 0) window.SetUpdateSnapshot(failed);
+        PumpFor(f.dispatcher, 500ms);
+        const auto scrolled = CaptureWithRetry(backdrop.hwnd, guard, client);
+        if (scrolled.Valid()) {
+            CHECK(SavePng(scrolled, InspectionPath("settings-scrolled-" + std::to_string(round))));
+            const int difference = WorstAreaDifference(plainScrolled, scrolled);
+            // Rows drawn afresh here differ a little from kept ones in the smoothing of their text: noted, and looked at.
+            TEST_NOTE("while scrolled, round " + std::to_string(round) + ": worst area " + std::to_string(difference));
+        }
+        wheel(8);
+        PumpFor(f.dispatcher, 1800ms);  // the scroll indicator fades too
+        const auto after = CaptureWithRetry(backdrop.hwnd, guard, client);
+        if (!after.Valid()) continue;
+        CHECK(SavePng(after, InspectionPath("settings-back-up-" + std::to_string(round))));
+        // 0.3.0's source: 70, with the rows twice over and the headline stuck on "Checking".
+        const int difference = WorstAreaDifference(plainBack, after);
+        TEST_NOTE("back at the top, round " + std::to_string(round) + ": worst area " + std::to_string(difference));
+        CHECK(difference <= kLeftBehind);
+    }
     window.Close();
 }
 

@@ -23,7 +23,7 @@ if(AETHER_BUILD_TESTS)
         LINK aether_install aether_settings aether_ui_form aether_graphics aether_platform aether_core comctl32 shell32 ole32)
     target_compile_definitions(AetherShellSetupTest PRIVATE AETHER_SETUP_TEST_MODE=1)
 endif()
-aether_add_module_tests(installer LINK aether_install aether_ui_form aether_graphics)
+aether_add_module_tests(installer LINK aether_install aether_settings aether_ui_form aether_graphics)
 if(TARGET aether_installer_integration_tests)
     add_dependencies(aether_installer_integration_tests AetherShellSetupTest)
     target_compile_definitions(aether_installer_integration_tests PRIVATE

@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <set>
 
 namespace aether::app {
 
@@ -48,11 +49,13 @@ public:
     TouchDigitizerWatcher& operator=(const TouchDigitizerWatcher&) = delete;
     void SetEnabled(HWND host, bool enabled) noexcept;
     [[nodiscard]] bool Enabled() const noexcept { return host_ != nullptr; }
-    [[nodiscard]] std::optional<ScreenEdge> OnRawInput(LPARAM input) noexcept;
+    // `contactLanded` is set when this report starts a new contact, anywhere (D60: open panels close).
+    [[nodiscard]] std::optional<ScreenEdge> OnRawInput(LPARAM input, bool* contactLanded = nullptr) noexcept;
 
 private:
     HWND host_ = nullptr;
     EdgeSwipeRecognizer recognizer_;
+    std::set<std::uint32_t> contactsDown_;
 };
 
 }  // namespace aether::app

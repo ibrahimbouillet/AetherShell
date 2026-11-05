@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <optional>
 #include <span>
+#include <string_view>
 #include <vector>
 
 namespace aether::welcome {
@@ -34,6 +35,12 @@ struct BackdropImage {
 // The rectangle that fills the area with the whole picture's proportions, centred (as "Fill" does).
 [[nodiscard]] D2D1_RECT_F CoverRect(float imageWidth, float imageHeight, float areaWidth, float areaHeight) noexcept;
 
+// The files to try for a monitor's picture, in order: the one Windows names, then `windowsCopy`, the copy
+// of the picture Windows itself shows. None when Windows shows a plain colour (both names empty). Windows
+// names no file for a monitor whose picture was moved or deleted, yet still shows it from its copy (D61):
+// `desktopPicture`, the desktop-wide setting, still holds the old name then.
+[[nodiscard]] std::vector<std::filesystem::path> BackdropCandidates(std::wstring_view monitorPicture, std::wstring_view desktopPicture,
+                                                                    const std::filesystem::path& windowsCopy);
 // Decodes a picture, reduced until it just covers `coverWidth` x `coverHeight` pixels; never enlarged.
 [[nodiscard]] Result<BackdropImage> DecodeBackdrop(const std::filesystem::path& file, UINT coverWidth, UINT coverHeight);
 // The desktop picture of the monitor at `monitorPx`; nullopt when it is a plain colour or cannot be read.

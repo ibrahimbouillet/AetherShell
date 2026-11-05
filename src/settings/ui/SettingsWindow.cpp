@@ -58,6 +58,18 @@ constexpr int kLocationField = kFirstField + 70, kReleaseNotes = kFirstField + 7
 
 constexpr wchar_t kApplyHint[] = L"Press Apply to confirm this change.";
 
+// D60: what a failed check or download means, in words. An error's own message can name files and addresses.
+const wchar_t* FailureSentence(ErrorCode code) noexcept {
+    switch (code) {
+        case ErrorCode::Network: case ErrorCode::Timeout: case ErrorCode::Unavailable: return L"GitHub could not be reached.";
+        case ErrorCode::RateLimited: case ErrorCode::Http: return L"GitHub did not answer the request just now.";
+        case ErrorCode::Integrity: case ErrorCode::Signature: return L"The release did not pass verification, so nothing was installed.";
+        case ErrorCode::InsufficientSpace: return L"There is not enough free disk space.";
+        case ErrorCode::AccessDenied: case ErrorCode::Io: return L"Windows refused access to the update files.";
+        default: return nullptr;
+    }
+}
+
 bool CanDownloadOrInstall(const updates::UpdateSnapshot& value) {
     return value.state != updates::UpdateState::Checking && value.state != updates::UpdateState::Downloading &&
         (value.prepared.has_value() || static_cast<bool>(value.manifest));
@@ -1064,9 +1076,15 @@ void SettingsWindow::Impl::RefreshUpdates() {
             tone = StatusTone::Error;
             break;
     }
-    if (update.failure) {
+    if (update.failure && update.failure->manualVersion) {
+        // D60: nothing failed. A newer version is out, and for now it installs by hand.
+        headline = L"Version " + text::Widen(update.failure->manualVersion->ToString()) + L" is available";
+        tone = StatusTone::Info;
+        summary += L" It installs by hand for now: open Release details, then download and run its setup.";
+    } else if (update.failure) {
         tone = StatusTone::Error;
-        summary += L" Failure: " + text::Widen(ToString(update.failure->error.code)) + L". ";
+        if (const auto* sentence = FailureSentence(update.failure->error.code)) summary += std::wstring(L" ") + sentence + L" ";
+        else summary += L" Failure: " + text::Widen(ToString(update.failure->error.code)) + L". ";
         summary += CanDownloadOrInstall(update) ? L"Choose Retry Download to try again." : L"Use Check now to try again.";
     }
     if (update.nextCheck && update.automaticChecks && update.state != updates::UpdateState::Checking &&
