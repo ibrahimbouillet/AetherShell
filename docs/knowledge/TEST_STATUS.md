@@ -2982,3 +2982,7 @@ records this entry. Not pushed, tagged, published or installed.
 **Owner trial (2026-11-05):** the owner installed and tried test 3.5 and validated it: "everything pleases me, I see no bug for now".
 This is the owner's acceptance of 3.5 in use, not a qualification of the points listed above as not executed. Still reported and open:
 blank pages (AS4-01) and a disappearing Claude window, neither reproduced. Commit and push to `main` approved.
+
+**Pushed (2026-11-05):** commits `8ac3a6b` and `e1e14ce` pushed to `main` (`8af10b2..e1e14ce`). Windows CI run
+[42025384210](https://github.com/ibrahimbouillet/AetherShell/actions/runs/42025384210) succeeded on `e1e14ce`. No tag and no GitHub
+Release were created; 3.3 stays the Latest release.
