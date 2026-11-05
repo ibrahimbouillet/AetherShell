@@ -140,7 +140,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - **D59 (2026-11-01):** 3.3 (`0.3.3-alpha.3`) is published: `main`, tag `v0.3.3-alpha.3` and its GitHub Release (Latest, setup
   and checksums only). Do not move the tag or republish; the owner's installed copy is still Alpha 3 until the owner installs.
 - **D60/D61 (2026-11-01, corrected 2026-11-05):** 3.4 (`0.3.4-alpha.3`) was built and installed as a test build but **never published**:
-  no commit, tag or release exists for it. Test 3.5 (`0.3.5-alpha.3`, D61) carries all of it; publishing it needs the owner's word.
+  no commit, tag or release exists for it. Test 3.5 (`0.3.5-alpha.3`, D61) carries all of it; the owner validated it and approved commit
+  and push to `main` (2026-11-05). No tag or GitHub Release for it unless the owner asks.
   `resources/preview/` is committed at the owner's request; `.agents/` stays out of commits. The Top Bar's edge is the top pixel only.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;

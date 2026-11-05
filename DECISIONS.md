@@ -135,6 +135,9 @@ and under which number it is published is the owner's call after trying it.
   The download links point at the latest release, so that they never lead to a missing page, and the stale "screenshots will be
   added" section is gone. The pictures show the owner's desktop and third-party wallpapers; the README says these are not covered by the
   project's license.
+- **Validated (owner, 2026-11-05):** after trying test 3.5, "everything pleases me, I see no bug for now"; commit and push to `main`
+  approved. Not fixed and left for later investigation: the blank page (AS4-01) and a newly reported disappearing Claude window. The next
+  batch is announced as version 4 ("very advanced"), not 3.6; its content is still to be named. A GitHub Release of 3.5 was not mentioned.
 
 ### D60 — Version 3.4: the top pixel only, a quarter of a second, a flowing pen, panels that close, a complete search
 

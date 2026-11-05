@@ -2978,3 +2978,7 @@ and the caption survive GitHub's filtering). Silent setup has no name option.
 **Test build 3.5:** `AetherShell-0.3.5-alpha.3-win-x64-setup.exe`, 6742528 bytes, SHA-256
 `203ee2abccd24e895302f424a28b189bf9146502a1d8688d22aabea136f57e92`, built by `scripts/package.ps1` from the tree of the commit that
 records this entry. Not pushed, tagged, published or installed.
+
+**Owner trial (2026-11-05):** the owner installed and tried test 3.5 and validated it: "everything pleases me, I see no bug for now".
+This is the owner's acceptance of 3.5 in use, not a qualification of the points listed above as not executed. Still reported and open:
+blank pages (AS4-01) and a disappearing Claude window, neither reproduced. Commit and push to `main` approved.

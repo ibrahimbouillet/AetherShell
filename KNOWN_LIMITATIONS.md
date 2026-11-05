@@ -7,6 +7,8 @@ remain available. The source describes test build 3.5, `0.3.5-alpha.3` (D61), wh
 Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
 `docs/knowledge/TEST_STATUS.md`.
 
+- Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
+  application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the
   picture was established on the owner's machine by reading what Windows reports, not yet seen at a real lock. The incremental ink edge
   was compared with the old whole blur offscreen, on a software renderer; the pen's pace on a real screen is logged, not yet measured.
