@@ -7,7 +7,16 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4 begins: the welcome bubble prototype (D62, 2026-11-05)
+## Current checkpoint — Alpha 4: Liquid and Grain styles, arrival prototype redone (D63, 2026-11-05)
+
+The owner defined two styles (D63): **Liquid** (pure water: no semi-transparency, blur or grain; the water bends the
+picture, focuses the light, and shows icon shadows and an application's red call on it) and **Grain** (the current frosted,
+semi-transparent neutral material with grain). The whole application will follow the chosen one, Settings included; choosing
+it replays the arrival in it. Only two drops divide (no satellite). The prototype was rewritten for fluidity after the owner
+found the start poor (one soft overshoot, a single slow swing, material computed only near the shapes). Still in
+`tools/liquid-glass/` only; the owner has not judged this version yet. The section below describes the first version.
+
+## Earlier — Alpha 4 begins: the welcome bubble prototype (D62, 2026-11-05)
 
 The owner set Alpha 4's plan (D62): Liquid Glass design (Aether as a bubble of water), then fluidity (memory, graphics,
 rebuilding graphics), then a code-signed setup so that SmartScreen stops flagging it. First piece: the arrival after the

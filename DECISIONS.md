@@ -111,6 +111,26 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D63 — Two styles, Liquid and Grain; the arrival plays in the chosen one
+
+Owner direction, 2026-11-05, after the first bubble. Aether gets a **Style** setting with two choices, and the whole
+application follows it, Settings included:
+
+- **Liquid** (the name "Liquid Glass" is avoided): every surface is pure water. Layers, from the back: the water, which
+  bends the picture behind it by itself and gathers the light into one bright place (a focus, where the drop or bar
+  "holds" the light); then, between the water and the icons, what passes over it (an icon's shadow, the red light of an
+  application asking for attention, cast on the water); then the icons. **No semi-transparency, no blur, no grain**: the
+  water alone shows and deforms what is behind it. The transparency setting is not offered in Liquid, for now.
+- **Grain**: Aether's current material. Layers: the grain, the blur, the semi-transparency of a constant neutral
+  colour; the water's light and lens disappear.
+
+Choosing a style in Settings plays the arrival in it: the Liquid drop of water, or in Grain a circle of the frosted
+material, with the same motion: it appears, swells, its middle narrows into a bridge that holds and then lets go, and the
+two halves leave for the top and the bottom. **Only two drops divide: nothing is left between them** (the first prototype's
+satellite drop is removed). The motion was redone for fluidity after the owner found the start, at the centre, poor:
+one soft overshoot instead of a 16 % wobble at birth, a single slow swing instead of two fast ones, and a shader that
+computes the material only near the shapes. Still a prototype (`tools/liquid-glass/welcome-bubble.html`) until validated.
+
 ### D62 — Alpha 4: Liquid Glass, then fluidity, then a trusted setup; first, the welcome bubble
 
 Owner direction, 2026-11-05, after publishing 3.5. The next major version is **Alpha 4**, in parts, in this order:
