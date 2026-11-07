@@ -14,7 +14,7 @@
   <a href="https://www.youtube.com/@IbrahimBouillet"><img alt="YouTube channel" src="https://img.shields.io/badge/YouTube-Subscribe-red?logo=youtube&logoColor=white"></a>
 </p>
 
-![Aether Shell in use: the floating Dock and the Top Status Bar](./resources/branding/gif/AetherShell.gif)
+![Aether Shell in use: the floating Dock and the Top Status Bar. Ibrahim Bouillet](./resources/branding/gif/AetherShell.gif)
 
 # Aether Shell
 
