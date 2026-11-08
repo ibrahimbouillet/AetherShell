@@ -184,6 +184,33 @@ AETHER_TEST("liquid material: water shows the picture itself, with no colour of 
     CHECK(differences > 5);
 }
 
+AETHER_TEST("liquid material: the bars' transparent water leaves the page behind visible and adds only its light and shade") {
+    const auto device = SoftwareDevice();
+    REQUIRE(device != nullptr);
+    LiquidRenderer renderer;
+    REQUIRE(renderer.Initialize(device.get()).ok());   // no picture at all: transparent water needs none (D65)
+    constexpr UINT kWidth = 320, kHeight = 160;
+    MaterialScene scene;
+    scene.style = MaterialStyle::Liquid;
+    scene.transparent = true;
+    scene.edgeBend = 0.0f;
+    scene.bodies[0] = {true, 160.0f, 70.0f, 120.0f, 24.0f, 12.0f, 0.0f};
+    scene.lens = 1.0f;
+    std::vector<std::uint8_t> pixels;
+    REQUIRE(renderer.RenderToMemory(scene, D2D1::SizeU(kWidth, kHeight), pixels).ok());
+    CHECK(At(pixels, kWidth, 160, 70)[3] <= 2);                // the middle of the bar: the page itself, untouched
+    CHECK(At(pixels, kWidth, 160, 47)[3] > 40);                // its top edge catches the light...
+    CHECK(At(pixels, kWidth, 160, 47)[1] > 30);                // ...white light (with some of the edge's shade)
+    CHECK(At(pixels, kWidth, 160, 100)[3] > 8);                // and it casts its shadow below
+    CHECK_EQ(At(pixels, kWidth, 5, 5)[3], 0);
+    int largestCast = 0;
+    for (UINT y = 40; y < 100; ++y) for (UINT x = 30; x < 290; ++x) {
+        const auto* p = At(pixels, kWidth, x, y);
+        largestCast = std::max(largestCast, std::abs(static_cast<int>(p[0]) - static_cast<int>(p[1])) + std::abs(static_cast<int>(p[2]) - static_cast<int>(p[1])));
+    }
+    CHECK(largestCast <= 2);   // white light and black shade only: no colour of its own
+}
+
 AETHER_TEST("liquid material: the arrival renders on its own picture, every phase, and saves frames to compare") {
     const auto device = SoftwareDevice();
     REQUIRE(device != nullptr);

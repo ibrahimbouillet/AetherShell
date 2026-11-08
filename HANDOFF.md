@@ -7,7 +7,17 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.0: Liquid and Grain inside the shell (`0.4.0-alpha.4`, D64, S-068, 2026-11-05)
+## Current checkpoint — Alpha 4, test 4.1: transparent water, instant previews (`0.4.0-alpha.4`, D65, S-069, 2026-11-08)
+
+The owner did not validate test 4.0 (slow previews showing the drop, Liquid bars showing the wallpaper and stuttering) and chose
+**transparent water** for the bars (D65): they let the live page through and draw only the water's light and shade, kept in a
+bitmap until their geometry changes; the Top Bar's text gets a soft shadow. Previews are computed once per timer step, play
+the arrival once and rest on the bars. **Alpha 4 keeps `0.4.0-alpha.4` and nothing is pushed until the owner says Alpha 4 is
+complete** (commits stay local; `origin/main` stops at `edf2808`). Receipts in TEST_STATUS S-069; the test build is in `dist/`.
+**Next:** the owner's trial; then Liquid for Settings, menus, Search and Quick Settings, the arrival after the setup's Close,
+and D62's fluidity and code-signing parts.
+
+## Earlier — Alpha 4, test 4.0: Liquid and Grain inside the shell (`0.4.0-alpha.4`, D64, S-068, 2026-11-05)
 
 The owner validated the prototype's rendering and asked for it in the shell, exactly the same. Done in C++ (D64): the motion
 (`graphics/LiquidMotion`) and the shader (`graphics/LiquidShader.inc`, HLSL) run by `graphics/LiquidRenderer` on Direct3D 11;
@@ -15,7 +25,7 @@ offscreen they match the prototype within about 1.3/255 on average. Settings →
 two animated previews; Liquid Dock and Top Bar; the arrival after the greeting, landing on the real bars. Receipts in
 TEST_STATUS S-068; the test build is in `dist/`, not installed or published. **Next:** the owner's trial (choose Liquid, lock
 and unlock to see the arrival); then Liquid for Settings, menus, Search and Quick Settings (D63 wants the whole application),
-the arrival after the setup's Close, and D62's fluidity and code-signing parts. Test builds count from `0.4.1-alpha.4`.
+the arrival after the setup's Close, and D62's fluidity and code-signing parts. Test builds keep `0.4.0-alpha.4` (D65).
 
 ## Earlier — Alpha 4: Liquid and Grain styles, arrival prototype redone (D63, 2026-11-05)
 

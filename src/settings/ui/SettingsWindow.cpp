@@ -23,6 +23,7 @@
 #include <dwmapi.h>
 #include <shellapi.h>
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cwchar>
@@ -48,7 +49,8 @@ constexpr DWORD kDwmCaptionButtonBounds = 5, kDwmCaptionColor = 35, kDwmTextColo
 constexpr float kCaptionButtonWidth = 46.0f;
 constexpr UINT_PTR kLiveApplyTimer = 19;
 constexpr UINT_PTR kStylePreviewTimer = 20;      // D63: the Appearance page's previews, about 30 frames a second
-constexpr float kStylePreviewLoop = 4.4f;        // the arrival (3 s), then the settled bars, then again
+constexpr float kStylePreviewRest = 3.25f;       // D65: the arrival, then the previews rest on the bars and their contents
+constexpr auto kStylePreviewWait = std::chrono::seconds(10);   // D65: no frame by then (no picture, no GPU): stop asking
 constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPostpone = 303,
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
@@ -254,13 +256,68 @@ struct SettingsWindow::Impl {
     D2D1_RECT_F brandMark{};   // form client DIPs
     D2D1_RECT_F aboutMark{};   // canvas DIPs (About page)
     D2D1_RECT_F stylePreview{};   // canvas DIPs (Appearance page): the Liquid and Grain previews, D63
-    std::chrono::steady_clock::time_point previewEpoch{};
+    std::chrono::steady_clock::time_point previewEpoch{}, previewAsked{};
     winrt::com_ptr<IDWriteFactory> previewText;
-    winrt::com_ptr<IDWriteTextFormat> previewCaption;
+    winrt::com_ptr<IDWriteTextFormat> previewCaption, previewClock;
+    // D65: each frame of the previews is computed once, by the timer, then only drawn by the decorator, which runs for
+    // every window of the form that repaints. They play the arrival once (page opened, style chosen), then rest on the
+    // bars with their contents; nothing is computed while they rest.
+    std::array<std::vector<std::uint8_t>, 2> previewPixels;
+    UINT previewWidth = 0, previewHeight = 0;
+    float previewSeconds = 0.0f;
+    bool previewPlaying = false;   // a frame of this play was drawn: its clock runs from that frame
+    bool previewTicking = false;   // the timer runs; stopped while hidden or minimized, the next paint resumes it
+    bool previewSettled = false;   // this play has ended: resting on the bars, or no frame could be drawn
+    std::uint64_t previewFrame = 0, previewDrawnFrame = 0;
+    ID2D1DeviceContext* previewTarget = nullptr;
+    std::array<winrt::com_ptr<ID2D1Bitmap>, 2> previewBitmaps;
+    std::optional<SurfaceStyle> previewStyle;   // the style the previews last played for
+
+    [[nodiscard]] float PreviewTileWidth() const {
+        return std::min((stylePreview.right - stylePreview.left - 12.0f) / 2.0f, 300.0f);
+    }
+    // Plays the arrival in both previews from its start.
+    void StartStylePreviews() {
+        if (!callbacks.stylePreview || !window) return;
+        previewAsked = previewEpoch = std::chrono::steady_clock::now();
+        previewPlaying = previewSettled = false;
+        previewStyle = service.Current().general.surfaceStyle;
+        previewTicking = ::SetTimer(window, kStylePreviewTimer, 33, nullptr) != 0;
+    }
+    // One step of the previews: both frames, then a repaint of exactly where they lie. False when the timer should stop:
+    // the play has ended (settled), or the previews cannot be seen for now.
+    bool StepStylePreviews() {
+        if (page != SettingsPage::Appearance || stylePreview.right <= stylePreview.left || !scroll.Canvas() || !::IsWindowVisible(window) || ::IsIconic(window))
+            return false;
+        const float tileWidth = PreviewTileWidth();
+        const UINT width = static_cast<UINT>(std::max(1, Px(tileWidth))), height = static_cast<UINT>(std::max(1, Px(std::round(tileWidth * 9.0f / 16.0f))));
+        // The desktop picture is decoded the first time the page opens: the arrival starts with the first frame it allows,
+        // so the drop is seen forming rather than joined halfway.
+        const auto now = std::chrono::steady_clock::now();
+        if (!previewPlaying) previewEpoch = now;
+        const float seconds = std::min(std::chrono::duration<float>(now - previewEpoch).count(), kStylePreviewRest);
+        bool drawn = true;
+        for (int i = 0; i < 2; ++i) drawn = callbacks.stylePreview(i == 0, seconds, width, height, previewPixels[static_cast<std::size_t>(i)]) && drawn;
+        if (drawn) {
+            previewPlaying = true;
+            previewWidth = width;
+            previewHeight = height;
+            previewSeconds = seconds;
+            ++previewFrame;
+            const RECT area{Px(stylePreview.left), Px(stylePreview.top), Px(stylePreview.right), Px(stylePreview.bottom)};
+            ::InvalidateRect(scroll.Canvas(), &area, FALSE);
+        }
+        // Without the picture yet, keep asking for a while; once at rest on the bars, stop.
+        previewSettled = previewPlaying ? seconds >= kStylePreviewRest : now - previewAsked >= kStylePreviewWait;
+        return !previewSettled;
+    }
 
     // D63: the arrival, small, in each style, side by side and captioned; the chosen one outlined in the accent.
     void PaintStylePreviews(ID2D1DeviceContext* target, const graphics::DesignTokens& theme) {
         if (!callbacks.stylePreview || stylePreview.right <= stylePreview.left || !scroll.Canvas()) return;
+        if (previewStyle != service.Current().general.surfaceStyle && window) StartStylePreviews();   // a new choice plays again
+        else if (!previewTicking && !previewSettled && window)   // stopped while hidden or minimized: carry on
+            previewTicking = ::SetTimer(window, kStylePreviewTimer, 33, nullptr) != 0;
         const POINT origin = surface.ClientOriginPx(scroll.Canvas());
         const RECT viewport = scroll.Frame();
         const float dx = Dip(static_cast<float>(origin.x)), dy = Dip(static_cast<float>(origin.y));
@@ -268,38 +325,65 @@ struct SettingsWindow::Impl {
                                                 Dip(static_cast<float>(viewport.right)), Dip(static_cast<float>(viewport.bottom))), D2D1_ANTIALIAS_MODE_ALIASED);
         struct Pop { ID2D1DeviceContext* target; ~Pop() { target->PopAxisAlignedClip(); } } pop{target};
         constexpr float kGap = 12.0f;
-        const float tileWidth = std::min((stylePreview.right - stylePreview.left - kGap) / 2.0f, 300.0f);
+        const float tileWidth = PreviewTileWidth();
         const float tileHeight = std::round(tileWidth * 9.0f / 16.0f);
-        const float seconds = std::fmod(std::chrono::duration<float>(std::chrono::steady_clock::now() - previewEpoch).count(), kStylePreviewLoop);
         const bool liquidChosen = service.Current().general.surfaceStyle == SurfaceStyle::Liquid;
         if (!previewCaption) {
             if (SUCCEEDED(::DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(previewText.put()))) &&
                 SUCCEEDED(previewText->CreateTextFormat(theme.fontFamily.c_str(), nullptr, DWRITE_FONT_WEIGHT_SEMI_BOLD, DWRITE_FONT_STYLE_NORMAL,
-                                                        DWRITE_FONT_STRETCH_NORMAL, 13.0f, L"", previewCaption.put())))
+                                                        DWRITE_FONT_STRETCH_NORMAL, 13.0f, L"", previewCaption.put()))) {
                 previewCaption->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+                if (SUCCEEDED(previewText->CreateTextFormat(theme.fontFamily.c_str(), nullptr, DWRITE_FONT_WEIGHT_SEMI_BOLD, DWRITE_FONT_STYLE_NORMAL,
+                                                            DWRITE_FONT_STRETCH_NORMAL, 7.0f, L"", previewClock.put()))) {
+                    previewClock->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+                    previewClock->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+                }
+            }
+        }
+        // The frames as bitmaps of this target, made again only for a new frame or a new target.
+        if (previewTarget != target || previewDrawnFrame != previewFrame) {
+            for (auto& bitmap : previewBitmaps) bitmap = nullptr;
+            previewTarget = target;
+            previewDrawnFrame = previewFrame;
+            for (std::size_t i = 0; i < 2; ++i)
+                if (previewWidth && previewHeight && previewPixels[i].size() >= static_cast<std::size_t>(previewWidth) * previewHeight * 4u)
+                    (void)target->CreateBitmap(D2D1::SizeU(previewWidth, previewHeight), previewPixels[i].data(), previewWidth * 4u,
+                                               D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)), previewBitmaps[i].put());
         }
         winrt::com_ptr<ID2D1Factory> factory;
         target->GetFactory(factory.put());
+        // The bars' contents, once they have spread: the arrival's 1280 x 720-DIP screen, drawn at the tile's scale.
+        const float contents = std::clamp((previewSeconds - 2.85f) / 0.35f, 0.0f, 1.0f);
+        static constexpr std::array<unsigned, 8> kIcons{0x3B82F6, 0x6B7280, 0x64748B, 0xFBBF24, 0x22C55E, 0xA855F7, 0xF43F5E, 0x94A3B8};
         for (int i = 0; i < 2; ++i) {
             const bool liquid = i == 0;
             const float left = stylePreview.left + dx + static_cast<float>(i) * (tileWidth + kGap), top = stylePreview.top + dy;
             const auto tile = D2D1::RectF(left, top, left + tileWidth, top + tileHeight);
-            const UINT width = static_cast<UINT>(std::max(1, Px(tileWidth))), height = static_cast<UINT>(std::max(1, Px(tileHeight)));
-            std::vector<std::uint8_t> pixels;
-            winrt::com_ptr<ID2D1Bitmap> bitmap;
-            if (callbacks.stylePreview(liquid, std::min(seconds, 3.0f), width, height, pixels) && pixels.size() >= static_cast<std::size_t>(width) * height * 4u)
-                (void)target->CreateBitmap(D2D1::SizeU(width, height), pixels.data(), width * 4u,
-                                           D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)), bitmap.put());
             winrt::com_ptr<ID2D1RoundedRectangleGeometry> shape;
-            if (bitmap && factory && SUCCEEDED(factory->CreateRoundedRectangleGeometry(D2D1::RoundedRect(tile, 10.0f, 10.0f), shape.put()))) {
+            if (factory && SUCCEEDED(factory->CreateRoundedRectangleGeometry(D2D1::RoundedRect(tile, 10.0f, 10.0f), shape.put()))) {
                 target->PushLayer(D2D1::LayerParameters1(tile, shape.get()), nullptr);
-                target->DrawBitmap(bitmap.get(), tile);
+                if (previewBitmaps[static_cast<std::size_t>(i)]) target->DrawBitmap(previewBitmaps[static_cast<std::size_t>(i)].get(), tile);
+                if (contents > 0.0f) {
+                    const float k = tileWidth / 1280.0f;
+                    winrt::com_ptr<ID2D1SolidColorBrush> fill;
+                    for (std::size_t icon = 0; icon < kIcons.size(); ++icon) {
+                        const float x = left + (452.0f + static_cast<float>(icon) * 48.0f) * k, y = top + 664.5f * k, s = 40.0f * k;
+                        fill = nullptr;
+                        if (SUCCEEDED(target->CreateSolidColorBrush(graphics::Color::FromHex(kIcons[icon], contents).ToD2D(), fill.put())))
+                            target->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(x, y, x + s, y + s), s * 0.24f, s * 0.24f), fill.get());
+                    }
+                    graphics::PaintBrandMark(target, D2D1::RectF(left + 22.0f * k, top + 12.0f * k, left + 42.0f * k, top + 32.0f * k), theme);
+                    fill = nullptr;
+                    if (previewClock && SUCCEEDED(target->CreateSolidColorBrush(D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.95f * contents), fill.put())))
+                        target->DrawText(L"12:00", 5, previewClock.get(), D2D1::RectF(left + 900.0f * k, top + 6.0f * k, left + 1250.0f * k, top + 38.0f * k), fill.get());
+                }
                 target->PopLayer();
             }
             const bool chosen = liquid == liquidChosen;
             winrt::com_ptr<ID2D1SolidColorBrush> brush;
             if (SUCCEEDED(target->CreateSolidColorBrush((chosen ? theme.accentRoles.fill : theme.form.divider).ToD2D(), brush.put())))
                 target->DrawRoundedRectangle(D2D1::RoundedRect(tile, 10.0f, 10.0f), brush.get(), chosen ? 2.0f : 1.0f);
+            brush = nullptr;
             if (previewCaption && SUCCEEDED(target->CreateSolidColorBrush(theme.textPrimary.ToD2D(), brush.put()))) {
                 const wchar_t* caption = liquid ? L"Liquid" : L"Grain";
                 target->DrawText(caption, static_cast<UINT32>(std::wcslen(caption)), previewCaption.get(),
@@ -815,10 +899,7 @@ void SettingsWindow::Impl::BuildPage() {
     pageTitle = pageDescription = nullptr;
     aboutMark = {};
     stylePreview = {};
-    if (page == SettingsPage::Appearance && callbacks.stylePreview && window) {   // D63: the previews move while the page shows
-        previewEpoch = std::chrono::steady_clock::now();
-        ::SetTimer(window, kStylePreviewTimer, 33, nullptr);
-    }
+    if (page == SettingsPage::Appearance) StartStylePreviews();   // D63/D65: the arrival plays once in the previews
     const auto& current = service.Current();
     HWND canvas = Canvas();
     const auto header = [&](const wchar_t* title, const wchar_t* description) {
@@ -1978,12 +2059,11 @@ LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam)
     if (message == WM_VSCROLL) { if (surfaceReady) scroll.HandleScrollCode(LOWORD(wParam), static_cast<short>(HIWORD(wParam))); return 0; }
     if (message == WM_MOUSEWHEEL) { if (surfaceReady) ::SendMessageW(scroll.Viewport(), WM_MOUSEWHEEL, wParam, lParam); return 0; }
     if (message == WM_TIMER && wParam == kStylePreviewTimer) {
-        // Only while the previews can be seen; they stop with the page or the window.
-        if (page != SettingsPage::Appearance || stylePreview.right <= stylePreview.left || !::IsWindowVisible(window) || ::IsIconic(window)) {
+        // While the arrival plays in the previews, and only while they can be seen: then they rest.
+        if (!StepStylePreviews()) {
             ::KillTimer(window, kStylePreviewTimer);
-            return 0;
+            previewTicking = false;
         }
-        ::InvalidateRect(window, nullptr, FALSE);
         return 0;
     }
     if (message == WM_TIMER && wParam == kLiveApplyTimer) {

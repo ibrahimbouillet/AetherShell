@@ -111,6 +111,31 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D65 — Test 4.0 not validated: transparent water, instant previews; Alpha 4 stays 0.4.0 and unpushed
+
+Owner, 2026-11-08, after trying test 4.0: not validated, for three reasons. The Settings previews took some 20 seconds to
+appear, piece by piece; they showed a moment of the drop instead of the Dock and the Top Bar; and the Liquid bars showed the
+desktop picture instead of the page behind them, and stuttered. The owner's model: Liquid is a transparent layer with the
+properties of water, over the content of the window behind.
+
+- **Transparent water (owner's choice between two):** Windows gives no sharp image of what lies behind a window, so the
+  alternative was to capture the screen continuously (heavier, the bars excluded from screenshots and recordings, protected
+  video black behind them). The owner chose transparency: the bars let the live content through and draw only the water's
+  white light (highlight, sheen, focus, bright edge) and shade (the darker edge, the shadow below), so they show over a dark
+  page by their light and over a white one by their edge. What is lost is the bending of the picture at a bar's edge; the
+  arrival and the previews end on the same unbent bars. Over transparent water the Top Bar's text and glyphs get a soft shadow
+  one pixel below, and the Dock's icons keep their shadow and red call on the water.
+- **Fluid:** the water depends on nothing behind it, so each bar draws it once, around its panel only, and keeps it until its
+  geometry changes; a frame that moves nothing costs one bitmap draw.
+- **Previews:** the cause of the 20 seconds was the Settings form, which repaints window by window: the previews were drawn
+  whenever some other part repainted, and every repaint computed them again. Now each frame is computed once by a timer and
+  exactly its area repainted; the arrival plays once when the page opens and when the style changes, then the previews rest on
+  the bars with their icons and clock. The desktop picture is decoded on its own thread, and the arrival starts with the
+  first frame it allows, so the drop is seen forming; with no frame for 10 seconds (no picture, no GPU) they stop asking,
+  and hidden or minimized they pause and carry on at the next paint.
+- **Version and publication:** Alpha 4's test builds keep `0.4.0-alpha.4`, and nothing is pushed to GitHub, until the owner
+  says Alpha 4 is complete and pushing is allowed. Commits stay local. Setup reinstalls a same-numbered build in place.
+
 ### D64 — Alpha 4, test 4.0: Liquid and Grain inside Aether Shell, rendered exactly as the prototype
 
 Owner direction, 2026-11-05: the prototype's rendering satisfies the owner; bring it into Aether Shell in C++ with exactly the

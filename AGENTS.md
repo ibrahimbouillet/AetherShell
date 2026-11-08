@@ -143,6 +143,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
   no commit, tag or release exists for it. 3.5 (`0.3.5-alpha.3`, D61) carries all of it; the owner validated it and asked for its
   publication (2026-11-05): tag `v0.3.5-alpha.3`, Latest, setup and checksums only. Do not move the tag or republish.
   `resources/preview/` is committed at the owner's request; `.agents/` stays out of commits. The Top Bar's edge is the top pixel only.
+- **D65 (2026-11-08): Alpha 4 is built locally.** Its test builds keep `0.4.0-alpha.4`; commit locally and do **not push** to
+  GitHub until the owner says Alpha 4 is complete and pushing is allowed.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.

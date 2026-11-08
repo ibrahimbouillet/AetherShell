@@ -6,11 +6,12 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
 `0.3.3-alpha.3`, `0.3.0-alpha.3`, `0.2.0-alpha.2` and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
 `docs/knowledge/TEST_STATUS.md`.
 
-- Test 4.0 (D64, S-068), Liquid style: the water bends the **desktop picture**, not the live content behind it (Windows gives
-  no sharp image of what lies behind a window), so a Liquid bar over an application window (Auto-Hide) shows the picture.
-  The picture is placed as "Fill" whatever the desktop's own setting, on the primary monitor. Only the Dock, the Top Bar, the
-  arrival and the Settings previews are Liquid yet; Settings, menus, Search and Quick Settings stay Grain. A device that
-  cannot run the shader (Direct3D below 10) draws Grain. The arrival has run in fixtures, not yet at a real sign-in or unlock.
+- Alpha 4 tests (D64, D65, S-068, S-069), Liquid style: the bars are transparent water over the live content behind them; they
+  do not bend it at their edges as the prototype does (that would need a continuous screen capture; D65). The arrival and the
+  Settings previews show the desktop picture, placed as "Fill" whatever the desktop's own setting, on the primary monitor.
+  Only the Dock, the Top Bar, the arrival and the previews are Liquid yet; Settings, menus, Search and Quick Settings stay
+  Grain. A device that cannot run the shader (Direct3D below 10) draws Grain. The arrival has run in fixtures, not yet at a
+  real sign-in or unlock; the Top Bar's text shadow over every kind of page has not been judged by the owner.
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
   application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the

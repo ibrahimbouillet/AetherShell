@@ -281,6 +281,83 @@ AETHER_TEST("settings design: compact pages keep complete rows and actions at en
     window.Close();
 }
 
+// D65, the owner's report on test 4.0: the previews took some 20 seconds to appear, piece by piece, and showed the drop
+// rather than the bars. They must be on screen at once, cost two frames a step, and rest once the arrival has played.
+AETHER_TEST("settings design: the style previews show at once, play the arrival once, then rest on the bars") {
+    Fixture f("settings-design-style-previews");
+    settings::ui::SettingsCallbacks callbacks;
+    int frames = 0;
+    float latest = -1.0f;
+    callbacks.stylePreview = [&](bool, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
+        ++frames;
+        latest = seconds;
+        bgra.assign(static_cast<std::size_t>(width) * height * 4u, 0);
+        for (std::size_t i = 0; i < bgra.size(); i += 4) { bgra[i] = 0; bgra[i + 1] = 200; bgra[i + 2] = 0; bgra[i + 3] = 255; }   // this test's own green
+        return true;
+    };
+    settings::ui::SettingsWindow window(f.service, f.dispatcher, std::move(callbacks));
+    REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
+    const RECT safe = SafeArea();
+    const int width = std::min<int>(safe.right - safe.left - 40, ::MulDiv(1040, static_cast<int>(::GetDpiForWindow(window.Handle())), 96));
+    const int height = std::min<int>(safe.bottom - safe.top - 20, ::MulDiv(640, static_cast<int>(::GetDpiForWindow(window.Handle())), 96));
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, (safe.left + safe.right - width) / 2, safe.top + 8, width, height, SWP_NOACTIVATE);
+    RECT guard{};
+    ::GetWindowRect(window.Handle(), &guard);
+    BackdropGuard backdrop;
+    backdrop.hwnd = CreateTestBackdrop(guard);
+    REQUIRE(backdrop.hwnd != nullptr);
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    PumpFor(f.dispatcher, 300ms);
+    CHECK(frames >= 2);
+    RECT client{};
+    ::GetClientRect(window.Handle(), &client);
+    ::MapWindowPoints(window.Handle(), nullptr, reinterpret_cast<POINT*>(&client), 2);
+    const auto early = CaptureWithRetry(backdrop.hwnd, guard, client);
+    if (early.Valid()) {
+        int green = 0;
+        for (int y = 0; y < early.height; y += 2) for (int x = 0; x < early.width; x += 2) {
+            const auto* p = early.bgra.data() + (static_cast<std::size_t>(y) * early.width + x) * 4;
+            green += p[1] > 170 && p[0] < 40 && p[2] < 40;
+        }
+        TEST_NOTE("green samples after 0.3 s: " + std::to_string(green));
+        CHECK(green > 1500);   // both previews already on screen, whole
+    } else {
+        TEST_NOTE("capture inconclusive: a foreign window overlapped the private backdrop");
+    }
+    PumpFor(f.dispatcher, 3500ms);
+    const int played = frames;
+    TEST_NOTE("frames computed while the arrival played: " + std::to_string(played));
+    CHECK(latest >= 3.0f);              // it ends on the settled bars
+    CHECK(played <= 2 * 120);          // two frames a step, never one per repainted control
+    PumpFor(f.dispatcher, 700ms);
+    CHECK_EQ(frames, played);           // resting: nothing more is computed
+    window.Close();
+}
+
+AETHER_TEST("settings design: a desktop picture that arrives late still lets the previews show the drop forming") {
+    Fixture f("settings-design-style-previews-late");
+    settings::ui::SettingsCallbacks callbacks;
+    const auto opened = std::chrono::steady_clock::now();
+    int refused = 0;
+    float first = -1.0f, latest = -1.0f;
+    callbacks.stylePreview = [&](bool, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
+        if (std::chrono::steady_clock::now() - opened < 600ms) { ++refused; return false; }   // the picture is still being decoded
+        if (first < 0.0f) first = seconds;
+        latest = seconds;
+        bgra.assign(static_cast<std::size_t>(width) * height * 4u, 255);
+        return true;
+    };
+    settings::ui::SettingsWindow window(f.service, f.dispatcher, std::move(callbacks));
+    REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
+    PumpFor(f.dispatcher, 4500ms);
+    TEST_NOTE("frames refused before the picture: " + std::to_string(refused) + "; first drawn at " + std::to_string(first) + " s of the arrival");
+    CHECK(refused > 0);
+    CHECK(first >= 0.0f);
+    CHECK(first < 0.05f);      // the arrival starts from its beginning, not where the clock had got to
+    CHECK(latest >= 3.0f);     // and still ends on the settled bars
+    window.Close();
+}
+
 AETHER_TEST("settings design: dropdowns keep the native list and selection contract") {
     Fixture f("settings-design-dropdown");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);

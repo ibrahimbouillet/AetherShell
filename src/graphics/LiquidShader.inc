@@ -21,6 +21,9 @@ cbuffer Scene : register(b0) {
     float gShadow;       // scales the exterior shadow (0 where a window region would cut it)
     float gLodBias;      // the picture's texels per target pixel, as a mip level
     float gMarkLod;
+    float gTransparent;  // D65: 1 for the shell's bars: transparent water over the live content, its light and shadow only
+    float gEdgeBend;     // how much a bar's edge bends the picture: 1 in the prototype, 0 where the bars are transparent
+    float2 gUnused;
 };
 Texture2D gPictureTex : register(t0);
 Texture2D gMarkTex : register(t1);
@@ -99,13 +102,33 @@ float4 PS(VertexOut input) : SV_Target {
     }
 
     float3 c;
+    if (gStyle < 0.5 && gTransparent > 0.5) {
+        // D65, the shell's Liquid bars: transparent water over whatever lies behind them, live. Nothing of the
+        // picture: only the water's light (premultiplied white) and its shade at the edge (premultiplied black), so
+        // that it shows over a dark page by its light and over a white one by its edge.
+        float z = sqrt(max(1.0 - s * s, 0.0));
+        float3 n = normalize(float3(g * s / max(z, 0.12), 1.0));
+        float2 through = normalize(float2(0.42, 0.78));
+        float3 L = normalize(float3(-0.42, -0.78, 0.6));
+        float3 H = normalize(L + float3(0.0, 0.0, 1.0));
+        float spec = pow(max(dot(n, H), 0.0), 120.0) * 0.8;
+        float top = saturate(-dot(g, normalize(float2(0.35, 1.0))));
+        float sheen = smoothstep(0.6, 0.97, s) * top * 0.12;
+        float fresnel = pow(s, 6.0) * 0.24;
+        float focus = smoothstep(0.55, 0.9, s) * (1.0 - smoothstep(0.95, 1.0, s)) * pow(max(dot(g, through), 0.0), 3.0) * 0.4;
+        float rim = hairline * (0.22 + 0.5 * max(dot(g, -through), 0.0) + 0.25 * max(dot(g, through), 0.0));
+        float light = saturate(spec + sheen + fresnel + focus + rim);
+        float shade = smoothstep(0.7, 0.96, s) * (1.0 - hairline) * 0.16;   // the water's edge, darker as light bends away
+        float4 water = float4(light, light, light, light + shade - light * shade);
+        return lerp(outside, water, coverage);
+    }
     if (gStyle < 0.5) {
         // LIQUID. Pure water: no tint, no blur, no grain, no semi-transparency. It bends the picture: a ball of
         // water turns it over and takes in a wide view of it; a bar bends it only at its edges.
         float z = sqrt(max(1.0 - s * s, 0.0));
         float3 n = normalize(float3(g * s / max(z, 0.12), 1.0));
         float2 ball = -q * (1.0 + lerp(1.5, 2.6, rn * rn));
-        float2 offset = lerp(ball, -n.xy * bevel * 1.15, gLens);
+        float2 offset = lerp(ball, -n.xy * bevel * 1.15 * gEdgeBend, gLens);
         c = tap(p + offset, gBlur * 0.5) * (1.0 - gVeil);   // one read: no colour separation, no fringe of any colour
         // The mark has no colour of its own: a lighter, frosted shape in the water.
         if (mark > 0.0) c = lerp(c, soft(p + offset, 3.0) * (1.0 - gVeil) * 1.22 + 0.14, mark * 0.9);

@@ -266,3 +266,5 @@ points with vector fallbacks).
 ## Liquid and Grain materials (D62–D64)
 
 `LiquidMotion` is the arrival as pure functions of time (a drop that divides into the Top Bar and the Dock). `LiquidRenderer` runs `LiquidShader.inc` (HLSL, a line-for-line port of `tools/liquid-glass/welcome-bubble.html`) with Direct3D 11 on the Direct2D device, in its own device-context state, into textures drawn as Direct2D bitmaps. `GraphicsDevice::Material()` owns one, made ready on first use and again after a device loss; it keeps the desktop picture (BGRA, with its placement on the screen) on the CPU to upload it again. `SurfaceWindow::PaintLiquidPanel` draws a surface's panel as water; `DesignTokens::liquid` says when to (the Style setting, never high contrast).
+
+D65: `MaterialScene::transparent` draws only the water's light and shade over whatever lies behind (the shell's bars), and `edgeBend` 0 keeps a bar's edge from bending the picture, so that the arrival and previews end as the bars look. `SurfaceWindow::PaintLiquidPanel` renders the panel and its shadow area only and keeps the result until its geometry or the device changes.

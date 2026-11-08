@@ -582,13 +582,17 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     }
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
+    const float shown = impl_->transition.Value(context.now);
+    // `tokens` and `ink` are the bar's own, or, for the shadow pass under Liquid, a translucent black.
+    const auto paintItems = [&](const graphics::DesignTokens& tokens, const graphics::Color* ink, bool focus) {
     for (const auto& entry : impl_->placed) {
-        if (impl_->focusedWindow && impl_->keyboardCues && impl_->focused == entry.item.id) {
+        if (focus && impl_->focusedWindow && impl_->keyboardCues && impl_->focused == entry.item.id) {
             const auto inset = D2D1::RectF(entry.rect.left+2,entry.rect.top+3,entry.rect.right-2,entry.rect.bottom-3);
-            graphics::PaintFocusRing(context.d2d,inset,6,impl_->tokens);
+            graphics::PaintFocusRing(context.d2d,inset,6,tokens);
         }
-        const auto color = entry.item.unknown ? impl_->tokens.textSecondary : impl_->tokens.textPrimary;
-        brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
+        const auto colorOf = [&](bool unknown) { return ink ? ink->WithAlpha(ink->a * shown) : (unknown ? tokens.textSecondary : tokens.textPrimary).WithAlpha(shown); };
+        const auto color = colorOf(entry.item.unknown);
+        brush->SetColor(color.ToD2D());
         if (entry.item.kind == ItemKind::NotificationArea) {
             const float cx = (entry.rect.left + entry.rect.right) * 0.5f, cy = (entry.rect.top + entry.rect.bottom) * 0.5f;
             const auto chevron = impl_->hiddenIconsOpen ? graphics::Symbol::ChevronUp : graphics::Symbol::ChevronDown;
@@ -598,11 +602,11 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
         if(entry.item.kind==ItemKind::QuickControls){
             float x=entry.rect.left+10;
-            for(const auto& component:entry.item.components){brush->SetColor((component.unknown?impl_->tokens.textSecondary:impl_->tokens.textPrimary).WithAlpha(impl_->transition.Value(context.now)).ToD2D());
-                Glyph(context.d2d,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),impl_->tokens,false);x+=27;}
+            for(const auto& component:entry.item.components){brush->SetColor(colorOf(component.unknown).ToD2D());
+                Glyph(context.d2d,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),tokens,false);x+=27;}
         }else if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
-            brush.get(), impl_->tokens, impl_->updateAvailable);
-        brush->SetColor(color.WithAlpha(impl_->transition.Value(context.now)).ToD2D());
+            brush.get(), tokens, impl_->updateAvailable);
+        brush->SetColor(color.ToD2D());
         graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
         style.weight = entry.item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
         style.tabularFigures = entry.item.kind == ItemKind::Clock || entry.item.kind == ItemKind::Battery;
@@ -619,6 +623,21 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
             impl_->textCache.Draw(context.d2d, entry.item.secondaryText, textBounds, style, brush.get());
         } else impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
     }
+    };
+    if (liquid) {
+        // D65: over transparent water the text and glyphs sit on whatever page is behind; a soft shadow one pixel
+        // below keeps them readable over a white page, as the owner's layers have shadows between icons and water.
+        auto shade = impl_->tokens;
+        const graphics::Color black{0.0f, 0.0f, 0.0f, 0.55f};
+        shade.textPrimary = shade.textSecondary = shade.brandPrimary = shade.brandSecondary = black;
+        shade.glass.tint = black;
+        D2D1_MATRIX_3X2_F transform{};
+        context.d2d->GetTransform(&transform);
+        context.d2d->SetTransform(D2D1::Matrix3x2F::Translation(0.0f, 1.0f) * transform);
+        paintItems(shade, &black, false);
+        context.d2d->SetTransform(transform);
+    }
+    paintItems(impl_->tokens, nullptr, true);
 }
 bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(now); }
 

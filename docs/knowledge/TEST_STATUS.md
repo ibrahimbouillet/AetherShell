@@ -3034,3 +3034,45 @@ Settings previews on screen; the material after a real device loss; Liquid's cos
 `5d1e302f933ce5322864ce02f9f155d0ac9e122a25ade04be4ddf55f09fed976`, built by `scripts/package.ps1` from the tree committed with
 this entry (its embedded revision is the commit before, `edf2808`, as for test builds made before their commit). Not pushed,
 tagged, published or installed.
+
+### S-069 — Alpha 4, test 4.1: transparent water, instant previews (Claude, 2026-11-08)
+
+**What changed (D65):** the owner did not validate test 4.0. Liquid bars are now transparent water over the live page
+(`gTransparent` in `graphics/LiquidShader.inc`: the water's light and shade only, no picture), drawn around the panel only and
+kept in a bitmap until the geometry changes (`ui/SurfaceWindow::PaintLiquidPanel`); the Top Bar's text and glyphs get a soft
+shadow one pixel below. The Settings previews are computed once per 33 ms timer step and only their area repainted; they play
+the arrival once, start it with the first frame the desktop picture allows (decoded on its own thread), stop asking after
+10 s without a frame, pause while hidden or minimized and carry on at the next paint, then rest on the bars. The arrival and
+the previews end on unbent bars (`edgeBend = 0`). Version unchanged: `0.4.0-alpha.4`.
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 on the final tree, including new: transparent water leaves the page behind visible and adds only light and shade. An earlier run of the same gate, before the last preview change, was 24/25: the install lifecycle's `waited >= 140ms` (AS4-17) |
+| Native settings_ui | 38/39 on the final tree; new: the previews are on screen within 0.3 s (56 145 green samples), the arrival computes 130–140 frames and then nothing; a picture refused for 0.6 s (18 refused steps) still shows the arrival from 0.000 s |
+| Native welcome 11/11, topbar 7/7, dock 14/14 | Pass (greeting and arrival 5.7 s) |
+| Native ui 30/30 | Pass |
+| Native ui_form | 25/31 once while the desktop was busy, then 31/31 twice in a row; the 3.5 binary, alternating with it, 30/31 then 31/31 |
+| Native app | 21/22: the window-corner pixel case of S-067 and S-068, unchanged |
+| `scripts/package.ps1` privacy audit | Pass |
+
+Welcome, topbar, dock, ui, app and ui_form's first run used the tree before the last preview change, which touches only
+the Settings previews' timer; settings_ui, ui_form's later runs and the unit gate used the final tree.
+
+**Failures kept visible, judged environmental:** "a check for updates leaves no trace of where the rows were" failed in 3 of 7
+runs of this tree. Each time a foreign window lay over the captured area: a Claude notification in the corner (seen in the
+saved image), the installed Aether Shell's topmost window (named by the test), and once 130 back at the top with no overlay
+named. Run alone, alternating with the 3.5 binary, both passed 3 times out of 3 with the same figures (worst area 0 to 24,
+limit 40); S-068 saw the 3.5 binary fail the same check. The page under test, Updates, is not where this round's code runs.
+The install wait failure measures its deadline with `GetTickCount64` (15.6 ms steps) while the test allows 10 ms below
+150 ms; install code is unchanged since Alpha 3, and 3 reruns plus the 3.5 binary passed.
+
+**Not executed, so not claimed:** the setup itself; the Liquid bars on the real desktop over a live page; the previews on
+the owner's screen and GPU; the arrival at a real lock or sign-in; Liquid after a real device loss.
+
+**Test build 4.1:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 6813184 bytes, SHA-256
+`02a4fa42bd37ac2cc911e3cdf84581a88735cd0dbe8940d688fa6543dc905782`, built by `scripts/package.ps1` from the tree committed with
+this entry (its embedded revision is the commit before, `cbe3daa`). Test 4.0's build moved to `dist/test-4.0-not-validated/`.
+Not pushed, tagged, published or installed.

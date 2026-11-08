@@ -30,8 +30,9 @@ struct alignas(16) Constants {
     float k;
     float style, lens, veil, blur;
     float background, shadow, lodBias, markLod;
+    float transparent, edgeBend, unused[2];
 };
-static_assert(sizeof(Constants) == 144, "Constants must match the shader's cbuffer");
+static_assert(sizeof(Constants) == 160, "Constants must match the shader's cbuffer");
 
 Error Failed(const char* what, HRESULT hr) {
     return MakeError(hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET ? ErrorCode::Unavailable : ErrorCode::Platform, what, hr);
@@ -229,6 +230,8 @@ struct LiquidRenderer::Impl {
         c.shadow = scene.shadow;
         c.lodBias = pictureUploaded ? std::max(-2.0f, std::log2(static_cast<float>(pictureWidth) / pictureWidthPx)) : 0.0f;
         c.markLod = std::max(0.0f, std::log2(static_cast<float>(kMarkSize) / std::max(2.0f * scene.logoHalf, 1.0f)));
+        c.transparent = scene.transparent ? 1.0f : 0.0f;
+        c.edgeBend = scene.edgeBend;
 
         winrt::com_ptr<ID3DDeviceContextState> previous;
         context->SwapDeviceContextState(state.get(), previous.put());

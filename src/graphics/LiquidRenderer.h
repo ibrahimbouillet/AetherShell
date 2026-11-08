@@ -7,9 +7,9 @@
 //   Liquid: pure water that bends the desktop picture behind it, gathers the light and casts a shadow.
 //   Grain:  the frosted material, used by the arrival only; the bars keep their own Grain painting.
 //
-// Windows gives no sharp image of what lies behind a window (its host backdrop is already blurred), so the
-// water bends the desktop picture itself, placed as Windows shows it. Over the desktop that is exactly what
-// is behind; over an application window it is the picture all the same (a documented limit of D63's first build).
+// Windows gives no sharp image of what lies behind a window (its host backdrop is already blurred). The arrival and
+// the Settings previews bend the desktop picture, placed as Windows shows it; the shell's bars are transparent water
+// over the live content, drawing only the water's light and shade (D65, the owner's choice).
 // Rendering runs in its own Direct3D state, so it never disturbs Direct2D's.
 #pragma once
 
@@ -39,6 +39,12 @@ struct MaterialScene {
     float pxPerDip = 1.0f;
     bool background = false;   // true: the picture fills the target behind the shapes
     float shadow = 1.0f;       // 0 removes the exterior shadow
+    // D65: the shell's Liquid bars are transparent water over the live content behind them: only the water's light and
+    // shade are drawn (no picture). Windows gives no sharp image of what lies behind a window, and the owner chose this.
+    bool transparent = false;
+    // How much a bar's edge bends the picture behind it: 1 as in the prototype; 0 so that the arrival's bars end as the
+    // transparent bars will look (D65).
+    float edgeBend = 1.0f;
     D2D1_RECT_F picture{};     // where the desktop picture lies, in the target's pixels ("Fill", as Windows shows it)
 };
 

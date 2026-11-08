@@ -159,30 +159,60 @@ void SurfaceWindow::ApplyInputRegion() {
 
 bool SurfaceWindow::PaintLiquidPanel(const RenderContext& context, const D2D1_RECT_F& panelDip, float cornerRadiusDip, float shadow) {
     auto* renderer = device_.Material();
-    if (!renderer || !renderer->HasPicture() || !context.d2d) return false;
+    if (!renderer || !context.d2d) return false;
     const float scale = static_cast<float>(dpi_) / 96.0f;
-    const auto size = D2D1::SizeU(static_cast<UINT32>(std::lround(context.widthDip * scale)), static_cast<UINT32>(std::lround(context.heightDip * scale)));
-    if (size.width == 0 || size.height == 0) return false;
+    // D65: transparent water. Only the panel and its shadow are drawn, from a bitmap kept until the panel changes:
+    // nothing in it depends on what lies behind, so a frame that moves nothing costs one bitmap draw.
+    constexpr float kShadowRoomDip = 30.0f;
+    const auto left = static_cast<LONG>(std::floor(std::max(0.0f, panelDip.left - kShadowRoomDip) * scale));
+    const auto top = static_cast<LONG>(std::floor(std::max(0.0f, panelDip.top - kShadowRoomDip) * scale));
+    const auto right = static_cast<LONG>(std::ceil(std::min(context.widthDip, panelDip.right + kShadowRoomDip) * scale));
+    const auto bottom = static_cast<LONG>(std::ceil(std::min(context.heightDip, panelDip.bottom + kShadowRoomDip) * scale));
+    if (right <= left || bottom <= top) return false;
+    const auto size = D2D1::SizeU(static_cast<UINT32>(right - left), static_cast<UINT32>(bottom - top));
+    const std::array<float, 9> key{static_cast<float>(left), static_cast<float>(top), static_cast<float>(size.width), static_cast<float>(size.height),
+                                   panelDip.left * scale, panelDip.top * scale, panelDip.right * scale, panelDip.bottom * scale, cornerRadiusDip * scale + shadow * 1000.0f};
+    const auto area = D2D1::RectF(static_cast<float>(left) / scale, static_cast<float>(top) / scale, static_cast<float>(right) / scale, static_cast<float>(bottom) / scale);
+    if (liquidCache_ && key == liquidKey_ && liquidGeneration_ == device_.Generation()) {
+        context.d2d->DrawBitmap(liquidCache_.get(), area, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+        return true;
+    }
     graphics::MaterialScene scene;
     scene.style = graphics::MaterialStyle::Liquid;
+    scene.transparent = true;
+    scene.edgeBend = 0.0f;
     scene.pxPerDip = scale;
     auto& body = scene.bodies[0];
     body.present = true;
-    body.cx = (panelDip.left + panelDip.right) / 2.0f * scale;
-    body.cy = (panelDip.top + panelDip.bottom) / 2.0f * scale;
+    body.cx = (panelDip.left + panelDip.right) / 2.0f * scale - static_cast<float>(left);
+    body.cy = (panelDip.top + panelDip.bottom) / 2.0f * scale - static_cast<float>(top);
     body.hx = (panelDip.right - panelDip.left) / 2.0f * scale;
     body.hy = (panelDip.bottom - panelDip.top) / 2.0f * scale;
     body.radius = cornerRadiusDip * scale;
     scene.lens = 1.0f;
     scene.shadow = shadow;
-    // The picture where Windows shows it, seen from this window.
-    const auto placement = renderer->PicturePlacement();
-    const auto left = static_cast<float>(bounds_.left), top = static_cast<float>(bounds_.top);
-    scene.picture = D2D1::RectF(placement.left - left, placement.top - top, placement.right - left, placement.bottom - top);
+    scene.picture = D2D1::RectF(0.0f, 0.0f, static_cast<float>(size.width), static_cast<float>(size.height));   // unused: transparent
     context.d2d->Flush();   // Direct2D's work so far reaches the device before the material's own
     auto frame = renderer->Render(context.d2d, scene, size);
     if (!frame) return false;   // a lost device shows at the end of this frame, where the surface already recovers
-    context.d2d->DrawBitmap(frame->get(), D2D1::RectF(0.0f, 0.0f, context.widthDip, context.heightDip), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+    // Kept in a bitmap of this window's own: the renderer's texture serves the next surface that draws.
+    D2D1_SIZE_U kept{};
+    if (liquidCache_) kept = liquidCache_->GetPixelSize();
+    if (!liquidCache_ || kept.width != size.width || kept.height != size.height || liquidGeneration_ != device_.Generation()) {
+        liquidCache_ = nullptr;
+        float dpiX = 96.0f, dpiY = 96.0f;
+        context.d2d->GetDpi(&dpiX, &dpiY);
+        const auto properties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_NONE, D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), dpiX, dpiY);
+        if (FAILED(context.d2d->CreateBitmap(size, nullptr, 0, properties, liquidCache_.put()))) liquidCache_ = nullptr;
+    }
+    if (liquidCache_ && SUCCEEDED(liquidCache_->CopyFromBitmap(nullptr, frame->get(), nullptr))) {
+        liquidKey_ = key;
+        liquidGeneration_ = device_.Generation();
+        context.d2d->DrawBitmap(liquidCache_.get(), area, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+    } else {
+        liquidCache_ = nullptr;
+        context.d2d->DrawBitmap(frame->get(), area, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+    }
     return true;
 }
 

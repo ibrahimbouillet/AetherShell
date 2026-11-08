@@ -131,6 +131,8 @@ struct ShellApplication::Impl {
     WorkerPool locationWorker{{1,L"Aether Windows weather location",ComApartment::MultiThreaded}};
     WorkerPool trayWorker{{1, L"Aether hidden icons", ComApartment::MultiThreaded}};  // UI Automation calls into Explorer
     WorkerPool wifiWorker{{1, L"Aether Wi-Fi", ComApartment::MultiThreaded}};         // a scan takes seconds
+    // D65: the desktop picture, decoded on its own thread: the application worker can be busy for seconds.
+    WorkerPool pictureWorker{{1, L"Aether desktop picture", ComApartment::MultiThreaded}};
     CancellationSource cancellation;
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
@@ -290,7 +292,7 @@ struct ShellApplication::Impl {
         const auto request = ++desktopPictureRequest;
         const auto monitor = platform::PrimaryMonitor().bounds;
         const auto weak = std::weak_ptr<bool>(alive);
-        worker.Post([this, weak, request, monitor] {
+        pictureWorker.Post([this, weak, request, monitor] {
             auto picture = welcome::LoadDesktopBackdrop(monitor, 1.0f);
             dispatcher.Post([this, weak, request, monitor, picture = std::move(picture)]() mutable {
                 if (const auto live = weak.lock(); !live || !*live || request != desktopPictureRequest) return;
@@ -1275,7 +1277,6 @@ void ShellApplication::Impl::ApplySettings() {
     appearance.accent = static_cast<graphics::AccentSource>(value.general.accentSource);
     auto tokens = graphics::MakeShellDesignTokens(appearance);
     tokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && tokens.mode != graphics::ThemeMode::HighContrast;   // D63
-    if (tokens.liquid && !desktopPictureRequest) RequestDesktopPicture();
     graphics::MotionPolicy motion;
     motion.reduced = tokens.mode == graphics::ThemeMode::HighContrast || value.general.motion == settings::MotionPreference::Reduced ||
         (value.general.motion == settings::MotionPreference::System && !platform::SystemAnimationsEnabled());
@@ -1428,6 +1429,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(seconds, layout, false), liquid ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain,
                                                 D2D1::Point2F(0.0f, 0.0f), scale);
         scene.background = true;
+        scene.edgeBend = 0.0f;   // D65: the bars end as the shell draws them, transparent water
         const auto picture = renderer->PictureSize();
         scene.picture = welcome::CoverRect(static_cast<float>(picture.cx), static_cast<float>(picture.cy), static_cast<float>(width), static_cast<float>(height));
         return renderer->RenderToMemory(scene, D2D1::SizeU(width, height), bgra).ok();
@@ -1840,6 +1842,7 @@ void ShellApplication::Impl::Stop() noexcept {
     taskbar.reset();
     locationWorker.Shutdown();
     wifiWorker.Shutdown();
+    pictureWorker.Shutdown();
     controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();

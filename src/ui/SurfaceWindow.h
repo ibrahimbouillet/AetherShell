@@ -24,6 +24,7 @@
 
 #include <windows.h>
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
@@ -181,6 +182,10 @@ private:
     std::vector<RECT> visualRegion_;
     std::vector<RECT> appliedRegion_;      // what the window currently has (AS4-08)
     HWND appliedRegionWindow_ = nullptr;
+    // D65: the Liquid panel last drawn, kept until its geometry or the device changes.
+    winrt::com_ptr<ID2D1Bitmap1> liquidCache_;
+    std::array<float, 9> liquidKey_{};
+    std::uint64_t liquidGeneration_ = 0;
     D2D1_RECT_F backdropPanelDip_{};
     float backdropRadiusDip_ = 0.0f;
     float backdropOpacity_ = 1.0f;

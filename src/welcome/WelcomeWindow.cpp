@@ -374,6 +374,7 @@ void WelcomeWindow::OnRender(const ui::RenderContext& context) {
         if (renderer && renderer->HasPicture() && size.width && size.height) {
             auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(t, *arrival_, true), arrivalStyle_, D2D1::Point2F(0.0f, 0.0f), scale);
             scene.background = true;
+            scene.edgeBend = 0.0f;   // D65: the drops end as the bars will look, transparent water
             const auto placement = renderer->PicturePlacement();
             const auto bounds = BoundsPx();
             scene.picture = D2D1::RectF(placement.left - bounds.left, placement.top - bounds.top, placement.right - bounds.left, placement.bottom - bounds.top);
