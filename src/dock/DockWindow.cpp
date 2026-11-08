@@ -347,7 +347,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         // D66: Liquid sees the blurred backdrop through its regular glass; Grain under its tint.
         const bool blur = tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast;
         window.SetBackdropPanel(layout.panel, graphics::DockCornerRadius(tokens, layout.panel.bottom - layout.panel.top), blur,
-            blur && tokens.liquid ? 1.0f : tokens.glass.backdropOpacity, blur && tokens.liquid ? &tokens.liquidGlass : nullptr);
+            blur && tokens.liquid ? tokens.liquidGlass.blurOpacity : tokens.glass.backdropOpacity, blur && tokens.liquid ? &tokens.liquidGlass : nullptr);
         return Ok();
     }
     Result<void> Rebuild() {

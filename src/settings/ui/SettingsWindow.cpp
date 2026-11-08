@@ -24,6 +24,7 @@
 #include <shellapi.h>
 #include <algorithm>
 #include <array>
+#include <tuple>
 #include <chrono>
 #include <cmath>
 #include <cwchar>
@@ -272,16 +273,23 @@ struct SettingsWindow::Impl {
     ID2D1DeviceContext* previewTarget = nullptr;
     std::array<winrt::com_ptr<ID2D1Bitmap>, 2> previewBitmaps;
     std::optional<SurfaceStyle> previewStyle;   // the style the previews last played for
+    std::tuple<double, LiquidTint, double> previewBlur{-1.0, LiquidTint::Automatic, -1.0};   // D67: and the blur layer
 
     [[nodiscard]] float PreviewTileWidth() const {
         return std::min((stylePreview.right - stylePreview.left - 12.0f) / 2.0f, 300.0f);
     }
     // Plays the arrival in both previews from its start.
-    void StartStylePreviews() {
+    void StartStylePreviews(bool atRest = false) {
         if (!callbacks.stylePreview || !window) return;
         previewAsked = previewEpoch = std::chrono::steady_clock::now();
         previewPlaying = previewSettled = false;
-        previewStyle = service.Current().general.surfaceStyle;
+        if (atRest) {   // D67: one frame of the bars at rest, as the blur layer now is
+            previewEpoch -= std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float>(kStylePreviewRest));
+            previewPlaying = true;
+        }
+        const auto& general = service.Current().general;
+        previewStyle = general.surfaceStyle;
+        previewBlur = {general.liquidBlurOpacity, general.liquidTint, general.liquidTintStrength};
         previewTicking = ::SetTimer(window, kStylePreviewTimer, 33, nullptr) != 0;
     }
     // One step of the previews: both frames, then a repaint of exactly where they lie. False when the timer should stop:
@@ -315,7 +323,10 @@ struct SettingsWindow::Impl {
     // D63: the arrival, small, in each style, side by side and captioned; the chosen one outlined in the accent.
     void PaintStylePreviews(ID2D1DeviceContext* target, const graphics::DesignTokens& theme) {
         if (!callbacks.stylePreview || stylePreview.right <= stylePreview.left || !scroll.Canvas()) return;
-        if (previewStyle != service.Current().general.surfaceStyle && window) StartStylePreviews();   // a new choice plays again
+        const auto& general = service.Current().general;
+        if (previewStyle != general.surfaceStyle && window) StartStylePreviews();   // a new choice plays again
+        else if (previewBlur != std::tuple{general.liquidBlurOpacity, general.liquidTint, general.liquidTintStrength} && window)
+            StartStylePreviews(true);   // D67: a new blur layer shows at once on the bars
         else if (!previewTicking && !previewSettled && window)   // stopped while hidden or minimized: carry on
             previewTicking = ::SetTimer(window, kStylePreviewTimer, 33, nullptr) != 0;
         const POINT origin = surface.ClientOriginPx(scroll.Canvas());
@@ -1071,10 +1082,19 @@ void SettingsWindow::Impl::BuildPage() {
         header(L"Appearance", L"Color mode, accent, motion speed and the look of the Dock and Top Bar.");
         // D63: the material of every surface, shown by the two previews above it.
         BeginSection(L"Style");
-        Choice(L"Style", L"Liquid: pure water that bends your desktop picture and catches the light, with no blur, transparency or grain. "
-                         L"Grain: frosted glass, blurred and semi-transparent, with a fine grain.",
+        Choice(L"Style", L"Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, "
+                         L"kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.",
                {L"Grain", L"Liquid"},
                [](const Settings& s){return s.general.surfaceStyle;}, [](Settings& s,int v){s.general.surfaceStyle=static_cast<SurfaceStyle>(v);});
+        // D67: Liquid's blur layer, under the liquid. Never grained; the text stays readable whatever its colour.
+        const auto share = [] { NumberFormat f; f.minimum = 0; f.maximum = 100; f.step = 5; f.scale = 100; f.unit = L"%"; return f; };
+        Number(L"Liquid blur", L"How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.",
+               share(), [](const Settings& s){return s.general.liquidBlurOpacity;}, [](Settings& s,double v){s.general.liquidBlurOpacity=v;});
+        Choice(L"Liquid blur color", L"Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.",
+               {L"Automatic", L"White", L"Black", L"Accent", L"Blue", L"Violet", L"Pink", L"Red", L"Orange", L"Yellow", L"Green", L"Teal"},
+               [](const Settings& s){return s.general.liquidTint;}, [](Settings& s,int v){s.general.liquidTint=static_cast<LiquidTint>(v);});
+        Number(L"Liquid color strength", L"How much of the chosen color the blur layer takes.", share(),
+               [](const Settings& s){return s.general.liquidTintStrength;}, [](Settings& s,double v){s.general.liquidTintStrength=v;});
         BeginSection(L"Theme");
         Choice(L"Color mode", L"High contrast always takes precedence.", {L"Follow Windows", L"Light", L"Dark"},
                [](const Settings& s){return s.general.themeMode;}, [](Settings& s,int v){s.general.themeMode=static_cast<ThemePreference>(v);});

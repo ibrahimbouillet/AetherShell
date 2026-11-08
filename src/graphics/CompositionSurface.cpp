@@ -23,19 +23,30 @@ using winrt::Windows::Foundation::Numerics::float3;
 namespace wge = winrt::Windows::Graphics::Effects;
 namespace abi_wge = ABI::Windows::Graphics::Effects;
 
-// D66: Liquid's regular glass as one colour matrix ([r g b a 1] times M): the saturation around each pixel's own
-// grey (Rec. 709 weights), then the brightness compressed into the readable band. Alpha passes unchanged.
+// D66, D67: Liquid's regular glass as one colour matrix ([r g b a 1] times M): the blur layer's colour mixed in
+// first, then the saturation around each pixel's own grey (Rec. 709 weights), then the brightness compressed into the
+// readable band. Alpha passes unchanged. All three steps are linear, so one matrix holds them.
 D2D1_MATRIX_5X4_F GlassMatrix(const LiquidGlassTokens& glass) noexcept {
     constexpr float wr = 0.2126f, wg = 0.7152f, wb = 0.0722f;
+    const auto unit = [](float v, float fallback) { return std::isfinite(v) ? std::clamp(v, 0.0f, 1.0f) : fallback; };
     const float s = std::isfinite(glass.saturation) ? std::clamp(glass.saturation, 0.0f, 3.0f) : 1.0f;
-    const float k = std::isfinite(glass.scale) ? std::clamp(glass.scale, 0.0f, 1.0f) : 1.0f;
-    const float c = std::isfinite(glass.offset) ? std::clamp(glass.offset, 0.0f, 1.0f) : 0.0f;
+    const float k = unit(glass.scale, 1.0f), c = unit(glass.offset, 0.0f);
+    const float t = unit(glass.tintStrength, 0.0f), keep = 1.0f - t;
+    const float tint[3] = {unit(glass.tintR, 0.0f), unit(glass.tintG, 0.0f), unit(glass.tintB, 0.0f)};
+    // Saturation as a 3x3 matrix: row = input channel, column = output channel.
+    const float sat[3][3] = {{wr + s * (1.0f - wr), wr * (1.0f - s), wr * (1.0f - s)},
+                             {wg * (1.0f - s), wg + s * (1.0f - wg), wg * (1.0f - s)},
+                             {wb * (1.0f - s), wb * (1.0f - s), wb + s * (1.0f - wb)}};
     D2D1_MATRIX_5X4_F m{};
-    m._11 = k * (wr + s * (1.0f - wr)); m._12 = k * wr * (1.0f - s);          m._13 = k * wr * (1.0f - s);
-    m._21 = k * wg * (1.0f - s);          m._22 = k * (wg + s * (1.0f - wg)); m._23 = k * wg * (1.0f - s);
-    m._31 = k * wb * (1.0f - s);          m._32 = k * wb * (1.0f - s);          m._33 = k * (wb + s * (1.0f - wb));
+    float* cells = reinterpret_cast<float*>(&m);   // 5 rows of 4
+    for (int in = 0; in < 3; ++in)
+        for (int out = 0; out < 3; ++out) cells[in * 4 + out] = k * keep * sat[in][out];
     m._44 = 1.0f;
-    m._51 = c; m._52 = c; m._53 = c;
+    for (int out = 0; out < 3; ++out) {
+        float tinted = 0.0f;   // the colour's own share, through the same saturation
+        for (int in = 0; in < 3; ++in) tinted += t * tint[in] * sat[in][out];
+        cells[4 * 4 + out] = c + k * tinted;
+    }
     return m;
 }
 

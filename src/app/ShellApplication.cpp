@@ -1339,6 +1339,32 @@ void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) 
     }
 }
 
+// D67: Liquid's glass in `tokens`' mode, with the blur layer the person shaped: its cover and its colour.
+graphics::LiquidGlassTokens LiquidGlassFrom(const settings::Settings& value, const graphics::DesignTokens& tokens) {
+    auto glass = graphics::MakeDesignTokens(tokens.mode == graphics::ThemeMode::Light ? graphics::ThemeMode::Light : graphics::ThemeMode::Dark).liquidGlass;
+    glass.blurOpacity = static_cast<float>(std::clamp(value.general.liquidBlurOpacity, 0.0, 1.0));
+    using settings::LiquidTint;
+    const auto tint = value.general.liquidTint;
+    if (tint == LiquidTint::Automatic) return glass;
+    graphics::Color color = tokens.accent;
+    switch (tint) {
+        case LiquidTint::White: color = graphics::Color::FromHex(0xFFFFFF); break;
+        case LiquidTint::Black: color = graphics::Color::FromHex(0x000000); break;
+        case LiquidTint::Blue: color = graphics::Color::FromHex(0x2F7BF5); break;
+        case LiquidTint::Violet: color = graphics::Color::FromHex(0x8B5CF6); break;
+        case LiquidTint::Pink: color = graphics::Color::FromHex(0xEC4899); break;
+        case LiquidTint::Red: color = graphics::Color::FromHex(0xEF4444); break;
+        case LiquidTint::Orange: color = graphics::Color::FromHex(0xF97316); break;
+        case LiquidTint::Yellow: color = graphics::Color::FromHex(0xFACC15); break;
+        case LiquidTint::Green: color = graphics::Color::FromHex(0x22C55E); break;
+        case LiquidTint::Teal: color = graphics::Color::FromHex(0x14B8A6); break;
+        default: break;   // the accent
+    }
+    glass.tintR = color.r; glass.tintG = color.g; glass.tintB = color.b;
+    glass.tintStrength = static_cast<float>(std::clamp(value.general.liquidTintStrength, 0.0, 1.0));
+    return glass;
+}
+
 void ShellApplication::Impl::ApplySettings() {
     if (!settings || !settings->Loaded()) return;
     const auto& value = settings->Current();
@@ -1347,6 +1373,7 @@ void ShellApplication::Impl::ApplySettings() {
     appearance.accent = static_cast<graphics::AccentSource>(value.general.accentSource);
     auto tokens = graphics::MakeShellDesignTokens(appearance);
     tokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && tokens.mode != graphics::ThemeMode::HighContrast;   // D63
+    tokens.liquidGlass = LiquidGlassFrom(value, tokens);   // D67: the blur layer the person shaped
     graphics::MotionPolicy motion;
     motion.reduced = tokens.mode == graphics::ThemeMode::HighContrast || value.general.motion == settings::MotionPreference::Reduced ||
         (value.general.motion == settings::MotionPreference::System && !platform::SystemAnimationsEnabled());
@@ -1505,7 +1532,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         scene.background = true;
         scene.edgeBend = 0.0f;   // D65: the bars end as the shell draws them
         scene.glass = true;      // D66: Liquid's regular glass, in the shell's mode
-        scene.glassTokens = shellTokens.liquidGlass;
+        scene.glassTokens = LiquidGlassFrom(settings->Current(), shellTokens);   // D67: as just saved, before it is applied
         const auto picture = renderer->PictureSize();
         scene.picture = welcome::CoverRect(static_cast<float>(picture.cx), static_cast<float>(picture.cy), static_cast<float>(width), static_cast<float>(height));
         return renderer->RenderToMemory(scene, D2D1::SizeU(width, height), bgra).ok();
@@ -1653,8 +1680,13 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     // At sign-in the greeting goes up first; the bars, ready underneath, come out when it ends.
     const bool signInGreeting = command.autostart && command.action == StartupAction::None;
     const auto greeting = signInGreeting ? welcomeController.SignedIn(WelcomeAllowed(), ::GetTickCount64()) : welcome::WelcomeController::Action::None;
-    if (greeting == welcome::WelcomeController::Action::None) { dock->Show(); topbar->Show(); }
     ready = true;
+    if (greeting == welcome::WelcomeController::Action::None) {
+        // D67: a start without a greeting (started by hand, restarted) lights the shell up with the arrival, as a change
+        // of style does: the bars come out where the drops land. Where it is not played they come out at once.
+        ReplayArrival();
+        if (!arrivalReplay) { dock->Show(); topbar->Show(); }
+    }
     connections.push_back(events.SessionChanged.Connect([this](WPARAM change) { OnSessionChanged(change); }));
     connections.push_back(events.RawInput.Connect([this](LPARAM input) { OnRawTouch(input); }));
     ApplyWelcome(greeting);

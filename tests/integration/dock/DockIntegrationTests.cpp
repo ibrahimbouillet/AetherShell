@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
 #include "FakeTouch.h"
+#include "LiquidScenes.h"
 
 #include "core/FileSystem.h"
 #include "dock/DockWindow.h"
@@ -463,6 +464,112 @@ AETHER_TEST("dock integration: light native Dock renders synthetic icons and bec
 AETHER_TEST("dock integration: Liquid keeps the icons on their own layer over the glass, in dark and light (D66)") {
     Probe(graphics::ThemeMode::Dark, "liquid-dark", true);
     Probe(graphics::ThemeMode::Light, "liquid-light", true);
+}
+
+// D66, D67: the Dock over the eight scenes, in Liquid and in Grain, dark and light. Start and Task View are glyphs in the
+// text colour (white in dark mode): over a white page they must still be seen, the glass between them in its band.
+AETHER_TEST("dock integration: Liquid's glass keeps the Dock's glyphs readable over eight scenes, icons over it (D66, D67)") {
+    namespace lq = aether::test::liquid;
+    platform::ComApartment com; REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    if (!device.Capabilities().hostBackdrop) { TEST_NOTE("no host backdrop here: Liquid falls back to Grain, nothing to measure"); return; }
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    ManualDispatcher dispatcher;
+    const auto file = test::MakeTempDirectory("dock-liquid-scenes") / L"settings.json";
+    bool loaded = false, saved = false;
+    settings::SettingsService settings(file, dispatcher);
+    REQUIRE(settings.Load([&](Result<settings::LoadReport> result) { loaded = result.ok(); }).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 5s;
+    while (!loaded && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(loaded);
+    REQUIRE(settings.Update([](settings::Settings& value) {
+        settings::PinnedApp a; a.id = L"exe:synthetic-a"; a.displayName = L"Synthetic A"; a.parsingName = L"Synthetic.Application.A";
+        settings::PinnedApp b; b.id = L"exe:synthetic-b"; b.displayName = L"Synthetic B"; b.parsingName = L"Synthetic.Application.B";
+        value.dock.pinned = {a, b}; value.dock.reserveSpace = true;
+        value.dock.showStartButton = true; value.dock.showTaskViewButton = true;
+    }, [&](Result<void> result) { saved = result.ok(); }).ok());
+    while (!saved && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(saved);
+    lq::Photo() = lq::LoadPhoto();
+    FakeLauncher launcher; FakeIcons icons;
+    const auto monitor = platform::PrimaryMonitor();
+    const LONG width = std::min<LONG>(1000, monitor.workArea.right - monitor.workArea.left - 100);
+    const LONG x = (monitor.workArea.left + monitor.workArea.right - width) / 2;
+    const LONG bottomInset = 144 + static_cast<LONG>(std::ceil((dock::kDockShadowMargin + dock::kDockEntranceOffset) * monitor.dpi / 96.0f));
+    const RECT area{x, monitor.workArea.bottom - bottomInset - 260, x + width, monitor.workArea.bottom - bottomInset};
+    lq::SceneBackdrop backdrop; REQUIRE(backdrop.Create(area));
+    dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings});
+    dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
+    options.replacementTaskbarMode = true;
+    REQUIRE(window.Create(options).ok());
+    const auto inputFilter = loop.AddMessageFilter([hwnd = window.Handle()](MSG& message) {
+        return message.hwnd == hwnd && (message.message == WM_MOUSEMOVE || message.message == WM_MOUSELEAVE);
+    });
+    apps::RunningApplication running; running.id = L"exe:synthetic-c"; running.displayName = L"Synthetic C";
+    running.foreground = true; running.windows.push_back({reinterpret_cast<HWND>(1), L"Synthetic window", false});
+    REQUIRE(window.SetRunningApplications({running}).ok());
+    const auto output = std::filesystem::temp_directory_path() / L"AetherShellTests";
+    std::filesystem::create_directories(output);
+    std::vector<std::vector<lq::Image>> rows;
+    bool shown = false;
+    for (const auto mode : {graphics::ThemeMode::Dark, graphics::ThemeMode::Light}) {
+        const std::string modeName = mode == graphics::ThemeMode::Dark ? "dark" : "light";
+        for (int scene = 0; scene < static_cast<int>(lq::kSceneNames.size()); ++scene) {
+            backdrop.Show(scene);
+            std::vector<lq::Image> row;
+            for (const bool liquid : {true, false}) {
+                auto tokens = graphics::MakeDesignTokens(mode); tokens.transparencyEnabled = true; tokens.liquid = liquid;
+                REQUIRE(window.SetTheme(tokens, graphics::MotionPolicy{}, settings.Current().dock).ok());
+                if (!shown) {
+                    window.Show(false); ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0);
+                    const auto entrance = std::chrono::steady_clock::now() + 3s;
+                    do { RunFor(loop, 25); } while ((!window.IsShown() || window.IsTransitioning()) && std::chrono::steady_clock::now() < entrance);
+                    shown = true;
+                }
+                RunFor(loop, 450);   // the compositor's backdrop catches up with the scene
+                RECT guarded = window.BoundsPx(); ::InflateRect(&guarded, 128, 128);
+                bool privateNow = false;
+                for (int attempt = 0; attempt < 6 && !privateNow; ++attempt) {
+                    ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, guarded.left, guarded.top, guarded.right - guarded.left, guarded.bottom - guarded.top, SWP_NOACTIVATE);
+                    ::UpdateWindow(backdrop.hwnd);
+                    ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                    RunFor(loop, 60);
+                    privateNow = PrivateCrop(backdrop.hwnd, guarded);
+                    if (!privateNow) RunFor(loop, 250);
+                }
+                const std::string name = std::string("dock-") + (liquid ? "liquid-" : "grain-") + modeName + "-" + lq::kSceneNames[static_cast<std::size_t>(scene)];
+                if (!privateNow) { TEST_NOTE("inconclusive, a foreign window passed: " + name); continue; }
+                const auto captured = CaptureOwn(backdrop.hwnd, window.Handle(), window.BoundsPx());
+                SavePng(captured, output / (name + ".png"));
+                row.push_back(lq::Image{captured.width, captured.height, captured.pixels});
+                if (!liquid) continue;
+                CHECK(window.BackdropGlassActive());
+                // The glass the glyphs sit on: the strip between the panel's top and the icons, across the Dock (the icons
+                // stand too close together for the glass between them to be read), against the glyphs' colour.
+                const auto geometry = window.Geometry(); REQUIRE(geometry.ok());
+                const auto px = [&](float dip) { return static_cast<int>(std::lround(window.ToPx(dip))); };
+                float iconTop = geometry->panel.bottom;
+                for (const auto& item : geometry->items) iconTop = std::min(iconTop, item.icon.top);
+                const int strip = px((geometry->panel.top + iconTop) / 2.0f);
+                const double glyph = lq::LuminanceOf(tokens.textPrimary.r, tokens.textPrimary.g, tokens.textPrimary.b);
+                double worst = 100.0; int samples = 0;
+                for (int cx = px(geometry->panel.left + 24.0f); cx < px(geometry->panel.right - 24.0f); cx += 2) {
+                    if (cx < 0 || cx >= captured.width || strip < 0 || strip >= captured.height) continue;
+                    ++samples;
+                    worst = std::min(worst, lq::Contrast(lq::Luminance(captured.pixels.data() + (static_cast<std::size_t>(strip) * captured.width + cx) * 4), glyph));
+                }
+                char line[160];
+                std::snprintf(line, sizeof(line), "%s: glyphs against the glass at least %.2f:1 (%d samples)", name.c_str(), worst, samples);
+                TEST_NOTE(line);
+                CHECK(samples > 20);
+                CHECK(worst >= 4.5);   // white Start and Task View glyphs over a white page, dark ones over black: still seen
+            }
+            if (!row.empty()) rows.push_back(std::move(row));
+        }
+    }
+    if (!rows.empty()) lq::SavePng(lq::Sheet(rows), output / L"dock-liquid-sheet.png");
+    window.Destroy();
+    loop.RemoveMessageFilter(inputFilter);
 }
 
 AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit unpin stay isolated") {

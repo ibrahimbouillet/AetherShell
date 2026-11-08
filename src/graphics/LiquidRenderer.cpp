@@ -31,9 +31,10 @@ struct alignas(16) Constants {
     float style, lens, veil, blur;
     float background, shadow, lodBias, markLod;
     float transparent, edgeBend, glassOn, glassLod;
-    float glassSaturation, glassScale, glassOffset, unused;
+    float glassSaturation, glassScale, glassOffset, glassOpacity;
+    float glassTint[4];
 };
-static_assert(sizeof(Constants) == 176, "Constants must match the shader's cbuffer");
+static_assert(sizeof(Constants) == 192, "Constants must match the shader's cbuffer");
 
 Error Failed(const char* what, HRESULT hr) {
     return MakeError(hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET ? ErrorCode::Unavailable : ErrorCode::Platform, what, hr);
@@ -239,6 +240,9 @@ struct LiquidRenderer::Impl {
         c.glassSaturation = scene.glassTokens.saturation;
         c.glassScale = scene.glassTokens.scale;
         c.glassOffset = scene.glassTokens.offset;
+        c.glassOpacity = std::clamp(scene.glassTokens.blurOpacity, 0.0f, 1.0f);   // D67: the blur layer's cover
+        c.glassTint[0] = scene.glassTokens.tintR; c.glassTint[1] = scene.glassTokens.tintG; c.glassTint[2] = scene.glassTokens.tintB;
+        c.glassTint[3] = std::clamp(scene.glassTokens.tintStrength, 0.0f, 1.0f);
 
         winrt::com_ptr<ID3DDeviceContextState> previous;
         context->SwapDeviceContextState(state.get(), previous.put());

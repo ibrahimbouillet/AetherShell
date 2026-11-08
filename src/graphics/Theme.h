@@ -307,6 +307,11 @@ struct LiquidGlassTokens {
     float saturation = 1.35f;   // around each pixel's own grey
     float scale = 0.40f;        // the backdrop's brightness, 0 to 1, is compressed to this span...
     float offset = 0.04f;       // ...starting here
+    // D67: the blur layer the owner can shape: how much of it covers the sharp content behind (1: all of it), and a
+    // colour mixed into it before the band (0: none). The band keeps the text readable whatever the colour.
+    float blurOpacity = 1.0f;
+    float tintR = 0.0f, tintG = 0.0f, tintB = 0.0f;
+    float tintStrength = 0.0f;
     [[nodiscard]] bool operator==(const LiquidGlassTokens&) const noexcept = default;
 };
 

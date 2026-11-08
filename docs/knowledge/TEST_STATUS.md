@@ -3116,3 +3116,36 @@ glass over moving video; a measured frame time on the owner's GPU; reduced-trans
 `494913d204e7ea5a5483a72d9027d88eec7637855d709dd3d90bdd9ee0f2d0fe`, built by `scripts/package.ps1` from the tree committed
 with this entry (its embedded revision is the commit before, `c6892c7`). Test 4.1's build moved to
 `dist/test-4.1-not-validated/`. Not pushed, tagged, published or installed.
+
+### S-071 — Alpha 4, test 4.3: Liquid's blur layer in Settings, the arrival at every start (Claude, 2026-11-08)
+
+**What changed (D67):** the owner's screenshots of unreadable, unblurred bars came from test 4.1, still installed (its
+program dated 18:50; test 4.2 was built about 21:00). Test 4.3 adds the blur layer the owner asked for: under the liquid,
+following the bars, never grained; `general.liquidBlurOpacity`, `liquidTint` (Automatic, White, Black, Accent, eight hues)
+and `liquidTintStrength`, in Settings → Appearance under Style (control numbers there move by three). The colour is mixed
+in before the readable band (compositor matrix and shader alike). The previews show a change of the blur at once, at rest.
+The arrival plays at every start without a greeting. Shared scenes for judging the glass: `tests/framework/LiquidScenes.h`
+(white, black, split, vivid, a light page, a dark window full of real text, a light application, a photograph).
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25, showcase 86/86; new: the blur layer's settings in plain words, kept in range |
+| Real Top Bar, Liquid, eight scenes, both modes | Text against the glass at least 4.74:1 (dark over white or a light page or app), up to 19:1; the dark window full of text 15.4:1 (dark) and 6.5:1 (light), its text blurred out |
+| Real Top Bar, the blur layer shaped (dark text and photo scenes, both modes) | White, accent and teal tints at 40 to 60%: at least 7.65:1. Blur at 60%: 6.5 to 7.6:1 in dark mode, 3.2 to 3.4:1 in light mode (the sharp page shows through; Settings says so) |
+| Real Dock, Liquid, eight scenes, both modes, with Start and Task View glyphs | Glyphs against the glass at least 4.67:1 (white glyphs over a white page in dark mode), 15.8:1 in light mode over white |
+| Native settings_ui | 38/39 in the full run: the late-picture preview test, which timed its refusals from the window's creation on a loaded PC (the suite took 202 s against 88 s); made to refuse its first ten steps instead, it passed twice. A black capture of the preview test (three runs in a row about 21:25) was not reproduced in four later runs, cause unknown |
+| Native welcome 12/12, topbar 8/8, dock 16/16, ui 30/30 | Pass |
+| Native app | 21/22: the window-corner pixel case of S-067 to S-070 |
+| Native ui_form | 29/31, then 26/31; the 3.5 binary at the same moment 28/31, failing partly the same acrylic case; the cases change from run to run |
+| `scripts/package.ps1` privacy audit | Pass |
+
+**Not executed, so not claimed:** the setup itself; the blur layer, the replay and the arrival at a start on the owner's
+desktop; moving video behind the bars; frame time on the owner's GPU.
+
+**Test build 4.3:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 6855680 bytes, SHA-256
+`4b1e218a93e734b1ba49957c10e6bceaea4ebcb17663ccc3a6066134d8eb4046`, built by `scripts/package.ps1` from the tree committed
+with this entry (its embedded revision is the commit before, `e73f50b`). Test 4.2's build, never installed, moved to
+`dist/test-4.2-superseded/`. Not pushed, tagged, published or installed.

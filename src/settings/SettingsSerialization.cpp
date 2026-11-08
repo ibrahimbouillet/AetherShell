@@ -90,6 +90,9 @@ void Fields(S& s, F&& f) {
     f("general", "themeMode", s.general.themeMode);
     f("general", "accentSource", s.general.accentSource);
     f("general", "surfaceStyle", s.general.surfaceStyle);
+    f("general", "liquidBlurOpacity", s.general.liquidBlurOpacity);
+    f("general", "liquidTint", s.general.liquidTint);
+    f("general", "liquidTintStrength", s.general.liquidTintStrength);
     f("general", "animationSpeed", s.general.animationSpeed);
 }
 
@@ -128,6 +131,13 @@ template <> struct EnumNames<AccentSource> {
 };
 template <> struct EnumNames<SurfaceStyle> {
     static constexpr std::array values{std::pair{SurfaceStyle::Grain, "grain"}, std::pair{SurfaceStyle::Liquid, "liquid"}};
+};
+template <> struct EnumNames<LiquidTint> {
+    static constexpr std::array values{std::pair{LiquidTint::Automatic, "automatic"}, std::pair{LiquidTint::White, "white"},
+        std::pair{LiquidTint::Black, "black"}, std::pair{LiquidTint::Accent, "accent"}, std::pair{LiquidTint::Blue, "blue"},
+        std::pair{LiquidTint::Violet, "violet"}, std::pair{LiquidTint::Pink, "pink"}, std::pair{LiquidTint::Red, "red"},
+        std::pair{LiquidTint::Orange, "orange"}, std::pair{LiquidTint::Yellow, "yellow"}, std::pair{LiquidTint::Green, "green"},
+        std::pair{LiquidTint::Teal, "teal"}};
 };
 template <> struct EnumNames<WeatherPlacement> {
     static constexpr std::array values{std::pair{WeatherPlacement::Left, "left"},
@@ -325,6 +335,8 @@ Result<std::vector<std::string>> Validate(Settings& s) {
         Clamp(s.weather.refreshMinutes, 15, 180, defaults.weather.refreshMinutes, warnings, "refreshMinutes");
         Clamp(s.updates.checkIntervalHours, 6, 168, defaults.updates.checkIntervalHours, warnings, "checkIntervalHours");
         Clamp(s.general.animationSpeed, 0.5, 1.5, defaults.general.animationSpeed, warnings, "animationSpeed");
+        Clamp(s.general.liquidBlurOpacity, 0.0, 1.0, defaults.general.liquidBlurOpacity, warnings, "liquidBlurOpacity");
+        Clamp(s.general.liquidTintStrength, 0.0, 1.0, defaults.general.liquidTintStrength, warnings, "liquidTintStrength");
         if (s.weather.latitude.has_value() != s.weather.longitude.has_value() ||
             (s.weather.latitude && (!std::isfinite(*s.weather.latitude) || !std::isfinite(*s.weather.longitude)))) {
             s.weather.latitude.reset(); s.weather.longitude.reset();

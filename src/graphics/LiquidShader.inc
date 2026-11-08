@@ -26,7 +26,8 @@ cbuffer Scene : register(b0) {
     float gGlassOn;      // D66: 1 where the drops become the regular glass of the shell's bars
     float gGlassLod;     // its diffusion, as a mip level of the target
     float3 gGlass;       // its saturation, then the band its brightness is brought into: scale, offset
-    float gUnused;
+    float gGlassOpacity; // D67: how much the blur layer covers the sharp picture behind
+    float4 gGlassTint;   // D67: the blur layer's colour and how much of it
 };
 Texture2D gPictureTex : register(t0);
 Texture2D gMarkTex : register(t1);
@@ -62,6 +63,7 @@ float3 soft(float2 px, float lod) {   // four taps soften the mip steps of a blu
 
 // D66: Liquid's regular glass, as the compositor applies it to the shell's bars (CompositionSurface's colour matrix).
 float3 adapt(float3 c) {
+    c = lerp(c, gGlassTint.rgb, gGlassTint.a);   // D67: the blur layer's colour first, then the band
     float l = dot(c, float3(0.2126, 0.7152, 0.0722));
     return saturate((l + gGlass.x * (c - l)) * gGlass.y + gGlass.z);
 }
@@ -166,7 +168,7 @@ float4 PS(VertexOut input) : SV_Target {
             // D66: as the drops become bars they become the bars' regular glass: the picture diffused and adapted,
             // under the same light and shade as the shell's bars, so that the hand-over to them does not show.
             float2 ls = glassLight(s, g, hairline);
-            float3 base = adapt(soft(p, gGlassLod) * (1.0 - gVeil));
+            float3 base = lerp(tap(p, 0.0), adapt(soft(p, gGlassLod)), gGlassOpacity) * (1.0 - gVeil);   // D67: the blur layer's cover
             float3 bar = base * (1.0 - ls.y) * (1.0 - ls.x) + ls.x;
             c = lerp(c, bar, smoothstep(0.35, 1.0, gLens));
         }

@@ -111,6 +111,26 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D67 — Liquid's blur layer, shaped in Settings; the arrival at every start; many captures before a build
+
+Owner, 2026-11-08, from screenshots of the installed shell: over light pages the text was light and unreadable, white
+icons vanished over a white window, and over dark windows the text behind showed through the bars unblurred. Those
+screenshots came from test 4.1 (the installed program dated from 18:50, before test 4.2 existed, and every Alpha 4 test
+build carries the same number); test 4.2 already blurred and adapted. The owner's requests stand:
+
+- **A blur layer under the liquid**, following the bars' shapes and motion, never grained, which the person can shape:
+  its opacity (how much it covers the sharp content behind, `general.liquidBlurOpacity`, 100% by default) and its colour
+  (`general.liquidTint`: Automatic, White, Black, Accent or eight hues, with `general.liquidTintStrength`). The colour is
+  mixed in before the readable band (one colour matrix in the compositor, the same order in the shader), so the text keeps
+  its contrast whatever the colour; a lower opacity lets the sharp page through, which Settings says can make text read
+  less well over a busy page. The previews show a change at once, at rest.
+- **The arrival plays at every start of the shell** that has no greeting (started by hand, restarted), as after a change
+  of style; at sign-in the greeting brings it. Not with reduced motion, high contrast, a full-screen application or in a
+  test instance.
+- **Proof before a build:** the real Top Bar and Dock captured over eight scenes (white, black, split, vivid, a light page,
+  a dark window full of text, a light application, a photograph) in both modes and both styles, the glass measured against
+  the text and glyph colours, and the shaped variants captured too.
+
 ### D66 — Test 4.1: Liquid becomes regular glass after the owner's skill; the arrival replays; bars stay after it
 
 Owner, 2026-11-08, after trying test 4.1: better, but Liquid is not right. Transparent water shows nothing over light areas

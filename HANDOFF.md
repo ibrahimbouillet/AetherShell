@@ -7,7 +7,17 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.2: Liquid as regular glass, the arrival replays (`0.4.0-alpha.4`, D66, S-070, 2026-11-08)
+## Current checkpoint — Alpha 4, test 4.3: Liquid's blur layer in Settings, the arrival at every start (`0.4.0-alpha.4`, D67, S-071, 2026-11-08)
+
+The owner's screenshots of unreadable bars came from test 4.1, still installed (D67); test 4.2's glass was not yet seen.
+Test 4.3 adds the blur layer the owner asked for: under the liquid, never grained, its opacity and colour shaped in
+Settings → Appearance (the text's band applies after the colour). The arrival now plays at every start without a
+greeting. Measured on the real Top Bar and Dock over eight scenes in both modes: text and glyphs at 4.67:1 or more; the
+shaped variants keep 7.6:1 or more with any colour. Nothing pushed (D65). Receipts in TEST_STATUS S-071; the build is in
+`dist/`. **Next:** the owner's trial of 4.3 (check the installed program's date); then Liquid for Settings, menus, Search
+and Quick Settings, the arrival after the setup's Close, and D62's fluidity and code-signing.
+
+## Earlier — Alpha 4, test 4.2: Liquid as regular glass, the arrival replays (`0.4.0-alpha.4`, D66, S-070, 2026-11-08)
 
 The owner found test 4.1's transparent water invisible over light and dark pages and gave a skill with Apple-like Liquid Glass
 criteria (`ibrahimbouillet/liquid-glass-visual-skill`). D66: Liquid is regular glass made by Windows' compositor (its

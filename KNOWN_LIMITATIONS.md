@@ -12,8 +12,10 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   whatever the desktop's own setting, on the primary monitor. Only the Dock, the Top Bar, the arrival and the previews are
   Liquid yet; Settings, menus, Search and Quick Settings stay Grain. Without transparency, on a system without the host
   backdrop or where the compositor refuses the effect, and on a device that cannot run the shader (Direct3D below 10), the
-  bars draw Grain. The replay after a change of style and the bars staying after an unlock have run in fixtures, not yet on
-  the owner's desktop; contrast was measured on the Top Bar, the Dock uses the same glass.
+  bars draw Grain. The replay after a change of style or at a start, and the bars staying after an unlock, have run in
+  fixtures, not yet on the owner's desktop. A Liquid blur below 100% lets the sharp page through and can lower the text's
+  contrast over a busy page (measured 3.2:1 at 60% in light mode); Settings says so. Every Alpha 4 test build carries
+  `0.4.0-alpha.4`: only the installed program's date tells them apart.
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
   application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the

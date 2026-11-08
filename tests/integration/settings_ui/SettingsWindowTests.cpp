@@ -7,6 +7,7 @@
 
 #include <commctrl.h>
 #include <chrono>
+#include <cmath>
 #include <string>
 #include <thread>
 
@@ -36,30 +37,40 @@ AETHER_TEST("settings UI: appearance controls preserve custom size and opt-out w
     settings::ui::SettingsWindow window(service,dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
     CHECK_EQ(::SendMessageW(window.Control(200),CB_GETCURSEL,0,0),LRESULT{0});  // D63: Style, Grain by default
-    CHECK_EQ(::SendMessageW(window.Control(204),CB_GETCURSEL,0,0),LRESULT{3});
+    const auto textOf=[](HWND control){wchar_t text[64]{};::GetWindowTextW(control,text,64);return std::wstring(text);};
+    CHECK_EQ(textOf(window.Control(201)),std::wstring(L"100"));                  // D67: the blur layer, all of it
+    CHECK_EQ(::SendMessageW(window.Control(202),CB_GETCURSEL,0,0),LRESULT{0});  // its color: Automatic
+    CHECK_EQ(textOf(window.Control(203)),std::wstring(L"30"));
+    CHECK_EQ(::SendMessageW(window.Control(207),CB_GETCURSEL,0,0),LRESULT{3});
     ::SendMessageW(window.Control(200),CB_SETCURSEL,1,0);  // Liquid
-    ::SendMessageW(window.Control(201),CB_SETCURSEL,2,0);
-    ::SendMessageW(window.Control(202),CB_SETCURSEL,1,0);
-    ::SetWindowTextW(window.Control(203),L"1.25");
-    ::SendMessageW(window.Control(205),BM_SETCHECK,BST_UNCHECKED,0);
-    ::SendMessageW(window.Control(206),BM_SETCHECK,BST_UNCHECKED,0);
-    ::SendMessageW(window.Control(207),BM_SETCHECK,BST_CHECKED,0);
-    ::SendMessageW(window.Control(208),CB_SETCURSEL,1,0);
-    ::SendMessageW(window.Control(209),CB_SETCURSEL,0,0);
-    ::SendMessageW(window.Control(210),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SetWindowTextW(window.Control(201),L"60");
+    ::SendMessageW(window.Control(202),CB_SETCURSEL,3,0);  // Accent
+    ::SetWindowTextW(window.Control(203),L"45");
+    ::SendMessageW(window.Control(204),CB_SETCURSEL,2,0);
+    ::SendMessageW(window.Control(205),CB_SETCURSEL,1,0);
+    ::SetWindowTextW(window.Control(206),L"1.25");
+    ::SendMessageW(window.Control(208),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SendMessageW(window.Control(209),BM_SETCHECK,BST_UNCHECKED,0);
+    ::SendMessageW(window.Control(210),BM_SETCHECK,BST_CHECKED,0);
+    ::SendMessageW(window.Control(211),CB_SETCURSEL,1,0);
+    ::SendMessageW(window.Control(212),CB_SETCURSEL,0,0);
+    ::SendMessageW(window.Control(213),BM_SETCHECK,BST_UNCHECKED,0);
     ::SendMessageW(window.Control(101),BM_CLICK,0,0);
     REQUIRE(Pump(dispatcher,[&]{return service.Current().general.themeMode==settings::ThemePreference::Dark && !service.Dirty();}));
     CHECK_EQ(service.Current().dock.iconSize,64);
     CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);
     CHECK_EQ(service.Current().general.accentSource,settings::AccentSource::Aether);
     CHECK_EQ(service.Current().general.surfaceStyle,settings::SurfaceStyle::Liquid);
+    CHECK(std::abs(service.Current().general.liquidBlurOpacity-0.6)<1e-9);
+    CHECK_EQ(service.Current().general.liquidTint,settings::LiquidTint::Accent);
+    CHECK(std::abs(service.Current().general.liquidTintStrength-0.45)<1e-9);
     CHECK_EQ(service.Current().general.animationSpeed,1.25);
     CHECK_FALSE(service.Current().dock.showStartButton);CHECK_FALSE(service.Current().dock.showTaskViewButton);
     CHECK(service.Current().dock.reserveAnimationSpace);
     CHECK_EQ(service.Current().topBar.weatherPlacement,settings::WeatherPlacement::Right);
     CHECK_EQ(service.Current().topBar.keyboardIndicator,settings::KeyboardIndicatorStyle::Compact);
     CHECK_FALSE(service.Current().general.syncTaskbarPins);
-    ::SendMessageW(window.Control(204),CB_SETCURSEL,0,0);
+    ::SendMessageW(window.Control(207),CB_SETCURSEL,0,0);
     ::SendMessageW(window.Control(101),BM_CLICK,0,0);
     REQUIRE(Pump(dispatcher,[&]{return service.Current().dock.iconSize==32 && !service.Dirty();}));
     window.Close();

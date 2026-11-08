@@ -320,11 +320,13 @@ AETHER_TEST("settings design: the style previews show at once, play the arrival 
             green += p[1] > 170 && p[0] < 40 && p[2] < 40;
         }
         TEST_NOTE("green samples after 0.3 s: " + std::to_string(green));
+        CHECK(SavePng(early, InspectionPath("settings-style-previews-early")));
         CHECK(green > 1500);   // both previews already on screen, whole
     } else {
         TEST_NOTE("capture inconclusive: a foreign window overlapped the private backdrop");
     }
     PumpFor(f.dispatcher, 3500ms);
+    if (const auto late = CaptureWithRetry(backdrop.hwnd, guard, client); late.Valid()) CHECK(SavePng(late, InspectionPath("settings-style-previews-rest")));
     const int played = frames;
     TEST_NOTE("frames computed while the arrival played: " + std::to_string(played));
     CHECK(latest >= 3.0f);              // it ends on the settled bars
@@ -337,11 +339,10 @@ AETHER_TEST("settings design: the style previews show at once, play the arrival 
 AETHER_TEST("settings design: a desktop picture that arrives late still lets the previews show the drop forming") {
     Fixture f("settings-design-style-previews-late");
     settings::ui::SettingsCallbacks callbacks;
-    const auto opened = std::chrono::steady_clock::now();
     int refused = 0;
     float first = -1.0f, latest = -1.0f;
     callbacks.stylePreview = [&](bool, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
-        if (std::chrono::steady_clock::now() - opened < 600ms) { ++refused; return false; }   // the picture is still being decoded
+        if (refused < 20) { ++refused; return false; }   // the picture is still being decoded: ten steps of two previews
         if (first < 0.0f) first = seconds;
         latest = seconds;
         bgra.assign(static_cast<std::size_t>(width) * height * 4u, 255);
@@ -362,7 +363,7 @@ AETHER_TEST("settings design: dropdowns keep the native list and selection contr
     Fixture f("settings-design-dropdown");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
-    HWND mode = window.Control(201);  // Color mode: Follow Windows / Light / Dark (200 is Style, D63)
+    HWND mode = window.Control(204);  // Color mode: Follow Windows / Light / Dark (200 is Style, D63; 201-203 Liquid's blur, D67)
     REQUIRE(mode != nullptr);
     ::SetFocus(mode);
     ::SendMessageW(mode, CB_SHOWDROPDOWN, TRUE, 0);

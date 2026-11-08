@@ -574,7 +574,7 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     // frosted glass. Without transparency, or where the compositor offers no glass, Grain.
     const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
     const bool wantGlass = blur && impl_->tokens.liquid;
-    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, wantGlass ? 1.0f : impl_->tokens.glass.backdropOpacity,
+    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, wantGlass ? impl_->tokens.liquidGlass.blurOpacity : impl_->tokens.glass.backdropOpacity,
                      wantGlass ? &impl_->tokens.liquidGlass : nullptr);
     // No exterior shadow: the window's region ends at the panel and would cut it into square corners.
     const bool liquid = wantGlass && BackdropGlassActive() && PaintLiquidPanel(context, panel, impl_->tokens.barCornerRadius, 0.0f);

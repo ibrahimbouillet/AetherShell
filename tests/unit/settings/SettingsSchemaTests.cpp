@@ -9,6 +9,7 @@
 #include "settings/SettingsSerialization.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <limits>
 #include <string>
@@ -142,6 +143,19 @@ AETHER_TEST("settings schema: new enums use stable lower-case JSON names") {
     settings.general.surfaceStyle = SurfaceStyle::Liquid;
     CHECK_EQ(Member(settings, "general", "surfaceStyle"), std::string("liquid"));
     CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"surfaceStyle":"liquid"}})").value.general.surfaceStyle, SurfaceStyle::Liquid);
+    // D67: Liquid's blur layer, its cover and its color, in plain words; out of range is brought back.
+    CHECK_EQ(Member(settings, "general", "liquidTint"), std::string("automatic"));
+    settings.general.liquidTint = LiquidTint::Teal;
+    CHECK_EQ(Member(settings, "general", "liquidTint"), std::string("teal"));
+    const auto blur = ParseText(R"({"dock":{"metricsVersion":2},"general":{"liquidBlurOpacity":0.6,"liquidTint":"accent","liquidTintStrength":0.45}})").value.general;
+    CHECK(std::abs(blur.liquidBlurOpacity - 0.6) < 1e-9);
+    CHECK_EQ(blur.liquidTint, LiquidTint::Accent);
+    CHECK(std::abs(blur.liquidTintStrength - 0.45) < 1e-9);
+    const auto wild = ParseText(R"({"dock":{"metricsVersion":2},"general":{"liquidBlurOpacity":3,"liquidTint":"plaid","liquidTintStrength":-1}})");
+    CHECK_EQ(wild.value.general.liquidBlurOpacity, 1.0);
+    CHECK_EQ(wild.value.general.liquidTint, LiquidTint::Automatic);
+    CHECK_EQ(wild.value.general.liquidTintStrength, 0.0);
+    CHECK_FALSE(wild.warnings.empty());
 
     const auto parsed = ParseText(R"({"dock":{"metricsVersion":2},"general":{"themeMode":"dark","accentSource":"aether"},"topBar":{"weatherPlacement":"right","keyboardIndicator":"compact"}})");
     CHECK(parsed.warnings.empty());

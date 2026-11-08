@@ -8,17 +8,19 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [0.4.0-alpha.4] — in progress, not published
 
-Alpha 4 (D62–D66). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D67). Its test builds keep this number until the owner calls Alpha 4 complete.
 
 ### Added
 
 - **Two styles, Liquid and Grain** (Settings → Appearance → Style). Liquid draws the Dock and the Top Bar as glass over the
   page behind them, live: its colours and shapes show through, softened and a little livelier, kept in a band of brightness
   where the bars' text reads over white, black or anything between, with a bright rim, light gathered in its edges and a fine
-  outline; icons cast their shadow on it and an application that asks for attention casts a red light. Grain is the frosted
-  glass as before, and stays the default.
+  outline; icons cast their shadow on it and an application that asks for attention casts a red light. Its blur layer can be
+  shaped in Settings → Appearance: how much it covers, and its color. Grain is the frosted glass as before, and stays the
+  default.
 - **The arrival** after the greeting: a drop with the Aether mark floats, divides in two, and its halves strike the top and the
-  bottom of the screen and spread into the Top Bar and the Dock, in the chosen style. Choosing another style plays it again.
+  bottom of the screen and spread into the Top Bar and the Dock, in the chosen style. It plays again when another style is
+  chosen and when Aether Shell starts without a greeting.
 - **Two previews** of the styles in Settings → Appearance: on screen at once, they play the arrival, then rest on the Dock and
   the Top Bar.
 

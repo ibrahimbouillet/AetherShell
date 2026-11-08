@@ -24,9 +24,11 @@ enum class TemperatureUnit { Celsius, Fahrenheit };
 enum class UpdateChannel { Stable, Prerelease };
 enum class ThemePreference { System, Light, Dark };        // "system" follows the Windows light/dark mode
 enum class AccentSource { Windows, Aether };              // Windows accent color or the Aether brand palette
-// D63: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
-// Liquid is pure water that bends the desktop picture behind it, with no blur, tint or grain.
+// D63, D66: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
+// Liquid is glass in layers over what lies behind: a blur layer, the liquid's light, then the icons and text.
 enum class SurfaceStyle { Grain, Liquid };
+// D67: the colour of Liquid's blur layer. Automatic adds none (the glass's own adaptation only).
+enum class LiquidTint { Automatic, White, Black, Accent, Blue, Violet, Pink, Red, Orange, Yellow, Green, Teal };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
 enum class KeyboardIndicatorStyle { Compact, TwoLine };   // "FR" or a two-line "FRA / FR" indicator
 
@@ -147,6 +149,11 @@ struct GeneralSettings {
     ThemePreference themeMode = ThemePreference::System;  // high contrast always takes precedence
     AccentSource accentSource = AccentSource::Windows;
     SurfaceStyle surfaceStyle = SurfaceStyle::Grain;   // D63; Grain keeps every installation as it was
+    // D67: Liquid's blur layer, under the liquid: how much it covers what lies behind (1 blurs it all, 0 leaves it
+    // sharp), and its colour with how much of it. Never grained; the text's band of brightness applies after it.
+    double liquidBlurOpacity = 1.0;
+    LiquidTint liquidTint = LiquidTint::Automatic;
+    double liquidTintStrength = 0.3;
     double animationSpeed = 1.0;    // MotionPolicy duration scale, 0.5 (faster)..1.5 (slower)
     bool hotkeysEnabled = true;     // Ctrl+Alt+Space (search), Ctrl+Alt+D (focus Dock)
     HotkeyChord searchHotkey{};
