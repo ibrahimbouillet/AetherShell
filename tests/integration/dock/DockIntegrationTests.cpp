@@ -175,7 +175,7 @@ LPARAM Point(const dock::DockWindow& window, const D2D1_RECT_F& rect) {
         static_cast<WORD>(std::lround(window.ToPx((rect.top + rect.bottom) / 2))));
 }
 
-void Probe(graphics::ThemeMode theme, const std::string& prefix) {
+void Probe(graphics::ThemeMode theme, const std::string& prefix, bool liquid = false) {
     platform::ComApartment com(COINIT_APARTMENTTHREADED);
     platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
     graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
@@ -219,7 +219,8 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
         // own test window so the stationary physical cursor cannot change the resting fixture.
         return message.hwnd==hwnd && (message.message==WM_MOUSEMOVE || message.message==WM_MOUSELEAVE);
     });
-    const auto tokens = graphics::MakeDesignTokens(theme);
+    auto tokens = graphics::MakeDesignTokens(theme);
+    tokens.liquid = liquid;   // D66: the regular glass under the same icons
     REQUIRE(window.SetTheme(tokens, graphics::MotionPolicy{}, settings.Current().dock).ok());
     apps::RunningApplication running; running.id = L"exe:synthetic-c"; running.displayName = L"Synthetic C";
     running.foreground = true; running.windows.push_back({reinterpret_cast<HWND>(1), L"Synthetic window", false});
@@ -257,6 +258,7 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix) {
     std::filesystem::create_directories(output);
     SavePng(rest, output / ("dock-" + prefix + "-rest.png"));
     CHECK(BluePixels(rest) > 300);
+    if (liquid && device.Capabilities().hostBackdrop) CHECK(window.BackdropGlassActive());
     TEST_NOTE("hover injection state: transitioning=" + std::to_string(window.IsTransitioning()) +
               " shown=" + std::to_string(window.IsShown()) +
               " enabled=" + std::to_string(::IsWindowEnabled(window.Handle())));
@@ -455,6 +457,12 @@ AETHER_TEST("dock integration: dark native Dock renders synthetic icons magnifie
 }
 AETHER_TEST("dock integration: light native Dock renders synthetic icons and becomes idle") {
     Probe(graphics::ThemeMode::Light, "light");
+}
+// D66: in Liquid the icons are their own layer, over the glass: the same synthetic icons, whole and sharp, with the same
+// magnification, input and idle checks as Grain.
+AETHER_TEST("dock integration: Liquid keeps the icons on their own layer over the glass, in dark and light (D66)") {
+    Probe(graphics::ThemeMode::Dark, "liquid-dark", true);
+    Probe(graphics::ThemeMode::Light, "liquid-light", true);
 }
 
 AETHER_TEST("dock integration: fixed actions menus profile refresh and explicit unpin stay isolated") {

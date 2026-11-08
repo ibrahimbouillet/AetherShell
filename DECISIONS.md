@@ -111,6 +111,40 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D66 — Test 4.1: Liquid becomes regular glass after the owner's skill; the arrival replays; bars stay after it
+
+Owner, 2026-11-08, after trying test 4.1: better, but Liquid is not right. Transparent water shows nothing over light areas
+and nothing over dark ones; the owner wants a truly transparent material like Apple's Liquid Glass and wrote a skill with its
+criteria (`ibrahimbouillet/liquid-glass-visual-skill`: the backdrop shows through and is softened, edge lensing, a fine
+specular rim, a soft depth, adaptation to what lies under each surface so that text reads over white, black and anything
+between, checked on the real render). Also: changing the style should light the shell up again (replay the drop); and after
+the arrival at an unlock the bars vanished without their icons until the pointer brought them back.
+
+- **Liquid is regular glass (Windows' compositor, as the skill prefers native composition):** the live backdrop that
+  Windows already blurs for Grain, seen through a colour matrix in the compositor (`BackdropKind::HostGlass`): saturation
+  1.35 around each pixel's own grey, then its brightness compressed into a band where the mode's text reads
+  (`LiquidGlassTokens`: dark mode 0.04 to 0.44 of white under white text, light mode 0.57 to 0.97 under dark text). Colours
+  and shapes behind still show, livelier; nothing switches or flickers, because the band is fixed per mode and applied per
+  pixel. Over it, the shader draws the glass's light only: the rim, the light gathered inside the curved edges, the shade
+  where they curve away and a fine outline that shows over a light page. No grain, no tint, no text shadow (the labels stay
+  sharp). The bars have no exterior shadow (their windows end at the panel and cut it into square corners).
+- **Layers (owner, 2026-11-08), as Apple builds it:** each layer has one job and sits on the one below, never inside it:
+  (1) what lies behind, the desktop and windows; (2) the glass, the compositor's adapted backdrop; (3) the glass's light,
+  rim, edge light, shade and outline; (4) the content, icons and text with their soft shadow and an application's red call.
+  Icons are never bent or blurred by the glass. Kept apart this way, each layer can later get its own settings.
+- **What Windows does not allow:** a sharp image of what lies behind a window, so the edges cannot bend the page as Apple's
+  glass does; the edge lensing is the light gathered there. Not Apple's renderer and no claim of parity.
+- **Measured on the real bars** (Top Bar over white, black, a black and white split, vivid hues, a page of text and a
+  photograph, both modes): text contrast at least 4.74:1 everywhere (WCAG AA 4.5:1), the edge visible over plain white and
+  plain black. Without transparency, or where the compositor refuses the effect, Grain.
+- **The arrival and the previews** end on the same glass: as the drops become bars the shader diffuses the picture and
+  applies the same band, under the same light (it matches the compositor within one level of 255).
+- **The arrival replays after a change of style**, alone (nothing to read), over the desktop picture, then the bars come out;
+  a click or Escape ends it. Not while a greeting or its cover is up, nor with reduced motion, high contrast, an application
+  in full screen, or in a test instance.
+- **After the welcome hands over, the bars stay out four seconds as if in use** (`AutoHideState::RevealUntil`), then
+  Auto-Hide goes on as usual. With Auto-Hide on, the page left open covered the bars, which therefore left at once.
+
 ### D65 — Test 4.0 not validated: transparent water, instant previews; Alpha 4 stays 0.4.0 and unpushed
 
 Owner, 2026-11-08, after trying test 4.0: not validated, for three reasons. The Settings previews took some 20 seconds to

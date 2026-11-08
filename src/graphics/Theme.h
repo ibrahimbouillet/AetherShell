@@ -298,12 +298,25 @@ struct MenuTokens {
     double submenuDelay = 0.30;     // hover time before a submenu opens
 };
 
+// D66: Liquid's regular glass, after the owner's Liquid Glass skill (Apple's design principles, rendered with
+// Windows' own compositor). The live backdrop, blurred by Windows, keeps its colours and shapes, a little
+// livelier, while its brightness is brought into a band where this mode's text and icons stay readable over
+// white, black or anything between: never brighter than white text needs, never darker than dark text needs
+// (4.5:1 for the bars' text). The compositor applies it to the bars, the shader to the arrival and previews.
+struct LiquidGlassTokens {
+    float saturation = 1.35f;   // around each pixel's own grey
+    float scale = 0.40f;        // the backdrop's brightness, 0 to 1, is compressed to this span...
+    float offset = 0.04f;       // ...starting here
+    [[nodiscard]] bool operator==(const LiquidGlassTokens&) const noexcept = default;
+};
+
 struct DesignTokens {
     ThemeMode mode = ThemeMode::Dark;
     bool transparencyEnabled = true;  // honors Windows accessibility/personalization preference
     // D63: the Liquid style, chosen in Settings: surfaces that can are drawn as pure water bending the desktop
     // picture (LiquidRenderer) instead of the Grain glass. Never in high contrast.
     bool liquid = false;
+    LiquidGlassTokens liquidGlass;   // D66: dark mode's band by default; MakeDesignTokens sets light mode's
     GlassTokens glass;
     FormTokens form;
     MenuTokens menu;

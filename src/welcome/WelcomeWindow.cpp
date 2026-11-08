@@ -15,6 +15,7 @@ namespace {
 constexpr double kStillReadingSeconds = 2.0;  // without motion: the same two seconds
 constexpr double kReadingHoldSeconds = 0.5;   // the finished words stay a moment before they leave
 constexpr double kFadeOutSeconds = 0.3;       // the whole screen eases back to the desktop
+constexpr double kReplayPictureWaitSeconds = 1.5;   // D66: a replay waits this long for the desktop picture
 constexpr float kPenHeadSeconds = 0.08f;      // D60: the newest ink is still finer than it will settle to
 constexpr float kPenHeadFineness = 0.3f;      // its width at the tip, as a share of its final width
 
@@ -238,6 +239,7 @@ Result<void> WelcomeWindow::Present(std::wstring_view greeting, std::wstring_vie
     ResetInk();
     arrivalStart_ = -1.0;
     arrivalPlayed_ = false;
+    replay_ = false;
     startedAt_ = graphics::FrameScheduler::Now();
     writingFrames_ = 0;
     longestGap_ = 0.0;
@@ -258,6 +260,27 @@ Result<void> WelcomeWindow::Present(std::wstring_view greeting, std::wstring_vie
     return Ok();
 }
 
+Result<void> WelcomeWindow::PresentArrival(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion, const RECT& boundsPx) {
+    if (auto prepared = Prepare(tokens, motion, boundsPx); !prepared) return prepared;
+    if (!ArrivalWanted()) return MakeError(ErrorCode::Unavailable, "the arrival is not played here");
+    scene_ = {};
+    ResetInk();
+    arrivalStart_ = -1.0;
+    arrivalPlayed_ = false;
+    replay_ = true;
+    startedAt_ = graphics::FrameScheduler::Now();
+    writingLogged_ = true;   // nothing is written
+    covering_ = false;
+    presenting_ = true;
+    skipRequested_ = false;
+    Invalidate();
+    graphics::TransitionShape shape;
+    ShowAnimated(graphics::MakeEnterTransition(shape, tokens_, motion_), false);
+    ::SetWindowPos(Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    RequestAnimationFrame();
+    return Ok();
+}
+
 void WelcomeWindow::Dismiss(bool animated) {
     presenting_ = false;
     covering_ = false;
@@ -275,6 +298,7 @@ void WelcomeWindow::Dismiss(bool animated) {
 }
 
 bool WelcomeWindow::GreetingRead(double now) const noexcept {
+    if (replay_) return true;   // D66: nothing to read
     const double length = animated_ ? static_cast<double>(scene_.duration) + kReadingHoldSeconds : kStillReadingSeconds;
     return now - startedAt_ >= length;
 }
@@ -372,9 +396,11 @@ void WelcomeWindow::OnRender(const ui::RenderContext& context) {
         const auto size = D2D1::SizeU(static_cast<UINT32>(std::lround(context.widthDip * scale)), static_cast<UINT32>(std::lround(context.heightDip * scale)));
         bool drawn = false;
         if (renderer && renderer->HasPicture() && size.width && size.height) {
-            auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(t, *arrival_, true), arrivalStyle_, D2D1::Point2F(0.0f, 0.0f), scale);
+            auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(t, *arrival_, !replay_), arrivalStyle_, D2D1::Point2F(0.0f, 0.0f), scale);
             scene.background = true;
-            scene.edgeBend = 0.0f;   // D65: the drops end as the bars will look, transparent water
+            scene.edgeBend = 0.0f;   // D65: the drops end as the bars will look
+            scene.glass = true;      // D66: in Liquid, as the shell's regular glass, in this mode's band
+            scene.glassTokens = tokens_.liquidGlass;
             const auto placement = renderer->PicturePlacement();
             const auto bounds = BoundsPx();
             scene.picture = D2D1::RectF(placement.left - bounds.left, placement.top - bounds.top, placement.right - bounds.left, placement.bottom - bounds.top);
@@ -384,10 +410,12 @@ void WelcomeWindow::OnRender(const ui::RenderContext& context) {
                 drawn = true;
             }
         }
+        if (replay_) return;   // D66: no greeting and no cover under a replay
         const float greeting = drawn ? 1.0f - std::clamp(t / 0.35f, 0.0f, 1.0f) : 1.0f;
         if (greeting > 0.0f) PaintGreeting(context, greeting * greeting * (3.0f - 2.0f * greeting));
         return;
     }
+    if (replay_) return;   // waiting a moment for the picture: nothing over the desktop yet
     PaintGreeting(context, 1.0f);
 }
 
@@ -457,7 +485,9 @@ bool WelcomeWindow::OnAnimate(double now) {
             auto* renderer = Device().Material();
             if (renderer && renderer->HasPicture()) {
                 arrivalStart_ = now;
-                AETHER_LOG_INFO("welcome", "arrival in {}", arrivalStyle_ == graphics::MaterialStyle::Liquid ? "Liquid" : "Grain");
+                AETHER_LOG_INFO("welcome", "arrival in {}{}", arrivalStyle_ == graphics::MaterialStyle::Liquid ? "Liquid" : "Grain", replay_ ? " (style changed)" : "");
+            } else if (replay_ && now - startedAt_ < kReplayPictureWaitSeconds) {
+                // D66: the picture is still being read; the replay waits for it a moment.
             } else {
                 AETHER_LOG_INFO("welcome", "arrival unavailable (no material or picture yet): the greeting fades");
                 arrival_.reset();   // the greeting fades as before

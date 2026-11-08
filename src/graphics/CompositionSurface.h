@@ -6,15 +6,23 @@
 //   DesktopWindowTarget (HWND with WS_EX_NOREDIRECTIONBITMAP)
 //   └─ root ContainerVisual
 //      ├─ backdrop SpriteVisual  HostBackdropBrush (blurred desktop), clipped to the panel's
-//      │                         rounded rectangle — Windows 11 only
+//      │                         rounded rectangle — Windows 11 only; for Liquid's regular glass
+//      │                         (D66) seen through a colour-matrix effect that adapts it
 //      └─ content SpriteVisual   CompositionDrawingSurface rendered with Direct2D
 //                                (tint, highlights, border, shadow, icons, text), premultiplied alpha
+//
+// D66, the owner's layers for Liquid, bottom to top, each with one job and none inside another:
+//   1. what lies behind: the desktop and the windows (not this process's)
+//   2. the glass: the backdrop visual (HostGlass), that content diffused and adapted by the compositor
+//   3. the glass's light: rim, edge light, shade and outline, drawn first into the content visual (and cached)
+//   4. the content: icons, text, their soft shadow and an application's red call, drawn over the glass, never in it
 //
 // Visual coordinates are physical pixels; Draw() configures Direct2D so callers draw in DIPs.
 #pragma once
 
 #include "core/Result.h"
 #include "graphics/GraphicsDevice.h"
+#include "graphics/Theme.h"
 #include "graphics/Transition.h"
 
 #include <chrono>
@@ -27,6 +35,7 @@ namespace aether::graphics {
 enum class BackdropKind {
     None,      // per-pixel transparency only (tint painted by Direct2D)
     HostBlur,  // blurred desktop behind the panel (Windows 11)
+    HostGlass, // D66: the same, through LiquidGlassTokens: livelier colours, brightness kept where text reads
 };
 
 class CompositionSurface {
@@ -64,7 +73,9 @@ public:
     // Places the backdrop under the panel shape (pixels, relative to the window). Requesting HostBlur on
     // a system without support falls back to None. Returns the effective kind. opacity is the blurred
     // desktop's opacity under the tint (DesignTokens::glass.backdropOpacity), clamped to 0..1.
-    BackdropKind SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx, float opacity = 1.0f);
+    // HostGlass adapts the backdrop with `glass`; where the compositor refuses the effect it falls back to HostBlur.
+    BackdropKind SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx, float opacity = 1.0f,
+                             const LiquidGlassTokens& glass = {});
     [[nodiscard]] BackdropKind EffectiveBackdrop() const noexcept { return backdropKind_; }
 
     // Redraws the whole surface. The context is cleared to transparent, its DPI set to `dpi` (so the
@@ -84,6 +95,10 @@ private:
     wuc::CompositionDrawingSurface surface_{nullptr};
     wuc::CompositionSurfaceBrush surfaceBrush_{nullptr};
     wuc::CompositionBackdropBrush hostBackdropBrush_{nullptr};
+    wuc::CompositionEffectBrush glassBrush_{nullptr};   // D66: hostBackdropBrush_ through the glass's colour matrix
+    LiquidGlassTokens glassTokens_{};
+    bool glassRefused_ = false;                         // the compositor would not build it: HostBlur instead
+    bool glassShown_ = false;                           // which brush the backdrop visual holds
     wuc::CompositionRoundedRectangleGeometry clipGeometry_{nullptr};
     // CompositionScopedBatch does not provide IWeakReferenceSource on every supported runtime;
     // C++/WinRT auto_revoke assumes it does. Keep an explicit strong source and event token instead.

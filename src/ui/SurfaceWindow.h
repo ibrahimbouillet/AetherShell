@@ -88,9 +88,13 @@ public:
     // HTTRANSPARENT; Windows guarantees forwarding that result only to windows on the same thread.
     void SetVisualRegionPx(std::span<const RECT> rects);
     // Places the blurred backdrop (when available) under the panel shape, in DIPs. `backdropOpacity` is
-    // the blurred desktop's opacity under the tint (DesignTokens::glass.backdropOpacity).
-    void SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity = 1.0f);
+    // the blurred desktop's opacity under the tint (DesignTokens::glass.backdropOpacity). With `glass` (D66,
+    // Liquid) the blurred desktop is seen through Liquid's regular glass instead.
+    void SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity = 1.0f,
+                          const graphics::LiquidGlassTokens* glass = nullptr);
     [[nodiscard]] bool BackdropBlurActive() const noexcept;
+    // D66: the panel shows Liquid's regular glass: the live, blurred desktop adapted by the compositor.
+    [[nodiscard]] bool BackdropGlassActive() const noexcept;
 
     // Show() and Hide() act at once and cancel a running transition.
     void Show(bool activate = false);
@@ -119,9 +123,9 @@ protected:
     [[nodiscard]] graphics::GraphicsDevice& Device() noexcept { return device_; }
     [[nodiscard]] graphics::FrameScheduler& Scheduler() noexcept { return scheduler_; }
 
-    // D63: the Liquid material under `panelDip` (window DIPs): water that bends the desktop picture lying behind
-    // the window, catches the light and casts `shadow` (0 to 1). Call first in OnRender, with no blurred backdrop
-    // under the panel. False when it cannot be drawn (no renderer on this device, no picture yet): paint Grain.
+    // D63, D66: Liquid's light over `panelDip` (window DIPs): the glass's rim, its highlight, the light it gathers at
+    // its edges and the shade where it curves away, and its `shadow` (0 to 1). Drawn over the regular glass
+    // (BackdropGlassActive). False when it cannot be drawn (no renderer on this device): paint Grain.
     [[nodiscard]] bool PaintLiquidPanel(const RenderContext& context, const D2D1_RECT_F& panelDip, float cornerRadiusDip, float shadow = 1.0f);
 
     virtual void OnRender(const RenderContext& context) = 0;
@@ -190,6 +194,7 @@ private:
     float backdropRadiusDip_ = 0.0f;
     float backdropOpacity_ = 1.0f;
     bool backdropBlurRequested_ = false;
+    std::optional<graphics::LiquidGlassTokens> backdropGlass_;
     bool hiding_ = false;
     bool shown_ = false;
     bool presented_ = false;

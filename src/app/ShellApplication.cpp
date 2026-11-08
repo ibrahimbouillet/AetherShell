@@ -84,6 +84,8 @@ constexpr UINT kAutoHideTickMs = 50;
 constexpr UINT_PTR kWelcomeTimer = 0xA378;           // FR-041: readiness and the deadline while a greeting shows
 constexpr int kWelcomeEscapeHotkey = 3;              // Escape skips the greeting without it taking focus
 constexpr std::uint64_t kWelcomeBackdropWaitMs = 400; // for the desktop picture, before going on without it
+constexpr std::uint64_t kWelcomeRevealMs = 4000;     // D66: the bars stay out this long after the welcome hands over
+constexpr std::uint64_t kArrivalReplayLimitMs = 8000; // D66: a replay of the arrival never stays longer
 constexpr std::uint64_t kBrightnessSettleMs = 4000;   // the panel keeps showing a request about this long
 constexpr std::uint64_t kWiFiRescanMs = 20000;        // while the Wi-Fi view stays open
 
@@ -177,6 +179,9 @@ struct ShellApplication::Impl {
     RECT controlsAnchor{};
     bool welcomeBackdropPending = false;
     bool welcomeHoldsBars = false;
+    bool arrivalReplay = false;                       // D66: the arrival replays after a change of style
+    std::uint64_t arrivalReplayStarted = 0;
+    std::optional<settings::SurfaceStyle> appliedStyle;
     Connection welcomeSkip;
     graphics::DesignTokens shellTokens;
     graphics::MotionPolicy shellMotion;
@@ -357,8 +362,7 @@ struct ShellApplication::Impl {
             if (welcomeWindow->Presenting()) return;
             const auto& value = settings->Current().welcome;
             const auto word = welcome::GreetingWord(value.language, ::GetUserDefaultUILanguage());
-            const auto style = settings->Current().general.surfaceStyle == settings::SurfaceStyle::Liquid ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain;
-            welcomeWindow->SetArrival(ArrivalLayoutOn(monitor.bounds), style);
+            welcomeWindow->SetArrival(ArrivalLayoutOn(monitor.bounds), ArrivalStyle());
             if (auto shown = welcomeWindow->Present(word, value.displayName, shellTokens, shellMotion, monitor.bounds); !shown) {
                 failed(shown.error().code);
                 return;
@@ -370,9 +374,17 @@ struct ShellApplication::Impl {
     }
     // The welcome has the screen to itself: the bars, ready underneath, come out when it ends (D56).
     void HoldBarsForWelcome() {
-        const bool hold = !closing && (welcomeController.Presenting() || welcomeController.Covering());
+        const bool hold = !closing && (welcomeController.Presenting() || welcomeController.Covering() || arrivalReplay);
         if (hold == welcomeHoldsBars) return;
         welcomeHoldsBars = hold;
+        if (!hold && !closing) {
+            // D66: the welcome hands over to bars that have just come out. With Auto-Hide they stay a moment, as if
+            // in use, rather than leaving at once because the page left open covers them.
+            const auto until = ::GetTickCount64() + kWelcomeRevealMs;
+            topAutoHide.RevealUntil(until);
+            dockAutoHide.RevealUntil(until);
+            if (autoHideArmed) AutoHideTick();
+        }
         // After the arrival the bars are already where the drops landed: they come back at once, under its crossfade.
         if (topbar) topbar->SetHeldBack(hold, !(welcomeWindow && welcomeWindow->ArrivalPlayed()));
         ApplyDockSuppression();
@@ -393,10 +405,7 @@ struct ShellApplication::Impl {
             return;  // the timer keeps running until the window has hidden, then releases it
         }
         try {
-            if (!welcomeWindow) {
-                welcomeWindow = std::make_unique<welcome::WelcomeWindow>(graphics, scheduler);
-                welcomeSkip = welcomeWindow->SkipRequested.Connect([this] { ApplyWelcome(welcomeController.Skipped()); });
-            }
+            EnsureWelcomeWindow();
             if (!welcomeBackdrop && !welcomeBackdropPending) RequestWelcomeBackdrop();
             if (!desktopPictureRequest) RequestDesktopPicture();   // D62: the arrival shows the picture itself
             // Without its timer a greeting is not allowed to stay. The surface is simply kept hidden
@@ -411,9 +420,68 @@ struct ShellApplication::Impl {
             welcomeController.PresentationFailed();
         }
     }
+    // The arrival's material: Liquid where the bars show it (it needs transparency), otherwise Grain.
+    [[nodiscard]] graphics::MaterialStyle ArrivalStyle() const {
+        return shellTokens.liquid && shellTokens.transparencyEnabled ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain;
+    }
+    void EnsureWelcomeWindow() {
+        if (welcomeWindow) return;
+        welcomeWindow = std::make_unique<welcome::WelcomeWindow>(graphics, scheduler);
+        welcomeSkip = welcomeWindow->SkipRequested.Connect([this] { SkipWelcome(); });
+    }
+    // A click, a touch or Escape: the greeting, or a replay of the arrival, leaves.
+    void SkipWelcome() {
+        if (arrivalReplay) EndArrivalReplay(true);
+        else ApplyWelcome(welcomeController.Skipped());
+    }
+    // D66: choosing another style replays the arrival in it, as the shell lighting up again: the drop over the
+    // desktop picture, its halves landing on the bars, which then come out. Not while a greeting or its cover is
+    // up or the session is locked, nor where the arrival is not played (reduced motion, high contrast, an
+    // application in full screen, a test instance).
+    void ReplayArrival() {
+        if (closing || arrivalReplay || !nativeTaskbarAccess || !settings || !settings->Loaded()) return;
+        if (welcomeController.Presenting() || welcomeController.Covering() || welcomeController.SessionLocked()) return;
+        if (!shellMotion.AllowsMovement() || shellTokens.mode == graphics::ThemeMode::HighContrast || ApplicationFullScreen()) return;
+        try {
+            const auto monitor = platform::PrimaryMonitor();
+            const auto layout = ArrivalLayoutOn(monitor.bounds);
+            if (!layout) return;
+            EnsureWelcomeWindow();
+            if (!desktopPictureRequest) RequestDesktopPicture();
+            welcomeWindow->SetArrival(layout, ArrivalStyle());
+            if (auto shown = welcomeWindow->PresentArrival(shellTokens, shellMotion, monitor.bounds); !shown) {
+                AETHER_LOG_INFO("app", "arrival replay unavailable ({})", ToString(shown.error().code));
+                return;
+            }
+            if (!::SetTimer(events.Handle(), kWelcomeTimer, 50, nullptr)) {
+                welcomeWindow->Dismiss(false);
+                return;
+            }
+            arrivalReplay = true;
+            arrivalReplayStarted = ::GetTickCount64();
+            (void)::RegisterHotKey(events.Handle(), kWelcomeEscapeHotkey, 0, VK_ESCAPE);
+            HoldBarsForWelcome();
+        } catch (...) {
+            AETHER_LOG_WARN("app", "arrival replay unavailable");
+            arrivalReplay = false;
+            HoldBarsForWelcome();
+        }
+    }
+    void EndArrivalReplay(bool animated) {
+        if (!arrivalReplay) return;
+        arrivalReplay = false;
+        ::UnregisterHotKey(events.Handle(), kWelcomeEscapeHotkey);
+        if (welcomeWindow) welcomeWindow->Dismiss(animated);
+        HoldBarsForWelcome();   // the bars come out, without their entrance once the drops have landed
+    }
     void WelcomeTick() {
-        if (!welcomeWindow) { EndWelcomeInput(); return; }
+        if (!welcomeWindow) { arrivalReplay = false; EndWelcomeInput(); HoldBarsForWelcome(); return; }
         const auto now = ::GetTickCount64();
+        if (arrivalReplay) {
+            // The drops have reached the bars, or the arrival could not play (no picture in time), or it overstays.
+            if (welcomeWindow->WritingFinished(graphics::FrameScheduler::Now()) || now - arrivalReplayStarted > kArrivalReplayLimitMs) EndArrivalReplay(true);
+            return;
+        }
         if (welcomeController.Covering()) {
             // Windows' own answer, independent of its notifications: a missed unlock cannot leave the
             // cover in front of the desktop, and an unknown answer is not a reason to keep it up.
@@ -433,6 +501,8 @@ struct ShellApplication::Impl {
     }
     void OnSessionChanged(WPARAM change) {
         const auto now = ::GetTickCount64();
+        if (change == WTS_SESSION_LOCK || change == WTS_CONSOLE_DISCONNECT || change == WTS_REMOTE_DISCONNECT || change == WTS_SESSION_LOGOFF)
+            EndArrivalReplay(false);
         switch (change) {
             case WTS_SESSION_LOCK:
                 ApplyWelcome(welcomeController.Locked(WelcomeEnabled(), now));
@@ -1346,6 +1416,10 @@ void ShellApplication::Impl::ApplySettings() {
         }
         RefreshUpdateOffer(updates->Snapshot());
     }
+    // D66: another style lights the shell up again, in it. Not at start, where the greeting does it.
+    const auto style = value.general.surfaceStyle;
+    if (appliedStyle && *appliedStyle != style) ReplayArrival();
+    appliedStyle = style;
 }
 
 Result<void> ShellApplication::Impl::StartSurfaces() {
@@ -1429,7 +1503,9 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(seconds, layout, false), liquid ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain,
                                                 D2D1::Point2F(0.0f, 0.0f), scale);
         scene.background = true;
-        scene.edgeBend = 0.0f;   // D65: the bars end as the shell draws them, transparent water
+        scene.edgeBend = 0.0f;   // D65: the bars end as the shell draws them
+        scene.glass = true;      // D66: Liquid's regular glass, in the shell's mode
+        scene.glassTokens = shellTokens.liquidGlass;
         const auto picture = renderer->PictureSize();
         scene.picture = welcome::CoverRect(static_cast<float>(picture.cx), static_cast<float>(picture.cy), static_cast<float>(width), static_cast<float>(height));
         return renderer->RenderToMemory(scene, D2D1::SizeU(width, height), bgra).ok();
@@ -1539,7 +1615,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (desktopPictureRequest) RequestDesktopPicture();ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (desktopPictureRequest) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -1731,6 +1807,7 @@ void ShellApplication::Impl::InstallUpdate() {
 
 void ShellApplication::Impl::RequestQuit() {
     if (closing) return; closing = true;
+    EndArrivalReplay(false);
     ApplyWelcome(welcomeController.Canceled());
     if(controls)controls->Close();
     locationCancellation->Cancel();++locationGeneration;locationPolicy.reset();
@@ -1955,7 +2032,7 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             impl_->ObserveUpdateHandoff();
             return true;
         }
-        if (message.message == WM_HOTKEY && message.wParam == kWelcomeEscapeHotkey) { impl_->ApplyWelcome(impl_->welcomeController.Skipped()); return true; }
+        if (message.message == WM_HOTKEY && message.wParam == kWelcomeEscapeHotkey) { impl_->SkipWelcome(); return true; }
         if (message.message == WM_HOTKEY) { if(impl_->closing)return true; if(message.wParam==1 && impl_->searchWindow)impl_->searchWindow->Toggle(); else if(message.wParam==2 && impl_->dock)(void)impl_->dock->FocusDock(); return true; }
         return impl_->settingsWindow && impl_->settingsWindow->PreTranslate(message);
     });

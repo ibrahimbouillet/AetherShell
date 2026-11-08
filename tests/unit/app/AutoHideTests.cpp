@@ -142,6 +142,18 @@ AETHER_TEST("auto-hide: resetting a bar forgets its state but keeps its own timi
     CHECK_FALSE(top.Update(sample(2250, true)));
 }
 
+AETHER_TEST("auto-hide: a bar that has just come out stays a moment, then hides as usual (D66)") {
+    Bar bar;
+    CHECK(bar.Step(true));                        // a page covers it: hidden, as before the arrival
+    bar.state.RevealUntil(bar.now + 1000);        // the welcome hands over
+    for (int i = 0; i < 20; ++i) CHECK_FALSE(bar.Step(true));   // a full second out, though covered
+    bool hidden = false;
+    for (int i = 0; i < 20 && !hidden; ++i) hidden = bar.Step(true);   // then the usual delay, and it goes
+    CHECK(hidden);
+    bar.state.RevealUntil(bar.now - 1);           // a hold already over changes nothing
+    CHECK(bar.Step(true));
+}
+
 AETHER_TEST("auto-hide: the Dock keeps its short dwell") {
     CHECK_EQ(AutoHideTiming{}.revealDwellMs, 40u);
     CHECK_EQ(kTopBarAutoHideTiming.revealDwellMs, 250u);

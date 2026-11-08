@@ -28,7 +28,7 @@ bool AutoHideState::Update(const AutoHideSample& sample) noexcept {
     // The dwell only guards a hidden bar: one still shown stays while the pointer rests on its edge,
     // rather than hiding when its delay ends and returning when the dwell does.
     const bool edgeReveal = resting && (revealed_ || sample.now - *edgeSince_ >= timing_.revealDwellMs);
-    if (sample.engaged || edgeReveal) {
+    if (sample.engaged || edgeReveal || sample.now < holdUntil_) {
         revealed_ = true;
         lastUse_ = sample.now;
         return hidden_ = false;

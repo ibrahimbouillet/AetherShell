@@ -6,12 +6,14 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
 `0.3.3-alpha.3`, `0.3.0-alpha.3`, `0.2.0-alpha.2` and `0.1.0-alpha.1` remain available. Earlier deliveries do not qualify later versions. Build, package and CI receipts are recorded only when executed in HANDOFF and
 `docs/knowledge/TEST_STATUS.md`.
 
-- Alpha 4 tests (D64, D65, S-068, S-069), Liquid style: the bars are transparent water over the live content behind them; they
-  do not bend it at their edges as the prototype does (that would need a continuous screen capture; D65). The arrival and the
-  Settings previews show the desktop picture, placed as "Fill" whatever the desktop's own setting, on the primary monitor.
-  Only the Dock, the Top Bar, the arrival and the previews are Liquid yet; Settings, menus, Search and Quick Settings stay
-  Grain. A device that cannot run the shader (Direct3D below 10) draws Grain. The arrival has run in fixtures, not yet at a
-  real sign-in or unlock; the Top Bar's text shadow over every kind of page has not been judged by the owner.
+- Alpha 4 tests (D64 to D66, S-068 to S-070), Liquid style: the bars are regular glass made by Windows' compositor from its
+  blurred backdrop; Windows gives no sharp image of what lies behind a window, so their edges gather light but do not bend
+  the page as Apple's glass does (D66). The arrival and the Settings previews show the desktop picture, placed as "Fill"
+  whatever the desktop's own setting, on the primary monitor. Only the Dock, the Top Bar, the arrival and the previews are
+  Liquid yet; Settings, menus, Search and Quick Settings stay Grain. Without transparency, on a system without the host
+  backdrop or where the compositor refuses the effect, and on a device that cannot run the shader (Direct3D below 10), the
+  bars draw Grain. The replay after a change of style and the bars staying after an unlock have run in fixtures, not yet on
+  the owner's desktop; contrast was measured on the Top Bar, the Dock uses the same glass.
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
   application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the

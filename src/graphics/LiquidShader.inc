@@ -23,7 +23,10 @@ cbuffer Scene : register(b0) {
     float gMarkLod;
     float gTransparent;  // D65: 1 for the shell's bars: transparent water over the live content, its light and shadow only
     float gEdgeBend;     // how much a bar's edge bends the picture: 1 in the prototype, 0 where the bars are transparent
-    float2 gUnused;
+    float gGlassOn;      // D66: 1 where the drops become the regular glass of the shell's bars
+    float gGlassLod;     // its diffusion, as a mip level of the target
+    float3 gGlass;       // its saturation, then the band its brightness is brought into: scale, offset
+    float gUnused;
 };
 Texture2D gPictureTex : register(t0);
 Texture2D gMarkTex : register(t1);
@@ -55,6 +58,32 @@ float3 soft(float2 px, float lod) {   // four taps soften the mip steps of a blu
     if (lod < 0.75) return tap(px, lod);
     float2 t = 0.6 * exp2(lod);
     return 0.25 * (tap(px + t, lod) + tap(px + float2(-t.x, t.y), lod) + tap(px + float2(t.x, -t.y), lod) + tap(px - t, lod));
+}
+
+// D66: Liquid's regular glass, as the compositor applies it to the shell's bars (CompositionSurface's colour matrix).
+float3 adapt(float3 c) {
+    float l = dot(c, float3(0.2126, 0.7152, 0.0722));
+    return saturate((l + gGlass.x * (c - l)) * gGlass.y + gGlass.z);
+}
+// The light a bar's glass gathers and the shade where it curves away (D65), shared by the bars and the arrival.
+// x: white light (premultiplied); y: the darkening at the edge.
+float2 glassLight(float s, float2 g, float hairline) {
+    float z = sqrt(max(1.0 - s * s, 0.0));
+    float3 n = normalize(float3(g * s / max(z, 0.12), 1.0));
+    float2 through = normalize(float2(0.42, 0.78));
+    float3 L = normalize(float3(-0.42, -0.78, 0.6));
+    float3 H = normalize(L + float3(0.0, 0.0, 1.0));
+    // The glint stays on the rim (D66): a bar's corner otherwise holds a loose bright dot just inside it.
+    float spec = pow(max(dot(n, H), 0.0), 120.0) * 0.8 * smoothstep(0.8, 0.98, s);
+    float top = saturate(-dot(g, normalize(float2(0.35, 1.0))));
+    float sheen = smoothstep(0.6, 0.97, s) * top * 0.12;
+    float fresnel = pow(s, 6.0) * 0.24;
+    float focus = smoothstep(0.55, 0.9, s) * (1.0 - smoothstep(0.95, 1.0, s)) * pow(max(dot(g, through), 0.0), 3.0) * 0.4;
+    float rim = hairline * (0.22 + 0.5 * max(dot(g, -through), 0.0) + 0.25 * max(dot(g, through), 0.0));
+    float light = saturate(spec + sheen + fresnel + focus + rim);
+    // Darker as the light bends away; and a fine outline (D66), seen over a light page where the rim's light is not.
+    float shade = smoothstep(0.7, 0.96, s) * (1.0 - hairline) * 0.16 + hairline * 0.2;
+    return float2(light, shade);
 }
 
 float4 PS(VertexOut input) : SV_Target {
@@ -103,23 +132,10 @@ float4 PS(VertexOut input) : SV_Target {
 
     float3 c;
     if (gStyle < 0.5 && gTransparent > 0.5) {
-        // D65, the shell's Liquid bars: transparent water over whatever lies behind them, live. Nothing of the
-        // picture: only the water's light (premultiplied white) and its shade at the edge (premultiplied black), so
-        // that it shows over a dark page by its light and over a white one by its edge.
-        float z = sqrt(max(1.0 - s * s, 0.0));
-        float3 n = normalize(float3(g * s / max(z, 0.12), 1.0));
-        float2 through = normalize(float2(0.42, 0.78));
-        float3 L = normalize(float3(-0.42, -0.78, 0.6));
-        float3 H = normalize(L + float3(0.0, 0.0, 1.0));
-        float spec = pow(max(dot(n, H), 0.0), 120.0) * 0.8;
-        float top = saturate(-dot(g, normalize(float2(0.35, 1.0))));
-        float sheen = smoothstep(0.6, 0.97, s) * top * 0.12;
-        float fresnel = pow(s, 6.0) * 0.24;
-        float focus = smoothstep(0.55, 0.9, s) * (1.0 - smoothstep(0.95, 1.0, s)) * pow(max(dot(g, through), 0.0), 3.0) * 0.4;
-        float rim = hairline * (0.22 + 0.5 * max(dot(g, -through), 0.0) + 0.25 * max(dot(g, through), 0.0));
-        float light = saturate(spec + sheen + fresnel + focus + rim);
-        float shade = smoothstep(0.7, 0.96, s) * (1.0 - hairline) * 0.16;   // the water's edge, darker as light bends away
-        float4 water = float4(light, light, light, light + shade - light * shade);
+        // D65, D66: the shell's Liquid bars. The compositor shows the regular glass (the live backdrop, adapted)
+        // under them; this draws its light (premultiplied white) and its shade at the edge (premultiplied black).
+        float2 ls = glassLight(s, g, hairline);
+        float4 water = float4(ls.x, ls.x, ls.x, ls.x + ls.y - ls.x * ls.y);
         return lerp(outside, water, coverage);
     }
     if (gStyle < 0.5) {
@@ -146,6 +162,14 @@ float4 PS(VertexOut input) : SV_Target {
         float focusBar = smoothstep(0.55, 0.9, s) * (1.0 - smoothstep(0.95, 1.0, s)) * pow(max(dot(g, through), 0.0), 3.0) * 0.4;
         float rim = hairline * (0.22 + 0.5 * max(dot(g, -through), 0.0) + 0.25 * max(dot(g, through), 0.0));
         c += spec + sheen + fresnel + lerp(focusDrop, focusBar, gLens) + rim;
+        if (gGlassOn > 0.5) {
+            // D66: as the drops become bars they become the bars' regular glass: the picture diffused and adapted,
+            // under the same light and shade as the shell's bars, so that the hand-over to them does not show.
+            float2 ls = glassLight(s, g, hairline);
+            float3 base = adapt(soft(p, gGlassLod) * (1.0 - gVeil));
+            float3 bar = base * (1.0 - ls.y) * (1.0 - ls.x) + ls.x;
+            c = lerp(c, bar, smoothstep(0.35, 1.0, gLens));
+        }
     } else {
         // GRAIN. Aether's frosted material: the picture blurred behind a semi-transparent neutral shade, with a
         // fixed grain and a hairline edge. No refraction and no light of its own.

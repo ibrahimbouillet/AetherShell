@@ -570,10 +570,14 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
 void TopBarWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
     const auto panel = impl_->panel;
-    // D63: Liquid is water bending the desktop picture, with no blurred backdrop; Grain is the frosted glass.
-    const bool liquid = impl_->tokens.liquid && PaintLiquidPanel(context, panel, impl_->tokens.barCornerRadius);
-    const bool blur = !liquid && impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
-    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, impl_->tokens.glass.backdropOpacity);
+    // D66: Liquid is the regular glass (the live backdrop adapted by the compositor) under its light; Grain is the
+    // frosted glass. Without transparency, or where the compositor offers no glass, Grain.
+    const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
+    const bool wantGlass = blur && impl_->tokens.liquid;
+    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, wantGlass ? 1.0f : impl_->tokens.glass.backdropOpacity,
+                     wantGlass ? &impl_->tokens.liquidGlass : nullptr);
+    // No exterior shadow: the window's region ends at the panel and would cut it into square corners.
+    const bool liquid = wantGlass && BackdropGlassActive() && PaintLiquidPanel(context, panel, impl_->tokens.barCornerRadius, 0.0f);
     if (!liquid) {
         graphics::GlassStyle glass;
         glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
@@ -583,7 +587,7 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
     const float shown = impl_->transition.Value(context.now);
-    // `tokens` and `ink` are the bar's own, or, for the shadow pass under Liquid, a translucent black.
+    // `tokens` are the bar's own; `ink`, when given, paints every item in one colour.
     const auto paintItems = [&](const graphics::DesignTokens& tokens, const graphics::Color* ink, bool focus) {
     for (const auto& entry : impl_->placed) {
         if (focus && impl_->focusedWindow && impl_->keyboardCues && impl_->focused == entry.item.id) {
@@ -624,19 +628,8 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
         } else impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
     }
     };
-    if (liquid) {
-        // D65: over transparent water the text and glyphs sit on whatever page is behind; a soft shadow one pixel
-        // below keeps them readable over a white page, as the owner's layers have shadows between icons and water.
-        auto shade = impl_->tokens;
-        const graphics::Color black{0.0f, 0.0f, 0.0f, 0.55f};
-        shade.textPrimary = shade.textSecondary = shade.brandPrimary = shade.brandSecondary = black;
-        shade.glass.tint = black;
-        D2D1_MATRIX_3X2_F transform{};
-        context.d2d->GetTransform(&transform);
-        context.d2d->SetTransform(D2D1::Matrix3x2F::Translation(0.0f, 1.0f) * transform);
-        paintItems(shade, &black, false);
-        context.d2d->SetTransform(transform);
-    }
+    // D66: no shadow under the text in Liquid any more: the regular glass keeps its brightness where the text reads,
+    // and the labels stay sharp.
     paintItems(impl_->tokens, nullptr, true);
 }
 bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(now); }

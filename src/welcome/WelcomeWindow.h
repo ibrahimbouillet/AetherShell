@@ -67,6 +67,10 @@ public:
     // Starts writing, over the cover if it is up, otherwise with an entrance.
     [[nodiscard]] Result<void> Present(std::wstring_view greeting, std::wstring_view name, const graphics::DesignTokens& tokens,
                                        const graphics::MotionPolicy& motion, const RECT& boundsPx);
+    // D66: the arrival alone, with no greeting, over the desktop picture: the shell lighting up again after the
+    // style was changed. Fails, and shows nothing, where the arrival is not played (no layout, no motion, high
+    // contrast). It waits up to a moment and a half for the picture, then ends without it.
+    [[nodiscard]] Result<void> PresentArrival(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion, const RECT& boundsPx);
     void Dismiss(bool animated);
     // D62/D63: after the greeting has been read, the arrival: a drop divides into the bars, in `style`, landing on
     // `layout` (DIPs from the window's top-left, which is the monitor's). Without one, or without motion or the
@@ -131,6 +135,7 @@ private:
     graphics::MaterialStyle arrivalStyle_ = graphics::MaterialStyle::Grain;
     double arrivalStart_ = -1.0;   // FrameScheduler time; negative until the arrival begins
     bool arrivalPlayed_ = false;
+    bool replay_ = false;          // D66: the arrival alone (PresentArrival)
 };
 
 }  // namespace aether::welcome

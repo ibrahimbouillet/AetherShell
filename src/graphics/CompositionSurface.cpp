@@ -6,6 +6,8 @@
 #include "platform/windows/Win32Error.h"
 
 #include <dwmapi.h>
+#include <windows.graphics.effects.interop.h>
+#include <winrt/Windows.Graphics.Effects.h>
 
 #include <algorithm>
 #include <cmath>
@@ -18,6 +20,82 @@ constexpr DWORD kDwmUseHostBackdropBrush = 17;
 
 using winrt::Windows::Foundation::Numerics::float2;
 using winrt::Windows::Foundation::Numerics::float3;
+namespace wge = winrt::Windows::Graphics::Effects;
+namespace abi_wge = ABI::Windows::Graphics::Effects;
+
+// D66: Liquid's regular glass as one colour matrix ([r g b a 1] times M): the saturation around each pixel's own
+// grey (Rec. 709 weights), then the brightness compressed into the readable band. Alpha passes unchanged.
+D2D1_MATRIX_5X4_F GlassMatrix(const LiquidGlassTokens& glass) noexcept {
+    constexpr float wr = 0.2126f, wg = 0.7152f, wb = 0.0722f;
+    const float s = std::isfinite(glass.saturation) ? std::clamp(glass.saturation, 0.0f, 3.0f) : 1.0f;
+    const float k = std::isfinite(glass.scale) ? std::clamp(glass.scale, 0.0f, 1.0f) : 1.0f;
+    const float c = std::isfinite(glass.offset) ? std::clamp(glass.offset, 0.0f, 1.0f) : 0.0f;
+    D2D1_MATRIX_5X4_F m{};
+    m._11 = k * (wr + s * (1.0f - wr)); m._12 = k * wr * (1.0f - s);          m._13 = k * wr * (1.0f - s);
+    m._21 = k * wg * (1.0f - s);          m._22 = k * (wg + s * (1.0f - wg)); m._23 = k * wg * (1.0f - s);
+    m._31 = k * wb * (1.0f - s);          m._32 = k * wb * (1.0f - s);          m._33 = k * (wb + s * (1.0f - wb));
+    m._44 = 1.0f;
+    m._51 = c; m._52 = c; m._53 = c;
+    return m;
+}
+
+// The Direct2D colour-matrix effect, described the way the compositor reads effects (this project has no Win2D).
+struct GlassMatrixEffect : winrt::implements<GlassMatrixEffect, wge::IGraphicsEffect, wge::IGraphicsEffectSource, abi_wge::IGraphicsEffectD2D1Interop> {
+    GlassMatrixEffect(const D2D1_MATRIX_5X4_F& matrix, wge::IGraphicsEffectSource source) : matrix_(matrix), source_(std::move(source)) {}
+    winrt::hstring Name() const { return name_; }
+    void Name(const winrt::hstring& name) { name_ = name; }
+    HRESULT __stdcall GetEffectId(GUID* id) noexcept override {
+        if (!id) return E_POINTER;
+        *id = CLSID_D2D1ColorMatrix;
+        return S_OK;
+    }
+    HRESULT __stdcall GetNamedPropertyMapping(LPCWSTR, UINT*, abi_wge::GRAPHICS_EFFECT_PROPERTY_MAPPING*) noexcept override { return E_INVALIDARG; }
+    HRESULT __stdcall GetPropertyCount(UINT* count) noexcept override {
+        if (!count) return E_POINTER;
+        *count = 3;
+        return S_OK;
+    }
+    HRESULT __stdcall GetProperty(UINT index, ABI::Windows::Foundation::IPropertyValue** value) noexcept override try {
+        if (!value) return E_POINTER;
+        *value = nullptr;
+        winrt::Windows::Foundation::IInspectable boxed{nullptr};
+        switch (index) {
+            case D2D1_COLORMATRIX_PROP_COLOR_MATRIX: {
+                const auto* first = reinterpret_cast<const float*>(&matrix_);
+                boxed = winrt::Windows::Foundation::PropertyValue::CreateSingleArray(winrt::array_view<const float>(first, first + 20));
+                break;
+            }
+            case D2D1_COLORMATRIX_PROP_ALPHA_MODE:
+                boxed = winrt::Windows::Foundation::PropertyValue::CreateUInt32(D2D1_COLORMATRIX_ALPHA_MODE_PREMULTIPLIED);
+                break;
+            case D2D1_COLORMATRIX_PROP_CLAMP_OUTPUT: boxed = winrt::Windows::Foundation::PropertyValue::CreateBoolean(true); break;
+            default: return E_INVALIDARG;
+        }
+        *value = boxed.as<ABI::Windows::Foundation::IPropertyValue>().detach();
+        return S_OK;
+    } catch (...) {
+        return winrt::to_hresult();
+    }
+    HRESULT __stdcall GetSource(UINT index, abi_wge::IGraphicsEffectSource** source) noexcept override try {
+        if (!source) return E_POINTER;
+        *source = nullptr;
+        if (index != 0 || !source_) return E_INVALIDARG;
+        *source = source_.as<abi_wge::IGraphicsEffectSource>().detach();
+        return S_OK;
+    } catch (...) {
+        return winrt::to_hresult();
+    }
+    HRESULT __stdcall GetSourceCount(UINT* count) noexcept override {
+        if (!count) return E_POINTER;
+        *count = 1;
+        return S_OK;
+    }
+
+private:
+    D2D1_MATRIX_5X4_F matrix_{};
+    wge::IGraphicsEffectSource source_{nullptr};
+    winrt::hstring name_;
+};
 
 }  // namespace
 
@@ -215,6 +293,9 @@ void CompositionSurface::Detach() noexcept {
     } catch (...) {
     }
     hostBackdropBrush_ = nullptr;
+    glassBrush_ = nullptr;
+    glassRefused_ = false;
+    glassShown_ = false;
     clipGeometry_ = nullptr;
     surfaceBrush_ = nullptr;
     surface_ = nullptr;
@@ -257,11 +338,11 @@ Result<void> CompositionSurface::Resize(int widthPx, int heightPx) {
 }
 
 BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_F& panelPx, float cornerRadiusPx,
-                                             float opacity) {
+                                             float opacity, const LiquidGlassTokens& glass) {
     if (!device_ || !backdrop_) return BackdropKind::None;
-    if (kind == BackdropKind::HostBlur && !device_->Capabilities().hostBackdrop) kind = BackdropKind::None;
+    if (kind != BackdropKind::None && !device_->Capabilities().hostBackdrop) kind = BackdropKind::None;
     try {
-        if (kind == BackdropKind::HostBlur) {
+        if (kind != BackdropKind::None) {
             if (!hostBackdropBrush_) {
                 const BOOL enable = TRUE;
                 if (FAILED(::DwmSetWindowAttribute(hwnd_, kDwmUseHostBackdropBrush, &enable, sizeof(enable)))) {
@@ -270,10 +351,36 @@ BackdropKind CompositionSurface::SetBackdrop(BackdropKind kind, const D2D1_RECT_
                 } else {
                     hostBackdropBrush_ = device_->Compositor().CreateHostBackdropBrush();
                     backdrop_.Brush(hostBackdropBrush_);
+                    glassShown_ = false;
                 }
             }
         }
-        if (kind == BackdropKind::HostBlur) {
+        if (kind == BackdropKind::HostGlass) {
+            // D66: built once per band (a theme change), then only shown or not.
+            if ((!glassBrush_ || !(glassTokens_ == glass)) && !glassRefused_) {
+                try {
+                    auto effect = winrt::make<GlassMatrixEffect>(GlassMatrix(glass), wuc::CompositionEffectSourceParameter(L"backdrop"));
+                    auto brush = device_->Compositor().CreateEffectFactory(effect).CreateBrush();
+                    brush.SetSourceParameter(L"backdrop", hostBackdropBrush_);
+                    glassBrush_ = brush;
+                    glassTokens_ = glass;
+                    glassShown_ = false;
+                } catch (const winrt::hresult_error& error) {
+                    AETHER_LOG_WARN("graphics", "Liquid glass effect refused (0x{:08X}); the blurred backdrop instead",
+                                    static_cast<unsigned>(error.code().value));
+                    glassRefused_ = true;
+                    glassBrush_ = nullptr;
+                }
+            }
+            if (!glassBrush_) kind = BackdropKind::HostBlur;
+        }
+        if (kind != BackdropKind::None) {
+            const bool showGlass = kind == BackdropKind::HostGlass;
+            if (showGlass != glassShown_) {
+                if (showGlass) backdrop_.Brush(glassBrush_);
+                else backdrop_.Brush(hostBackdropBrush_);
+                glassShown_ = showGlass;
+            }
             const float width = std::max(0.0f, panelPx.right - panelPx.left);
             const float height = std::max(0.0f, panelPx.bottom - panelPx.top);
             backdrop_.Offset(float3{panelPx.left, panelPx.top, 0.0f});

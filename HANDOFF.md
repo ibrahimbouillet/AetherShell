@@ -7,7 +7,18 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.1: transparent water, instant previews (`0.4.0-alpha.4`, D65, S-069, 2026-11-08)
+## Current checkpoint — Alpha 4, test 4.2: Liquid as regular glass, the arrival replays (`0.4.0-alpha.4`, D66, S-070, 2026-11-08)
+
+The owner found test 4.1's transparent water invisible over light and dark pages and gave a skill with Apple-like Liquid Glass
+criteria (`ibrahimbouillet/liquid-glass-visual-skill`). D66: Liquid is regular glass made by Windows' compositor (its
+blurred live backdrop through a colour matrix: livelier colours, brightness kept where text reads; the shader adds the rim,
+the light gathered in the edges and a fine outline). Measured on the real Top Bar over six scenes in both modes: text at
+4.74:1 or more. The arrival and previews end on the same glass; changing the style replays the arrival; after the welcome
+the bars stay out four seconds before Auto-Hide (the unlock bug). Nothing pushed (D65): commits stay local, `origin/main`
+stops at `edf2808`. Receipts in TEST_STATUS S-070; the test build is in `dist/`. **Next:** the owner's trial; then Liquid
+for Settings, menus, Search and Quick Settings, the arrival after the setup's Close, and D62's fluidity and code-signing.
+
+## Earlier — Alpha 4, test 4.1: transparent water, instant previews (`0.4.0-alpha.4`, D65, S-069, 2026-11-08)
 
 The owner did not validate test 4.0 (slow previews showing the drop, Liquid bars showing the wallpaper and stuttering) and chose
 **transparent water** for the bars (D65): they let the live page through and draw only the water's light and shade, kept in a

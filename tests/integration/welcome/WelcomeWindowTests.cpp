@@ -182,6 +182,48 @@ AETHER_TEST("welcome window: with an arrival, the greeting ends only when the dr
     CHECK(stage.Pump([&] { return !stage.window->IsShown(); }, 2000));
 }
 
+AETHER_TEST("welcome window: after a change of style the arrival plays alone, with nothing to read, and ends on the bars (D66)") {
+    Stage stage;
+    auto* material = stage.device.Material();
+    if (!material) { TEST_NOTE("SKIPPED: this device cannot run the material"); return; }
+    const float scale = static_cast<float>(::GetDpiForSystem()) / 96.0f;
+    graphics::ArrivalLayout layout;
+    layout.width = static_cast<float>(stage.bounds.right - stage.bounds.left) / scale;
+    layout.height = static_cast<float>(stage.bounds.bottom - stage.bounds.top) / scale;
+    layout.topBar = {8.0f, 4.0f, layout.width - 8.0f, 24.0f, 8.0f};
+    layout.dock = {layout.width / 2.0f - 90.0f, layout.height - 44.0f, layout.width / 2.0f + 90.0f, layout.height - 4.0f, 14.0f};
+    // Not where it is not played: without motion, nothing shows at all.
+    stage.window->SetArrival(layout, graphics::MaterialStyle::Liquid);
+    graphics::MotionPolicy still;
+    still.reduced = true;
+    CHECK_FALSE(stage.window->PresentArrival(Dark(), still, stage.bounds).ok());
+    CHECK_FALSE(stage.window->IsShown());
+    // The picture arrives a moment after the replay begins: the drop waits for it, then plays from its start.
+    stage.window->SetArrival(layout, graphics::MaterialStyle::Liquid);
+    const auto started = graphics::FrameScheduler::Now();
+    REQUIRE(stage.window->PresentArrival(Dark(), graphics::MotionPolicy{}, stage.bounds).ok());
+    CHECK(stage.window->Presenting());
+    CHECK(stage.Pump([&] { return stage.window->IsShown(); }, 1000));
+    (void)stage.Pump([] { return false; }, 300);
+    CHECK_FALSE(stage.window->WritingFinished(graphics::FrameScheduler::Now()));
+    auto picture = std::make_shared<std::vector<std::uint8_t>>(64u * 36u * 4u, std::uint8_t{160});
+    material->SetPicture(picture, 64, 36, D2D1::RectF(static_cast<float>(stage.bounds.left), static_cast<float>(stage.bounds.top),
+                                                      static_cast<float>(stage.bounds.right), static_cast<float>(stage.bounds.bottom)));
+    (void)stage.Pump([&] { return stage.window->WritingFinished(graphics::FrameScheduler::Now()); }, 8000);
+    const double took = graphics::FrameScheduler::Now() - started;
+    TEST_NOTE("the arrival alone took " + std::to_string(took) + " s, the picture having come after 0.3 s");
+    CHECK(stage.window->ArrivalPlayed());
+    CHECK(took >= 0.3 + static_cast<double>(graphics::kArrivalSettledSeconds) - 0.05);   // all of it, from the drop's start
+    CHECK(took < 0.3 + static_cast<double>(graphics::kArrivalSettledSeconds) + 1.0);
+    stage.window->Dismiss(true);
+    CHECK(stage.Pump([&] { return !stage.window->IsShown(); }, 2000));
+    // A greeting afterwards is a greeting again: it has words to write and read.
+    stage.window->SetArrival(std::nullopt, graphics::MaterialStyle::Grain);
+    REQUIRE(stage.window->Present(L"Hello", L"Zoé", Dark(), graphics::MotionPolicy{}, stage.bounds).ok());
+    CHECK_FALSE(stage.window->WritingFinished(graphics::FrameScheduler::Now()));
+    stage.window->Dismiss(false);
+}
+
 AETHER_TEST("welcome window: reduced motion shows the finished words at once, without pen or animation frames") {
     Stage stage;
     graphics::MotionPolicy reduced; reduced.reduced = true;

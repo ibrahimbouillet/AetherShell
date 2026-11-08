@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
 #include <functional>
 #include <stdexcept>
@@ -142,6 +143,122 @@ TopBarSnapshots Synthetic() {
     snapshots.weather.glyph = weather::WeatherGlyph::Clear; snapshots.weather.isDay = true;
     return snapshots;
 }
+
+// D66: the Liquid Glass skill's scenes behind a bar (G01 to G06): white, black, a black and white split, vivid
+// colours, a page of text and pictures, and a photograph (the README's wallpaper, when the sources are near).
+struct ScenePicture { int width = 0, height = 0; std::vector<std::uint8_t> bgra; };
+ScenePicture& Photo() { static ScenePicture photo; return photo; }
+int& SceneIndex() { static int scene = 0; return scene; }
+ScenePicture LoadPhoto() {
+    ScenePicture picture;
+    wchar_t module[MAX_PATH]{};
+    ::GetModuleFileNameW(nullptr, module, MAX_PATH);
+    for (auto dir = std::filesystem::path(module).parent_path(); dir.has_relative_path(); dir = dir.parent_path()) {
+        const auto file = dir / L"resources" / L"preview" / L"setup_preview-3.webp";
+        if (!std::filesystem::exists(file)) continue;
+        try {
+            auto factory = winrt::create_instance<IWICImagingFactory>(CLSID_WICImagingFactory);
+            winrt::com_ptr<IWICBitmapDecoder> decoder;
+            winrt::check_hresult(factory->CreateDecoderFromFilename(file.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, decoder.put()));
+            winrt::com_ptr<IWICBitmapFrameDecode> frame; winrt::check_hresult(decoder->GetFrame(0, frame.put()));
+            winrt::com_ptr<IWICFormatConverter> converter; winrt::check_hresult(factory->CreateFormatConverter(converter.put()));
+            winrt::check_hresult(converter->Initialize(frame.get(), GUID_WICPixelFormat32bppBGRA, WICBitmapDitherTypeNone, nullptr, 0.0, WICBitmapPaletteTypeCustom));
+            UINT w = 0, h = 0; winrt::check_hresult(converter->GetSize(&w, &h));
+            picture.bgra.resize(static_cast<std::size_t>(w) * h * 4);
+            winrt::check_hresult(converter->CopyPixels(nullptr, w * 4, static_cast<UINT>(picture.bgra.size()), picture.bgra.data()));
+            picture.width = static_cast<int>(w); picture.height = static_cast<int>(h);
+        } catch (...) { picture = {}; }
+        break;
+    }
+    return picture;
+}
+void PaintScene(HDC dc, const RECT& client) {
+    const auto fill = [&](const RECT& r, COLORREF color) { HBRUSH b = ::CreateSolidBrush(color); ::FillRect(dc, &r, b); ::DeleteObject(b); };
+    const int w = client.right, h = client.bottom;
+    switch (SceneIndex()) {
+        case 0: fill(client, RGB(255, 255, 255)); break;
+        case 1: fill(client, RGB(0, 0, 0)); break;
+        case 2: fill({0, 0, w / 2, h}, RGB(0, 0, 0)); fill({w / 2, 0, w, h}, RGB(255, 255, 255)); break;
+        case 3:
+            for (int x = 0; x < w; x += 2) {   // the hues across, as vivid as sRGB allows
+                const float hue = 6.0f * static_cast<float>(x) / static_cast<float>(w);
+                const int i = static_cast<int>(hue) % 6;
+                const int up = static_cast<int>(255.0f * (hue - std::floor(hue))), down = 255 - up;
+                const COLORREF c = i == 0 ? RGB(255, up, 0) : i == 1 ? RGB(down, 255, 0) : i == 2 ? RGB(0, 255, up)
+                                 : i == 3 ? RGB(0, down, 255) : i == 4 ? RGB(up, 0, 255) : RGB(255, 0, down);
+                fill({x, 0, x + 2, h}, c);
+            }
+            break;
+        case 4:   // a page scrolled under the bar: dark lines of text and two pictures on white
+            fill(client, RGB(255, 255, 255));
+            for (int y = 6, row = 0; y < h; y += 14, ++row)
+                for (int x = 20 + (row % 3) * 7; x < w - 20; x += 90 + (row * 13 + x) % 60)
+                    fill({x, y, x + 60 + (row * 7 + x) % 25, y + 7}, RGB(32, 33, 36));
+            fill({w / 3, 120, w / 3 + 160, 200}, RGB(220, 70, 40));
+            fill({2 * w / 3, 110, 2 * w / 3 + 180, 230}, RGB(30, 110, 200));
+            break;
+        default: {
+            const auto& photo = Photo();
+            if (photo.width <= 0) { fill(client, RGB(90, 90, 90)); break; }
+            BITMAPINFO info{}; info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+            info.bmiHeader.biWidth = photo.width; info.bmiHeader.biHeight = -photo.height;
+            info.bmiHeader.biPlanes = 1; info.bmiHeader.biBitCount = 32;
+            // "Fill", as Windows shows a wallpaper: the whole picture, scaled to cover, centred.
+            const double cover = std::max(static_cast<double>(w) / photo.width, static_cast<double>(h) / photo.height);
+            const int dw = static_cast<int>(std::ceil(photo.width * cover)), dh = static_cast<int>(std::ceil(photo.height * cover));
+            ::SetStretchBltMode(dc, HALFTONE);
+            ::StretchDIBits(dc, (w - dw) / 2, (h - dh) / 2, dw, dh, 0, 0, photo.width, photo.height, photo.bgra.data(), &info, DIB_RGB_COLORS, SRCCOPY);
+        }
+    }
+}
+LRESULT CALLBACK SceneProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == WM_PAINT) {
+        PAINTSTRUCT paint{}; HDC dc = ::BeginPaint(hwnd, &paint);
+        RECT client{}; ::GetClientRect(hwnd, &client); PaintScene(dc, client);
+        ::EndPaint(hwnd, &paint); return 0;
+    }
+    if (message == WM_ERASEBKGND) return 1;
+    return ::DefWindowProcW(hwnd, message, wParam, lParam);
+}
+struct SceneBackdrop {
+    HWND hwnd = nullptr;
+    ~SceneBackdrop() { if (hwnd) ::DestroyWindow(hwnd); }
+    bool Create(const RECT& bounds) {
+        WNDCLASSW cls{}; cls.lpfnWndProc = SceneProc; cls.hInstance = ::GetModuleHandleW(nullptr);
+        cls.lpszClassName = L"Aether.TopBar.TestScenes";
+        if (!::RegisterClassW(&cls) && ::GetLastError() != ERROR_CLASS_ALREADY_EXISTS) return false;
+        hwnd = ::CreateWindowExW(WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, cls.lpszClassName, L"", WS_POPUP, bounds.left, bounds.top,
+            bounds.right - bounds.left, bounds.bottom - bounds.top, nullptr, nullptr, cls.hInstance, nullptr);
+        if (!hwnd) return false;
+        ::ShowWindow(hwnd, SW_SHOWNOACTIVATE); ::UpdateWindow(hwnd); return true;
+    }
+};
+// WCAG 2.2 relative luminance and contrast, from 8-bit sRGB.
+double Linear(double v) { const double s = v / 255.0; return s <= 0.04045 ? s / 12.92 : std::pow((s + 0.055) / 1.055, 2.4); }
+double Luminance(const std::uint8_t* bgra) { return 0.2126 * Linear(bgra[2]) + 0.7152 * Linear(bgra[1]) + 0.0722 * Linear(bgra[0]); }
+double Contrast(double a, double b) { return (std::max(a, b) + 0.05) / (std::min(a, b) + 0.05); }
+// Several captures side by side and one under another, for a person to compare.
+Capture Sheet(const std::vector<std::vector<Capture>>& rows) {
+    Capture sheet{0, 0, {}};
+    for (const auto& row : rows) {
+        int width = 0, height = 0;
+        for (const auto& c : row) { width += c.width + 8; height = std::max(height, c.height); }
+        sheet.width = std::max(sheet.width, width); sheet.height += height + 8;
+    }
+    sheet.bytes.assign(static_cast<std::size_t>(sheet.width) * sheet.height * 4, 128);
+    int top = 0;
+    for (const auto& row : rows) {
+        int left = 0, height = 0;
+        for (const auto& c : row) {
+            for (int y = 0; y < c.height; ++y)
+                std::copy_n(c.bytes.data() + static_cast<std::size_t>(y) * c.width * 4, static_cast<std::size_t>(c.width) * 4,
+                            sheet.bytes.data() + (static_cast<std::size_t>(top + y) * sheet.width + left) * 4);
+            left += c.width + 8; height = std::max(height, c.height);
+        }
+        top += height + 8;
+    }
+    return sheet;
+}
 }
 
 AETHER_TEST("topbar integration: dark and light own-window captures, unchanged work area and idle frames") {
@@ -254,6 +371,110 @@ AETHER_TEST("topbar integration: dark and light own-window captures, unchanged w
     CHECK(window.Items().front().item.tooltip.find(L"Update available") == std::wstring::npos);
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0) != FALSE);
     CHECK(::EqualRect(&originalWork, &after) != FALSE);
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
+}
+
+AETHER_TEST("topbar integration: Liquid's regular glass keeps text readable and its edge seen over white, black, split, vivid, a page and a photo (D66)") {
+    platform::ComApartment com;
+    REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    if (!device.Capabilities().hostBackdrop) { TEST_NOTE("no host backdrop here: Liquid falls back to Grain, nothing to measure"); return; }
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    Photo() = LoadPhoto();
+    if (Photo().width <= 0) TEST_NOTE("the photograph was not found near the build: that scene is a plain grey");
+    const auto monitor = platform::PrimaryMonitor();
+    const float scale = static_cast<float>(monitor.dpi) / 96.0f;
+    const int width = static_cast<int>(std::min<LONG>(1100, monitor.workArea.right - monitor.workArea.left - 80));
+    const int height = static_cast<int>(std::lround(32 * scale));
+    const RECT captureBounds{monitor.workArea.left + 40, monitor.workArea.top + 140,
+        monitor.workArea.left + 40 + width, monitor.workArea.top + 140 + height + 48};
+    RECT privateBounds = captureBounds;
+    ::InflateRect(&privateBounds, 128, 128);   // the compositor's blur reads around the bar: the scene there too
+    SceneBackdrop backdrop; REQUIRE(backdrop.Create(privateBounds));
+    const RECT barBounds{captureBounds.left + 10, captureBounds.top + 20, captureBounds.right - 10, captureBounds.top + 20 + height};
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false;
+    TopBarWindow window(context); REQUIRE(window.Create(barBounds).ok());
+    settings::TopBarSettings settings; settings.reserveSpace = false; settings.clockFormat = settings::ClockFormat::Hours24;
+    window.SetSettings(settings, true); window.SetSnapshots(Synthetic());
+    const auto output = std::filesystem::temp_directory_path() / "AetherShellTests";
+    std::filesystem::create_directories(output);
+    const char* names[] = {"white", "black", "split", "vivid", "page", "photo"};
+    std::vector<std::vector<Capture>> rows;
+    const int panelTop = barBounds.top - captureBounds.top, panelBottom = panelTop + height;
+    const int panelLeft = barBounds.left - captureBounds.left, panelRight = barBounds.right - captureBounds.left;
+    const int inset = static_cast<int>(std::lround(5 * scale));
+    for (const auto mode : {graphics::ThemeMode::Dark, graphics::ThemeMode::Light}) {
+        const char* modeName = mode == graphics::ThemeMode::Dark ? "dark" : "light";
+        for (int scene = 0; scene < 6; ++scene) {
+            SceneIndex() = scene;
+            ::InvalidateRect(backdrop.hwnd, nullptr, FALSE); ::UpdateWindow(backdrop.hwnd);
+            std::vector<Capture> row;
+            for (const bool liquid : {true, false}) {
+                auto tokens = graphics::MakeDesignTokens(mode); tokens.transparencyEnabled = true; tokens.liquid = liquid;
+                window.SetTheme(tokens, graphics::MotionPolicy{true, 1});
+                window.Show(false);
+                ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                RunFor(loop, 450);   // the compositor's backdrop catches up with the scene
+                if (liquid) CHECK(window.BackdropGlassActive());
+                bool privateNow = false;
+                for (int attempt = 0; attempt < 6 && !privateNow; ++attempt) {
+                    privateNow = PrivateCrop(backdrop.hwnd, privateBounds);
+                    if (!privateNow) RunFor(loop, 250);
+                }
+                if (!privateNow) { TEST_NOTE(std::string("inconclusive, a foreign window passed: ") + modeName + " " + names[scene]); continue; }
+                const auto captured = CaptureOwnBackdrop(backdrop.hwnd, privateBounds, captureBounds);
+                const auto file = std::string("topbar-") + (liquid ? "liquid-" : "grain-") + modeName + "-" + names[scene] + ".png";
+                Save(captured, output / file);
+                row.push_back(captured);
+                if (!liquid) continue;
+                const auto at = [&](int x, int y) { return captured.bytes.data() + (static_cast<std::size_t>(y) * captured.width + x) * 4; };
+                // Text over the glass: the glass at the height of the text between the items, and along the whole bar
+                // just above and below the text (which only the two-line keyboard item and the logo reach).
+                const int windowLeft = window.BoundsPx().left - captureBounds.left;
+                const auto within = [&](int x, const D2D1_RECT_F& rect) {
+                    return x >= windowLeft + static_cast<int>(rect.left * scale) - 4 && x <= windowLeft + static_cast<int>(rect.right * scale) + 4;
+                };
+                const auto glyphsAt = [&](int x, int y) {
+                    for (const auto& entry : window.Items()) {
+                        const bool tall = entry.item.kind == ItemKind::Keyboard || entry.item.kind == ItemKind::Logo;
+                        if (within(x, entry.rect) && (tall || y == (panelTop + panelBottom) / 2)) return true;
+                    }
+                    return false;
+                };
+                std::uint8_t ink[4]{static_cast<std::uint8_t>(std::lround(tokens.textPrimary.b * 255)), static_cast<std::uint8_t>(std::lround(tokens.textPrimary.g * 255)),
+                                    static_cast<std::uint8_t>(std::lround(tokens.textPrimary.r * 255)), 255};
+                const double text = Luminance(ink);
+                double worst = 100.0, darkest = 1.0, brightest = 0.0;
+                int measured = 0;
+                for (const int y : {(panelTop + panelBottom) / 2, panelTop + inset, panelBottom - 1 - inset})
+                    for (int x = panelLeft + static_cast<int>(24 * scale); x < panelRight - static_cast<int>(24 * scale); x += 2) {
+                        if (glyphsAt(x, y)) continue;
+                        ++measured;
+                        const double glass = Luminance(at(x, y));
+                        worst = std::min(worst, Contrast(glass, text));
+                        darkest = std::min(darkest, glass); brightest = std::max(brightest, glass);
+                    }
+                // Its edge: the glass's rim and shade against the scene just outside, top and bottom, across the bar.
+                double edge = 0.0; int samples = 0;
+                for (int x = panelLeft + static_cast<int>(40 * scale); x < panelRight - static_cast<int>(40 * scale); x += 4, ++samples)
+                    edge += std::max(std::abs(Luminance(at(x, panelTop + 1)) - Luminance(at(x, panelTop - 3))),
+                                     std::abs(Luminance(at(x, panelBottom - 2)) - Luminance(at(x, panelBottom + 2))));
+                edge /= std::max(samples, 1);
+                char line[200];
+                std::snprintf(line, sizeof(line), "%s %s: text contrast at least %.2f:1 (glass luminance %.3f to %.3f, %d samples), edge %.3f",
+                              modeName, names[scene], worst, darkest, brightest, measured, edge);
+                TEST_NOTE(line);
+                CHECK(measured > 200);
+                CHECK(worst >= 4.5);                 // WCAG 2.2 AA for the bar's text, on every scene
+                if (scene <= 1) CHECK(edge >= 0.04);  // over plain white and plain black the bar is still seen
+            }
+            if (!row.empty()) rows.push_back(std::move(row));
+        }
+    }
+    if (!rows.empty()) Save(Sheet(rows), output / L"topbar-liquid-sheet.png");
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
 }
 

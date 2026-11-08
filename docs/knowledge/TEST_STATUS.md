@@ -3076,3 +3076,43 @@ the owner's screen and GPU; the arrival at a real lock or sign-in; Liquid after 
 `02a4fa42bd37ac2cc911e3cdf84581a88735cd0dbe8940d688fa6543dc905782`, built by `scripts/package.ps1` from the tree committed with
 this entry (its embedded revision is the commit before, `cbe3daa`). Test 4.0's build moved to `dist/test-4.0-not-validated/`.
 Not pushed, tagged, published or installed.
+
+### S-070 — Alpha 4, test 4.2: Liquid as regular glass, the arrival replays, bars stay after it (Claude, 2026-11-08)
+
+**What changed (D66):** after the owner's skill (`ibrahimbouillet/liquid-glass-visual-skill`, read in full; text, three SVG
+scenes and a small contrast helper, nothing run), Liquid is regular glass in four layers: what lies behind; the glass (the
+compositor's blurred live backdrop through a colour matrix, `BackdropKind::HostGlass`, `LiquidGlassTokens` per mode); the
+glass's light (rim, edge light, shade, a fine outline; the glint kept on the rim); the content (icons and text over the
+glass; the Dock's icon shadows and red call clipped to the glass). No text shadow, no exterior bar shadow. The arrival and
+previews end on the same glass (`MaterialScene::glass`). Changing the style replays the arrival alone
+(`WelcomeWindow::PresentArrival`). After the welcome hands over, the bars stay out four seconds as if used
+(`AutoHideState::RevealUntil`): the cause of the unlock bug, with Auto-Hide on for both bars on the owner's PC.
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 before the last Dock change; on the final tree 24/24 registered after packaging (which configures without the showcase module) plus the showcase program run directly, 86/86; the search benchmark (AS4-26) failed once and passed on rerun. New: a bar that has just come out stays, then hides as usual; as the drops become bars they become the regular glass (WARP: dark band 112 over white, 10 over black; light 247 and 145, as computed) |
+| Real Top Bar, Liquid, six scenes (white, black, split, vivid, a page, a photograph) in both modes | Text against the glass at least 4.74:1 (dark over white) and up to 19:1, over 882 samples per scene between and around the items (WCAG AA 4.5:1); the edge against the scene 0.21 to 0.70 in luminance. Captures and a side-by-side sheet with Grain kept for inspection |
+| Native welcome | 12/12; new: after a change of style the arrival plays alone, waits 0.3 s for a late picture, and ends on the bars (3.33 s) |
+| Native topbar 8/8, ui 30/30 | Pass |
+| Native dock | 15/15 on the final tree; new: Liquid keeps the icons on their own layer over the glass, dark and light, with every Grain check (magnification, input, idle) and a clear raised-icon slot (255; 248 before the shadow was clipped to the glass). A first full run of that tree failed three different cases (Grain light, Liquid, a preview) during the desktop disturbance below; details not kept |
+| Native settings_ui | 38/39: the maximized-window corner case, with foreign windows noted over its backdrop; run alone, it passed twice for this tree and twice for 3.5 |
+| Native app | 21/22: the window-corner pixel case of S-067 to S-069 |
+| Native ui_form | 28/31, then 29/31 and 27/31; the 3.5 binary, alternating with it at the same moments, 27/31 twice with the same acrylic and scrolling cases. `ui_form` does not use the code this round changed |
+| `scripts/package.ps1` privacy audit | Pass |
+
+**Seen and corrected on the real render before this entry:** a loose glint inside the bars' top-left corner; grey square
+corners where the bar's shadow met its window's edge; contrast 4.42:1 near the edges in dark mode over white (the band's top
+lowered from 0.46 to 0.44). The arrival frames saved with the README picture show icons inside the drops because that picture
+is itself a screenshot of Aether with its bars; the shell's own icons are drawn over the glass.
+
+**Not executed, so not claimed:** the setup itself; the replay and the bars staying after a real unlock on the owner's PC; the
+glass over moving video; a measured frame time on the owner's GPU; reduced-transparency and high-contrast fallbacks on screen
+(by construction Grain).
+
+**Test build 4.2:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 6834688 bytes, SHA-256
+`494913d204e7ea5a5483a72d9027d88eec7637855d709dd3d90bdd9ee0f2d0fe`, built by `scripts/package.ps1` from the tree committed
+with this entry (its embedded revision is the commit before, `c6892c7`). Test 4.1's build moved to
+`dist/test-4.1-not-validated/`. Not pushed, tagged, published or installed.

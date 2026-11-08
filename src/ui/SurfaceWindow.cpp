@@ -83,7 +83,7 @@ Result<void> SurfaceWindow::Create(const SurfaceWindowOptions& options, const RE
     }
     deviceReplaced_ = device_.DeviceReplaced.Connect([this] {
         OnDeviceReplaced();
-        if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_);
+        if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_, backdropGlass_ ? &*backdropGlass_ : nullptr);
         Invalidate();
     });
     OnCreated();
@@ -161,8 +161,9 @@ bool SurfaceWindow::PaintLiquidPanel(const RenderContext& context, const D2D1_RE
     auto* renderer = device_.Material();
     if (!renderer || !context.d2d) return false;
     const float scale = static_cast<float>(dpi_) / 96.0f;
-    // D65: transparent water. Only the panel and its shadow are drawn, from a bitmap kept until the panel changes:
-    // nothing in it depends on what lies behind, so a frame that moves nothing costs one bitmap draw.
+    // D65, D66: the glass's light and shade only (the compositor shows the adapted backdrop under it). Only the panel
+    // and its shadow are drawn, from a bitmap kept until the panel changes: nothing in it depends on what lies
+    // behind, so a frame that moves nothing costs one bitmap draw.
     constexpr float kShadowRoomDip = 30.0f;
     const auto left = static_cast<LONG>(std::floor(std::max(0.0f, panelDip.left - kShadowRoomDip) * scale));
     const auto top = static_cast<LONG>(std::floor(std::max(0.0f, panelDip.top - kShadowRoomDip) * scale));
@@ -216,18 +217,25 @@ bool SurfaceWindow::PaintLiquidPanel(const RenderContext& context, const D2D1_RE
     return true;
 }
 
-void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity) {
+void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity,
+                                     const graphics::LiquidGlassTokens* glass) {
     backdropPanelDip_ = panelDip;
     backdropRadiusDip_ = cornerRadiusDip;
     backdropOpacity_ = backdropOpacity;
     backdropBlurRequested_ = blur;
+    if (glass) backdropGlass_ = *glass;
+    else backdropGlass_.reset();
     const D2D1_RECT_F panelPx{ToPx(panelDip.left), ToPx(panelDip.top), ToPx(panelDip.right), ToPx(panelDip.bottom)};
-    surface_.SetBackdrop(blur ? graphics::BackdropKind::HostBlur : graphics::BackdropKind::None, panelPx,
-                         ToPx(cornerRadiusDip), backdropOpacity);
+    const auto kind = !blur ? graphics::BackdropKind::None : glass ? graphics::BackdropKind::HostGlass : graphics::BackdropKind::HostBlur;
+    surface_.SetBackdrop(kind, panelPx, ToPx(cornerRadiusDip), backdropOpacity, glass ? *glass : graphics::LiquidGlassTokens{});
 }
 
 bool SurfaceWindow::BackdropBlurActive() const noexcept {
     return surface_.EffectiveBackdrop() == graphics::BackdropKind::HostBlur;
+}
+
+bool SurfaceWindow::BackdropGlassActive() const noexcept {
+    return surface_.EffectiveBackdrop() == graphics::BackdropKind::HostGlass;
 }
 
 void SurfaceWindow::Show(bool activate) {
@@ -436,7 +444,7 @@ LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
         case WM_DPICHANGED: {
             dpi_ = HIWORD(wParam);
             OnDpiChanged(dpi_, *reinterpret_cast<const RECT*>(lParam));
-            if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_);
+            if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_, backdropGlass_ ? &*backdropGlass_ : nullptr);
             Invalidate();
             return 0;
         }

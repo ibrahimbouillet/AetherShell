@@ -344,9 +344,10 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         // HTTRANSPARENT forwards only within one thread. Keep empty margins outside the native
         // HWND region so other processes receive clicks; outer shadows/entrance pixels are clipped.
         window.SetVisualRegionPx({});
-        // D63: Liquid draws its own water under the panel, without the blurred backdrop.
-        window.SetBackdropPanel(layout.panel, graphics::DockCornerRadius(tokens, layout.panel.bottom - layout.panel.top),
-            !tokens.liquid && tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast, tokens.glass.backdropOpacity);
+        // D66: Liquid sees the blurred backdrop through its regular glass; Grain under its tint.
+        const bool blur = tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast;
+        window.SetBackdropPanel(layout.panel, graphics::DockCornerRadius(tokens, layout.panel.bottom - layout.panel.top), blur,
+            blur && tokens.liquid ? 1.0f : tokens.glass.backdropOpacity, blur && tokens.liquid ? &tokens.liquidGlass : nullptr);
         return Ok();
     }
     Result<void> Rebuild() {
@@ -1000,21 +1001,32 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
     // Exact native hit regions clip exterior shadows into the rectangular slots of raised icons.
     // Keep those transparent bitmap corners clear instead of painting square shadow fragments.
     style.shadow = false;
-    // D63: in Liquid the panel is water (no exterior shadow, for the same reason); Grain is the frosted glass.
-    const bool liquid = impl_->tokens.liquid && PaintLiquidPanel(context, impl_->layout.panel, style.cornerRadius, 0.0f);
+    // D66: in Liquid the panel is the regular glass under its light (no exterior shadow, for the same reason); Grain
+    // is the frosted glass.
+    const bool liquid = impl_->tokens.liquid && BackdropGlassActive() && PaintLiquidPanel(context, impl_->layout.panel, style.cornerRadius, 0.0f);
     if (!liquid) graphics::PaintGlassPanel(context.d2d, impl_->layout.panel, impl_->tokens, style);
     winrt::com_ptr<ID2D1SolidColorBrush> primary, attention;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), primary.put())) ||
         FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.critical.ToD2D(), attention.put()))) return;
+    // D66: the glass's shape. What an icon casts falls on the glass and stays on it, so that a raised icon's window slot
+    // above the panel stays clear (no square patch of shadow there).
+    winrt::com_ptr<ID2D1RoundedRectangleGeometry> glassShape;
+    if (liquid) {
+        winrt::com_ptr<ID2D1Factory> factory;
+        context.d2d->GetFactory(factory.put());
+        if (factory) (void)factory->CreateRoundedRectangleGeometry(D2D1::RoundedRect(impl_->layout.panel, style.cornerRadius, style.cornerRadius), glassShape.put());
+    }
     const auto drawItem = [&](std::size_t index) {
         const auto& item = impl_->fitted.items[index];
         const auto rect = impl_->layout.items[index].icon;
         const float size = rect.right - rect.left;
-        if (liquid) {
-            // What passes between an icon and the water shows on the water: the icon's soft shadow, and the red
-            // light of an application that asks for attention, cast just below it.
+        if (liquid && glassShape) {
+            // D66, layer 4 over layer 3: the icon is drawn over the glass, never in it. What passes between them shows
+            // on the glass only: the icon's soft shadow, and the red light of an application that asks for attention.
+            context.d2d->PushLayer(D2D1::LayerParameters1(impl_->layout.panel, glassShape.get()), nullptr);
             graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens, 0.35f);
             if (item.attentionRequested && !item.foreground) PaintWaterLight(context.d2d, rect, impl_->tokens.critical);
+            context.d2d->PopLayer();
         }
         if (const auto pulse = impl_->attentionPulses.find(item.id); pulse != impl_->attentionPulses.end() && impl_->AllowsDecoration()) {
             const float opacity = DockAttentionAt((graphics::FrameScheduler::Now() - pulse->second) / impl_->motion.EffectiveScale()).opacity;

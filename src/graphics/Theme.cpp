@@ -429,6 +429,10 @@ DesignTokens MakeDesignTokens(ThemeMode mode) {
     t.glass.shadowBlur = t.elevation.dock.key.blur * 2.0f;
     t.glass.shadowOffsetY = t.elevation.dock.key.offsetY;
 
+    // D66: dark text needs a light glass (at least about 0.51 of white), white text a dark one (at most about 0.47;
+    // 0.44 here, as the glass's edge light adds a little).
+    if (mode == ThemeMode::Light) t.liquidGlass = {1.35f, 0.40f, 0.57f};
+
     t.dockCornerRadius = t.radii.dockMax;
     t.barCornerRadius = t.radii.bar;
     t.popupCornerRadius = t.radii.popup;

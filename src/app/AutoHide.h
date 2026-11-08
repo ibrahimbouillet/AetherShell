@@ -47,6 +47,9 @@ public:
     bool Update(const AutoHideSample& sample) noexcept;
     // Forgets the observed state (the setting went off); this bar keeps its own timing.
     void Reset() noexcept { *this = AutoHideState(timing_); }
+    // D66: the bar has just come out (the welcome's arrival, a replay of it): it stays as if in use until
+    // `until` (the host's milliseconds), then hides after the usual delay if a window still covers it.
+    void RevealUntil(std::uint64_t until) noexcept { if (until > holdUntil_) holdUntil_ = until; }
     [[nodiscard]] bool Hidden() const noexcept { return hidden_; }
     // How long the current wait on the edge has run; zero when there is none.
     [[nodiscard]] std::uint64_t EdgeRestMs(std::uint64_t now) const noexcept { return edgeSince_ ? now - *edgeSince_ : 0; }
@@ -57,6 +60,7 @@ private:
     bool revealed_ = false;  // shown by the edge or by use while covered
     std::uint64_t lastUse_ = 0;
     std::optional<std::uint64_t> edgeSince_;
+    std::uint64_t holdUntil_ = 0;
 };
 
 // Whether a visible application window overlaps `zone` (physical screen pixels): not minimized,

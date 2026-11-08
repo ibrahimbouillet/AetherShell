@@ -235,6 +235,60 @@ AETHER_TEST("liquid material: the arrival renders on its own picture, every phas
     TEST_NOTE("rendered six moments in both styles");
 }
 
+AETHER_TEST("liquid material: as the drops become bars they become the shell's regular glass, in each mode's band (D66)") {
+    const auto device = SoftwareDevice();
+    REQUIRE(device != nullptr);
+    LiquidRenderer renderer;
+    REQUIRE(renderer.Initialize(device.get()).ok());
+    const auto layout = Screen1080();
+    constexpr UINT kWidth = 1280, kHeight = 720;
+    renderer.SetPicture(SplitPicture(kWidth, kHeight, 255, 0), kWidth, kHeight);   // white on the left, black on the right
+    const UINT barY = 22, whiteX = 320, blackX = 960;
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light}) {
+        const auto tokens = MakeDesignTokens(mode);
+        auto scene = SceneFromArrival(ArrivalAt(3.5f, layout, true), MaterialStyle::Liquid, D2D1::Point2F(0.0f, 0.0f), 1.0f);
+        scene.background = true;
+        scene.edgeBend = 0.0f;
+        scene.glass = true;
+        scene.glassTokens = tokens.liquidGlass;
+        scene.picture = D2D1::RectF(0.0f, 0.0f, kWidth, kHeight);
+        std::vector<std::uint8_t> pixels;
+        REQUIRE(renderer.RenderToMemory(scene, D2D1::SizeU(kWidth, kHeight), pixels).ok());
+        const int overWhite = At(pixels, kWidth, whiteX, barY)[1], overBlack = At(pixels, kWidth, blackX, barY)[1];
+        const auto band = [&](float brightness) { return static_cast<int>(std::lround(255.0f * (tokens.liquidGlass.offset + tokens.liquidGlass.scale * brightness))); };
+        TEST_NOTE(std::string(mode == ThemeMode::Dark ? "dark" : "light") + ": the bar over white " + std::to_string(overWhite) + ", over black " + std::to_string(overBlack));
+        CHECK(std::abs(overWhite - band(1.0f)) <= 6);   // white brought down into the band
+        CHECK(std::abs(overBlack - band(0.0f)) <= 6);   // black brought up into it
+        CHECK_EQ(static_cast<int>(At(pixels, kWidth, whiteX, 300)[1]), 255);   // the picture itself, away from the bars
+        CHECK_EQ(static_cast<int>(At(pixels, kWidth, blackX, 300)[1]), 0);
+    }
+    // For a person to look at, with the wallpaper of AETHER_LIQUID_PICTURE: the arrival as the shell now plays it.
+    wchar_t file[1024]{};
+    if (!::GetEnvironmentVariableW(L"AETHER_LIQUID_PICTURE", file, 1024)) return;
+    struct Com { HRESULT hr = ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); ~Com() { if (SUCCEEDED(hr)) ::CoUninitialize(); } } com;   // WIC
+    UINT pw = 0, ph = 0;
+    auto picture = DecodeCovering(file, kWidth, kHeight, pw, ph);
+    REQUIRE(picture != nullptr);
+    renderer.SetPicture(picture, pw, ph);
+    const float left = (kWidth - static_cast<float>(pw)) / 2.0f, top = (kHeight - static_cast<float>(ph)) / 2.0f;
+    const auto folder = std::filesystem::temp_directory_path() / L"AetherShellTests";
+    std::error_code ignored;
+    std::filesystem::create_directories(folder, ignored);
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light})
+        for (const char* seconds : {"0.9", "1.97", "2.6", "3.5"}) {
+            auto scene = SceneFromArrival(ArrivalAt(std::stof(seconds), layout, false), MaterialStyle::Liquid, D2D1::Point2F(0.0f, 0.0f), 1.0f);
+            scene.background = true;
+            scene.edgeBend = 0.0f;
+            scene.glass = true;
+            scene.glassTokens = MakeDesignTokens(mode).liquidGlass;
+            scene.picture = D2D1::RectF(left, top, left + static_cast<float>(pw), top + static_cast<float>(ph));
+            std::vector<std::uint8_t> pixels;
+            REQUIRE(renderer.RenderToMemory(scene, D2D1::SizeU(kWidth, kHeight), pixels).ok());
+            SavePng(pixels, kWidth, kHeight, folder / (std::string("arrival-glass-") + (mode == ThemeMode::Dark ? "dark-" : "light-") + seconds + ".png"));
+        }
+    TEST_NOTE("saved the arrival in the regular glass under " + folder.string());
+}
+
 // Only when AETHER_LIQUID_PICTURE names a picture: the arrival at the prototype's moments, 1280 x 720 at 1x, saved
 // as liquid-<style>-<seconds>.png for a pixel comparison with welcome-bubble.html?t=<seconds>&picture=<same file>.
 AETHER_TEST("liquid material: frames to compare with the validated prototype") {

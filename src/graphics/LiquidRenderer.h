@@ -15,6 +15,7 @@
 
 #include "core/Result.h"
 #include "graphics/LiquidMotion.h"
+#include "graphics/Theme.h"
 #include "graphics/WinRT.h"
 
 #include <array>
@@ -45,6 +46,11 @@ struct MaterialScene {
     // How much a bar's edge bends the picture behind it: 1 as in the prototype; 0 so that the arrival's bars end as the
     // transparent bars will look (D65).
     float edgeBend = 1.0f;
+    // D66: Liquid's regular glass, as the shell's bars show it: as the drops become bars (lens towards 1) the picture
+    // behind them is diffused by `glassBlurDip` and brought into `glassTokens`' band, under the glass's light.
+    bool glass = false;
+    LiquidGlassTokens glassTokens{};
+    float glassBlurDip = 16.0f;
     D2D1_RECT_F picture{};     // where the desktop picture lies, in the target's pixels ("Fill", as Windows shows it)
 };
 
