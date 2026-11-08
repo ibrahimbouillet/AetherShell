@@ -13,9 +13,11 @@
 
 #include "core/Result.h"
 #include "core/Signal.h"
+#include "graphics/LiquidRenderer.h"
 #include "graphics/WinRT.h"
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 
 namespace aether::graphics {
@@ -64,6 +66,9 @@ public:
     [[nodiscard]] IDWriteFactory* DWriteFactory() const noexcept { return dwriteFactory_.get(); }
     [[nodiscard]] IWICImagingFactory* WicFactory() const noexcept { return wicFactory_.get(); }
     [[nodiscard]] const GraphicsCapabilities& Capabilities() const noexcept { return capabilities_; }
+    // D63: the materials' renderer on this device, made ready on first use and again after a device loss
+    // (it keeps the desktop picture across it). Null when this device cannot run it: callers draw Grain.
+    [[nodiscard]] LiquidRenderer* Material() noexcept;
 
     // Recreates the Direct3D/Direct2D devices after a device-lost error and raises DeviceReplaced.
     [[nodiscard]] Result<void> HandleDeviceLost();
@@ -96,6 +101,8 @@ private:
     winrt::com_ptr<ID2D1Device> d2dDevice_;
     winrt::com_ptr<IDWriteFactory> dwriteFactory_;
     winrt::com_ptr<IWICImagingFactory> wicFactory_;
+    std::unique_ptr<LiquidRenderer> material_;
+    bool materialFailed_ = false;   // logged once per device
     GraphicsCapabilities capabilities_;
     std::uint64_t generation_ = 0;
 };

@@ -24,6 +24,9 @@ enum class TemperatureUnit { Celsius, Fahrenheit };
 enum class UpdateChannel { Stable, Prerelease };
 enum class ThemePreference { System, Light, Dark };        // "system" follows the Windows light/dark mode
 enum class AccentSource { Windows, Aether };              // Windows accent color or the Aether brand palette
+// D63: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
+// Liquid is pure water that bends the desktop picture behind it, with no blur, tint or grain.
+enum class SurfaceStyle { Grain, Liquid };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
 enum class KeyboardIndicatorStyle { Compact, TwoLine };   // "FR" or a two-line "FRA / FR" indicator
 
@@ -143,6 +146,7 @@ struct GeneralSettings {
     MotionPreference motion = MotionPreference::System;
     ThemePreference themeMode = ThemePreference::System;  // high contrast always takes precedence
     AccentSource accentSource = AccentSource::Windows;
+    SurfaceStyle surfaceStyle = SurfaceStyle::Grain;   // D63; Grain keeps every installation as it was
     double animationSpeed = 1.0;    // MotionPolicy duration scale, 0.5 (faster)..1.5 (slower)
     bool hotkeysEnabled = true;     // Ctrl+Alt+Space (search), Ctrl+Alt+D (focus Dock)
     HotkeyChord searchHotkey{};

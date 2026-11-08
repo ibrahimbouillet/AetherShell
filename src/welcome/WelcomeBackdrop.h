@@ -44,8 +44,9 @@ struct BackdropImage {
 // Decodes a picture, reduced until it just covers `coverWidth` x `coverHeight` pixels; never enlarged.
 [[nodiscard]] Result<BackdropImage> DecodeBackdrop(const std::filesystem::path& file, UINT coverWidth, UINT coverHeight);
 // The desktop picture of the monitor at `monitorPx`; nullopt when it is a plain colour or cannot be read.
-// Runs on a worker thread with COM initialized. Half the monitor's resolution is plenty under the blur.
-[[nodiscard]] std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx);
+// Runs on a worker thread with COM initialized. `share` of the monitor's resolution: half is plenty under the
+// welcome's blur; the Liquid material (D63) shows the picture itself and needs all of it.
+[[nodiscard]] std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx, float share = 0.5f);
 
 // The blurred picture, once, on the device: it is then simply drawn each frame.
 [[nodiscard]] winrt::com_ptr<ID2D1Bitmap1> BlurBackdrop(ID2D1Device* device, const BackdropImage& image);

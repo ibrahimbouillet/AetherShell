@@ -236,6 +236,8 @@ Result<void> WelcomeWindow::Present(std::wstring_view greeting, std::wstring_vie
     if (!scene) return scene.error();
     scene_ = std::move(*scene);
     ResetInk();
+    arrivalStart_ = -1.0;
+    arrivalPlayed_ = false;
     startedAt_ = graphics::FrameScheduler::Now();
     writingFrames_ = 0;
     longestGap_ = 0.0;
@@ -264,16 +266,31 @@ void WelcomeWindow::Dismiss(bool animated) {
     if (animated) {
         graphics::TransitionShape shape;
         auto exit = graphics::MakeExitTransition(shape, tokens_, motion_);
-        if (!exit.IsInstant()) exit.duration = kFadeOutSeconds;
+        // After the arrival the shell's bars are already in the drops' places: a short crossfade hands over to them.
+        if (!exit.IsInstant()) exit.duration = arrivalPlayed_ ? 0.18 : kFadeOutSeconds;
         HideAnimated(exit);
     } else {
         Hide();
     }
 }
 
-bool WelcomeWindow::WritingFinished(double now) const noexcept {
+bool WelcomeWindow::GreetingRead(double now) const noexcept {
     const double length = animated_ ? static_cast<double>(scene_.duration) + kReadingHoldSeconds : kStillReadingSeconds;
     return now - startedAt_ >= length;
+}
+
+bool WelcomeWindow::ArrivalWanted() const noexcept {
+    return arrival_.has_value() && animated_ && tokens_.mode != graphics::ThemeMode::HighContrast;
+}
+
+bool WelcomeWindow::WritingFinished(double now) const noexcept {
+    if (!GreetingRead(now)) return false;
+    return !ArrivalWanted() || arrivalPlayed_;   // D62: with an arrival, the greeting ends when the drops reach the bars
+}
+
+void WelcomeWindow::SetArrival(std::optional<graphics::ArrivalLayout> layout, graphics::MaterialStyle style) {
+    arrival_ = std::move(layout);
+    arrivalStyle_ = style;
 }
 
 bool WelcomeWindow::EnsureInkLayer() {
@@ -346,7 +363,38 @@ void WelcomeWindow::OnRender(const ui::RenderContext& context) {
         lastFrameAt_ = context.now;
         ++writingFrames_;
     }
+    if (arrivalStart_ >= 0.0 && arrival_) {
+        // D62/D63: the arrival, drawn by the same shader as the validated prototype, over the desktop picture as it
+        // clears from the cover; the greeting and its cover fade away above it in the first third of a second.
+        const float t = std::min(static_cast<float>(context.now - arrivalStart_), graphics::kArrivalSettledSeconds);
+        auto* renderer = Device().Material();
+        const float scale = static_cast<float>(Dpi()) / 96.0f;
+        const auto size = D2D1::SizeU(static_cast<UINT32>(std::lround(context.widthDip * scale)), static_cast<UINT32>(std::lround(context.heightDip * scale)));
+        bool drawn = false;
+        if (renderer && renderer->HasPicture() && size.width && size.height) {
+            auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(t, *arrival_, true), arrivalStyle_, D2D1::Point2F(0.0f, 0.0f), scale);
+            scene.background = true;
+            const auto placement = renderer->PicturePlacement();
+            const auto bounds = BoundsPx();
+            scene.picture = D2D1::RectF(placement.left - bounds.left, placement.top - bounds.top, placement.right - bounds.left, placement.bottom - bounds.top);
+            context.d2d->Flush();
+            if (auto frame = renderer->Render(context.d2d, scene, size)) {
+                context.d2d->DrawBitmap(frame->get(), D2D1::RectF(0.0f, 0.0f, context.widthDip, context.heightDip), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                drawn = true;
+            }
+        }
+        const float greeting = drawn ? 1.0f - std::clamp(t / 0.35f, 0.0f, 1.0f) : 1.0f;
+        if (greeting > 0.0f) PaintGreeting(context, greeting * greeting * (3.0f - 2.0f * greeting));
+        return;
+    }
+    PaintGreeting(context, 1.0f);
+}
+
+void WelcomeWindow::PaintGreeting(const ui::RenderContext& context, float opacity) {
     auto* d2d = context.d2d;
+    const bool layered = opacity < 1.0f;
+    if (layered) d2d->PushLayer(D2D1::LayerParameters1(D2D1::InfiniteRect(), nullptr, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE, D2D1::IdentityMatrix(), opacity), nullptr);
+    struct PopLayer { ID2D1DeviceContext* d2d; bool active; ~PopLayer() { if (active) d2d->PopLayer(); } } pop{d2d, layered};
     const bool contrast = tokens_.mode == graphics::ThemeMode::HighContrast;
     if (contrast) {
         d2d->Clear(SystemColor(COLOR_WINDOW));
@@ -401,6 +449,26 @@ bool WelcomeWindow::OnAnimate(double now) {
     if (!presenting_ || !animated_) return false;
     AdvanceInk(now);
     const bool writing = now - startedAt_ < static_cast<double>(scene_.duration + kPenHeadSeconds) + 0.05;  // no frames once it is written
+    bool arriving = false;
+    if (ArrivalWanted() && !arrivalPlayed_) {
+        arriving = true;
+        if (arrivalStart_ < 0.0 && GreetingRead(now)) {
+            auto* renderer = Device().Material();
+            if (renderer && renderer->HasPicture()) {
+                arrivalStart_ = now;
+                AETHER_LOG_INFO("welcome", "arrival in {}", arrivalStyle_ == graphics::MaterialStyle::Liquid ? "Liquid" : "Grain");
+            } else {
+                AETHER_LOG_INFO("welcome", "arrival unavailable (no material or picture yet): the greeting fades");
+                arrival_.reset();   // the greeting fades as before
+                arriving = false;
+            }
+        }
+        if (arrivalStart_ >= 0.0 && now - arrivalStart_ >= static_cast<double>(graphics::kArrivalSettledSeconds)) {
+            arrivalPlayed_ = true;
+            arriving = false;
+        }
+    }
+    if (arriving) Invalidate();
     if (!writing && !writingLogged_) {
         // Whether the pen moved smoothly on this PC: a long gap is a visible jump. Never the words or the name.
         writingLogged_ = true;
@@ -408,7 +476,7 @@ bool WelcomeWindow::OnAnimate(double now) {
         AETHER_LOG_INFO("welcome", "written in {:.2f} s: {} frames, {:.0f} per second, longest gap {:.0f} ms, background {}", seconds, writingFrames_,
                         seconds > 0.0 ? static_cast<double>(writingFrames_) / seconds : 0.0, longestGap_ * 1000.0, blurred_ ? "picture" : "plain colour");
     }
-    return writing;
+    return writing || arriving;   // frames until the greeting is read and the drops have reached the bars
 }
 
 void WelcomeWindow::RequestSkip() {

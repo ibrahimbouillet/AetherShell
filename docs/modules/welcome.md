@@ -25,9 +25,13 @@ python tools/handwriting/strokes.py --cpp > src/welcome/HandwritingStrokes.inc
 ```
 
 Privacy: the name is entered by the person, kept in `settings.json`, and never logged, transmitted or read
-from the Windows account. The desktop picture is read only while a greeting is due, held in memory until it
-ends, and never logged, stored or transmitted. Settings warnings name the field, never its value, and the window text never
+from the Windows account. The desktop picture is read when a greeting is due, and kept in memory while the
+Liquid style is chosen or after an arrival (D64, the water shows it); it is never logged, stored or transmitted. Settings warnings name the field, never its value, and the window text never
 carries it.
 
 Evidence and limits: TEST_STATUS S-061, S-062. Real sign-in, the cover at a real lock and the owner's
 acceptance are separate checks.
+
+## The arrival (D62, D64)
+
+`WelcomeWindow::SetArrival` gives the real bars' panels; once the greeting is read, the window draws the arrival with `graphics::LiquidRenderer` over the desktop picture, fades the greeting during its first third of a second, and `WritingFinished` waits for `ArrivalPlayed`. The application then returns the bars without their entrance under a 0.18 s crossfade. Without motion, high contrast, the material or the picture, the greeting fades as before.

@@ -89,6 +89,7 @@ void Fields(S& s, F&& f) {
     f("general", "syncTaskbarPins", s.general.syncTaskbarPins);
     f("general", "themeMode", s.general.themeMode);
     f("general", "accentSource", s.general.accentSource);
+    f("general", "surfaceStyle", s.general.surfaceStyle);
     f("general", "animationSpeed", s.general.animationSpeed);
 }
 
@@ -124,6 +125,9 @@ template <> struct EnumNames<ThemePreference> {
 template <> struct EnumNames<AccentSource> {
     static constexpr std::array values{std::pair{AccentSource::Windows, "windows"},
         std::pair{AccentSource::Aether, "aether"}};
+};
+template <> struct EnumNames<SurfaceStyle> {
+    static constexpr std::array values{std::pair{SurfaceStyle::Grain, "grain"}, std::pair{SurfaceStyle::Liquid, "liquid"}};
 };
 template <> struct EnumNames<WeatherPlacement> {
     static constexpr std::array values{std::pair{WeatherPlacement::Left, "left"},

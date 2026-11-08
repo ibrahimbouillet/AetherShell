@@ -60,6 +60,9 @@ struct SettingsCallbacks {
     graphics::FrameScheduler* scheduler = nullptr;
     // Confirmation seam: returns true to proceed. Null shows the shared glass confirmation dialog.
     std::function<bool(const SettingsConfirmation&)> confirm;
+    // D63: a frame of the arrival in a style (true: Liquid) `seconds` in, `width` x `height` pixels, as top-down
+    // premultiplied BGRA, for the Appearance page's two animated previews. Null, or false, shows none.
+    std::function<bool(bool liquid, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra)> stylePreview;
 };
 
 class SettingsWindow {

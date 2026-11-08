@@ -11,6 +11,8 @@
 
 #include "core/Result.h"
 #include "core/Signal.h"
+#include "graphics/LiquidMotion.h"
+#include "graphics/LiquidRenderer.h"
 #include "graphics/TextCache.h"
 #include "graphics/Theme.h"
 #include "ui/SurfaceWindow.h"
@@ -66,6 +68,12 @@ public:
     [[nodiscard]] Result<void> Present(std::wstring_view greeting, std::wstring_view name, const graphics::DesignTokens& tokens,
                                        const graphics::MotionPolicy& motion, const RECT& boundsPx);
     void Dismiss(bool animated);
+    // D62/D63: after the greeting has been read, the arrival: a drop divides into the bars, in `style`, landing on
+    // `layout` (DIPs from the window's top-left, which is the monitor's). Without one, or without motion or the
+    // material, the greeting simply fades as before. Set before Present.
+    void SetArrival(std::optional<graphics::ArrivalLayout> layout, graphics::MaterialStyle style);
+    // The drops have reached the bars: the shell's own bars can take over under a short crossfade.
+    [[nodiscard]] bool ArrivalPlayed() const noexcept { return arrivalPlayed_; }
     [[nodiscard]] bool Presenting() const noexcept { return presenting_; }
     [[nodiscard]] bool Covering() const noexcept { return covering_; }
     // Whether the writing has finished and been there long enough to read (without motion: just to read).
@@ -93,6 +101,9 @@ private:
     void ResetInk() noexcept;
     [[nodiscard]] float InkMargin() const noexcept;
     void RequestSkip();
+    [[nodiscard]] bool GreetingRead(double now) const noexcept;   // written, and held long enough to read
+    [[nodiscard]] bool ArrivalWanted() const noexcept;
+    void PaintGreeting(const ui::RenderContext& context, float opacity);
 
     graphics::DesignTokens tokens_;
     graphics::MotionPolicy motion_;
@@ -116,6 +127,10 @@ private:
     std::uint64_t writingFrames_ = 0;
     double lastFrameAt_ = 0.0, longestGap_ = 0.0;
     bool writingLogged_ = true;
+    std::optional<graphics::ArrivalLayout> arrival_;
+    graphics::MaterialStyle arrivalStyle_ = graphics::MaterialStyle::Grain;
+    double arrivalStart_ = -1.0;   // FrameScheduler time; negative until the arrival begins
+    bool arrivalPlayed_ = false;
 };
 
 }  // namespace aether::welcome

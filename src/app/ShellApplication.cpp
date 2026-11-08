@@ -164,9 +164,10 @@ struct ShellApplication::Impl {
     std::unique_ptr<WindowCorners> windowCorners;
     std::unique_ptr<WorkAreaInsets> sideInsets;
     std::unique_ptr<welcome::WelcomeWindow> welcomeWindow;
-    welcome::WelcomeController welcomeController;
+    welcome::WelcomeController welcomeController{welcome::WelcomeTiming{10000}};   // D62: the greeting, then the 3-second arrival
     std::shared_ptr<const welcome::BackdropImage> welcomeBackdrop;
     std::uint64_t welcomeBackdropRequest = 0, welcomeBackdropAsked = 0;
+    std::uint64_t desktopPictureRequest = 0;   // D63: 0 until the Liquid material or the arrival first needs the picture
     std::uint64_t brightnessSettleUntil = 0;
     std::uint64_t launchedAt = ::GetTickCount64();
     std::uint64_t lastWiFiScan = 0;
@@ -259,6 +260,60 @@ struct ShellApplication::Impl {
         ::KillTimer(events.Handle(), kWelcomeTimer);
         ::UnregisterHotKey(events.Handle(), kWelcomeEscapeHotkey);
     }
+    // D62: where the arrival's drops land: the real Top Bar's and Dock's panels, in DIPs from the monitor's top-left.
+    // Nothing when either bar is missing or not on this monitor: the greeting then simply fades.
+    [[nodiscard]] std::optional<graphics::ArrivalLayout> ArrivalLayoutOn(const RECT& monitorPx) const {
+        if (!dock || !topbar || !dock->Handle() || !topbar->Handle()) return std::nullopt;
+        const auto geometry = dock->Geometry();
+        if (!geometry) return std::nullopt;
+        const float scale = static_cast<float>(::GetDpiForWindow(topbar->Handle())) / 96.0f;
+        const auto toLayout = [&](const RECT& windowPx, const D2D1_RECT_F& panelDip, float windowScale) {
+            const auto x = [&](float dip) { return (static_cast<float>(windowPx.left - monitorPx.left) + dip * windowScale) / scale; };
+            const auto y = [&](float dip) { return (static_cast<float>(windowPx.top - monitorPx.top) + dip * windowScale) / scale; };
+            return graphics::LiquidBar{x(panelDip.left), y(panelDip.top), x(panelDip.right), y(panelDip.bottom), 0.0f};
+        };
+        graphics::ArrivalLayout layout;
+        layout.width = static_cast<float>(monitorPx.right - monitorPx.left) / scale;
+        layout.height = static_cast<float>(monitorPx.bottom - monitorPx.top) / scale;
+        layout.topBar = toLayout(topbar->BoundsPx(), topbar->PanelDip(), scale);
+        layout.topBar.radius = shellTokens.barCornerRadius;
+        const float dockScale = static_cast<float>(::GetDpiForWindow(dock->Handle())) / 96.0f;
+        layout.dock = toLayout(dock->BoundsPx(), geometry->panel, dockScale);
+        layout.dock.radius = graphics::DockCornerRadius(shellTokens, geometry->panel.bottom - geometry->panel.top);
+        const bool inside = layout.topBar.right > layout.topBar.left && layout.dock.right > layout.dock.left &&
+                            layout.topBar.top >= -1.0f && layout.dock.bottom <= layout.height + 1.0f;
+        return inside ? std::optional<graphics::ArrivalLayout>(layout) : std::nullopt;
+    }
+    // D63: the desktop picture at the monitor's own resolution, for the Liquid material and the arrival, decoded
+    // away from the UI thread when first needed and again when the wallpaper or the display changes.
+    void RequestDesktopPicture() {
+        const auto request = ++desktopPictureRequest;
+        const auto monitor = platform::PrimaryMonitor().bounds;
+        const auto weak = std::weak_ptr<bool>(alive);
+        worker.Post([this, weak, request, monitor] {
+            auto picture = welcome::LoadDesktopBackdrop(monitor, 1.0f);
+            dispatcher.Post([this, weak, request, monitor, picture = std::move(picture)]() mutable {
+                if (const auto live = weak.lock(); !live || !*live || request != desktopPictureRequest) return;
+                auto* renderer = graphics.Material();
+                if (!renderer) return;
+                auto image = std::make_shared<welcome::BackdropImage>();
+                if (picture) *image = std::move(*picture);
+                else {   // a plain colour: the water shows that colour
+                    const COLORREF colour = ::GetSysColor(COLOR_DESKTOP);
+                    image->width = image->height = 1;
+                    image->pixels = {GetBValue(colour), GetGValue(colour), GetRValue(colour), 255};
+                }
+                const auto width = static_cast<float>(monitor.right - monitor.left), height = static_cast<float>(monitor.bottom - monitor.top);
+                const auto cover = welcome::CoverRect(static_cast<float>(image->width), static_cast<float>(image->height), width, height);
+                const auto left = static_cast<float>(monitor.left), top = static_cast<float>(monitor.top);
+                renderer->SetPicture(std::shared_ptr<const std::vector<std::uint8_t>>(image, &image->pixels), image->width, image->height,
+                                     D2D1::RectF(left + cover.left, top + cover.top, left + cover.right, top + cover.bottom));
+                if (dock) dock->Invalidate();
+                if (topbar) topbar->Invalidate();
+                if (welcomeWindow) welcomeWindow->Invalidate();
+            });
+        });
+    }
     // D54: the desktop picture is decoded away from the UI thread, once per lock or greeting.
     void RequestWelcomeBackdrop() {
         const auto request = ++welcomeBackdropRequest;
@@ -300,6 +355,8 @@ struct ShellApplication::Impl {
             if (welcomeWindow->Presenting()) return;
             const auto& value = settings->Current().welcome;
             const auto word = welcome::GreetingWord(value.language, ::GetUserDefaultUILanguage());
+            const auto style = settings->Current().general.surfaceStyle == settings::SurfaceStyle::Liquid ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain;
+            welcomeWindow->SetArrival(ArrivalLayoutOn(monitor.bounds), style);
             if (auto shown = welcomeWindow->Present(word, value.displayName, shellTokens, shellMotion, monitor.bounds); !shown) {
                 failed(shown.error().code);
                 return;
@@ -314,7 +371,8 @@ struct ShellApplication::Impl {
         const bool hold = !closing && (welcomeController.Presenting() || welcomeController.Covering());
         if (hold == welcomeHoldsBars) return;
         welcomeHoldsBars = hold;
-        if (topbar) topbar->SetHeldBack(hold);
+        // After the arrival the bars are already where the drops landed: they come back at once, under its crossfade.
+        if (topbar) topbar->SetHeldBack(hold, !(welcomeWindow && welcomeWindow->ArrivalPlayed()));
         ApplyDockSuppression();
     }
     void ApplyWelcome(welcome::WelcomeController::Action action) {
@@ -338,6 +396,7 @@ struct ShellApplication::Impl {
                 welcomeSkip = welcomeWindow->SkipRequested.Connect([this] { ApplyWelcome(welcomeController.Skipped()); });
             }
             if (!welcomeBackdrop && !welcomeBackdropPending) RequestWelcomeBackdrop();
+            if (!desktopPictureRequest) RequestDesktopPicture();   // D62: the arrival shows the picture itself
             // Without its timer a greeting is not allowed to stay. The surface is simply kept hidden
             // for the next time, since nothing would release it. The cover only waits, and rarely checks.
             if (!::SetTimer(events.Handle(), kWelcomeTimer, action == Action::Cover ? 500 : 50, nullptr)) {
@@ -1214,7 +1273,9 @@ void ShellApplication::Impl::ApplySettings() {
     graphics::AppearanceOptions appearance;
     appearance.theme = static_cast<graphics::ThemePreference>(value.general.themeMode);
     appearance.accent = static_cast<graphics::AccentSource>(value.general.accentSource);
-    const auto tokens = graphics::MakeShellDesignTokens(appearance);
+    auto tokens = graphics::MakeShellDesignTokens(appearance);
+    tokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && tokens.mode != graphics::ThemeMode::HighContrast;   // D63
+    if (tokens.liquid && !desktopPictureRequest) RequestDesktopPicture();
     graphics::MotionPolicy motion;
     motion.reduced = tokens.mode == graphics::ThemeMode::HighContrast || value.general.motion == settings::MotionPreference::Reduced ||
         (value.general.motion == settings::MotionPreference::System && !platform::SystemAnimationsEnabled());
@@ -1351,6 +1412,26 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.exportDiagnostics = [this] { ExportDiagnostics(); };
     appTokens = graphics::MakeAppDesignTokens(graphics::AppearanceOptions{});
     actions.scheduler = &scheduler;
+    // D63: the Appearance page's two previews: the arrival, small, over this desktop's picture, in each style.
+    actions.stylePreview = [this](bool liquid, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
+        auto* renderer = graphics.Material();
+        if (!renderer || width == 0 || height == 0) return false;
+        if (!desktopPictureRequest) RequestDesktopPicture();
+        if (!renderer->HasPicture()) return false;
+        // A 1280 x 720-DIP screen with the default bars (as in the prototype), drawn at the tile's size.
+        graphics::ArrivalLayout layout;
+        layout.width = 1280.0f;
+        layout.height = 720.0f;
+        layout.topBar = {12.0f, 6.0f, 1268.0f, 38.0f, 11.0f};
+        layout.dock = {438.0f, 653.0f, 842.0f, 716.0f, 21.0f};
+        const float scale = static_cast<float>(width) / layout.width;
+        auto scene = graphics::SceneFromArrival(graphics::ArrivalAt(seconds, layout, false), liquid ? graphics::MaterialStyle::Liquid : graphics::MaterialStyle::Grain,
+                                                D2D1::Point2F(0.0f, 0.0f), scale);
+        scene.background = true;
+        const auto picture = renderer->PictureSize();
+        scene.picture = welcome::CoverRect(static_cast<float>(picture.cx), static_cast<float>(picture.cy), static_cast<float>(width), static_cast<float>(height));
+        return renderer->RenderToMemory(scene, D2D1::SizeU(width, height), bgra).ok();
+    };
     settingsWindow = std::make_unique<settings::ui::SettingsWindow>(*settings, dispatcher, std::move(actions));
     searchWindow = std::make_unique<search::ui::SearchWindow>(graphics, scheduler, *search, *launcher, *icons);
     if (auto result = searchWindow->Initialize(); !result) return result;
@@ -1456,7 +1537,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (desktopPictureRequest) RequestDesktopPicture();ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -1467,6 +1548,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
     connections.push_back(events.SettingChanged.Connect([this](UINT action, const std::wstring& section){
+        if (action == SPI_SETDESKWALLPAPER && desktopPictureRequest) RequestDesktopPicture();   // D63: the water shows the new picture
         // AS4-08: a work-area broadcast (every AppBar change, Auto-Hide included) is answered by the
         // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
         switch (ClassifySettingChange(action, section)) {

@@ -14,6 +14,7 @@
 #include <windowsx.h>
 
 #include <algorithm>
+#include <cmath>
 #include <exception>
 
 namespace aether::ui {
@@ -154,6 +155,35 @@ void SurfaceWindow::ApplyInputRegion() {
         (void)combined.Release();
         appliedRegion_ = region; appliedRegionWindow_ = hwnd_;
     }
+}
+
+bool SurfaceWindow::PaintLiquidPanel(const RenderContext& context, const D2D1_RECT_F& panelDip, float cornerRadiusDip, float shadow) {
+    auto* renderer = device_.Material();
+    if (!renderer || !renderer->HasPicture() || !context.d2d) return false;
+    const float scale = static_cast<float>(dpi_) / 96.0f;
+    const auto size = D2D1::SizeU(static_cast<UINT32>(std::lround(context.widthDip * scale)), static_cast<UINT32>(std::lround(context.heightDip * scale)));
+    if (size.width == 0 || size.height == 0) return false;
+    graphics::MaterialScene scene;
+    scene.style = graphics::MaterialStyle::Liquid;
+    scene.pxPerDip = scale;
+    auto& body = scene.bodies[0];
+    body.present = true;
+    body.cx = (panelDip.left + panelDip.right) / 2.0f * scale;
+    body.cy = (panelDip.top + panelDip.bottom) / 2.0f * scale;
+    body.hx = (panelDip.right - panelDip.left) / 2.0f * scale;
+    body.hy = (panelDip.bottom - panelDip.top) / 2.0f * scale;
+    body.radius = cornerRadiusDip * scale;
+    scene.lens = 1.0f;
+    scene.shadow = shadow;
+    // The picture where Windows shows it, seen from this window.
+    const auto placement = renderer->PicturePlacement();
+    const auto left = static_cast<float>(bounds_.left), top = static_cast<float>(bounds_.top);
+    scene.picture = D2D1::RectF(placement.left - left, placement.top - top, placement.right - left, placement.bottom - top);
+    context.d2d->Flush();   // Direct2D's work so far reaches the device before the material's own
+    auto frame = renderer->Render(context.d2d, scene, size);
+    if (!frame) return false;   // a lost device shows at the end of this frame, where the surface already recovers
+    context.d2d->DrawBitmap(frame->get(), D2D1::RectF(0.0f, 0.0f, context.widthDip, context.heightDip), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+    return true;
 }
 
 void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity) {

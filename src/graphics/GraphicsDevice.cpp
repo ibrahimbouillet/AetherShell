@@ -103,9 +103,28 @@ Result<void> GraphicsDevice::HandleDeviceLost() {
                         static_cast<unsigned>(reason));
     }
     ReleaseGlassResources();
+    if (material_) material_->Reset();
+    materialFailed_ = false;
     if (auto result = CreateDevices(); !result) return result.error();
     DeviceReplaced.Emit();
     return Ok();
+}
+
+LiquidRenderer* GraphicsDevice::Material() noexcept {
+    if (!d3dDevice_ || materialFailed_) return nullptr;
+    try {
+        if (!material_) material_ = std::make_unique<LiquidRenderer>();
+        if (material_->Ready()) return material_.get();
+        if (auto ready = material_->Initialize(d3dDevice_.get()); !ready) {
+            materialFailed_ = true;
+            AETHER_LOG_WARN("graphics", "Liquid material unavailable on this device ({}): Grain is drawn instead", ToString(ready.error().code));
+            return nullptr;
+        }
+        return material_.get();
+    } catch (...) {
+        materialFailed_ = true;
+        return nullptr;
+    }
 }
 
 std::optional<unsigned> DeviceRecoveryPolicy::Failed() noexcept {
@@ -153,6 +172,7 @@ void GraphicsDevice::Shutdown() noexcept {
     if (recoveringDevice == this) recoveringDevice = nullptr;
     ReleaseGlassResources();
     ReleaseGlyphResources();
+    material_.reset();
     compositionDevice_ = nullptr;
     compositor_ = nullptr;
     d2dDevice_ = nullptr;

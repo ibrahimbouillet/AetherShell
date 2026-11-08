@@ -519,7 +519,8 @@ void TopBarWindow::SetAutoHidden(bool hidden) {
     }
 }
 bool TopBarWindow::AutoHidden() const noexcept { return impl_->autoHidden; }
-void TopBarWindow::SetHeldBack(bool held) {
+D2D1_RECT_F TopBarWindow::PanelDip() const noexcept { return impl_->panel; }
+void TopBarWindow::SetHeldBack(bool held, bool entrance) {
     auto& p = *impl_;
     if (p.heldBack == held || p.destroyed) return;
     p.heldBack = held;
@@ -527,6 +528,8 @@ void TopBarWindow::SetHeldBack(bool held) {
     if (held) {
         p.press.Cancel(); p.hover.reset(); p.pointerInside = false; p.tooltip.HideTooltip();
         Hide();
+    } else if (!entrance) {
+        Show(false);
     } else {
         graphics::TransitionShape shape;
         shape.offsetY = -(p.panel.bottom + 8.0f);
@@ -567,12 +570,16 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
 void TopBarWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
     const auto panel = impl_->panel;
-    const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
+    // D63: Liquid is water bending the desktop picture, with no blurred backdrop; Grain is the frosted glass.
+    const bool liquid = impl_->tokens.liquid && PaintLiquidPanel(context, panel, impl_->tokens.barCornerRadius);
+    const bool blur = !liquid && impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
     SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, impl_->tokens.glass.backdropOpacity);
-    graphics::GlassStyle glass;
-    glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
-    glass.backdropBlur = BackdropBlurActive(); glass.elevation = graphics::Elevation::Bar;
-    graphics::PaintGlassPanel(context.d2d, panel, impl_->tokens, glass);
+    if (!liquid) {
+        graphics::GlassStyle glass;
+        glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
+        glass.backdropBlur = BackdropBlurActive(); glass.elevation = graphics::Elevation::Bar;
+        graphics::PaintGlassPanel(context.d2d, panel, impl_->tokens, glass);
+    }
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
     for (const auto& entry : impl_->placed) {

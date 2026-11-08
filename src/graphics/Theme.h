@@ -301,6 +301,9 @@ struct MenuTokens {
 struct DesignTokens {
     ThemeMode mode = ThemeMode::Dark;
     bool transparencyEnabled = true;  // honors Windows accessibility/personalization preference
+    // D63: the Liquid style, chosen in Settings: surfaces that can are drawn as pure water bending the desktop
+    // picture (LiquidRenderer) instead of the Grain glass. Never in high contrast.
+    bool liquid = false;
     GlassTokens glass;
     FormTokens form;
     MenuTokens menu;

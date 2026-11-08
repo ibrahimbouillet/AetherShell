@@ -63,8 +63,11 @@ public:
     // touching full-screen suppression, which always wins. An auto-hidden bar keeps its state.
     void SetAutoHidden(bool hidden);
     [[nodiscard]] bool AutoHidden() const noexcept;
-    // Off the screen while the welcome holds it, whatever Auto-Hide says; it returns with an entrance.
-    void SetHeldBack(bool held);
+    // Off the screen while the welcome holds it, whatever Auto-Hide says; it returns with an entrance, or at once
+    // when the welcome's arrival has already brought it to its place (D62).
+    void SetHeldBack(bool held, bool entrance = true);
+    // The panel, in the window's DIPs (the arrival's drops land on it).
+    [[nodiscard]] D2D1_RECT_F PanelDip() const noexcept;
     // In use: the pointer is over the bar, one of its menus is open or it has keyboard navigation.
     [[nodiscard]] bool Engaged() const noexcept;
     // A host action started from `item` failed: a short explanation below that item, never over a

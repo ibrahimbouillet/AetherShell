@@ -7,7 +7,17 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4: Liquid and Grain styles, arrival prototype redone (D63, 2026-11-05)
+## Current checkpoint — Alpha 4, test 4.0: Liquid and Grain inside the shell (`0.4.0-alpha.4`, D64, S-068, 2026-11-05)
+
+The owner validated the prototype's rendering and asked for it in the shell, exactly the same. Done in C++ (D64): the motion
+(`graphics/LiquidMotion`) and the shader (`graphics/LiquidShader.inc`, HLSL) run by `graphics/LiquidRenderer` on Direct3D 11;
+offscreen they match the prototype within about 1.3/255 on average. Settings → Appearance → Style (Grain default, Liquid) with
+two animated previews; Liquid Dock and Top Bar; the arrival after the greeting, landing on the real bars. Receipts in
+TEST_STATUS S-068; the test build is in `dist/`, not installed or published. **Next:** the owner's trial (choose Liquid, lock
+and unlock to see the arrival); then Liquid for Settings, menus, Search and Quick Settings (D63 wants the whole application),
+the arrival after the setup's Close, and D62's fluidity and code-signing parts. Test builds count from `0.4.1-alpha.4`.
+
+## Earlier — Alpha 4: Liquid and Grain styles, arrival prototype redone (D63, 2026-11-05)
 
 The owner defined two styles (D63): **Liquid** (pure water: no semi-transparency, blur or grain; the water bends the
 picture, focuses the light, and shows icon shadows and an application's red call on it) and **Grain** (the current frosted,

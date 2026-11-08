@@ -155,6 +155,33 @@ AETHER_TEST("welcome window: it writes with continuous frames, then requests non
     CHECK(stage.Pump([&] { return !stage.window->IsShown(); }, 2000));
 }
 
+AETHER_TEST("welcome window: with an arrival, the greeting ends only when the drops have reached the bars (D62)") {
+    Stage stage;
+    auto* material = stage.device.Material();
+    if (!material) { TEST_NOTE("SKIPPED: this device cannot run the material"); return; }
+    auto picture = std::make_shared<std::vector<std::uint8_t>>(64u * 36u * 4u, std::uint8_t{160});
+    material->SetPicture(picture, 64, 36, D2D1::RectF(static_cast<float>(stage.bounds.left), static_cast<float>(stage.bounds.top),
+                                                      static_cast<float>(stage.bounds.right), static_cast<float>(stage.bounds.bottom)));
+    const float scale = static_cast<float>(::GetDpiForSystem()) / 96.0f;
+    graphics::ArrivalLayout layout;
+    layout.width = static_cast<float>(stage.bounds.right - stage.bounds.left) / scale;
+    layout.height = static_cast<float>(stage.bounds.bottom - stage.bounds.top) / scale;
+    layout.topBar = {8.0f, 4.0f, layout.width - 8.0f, 24.0f, 8.0f};
+    layout.dock = {layout.width / 2.0f - 90.0f, layout.height - 44.0f, layout.width / 2.0f + 90.0f, layout.height - 4.0f, 14.0f};
+    stage.window->SetArrival(layout, graphics::MaterialStyle::Liquid);
+    REQUIRE(stage.window->Present(L"Hello", L"Zoé", Dark(), graphics::MotionPolicy{}, stage.bounds).ok());
+    const auto started = graphics::FrameScheduler::Now();
+    const auto writing = stage.window->Scene().duration;
+    (void)stage.Pump([&] { return stage.window->WritingFinished(graphics::FrameScheduler::Now()); }, 15000);
+    const double took = graphics::FrameScheduler::Now() - started;
+    TEST_NOTE("greeting and arrival took " + std::to_string(took) + " s");
+    CHECK(stage.window->ArrivalPlayed());
+    CHECK(took >= static_cast<double>(writing) + 0.5 + static_cast<double>(graphics::kArrivalSettledSeconds) - 0.05);
+    CHECK(took < static_cast<double>(writing) + 0.5 + static_cast<double>(graphics::kArrivalSettledSeconds) + 1.5);
+    stage.window->Dismiss(true);
+    CHECK(stage.Pump([&] { return !stage.window->IsShown(); }, 2000));
+}
+
 AETHER_TEST("welcome window: reduced motion shows the finished words at once, without pen or animation frames") {
     Stage stage;
     graphics::MotionPolicy reduced; reduced.reduced = true;

@@ -111,6 +111,30 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D64 — Alpha 4, test 4.0: Liquid and Grain inside Aether Shell, rendered exactly as the prototype
+
+Owner direction, 2026-11-05: the prototype's rendering satisfies the owner; bring it into Aether Shell in C++ with exactly the
+same result, as a test build for the owner, without changing how the application works; a Style choice in Settings with a
+short animation of each.
+
+- **Same rendering:** the prototype's motion (`stateAt`) is `graphics/LiquidMotion` and its fragment shader is
+  `graphics/LiquidShader.inc` (HLSL, line for line), run by Direct3D 11 on the device Direct2D already uses
+  (`graphics/LiquidRenderer`, in its own device-context state). Compared offscreen with the prototype on the same wallpaper,
+  at seven moments in both styles: a mean difference of about 1.3/255, under 1 % of pixels differing by more than 10
+  (the two shrink the wallpaper differently). Change the prototype and the port together.
+- **Where Liquid is drawn in this build:** the arrival after the greeting, the Dock and the Top Bar, and the Settings
+  previews. Windows gives no sharp image of what lies behind a window (its host backdrop is already blurred), so the water
+  bends the **desktop picture**, read at the monitor's resolution and placed as Windows shows it ("Fill"); over an application
+  window it still shows the picture. Settings, menus, Search and Quick Settings keep Grain for now; the owner wants the whole
+  application to follow the style (D63), which remains to do. High contrast is always Grain.
+- **The arrival:** after the greeting has been read, the drop divides into the real Top Bar's and Dock's places (their panels
+  as laid out, not the prototype's defaults); the greeting and its cover fade during its first third of a second; the shell's
+  bars then return without their entrance under a 0.18 s crossfade. The welcome's deadline is 10 s instead of 6.
+  Without motion, without the material or before the picture is read, the greeting fades as before.
+- **Settings → Appearance → Style:** Grain (the default, so that nothing changes until chosen) or Liquid, above two animated
+  previews of the arrival on this desktop's picture, the chosen one outlined.
+- **Version:** `0.4.0-alpha.4`, "Alpha 4, test 4.0" (D57 numbering carried to Alpha 4); a test build, not published.
+
 ### D63 — Two styles, Liquid and Grain; the arrival plays in the chosen one
 
 Owner direction, 2026-11-05, after the first bubble. Aether gets a **Style** setting with two choices, and the whole

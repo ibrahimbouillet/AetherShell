@@ -118,6 +118,11 @@ protected:
     [[nodiscard]] graphics::GraphicsDevice& Device() noexcept { return device_; }
     [[nodiscard]] graphics::FrameScheduler& Scheduler() noexcept { return scheduler_; }
 
+    // D63: the Liquid material under `panelDip` (window DIPs): water that bends the desktop picture lying behind
+    // the window, catches the light and casts `shadow` (0 to 1). Call first in OnRender, with no blurred backdrop
+    // under the panel. False when it cannot be drawn (no renderer on this device, no picture yet): paint Grain.
+    [[nodiscard]] bool PaintLiquidPanel(const RenderContext& context, const D2D1_RECT_F& panelDip, float cornerRadiusDip, float shadow = 1.0f);
+
     virtual void OnRender(const RenderContext& context) = 0;
     // Advance animations to `now`; return true while anything is still moving.
     virtual bool OnAnimate(double /*now*/) { return false; }

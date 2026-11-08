@@ -285,7 +285,7 @@ AETHER_TEST("settings design: dropdowns keep the native list and selection contr
     Fixture f("settings-design-dropdown");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
-    HWND mode = window.Control(200);  // Color mode: Follow Windows / Light / Dark
+    HWND mode = window.Control(201);  // Color mode: Follow Windows / Light / Dark (200 is Style, D63)
     REQUIRE(mode != nullptr);
     ::SetFocus(mode);
     ::SendMessageW(mode, CB_SHOWDROPDOWN, TRUE, 0);
@@ -300,7 +300,7 @@ AETHER_TEST("settings design: dropdowns keep the native list and selection contr
     CHECK_FALSE(::IsWindowVisible(combo.hwndList));
     // Selection is still represented by the real combo and its normal CBN_SELCHANGE notification.
     ::SendMessageW(mode, CB_SETCURSEL, 2, 0);
-    ::SendMessageW(::GetParent(mode), WM_COMMAND, MAKEWPARAM(200, CBN_SELCHANGE), reinterpret_cast<LPARAM>(mode));
+    ::SendMessageW(::GetParent(mode), WM_COMMAND, MAKEWPARAM(201, CBN_SELCHANGE), reinterpret_cast<LPARAM>(mode));
     CHECK_EQ(::SendMessageW(mode, CB_GETCURSEL, 0, 0), LRESULT{2});
     ::SendMessageW(window.Handle(), WM_TIMER, 19, 0);
     REQUIRE(PumpUntil(f.dispatcher, [&] { return f.service.Current().general.themeMode == settings::ThemePreference::Dark && !f.service.Dirty(); }));

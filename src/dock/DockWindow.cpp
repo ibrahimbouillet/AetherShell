@@ -63,6 +63,19 @@ bool SamePresentation(const std::vector<DockItem>& first, const std::vector<Dock
     return true;
 }
 
+// D63: a light cast on the Liquid water just below an icon, fading from `color` to nothing.
+void PaintWaterLight(ID2D1DeviceContext* context, const D2D1_RECT_F& icon, const graphics::Color& color) {
+    const float size = icon.right - icon.left;
+    const auto center = D2D1::Point2F((icon.left + icon.right) / 2.0f, icon.bottom - size * 0.12f);
+    const D2D1_GRADIENT_STOP stops[] = {{0.0f, color.WithAlpha(0.55f).ToD2D()}, {0.55f, color.WithAlpha(0.22f).ToD2D()}, {1.0f, color.WithAlpha(0.0f).ToD2D()}};
+    winrt::com_ptr<ID2D1GradientStopCollection> collection;
+    winrt::com_ptr<ID2D1RadialGradientBrush> brush;
+    if (FAILED(context->CreateGradientStopCollection(stops, 3, collection.put())) ||
+        FAILED(context->CreateRadialGradientBrush(D2D1::RadialGradientBrushProperties(center, D2D1::Point2F(), size * 0.8f, size * 0.42f),
+                                                  collection.get(), brush.put()))) return;
+    context->FillEllipse(D2D1::Ellipse(center, size * 0.8f, size * 0.42f), brush.get());
+}
+
 }  // namespace
 
 struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
@@ -331,8 +344,9 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         // HTTRANSPARENT forwards only within one thread. Keep empty margins outside the native
         // HWND region so other processes receive clicks; outer shadows/entrance pixels are clipped.
         window.SetVisualRegionPx({});
+        // D63: Liquid draws its own water under the panel, without the blurred backdrop.
         window.SetBackdropPanel(layout.panel, graphics::DockCornerRadius(tokens, layout.panel.bottom - layout.panel.top),
-            tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast, tokens.glass.backdropOpacity);
+            !tokens.liquid && tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast, tokens.glass.backdropOpacity);
         return Ok();
     }
     Result<void> Rebuild() {
@@ -986,7 +1000,9 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
     // Exact native hit regions clip exterior shadows into the rectangular slots of raised icons.
     // Keep those transparent bitmap corners clear instead of painting square shadow fragments.
     style.shadow = false;
-    graphics::PaintGlassPanel(context.d2d, impl_->layout.panel, impl_->tokens, style);
+    // D63: in Liquid the panel is water (no exterior shadow, for the same reason); Grain is the frosted glass.
+    const bool liquid = impl_->tokens.liquid && PaintLiquidPanel(context, impl_->layout.panel, style.cornerRadius, 0.0f);
+    if (!liquid) graphics::PaintGlassPanel(context.d2d, impl_->layout.panel, impl_->tokens, style);
     winrt::com_ptr<ID2D1SolidColorBrush> primary, attention;
     if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), primary.put())) ||
         FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.critical.ToD2D(), attention.put()))) return;
@@ -994,6 +1010,12 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
         const auto& item = impl_->fitted.items[index];
         const auto rect = impl_->layout.items[index].icon;
         const float size = rect.right - rect.left;
+        if (liquid) {
+            // What passes between an icon and the water shows on the water: the icon's soft shadow, and the red
+            // light of an application that asks for attention, cast just below it.
+            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens, 0.35f);
+            if (item.attentionRequested && !item.foreground) PaintWaterLight(context.d2d, rect, impl_->tokens.critical);
+        }
         if (const auto pulse = impl_->attentionPulses.find(item.id); pulse != impl_->attentionPulses.end() && impl_->AllowsDecoration()) {
             const float opacity = DockAttentionAt((graphics::FrameScheduler::Now() - pulse->second) / impl_->motion.EffectiveScale()).opacity;
             const D2D1_POINT_2F center{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2};

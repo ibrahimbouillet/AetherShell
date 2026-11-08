@@ -47,6 +47,8 @@ constexpr DWORD kDwmCaptionButtonBounds = 5, kDwmCaptionColor = 35, kDwmTextColo
 // Width of a caption button Settings draws itself (a maximized window, D45), as on Windows 11.
 constexpr float kCaptionButtonWidth = 46.0f;
 constexpr UINT_PTR kLiveApplyTimer = 19;
+constexpr UINT_PTR kStylePreviewTimer = 20;      // D63: the Appearance page's previews, about 30 frames a second
+constexpr float kStylePreviewLoop = 4.4f;        // the arrival (3 s), then the settled bars, then again
 constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPostpone = 303,
               kSkip = 304, kDisableUpdates = 305, kReleaseDetails = 306, kGeoSearch = 307,
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
@@ -251,6 +253,60 @@ struct SettingsWindow::Impl {
     std::vector<Section> sections;
     D2D1_RECT_F brandMark{};   // form client DIPs
     D2D1_RECT_F aboutMark{};   // canvas DIPs (About page)
+    D2D1_RECT_F stylePreview{};   // canvas DIPs (Appearance page): the Liquid and Grain previews, D63
+    std::chrono::steady_clock::time_point previewEpoch{};
+    winrt::com_ptr<IDWriteFactory> previewText;
+    winrt::com_ptr<IDWriteTextFormat> previewCaption;
+
+    // D63: the arrival, small, in each style, side by side and captioned; the chosen one outlined in the accent.
+    void PaintStylePreviews(ID2D1DeviceContext* target, const graphics::DesignTokens& theme) {
+        if (!callbacks.stylePreview || stylePreview.right <= stylePreview.left || !scroll.Canvas()) return;
+        const POINT origin = surface.ClientOriginPx(scroll.Canvas());
+        const RECT viewport = scroll.Frame();
+        const float dx = Dip(static_cast<float>(origin.x)), dy = Dip(static_cast<float>(origin.y));
+        target->PushAxisAlignedClip(D2D1::RectF(Dip(static_cast<float>(viewport.left)), Dip(static_cast<float>(viewport.top)),
+                                                Dip(static_cast<float>(viewport.right)), Dip(static_cast<float>(viewport.bottom))), D2D1_ANTIALIAS_MODE_ALIASED);
+        struct Pop { ID2D1DeviceContext* target; ~Pop() { target->PopAxisAlignedClip(); } } pop{target};
+        constexpr float kGap = 12.0f;
+        const float tileWidth = std::min((stylePreview.right - stylePreview.left - kGap) / 2.0f, 300.0f);
+        const float tileHeight = std::round(tileWidth * 9.0f / 16.0f);
+        const float seconds = std::fmod(std::chrono::duration<float>(std::chrono::steady_clock::now() - previewEpoch).count(), kStylePreviewLoop);
+        const bool liquidChosen = service.Current().general.surfaceStyle == SurfaceStyle::Liquid;
+        if (!previewCaption) {
+            if (SUCCEEDED(::DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(previewText.put()))) &&
+                SUCCEEDED(previewText->CreateTextFormat(theme.fontFamily.c_str(), nullptr, DWRITE_FONT_WEIGHT_SEMI_BOLD, DWRITE_FONT_STYLE_NORMAL,
+                                                        DWRITE_FONT_STRETCH_NORMAL, 13.0f, L"", previewCaption.put())))
+                previewCaption->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+        }
+        winrt::com_ptr<ID2D1Factory> factory;
+        target->GetFactory(factory.put());
+        for (int i = 0; i < 2; ++i) {
+            const bool liquid = i == 0;
+            const float left = stylePreview.left + dx + static_cast<float>(i) * (tileWidth + kGap), top = stylePreview.top + dy;
+            const auto tile = D2D1::RectF(left, top, left + tileWidth, top + tileHeight);
+            const UINT width = static_cast<UINT>(std::max(1, Px(tileWidth))), height = static_cast<UINT>(std::max(1, Px(tileHeight)));
+            std::vector<std::uint8_t> pixels;
+            winrt::com_ptr<ID2D1Bitmap> bitmap;
+            if (callbacks.stylePreview(liquid, std::min(seconds, 3.0f), width, height, pixels) && pixels.size() >= static_cast<std::size_t>(width) * height * 4u)
+                (void)target->CreateBitmap(D2D1::SizeU(width, height), pixels.data(), width * 4u,
+                                           D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)), bitmap.put());
+            winrt::com_ptr<ID2D1RoundedRectangleGeometry> shape;
+            if (bitmap && factory && SUCCEEDED(factory->CreateRoundedRectangleGeometry(D2D1::RoundedRect(tile, 10.0f, 10.0f), shape.put()))) {
+                target->PushLayer(D2D1::LayerParameters1(tile, shape.get()), nullptr);
+                target->DrawBitmap(bitmap.get(), tile);
+                target->PopLayer();
+            }
+            const bool chosen = liquid == liquidChosen;
+            winrt::com_ptr<ID2D1SolidColorBrush> brush;
+            if (SUCCEEDED(target->CreateSolidColorBrush((chosen ? theme.accentRoles.fill : theme.form.divider).ToD2D(), brush.put())))
+                target->DrawRoundedRectangle(D2D1::RoundedRect(tile, 10.0f, 10.0f), brush.get(), chosen ? 2.0f : 1.0f);
+            if (previewCaption && SUCCEEDED(target->CreateSolidColorBrush(theme.textPrimary.ToD2D(), brush.put()))) {
+                const wchar_t* caption = liquid ? L"Liquid" : L"Grain";
+                target->DrawText(caption, static_cast<UINT32>(std::wcslen(caption)), previewCaption.get(),
+                                 D2D1::RectF(left, top + tileHeight + 6.0f, left + tileWidth, top + tileHeight + 26.0f), brush.get());
+            }
+        }
+    }
 
     // --- geometry helpers ---
     [[nodiscard]] float Dip(float px) const { return surfaceReady ? surface.ToDip(px) : px * 96.0f / static_cast<float>(DpiNow()); }
@@ -758,6 +814,11 @@ void SettingsWindow::Impl::BuildPage() {
     bindings.clear(); locations.clear(); sections.clear();
     pageTitle = pageDescription = nullptr;
     aboutMark = {};
+    stylePreview = {};
+    if (page == SettingsPage::Appearance && callbacks.stylePreview && window) {   // D63: the previews move while the page shows
+        previewEpoch = std::chrono::steady_clock::now();
+        ::SetTimer(window, kStylePreviewTimer, 33, nullptr);
+    }
     const auto& current = service.Current();
     HWND canvas = Canvas();
     const auto header = [&](const wchar_t* title, const wchar_t* description) {
@@ -927,6 +988,12 @@ void SettingsWindow::Impl::BuildPage() {
              [](const Settings& s){return s.welcome.displayName;}, [](Settings& s,std::wstring v){s.welcome.displayName=std::move(v);});
     } else if (page == SettingsPage::Appearance) {
         header(L"Appearance", L"Color mode, accent, motion speed and the look of the Dock and Top Bar.");
+        // D63: the material of every surface, shown by the two previews above it.
+        BeginSection(L"Style");
+        Choice(L"Style", L"Liquid: pure water that bends your desktop picture and catches the light, with no blur, transparency or grain. "
+                         L"Grain: frosted glass, blurred and semi-transparent, with a fine grain.",
+               {L"Grain", L"Liquid"},
+               [](const Settings& s){return s.general.surfaceStyle;}, [](Settings& s,int v){s.general.surfaceStyle=static_cast<SurfaceStyle>(v);});
         BeginSection(L"Theme");
         Choice(L"Color mode", L"High contrast always takes precedence.", {L"Follow Windows", L"Light", L"Dark"},
                [](const Settings& s){return s.general.themeMode;}, [](Settings& s,int v){s.general.themeMode=static_cast<ThemePreference>(v);});
@@ -1218,6 +1285,12 @@ void SettingsWindow::Impl::LayoutCanvas() {
         y += descriptionHeight;
     }
     if (page == SettingsPage::About) y = std::max(y, aboutMark.bottom);
+    if (page == SettingsPage::Appearance && callbacks.stylePreview) {
+        // Two 16:9 tiles side by side, captioned below.
+        const float tileWidth = std::min((width - 12.0f) / 2.0f, 300.0f);
+        stylePreview = D2D1::RectF(0.0f, y + 16.0f, width, y + 16.0f + std::round(tileWidth * 9.0f / 16.0f) + 28.0f);
+        y = stylePreview.bottom;
+    }
     y += f.sectionGap;
     for (auto& section : sections) {
         const bool visibleRows = std::any_of(section.rows.begin(), section.rows.end(), [](const Row& row) { return !row.hidden; });
@@ -1904,6 +1977,15 @@ LRESULT SettingsWindow::Impl::Handle(UINT message, WPARAM wParam, LPARAM lParam)
     if (message == WM_HSCROLL) return 0;  // no horizontal scrolling: the content reflows to the width
     if (message == WM_VSCROLL) { if (surfaceReady) scroll.HandleScrollCode(LOWORD(wParam), static_cast<short>(HIWORD(wParam))); return 0; }
     if (message == WM_MOUSEWHEEL) { if (surfaceReady) ::SendMessageW(scroll.Viewport(), WM_MOUSEWHEEL, wParam, lParam); return 0; }
+    if (message == WM_TIMER && wParam == kStylePreviewTimer) {
+        // Only while the previews can be seen; they stop with the page or the window.
+        if (page != SettingsPage::Appearance || stylePreview.right <= stylePreview.left || !::IsWindowVisible(window) || ::IsIconic(window)) {
+            ::KillTimer(window, kStylePreviewTimer);
+            return 0;
+        }
+        ::InvalidateRect(window, nullptr, FALSE);
+        return 0;
+    }
     if (message == WM_TIMER && wParam == kLiveApplyTimer) {
         if (sliderHeld) ::KillTimer(window, kLiveApplyTimer);  // still pending: its release applies it
         else Apply(false);
@@ -1988,6 +2070,7 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
                     graphics::PaintBrandMark(target, state.captionMark, tokens);
                 state.PaintCaptionButtons(target, tokens);
                 graphics::PaintBrandMark(target, state.brandMark, tokens);
+                if (state.page == SettingsPage::Appearance) state.PaintStylePreviews(target, tokens);
                 if (state.page != SettingsPage::About || state.aboutMark.right <= state.aboutMark.left || !state.scroll.Canvas()) return;
                 // Includes a scroll the surface is presenting, so the mark moves with its page.
                 const POINT origin = state.surface.ClientOriginPx(state.scroll.Canvas());

@@ -62,4 +62,8 @@ page draws nothing.
 - Geometry comes from the shell's defaults (Top Bar 32 DIPs high, 6 from the top; Dock of 40-DIP icons, 4 from the
   bottom); in the shell it will read the person's settings.
 
+**Ported (D64, test 4.0):** `src/graphics/LiquidMotion` is `stateAt`, `src/graphics/LiquidShader.inc` is the fragment shader in
+HLSL, run by `src/graphics/LiquidRenderer`. Compared offscreen on the same wallpaper they differ by about 1.3/255 on average
+(`tests/unit/graphics/LiquidTests.cpp`, with `AETHER_LIQUID_PICTURE` set). Change this page and the port together.
+
 The web page is a design tool only: no web technology enters the product (AGENTS, "Non-negotiable constraints").

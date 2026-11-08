@@ -69,6 +69,7 @@ AETHER_TEST("settings schema: new fields have the documented defaults") {
     CHECK(defaults.general.syncTaskbarPins);
     CHECK_EQ(defaults.general.themeMode, ThemePreference::System);
     CHECK_EQ(defaults.general.accentSource, AccentSource::Windows);
+    CHECK_EQ(defaults.general.surfaceStyle, SurfaceStyle::Grain);  // D63: every installation keeps its look until it chooses
     CHECK_EQ(defaults.general.animationSpeed, 1.0);
     // D23: on by default, flipped together with the lifecycle test guards (nativeTaskbarAccess).
     CHECK(defaults.general.replaceWindowsTaskbar);
@@ -94,6 +95,7 @@ AETHER_TEST("settings schema: every new field survives a JSON text round trip") 
     settings.general.syncTaskbarPins = false;
     settings.general.themeMode = ThemePreference::Dark;
     settings.general.accentSource = AccentSource::Aether;
+    settings.general.surfaceStyle = SurfaceStyle::Liquid;
     settings.general.animationSpeed = 1.25;
     const auto parsed = RoundTrip(settings);
     CHECK(parsed.warnings.empty());
@@ -115,6 +117,7 @@ AETHER_TEST("settings schema: every new field survives a JSON text round trip") 
     CHECK_FALSE(value.general.syncTaskbarPins);
     CHECK_EQ(value.general.themeMode, ThemePreference::Dark);
     CHECK_EQ(value.general.accentSource, AccentSource::Aether);
+    CHECK_EQ(value.general.surfaceStyle, SurfaceStyle::Liquid);
     CHECK_EQ(value.general.animationSpeed, 1.25);
     CHECK_EQ(*ToJson(value), *ToJson(settings));
 }
@@ -135,6 +138,10 @@ AETHER_TEST("settings schema: new enums use stable lower-case JSON names") {
     CHECK_EQ(Member(settings, "topBar", "keyboardIndicator"), std::string("compact"));
     settings.general.themeMode = ThemePreference::Dark;
     CHECK_EQ(Member(settings, "general", "themeMode"), std::string("dark"));
+    CHECK_EQ(Member(settings, "general", "surfaceStyle"), std::string("grain"));
+    settings.general.surfaceStyle = SurfaceStyle::Liquid;
+    CHECK_EQ(Member(settings, "general", "surfaceStyle"), std::string("liquid"));
+    CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"surfaceStyle":"liquid"}})").value.general.surfaceStyle, SurfaceStyle::Liquid);
 
     const auto parsed = ParseText(R"({"dock":{"metricsVersion":2},"general":{"themeMode":"dark","accentSource":"aether"},"topBar":{"weatherPlacement":"right","keyboardIndicator":"compact"}})");
     CHECK(parsed.warnings.empty());

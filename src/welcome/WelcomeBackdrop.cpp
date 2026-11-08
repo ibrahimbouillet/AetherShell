@@ -132,7 +132,7 @@ Result<BackdropImage> DecodeBackdrop(const std::filesystem::path& file, UINT cov
     return MakeError(ErrorCode::Internal, "The desktop picture could not be read");
 }
 
-std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx) {
+std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx, float share) {
     // The log says which way it went, never which file: a black welcome can then be told apart from a plain colour.
     try {
         const auto files = BackdropCandidates(MonitorPicture(monitorPx), DesktopPicture(), WindowsCopy());
@@ -140,8 +140,9 @@ std::optional<BackdropImage> LoadDesktopBackdrop(const RECT& monitorPx) {
             AETHER_LOG_INFO("welcome", "background: the desktop is a plain colour");
             return std::nullopt;
         }
-        const UINT width = static_cast<UINT>(std::max(1L, (monitorPx.right - monitorPx.left) / 2));
-        const UINT height = static_cast<UINT>(std::max(1L, (monitorPx.bottom - monitorPx.top) / 2));
+        share = std::clamp(share, 0.1f, 1.0f);
+        const UINT width = static_cast<UINT>(std::max(1L, std::lround(static_cast<float>(monitorPx.right - monitorPx.left) * share)));
+        const UINT height = static_cast<UINT>(std::max(1L, std::lround(static_cast<float>(monitorPx.bottom - monitorPx.top) * share)));
         // Moved, deleted or only in the cloud: Windows keeps its own local copy of the picture it shows.
         for (std::size_t i = 0; i < files.size(); ++i) {
             if (auto image = DecodeBackdrop(files[i], width, height)) {

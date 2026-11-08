@@ -2996,3 +2996,41 @@ Latest and not pre-release, with exactly two assets: `AetherShell-0.3.5-alpha.3-
 `35f3f419440ae44f3574372e5bb39d75f8f15a7009911b4673fa7f48ffd6ebb5`, and its checksums file. No manifest was uploaded. Downloaded back
 from the release, the setup matches its checksums file and is byte-identical to the local build. The API reports this tag as latest;
 3.3 and the earlier releases remain available. The owner's installed copy is the validated test setup, same source.
+
+### S-068 — Alpha 4, test 4.0: Liquid and Grain in the shell (Claude, 2026-11-05 to 2026-11-08)
+
+**What changed (D64):** the validated prototype's motion and shader ported to C++ (`graphics/LiquidMotion`,
+`graphics/LiquidShader.inc`, `graphics/LiquidRenderer` on Direct3D 11 beside Direct2D); `general.surfaceStyle` (Grain default,
+Liquid); Settings → Appearance → Style with two animated previews; Liquid Dock and Top Bar over the desktop picture read at the
+monitor's resolution; the arrival after the greeting, landing on the real bars, which then return without their entrance.
+
+**Same rendering as the prototype:** with the same wallpaper (`resources/preview/setup_preview-3.webp`), the C++ renderer
+(WARP, offscreen) and the prototype (headless Chrome, software WebGL) at seven moments in both styles: mean absolute difference
+1.03–1.33/255 and 0.5–0.9 % of pixels differing by more than 10 up to 2.6 s; at 3.5 s 2.45 % and 2.62 %, where the prototype draws
+placeholder icons that the shell leaves to its real bars. Side by side the frames are indistinguishable.
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25 suites, including new: the arrival's motion (one drop, only two halves, continuous, landing on given bars), the materials (flat water shows the picture exactly, no colour cast over grey, a shadow, transparent elsewhere; Grain frosted and grained), the Style setting's JSON |
+| Native welcome | 11/11; new: with an arrival the greeting ends when the drops reach the bars (5.7 s in all) |
+| Native topbar 7/7, dock 14/14 | Pass |
+| Native settings_ui | 37/38 after two Appearance tests were moved to the page's new control numbers (Style is now its first field) |
+| Native app | 21/22: the window-corner pixel case of S-067, unchanged |
+| Native ui_form | 28/31, then 29/31, different cases each run |
+| `scripts/package.ps1` privacy and freshness audit | Pass |
+
+**Failures kept visible, judged environmental:** across three runs of the same tree, Settings failed a different case each time
+(a focus check on the Dock page, the pixel check after a check for updates, a save wait on the General page), none on code this
+round changed; the published 3.5 binary, run at the same moment, failed the same pixel check. ui_form failed native-combo,
+acrylic and touch cases, different ones in each run, on code this round did not change. The desktop was in use.
+
+**Not executed, so not claimed:** the setup itself; Liquid bars on the real desktop; the arrival at a real lock or sign-in; the
+Settings previews on screen; the material after a real device loss; Liquid's cost on the owner's GPU.
+
+**Test build 4.0:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 6808064 bytes, SHA-256
+`5d1e302f933ce5322864ce02f9f155d0ac9e122a25ade04be4ddf55f09fed976`, built by `scripts/package.ps1` from the tree committed with
+this entry (its embedded revision is the commit before, `edf2808`, as for test builds made before their commit). Not pushed,
+tagged, published or installed.
