@@ -8,7 +8,7 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [0.4.0-alpha.4] — in progress, not published
 
-Alpha 4 (D62–D67). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D68). Its test builds keep this number until the owner calls Alpha 4 complete.
 
 ### Added
 
@@ -23,11 +23,16 @@ Alpha 4 (D62–D67). Its test builds keep this number until the owner calls Alph
   chosen and when Aether Shell starts without a greeting.
 - **Two previews** of the styles in Settings → Appearance: on screen at once, they play the arrival, then rest on the Dock and
   the Top Bar.
+- **Search finds everything by name, as Start does:** Windows' tools in either language and by their command (Device
+  Manager by "devmgmt"), Windows' Settings pages, and the files and folders in your own folders, from Windows' own index
+  (names only, never contents), each with what it is and where.
 
 ### Fixed
 
 - With Auto-Hide on, the Dock and the Top Bar left at once after the greeting at an unlock, because the page left open covered
   them; they now stay out a few seconds, as when they are used.
+- In Search, Enter opened the row under the mouse pointer instead of the one chosen; the pointer now only lights a row, and
+  opens it when clicked.
 
 ## [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3) — 2026-11-05
 

@@ -26,8 +26,10 @@ namespace {
 class Launcher final : public apps::IApplicationLauncher {
 public:
     int launches = 0;
-    void LaunchAsync(const apps::ApplicationInfo&, std::function<void(Result<void>)> completion) override {
+    std::wstring last;   // the id of the last launched result
+    void LaunchAsync(const apps::ApplicationInfo& app, std::function<void(Result<void>)> completion) override {
         ++launches;
+        last = app.id;
         completion(Ok());
     }
     Result<void> Activate(const apps::RunningApplication&) override { return Ok(); }
@@ -312,6 +314,37 @@ AETHER_TEST("search UI: a release launches only the row its press started on (AS
     CHECK_EQ(fixture.launcher.launches, 1);
 }
 
+// D68: the owner typed for one application, the pointer happened to rest on another row, Enter opened that row.
+AETHER_TEST("search UI: the row under the pointer is lit, not selected; Enter opens the selection, a click its own row") {
+    Fixture fixture;
+    auto& window = *fixture.window;
+    graphics::MotionPolicy reduced; reduced.reduced = true;
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), reduced);
+    window.Open();
+    fixture.Query(L"Test Application");
+    REQUIRE(window.Results().size() > 3u);
+    const auto bounds = window.BoundsPx();
+    const auto rowPoint = [&](std::size_t row) {
+        const auto rect = window.Item(row).boundsPx;
+        return MAKELPARAM((rect.left + rect.right) / 2 - bounds.left, (rect.top + rect.bottom) / 2 - bounds.top);
+    };
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, 0, rowPoint(2));
+    CHECK(window.HoveredIndex() == std::optional<std::size_t>(2));
+    CHECK_EQ(window.SelectedIndex(), 0u);                       // the pointer does not choose
+    ::SendMessageW(window.EditHandle(), WM_KEYDOWN, VK_DOWN, 0);
+    CHECK_EQ(window.SelectedIndex(), 1u);                       // the keys do
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, 0, rowPoint(3));
+    ::SendMessageW(window.EditHandle(), WM_KEYDOWN, VK_RETURN, 0);
+    REQUIRE_EQ(fixture.launcher.launches, 1);
+    CHECK(fixture.launcher.last == window.Results()[1].application.id);   // the selection, not the row under the pointer
+    window.Open();
+    fixture.Query(L"Test Application");
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, MK_LBUTTON, rowPoint(2));
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, rowPoint(2));
+    REQUIRE_EQ(fixture.launcher.launches, 2);
+    CHECK(fixture.launcher.last == window.Results()[2].application.id);   // a click opens the row clicked
+}
+
 AETHER_TEST("search UI: equal wheel totals move the selection equally far (AS4-15)") {
     Fixture fixture;
     auto& window = *fixture.window;
@@ -322,7 +355,7 @@ AETHER_TEST("search UI: equal wheel totals move the selection equally far (AS4-1
     REQUIRE(window.Results().size() > 5u);
     const auto wheel = [&](int delta) { ::SendMessageW(window.Handle(), WM_MOUSEWHEEL, MAKEWPARAM(0, static_cast<WORD>(static_cast<SHORT>(delta))), 0); };
     const auto selected = [&] { return window.SelectedIndex(); };
-    // From the first row, wherever the real pointer happens to rest: a row under it is selected on opening.
+    // From the first row (D68: the real pointer, wherever it rests, no longer selects the row under it).
     wheel(8 * WHEEL_DELTA);
     REQUIRE_EQ(selected(), 0u);
     wheel(-WHEEL_DELTA);

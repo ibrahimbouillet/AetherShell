@@ -416,7 +416,7 @@ void Probe(graphics::ThemeMode theme, const std::string& prefix, bool liquid = f
             winrt::com_ptr<IUIAutomationElement> search; check(children->GetElement(0, search.put()));
             accessibilityStage = 5;
             BSTR name{}; check(search->get_CurrentName(&name)); const std::wstring label(name ? name : L""); ::SysFreeString(name);
-            if (label != L"Search applications") throw std::runtime_error("Dock accessible label mismatch");
+            if (label != L"Search") throw std::runtime_error("Dock accessible label mismatch");
             winrt::com_ptr<IUIAutomationInvokePattern> invoke;
             accessibilityStage = 6;
             check(search->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern), invoke.put_void()));

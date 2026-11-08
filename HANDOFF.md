@@ -7,7 +7,16 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.3: Liquid's blur layer in Settings, the arrival at every start (`0.4.0-alpha.4`, D67, S-071, 2026-11-08)
+## Current checkpoint — Alpha 4, test 4.4: Search finds everything by name; Enter never opens the hovered row (`0.4.0-alpha.4`, D68, S-072, 2026-11-08)
+
+The owner liked test 4.3's render and asked for Search to find everything as Start does, and for Enter never to open the
+row merely under the pointer (D68, amending FR-012 and FR-013). Search now brings Windows' tools by either language's name
+and their command, 44 Settings pages, and files and folders of the person's folders from Windows' own index (by name,
+existing only), ranked together; the pointer only lights a row. Captured on this PC's real catalog and index. The owner's
+missing wallpaper (its file deleted from Downloads) was restored from Windows' own copy into Pictures, at the owner's
+request. Nothing pushed (D65). Receipts in TEST_STATUS S-072. **Next:** the owner's trial of 4.4.
+
+## Earlier — Alpha 4, test 4.3: Liquid's blur layer in Settings, the arrival at every start (`0.4.0-alpha.4`, D67, S-071, 2026-11-08)
 
 The owner's screenshots of unreadable bars came from test 4.1, still installed (D67); test 4.2's glass was not yet seen.
 Test 4.3 adds the blur layer the owner asked for: under the liquid, never grained, its opacity and colour shaped in

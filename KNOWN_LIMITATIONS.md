@@ -16,6 +16,10 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   fixtures, not yet on the owner's desktop. A Liquid blur below 100% lets the sharp page through and can lower the text's
   contrast over a busy page (measured 3.2:1 at 60% in light mode); Settings says so. Every Alpha 4 test build carries
   `0.4.0-alpha.4`: only the installed program's date tells them apart.
+- Alpha 4 Search (D68, S-072): files come from Windows' own index, so only what Windows Search has indexed in the person's
+  folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive) is found, by name, never by content; with
+  Windows Search off there are no files. Settings pages are a fixed list of 44 with English and French names; others are
+  reached through Windows' own Settings.
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
   application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the

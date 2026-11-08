@@ -111,6 +111,10 @@ inline constexpr wchar_t kControlPanelItemsFolder[] = L"::{26EE0668-A00A-44D7-93
 [[nodiscard]] std::optional<std::wstring_view> SystemToolFile(std::wstring_view parsingName) noexcept;
 // The listed tools whose file `exists`, named in French or English; the other name stays searchable.
 [[nodiscard]] std::vector<ApplicationInfo> SystemToolApplications(bool french, const std::function<bool(std::wstring_view file)>& exists);
+// D68: Windows' Settings pages, a fixed list (never typed text): "ms-settings:<page>", named as Windows' search names
+// them, in French or English with the other name searchable. Opened like the Control Panel's items.
+[[nodiscard]] bool IsSettingsPageName(std::wstring_view parsingName) noexcept;
+[[nodiscard]] std::vector<ApplicationInfo> SettingsPageApplications(bool french);
 // Adds the entries whose name the catalog does not have yet, and keeps its order.
 [[nodiscard]] std::vector<ApplicationInfo> AddSystemEntries(std::vector<ApplicationInfo> catalog, std::vector<ApplicationInfo> entries);
 

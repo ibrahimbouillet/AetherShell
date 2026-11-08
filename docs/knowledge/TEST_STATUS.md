@@ -3149,3 +3149,41 @@ desktop; moving video behind the bars; frame time on the owner's GPU.
 `4b1e218a93e734b1ba49957c10e6bceaea4ebcb17663ccc3a6066134d8eb4046`, built by `scripts/package.ps1` from the tree committed
 with this entry (its embedded revision is the commit before, `e73f50b`). Test 4.2's build, never installed, moved to
 `dist/test-4.2-superseded/`. Not pushed, tagged, published or installed.
+
+### S-072 — Alpha 4, test 4.4: Search finds everything by name; Enter never opens the hovered row (Claude, 2026-11-08)
+
+**What changed (D68):** the pointer lights a Search row (`HoveredIndex`) without selecting it; Enter opens the selection,
+a click the row clicked. Control Panel items carry their French names and commands; 44 Windows Settings pages join the
+catalog as `ms-settings:` items of a fixed list; files and folders come from Windows' search index (`FileSearch`,
+`SearchService::QueryFiles`: names only, the person's known folders, real paths from `System.ItemUrl`, existing only),
+ranked with the rest; keyword matches must be whole. Search labels: "Search apps, settings and files", Dock item "Search".
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Combined non-network unit gate | 25/25, showcase 86/86; new: Settings pages in both languages and only listed pages open; Control Panel items by French name and command; file kinds, folders and shortcuts left to the applications |
+| This PC's real catalog through the search index | "device manager", "devmgmt" and "gestionnaire de périphériques" all give Device Manager first; "display settings" gives the Display page, which opens; "wifi" lists the Wi-Fi page |
+| This PC's Windows index | 6 to 8 files for "a", "e", "desktop", every one still existing and opening as itself; a stale entry of a deleted folder and AppData/hidden-folder noise, seen in a first run, are now left out |
+| Real Search window captured (real catalog, icons, index) | "device": Device Manager, Devices and Printers, Bluetooth & devices settings; "display": Display settings; "pexels": the wallpaper picture in Pictures; "aether": the application, the AetherShell folder in Documents, Restore Windows taskbar |
+| Native search_ui | 17/17; new: the row under the pointer is lit, not selected; Enter opens the selection, a click its row |
+| Native applications 22/22, settings_ui 39/39, welcome 12/12, topbar 8/8, ui 30/30 | Pass |
+| Native app | 21/22: the window-corner pixel case of S-067 to S-071 |
+| Native dock | 13/16 twice: the light Grain probe, the Liquid probe and a preview case stop at UI Automation's stage 3 (the Dock's root read as a pane); the 3.5 binary, run right after, fails the same probe at the same stage. Earlier this day the same tree's cases passed 15/15 |
+| `scripts/package.ps1` | Completed (manifest and checksums written) |
+
+**Seen and corrected on the real render before this entry:** the index's display path is translated ("Utilisateurs") and
+cannot be opened, so the real path is read from its URL; loose keyword matches ("pexels" finding File Explorer Options);
+files always under the applications, now ranked with them.
+
+**Not executed, so not claimed:** the setup itself; Search on the owner's own use; files with Windows Search off on
+another PC; the Settings pages in a French Windows.
+
+**Also, at the owner's request:** the desktop wallpaper, black because its file had been deleted from Downloads, restored
+from Windows' own copy into Pictures and applied again (Fill). No repository file involved.
+
+**Test build 4.4:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 6923776 bytes, SHA-256
+`4caef0753717de946cf6b0c97a4fb18669a3bd4d4e84ce48e13abdd996c29571`, built by `scripts/package.ps1` from the tree committed
+with this entry (its embedded revision is the commit before, `ba50bbc`). Test 4.3's build moved to `dist/test-4.3/`. Not
+pushed, tagged, published or installed.

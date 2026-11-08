@@ -98,6 +98,11 @@ using RouteOutcome = std::optional<Result<void>>;
 
 RouteOutcome TryAppsFolder(const ApplicationInfo& app, std::wstring_view name) {
     if (text::Trim(app.parsingName).empty()) return std::nullopt;
+    if (app.kind == ApplicationKind::File) {   // D68: a search's file or folder opens with its own program
+        auto file = shell::CreateFileResultItem(app.parsingName);
+        if (!file) return Result<void>(file.error());
+        return ExecuteItem(file.value().get(), name);
+    }
     auto item = shell::CreateAppsFolderItem(app.parsingName);
     if (!item) return std::nullopt;
     return ExecuteItem(item.value().get(), name);

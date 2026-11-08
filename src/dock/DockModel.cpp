@@ -74,7 +74,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
             start.displayName = L"Start"; items.push_back(std::move(start));
         }
         DockItem search;
-        search.id = L"aether:search"; search.displayName = L"Search applications";
+        search.id = L"aether:search"; search.displayName = L"Search";
         items.push_back(std::move(search));
         if (settings.showTaskViewButton) {
             DockItem taskView; taskView.kind = DockItemKind::TaskView; taskView.id = L"aether:task-view";

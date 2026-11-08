@@ -23,7 +23,7 @@ the selection with Shift or a drag) by hit-testing the drawn DirectWrite layout 
 `EM_SETSEL`, so the caret lands where the glyphs are drawn. The EDIT's font follows the token family
 (falling back to Segoe UI when GDI does not know it) and is recreated only when the size or DPI
 changes. The native caret blink interval is respected while open. The edit's accessible name is
-annotated as "Search applications" through the documented
+annotated as "Search apps, settings and files" (D68) through the documented
 [IAccPropServices API](https://learn.microsoft.com/en-us/windows/win32/api/oleacc/nf-oleacc-iaccpropservices-sethwndpropstr).
 The SDK annotation GUID definitions live in `NativeEditGuids.cpp`; no third-party library is added.
 
@@ -43,7 +43,7 @@ The window keeps the height of its placement area (from 18% below the top to 16 
 plus shadow and entrance guard margins)
 and never resizes per query. Inside it, a glass panel (popup radius, Popup elevation, neutral
 material) is 680 DIPs wide at most and contains: a 48-DIP search field with a Search glyph and an
-underline that becomes a 2-DIP accent bar while focused, an "Applications" caption, 52-DIP result rows
+underline that becomes a 2-DIP accent bar while focused, a "Results" caption (D68), 52-DIP result rows
 (32-DIP icons drawn with `DrawIconBitmap`, the name with the matched ranges in the accent text color,
 the kind as secondary text), and a footer hint ("Navigate, Open, Close"). The selected row gets a
 selection pill and a small accent indicator whose position is tweened (fast, standard curve). A failed
@@ -116,3 +116,8 @@ changes, Windows 10, actual IME/screen-reader use and cross-process margin behav
 
 The Search panel uses the neutral glass material (`GlassStyle::neutral`, no highlight): the earlier
 top-weighted sheen is removed so every Aether surface shares one non-directional material.
+
+D68: the pointer lights the row it is over (`HoveredIndex`) without selecting it; Enter opens `SelectedIndex`, a click the
+row clicked. Each row's second line is its own description (`ApplicationInfo::detail`: "Settings", "Control Panel",
+"Video in Downloads") or its kind. Files arrive after the applications (`AddFileResults`) and are ranked with them by
+score; a selection the person moved stays on what they chose.

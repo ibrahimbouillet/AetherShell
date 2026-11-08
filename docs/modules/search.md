@@ -2,6 +2,14 @@
 
 `src/search`, static target `aether_search`. Requirements FR-012/NFR-002.
 
+D68: beyond the applications, the catalog brings Windows' tools (Control Panel items with French names and commands,
+the listed System32 tools) and Windows' Settings pages (`SettingsPageApplications`, `ms-settings:` items of a fixed list).
+`FileSearch` (`FindFiles`) asks Windows' search index for files and folders by name (`ISearchQueryHelper` and OLE DB,
+read-only), scoped to the person's known folders; it reads each item's real path from `System.ItemUrl` (the display path
+is translated), drops shortcuts, programs, Windows' views of files, hidden/package/AppData folders and anything that no
+longer exists. `SearchService::QueryFiles` runs it on its own worker, answers only the latest request on the UI thread,
+and ranks the files by name with the same matcher. Keywords and executable stems match only whole (no fuzzy letters).
+
 `Normalize` uses Windows NFKD and invariant lower case, removes nonspacing/diacritic marks, and maps
 normalized UTF-16 units back to whole original spans for highlights. Malformed surrogates are rejected.
 `SearchIndex::Build` deduplicates IDs, caches normalized names/keywords/executable stems, word starts,

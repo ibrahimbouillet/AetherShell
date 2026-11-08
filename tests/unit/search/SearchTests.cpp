@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "AetherTest.h"
 #include "search/SearchService.h"
+#include "search/FileSearch.h"
 
 #include <algorithm>
 #include <atomic>
@@ -128,4 +129,24 @@ AETHER_TEST("search: 2000 application Release benchmark records the module targe
 #ifdef NDEBUG
     CHECK(times[33]<2.0);
 #endif
+}
+
+// D68: the files Windows' index finds, as search results.
+AETHER_TEST("search files: a found file says what it is and where, and shortcuts are left to the applications") {
+    CHECK(aether::search::FileKindOf(L"C:\\Users\\a\\Videos\\Trip.MP4", false) == std::wstring_view(L"Video"));
+    CHECK(aether::search::FileKindOf(L"D:\\photo.jpeg", false) == std::wstring_view(L"Picture"));
+    CHECK(aether::search::FileKindOf(L"D:\\song.flac", false) == std::wstring_view(L"Music"));
+    CHECK(aether::search::FileKindOf(L"D:\\report.docx", false) == std::wstring_view(L"Document"));
+    CHECK(aether::search::FileKindOf(L"D:\\pack.7z", false) == std::wstring_view(L"Archive"));
+    CHECK(aether::search::FileKindOf(L"D:\\thing.xyz", false) == std::wstring_view(L"File"));
+    CHECK(aether::search::FileKindOf(L"D:\\Projects", true) == std::wstring_view(L"Folder"));
+    CHECK(aether::search::IsApplicationFile(L"C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\App.lnk"));
+    CHECK(aether::search::IsApplicationFile(L"C:\\Tools\\app.EXE"));
+    CHECK_FALSE(aether::search::IsApplicationFile(L"C:\\Docs\\notes.txt"));
+    const auto file = aether::search::FileResult(L"C:\\Users\\a\\Downloads\\Trip.mp4", L"Trip.mp4", false, L"Downloads");
+    CHECK(file.kind == aether::apps::ApplicationKind::File);
+    CHECK_EQ(file.id, std::wstring(L"file:c:\\users\\a\\downloads\\trip.mp4"));
+    CHECK_EQ(file.detail, std::wstring(L"Video in Downloads"));
+    CHECK_EQ(file.parsingName, std::wstring(L"C:\\Users\\a\\Downloads\\Trip.mp4"));
+    CHECK_EQ(file.displayName, std::wstring(L"Trip.mp4"));
 }

@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "search/SearchService.h"
 
+#include "search/FileSearch.h"
+
 #include "core/WorkerPool.h"
 #include "diagnostics/Logger.h"
 
@@ -166,6 +168,9 @@ Result<std::vector<SearchResult>> SearchIndex::Query(std::wstring_view query, st
             for (const auto* field : {&entry.keywords, &entry.executable}) {
                 if (field->text.empty() || match.score >= 7500) continue;
                 auto extra = MatchName(field->text, {}, {}, normalized->text);
+                // D68: keywords hold many words; letters scattered across them are noise ("pexels" in "l'eXplorateur
+                // ... fichierS"), so they count only where the typed text stands whole.
+                if (extra.kind == Match::Kind::Fuzzy) continue;
                 extra.score -= 2500;
                 if (extra.score > match.score) { match = std::move(extra); nameMatch = false; }
             }
@@ -190,9 +195,14 @@ Result<std::vector<SearchResult>> SearchIndex::Query(std::wstring_view query, st
 }
 
 struct SearchService::Impl {
-    explicit Impl(IUiDispatcher& ui) : dispatcher(ui), worker(WorkerPool::Options{1, L"Aether search", ComApartment::MultiThreaded}) {}
+    explicit Impl(IUiDispatcher& ui)
+        : dispatcher(ui), worker(WorkerPool::Options{1, L"Aether search", ComApartment::MultiThreaded}),
+          files(WorkerPool::Options{1, L"Aether file search", ComApartment::MultiThreaded}) {}
     IUiDispatcher& dispatcher;
     WorkerPool worker;
+    WorkerPool files;                   // D68: Windows' index answers out of process: never in the way of the rest
+    std::uint64_t fileGeneration = 0;   // the latest file request; older ones are dropped
+    bool fileFailureLogged = false;
     mutable std::mutex mutex;
     CancellationSource cancellation;
     std::uint64_t generation = 0;
@@ -208,6 +218,46 @@ SearchService::~SearchService() {
     { std::lock_guard lock(impl_->mutex); impl_->alive = false; cancellation = impl_->cancellation; }
     cancellation.Cancel();
     impl_->worker.Shutdown();
+    impl_->files.Shutdown();
+}
+
+void SearchService::QueryFiles(std::wstring query, std::size_t maxResults, FilesDelivered delivered) {
+    std::uint64_t generation = 0;
+    { std::lock_guard lock(impl_->mutex); if (!impl_->alive) return; generation = ++impl_->fileGeneration; }
+    const std::weak_ptr<Impl> weak = impl_;
+    (void)impl_->files.Post([weak, generation, query = std::move(query), maxResults, delivered = std::move(delivered)]() mutable {
+        auto state = weak.lock();
+        if (!state) return;
+        { std::lock_guard lock(state->mutex); if (!state->alive || generation != state->fileGeneration) return; }   // overtaken
+        Result<std::vector<SearchResult>> answer = std::vector<SearchResult>{};
+        auto files = FindFiles(query, maxResults, CancellationToken{});
+        if (!files) {
+            std::lock_guard lock(state->mutex);
+            if (!state->fileFailureLogged) {
+                state->fileFailureLogged = true;   // once: Windows Search may simply be off
+                AETHER_LOG_WARN("search", "files unavailable from Windows' index: {}", files.error().Describe());
+            }
+            answer = files.error();
+        } else if (!files->empty()) {
+            // Ranked by name as the applications are; what the index matched otherwise follows, in its order.
+            const auto all = files.value();
+            std::vector<SearchResult> ranked;
+            if (auto index = SearchIndex::Build(std::move(files.value()))) {
+                if (auto queried = index.value()->Query(query, all.size())) ranked = std::move(queried.value());
+            }
+            for (const auto& file : all) {
+                const bool listed = std::any_of(ranked.begin(), ranked.end(), [&](const SearchResult& r) { return r.application.id == file.id; });
+                if (!listed) ranked.push_back(SearchResult{file, 0, {}});
+            }
+            answer = std::move(ranked);
+        }
+        (void)state->dispatcher.Post([weak, generation, query = std::move(query), answer = std::move(answer), delivered = std::move(delivered)]() mutable {
+            auto live = weak.lock();
+            if (!live) return;
+            { std::lock_guard lock(live->mutex); if (!live->alive || generation != live->fileGeneration) return; }
+            try { delivered(query, std::move(answer)); } catch (...) { AETHER_LOG_WARN("search", "file results listener failed"); }
+        });
+    });
 }
 
 Result<void> SearchService::Rebuild(apps::IApplicationCatalog& catalog) {

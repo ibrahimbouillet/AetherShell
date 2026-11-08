@@ -43,6 +43,8 @@ public:
     [[nodiscard]] HWND EditHandle() const noexcept { return edit_; }
     [[nodiscard]] const std::vector<SearchResult>& Results() const noexcept { return results_; }
     [[nodiscard]] std::size_t SelectedIndex() const noexcept { return selected_; }
+    // D68: the row under the pointer, shown but never selected: Enter opens the selection, a click the row clicked.
+    [[nodiscard]] std::optional<std::size_t> HoveredIndex() const noexcept { return hovered_; }
     [[nodiscard]] const std::wstring& ErrorText() const noexcept { return error_; }
     [[nodiscard]] std::size_t QueryCount() const noexcept { return queryCount_; }
     [[nodiscard]] HWND PreviousForegroundWindow() const noexcept { return previousFocus_; }
@@ -71,6 +73,8 @@ protected:
     bool OnAnimate(double now) override;
     bool OnKeyDown(UINT key) override;
     void OnPointerMove(D2D1_POINT_2F point) override;
+    void OnPointerLeave() override;
+    void AddFileResults(std::vector<SearchResult> files);   // D68: appended after the rest, for the current query
     void OnPointerDown(aether::ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerUp(aether::ui::PointerButton button, D2D1_POINT_2F point) override;
     void OnPointerCaptureLost() override;
@@ -128,6 +132,7 @@ private:
     std::wstring query_, error_;
     std::vector<SearchResult> results_;
     std::size_t selected_ = 0;
+    std::optional<std::size_t> hovered_;   // D68: lit, not selected
     std::size_t firstVisible_ = 0, queryCount_ = 0;
     std::optional<RECT> placementArea_;
     graphics::Spring panelHeight_{0.0f};

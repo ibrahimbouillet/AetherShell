@@ -148,6 +148,100 @@ constexpr std::array<SystemTool, 17> kSystemTools{{
     {L"netplwiz.exe", L"User Accounts (Advanced)", L"Comptes d'utilisateurs (avancé)", L"netplwiz sign-in connexion"},
 }};
 
+// D68: the Control Panel's items by their canonical name: the French name and the commands people type
+// (devmgmt, appwiz...), so that each is found whatever the language of Windows or of the person.
+struct ControlPanelAlias { std::wstring_view canonical, french, keywords; };
+constexpr std::array<ControlPanelAlias, 38> kControlPanelAliases{{
+    {L"Microsoft.DeviceManager", L"Gestionnaire de périphériques", L"devmgmt devmgmt.msc drivers pilotes hardware matériel"},
+    {L"Microsoft.DevicesAndPrinters", L"Périphériques et imprimantes", L"printers imprimantes"},
+    {L"Microsoft.ProgramsAndFeatures", L"Programmes et fonctionnalités", L"appwiz appwiz.cpl uninstall désinstaller programs"},
+    {L"Microsoft.PowerOptions", L"Options d'alimentation", L"powercfg powercfg.cpl sleep veille battery batterie"},
+    {L"Microsoft.Sound", L"Son", L"mmsys mmsys.cpl audio speakers haut-parleurs"},
+    {L"Microsoft.Mouse", L"Souris", L"main.cpl pointer pointeur"},
+    {L"Microsoft.Keyboard", L"Clavier", L"typing frappe"},
+    {L"Microsoft.UserAccounts", L"Comptes d'utilisateurs", L"accounts comptes users utilisateurs"},
+    {L"Microsoft.CredentialManager", L"Gestionnaire d'identification", L"passwords mots de passe credentials"},
+    {L"Microsoft.DateAndTime", L"Date et heure", L"timedate.cpl clock horloge"},
+    {L"Microsoft.DefaultPrograms", L"Programmes par défaut", L"default apps applications par défaut"},
+    {L"Microsoft.NetworkAndSharingCenter", L"Centre Réseau et partage", L"network réseau sharing partage"},
+    {L"Microsoft.WindowsFirewall", L"Pare-feu Windows Defender", L"firewall.cpl firewall pare-feu"},
+    {L"Microsoft.System", L"Système", L"system système"},
+    {L"Microsoft.Troubleshooting", L"Dépannage", L"troubleshoot dépanner fix réparer"},
+    {L"Microsoft.FileHistory", L"Historique des fichiers", L"backup sauvegarde"},
+    {L"Microsoft.IndexingOptions", L"Options d'indexation", L"index search recherche"},
+    {L"Microsoft.InternetOptions", L"Options Internet", L"inetcpl inetcpl.cpl proxy"},
+    {L"Microsoft.FolderOptions", L"Options de l'Explorateur de fichiers", L"hidden files fichiers cachés extensions"},
+    {L"Microsoft.RegionAndLanguage", L"Région", L"intl.cpl region format"},
+    {L"Microsoft.AutoPlay", L"Exécution automatique", L"autoplay"},
+    {L"Microsoft.BackupAndRestore", L"Sauvegarder et restaurer (Windows 7)", L"backup sauvegarde restore restaurer"},
+    {L"Microsoft.BitLockerDriveEncryption", L"Chiffrement de lecteur BitLocker", L"bitlocker encryption chiffrement"},
+    {L"Microsoft.ColorManagement", L"Gestion des couleurs", L"color colour couleur icc"},
+    {L"Microsoft.EaseOfAccessCenter", L"Options d'ergonomie", L"accessibility accessibilité"},
+    {L"Microsoft.Recovery", L"Récupération", L"recovery restore restauration"},
+    {L"Microsoft.ActionCenter", L"Sécurité et maintenance", L"security sécurité maintenance"},
+    {L"Microsoft.StorageSpaces", L"Espaces de stockage", L"storage stockage"},
+    {L"Microsoft.SyncCenter", L"Centre de synchronisation", L"sync synchronisation"},
+    {L"Microsoft.AdministrativeTools", L"Outils Windows", L"administrative tools outils d'administration"},
+    {L"Microsoft.MobilityCenter", L"Centre de mobilité Windows", L"mobility mobilité"},
+    {L"Microsoft.PhoneAndModem", L"Téléphone et modem", L"modem"},
+    {L"Microsoft.PenAndTouch", L"Stylet et fonction tactile", L"pen stylet touch tactile"},
+    {L"Microsoft.TabletPCSettings", L"Paramètres du Tablet PC", L"tablet tablette"},
+    {L"Microsoft.RemoteAppAndDesktopConnections", L"Connexions RemoteApp et Bureau à distance", L"remote distance"},
+    {L"Microsoft.WorkFolders", L"Dossiers de travail", L"work folders"},
+    {L"Microsoft.Taskbar", L"Barre des tâches et navigation", L"taskbar barre des tâches"},
+    {L"Microsoft.Fonts", L"Polices", L"fonts polices"},
+}};
+
+// D68: Windows' Settings pages, named as Windows' own search names them.
+struct SettingsPage { std::wstring_view page, english, french, keywords; };
+constexpr std::wstring_view kSettingsPrefix = L"ms-settings:";
+constexpr std::array<SettingsPage, 44> kSettingsPages{{
+    {L"display", L"Display settings", L"Paramètres d'affichage", L"screen écran resolution résolution brightness luminosité scale échelle monitor moniteur hdr"},
+    {L"nightlight", L"Night light settings", L"Paramètres de l'éclairage nocturne", L"blue light lumière bleue"},
+    {L"display-advancedgraphics", L"Graphics settings", L"Paramètres graphiques", L"gpu graphics card carte graphique"},
+    {L"sound", L"Sound settings", L"Paramètres du son", L"audio volume speakers haut-parleurs microphone micro output sortie"},
+    {L"notifications", L"Notification settings", L"Paramètres de notification", L"alerts alertes do not disturb ne pas déranger"},
+    {L"powersleep", L"Power & battery settings", L"Paramètres d'alimentation et de batterie", L"power alimentation sleep veille battery batterie"},
+    {L"batterysaver", L"Energy saver settings", L"Paramètres de l'économiseur d'énergie", L"battery saver économiseur batterie"},
+    {L"storagesense", L"Storage settings", L"Paramètres de stockage", L"disk disque space espace cleanup nettoyage"},
+    {L"multitasking", L"Multitasking settings", L"Paramètres du mode multitâche", L"snap alt tab desktops bureaux"},
+    {L"clipboard", L"Clipboard settings", L"Paramètres du Presse-papiers", L"clipboard history historique copy copier paste coller"},
+    {L"remotedesktop", L"Remote Desktop settings", L"Paramètres du Bureau à distance", L"rdp remote"},
+    {L"about", L"About your PC", L"Informations système", L"pc name nom specifications caractéristiques version rename renommer"},
+    {L"bluetooth", L"Bluetooth & devices settings", L"Paramètres Bluetooth et appareils", L"pair appairer headphones casque devices appareils"},
+    {L"printers", L"Printers & scanners settings", L"Paramètres des imprimantes et scanners", L"print imprimer printer imprimante scanner"},
+    {L"mousetouchpad", L"Mouse settings", L"Paramètres de la souris", L"mouse souris pointer pointeur scroll défilement"},
+    {L"devices-touchpad", L"Touchpad settings", L"Paramètres du pavé tactile", L"touchpad trackpad gestures gestes"},
+    {L"network-status", L"Network & internet settings", L"Paramètres réseau et Internet", L"network réseau internet ethernet connection connexion"},
+    {L"network-wifi", L"Wi-Fi settings", L"Paramètres Wi-Fi", L"wifi wireless sans fil"},
+    {L"network-vpn", L"VPN settings", L"Paramètres VPN", L"vpn"},
+    {L"network-proxy", L"Proxy settings", L"Paramètres du proxy", L"proxy"},
+    {L"network-airplanemode", L"Airplane mode settings", L"Paramètres du mode Avion", L"airplane avion flight vol"},
+    {L"network-mobilehotspot", L"Mobile hotspot settings", L"Paramètres du point d'accès mobile", L"hotspot tethering partage de connexion"},
+    {L"personalization-background", L"Background settings", L"Paramètres de l'arrière-plan", L"wallpaper fond d'écran background arrière-plan"},
+    {L"colors", L"Color settings", L"Paramètres des couleurs", L"dark mode mode sombre light clair accent colors couleurs"},
+    {L"themes", L"Theme settings", L"Paramètres des thèmes", L"themes thèmes"},
+    {L"lockscreen", L"Lock screen settings", L"Paramètres de l'écran de verrouillage", L"lock screen verrouillage"},
+    {L"taskbar", L"Taskbar settings", L"Paramètres de la barre des tâches", L"taskbar barre des tâches"},
+    {L"fonts", L"Font settings", L"Paramètres des polices", L"fonts polices"},
+    {L"appsfeatures", L"Installed apps", L"Applications installées", L"uninstall désinstaller programs programmes apps applications"},
+    {L"defaultapps", L"Default apps settings", L"Paramètres des applications par défaut", L"default browser navigateur par défaut open with ouvrir avec"},
+    {L"startupapps", L"Startup apps settings", L"Paramètres des applications de démarrage", L"startup démarrage boot"},
+    {L"yourinfo", L"Account info", L"Informations du compte", L"account compte profile profil"},
+    {L"signinoptions", L"Sign-in options", L"Options de connexion", L"password mot de passe pin windows hello sign in connexion"},
+    {L"otherusers", L"Other users settings", L"Paramètres des autres utilisateurs", L"users utilisateurs family famille account compte"},
+    {L"dateandtime", L"Date & time settings", L"Paramètres de date et d'heure", L"date time heure clock horloge time zone fuseau horaire"},
+    {L"regionlanguage", L"Language & region settings", L"Paramètres de langue et région", L"language langue region région keyboard clavier"},
+    {L"typing", L"Typing settings", L"Paramètres de saisie", L"autocorrect correction typing saisie keyboard clavier"},
+    {L"easeofaccess", L"Accessibility settings", L"Paramètres d'accessibilité", L"accessibility accessibilité narrator narrateur magnifier loupe contrast contraste"},
+    {L"privacy", L"Privacy & security settings", L"Paramètres de confidentialité et sécurité", L"privacy confidentialité security sécurité permissions autorisations"},
+    {L"privacy-location", L"Location settings", L"Paramètres de localisation", L"location localisation gps position"},
+    {L"windowsupdate", L"Windows Update settings", L"Paramètres de Windows Update", L"update mise à jour upgrade"},
+    {L"recovery", L"Recovery settings", L"Paramètres de récupération", L"reset réinitialiser recovery récupération"},
+    {L"activation", L"Activation settings", L"Paramètres d'activation", L"product key clé de produit license licence activation"},
+    {L"developers", L"For developers settings", L"Paramètres pour les développeurs", L"developer mode mode développeur"},
+}};
+
 }  // namespace
 
 bool IsUninstallerName(std::wstring_view displayName) noexcept {
@@ -386,8 +480,17 @@ CatalogClassification ClassifyControlPanelItem(std::wstring_view displayName, st
     app.kind = ApplicationKind::Other;
     app.displayName = std::wstring(name);
     app.parsingName = std::wstring(parsing);
-    const auto words = WordsOfCanonicalName(text::Trim(canonicalName));
+    app.detail = L"Control Panel";
+    const auto canonical = text::Trim(canonicalName);
+    const auto words = WordsOfCanonicalName(canonical);
     if (!text::EqualsIgnoreCase(words, name)) app.keywords = words;
+    // D68: the other language's name and the commands people type, whatever the language of Windows.
+    const auto alias = std::find_if(kControlPanelAliases.begin(), kControlPanelAliases.end(),
+                                    [canonical](const ControlPanelAlias& entry) { return text::EqualsIgnoreCase(entry.canonical, canonical); });
+    if (alias != kControlPanelAliases.end()) {
+        if (!text::EqualsIgnoreCase(alias->french, name)) app.keywords += (app.keywords.empty() ? L"" : L" ") + std::wstring(alias->french);
+        app.keywords += (app.keywords.empty() ? L"" : L" ") + std::wstring(alias->keywords);
+    }
     return Finish(std::move(app));
 }
 
@@ -408,10 +511,32 @@ std::vector<ApplicationInfo> SystemToolApplications(bool french, const std::func
         app.displayName = std::wstring(french ? tool.french : tool.english);
         app.parsingName = std::wstring(kSystemToolPrefix) + std::wstring(tool.file);
         app.keywords = std::wstring(french ? tool.english : tool.french) + L" " + std::wstring(StemOf(tool.file)) + L" " + std::wstring(tool.keywords);
+        app.detail = L"Windows tool";
         auto finished = Finish(std::move(app));
         if (finished.decision == CatalogDecision::Include) tools.push_back(std::move(finished.app));
     }
     return tools;
+}
+
+bool IsSettingsPageName(std::wstring_view parsingName) noexcept {
+    if (!StartsWithIgnoreCase(parsingName, kSettingsPrefix)) return false;
+    const auto page = parsingName.substr(kSettingsPrefix.size());
+    return std::any_of(kSettingsPages.begin(), kSettingsPages.end(), [page](const SettingsPage& entry) { return text::EqualsIgnoreCase(entry.page, page); });
+}
+
+std::vector<ApplicationInfo> SettingsPageApplications(bool french) {
+    std::vector<ApplicationInfo> pages;
+    for (const auto& entry : kSettingsPages) {
+        ApplicationInfo app;
+        app.kind = ApplicationKind::Other;
+        app.displayName = std::wstring(french ? entry.french : entry.english);
+        app.parsingName = std::wstring(kSettingsPrefix) + std::wstring(entry.page);
+        app.keywords = std::wstring(french ? entry.english : entry.french) + L" " + std::wstring(entry.keywords);
+        app.detail = L"Settings";
+        auto finished = Finish(std::move(app));
+        if (finished.decision == CatalogDecision::Include) pages.push_back(std::move(finished.app));
+    }
+    return pages;
 }
 
 std::vector<ApplicationInfo> AddSystemEntries(std::vector<ApplicationInfo> catalog, std::vector<ApplicationInfo> entries) {

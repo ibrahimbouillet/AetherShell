@@ -4,6 +4,11 @@
 #include "platform/windows/ComApartment.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "search/ui/SearchWindow.h"
+#include "applications/ShellApplicationCatalog.h"
+#include "applications/ShellItems.h"
+#include "applications/ShellIconProvider.h"
+#include "search/FileSearch.h"
+#include "core/Strings.h"
 #include "CaptureFixture.h"
 
 #include <algorithm>
@@ -90,6 +95,61 @@ struct Fixture {
 };
 }
 
+// D68: the owner could not find Device Manager. The real catalog of this PC and the search index, as the shell uses them.
+AETHER_TEST("search: the real catalog finds Windows' own tools by name, Device Manager first") {
+    platform::ComApartment com;
+    REQUIRE(SUCCEEDED(com.Status()));
+    auto discovered = apps::ShellApplicationCatalog().DiscoverApplications(CancellationToken{});
+    REQUIRE(discovered.ok());
+    auto index = search::SearchIndex::Build(discovered.value());
+    REQUIRE(index.ok());
+    for (const auto* query : {L"device manager", L"Device Manager", L"device", L"devmgmt", L"gestionnaire de périphériques"}) {
+        auto found = index.value()->Query(query, 8);
+        REQUIRE(found.ok());
+        std::string top;
+        for (const auto& result : found.value()) top += text::Narrow(result.application.displayName) + " | ";
+        TEST_NOTE(text::Narrow(query) + " -> " + top);
+    }
+    // Device Manager first, by its name in either language or the command people type.
+    for (const auto* query : {L"device manager", L"devmgmt", L"gestionnaire de périphériques"}) {
+        const auto first = index.value()->Query(query, 8);
+        REQUIRE(first.ok());
+        REQUIRE_FALSE(first.value().empty());
+        CHECK(text::ToLower(first.value().front().application.parsingName).find(L"74246bfc") != std::wstring::npos);
+    }
+    // Windows' Settings pages, as Start finds them, and each one opens.
+    const auto display = index.value()->Query(L"display settings", 4);
+    REQUIRE(display.ok());
+    REQUIRE_FALSE(display.value().empty());
+    CHECK(display.value().front().application.parsingName == L"ms-settings:display");
+    CHECK(apps::shell::CreateApplicationItem(display.value().front().application).ok());
+    const auto wifi = index.value()->Query(L"wifi", 4);
+    REQUIRE(wifi.ok());
+    CHECK(std::any_of(wifi.value().begin(), wifi.value().end(), [](const search::SearchResult& r) { return r.application.parsingName == L"ms-settings:network-wifi"; }));
+}
+
+// D68: files and folders from Windows' own index, read-only. Windows Search can be off: then nothing, and no failure.
+AETHER_TEST("search: files come from Windows' index by name, existing, as files that open as themselves") {
+    platform::ComApartment com;
+    REQUIRE(SUCCEEDED(com.Status()));
+    for (const auto* query : {L"a", L"e", L"desktop"}) {
+        auto files = search::FindFiles(query, 8, CancellationToken{});
+        if (!files) { TEST_NOTE("Windows' index unavailable here: " + files.error().Describe()); return; }
+        CHECK(files.value().size() <= 8u);
+        std::size_t existing = 0;
+        for (const auto& file : files.value()) {
+            CHECK(file.kind == apps::ApplicationKind::File);
+            CHECK(file.id.rfind(L"file:", 0) == 0);
+            CHECK_FALSE(search::IsApplicationFile(file.parsingName));
+            CHECK_FALSE(file.detail.empty());
+            if (auto item = apps::shell::CreateApplicationItem(file); item.ok()) ++existing;
+            else if (existing == 0) TEST_NOTE("not opened (" + std::to_string(file.parsingName.size()) + " chars, starts '" + text::Narrow(file.parsingName.substr(0, 3)) + "'): " + item.error().Describe());
+        }
+        TEST_NOTE(text::Narrow(query) + ": " + std::to_string(files.value().size()) + " found, " + std::to_string(existing) + " still there");
+        CHECK_EQ(existing, files.value().size());   // only what still exists, never a deleted file the index remembers
+    }
+}
+
 AETHER_TEST("search UI: burst edits debounce, keys flush, failed launch remains visible and short results scroll") {
     Fixture fixture; auto& window = *fixture.window;
     const auto monitor = platform::PrimaryMonitor();
@@ -121,7 +181,7 @@ AETHER_TEST("search UI: repeated Open preserves its restore target and native in
             winrt::check_hresult(::CoCreateInstance(CLSID_CUIAutomation, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IUIAutomation), automation.put_void()));
             winrt::com_ptr<IUIAutomationElement> input; winrt::check_hresult(automation->ElementFromHandle(edit, input.put()));
             BSTR name = nullptr; winrt::check_hresult(input->get_CurrentName(&name)); const std::wstring text = name ? name : L""; ::SysFreeString(name);
-            if (text != L"Search applications") throw std::runtime_error("native edit name mismatch");
+            if (text != L"Search apps, settings and files") throw std::runtime_error("native edit name mismatch");
             BOOL focusable = FALSE; winrt::check_hresult(input->get_CurrentIsKeyboardFocusable(&focusable));
             if (!focusable) throw std::runtime_error("native edit is not focusable");
             winrt::com_ptr<IUIAutomationValuePattern> value;
@@ -169,6 +229,67 @@ AETHER_TEST("search UI: dark and light own-window captures include query selecti
     }
     RECT after{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &after, 0));
     CHECK(::EqualRect(&originalWork, &after)); window.Close();
+}
+
+// D68: the real Search, for a person to look at: this PC's catalog, its icons and Windows' index of its files.
+AETHER_TEST("search UI: the real catalog, icons and files, captured as the owner will see them (D68)") {
+    platform::ComApartment apartment;
+    REQUIRE(SUCCEEDED(apartment.Status()));
+    ManualDispatcher dispatcher;
+    search::SearchService service{dispatcher};
+    auto discovered = apps::ShellApplicationCatalog().DiscoverApplications(CancellationToken{});
+    REQUIRE(discovered.ok());
+    REQUIRE(service.Rebuild(std::move(discovered.value())).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 10s;
+    while (service.Current().state == search::IndexState::Building && std::chrono::steady_clock::now() < deadline) {
+        dispatcher.RunPending(); std::this_thread::sleep_for(1ms);
+    }
+    REQUIRE_EQ(service.Current().state, search::IndexState::Ready);
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    platform::MessageLoop loop;
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    Launcher launcher;
+    apps::ShellIconProvider icons(dispatcher);
+    auto window = std::make_unique<search::ui::SearchWindow>(device, scheduler, service, launcher, icons);
+    REQUIRE(window->Initialize().ok());
+    const auto monitor = platform::PrimaryMonitor();
+    const int areaWidth = std::min(800, platform::Width(monitor.workArea) - 360);
+    const int areaHeight = std::min(560, platform::Height(monitor.workArea) - 300);
+    const int areaLeft = monitor.workArea.left + (platform::Width(monitor.workArea) - areaWidth) / 2;
+    const int areaTop = monitor.workArea.top + (platform::Height(monitor.workArea) - areaHeight) / 2;
+    const RECT area{areaLeft, areaTop, areaLeft + areaWidth, areaTop + areaHeight};
+    window->SetPlacementArea(area);
+    window->Open();
+    RECT privateBounds = window->BoundsPx(); ::InflateRect(&privateBounds, 150, 150);   // the panel and its guard band
+    privateBounds.top = std::max(privateBounds.top, monitor.workArea.top);
+    privateBounds.bottom = std::min(privateBounds.bottom, monitor.workArea.bottom);
+    Backdrop backdrop; REQUIRE(backdrop.Create(privateBounds));
+    const auto output = std::filesystem::temp_directory_path() / "AetherShellTests";
+    std::filesystem::create_directories(output);
+    const auto settle = [&](DWORD milliseconds) {
+        for (DWORD waited = 0; waited < milliseconds; waited += 40) { dispatcher.RunPending(); RunFor(loop, 40); }
+    };
+    window->SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true, 1});
+    for (const auto* query : {L"device", L"display", L"pexels", L"aether"}) {
+        window->Open();
+        ::SetWindowTextW(window->EditHandle(), query);
+        settle(900);   // the applications at once, then the files from Windows' index, then the icons
+        const auto& results = window->Results();
+        std::size_t files = 0;
+        for (const auto& result : results) files += result.application.kind == apps::ApplicationKind::File ? 1u : 0u;
+        TEST_NOTE(text::Narrow(query) + ": " + std::to_string(results.size()) + " results, " + std::to_string(files) + " files");
+        ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        ::SetWindowPos(window->Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        settle(200);
+        auto bounds = window->BoundsPx(); ::InflateRect(&bounds, 10, 10);
+        if (!PrivateCrop(backdrop.hwnd, bounds)) { TEST_NOTE("inconclusive, a foreign window passed"); continue; }
+        Save(CaptureOwnBackdrop(backdrop.hwnd, bounds), output / (L"search-real-" + std::wstring(query) + L".png"));
+    }
+    CHECK_EQ(launcher.launches, 0);   // nothing was opened
+    window->Close();
+    window.reset();
+    icons.CancelAll();
+    scheduler.Shutdown();
 }
 
 AETHER_TEST("search UI: finite exit hides, reopen cancels exit and reduced motion is immediate") {

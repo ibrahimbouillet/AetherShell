@@ -79,6 +79,8 @@ struct ApplicationItem {
 // packaged or explicit AUMID), the validated .lnk, the validated executable. Network (UNC) paths are
 // rejected. NotFound when nothing usable exists.
 [[nodiscard]] Result<ApplicationItem> CreateApplicationItem(const ApplicationInfo& app);
+// D68: a search's file or folder: an absolute path that still exists (nothing relative); never a command line.
+[[nodiscard]] Result<winrt::com_ptr<IShellItem>> CreateFileResultItem(std::wstring_view path);
 
 // Icon routing only. A Desktop entry's existing ordinary, validated local .lnk may carry a profile
 // icon override that the generic Apps-folder/executable item does not. Worker thread: reads file

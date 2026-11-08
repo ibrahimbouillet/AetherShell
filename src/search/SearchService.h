@@ -8,6 +8,7 @@
 #include "core/Signal.h"
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -63,6 +64,11 @@ public:
     Result<void> Rebuild(apps::IApplicationCatalog& catalog);
     Result<void> Rebuild(std::vector<apps::ApplicationInfo> applications);
     [[nodiscard]] Result<std::vector<SearchResult>> Query(std::wstring_view query, std::size_t maxResults = 8) const;
+    // D68: files and folders of Windows' index whose name matches `query`, on a worker of their own, delivered on the
+    // UI thread with the query they answer. Only the latest request is answered: an overtaken one is dropped. Those
+    // that also match by name come first, highlighted like the applications. Nothing of the query is logged.
+    using FilesDelivered = std::function<void(const std::wstring& query, Result<std::vector<SearchResult>> files)>;
+    void QueryFiles(std::wstring query, std::size_t maxResults, FilesDelivered delivered);
     [[nodiscard]] IndexReport Current() const;
     [[nodiscard]] Signal<const IndexReport&>& IndexReady();
 private:

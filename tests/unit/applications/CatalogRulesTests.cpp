@@ -162,11 +162,13 @@ AETHER_TEST("catalog rules: Device Manager comes from the Control Panel's items"
     const auto item = ClassifyControlPanelItem(L"Gestionnaire de périphériques", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
     REQUIRE_EQ(item.decision, CatalogDecision::Include);
     CHECK_EQ(item.app.kind, ApplicationKind::Other);
-    CHECK_EQ(item.app.keywords, std::wstring(L"Device Manager"));  // found in English on a French Windows too
+    CHECK(item.app.keywords.find(L"Device Manager") != std::wstring::npos);  // found in English on a French Windows too
+    CHECK(item.app.keywords.find(L"devmgmt") != std::wstring::npos);         // D68: and by its command
     CHECK(IsControlPanelItemName(item.app.parsingName));
     const auto english = ClassifyControlPanelItem(L"Device Manager", L"::{26ee0668-a00a-44d7-9371-beb064c98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
     REQUIRE_EQ(english.decision, CatalogDecision::Include);
-    CHECK(english.app.keywords.empty());
+    CHECK(english.app.keywords.find(L"Device Manager") == std::wstring::npos);   // its own name is not repeated
+    CHECK(english.app.keywords.find(L"Gestionnaire de périphériques") != std::wstring::npos);   // D68: the French one is there
     CHECK_EQ(ClassifyControlPanelItem(L"", item.app.parsingName, L"").decision, CatalogDecision::SkipInvalid);
     CHECK_EQ(ClassifyControlPanelItem(L"Other", L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}", L"").decision, CatalogDecision::SkipInvalid);
     CHECK_FALSE(IsControlPanelItemName(L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0"));
@@ -369,4 +371,35 @@ AETHER_TEST("catalog rules: Apps-folder child names from absolute parsing names"
     CHECK_FALSE(IsAppsFolderParsingName(L"::{4234D49B-0245-4DF3-B780-3893943456E1}\\Microsoft.Windows.Explorer"));
     CHECK_FALSE(IsAppsFolderParsingName(L"::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"));
     CHECK_FALSE(IsAppsFolderParsingName(L""));
+}
+
+// D68: what Search finds besides the applications.
+AETHER_TEST("catalog rules: Windows' Settings pages, named as Windows names them, in both languages") {
+    const auto english = SettingsPageApplications(false);
+    const auto french = SettingsPageApplications(true);
+    REQUIRE_EQ(english.size(), french.size());
+    REQUIRE(english.size() >= 40u);
+    const auto display = std::find_if(english.begin(), english.end(), [](const ApplicationInfo& app) { return app.parsingName == L"ms-settings:display"; });
+    REQUIRE(display != english.end());
+    CHECK_EQ(display->displayName, std::wstring(L"Display settings"));
+    CHECK(display->keywords.find(L"Paramètres d'affichage") != std::wstring::npos);   // the other language stays searchable
+    CHECK_EQ(display->detail, std::wstring(L"Settings"));
+    CHECK_FALSE(display->id.empty());
+    for (const auto& page : english) CHECK(IsSettingsPageName(page.parsingName));
+    CHECK(IsSettingsPageName(L"MS-SETTINGS:Display"));
+    CHECK_FALSE(IsSettingsPageName(L"ms-settings:"));
+    CHECK_FALSE(IsSettingsPageName(L"ms-settings:display;calc"));   // only the listed pages, never typed text
+    CHECK_FALSE(IsSettingsPageName(L"ms-settings-other:display"));
+}
+
+AETHER_TEST("catalog rules: Control Panel items are found by their other language's name and their command") {
+    const auto manager = ClassifyControlPanelItem(L"Device Manager", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
+    REQUIRE_EQ(manager.decision, CatalogDecision::Include);
+    CHECK(manager.app.keywords.find(L"Gestionnaire de périphériques") != std::wstring::npos);
+    CHECK(manager.app.keywords.find(L"devmgmt") != std::wstring::npos);
+    CHECK_EQ(manager.app.detail, std::wstring(L"Control Panel"));
+    const auto programs = ClassifyControlPanelItem(L"Programmes et fonctionnalités", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{7B81BE6A-CE2B-4676-A29E-EB907A5126C5}", L"Microsoft.ProgramsAndFeatures");
+    CHECK(programs.app.keywords.find(L"Programs And Features") != std::wstring::npos);   // English, from the canonical name
+    CHECK(programs.app.keywords.find(L"appwiz") != std::wstring::npos);
+    CHECK(programs.app.keywords.find(L"Programmes et fonctionnalités") == std::wstring::npos);   // not its own name twice
 }

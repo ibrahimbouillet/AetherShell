@@ -20,6 +20,7 @@
 #include <shlobj_core.h>
 
 #include <array>
+#include <cwctype>
 
 namespace aether::apps::shell {
 
@@ -99,7 +100,7 @@ Result<winrt::com_ptr<IShellItem>> CreateAppsFolderItem(std::wstring_view parsin
     }
     std::wstring fullName = L"shell:AppsFolder\\" + name;
     // D60: Windows' tools outside the Apps folder: the Control Panel's items, and the listed files of System32.
-    if (IsControlPanelItemName(name)) {
+    if (IsControlPanelItemName(name) || IsSettingsPageName(name)) {   // D68: and Windows' listed Settings pages
         fullName = name;
     } else if (const auto tool = SystemToolFile(name)) {
         std::array<wchar_t, MAX_PATH> system{};
@@ -120,8 +121,24 @@ Result<winrt::com_ptr<IShellItem>> CreateFileItem(const std::wstring& path) {
     return item;
 }
 
+Result<winrt::com_ptr<IShellItem>> CreateFileResultItem(std::wstring_view path) {
+    const auto trimmed = text::Trim(path);
+    // An absolute local or network path, as Windows' index gives it, that still exists; nothing relative.
+    const bool drive = trimmed.size() >= 3 && std::iswalpha(trimmed[0]) && trimmed[1] == L':' && (trimmed[2] == L'\\' || trimmed[2] == L'/');
+    const bool network = trimmed.size() > 2 && trimmed[0] == L'\\' && trimmed[1] == L'\\' && trimmed.find(L'?') == std::wstring_view::npos;
+    if ((!drive && !network) || HasRelativeSegment(trimmed) || trimmed.size() > 32767) return MakeError(ErrorCode::InvalidArgument, "not an absolute file path");
+    const std::wstring full(trimmed);
+    if (::GetFileAttributesW(full.c_str()) == INVALID_FILE_ATTRIBUTES) return MakeError(ErrorCode::NotFound, "the file no longer exists");
+    return CreateFileItem(full);
+}
+
 Result<ApplicationItem> CreateApplicationItem(const ApplicationInfo& app) {
     Error last = MakeError(ErrorCode::NotFound, "the application has no launchable shell item");
+    if (app.kind == ApplicationKind::File) {   // D68: a search's file or folder
+        auto item = CreateFileResultItem(app.parsingName);
+        if (!item) return item.error();
+        return ApplicationItem{std::move(item).value(), ItemSource::Executable};
+    }
 
     const auto parsingName = text::Trim(app.parsingName);
     if (!parsingName.empty()) {

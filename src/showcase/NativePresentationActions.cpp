@@ -162,7 +162,7 @@ struct NativePresentationActions::Impl {
     }
     Result<void> SearchExplorer() {
         ownsSearch=true;
-        auto opened=Invoke(dock,UIA_NamePropertyId,L"Search applications");
+        auto opened=Invoke(dock,UIA_NamePropertyId,L"Search");
         if(!opened)return opened;
         HWND window=nullptr;
         for(int retry=0;retry<40&&!window;++retry){window=OwnedWindow(process,L"AetherShell.Search");if(!window)::Sleep(25);}

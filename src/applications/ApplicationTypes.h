@@ -23,6 +23,7 @@ enum class ApplicationKind {
     Desktop,   // classic Win32 application (Start-menu shortcut or executable)
     Packaged,  // MSIX/UWP application identified by an AppUserModelID
     Other,     // other launchable shell item exposed by the Apps folder
+    File,      // D68: a file or folder found by Windows' index for a search; parsingName is its absolute path
 };
 
 // Identity rules (see ApplicationIdentity.h for the helpers):
@@ -43,6 +44,9 @@ struct ApplicationInfo {
     // declared by a running window. It can contain user paths or profile names: never log it or
     // write it to test output. Empty when unknown.
     std::wstring iconResource;
+    // D68: what the entry is, shown under its name in Search ("Settings", "Control Panel", "Video in Downloads").
+    // Presentation only; may hold a folder's name, so never logged.
+    std::wstring detail;
 };
 
 struct RunningWindow {

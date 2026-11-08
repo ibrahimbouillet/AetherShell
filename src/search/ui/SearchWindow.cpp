@@ -19,13 +19,19 @@ namespace {
 constexpr UINT_PTR QueryTimer = 1, CaretTimer = 2;
 constexpr UINT kQueryDelayMs = 30;          // gathers a burst of keys; a query itself takes well under a millisecond
 constexpr std::size_t kMaxResults = 500;    // D60: every match can be reached; only visible rows ask for an icon
+constexpr std::size_t kMaxFiles = 12;       // D68: files and folders from Windows' index, after the rest
 const wchar_t* KindLabel(apps::ApplicationKind kind) noexcept {
     switch (kind) {
         case apps::ApplicationKind::Packaged: return L"Installed application";
         case apps::ApplicationKind::Desktop: return L"Desktop application";
+        case apps::ApplicationKind::File: return L"File";
         case apps::ApplicationKind::Other: break;
     }
     return L"Windows tool";
+}
+// D68: what a result is, under its name: its own description (Settings, Control Panel, a file's kind and folder), or its kind.
+std::wstring_view LabelOf(const apps::ApplicationInfo& app) noexcept {
+    return app.detail.empty() ? std::wstring_view(KindLabel(app.kind)) : std::wstring_view(app.detail);
 }
 // Panel layout in DIPs, relative to the panel's top-left corner.
 constexpr float kPanelWidth = 680.0f;
@@ -74,7 +80,7 @@ SearchWindow::~SearchWindow() {
 
 Result<void> SearchWindow::Initialize() {
     aether::ui::SurfaceWindowOptions options;
-    options.className = L"AetherShell.Search"; options.title = L"Search applications"; options.noActivate = false;
+    options.className = L"AetherShell.Search"; options.title = L"Search apps, settings and files"; options.noActivate = false;
     const auto created = Create(options, RECT{0, 0, 640, 400});
     if (!created) return created;
     // The native edit retains IME, selection and its standard accessibility provider.
@@ -89,10 +95,10 @@ Result<void> SearchWindow::Initialize() {
     HRESULT propertyStatus = ::CoCreateInstance(CLSID_AccPropServices, nullptr, CLSCTX_INPROC_SERVER,
                                                 IID_PPV_ARGS(properties.put()));
     if (SUCCEEDED(propertyStatus)) propertyStatus = properties->SetHwndPropStr(edit_, static_cast<DWORD>(OBJID_CLIENT), CHILDID_SELF,
-                                                                            PROPID_ACC_NAME, L"Search applications");
+                                                                            PROPID_ACC_NAME, L"Search apps, settings and files");
     if (FAILED(propertyStatus)) { Destroy(); return MakeError(ErrorCode::Platform, "search input accessibility could not be configured"); }
     ::SendMessageW(edit_, EM_SETLIMITTEXT, 128, 0);
-    ::SendMessageW(edit_, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(L"Search applications"));
+    ::SendMessageW(edit_, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(L"Search apps, settings and files"));
     ::SetWindowSubclass(edit_, &EditProc, 1, reinterpret_cast<DWORD_PTR>(this));
     if (auto connected = accessible_.Connect(Handle(), *this); !connected) return connected;
     const auto weak = std::weak_ptr<bool>(alive_);
@@ -307,6 +313,7 @@ void SearchWindow::RefreshResults() {
     ResetRowScroll();
     results_ = queried ? std::move(queried.value()) : std::vector<SearchResult>{};
     selected_ = firstVisible_ = 0;
+    hovered_.reset();
     if (!queried) error_ = L"Search could not be completed.";
     for (const auto& result : results_) {
         if (!accessibleIds_.contains(result.application.id)) accessibleIds_.emplace(result.application.id, nextAccessibleId_++);
@@ -314,6 +321,42 @@ void SearchWindow::RefreshResults() {
     EnsureVisible();
     SetPanelTarget(true);
     MoveIndicator(false);
+    (void)accessible_.NotifyStructureChanged(); Invalidate();
+    // D68: then the files and folders Windows' index finds by name, after the applications, tools and settings.
+    if (!query_.empty()) {
+        const auto weak = std::weak_ptr<bool>(alive_);
+        search_.QueryFiles(query_, kMaxFiles, [this, weak](const std::wstring& query, Result<std::vector<SearchResult>> files) {
+            const auto live = weak.lock();
+            if (!live || !*live || !files || files->empty() || query != query_ || !IsOpen()) return;
+            AddFileResults(std::move(files.value()));
+        });
+    }
+}
+
+void SearchWindow::AddFileResults(std::vector<SearchResult> files) {
+    const bool wasEmpty = results_.empty();
+    // A selection the person moved stays on what they chose; otherwise it stays on the best match, file or not.
+    const bool chosen = !wasEmpty && selected_ != 0;
+    const std::wstring chosenId = chosen ? results_[selected_].application.id : std::wstring{};
+    for (auto& file : files) {
+        const bool listed = std::any_of(results_.begin(), results_.end(), [&](const SearchResult& r) { return r.application.id == file.application.id; });
+        if (listed || results_.size() >= kMaxResults) continue;
+        if (!accessibleIds_.contains(file.application.id)) accessibleIds_.emplace(file.application.id, nextAccessibleId_++);
+        results_.push_back(std::move(file));
+    }
+    // Ranked together: a file whose name starts with the text goes before a loose match (applications first when equal).
+    std::stable_sort(results_.begin(), results_.end(), [](const SearchResult& a, const SearchResult& b) { return a.score > b.score; });
+    hovered_.reset();
+    if (chosen) {
+        const auto at = std::find_if(results_.begin(), results_.end(), [&](const SearchResult& r) { return r.application.id == chosenId; });
+        selected_ = at == results_.end() ? 0 : static_cast<std::size_t>(at - results_.begin());
+    } else {
+        selected_ = 0;
+    }
+    if (wasEmpty) { firstVisible_ = 0; error_.clear(); }
+    EnsureVisible();
+    SetPanelTarget(true);
+    MoveIndicator(wasEmpty);
     (void)accessible_.NotifyStructureChanged(); Invalidate();
 }
 
@@ -408,7 +451,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     }
     if (query_.empty()) {
         brush->SetColor(tokens_.textSecondary.ToD2D());
-        text_.Draw(dc, L"Search applications", inputBounds, textStyle, brush.get());
+        text_.Draw(dc, L"Search apps, settings and files", inputBounds, textStyle, brush.get());
     }
     dc->PopAxisAlignedClip();
 
@@ -416,7 +459,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     graphics::TextStyle caption; caption.size = tokens_.type.caption * textScale; caption.weight = DWRITE_FONT_WEIGHT_SEMI_BOLD;
     brush->SetColor(tokens_.textSecondary.ToD2D());
     const float captionTop = panel.top + kPadding + kFieldHeight + kCaptionGap;
-    text_.Draw(dc, L"Applications", D2D1::RectF(panel.left + kPadding + 4.0f, captionTop, panel.right - kPadding, captionTop + kCaptionHeight),
+    text_.Draw(dc, L"Results", D2D1::RectF(panel.left + kPadding + 4.0f, captionTop, panel.right - kPadding, captionTop + kCaptionHeight),
                caption, brush.get());
 
     // Rows.
@@ -432,6 +475,10 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
         const auto row = D2D1::RectF(panel.left + kRowInset, top, panel.right - kRowInset, top + kRowPill);
         const bool selected = i == selected_;
         if (selected) graphics::PaintSelectionPill(dc, row, tokens_.radii.overlay, tokens_, true, false);
+        else if (hovered_ == i) {   // D68: under the pointer, lit only
+            brush->SetColor(tokens_.hoverOverlay.ToD2D());
+            dc->FillRoundedRectangle(D2D1::RoundedRect(row, tokens_.radii.overlay, tokens_.radii.overlay), brush.get());
+        }
         const auto& app = results_[i].application;
         const float iconTop = top + (kRowPill - kIconSize) / 2.0f;
         const auto icon = D2D1::RectF(row.left + 12.0f, iconTop, row.left + 12.0f + kIconSize, iconTop + kIconSize);
@@ -458,7 +505,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
             dc->DrawTextLayout(D2D1::Point2F(textLeft, top + 4.0f), layout.get(), brush.get(), D2D1_DRAW_TEXT_OPTIONS_CLIP);
         }
         brush->SetColor((inverse ? tokens_.surface.selectedText : tokens_.textSecondary).ToD2D());
-        text_.Draw(dc, KindLabel(app.kind), D2D1::RectF(textLeft, top + kRowPill / 2.0f, row.right - 12.0f, top + kRowPill - 4.0f), kindStyle, brush.get());
+        text_.Draw(dc, LabelOf(app), D2D1::RectF(textLeft, top + kRowPill / 2.0f, row.right - 12.0f, top + kRowPill - 4.0f), kindStyle, brush.get());
     }
     if (!results_.empty() && selected_ >= firstVisible_ && selected_ < lastVisible) {
         const float centre = panel.top + indicatorY_.Value(context.now) - rowShift_;
@@ -469,7 +516,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     if (results_.empty()) {
         brush->SetColor(tokens_.textSecondary.ToD2D());
         const auto message = search_.Current().state == IndexState::Building ? L"Indexing applications…" :
-                             query_.empty() ? L"Type an application name to begin" : L"No applications match";
+                             query_.empty() ? L"Type to search apps, settings and files" : L"Nothing matches";
         nameStyle.size = tokens_.type.body * textScale;
         text_.Draw(dc, message, D2D1::RectF(panel.left + kPadding + 8.0f, panel.top + kRowTop, panel.right - kPadding, panel.top + kRowTop + kRowPill),
                    nameStyle, brush.get());
@@ -609,7 +656,14 @@ void SearchWindow::OnPointerMove(D2D1_POINT_2F p) {
         if (const auto index = CaretIndexAt(p)) { ::SendMessageW(edit_, EM_SETSEL, *selectionAnchor_, *index); Invalidate(); }
         return;
     }
-    if (const auto hit = Hit(p); hit && *hit != selected_) UpdateSelection(*hit);
+    // D68: the pointer only lights the row it is over. The selection, which Enter opens, moves with the keys and the
+    // wheel; a row is opened by the pointer only when it is clicked. A mouse resting on a row while the person types
+    // and presses Enter no longer opens that row instead of the one they chose.
+    const auto hit = Hit(p);
+    if (hit != hovered_) { hovered_ = hit; Invalidate(); }
+}
+void SearchWindow::OnPointerLeave() {
+    if (hovered_) { hovered_.reset(); Invalidate(); }
 }
 void SearchWindow::OnWheel(float notches, D2D1_POINT_2F) {
     if (!IsOpen()) return;
@@ -744,7 +798,7 @@ aether::ui::accessibility::AccessibleItem SearchWindow::Item(std::size_t index) 
     aether::ui::accessibility::AccessibleItem item;
     if (index >= results_.size()) return item;
     item.id = IdFor(index); item.name = results_[index].application.displayName;
-    item.helpText = KindLabel(results_[index].application.kind);
+    item.helpText = std::wstring(LabelOf(results_[index].application));
     item.controlType = UIA_ListItemControlTypeId; item.supportsInvoke = true; item.isFocusable = true; item.isEnabled = IsOpen();
     item.hasKeyboardFocus = IsOpen() && ::GetFocus() == edit_ && index == selected_;
     item.isOffscreen = !IsOpen() || index < firstVisible_ || index >= firstVisible_ + VisibleRows();

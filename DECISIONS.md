@@ -111,6 +111,28 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D68 — Search finds everything Start finds by name; the pointer never chooses what Enter opens
+
+Owner, 2026-11-08, after test 4.3 ("très bon rendu"): Search must show everything, like Windows' Start menu, files,
+applications, videos; Device Manager could not be found. And a row merely under the pointer must never be what Enter
+opens (typing "Y" for YouTube with the pointer resting on another row opened that row). Amends FR-012 (no longer
+applications only) and FR-013.
+
+- **Hover is not selection.** The pointer lights the row it is over; the selection moves with the keys and the wheel;
+  Enter opens the selection; a click opens the row clicked.
+- **Windows' tools** are found by either language's name and by their command (`devmgmt`, `appwiz`...): the Control
+  Panel's items carry their French names and commands, so "Device Manager", "Gestionnaire de périphériques" and
+  "devmgmt" all find it first. On this PC the catalog did list Device Manager; the case the owner hit was not reproduced
+  in the current code, and every way of asking now finds it.
+- **Windows' Settings pages** (44, from Display to Windows Update), named as Windows' search names them, in both languages,
+  opened as `ms-settings:` items of a fixed list (never typed text).
+- **Files and folders** from Windows' own search index (the one Start uses), by name only, never content: the person's
+  folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive), without hidden, package or AppData folders,
+  shortcuts or programs (the applications have them), and only what still exists (the index can remember deleted files).
+  The index answers on a worker of its own, out of process; the applications show at once and the files join them,
+  ranked together by name. Neither the typed text nor any path is logged. Without Windows Search, simply no files.
+- **Keywords match whole,** never as scattered letters, which only produced noise ("pexels" found File Explorer Options).
+
 ### D67 — Liquid's blur layer, shaped in Settings; the arrival at every start; many captures before a build
 
 Owner, 2026-11-08, from screenshots of the installed shell: over light pages the text was light and unreadable, white

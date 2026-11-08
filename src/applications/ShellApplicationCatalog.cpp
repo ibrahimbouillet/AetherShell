@@ -391,8 +391,11 @@ Result<std::vector<ApplicationInfo>> Discover(const ShellApplicationCatalog::Opt
     if (options.includeSystemTools) {
         auto system = ReadControlPanelItems(cancel);
         if (cancel.IsCancelled()) return CancelledError();
-        auto tools = SystemToolApplications(PRIMARYLANGID(::GetUserDefaultUILanguage()) == LANG_FRENCH, SystemFileExists);
+        const bool french = PRIMARYLANGID(::GetUserDefaultUILanguage()) == LANG_FRENCH;
+        auto tools = SystemToolApplications(french, SystemFileExists);
         system.insert(system.end(), std::make_move_iterator(tools.begin()), std::make_move_iterator(tools.end()));
+        auto pages = SettingsPageApplications(french);   // D68: Windows' Settings pages, as Start finds them
+        system.insert(system.end(), std::make_move_iterator(pages.begin()), std::make_move_iterator(pages.end()));
         applications = AddSystemEntries(std::move(applications), std::move(system));
     }
     AETHER_LOG_INFO(kLog,
