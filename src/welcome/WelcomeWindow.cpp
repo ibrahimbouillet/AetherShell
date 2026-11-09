@@ -404,10 +404,21 @@ void WelcomeWindow::OnRender(const ui::RenderContext& context) {
             const auto placement = renderer->PicturePlacement();
             const auto bounds = BoundsPx();
             scene.picture = D2D1::RectF(placement.left - bounds.left, placement.top - bounds.top, placement.right - bounds.left, placement.bottom - bounds.top);
-            context.d2d->Flush();
-            if (auto frame = renderer->Render(context.d2d, scene, size)) {
-                context.d2d->DrawBitmap(frame->get(), D2D1::RectF(0.0f, 0.0f, context.widthDip, context.heightDip), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                drawn = true;
+            // D69: straight into the window's surface where it can (one full-screen pass a frame instead of three: the
+            // shader into its own texture, then a copy of it); the same pixels either way.
+            D2D1_MATRIX_3X2_F transform{};
+            context.d2d->GetTransform(&transform);
+            const bool translationOnly = transform._11 == 1.0f && transform._22 == 1.0f && transform._12 == 0.0f && transform._21 == 0.0f;
+            const POINT origin{static_cast<LONG>(std::lround(transform._31 * scale)), static_cast<LONG>(std::lround(transform._32 * scale))};
+            if (translationOnly) {
+                if (auto direct = renderer->RenderInto(context.d2d, scene, size, origin); direct && *direct) drawn = true;
+            }
+            if (!drawn) {
+                context.d2d->Flush();
+                if (auto frame = renderer->Render(context.d2d, scene, size)) {
+                    context.d2d->DrawBitmap(frame->get(), D2D1::RectF(0.0f, 0.0f, context.widthDip, context.heightDip), 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                    drawn = true;
+                }
             }
         }
         if (replay_) return;   // D66: no greeting and no cover under a replay

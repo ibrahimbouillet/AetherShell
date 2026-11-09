@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "ui/GlassMenu.h"
 
+#include "core/Localization.h"
+
 #include "diagnostics/Logger.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
@@ -450,7 +452,7 @@ private:
 
 Result<void> MenuLevel::Build(std::span<const MenuEntry> entries, std::wstring name, POINT origin) {
     entries_ = entries;
-    name_ = name.empty() ? std::wstring(L"Menu") : std::move(name);
+    name_ = name.empty() ? std::wstring(i18n::Tr(L"Menu")) : std::move(name);
     rows_.clear();
     accessibleRows_.clear();
     rows_.reserve(entries.size());
@@ -821,9 +823,9 @@ accessibility::AccessibleItem MenuLevel::Item(std::size_t index) const {
     item.id = static_cast<int>(rowIndex) + 1;
     item.name = row.label.text;
     std::wstring help = row.label.accelerator;
-    if (row.submenu) help += help.empty() ? L"Opens a submenu" : L", opens a submenu";
+    if (row.submenu) help += i18n::Tr(help.empty() ? L"Opens a submenu" : L", opens a submenu");
     item.helpText = std::move(help);
-    if (row.checked) item.itemStatus = row.radio ? L"Selected" : L"Checked";
+    if (row.checked) item.itemStatus = i18n::Tr(row.radio ? L"Selected" : L"Checked");
     item.controlType = UIA_MenuItemControlTypeId;
     std::optional<RECT> visible;
     if (auto bounds = RowScreenRect(rowIndex, false)) {

@@ -47,7 +47,14 @@ private:
     [[nodiscard]] winrt::com_ptr<IDWriteTextLayout> TabularLayout(std::wstring_view text, IDWriteTextFormat* format,
                                                                   float width, float height);
 
+    // A layout of `text` in `style` for a `width` x `height` box, made once and reused while the same text is drawn
+    // again (a bar redraws the same labels; only the clock's digits change).
+    [[nodiscard]] IDWriteTextLayout* CachedLayout(std::wstring_view text, const TextStyle& style, IDWriteTextFormat* format,
+                                                  float width, float height);
+
     winrt::com_ptr<IDWriteFactory> factory_;
+    using LayoutKey = std::tuple<std::wstring, bool, int, int, int, int, bool, bool, bool, int, int>;
+    std::map<LayoutKey, winrt::com_ptr<IDWriteTextLayout>> layouts_;
     std::wstring textFamily_;
     std::wstring displayFamily_;
     std::wstring smallFamily_;

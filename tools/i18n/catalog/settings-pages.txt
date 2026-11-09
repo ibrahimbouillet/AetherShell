@@ -1,0 +1,1267 @@
+# D70: Settings pages (src/settings/ui). One block per text: en is the exact English text in the code.
+
+en: Dock
+fr: Dock
+es: Dock
+zh: 程序坞
+hi: डॉक
+
+en: Top Bar
+fr: Barre du haut
+es: Barra superior
+zh: 顶部栏
+hi: शीर्ष बार
+
+en: Weather
+fr: Météo
+es: Tiempo
+zh: 天气
+hi: मौसम
+
+en: Updates
+fr: Mises à jour
+es: Actualizaciones
+zh: 更新
+hi: अपडेट
+
+en: General
+fr: Général
+es: General
+zh: 常规
+hi: सामान्य
+
+en: About
+fr: À propos
+es: Acerca de
+zh: 关于
+hi: परिचय
+
+en: Desktop
+fr: Bureau
+es: Escritorio
+zh: 桌面
+hi: डेस्कटॉप
+
+en: Appearance
+fr: Apparence
+es: Apariencia
+zh: 外观
+hi: रूप-रंग
+
+en: Welcome
+fr: Bienvenue
+es: Bienvenida
+zh: 欢迎
+hi: स्वागत
+
+en: Aether Shell Settings
+fr: Paramètres d'Aether Shell
+es: Configuración de Aether Shell
+zh: Aether Shell 设置
+hi: Aether Shell सेटिंग्स
+
+en: Settings
+fr: Paramètres
+es: Configuración
+zh: 设置
+hi: सेटिंग्स
+
+en: Reset defaults...
+fr: Rétablir les valeurs par défaut...
+es: Restablecer valores predeterminados...
+zh: 恢复默认设置...
+hi: डिफ़ॉल्ट पर रीसेट करें...
+
+en: &Apply
+fr: &Appliquer
+es: &Aplicar
+zh: 应用(&A)
+hi: लागू करें(&A)
+
+en: Liquid
+fr: Liquide
+es: Líquido
+zh: 液态
+hi: लिक्विड
+
+en: Grain
+fr: Grain
+es: Grano
+zh: 磨砂
+hi: ग्रेन
+
+en: From {} to {}
+fr: De {} à {}
+es: De {} a {}
+zh: 从 {} 到 {}
+hi: {} से {} तक
+
+en: px
+fr: px
+es: px
+zh: 像素
+hi: px
+
+en: min
+fr: min
+es: min
+zh: 分钟
+hi: मिनट
+
+en: h
+fr: h
+es: h
+zh: 小时
+hi: घंटे
+
+en: This action could not be completed.
+fr: Cette action n'a pas pu être effectuée.
+es: No se pudo completar esta acción.
+zh: 无法完成此操作。
+hi: यह कार्य पूरा नहीं हो सका।
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+fr: Taille, espacement, mouvement et applications épinglées au Dock.
+es: Tamaño, espaciado, movimiento y aplicaciones ancladas al Dock.
+zh: 大小、间距、动效以及固定到程序坞的应用。
+hi: आकार, दूरी, गति और डॉक पर पिन किए गए ऐप्लिकेशन।
+
+en: Size and spacing
+fr: Taille et espacement
+es: Tamaño y espaciado
+zh: 大小和间距
+hi: आकार और दूरी
+
+en: Icon size
+fr: Taille des icônes
+es: Tamaño de los iconos
+zh: 图标大小
+hi: आइकन का आकार
+
+en: {}, scaled with the Windows display scale.
+fr: {}, mis à l'échelle de l'affichage Windows.
+es: {}, ajustado a la escala de pantalla de Windows.
+zh: {}，随 Windows 显示缩放比例调整。
+hi: {}, Windows डिस्प्ले स्केल के अनुसार।
+
+en: Bottom margin
+fr: Marge inférieure
+es: Margen inferior
+zh: 底部边距
+hi: नीचे का मार्जिन
+
+en: Space between the Dock and the bottom of the screen.
+fr: Espace entre le Dock et le bas de l'écran.
+es: Espacio entre el Dock y la parte inferior de la pantalla.
+zh: 程序坞与屏幕底部之间的距离。
+hi: डॉक और स्क्रीन के निचले किनारे के बीच की जगह।
+
+en: Minimum side margin
+fr: Marge latérale minimale
+es: Margen lateral mínimo
+zh: 最小侧边距
+hi: न्यूनतम साइड मार्जिन
+
+en: Space kept free at the left and right screen edges.
+fr: Espace laissé libre aux bords gauche et droit de l'écran.
+es: Espacio libre en los bordes izquierdo y derecho de la pantalla.
+zh: 屏幕左右边缘保留的空白距离。
+hi: स्क्रीन के बाएँ और दाएँ किनारों पर खाली छोड़ी गई जगह।
+
+en: Icon spacing
+fr: Espacement des icônes
+es: Espaciado entre iconos
+zh: 图标间距
+hi: आइकनों के बीच दूरी
+
+en: Space between neighbouring icons.
+fr: Espace entre deux icônes voisines.
+es: Espacio entre iconos contiguos.
+zh: 相邻图标之间的距离。
+hi: पास-पास के आइकनों के बीच की जगह।
+
+en: Glass and motion
+fr: Verre et mouvement
+es: Cristal y movimiento
+zh: 玻璃与动效
+hi: ग्लास और गति
+
+en: Glass opacity
+fr: Opacité du verre
+es: Opacidad del cristal
+zh: 玻璃不透明度
+hi: ग्लास अपारदर्शिता
+
+en: Lower values show more of the blurred desktop behind the Dock.
+fr: Une valeur plus basse laisse voir davantage le bureau flouté derrière le Dock.
+es: Los valores más bajos muestran más del escritorio desenfocado detrás del Dock.
+zh: 数值越低，程序坞后方模糊的桌面显示得越多。
+hi: कम मान डॉक के पीछे धुंधले डेस्कटॉप को ज़्यादा दिखाते हैं।
+
+en: Hover magnification
+fr: Agrandissement au survol
+es: Ampliación al pasar el puntero
+zh: 悬停放大
+hi: होवर पर बड़ा करना
+
+en: How much an icon grows under the pointer; 1 turns it off.
+fr: À quel point une icône grossit sous le pointeur ; 1 le désactive.
+es: Cuánto crece un icono bajo el puntero; 1 lo desactiva.
+zh: 指针下方图标放大的程度；设为 1 即关闭。
+hi: पॉइंटर के नीचे आइकन कितना बड़ा हो; 1 इसे बंद करता है।
+
+en: Behavior
+fr: Comportement
+es: Comportamiento
+zh: 行为
+hi: व्यवहार
+
+en: Show running applications
+fr: Afficher les applications ouvertes
+es: Mostrar las aplicaciones en ejecución
+zh: 显示正在运行的应用
+hi: चल रहे ऐप्लिकेशन दिखाएँ
+
+en: Open applications that are not pinned appear after the pinned ones.
+fr: Les applications ouvertes non épinglées apparaissent après les épinglées.
+es: Las aplicaciones abiertas no ancladas aparecen después de las ancladas.
+zh: 未固定的已打开应用显示在已固定应用之后。
+hi: खुले ऐप्लिकेशन जो पिन नहीं हैं, पिन किए गए ऐप्लिकेशनों के बाद दिखते हैं।
+
+en: Reserve screen space for the Dock
+fr: Réserver l'espace écran du Dock
+es: Reservar espacio de pantalla para el Dock
+zh: 为程序坞保留屏幕空间
+hi: डॉक के लिए स्क्रीन पर जगह आरक्षित करें
+
+en: Maximized windows stay above the Dock instead of under it.
+fr: Les fenêtres agrandies restent au-dessus du Dock au lieu de passer dessous.
+es: Las ventanas maximizadas quedan por encima del Dock en lugar de debajo.
+zh: 最大化的窗口停留在程序坞上方，而不是被它遮挡。
+hi: बड़ी की गई विंडो डॉक के नीचे जाने के बजाय उसके ऊपर रहती हैं।
+
+en: Automatically hide the Dock
+fr: Masquer automatiquement le Dock
+es: Ocultar el Dock automáticamente
+zh: 自动隐藏程序坞
+hi: डॉक को अपने-आप छिपाएँ
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+fr: Il se masque quand une fenêtre le recouvre ; amenez le pointeur au bord inférieur de l'écran pour le faire apparaître. Il reste visible sur le bureau, et les fenêtres prennent toute la hauteur de l'écran.
+es: Se oculta cuando una ventana lo cubre; lleva el puntero al borde inferior de la pantalla para mostrarlo. Permanece visible en el escritorio y las ventanas ocupan toda la altura de la pantalla.
+zh: 当应用窗口遮住它时隐藏；将指针移到屏幕底部边缘即可显示。在桌面上它保持可见，窗口可使用整个屏幕高度。
+hi: जब कोई ऐप्लिकेशन विंडो इसे ढकती है तो यह छिप जाता है; दिखाने के लिए पॉइंटर को स्क्रीन के निचले किनारे पर ले जाएँ। डेस्कटॉप पर यह दिखता रहता है, और विंडो को पूरी स्क्रीन ऊँचाई मिलती है।
+
+en: Pinned applications
+fr: Applications épinglées
+es: Aplicaciones ancladas
+zh: 已固定的应用
+hi: पिन किए गए ऐप्लिकेशन
+
+en: Move &up
+fr: Monter (&U)
+es: S&ubir
+zh: 上移(&U)
+hi: ऊपर ले जाएँ(&U)
+
+en: Move &down
+fr: &Descendre
+es: Ba&jar
+zh: 下移(&D)
+hi: नीचे ले जाएँ(&D)
+
+en: &Remove
+fr: &Retirer
+es: &Quitar
+zh: 移除(&R)
+hi: हटाएँ(&R)
+
+en: &Add application
+fr: &Ajouter une application
+es: &Añadir aplicación
+zh: 添加应用(&A)
+hi: ऐप्लिकेशन जोड़ें(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+fr: Les épingles conservent leur identité et leurs paramètres de lancement. Retirer une épingle empêche aussi la synchronisation automatique avec la barre des tâches Windows de la rajouter.
+es: Los anclajes conservan su identidad y su configuración de inicio. Quitar un anclaje también impide que la sincronización automática con la barra de tareas de Windows lo vuelva a añadir.
+zh: 固定项会保留其身份和启动设置。移除固定项后，Windows 任务栏的自动同步也不会再把它加回来。
+hi: पिन अपनी पहचान और लॉन्च सेटिंग्स बनाए रखते हैं। किसी पिन को हटाने से Windows टास्कबार का स्वचालित सिंक उसे दोबारा नहीं जोड़ता।
+
+en: Position, clock and the status items shown in the Top Status Bar.
+fr: Position, horloge et éléments d'état affichés dans la barre d'état du haut.
+es: Posición, reloj y elementos de estado de la barra superior.
+zh: 顶部状态栏的位置、时钟和状态项。
+hi: शीर्ष स्टेटस बार की स्थिति, घड़ी और उसमें दिखने वाले स्टेटस आइटम।
+
+en: Position and glass
+fr: Position et verre
+es: Posición y cristal
+zh: 位置与玻璃
+hi: स्थिति और ग्लास
+
+en: Top margin
+fr: Marge supérieure
+es: Margen superior
+zh: 顶部边距
+hi: ऊपर का मार्जिन
+
+en: Space between the Top Bar and the top of the screen.
+fr: Espace entre la barre du haut et le haut de l'écran.
+es: Espacio entre la barra superior y la parte superior de la pantalla.
+zh: 顶部栏与屏幕顶部之间的距离。
+hi: शीर्ष बार और स्क्रीन के ऊपरी किनारे के बीच की जगह।
+
+en: Lower values show more of the blurred desktop behind the bar.
+fr: Une valeur plus basse laisse voir davantage le bureau flouté derrière la barre.
+es: Los valores más bajos muestran más del escritorio desenfocado detrás de la barra.
+zh: 数值越低，栏后方模糊的桌面显示得越多。
+hi: कम मान बार के पीछे धुंधले डेस्कटॉप को ज़्यादा दिखाते हैं।
+
+en: Clock
+fr: Horloge
+es: Reloj
+zh: 时钟
+hi: घड़ी
+
+en: Clock format
+fr: Format de l'heure
+es: Formato del reloj
+zh: 时间格式
+hi: घड़ी का फ़ॉर्मैट
+
+en: Follow Windows
+fr: Comme Windows
+es: Igual que Windows
+zh: 跟随 Windows
+hi: Windows के अनुसार
+
+en: 12-hour
+fr: 12 heures
+es: 12 horas
+zh: 12 小时制
+hi: 12 घंटे
+
+en: 24-hour
+fr: 24 heures
+es: 24 horas
+zh: 24 小时制
+hi: 24 घंटे
+
+en: Date style
+fr: Style de la date
+es: Estilo de la fecha
+zh: 日期样式
+hi: तारीख की शैली
+
+en: Weekday, day and month
+fr: Jour de la semaine, jour et mois
+es: Día de la semana, día y mes
+zh: 星期、日和月
+hi: सप्ताह का दिन, दिन और महीना
+
+en: Short
+fr: Courte
+es: Corta
+zh: 短
+hi: छोटा
+
+en: Long
+fr: Longue
+es: Larga
+zh: 长
+hi: लंबा
+
+en: Show seconds
+fr: Afficher les secondes
+es: Mostrar los segundos
+zh: 显示秒
+hi: सेकंड दिखाएँ
+
+en: Show date
+fr: Afficher la date
+es: Mostrar la fecha
+zh: 显示日期
+hi: तारीख दिखाएँ
+
+en: Status items
+fr: Éléments d'état
+es: Elementos de estado
+zh: 状态项
+hi: स्टेटस आइटम
+
+en: Show battery
+fr: Afficher la batterie
+es: Mostrar la batería
+zh: 显示电池
+hi: बैटरी दिखाएँ
+
+en: Hide battery when absent
+fr: Masquer la batterie en son absence
+es: Ocultar la batería si no hay
+zh: 无电池时隐藏
+hi: बैटरी न होने पर छिपाएँ
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+fr: Les PC de bureau sans batterie n'affichent rien au lieu d'une batterie inconnue.
+es: Los PC de sobremesa sin batería no muestran nada en lugar de una batería desconocida.
+zh: 没有电池的台式电脑不显示任何内容，而不是显示未知电池。
+hi: बिना बैटरी वाले डेस्कटॉप PC अज्ञात बैटरी के बजाय कुछ नहीं दिखाते।
+
+en: Show input language
+fr: Afficher la langue de saisie
+es: Mostrar el idioma de entrada
+zh: 显示输入语言
+hi: इनपुट भाषा दिखाएँ
+
+en: Show network
+fr: Afficher le réseau
+es: Mostrar la red
+zh: 显示网络
+hi: नेटवर्क दिखाएँ
+
+en: Show audio output
+fr: Afficher la sortie audio
+es: Mostrar la salida de audio
+zh: 显示音频输出
+hi: ऑडियो आउटपुट दिखाएँ
+
+en: Show microphone
+fr: Afficher le microphone
+es: Mostrar el micrófono
+zh: 显示麦克风
+hi: माइक्रोफ़ोन दिखाएँ
+
+en: Show weather when enabled
+fr: Afficher la météo quand elle est activée
+es: Mostrar el tiempo si está activado
+zh: 启用时显示天气
+hi: चालू होने पर मौसम दिखाएँ
+
+en: Weather itself is turned on in Weather settings.
+fr: La météo elle-même s'active dans les paramètres Météo.
+es: El tiempo se activa en la configuración del Tiempo.
+zh: 天气功能本身需在“天气”设置中开启。
+hi: मौसम खुद मौसम सेटिंग्स में चालू किया जाता है।
+
+en: Show hidden icons button
+fr: Afficher le bouton des icônes cachées
+es: Mostrar el botón de iconos ocultos
+zh: 显示隐藏图标按钮
+hi: छिपे हुए आइकन का बटन दिखाएँ
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+fr: Un petit chevron qui ouvre les icônes cachées de la zone de notification de Windows.
+es: Una pequeña flecha que abre los iconos ocultos del área de notificación de Windows.
+zh: 一个小箭头，用于打开 Windows 通知区域中的隐藏图标。
+hi: एक छोटा शेवरॉन जो Windows के सूचना क्षेत्र के छिपे हुए आइकन खोलता है।
+
+en: Reserve screen space above windows
+fr: Réserver l'espace écran au-dessus des fenêtres
+es: Reservar espacio de pantalla sobre las ventanas
+zh: 在窗口上方保留屏幕空间
+hi: विंडो के ऊपर स्क्रीन पर जगह आरक्षित करें
+
+en: Maximized windows stay below the Top Bar.
+fr: Les fenêtres agrandies restent sous la barre du haut.
+es: Las ventanas maximizadas quedan debajo de la barra superior.
+zh: 最大化的窗口停留在顶部栏下方。
+hi: बड़ी की गई विंडो शीर्ष बार के नीचे रहती हैं।
+
+en: Automatically hide the Top Bar
+fr: Masquer automatiquement la barre du haut
+es: Ocultar la barra superior automáticamente
+zh: 自动隐藏顶部栏
+hi: शीर्ष बार को अपने-आप छिपाएँ
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+fr: Elle se masque quand une fenêtre la recouvre ; amenez le pointeur au bord supérieur de l'écran pour la faire apparaître. Elle reste visible sur le bureau.
+es: Se oculta cuando una ventana la cubre; lleva el puntero al borde superior de la pantalla para mostrarla. Permanece visible en el escritorio.
+zh: 当应用窗口遮住它时隐藏；将指针移到屏幕顶部边缘即可显示。在桌面上它保持可见。
+hi: जब कोई ऐप्लिकेशन विंडो इसे ढकती है तो यह छिप जाती है; दिखाने के लिए पॉइंटर को स्क्रीन के ऊपरी किनारे पर ले जाएँ। डेस्कटॉप पर यह दिखती रहती है।
+
+en: Use Windows Quick Settings (Windows 11)
+fr: Utiliser les paramètres rapides de Windows (Windows 11)
+es: Usar la configuración rápida de Windows (Windows 11)
+zh: 使用 Windows 快速设置（Windows 11）
+hi: Windows क्विक सेटिंग्स का उपयोग करें (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+fr: Désactivé : les commandes rapides d'Aether s'ouvrent sous la barre du haut. Activé : le panneau de Windows s'ouvre en bas de l'écran.
+es: Desactivado: los controles rápidos de Aether se abren bajo la barra superior. Activado: el panel de Windows se abre en la parte inferior de la pantalla.
+zh: 关闭：Aether 的快捷控制在顶部栏下方打开。开启：在屏幕底部打开 Windows 自带的面板。
+hi: बंद: Aether के क्विक कंट्रोल शीर्ष बार के नीचे खुलते हैं। चालू: Windows का अपना पैनल स्क्रीन के नीचे खुलता है।
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+fr: Des prévisions facultatives dans la barre du haut, fournies par Open-Meteo.
+es: Una previsión opcional en la barra superior, proporcionada por Open-Meteo.
+zh: 顶部栏中可选的天气预报，由 Open-Meteo 提供。
+hi: शीर्ष बार में एक वैकल्पिक मौसम पूर्वानुमान, Open-Meteo द्वारा।
+
+en: Forecast
+fr: Prévisions
+es: Previsión
+zh: 天气预报
+hi: पूर्वानुमान
+
+en: Enable weather
+fr: Activer la météo
+es: Activar el tiempo
+zh: 启用天气
+hi: मौसम चालू करें
+
+en: Off by default: the forecast needs network requests.
+fr: Désactivée par défaut : les prévisions nécessitent des requêtes réseau.
+es: Desactivado de forma predeterminada: la previsión necesita conexiones de red.
+zh: 默认关闭：天气预报需要发出网络请求。
+hi: डिफ़ॉल्ट रूप से बंद: पूर्वानुमान के लिए नेटवर्क अनुरोध ज़रूरी हैं।
+
+en: Temperature
+fr: Température
+es: Temperatura
+zh: 温度
+hi: तापमान
+
+en: Celsius
+fr: Celsius
+es: Celsius
+zh: 摄氏度
+hi: सेल्सियस
+
+en: Fahrenheit
+fr: Fahrenheit
+es: Fahrenheit
+zh: 华氏度
+hi: फ़ारेनहाइट
+
+en: Refresh interval
+fr: Intervalle d'actualisation
+es: Intervalo de actualización
+zh: 刷新间隔
+hi: रीफ़्रेश अंतराल
+
+en: Location
+fr: Emplacement
+es: Ubicación
+zh: 位置
+hi: स्थान
+
+en: Locate automatically with Windows
+fr: Localiser automatiquement avec Windows
+es: Ubicar automáticamente con Windows
+zh: 通过 Windows 自动定位
+hi: Windows के साथ अपने-आप स्थान पता करें
+
+en: Uses the Windows location service after you allow it.
+fr: Utilise le service de localisation de Windows une fois que vous l'avez autorisé.
+es: Usa el servicio de ubicación de Windows cuando lo permitas.
+zh: 在你允许后使用 Windows 定位服务。
+hi: आपकी अनुमति के बाद Windows स्थान सेवा का उपयोग करता है।
+
+en: Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com; a coarse location key is cached locally. If location is blocked, weather is unavailable.
+fr: Windows demande l'autorisation d'accéder à la position. Des coordonnées approximatives sont envoyées à Open-Meteo.com ; une clé de position grossière est gardée en cache localement. Si la localisation est bloquée, la météo n'est pas disponible.
+es: Windows pide permiso de ubicación. Se envían coordenadas aproximadas a Open-Meteo.com; se guarda localmente una clave de ubicación aproximada. Si la ubicación está bloqueada, el tiempo no está disponible.
+zh: Windows 会请求定位权限。大致坐标会发送到 Open-Meteo.com；粗略的位置标识会缓存在本地。如果定位被阻止，则无法显示天气。
+hi: Windows स्थान की अनुमति माँगता है। अनुमानित निर्देशांक Open-Meteo.com को भेजे जाते हैं; एक मोटा स्थान-कुंजी स्थानीय रूप से कैश की जाती है। अगर स्थान अवरुद्ध है, तो मौसम उपलब्ध नहीं है।
+
+en: Use &Windows location
+fr: Utiliser la position &Windows
+es: Usar la ubicación de &Windows
+zh: 使用 Windows 位置(&W)
+hi: Windows स्थान का उपयोग करें(&W)
+
+en: Location &settings
+fr: Paramètres de &localisation
+es: Configuración de &ubicación
+zh: 位置设置(&S)
+hi: स्थान सेटिंग्स(&S)
+
+en: Choose automatic location or search for a place below.
+fr: Choisissez la position automatique ou cherchez un lieu ci-dessous.
+es: Elige la ubicación automática o busca un lugar abajo.
+zh: 选择自动定位，或在下方搜索地点。
+hi: स्वचालित स्थान चुनें या नीचे कोई जगह खोजें।
+
+en: Search for a place
+fr: Chercher un lieu
+es: Buscar un lugar
+zh: 搜索地点
+hi: कोई जगह खोजें
+
+en: Searc&h
+fr: &Chercher
+es: &Buscar
+zh: 搜索(&H)
+hi: खोजें(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+fr: Données météo d'Open-Meteo.com (CC BY 4.0). La recherche manuelle n'envoie que le texte que vous saisissez.
+es: Datos meteorológicos de Open-Meteo.com (CC BY 4.0). La búsqueda manual solo envía el texto que escribes.
+zh: 天气数据来自 Open-Meteo.com（CC BY 4.0）。手动搜索只会发送你输入的文字。
+hi: मौसम डेटा Open-Meteo.com से (CC BY 4.0)। मैन्युअल खोज केवल आपका लिखा हुआ टेक्स्ट भेजती है।
+
+en: Signed releases from the official GitHub repository, verified before installation.
+fr: Versions signées du dépôt GitHub officiel, vérifiées avant l'installation.
+es: Versiones firmadas del repositorio oficial de GitHub, verificadas antes de instalarse.
+zh: 来自官方 GitHub 仓库的签名版本，安装前会进行验证。
+hi: आधिकारिक GitHub रिपॉज़िटरी से हस्ताक्षरित रिलीज़, इंस्टॉल से पहले सत्यापित।
+
+en: Preferences
+fr: Préférences
+es: Preferencias
+zh: 首选项
+hi: प्राथमिकताएँ
+
+en: Check for updates automatically
+fr: Rechercher automatiquement les mises à jour
+es: Buscar actualizaciones automáticamente
+zh: 自动检查更新
+hi: अपडेट अपने-आप जाँचें
+
+en: Check interval
+fr: Intervalle de vérification
+es: Intervalo de comprobación
+zh: 检查间隔
+hi: जाँच का अंतराल
+
+en: Release channel
+fr: Canal de publication
+es: Canal de versiones
+zh: 发布渠道
+hi: रिलीज़ चैनल
+
+en: Prereleases arrive earlier and change more often.
+fr: Les préversions arrivent plus tôt et changent plus souvent.
+es: Las versiones preliminares llegan antes y cambian con más frecuencia.
+zh: 预发布版本更早推出，变化也更频繁。
+hi: प्री-रिलीज़ पहले आती हैं और अक्सर बदलती रहती हैं।
+
+en: Stable
+fr: Stable
+es: Estable
+zh: 稳定版
+hi: स्थिर
+
+en: Prerelease
+fr: Préversion
+es: Versión preliminar
+zh: 预发布版
+hi: प्री-रिलीज़
+
+en: Show update notifications
+fr: Afficher les notifications de mise à jour
+es: Mostrar notificaciones de actualización
+zh: 显示更新通知
+hi: अपडेट सूचनाएँ दिखाएँ
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+fr: Démarrage, mouvement, raccourcis clavier et diagnostic.
+es: Inicio, movimiento, atajos de teclado y diagnóstico.
+zh: 启动、动效、键盘快捷键和诊断。
+hi: स्टार्टअप, गति, कीबोर्ड शॉर्टकट और डायग्नोस्टिक्स।
+
+en: The language of the bars, menus, Search, Settings and setup.
+fr: La langue des barres, des menus, de la recherche, des Paramètres et de l'installation.
+es: El idioma de las barras, los menús, la búsqueda, la Configuración y la instalación.
+zh: 顶部栏、程序坞、菜单、搜索、设置和安装程序使用的语言。
+hi: बार, मेनू, खोज, सेटिंग्स और सेटअप की भाषा।
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+fr: Les noms qui vous appartiennent ou qui appartiennent à d'autres programmes (applications, fichiers, réseaux Wi-Fi) ne sont jamais traduits. Avec une langue choisie, la barre du haut écrit la date dans cette langue ; « Comme Windows » garde votre format régional de Windows.
+es: Los nombres que son tuyos o de otros programas (aplicaciones, archivos, redes Wi-Fi) nunca se traducen. Con un idioma elegido, la barra superior escribe la fecha en ese idioma; «Igual que Windows» conserva tu formato regional de Windows.
+zh: 属于你或其他程序的名称（应用、文件、WLAN 网络）永远不会被翻译。选择某种语言后，顶部栏会用该语言显示日期；“跟随 Windows”则保留你的 Windows 区域格式。
+hi: आपके या दूसरे प्रोग्रामों के नाम (ऐप्लिकेशन, फ़ाइलें, Wi-Fi नेटवर्क) कभी अनुवादित नहीं होते। कोई भाषा चुनने पर शीर्ष बार तारीख उसी भाषा में लिखता है; "Windows के अनुसार" आपका Windows क्षेत्रीय फ़ॉर्मैट रखता है।
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+fr: L'accueil écrit à la main trace des lettres latines : il salue en français, en anglais ou en espagnol. Choisissez sa langue dans Bienvenue.
+es: La bienvenida escrita a mano traza letras latinas: saluda en francés, inglés o español. Elige su idioma en Bienvenida.
+zh: 手写欢迎只能书写拉丁字母：会用法语、英语或西班牙语问候。可在“欢迎”页面中选择其语言。
+hi: हाथ से लिखा स्वागत लैटिन अक्षर लिखता है: यह फ़्रेंच, अंग्रेज़ी या स्पैनिश में अभिवादन करता है। इसकी भाषा स्वागत में चुनें।
+
+en: Language
+fr: Langue
+es: Idioma
+zh: 语言
+hi: भाषा
+
+en: Interface language
+fr: Langue de l'interface
+es: Idioma de la interfaz
+zh: 界面语言
+hi: इंटरफ़ेस की भाषा
+
+en: Follow Windows uses the Windows display language when it is one of these, and English otherwise.
+fr: « Comme Windows » utilise la langue d'affichage de Windows si elle fait partie de celles-ci, et l'anglais sinon.
+es: «Igual que Windows» usa el idioma de Windows si es uno de estos y, si no, el inglés.
+zh: “跟随 Windows”会在 Windows 显示语言属于这些语言之一时使用它，否则使用英语。
+hi: “Windows के अनुसार” Windows की डिस्प्ले भाषा का उपयोग करता है अगर वह इनमें से एक है, वरना अंग्रेज़ी।
+
+en: Startup
+fr: Démarrage
+es: Inicio
+zh: 启动
+hi: स्टार्टअप
+
+en: Start Aether Shell when I sign in
+fr: Démarrer Aether Shell à l'ouverture de session
+es: Iniciar Aether Shell al iniciar sesión
+zh: 登录时启动 Aether Shell
+hi: साइन इन करने पर Aether Shell शुरू करें
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+fr: Ce changement nécessite Appliquer. Le Gestionnaire des tâches peut aussi le désactiver.
+es: Este cambio requiere Aplicar. El Administrador de tareas también puede desactivarlo.
+zh: 更改此项需要点击“应用”。任务管理器也可以将其关闭。
+hi: इसे बदलने के लिए लागू करें दबाएँ। टास्क मैनेजर भी इसे बंद कर सकता है।
+
+en: Motion
+fr: Mouvement
+es: Movimiento
+zh: 动效
+hi: गति
+
+en: Reduced motion removes decorative movement everywhere.
+fr: Le mouvement réduit supprime partout les animations décoratives.
+es: El movimiento reducido elimina en todas partes las animaciones decorativas.
+zh: 减少动效会移除所有装饰性动画。
+hi: कम गति हर जगह सजावटी हलचल हटा देती है।
+
+en: Reduced
+fr: Réduit
+es: Reducido
+zh: 减少
+hi: कम
+
+en: Full
+fr: Complet
+es: Completo
+zh: 完整
+hi: पूरा
+
+en: Keyboard shortcuts
+fr: Raccourcis clavier
+es: Atajos de teclado
+zh: 键盘快捷键
+hi: कीबोर्ड शॉर्टकट
+
+en: Enable global keyboard shortcuts
+fr: Activer les raccourcis clavier globaux
+es: Activar los atajos de teclado globales
+zh: 启用全局键盘快捷键
+hi: वैश्विक कीबोर्ड शॉर्टकट चालू करें
+
+en: Search shortcut key
+fr: Touche du raccourci de recherche
+es: Tecla del atajo de búsqueda
+zh: 搜索快捷键
+hi: खोज शॉर्टकट कुंजी
+
+en: Dock shortcut key
+fr: Touche du raccourci du Dock
+es: Tecla del atajo del Dock
+zh: 程序坞快捷键
+hi: डॉक शॉर्टकट कुंजी
+
+en: Search shortcut modifiers
+fr: Touches de modification de la recherche
+es: Modificadores del atajo de búsqueda
+zh: 搜索快捷键的修饰键
+hi: खोज शॉर्टकट के मॉडिफ़ायर
+
+en: Dock shortcut modifiers
+fr: Touches de modification du Dock
+es: Modificadores del atajo del Dock
+zh: 程序坞快捷键的修饰键
+hi: डॉक शॉर्टकट के मॉडिफ़ायर
+
+en: Shortcut status unavailable
+fr: État des raccourcis indisponible
+es: Estado de los atajos no disponible
+zh: 快捷键状态不可用
+hi: शॉर्टकट की स्थिति उपलब्ध नहीं
+
+en: Diagnostics
+fr: Diagnostic
+es: Diagnóstico
+zh: 诊断
+hi: डायग्नोस्टिक्स
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+fr: Le dossier des journaux contient les journaux d'Aether Shell de cet ordinateur. L'export du diagnostic n'enregistre que la version de l'application et la build de Windows, sans journaux ni données personnelles.
+es: La carpeta de registros contiene los registros de Aether Shell de este equipo. Exportar el diagnóstico solo guarda la versión de la aplicación y la compilación de Windows, sin registros ni datos personales.
+zh: 日志文件夹保存这台电脑上的 Aether Shell 日志。导出诊断信息只会保存应用版本和 Windows 版本号，不含日志或个人数据。
+hi: लॉग फ़ोल्डर में इस कंप्यूटर के Aether Shell लॉग रहते हैं। डायग्नोस्टिक्स निर्यात केवल ऐप का संस्करण और Windows बिल्ड सहेजता है - कोई लॉग या निजी डेटा नहीं।
+
+en: Open &log folder
+fr: Ouvrir le dossier des &journaux
+es: Abrir la carpeta de &registros
+zh: 打开日志文件夹(&L)
+hi: लॉग फ़ोल्डर खोलें(&L)
+
+en: &Export diagnostics...
+fr: &Exporter le diagnostic...
+es: &Exportar diagnóstico...
+zh: 导出诊断信息(&E)...
+hi: डायग्नोस्टिक्स निर्यात करें(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+fr: Un court message écrit à la main sur votre bureau après l'ouverture de session ou le déverrouillage de votre PC.
+es: Un breve saludo escrito a mano en tu escritorio tras iniciar sesión o desbloquear el PC.
+zh: 登录或解锁电脑后，在桌面上显示一段简短的手写问候。
+hi: साइन इन करने या PC अनलॉक करने के बाद आपके डेस्कटॉप पर हाथ से लिखा एक छोटा अभिवादन।
+
+en: Greeting
+fr: Salutation
+es: Saludo
+zh: 问候
+hi: अभिवादन
+
+en: Show the welcome at sign-in and unlock
+fr: Afficher l'accueil à l'ouverture de session et au déverrouillage
+es: Mostrar la bienvenida al iniciar sesión y al desbloquear
+zh: 登录和解锁时显示欢迎
+hi: साइन इन और अनलॉक पर स्वागत दिखाएँ
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+fr: Il apparaît une fois la session ouverte par Windows, pendant qu'Aether Shell se prépare. Touchez, cliquez ou appuyez sur Échap pour le passer.
+es: Aparece cuando Windows ha iniciado tu sesión, mientras Aether Shell se prepara. Toca, haz clic o pulsa Esc para omitirlo.
+zh: 它会在 Windows 完成登录、Aether Shell 准备就绪时出现。触摸、单击或按 Esc 键即可跳过。
+hi: यह Windows के साइन इन करने के बाद दिखता है, जब Aether Shell तैयार हो रहा होता है। छोड़ने के लिए छुएँ, क्लिक करें या Escape दबाएँ।
+
+en: Greeting language
+fr: Langue de la salutation
+es: Idioma del saludo
+zh: 问候语言
+hi: अभिवादन की भाषा
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in Chinese and Hindi it greets in English.
+fr: Salut en français, Hello en anglais, Hola en espagnol. La plume écrit en lettres latines : en chinois et en hindi, elle salue en anglais.
+es: Salut en francés, Hello en inglés, Hola en español. La pluma escribe letras latinas: en chino y en hindi saluda en inglés.
+zh: 法语为 Salut，英语为 Hello，西班牙语为 Hola。笔迹只能书写拉丁字母：中文和印地语界面下会用英语问候。
+hi: फ़्रेंच में Salut, अंग्रेज़ी में Hello, स्पैनिश में Hola। कलम लैटिन अक्षर लिखती है: चीनी और हिंदी में यह अंग्रेज़ी में अभिवादन करती है।
+
+en: Your name
+fr: Votre prénom
+es: Tu nombre
+zh: 你的名字
+hi: आपका नाम
+
+en: Name to greet you with
+fr: Prénom pour vous saluer
+es: Nombre con el que saludarte
+zh: 问候时使用的名字
+hi: अभिवादन के लिए नाम
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+fr: Facultatif, par exemple un prénom. Il reste sur ce PC dans vos paramètres d'Aether Shell et n'est jamais envoyé nulle part ni écrit dans un journal. Videz le champ pour le retirer.
+es: Opcional, por ejemplo un nombre de pila. Se queda en este PC, en tu configuración de Aether Shell, y nunca se envía a ningún sitio ni se escribe en un registro. Vacía el campo para quitarlo.
+zh: 可选，例如名字。它只保存在这台电脑的 Aether Shell 设置中，绝不会发送到任何地方，也不会写入日志。清空此字段即可删除。
+hi: वैकल्पिक, जैसे कोई पहला नाम। यह इसी PC पर आपकी Aether Shell सेटिंग्स में रहता है और कभी कहीं भेजा या लॉग में लिखा नहीं जाता। हटाने के लिए फ़ील्ड खाली करें।
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+fr: Mode de couleur, accent, vitesse des animations et aspect du Dock et de la barre du haut.
+es: Modo de color, color de énfasis, velocidad de las animaciones y aspecto del Dock y de la barra superior.
+zh: 颜色模式、强调色、动效速度，以及程序坞和顶部栏的外观。
+hi: रंग मोड, एक्सेंट, गति की रफ़्तार और डॉक तथा शीर्ष बार का रूप।
+
+en: Style
+fr: Style
+es: Estilo
+zh: 风格
+hi: शैली
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+fr: Liquide : du verre en couches sur ce qui se trouve derrière, une couche de flou, la lumière du liquide, puis les icônes et le texte, toujours lisibles sur les pages claires comme sombres. Grain : verre dépoli, flouté et semi-transparent, avec un grain fin.
+es: Líquido: cristal en capas sobre lo que hay detrás, una capa de desenfoque, la luz del líquido y luego los iconos y el texto, legibles sobre páginas claras y oscuras. Grano: cristal esmerilado, desenfocado y semitransparente, con un grano fino.
+zh: 液态：在背后内容之上叠加多层玻璃——一层模糊、液体的光泽，然后是图标和文字，在亮色和暗色页面上都清晰可读。磨砂：模糊、半透明的磨砂玻璃，带有细腻的颗粒。
+hi: लिक्विड: पीछे की चीज़ों के ऊपर परतों में ग्लास, एक ब्लर परत, तरल की रोशनी, फिर आइकन और टेक्स्ट, जो हल्के और गहरे पेजों पर पढ़ने योग्य रहते हैं। ग्रेन: फ्रॉस्टेड ग्लास, धुंधला और अर्ध-पारदर्शी, बारीक दानों के साथ।
+
+en: Liquid blur
+fr: Flou du Liquide
+es: Desenfoque del Líquido
+zh: 液态模糊
+hi: लिक्विड ब्लर
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+fr: À quel point la couche de flou sous le verre Liquide couvre ce qui se trouve derrière : 100 % floute tout. Une valeur plus basse montre la page plus nette, et le texte des barres peut alors se lire moins bien sur une page chargée.
+es: Cuánto cubre la capa de desenfoque bajo el cristal Líquido lo que hay detrás: 100 % lo desenfoca todo. Los valores más bajos muestran la página más nítida, y el texto de las barras puede leerse peor sobre una página recargada.
+zh: 液态玻璃下的模糊层覆盖背后内容的程度：100% 会全部模糊。数值越低，页面越清晰，但在内容繁杂的页面上，栏中的文字可能更难看清。
+hi: लिक्विड ग्लास के नीचे की ब्लर परत पीछे की चीज़ों को कितना ढकती है: 100% सब धुंधला कर देता है। कम मान पेज को ज़्यादा साफ़ दिखाते हैं, और तब भरे-भरे पेज पर बार का टेक्स्ट कम साफ़ पढ़ा जा सकता है।
+
+en: Liquid blur color
+fr: Couleur du flou Liquide
+es: Color del desenfoque Líquido
+zh: 液态模糊颜色
+hi: लिक्विड ब्लर का रंग
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+fr: Automatique garde les couleurs propres du verre. Le texte et les icônes restent lisibles quelle que soit la couleur.
+es: Automático conserva los colores propios del cristal. El texto y los iconos siguen siendo legibles sea cual sea el color.
+zh: “自动”会保留玻璃本身的颜色。无论选择哪种颜色，文字和图标都保持清晰可读。
+hi: स्वचालित ग्लास के अपने रंग रखता है। रंग चाहे जो हो, टेक्स्ट और आइकन पढ़ने योग्य रहते हैं।
+
+en: Automatic
+fr: Automatique
+es: Automático
+zh: 自动
+hi: स्वचालित
+
+en: White
+fr: Blanc
+es: Blanco
+zh: 白色
+hi: सफ़ेद
+
+en: Black
+fr: Noir
+es: Negro
+zh: 黑色
+hi: काला
+
+en: Accent
+fr: Accent
+es: Énfasis
+zh: 强调色
+hi: एक्सेंट
+
+en: Blue
+fr: Bleu
+es: Azul
+zh: 蓝色
+hi: नीला
+
+en: Violet
+fr: Violet
+es: Violeta
+zh: 紫色
+hi: बैंगनी
+
+en: Pink
+fr: Rose
+es: Rosa
+zh: 粉色
+hi: गुलाबी
+
+en: Red
+fr: Rouge
+es: Rojo
+zh: 红色
+hi: लाल
+
+en: Orange
+fr: Orange
+es: Naranja
+zh: 橙色
+hi: नारंगी
+
+en: Yellow
+fr: Jaune
+es: Amarillo
+zh: 黄色
+hi: पीला
+
+en: Green
+fr: Vert
+es: Verde
+zh: 绿色
+hi: हरा
+
+en: Teal
+fr: Bleu-vert
+es: Verde azulado
+zh: 青色
+hi: हरा-नीला
+
+en: Liquid color strength
+fr: Intensité de la couleur du Liquide
+es: Intensidad del color del Líquido
+zh: 液态颜色强度
+hi: लिक्विड रंग की तीव्रता
+
+en: How much of the chosen color the blur layer takes.
+fr: La part de la couleur choisie que prend la couche de flou.
+es: Cuánto del color elegido toma la capa de desenfoque.
+zh: 模糊层呈现所选颜色的程度。
+hi: ब्लर परत चुने गए रंग को कितना लेती है।
+
+en: Theme
+fr: Thème
+es: Tema
+zh: 主题
+hi: थीम
+
+en: Color mode
+fr: Mode de couleur
+es: Modo de color
+zh: 颜色模式
+hi: रंग मोड
+
+en: High contrast always takes precedence.
+fr: Le contraste élevé a toujours la priorité.
+es: El contraste alto siempre tiene prioridad.
+zh: 高对比度始终优先。
+hi: हाई कंट्रास्ट को हमेशा प्राथमिकता मिलती है।
+
+en: Light
+fr: Clair
+es: Claro
+zh: 浅色
+hi: हल्का
+
+en: Dark
+fr: Sombre
+es: Oscuro
+zh: 深色
+hi: गहरा
+
+en: Accent color
+fr: Couleur d'accentuation
+es: Color de énfasis
+zh: 强调色
+hi: एक्सेंट रंग
+
+en: Animation duration
+fr: Durée des animations
+es: Duración de las animaciones
+zh: 动画时长
+hi: एनिमेशन की अवधि
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+fr: 1 correspond à la vitesse standard ; une valeur plus élevée ralentit. Le mouvement réduit a la priorité.
+es: 1 es la velocidad estándar; los valores más altos son más lentos. El movimiento reducido tiene prioridad.
+zh: 1 为标准速度；数值越高越慢。“减少动效”优先。
+hi: 1 मानक गति है; बड़े मान धीमे होते हैं। कम गति को प्राथमिकता मिलती है।
+
+en: Dock icon preset
+fr: Préréglage des icônes du Dock
+es: Tamaño predefinido de los iconos del Dock
+zh: 程序坞图标预设
+hi: डॉक आइकन प्रीसेट
+
+en: A custom size from Dock settings is kept until you choose a preset.
+fr: Une taille personnalisée définie dans les paramètres du Dock est conservée jusqu'à ce que vous choisissiez un préréglage.
+es: Un tamaño personalizado de la configuración del Dock se mantiene hasta que elijas un tamaño predefinido.
+zh: 在程序坞设置中自定义的大小会一直保留，直到你选择某个预设。
+hi: डॉक सेटिंग्स का कस्टम आकार तब तक बना रहता है जब तक आप कोई प्रीसेट न चुनें।
+
+en: Small - 32 px
+fr: Petit - 32 px
+es: Pequeño - 32 px
+zh: 小 - 32 像素
+hi: छोटा - 32 px
+
+en: Medium - 40 px
+fr: Moyen - 40 px
+es: Mediano - 40 px
+zh: 中 - 40 像素
+hi: मध्यम - 40 px
+
+en: Large - 48 px
+fr: Grand - 48 px
+es: Grande - 48 px
+zh: 大 - 48 像素
+hi: बड़ा - 48 px
+
+en: Keep custom size
+fr: Garder la taille personnalisée
+es: Mantener el tamaño personalizado
+zh: 保留自定义大小
+hi: कस्टम आकार रखें
+
+en: Show Windows Start in the Dock
+fr: Afficher Démarrer de Windows dans le Dock
+es: Mostrar el Inicio de Windows en el Dock
+zh: 在程序坞中显示 Windows 开始
+hi: डॉक में Windows स्टार्ट दिखाएँ
+
+en: Show Task View in the Dock
+fr: Afficher la vue des tâches dans le Dock
+es: Mostrar la Vista de tareas en el Dock
+zh: 在程序坞中显示任务视图
+hi: डॉक में टास्क व्यू दिखाएँ
+
+en: Reserve extra space for Dock animations
+fr: Réserver de l'espace pour les animations du Dock
+es: Reservar espacio extra para las animaciones del Dock
+zh: 为程序坞动画额外保留空间
+hi: डॉक एनिमेशन के लिए अतिरिक्त जगह आरक्षित करें
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+fr: Évite que l'agrandissement et le rebond au lancement passent sous les fenêtres agrandies.
+es: Evita que la ampliación y el rebote al abrir queden bajo las ventanas maximizadas.
+zh: 让放大效果和启动弹跳不会被最大化的窗口遮住。
+hi: बड़ा होना और लॉन्च पर उछलना बड़ी की गई विंडो से अलग रखता है।
+
+en: Weather position
+fr: Position de la météo
+es: Posición del tiempo
+zh: 天气位置
+hi: मौसम की स्थिति
+
+en: Left
+fr: Gauche
+es: Izquierda
+zh: 左侧
+hi: बाएँ
+
+en: Right
+fr: Droite
+es: Derecha
+zh: 右侧
+hi: दाएँ
+
+en: Keyboard indicator
+fr: Indicateur du clavier
+es: Indicador del teclado
+zh: 键盘指示器
+hi: कीबोर्ड संकेतक
+
+en: Compact
+fr: Compact
+es: Compacto
+zh: 紧凑
+hi: छोटा
+
+en: Two lines
+fr: Deux lignes
+es: Dos líneas
+zh: 两行
+hi: दो पंक्तियाँ
+
+en: Windows taskbar pins
+fr: Épingles de la barre des tâches Windows
+es: Anclajes de la barra de tareas de Windows
+zh: Windows 任务栏固定项
+hi: Windows टास्कबार पिन
+
+en: Add newly discovered Windows taskbar pins
+fr: Ajouter les nouvelles épingles de la barre des tâches Windows
+es: Añadir los nuevos anclajes de la barra de tareas de Windows
+zh: 添加新发现的 Windows 任务栏固定项
+hi: नए मिले Windows टास्कबार पिन जोड़ें
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+fr: Tant que la barre des tâches est remplacée, les nouvelles épingles de Windows sont ajoutées au Dock.
+es: Mientras la barra de tareas está sustituida, los nuevos anclajes de Windows se añaden al Dock.
+zh: 在替换任务栏期间，新的 Windows 固定项会添加到程序坞。
+hi: जब तक टास्कबार बदला हुआ है, नए Windows पिन डॉक में जोड़े जाते हैं।
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+fr: Remplacement réversible de la barre des tâches Windows par le Dock.
+es: Sustitución reversible de la barra de tareas de Windows por el Dock.
+zh: 用程序坞可逆地替换 Windows 任务栏。
+hi: डॉक द्वारा Windows टास्कबार का उलटा जा सकने वाला प्रतिस्थापन।
+
+en: Taskbar replacement
+fr: Remplacement de la barre des tâches
+es: Sustitución de la barra de tareas
+zh: 替换任务栏
+hi: टास्कबार प्रतिस्थापन
+
+en: Replace the Windows taskbar
+fr: Remplacer la barre des tâches Windows
+es: Sustituir la barra de tareas de Windows
+zh: 替换 Windows 任务栏
+hi: Windows टास्कबार बदलें
+
+en: Changing this needs Apply.
+fr: Ce changement nécessite Appliquer.
+es: Este cambio requiere Aplicar.
+zh: 更改此项需要点击“应用”。
+hi: इसे बदलने के लिए लागू करें दबाएँ।
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+fr: Tant qu'Aether Shell fonctionne, il masque la barre des tâches Windows et réserve de l'espace sous les applications agrandies.
+es: Mientras Aether Shell se ejecuta, oculta la barra de tareas de Windows y reserva espacio bajo las aplicaciones maximizadas.
+zh: Aether Shell 运行时会隐藏 Windows 任务栏，并在最大化的应用下方保留空间。
+hi: Aether Shell चलते समय Windows टास्कबार छिपाता है और बड़े किए गए ऐप्लिकेशनों के नीचे जगह आरक्षित करता है।
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+fr: L'état de la barre des tâches Windows est rétabli quand ce mode est désactivé ou qu'Aether Shell se ferme. Un assistant de récupération séparé la rétablit aussi si l'application s'arrête de façon inattendue. Si la récupération échoue, redémarrez l'Explorateur Windows dans le Gestionnaire des tâches.
+es: El estado de la barra de tareas de Windows se restablece al desactivar este modo o al cerrar Aether Shell. Un asistente de recuperación independiente también la restablece si la aplicación se detiene de forma inesperada. Si la recuperación falla, reinicia el Explorador de Windows desde el Administrador de tareas.
+zh: 关闭此模式或退出 Aether Shell 时，会恢复 Windows 任务栏的状态。如果应用意外停止，独立的恢复助手也会将其恢复。如果恢复失败，请在任务管理器中重新启动 Windows 资源管理器。
+hi: यह मोड बंद करने या Aether Shell से बाहर निकलने पर Windows टास्कबार की स्थिति बहाल हो जाती है। अगर ऐप्लिकेशन अचानक रुक जाए तो एक अलग रिकवरी सहायक भी इसे बहाल करता है। अगर रिकवरी विफल हो, तो टास्क मैनेजर में Windows Explorer फिर से शुरू करें।
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+fr: Les Paramètres de Windows restent l'interface native de Windows. Leur page Barre des tâches n'est pas remplacée par Aether Shell ; réglez ce mode ici.
+es: La Configuración de Windows sigue siendo la interfaz nativa de Windows. Aether Shell no sustituye su página de la barra de tareas; configura este modo aquí.
+zh: Windows 设置仍是 Windows 原生界面。Aether Shell 不会替换其中的任务栏页面；请在这里配置此模式。
+hi: Windows सेटिंग्स मूल Windows इंटरफ़ेस ही रहती हैं। Aether Shell उसका टास्कबार पेज नहीं बदलता; यह मोड यहीं सेट करें।
+
+en: Pinned applications from Windows
+fr: Applications épinglées dans Windows
+es: Aplicaciones ancladas en Windows
+zh: 来自 Windows 的固定应用
+hi: Windows से पिन किए गए ऐप्लिकेशन
+
+en: &Import Windows taskbar pins
+fr: &Importer les épingles de la barre des tâches Windows
+es: &Importar los anclajes de la barra de tareas de Windows
+zh: 导入 Windows 任务栏固定项(&I)
+hi: Windows टास्कबार पिन आयात करें(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+fr: Lit les raccourcis épinglés sans modifier les épingles de Windows. Certaines épingles de Windows 11 ou leur ordre peuvent être indisponibles.
+es: Lee los accesos directos anclados sin cambiar los anclajes de Windows. Puede que algunos anclajes de Windows 11 o su orden no estén disponibles.
+zh: 读取已固定的快捷方式，不会更改 Windows 的固定项。部分 Windows 11 固定项或其顺序可能无法读取。
+hi: Windows पिन बदले बिना पिन किए गए शॉर्टकट पढ़ता है। कुछ Windows 11 पिन या उनका क्रम उपलब्ध न हो सकता है।
+
+en: Version {}
+fr: Version {}
+es: Versión {}
+zh: 版本 {}
+hi: संस्करण {}
+
+en: Created by Ibrahim Bouillet
+fr: Créé par Ibrahim Bouillet
+es: Creado por Ibrahim Bouillet
+zh: 由 Ibrahim Bouillet 创作
+hi: Ibrahim Bouillet द्वारा बनाया गया
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+fr: Une interface de bureau Windows native - un Dock flottant et une barre d'état en haut - qui fonctionne aux côtés de l'Explorateur.
+es: Una interfaz de escritorio nativa de Windows - un Dock flotante y una barra de estado superior - que funciona junto al Explorador.
+zh: 原生 Windows 桌面界面——悬浮程序坞与顶部状态栏——与资源管理器并行运行。
+hi: एक मूल Windows डेस्कटॉप इंटरफ़ेस - एक तैरता डॉक और शीर्ष स्टेटस बार - जो Explorer के साथ चलता है।
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+fr: Données météo : Open-Meteo.com (CC BY 4.0). Aucune bibliothèque d'exécution C++ tierce n'est incluse.
+es: Datos meteorológicos: Open-Meteo.com (CC BY 4.0). No se incluye ninguna biblioteca de tiempo de ejecución de C++ de terceros.
+zh: 天气数据：Open-Meteo.com（CC BY 4.0）。未捆绑任何第三方 C++ 运行库。
+hi: मौसम डेटा: Open-Meteo.com (CC BY 4.0)। कोई तृतीय-पक्ष C++ रनटाइम लाइब्रेरी शामिल नहीं है।
+
+en: &Official project
+fr: Projet &officiel
+es: Proyecto &oficial
+zh: 官方项目(&O)
+hi: आधिकारिक प्रोजेक्ट(&O)
+
+en: Licence
+fr: Licence
+es: Licencia
+zh: 许可证
+hi: लाइसेंस
+
+en: Taskbar replacement changes need Apply.
+fr: Les changements du remplacement de la barre des tâches nécessitent Appliquer.
+es: Los cambios de la sustitución de la barra de tareas requieren Aplicar.
+zh: 任务栏替换的更改需要点击“应用”。
+hi: टास्कबार प्रतिस्थापन के बदलावों के लिए लागू करें दबाएँ।
+
+en: Changes save automatically. Startup needs Apply.
+fr: Les changements sont enregistrés automatiquement. Le démarrage nécessite Appliquer.
+es: Los cambios se guardan automáticamente. El inicio requiere Aplicar.
+zh: 更改会自动保存。启动设置需要点击“应用”。
+hi: बदलाव अपने-आप सहेजे जाते हैं। स्टार्टअप के लिए लागू करें दबाएँ।
+
+en: Changes save automatically.
+fr: Les changements sont enregistrés automatiquement.
+es: Los cambios se guardan automáticamente.
+zh: 更改会自动保存。
+hi: बदलाव अपने-आप सहेजे जाते हैं।
+
+en: Press Apply to confirm this change.
+fr: Appuyez sur Appliquer pour confirmer ce changement.
+es: Pulsa Aplicar para confirmar este cambio.
+zh: 点击“应用”以确认此更改。
+hi: इस बदलाव की पुष्टि के लिए लागू करें दबाएँ।

@@ -83,6 +83,11 @@ public:
     // ErrorCode::Unavailable with the HRESULT in platformCode; the caller then asks the GraphicsDevice
     // to recover and invalidates.
     [[nodiscard]] Result<void> Draw(UINT dpi, const std::function<void(ID2D1DeviceContext*)>& draw);
+    // Redraws only `updatePx` (surface pixels, clamped to the surface): the rest keeps what was drawn before. The
+    // callback still draws in surface DIPs; the context is clipped to the area and only the area is cleared. The
+    // surface must hold a complete frame already (it does after a whole Draw that followed its last Resize).
+    [[nodiscard]] Result<void> Draw(UINT dpi, const RECT& updatePx, const std::function<void(ID2D1DeviceContext*)>& draw);
+    [[nodiscard]] SIZE PixelSize() const noexcept { return SIZE{widthPx_, heightPx_}; }
 
 private:
     void RevokeTransitionCompletion() noexcept;

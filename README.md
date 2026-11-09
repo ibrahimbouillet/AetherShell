@@ -1,6 +1,11 @@
 ![Aether Shell — a modular native desktop interface for Windows](resources/branding/png/readme-banner.png)
 
 <p align="center">
+  🇬🇧 <strong>English</strong> · 🇫🇷 <a href="README.fr.md">Français</a> · 🇪🇸 <a href="README.es.md">Español</a>
+  · 🇨🇳 <a href="README.zh-CN.md">中文</a> · 🇮🇳 <a href="README.hi.md">हिन्दी</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/ibrahimbouillet/AetherShell/releases/latest"><strong>Download the latest release</strong></a>
   · <a href="USER_GUIDE.md">User guide</a>
   · <a href="KNOWN_LIMITATIONS.md">Known limitations</a>
@@ -62,7 +67,9 @@ Real desktops, captured on Windows 11. Wallpapers and application icons belong t
   Control Panel's items.
 - **Auto-Hide:** let the Dock and the Top Bar, each on its own, slide away while an application window
   covers them and return when the pointer reaches their screen edge, for a full-screen workspace.
-- **Welcome:** an optional greeting, written by hand in French or English over your blurred wallpaper,
+- **Five languages:** the whole interface, setup included, in English, Chinese, Hindi, Spanish and French. It follows
+  Windows' display language, or the one you choose in Settings → Language. See [Languages](#languages).
+- **Welcome:** an optional greeting, written by hand in French, English or Spanish over your blurred wallpaper,
   after you sign in or unlock your PC. Setup can ask for the name it greets you with.
 - **Weather:** optionally use Windows location permission for a coarse position and a forecast. If
   location or the network is unavailable, weather remains unavailable rather than guessing.
@@ -78,6 +85,25 @@ Version 3.5 leaves applications' tabs and close buttons alone (the Top Bar answe
 panels as soon as you use anything else, and finds Windows' own tools in Search. The welcome now greets you by name from the first
 time, because setup asks for it; it shows your wallpaper even when the picture's file was moved or deleted, and its pen flows with
 less work per frame. Read the [release notes](docs/releases/0.3.5-alpha.3.md) and the [changelog](CHANGELOG.md).
+
+## Languages
+
+Aether Shell speaks the five most spoken languages in the world. Every menu, panel, Settings page, message and setup
+screen is translated, and so is this documentation.
+
+| | Language | Interface | Documentation |
+|---|---|---|---|
+| 🇬🇧 | English | ✅ | [README](README.md) · [User guide](USER_GUIDE.md) · [Installation](INSTALLATION.md) |
+| 🇨🇳 | 中文（简体） | ✅ | [README](README.zh-CN.md) · [使用指南](docs/i18n/zh-CN/USER_GUIDE.md) · [安装](docs/i18n/zh-CN/INSTALLATION.md) |
+| 🇮🇳 | हिन्दी | ✅ | [README](README.hi.md) · [उपयोग गाइड](docs/i18n/hi/USER_GUIDE.md) · [इंस्टॉलेशन](docs/i18n/hi/INSTALLATION.md) |
+| 🇪🇸 | Español | ✅ | [README](README.es.md) · [Guía de uso](docs/i18n/es/USER_GUIDE.md) · [Instalación](docs/i18n/es/INSTALLATION.md) |
+| 🇫🇷 | Français | ✅ | [README](README.fr.md) · [Guide d'utilisation](docs/i18n/fr/USER_GUIDE.md) · [Installation](docs/i18n/fr/INSTALLATION.md) |
+
+**Follow Windows** (the default) uses Windows' display language when it is one of these five, and English otherwise.
+Choose another in **Settings → Language**; the change applies at once. Names that belong to
+you or to other programs (applications, files, Wi-Fi networks) are never translated. The handwritten welcome writes
+Latin letters, so it greets in French, English or Spanish. Translations live in
+[tools/i18n/catalog](tools/i18n/catalog); corrections are welcome.
 
 ## Replacing the Windows taskbar
 

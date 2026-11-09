@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "ui/form/ConfirmDialog.h"
 
+#include "core/Localization.h"
 #include "diagnostics/Logger.h"
 #include "graphics/FrameScheduler.h"
 #include "graphics/GlassPainter.h"
@@ -145,7 +146,7 @@ private:
         const int height = platform::DipsToPixels(200.0f, dpi);
         const int x = (work_.left + work_.right - width) / 2;
         const int y = (work_.top + work_.bottom - height) / 2;
-        hwnd_ = ::CreateWindowExW(WS_EX_DLGMODALFRAME | WS_EX_CONTROLPARENT, kDialogClass, request_.windowTitle.c_str(), kStyle, x, y,
+        hwnd_ = ::CreateWindowExW(WS_EX_DLGMODALFRAME | WS_EX_CONTROLPARENT, kDialogClass, std::wstring(i18n::Tr(request_.windowTitle)).c_str(), kStyle, x, y,
                                   width, height, request_.owner && ::IsWindow(request_.owner) ? request_.owner : nullptr, nullptr,
                                   windowClass.hInstance, this);
         if (!hwnd_) return false;
@@ -161,7 +162,8 @@ private:
     }
 
     HWND AddStatic(const std::wstring& text, TextRole role) {
-        HWND label = ::CreateWindowExW(0, L"STATIC", text.c_str(), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW | SS_NOPREFIX, 0, 0, 0, 0,
+        const std::wstring shown(i18n::Tr(text));   // D70
+        HWND label = ::CreateWindowExW(0, L"STATIC", shown.c_str(), WS_CHILD | WS_VISIBLE | SS_OWNERDRAW | SS_NOPREFIX, 0, 0, 0, 0,
                                        scroll_.Canvas(), nullptr, ::GetModuleHandleW(nullptr), nullptr);
         if (!label) return nullptr;
         ControlSpec spec;
@@ -175,7 +177,8 @@ private:
     HWND AddButton(const std::wstring& text, int id, ButtonStyle style, bool isDefault, bool first) {
         DWORD buttonStyle = WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_MULTILINE | (isDefault ? BS_DEFPUSHBUTTON : BS_PUSHBUTTON);
         if (first) buttonStyle |= WS_GROUP;
-        HWND button = ::CreateWindowExW(0, L"BUTTON", text.c_str(), buttonStyle, 0, 0, 0, 0, hwnd_,
+        const std::wstring shown(i18n::Tr(text));   // D70
+        HWND button = ::CreateWindowExW(0, L"BUTTON", shown.c_str(), buttonStyle, 0, 0, 0, 0, hwnd_,
                                         reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), ::GetModuleHandleW(nullptr), nullptr);
         if (!button) return nullptr;
         ControlSpec spec;
@@ -197,7 +200,7 @@ private:
             if (!field_) return false;
             ControlSpec spec;
             spec.role = ControlRole::Field;
-            spec.accessibleName = L"Password";
+            spec.accessibleName = std::wstring(i18n::Tr(L"Password"));
             if (!surface_.Register(field_, spec)) return false;
         }
         const ConfirmChoice def = EffectiveDefault(request_);
@@ -517,11 +520,11 @@ private:
 };
 
 std::wstring FallbackText(const ConfirmRequest& request) {
-    std::wstring text = request.title;
+    std::wstring text(i18n::Tr(request.title));
     const auto append = [&text](const std::wstring& part) {
         if (part.empty()) return;
         if (!text.empty()) text += L"\r\n\r\n";
-        text += part;
+        text += i18n::Tr(part);
     };
     append(request.message);
     append(request.detail);

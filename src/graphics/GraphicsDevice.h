@@ -69,6 +69,12 @@ public:
     // D63: the materials' renderer on this device, made ready on first use and again after a device loss
     // (it keeps the desktop picture across it). Null when this device cannot run it: callers draw Grain.
     [[nodiscard]] LiquidRenderer* Material() noexcept;
+    // The renderer if it already exists, without making it: for giving its resources back.
+    [[nodiscard]] LiquidRenderer* ExistingMaterial() noexcept { return material_ && material_->Ready() ? material_.get() : nullptr; }
+    // After a heavy moment (the arrival, the Settings previews): asks the driver and the compositor to give back the
+    // memory they kept for it (IDXGIDevice3::Trim, CompositionGraphicsDevice::Trim). Nothing visible changes; the next
+    // frame simply allocates what it needs. UI thread, outside any drawing.
+    void Trim() noexcept;
 
     // Recreates the Direct3D/Direct2D devices after a device-lost error and raises DeviceReplaced.
     [[nodiscard]] Result<void> HandleDeviceLost();

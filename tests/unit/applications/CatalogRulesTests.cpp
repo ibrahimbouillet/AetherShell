@@ -392,6 +392,23 @@ AETHER_TEST("catalog rules: Windows' Settings pages, named as Windows names them
     CHECK_FALSE(IsSettingsPageName(L"ms-settings-other:display"));
 }
 
+// D70: named in the interface's language, found in any of the five.
+AETHER_TEST("catalog rules: Windows' tools and Settings pages in each of the five languages") {
+    const auto spanish = SettingsPageApplications(i18n::Language::Spanish);
+    const auto display = std::find_if(spanish.begin(), spanish.end(), [](const ApplicationInfo& app) { return app.parsingName == L"ms-settings:display"; });
+    REQUIRE(display != spanish.end());
+    CHECK_EQ(display->displayName, std::wstring(L"Configuración de pantalla"));
+    for (const auto* other : {L"Display settings", L"Paramètres d'affichage", L"显示设置"})
+        CHECK(display->keywords.find(other) != std::wstring::npos);
+    const auto all = [](std::wstring_view) { return true; };
+    const auto chinese = SystemToolApplications(i18n::Language::Chinese, all);
+    const auto* disks = FindByName(chinese, L"磁盘管理");
+    REQUIRE(disks != nullptr);
+    CHECK(disks->keywords.find(L"Disk Management") != std::wstring::npos);
+    CHECK(disks->keywords.find(L"diskmgmt") != std::wstring::npos);
+    CHECK_EQ(disks->id, FindByName(SystemToolApplications(false, all), L"Disk Management")->id);
+}
+
 AETHER_TEST("catalog rules: Control Panel items are found by their other language's name and their command") {
     const auto manager = ClassifyControlPanelItem(L"Device Manager", L"::{26EE0668-A00A-44D7-9371-BEB064C98683}\\0\\::{74246BFC-4C96-11D0-ABEF-0020AF6B0B7A}", L"Microsoft.DeviceManager");
     REQUIRE_EQ(manager.decision, CatalogDecision::Include);

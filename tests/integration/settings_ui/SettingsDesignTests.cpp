@@ -11,6 +11,7 @@
 #include "../ui_form/FormTestSupport.h"
 
 #include "core/FileSystem.h"
+#include "core/Localization.h"
 #include "graphics/Theme.h"
 #include "platform/windows/ComApartment.h"
 #include "settings/ui/SettingsWindow.h"
@@ -149,10 +150,30 @@ void CheckScrollableLayout(settings::ui::SettingsWindow& window, const char* wha
 constexpr settings::ui::SettingsPage kPages[] = {
     settings::ui::SettingsPage::Dock, settings::ui::SettingsPage::TopBar, settings::ui::SettingsPage::Weather,
     settings::ui::SettingsPage::Updates, settings::ui::SettingsPage::General, settings::ui::SettingsPage::About,
-    settings::ui::SettingsPage::Desktop, settings::ui::SettingsPage::Appearance};
-constexpr const char* kPageNames[] = {"dock", "topbar", "weather", "updates", "general", "about", "desktop", "appearance"};
+    settings::ui::SettingsPage::Desktop, settings::ui::SettingsPage::Appearance, settings::ui::SettingsPage::Language};
+constexpr const char* kPageNames[] = {"dock", "topbar", "weather", "updates", "general", "about", "desktop", "appearance", "welcome", "language"};
 
 }  // namespace
+
+// D70: the longer and the differently shaped texts of each language still fit, page by page, and every page's entry is
+// in the navigation.
+AETHER_TEST("settings design: every page lays out without overlap in each of the five languages") {
+    Fixture f("settings-design-languages");
+    settings::ui::SettingsWindow window(f.service, f.dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
+    CHECK_EQ(::SendMessageW(window.Control(100), LB_GETCOUNT, 0, 0), LRESULT{10});
+    for (const auto& language : i18n::Languages()) {
+        i18n::SetLanguage(language.language);
+        window.Relocalize();
+        for (const auto page : kPages) {
+            REQUIRE(window.Show(page).ok());
+            PumpFor(f.dispatcher, 40ms);
+            CheckScrollableLayout(window, (std::string(kPageNames[static_cast<int>(page)]) + "-" + std::string(language.code)).c_str());
+        }
+    }
+    i18n::SetLanguage(i18n::Language::English);
+    window.Close();
+}
 
 AETHER_TEST("settings design: every page lays out without overlap at default, small and high-DPI sizes") {
     Fixture f("settings-design-layout");

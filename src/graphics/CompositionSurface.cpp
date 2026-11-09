@@ -461,4 +461,52 @@ Result<void> CompositionSurface::Draw(UINT dpi, const std::function<void(ID2D1De
     return Ok();
 }
 
+Result<void> CompositionSurface::Draw(UINT dpi, const RECT& updatePx, const std::function<void(ID2D1DeviceContext*)>& draw) {
+    if (!surface_) return MakeError(ErrorCode::InvalidState, "surface not attached");
+    RECT update{std::max(0L, updatePx.left), std::max(0L, updatePx.top), std::min(static_cast<LONG>(widthPx_), updatePx.right),
+                std::min(static_cast<LONG>(heightPx_), updatePx.bottom)};
+    if (update.right <= update.left || update.bottom <= update.top) return Ok();   // nothing of it is on the surface
+    winrt::com_ptr<abi_wuc::ICompositionDrawingSurfaceInterop> interop;
+    try {
+        interop = surface_.as<abi_wuc::ICompositionDrawingSurfaceInterop>();
+    } catch (const winrt::hresult_error& error) {
+        return platform::ErrorFromHResult(error.code(), "drawing surface interop");
+    }
+    winrt::com_ptr<ID2D1DeviceContext> context;
+    POINT offset{};
+    // Only the area is handed out: the compositor keeps the rest of the surface as it was, and Direct2D rasterizes and
+    // the driver submits only what lies inside it (a clock that changes each second redraws its own digits only).
+    HRESULT hr = interop->BeginDraw(&update, __uuidof(ID2D1DeviceContext), context.put_void(), &offset);
+    if (FAILED(hr)) {
+        if (GraphicsDevice::IsDeviceLostError(hr)) return MakeError(ErrorCode::Unavailable, "rendering device lost", static_cast<std::uint32_t>(hr));
+        return platform::ErrorFromHResult(hr, "BeginDraw");
+    }
+    const float dpiF = static_cast<float>(dpi ? dpi : 96);
+    const float scale = dpiF / 96.0f;
+    context->SetDpi(dpiF, dpiF);
+    // The area's top-left lies at `offset` in the target: surface coordinates keep their meaning for the callback.
+    context->SetTransform(D2D1::Matrix3x2F::Translation(static_cast<float>(offset.x - update.left) / scale,
+                                                        static_cast<float>(offset.y - update.top) / scale));
+    context->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+    context->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+    context->PushAxisAlignedClip(D2D1::RectF(static_cast<float>(update.left) / scale, static_cast<float>(update.top) / scale,
+                                             static_cast<float>(update.right) / scale, static_cast<float>(update.bottom) / scale),
+                                 D2D1_ANTIALIAS_MODE_ALIASED);
+    context->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));   // the clip limits it to the area
+    try {
+        draw(context.get());
+    } catch (...) {
+        context->PopAxisAlignedClip();
+        interop->EndDraw();
+        return MakeError(ErrorCode::Internal, "render callback threw");
+    }
+    context->PopAxisAlignedClip();
+    hr = interop->EndDraw();
+    if (FAILED(hr)) {
+        if (GraphicsDevice::IsDeviceLostError(hr)) return MakeError(ErrorCode::Unavailable, "rendering device lost", static_cast<std::uint32_t>(hr));
+        return platform::ErrorFromHResult(hr, "EndDraw");
+    }
+    return Ok();
+}
+
 }  // namespace aether::graphics

@@ -40,6 +40,8 @@ public:
     [[nodiscard]] bool IsOpen() const noexcept { return IsShown() && !closing_; }
     Signal<> OpenChanged;
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
+    // D70: the field's prompt and name in the interface's current language.
+    void Relocalize();
     [[nodiscard]] HWND EditHandle() const noexcept { return edit_; }
     [[nodiscard]] const std::vector<SearchResult>& Results() const noexcept { return results_; }
     [[nodiscard]] std::size_t SelectedIndex() const noexcept { return selected_; }

@@ -1,5 +1,8 @@
 # Using Aether Shell
 
+🇬🇧 English · 🇫🇷 [Français](docs/i18n/fr/USER_GUIDE.md) · 🇪🇸 [Español](docs/i18n/es/USER_GUIDE.md) ·
+🇨🇳 [中文](docs/i18n/zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](docs/i18n/hi/USER_GUIDE.md)
+
 Start Aether Shell from its Start Menu shortcut or installed launcher. It opens two desktop
 surfaces: the Dock near the bottom and the Top Status Bar near the top. Windows Explorer continues
 to run normally. Dock items have context menus. Select the Top Bar's logo to open its menu, which
@@ -44,7 +47,14 @@ detail views for Wi-Fi, Bluetooth, accessibility and sound output; switches that
 itself open the matching Windows Settings page. On Windows 11, **Use Windows Quick Settings
 (Windows 11)** on the same page opens Windows' own panel instead.
 
-Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop and Appearance pages. Weather
+**Language** (Alpha 4): Aether Shell, setup included, speaks English, Chinese (simplified), Hindi, Spanish and French.
+Settings → **Language** chooses one; **Follow Windows**, the default, uses Windows' display language
+when it is one of the five, and English otherwise. The change applies at once to the bars, menus, Search and Settings.
+With a chosen language the Top Bar writes the date in it; with Follow Windows the date keeps your Windows regional
+format. Names of applications, files and networks are never translated. Search shows Windows' tools and Settings pages
+in the interface's language and finds them by their name in any of the five.
+
+Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop, Appearance, Welcome and Language pages. Weather
 starts disabled. Choose automatic Windows location with consent or a manual location before enabling
 it. Windows may deny location, in which case no location/weather is invented. Manual place search
 sends the entered place name to Open-Meteo; forecasts send the chosen coarse coordinates. It does
@@ -73,7 +83,7 @@ window types keep square corners. Since 3.3, only between the bars. With both ba
 window takes the whole screen, square.
 
 **Welcome** (since 3.3): after you sign in or unlock, Aether Shell writes a short greeting by hand,
-filling the screen, over your blurred desktop picture, and the bars come out when it ends: "Salut" or "Hello", with your name if you entered one. When you
+filling the screen, over your blurred desktop picture, and the bars come out when it ends: "Salut", "Hello" or "Hola", with your name if you entered one. When you
 unlock, it is already there, in place of the desktop. Touch, click or press Escape to skip it. Setup asks for
 the name, optionally (since 3.5); Settings → Welcome turns it off and sets the language and the name. If the
 picture's file was moved or deleted, the welcome uses the copy Windows keeps of it. The name and your picture stay on this PC; neither

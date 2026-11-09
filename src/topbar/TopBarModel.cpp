@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "topbar/TopBarModel.h"
 
+#include "core/Localization.h"
 #include "core/Strings.h"
 #include "status/ClockFormatter.h"
 
@@ -13,15 +14,22 @@
 namespace aether::topbar {
 namespace {
 
+using i18n::Tr;
+using i18n::TrFormat;
+// D70: a line of a tooltip, translated whole, after a line break.
+std::wstring Line(std::wstring_view english) { return L"\n" + std::wstring(Tr(english)); }
+// A detail after the separator, translated.
+std::wstring Detail(std::wstring_view english) { return L" \u00B7 " + std::wstring(Tr(english)); }
+
 std::wstring StateText(status::ProviderState state) {
     switch (state) {
-        case status::ProviderState::Initializing: return L"Initializing";
-        case status::ProviderState::Unavailable: return L"Unavailable";
-        case status::ProviderState::Unsupported: return L"Unsupported";
-        case status::ProviderState::Error: return L"Error";
-        case status::ProviderState::Available: return L"Available";
+        case status::ProviderState::Initializing: return std::wstring(Tr(L"Initializing"));
+        case status::ProviderState::Unavailable: return std::wstring(Tr(L"Unavailable"));
+        case status::ProviderState::Unsupported: return std::wstring(Tr(L"Unsupported"));
+        case status::ProviderState::Error: return std::wstring(Tr(L"Error"));
+        case status::ProviderState::Available: return std::wstring(Tr(L"Available"));
     }
-    return L"Unknown";
+    return std::wstring(Tr(L"Unknown"));
 }
 
 DisplayItem Item(ItemKind kind, std::wstring text, std::wstring tooltip, bool actionable = false) {
@@ -37,25 +45,25 @@ DisplayItem Item(ItemKind kind, std::wstring text, std::wstring tooltip, bool ac
 
 std::wstring Connectivity(status::InternetConnectivity value) {
     switch (value) {
-        case status::InternetConnectivity::Internet: return L"Internet access";
-        case status::InternetConnectivity::LocalOnly: return L"Local network only";
-        case status::InternetConnectivity::Constrained: return L"Limited Internet access";
-        case status::InternetConnectivity::None: return L"No network connection";
-        case status::InternetConnectivity::Unknown: return L"Connectivity unknown";
+        case status::InternetConnectivity::Internet: return std::wstring(Tr(L"Internet access"));
+        case status::InternetConnectivity::LocalOnly: return std::wstring(Tr(L"Local network only"));
+        case status::InternetConnectivity::Constrained: return std::wstring(Tr(L"Limited Internet access"));
+        case status::InternetConnectivity::None: return std::wstring(Tr(L"No network connection"));
+        case status::InternetConnectivity::Unknown: return std::wstring(Tr(L"Connectivity unknown"));
     }
-    return L"Connectivity unknown";
+    return std::wstring(Tr(L"Connectivity unknown"));
 }
 
 std::wstring KindText(status::ConnectionKind value) {
     switch (value) {
         case status::ConnectionKind::WiFi: return L"Wi-Fi";
-        case status::ConnectionKind::Ethernet: return L"Ethernet";
-        case status::ConnectionKind::Cellular: return L"Cellular";
-        case status::ConnectionKind::Other: return L"Network";
-        case status::ConnectionKind::None: return L"Offline";
-        case status::ConnectionKind::Unknown: return L"Network status unavailable";
+        case status::ConnectionKind::Ethernet: return std::wstring(Tr(L"Ethernet"));
+        case status::ConnectionKind::Cellular: return std::wstring(Tr(L"Cellular"));
+        case status::ConnectionKind::Other: return std::wstring(Tr(L"Network"));
+        case status::ConnectionKind::None: return std::wstring(Tr(L"Offline"));
+        case status::ConnectionKind::Unknown: return std::wstring(Tr(L"Network status unavailable"));
     }
-    return L"Network status unavailable";
+    return std::wstring(Tr(L"Network status unavailable"));
 }
 
 }  // namespace
@@ -69,7 +77,7 @@ std::optional<int> WiFiWaveCount(const DisplayItem& item) noexcept {
 Result<std::vector<DisplayItem>> GroupQuickControlItems(std::vector<DisplayItem> items) {
     try {
         DisplayItem group; group.id=static_cast<int>(ItemKind::QuickControls);group.kind=ItemKind::QuickControls;
-        group.actionable=true;group.tooltip=L"Quick controls";group.accessibleName=L"Quick controls";
+        group.actionable=true;group.tooltip=Tr(L"Quick controls");group.accessibleName=Tr(L"Quick controls");
         for (auto& item:items) if(item.kind==ItemKind::Network||item.kind==ItemKind::Volume||item.kind==ItemKind::Battery) {
             const auto line=item.tooltip.substr(0,item.tooltip.find(L'\n'));
             group.tooltip+=L"\n"+line;group.accessibleName+=L" · "+line;
@@ -88,13 +96,13 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
     TaskbarReplacementState taskbar) {
     try {
         std::vector<DisplayItem> result;
-        result.push_back(Item(ItemKind::Logo, L"", L"Aether Shell menu", true));
+        result.push_back(Item(ItemKind::Logo, L"", std::wstring(Tr(L"Aether Shell menu")), true));
         if (config.showWeather && weatherEnabled) {
             const auto& snapshot = s.weather.snapshot;
             const bool usable = (snapshot.state == status::WeatherState::Available ||
                                  snapshot.state == status::WeatherState::Cached) && snapshot.temperature &&
                                  std::isfinite(*snapshot.temperature);
-            auto item = Item(ItemKind::Weather, L"—", L"Weather status unavailable", true);
+            auto item = Item(ItemKind::Weather, L"—", std::wstring(Tr(L"Weather status unavailable")), true);
             item.unknown = !usable;
             if (usable) {
                 item.text = std::format(L"{:.0f}°{}", *snapshot.temperature,
@@ -102,65 +110,65 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
                 item.cached = snapshot.state == status::WeatherState::Cached;
                 item.weatherGlyph = s.weather.glyph;
                 item.isDay = s.weather.isDay;
-                item.tooltip = snapshot.locationName + L" · " + snapshot.conditionText + L" · " + item.text;
-                if (item.cached) item.tooltip += L"\nCached weather";
+                item.tooltip = snapshot.locationName + L" · " + std::wstring(Tr(snapshot.conditionText)) + L" · " + item.text;
+                if (item.cached) item.tooltip += Line(L"Cached weather");
                 if (snapshot.observedAt)
-                    item.tooltip += std::format(L"\nObservation (UTC): {:%F %R}",
-                        std::chrono::floor<std::chrono::seconds>(*snapshot.observedAt));
+                    item.tooltip += L"\n" + TrFormat(L"Observation (UTC): {}",
+                        std::format(L"{:%F %R}", std::chrono::floor<std::chrono::seconds>(*snapshot.observedAt)));
                 if (!snapshot.attribution.empty()) item.tooltip += L"\n" + snapshot.attribution;
             } else {
-                item.tooltip = L"Weather: " + text::Widen(weather::ToString(snapshot.state));
+                item.tooltip = TrFormat(L"Weather: {}", std::wstring(Tr(text::Widen(weather::ToString(snapshot.state)))));
             }
             if (!snapshot.detail.empty()) item.tooltip += L"\n" + text::Widen(snapshot.detail);
-            item.tooltip += L"\nClick to open weather settings";
+            item.tooltip += Line(L"Click to open weather settings");
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
         if (config.showHiddenIconsButton) {
             // D45: Windows' own hidden notification-area icons (background apps), not notifications and
             // not a second Dock. The host opens Explorer's overflow; nothing here lists or imitates icons.
-            auto item = Item(ItemKind::NotificationArea, L"", L"Show hidden icons", true);
-            item.tooltip += L"\nOpens Windows' notification-area overflow";
+            auto item = Item(ItemKind::NotificationArea, L"", std::wstring(Tr(L"Show hidden icons")), true);
+            item.tooltip += Line(L"Opens Windows' notification-area overflow");
             result.push_back(std::move(item));
         }
         if (config.showKeyboard) {
             const bool available = s.keyboard.state == status::ProviderState::Available && !s.keyboard.shortLabel.empty();
             auto item = Item(ItemKind::Keyboard, available ? s.keyboard.shortLabel : L"—",
                 available ? s.keyboard.languageName + L" · " + s.keyboard.layoutName
-                          : L"Input language: " + StateText(s.keyboard.state), true);
+                          : TrFormat(L"Input language: {}", StateText(s.keyboard.state)), true);
             item.unknown = !available;
             if (available && config.height >= 30 && config.keyboardIndicator == settings::KeyboardIndicatorStyle::TwoLine)
                 item.secondaryText = s.keyboard.layoutName;
-            if (available && !s.keyboard.fromForegroundWindow) item.tooltip += L"\nFallback input layout";
-            item.tooltip += L"\nClick to switch input language (Win+Space)";
+            if (available && !s.keyboard.fromForegroundWindow) item.tooltip += Line(L"Fallback input layout");
+            item.tooltip += Line(L"Click to switch input language (Win+Space)");
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
         if (config.showNetwork) {
             const bool available = s.network.state == status::ProviderState::Available;
             auto item = Item(ItemKind::Network, L"", available ? KindText(s.network.kind) + L" · " +
-                Connectivity(s.network.connectivity) : L"Network: " + StateText(s.network.state), true);
+                Connectivity(s.network.connectivity) : TrFormat(L"Network: {}", StateText(s.network.state)), true);
             item.connection = available ? s.network.kind : status::ConnectionKind::Unknown;
             item.connectivity = available ? s.network.connectivity : status::InternetConnectivity::Unknown;
             item.unknown = !available || item.connection == status::ConnectionKind::Unknown;
             if (available && s.network.signalBars && *s.network.signalBars <= 5) item.level = *s.network.signalBars;
             if ((item.connection == status::ConnectionKind::WiFi || item.connection == status::ConnectionKind::Cellular) && !item.level)
-                item.tooltip += L" · Signal strength unavailable";
-            item.tooltip += L"\nClick to open Windows network settings";
+                item.tooltip += Detail(L"Signal strength unavailable");
+            item.tooltip += Line(L"Click to open Windows network settings");
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
         if (config.showVolume) {
             const bool available = s.audio.state == status::ProviderState::Available && s.audio.deviceAvailable;
-            auto item = Item(ItemKind::Volume, L"", available ? L"Audio output" : L"Audio: " + StateText(s.audio.state), true);
+            auto item = Item(ItemKind::Volume, L"", available ? std::wstring(Tr(L"Audio output")) : TrFormat(L"Audio: {}", StateText(s.audio.state)), true);
             item.unknown = !available || !s.audio.muted || !s.audio.volume || !std::isfinite(*s.audio.volume);
             if (available && s.audio.volume && std::isfinite(*s.audio.volume)) {
                 item.level = static_cast<int>(std::round(std::clamp(*s.audio.volume, 0.0f, 1.0f) * 100.0f));
                 item.tooltip += L" · " + std::to_wstring(*item.level) + L"%";
-            } else item.tooltip += L" · volume unknown";
+            } else item.tooltip += Detail(L"volume unknown");
             if (available && s.audio.muted) {
                 item.muted = *s.audio.muted;
-                item.tooltip += item.muted ? L" · Muted" : L" · Sound on";
+                item.tooltip += Detail(item.muted ? L"Muted" : L"Sound on");
             }
             if (available && !s.audio.deviceName.empty()) item.tooltip += L"\n" + s.audio.deviceName;
             item.accessibleName = item.tooltip;
@@ -168,15 +176,15 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
         }
         if (config.showMicrophone) {
             const bool available = s.microphone.state == status::ProviderState::Available && s.microphone.deviceAvailable;
-            auto item = Item(ItemKind::Microphone, L"", L"Microphone: " + StateText(s.microphone.state), true);
+            auto item = Item(ItemKind::Microphone, L"", TrFormat(L"Microphone: {}", StateText(s.microphone.state)), true);
             item.unknown = !available || !s.microphone.muted;
             if (available && s.microphone.muted) {
                 item.muted = *s.microphone.muted;
-                item.tooltip += item.muted ? L" · Muted" : L" · Endpoint unmuted";
+                item.tooltip += Detail(item.muted ? L"Muted" : L"Endpoint unmuted");
             }
-            item.tooltip += L"\nRecording detection unsupported";
+            item.tooltip += Line(L"Recording detection unsupported");
             if (available && !s.microphone.deviceName.empty()) item.tooltip += L"\n" + s.microphone.deviceName;
-            item.tooltip += L"\nClick to toggle mute; right-click for Windows voice typing and microphone privacy settings";
+            item.tooltip += Line(L"Click to toggle mute; right-click for Windows voice typing and microphone privacy settings");
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
@@ -184,7 +192,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             (s.battery.state == status::ProviderState::Available || s.battery.state == status::ProviderState::Unavailable);
         if (config.showBattery && !(config.hideBatteryWhenAbsent && knownAbsent)) {
             const bool available = s.battery.state == status::ProviderState::Available && s.battery.batteryPresent;
-            auto item = Item(ItemKind::Battery, L"—", L"Battery: " + StateText(s.battery.state), true);
+            auto item = Item(ItemKind::Battery, L"—", TrFormat(L"Battery: {}", StateText(s.battery.state)), true);
             item.unknown = !available || !s.battery.percent || *s.battery.percent < 0 || *s.battery.percent > 100;
             const bool powerReported = s.battery.state == status::ProviderState::Available ||
                 s.battery.state == status::ProviderState::Unavailable;
@@ -194,20 +202,20 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             if (available && s.battery.percent && *s.battery.percent >= 0 && *s.battery.percent <= 100) {
                 item.level = *s.battery.percent;
                 item.text = std::to_wstring(*item.level) + L"%";
-                item.tooltip = L"Battery " + item.text;
-            } else item.tooltip = L"Battery status unavailable";
-            if (available && s.battery.charge == status::ChargeState::Charging) item.tooltip += L" · Charging";
-            if (item.powerSource == status::PowerSource::External) item.tooltip += L" · External power";
+                item.tooltip = TrFormat(L"Battery {}", item.text);
+            } else item.tooltip = Tr(L"Battery status unavailable");
+            if (available && s.battery.charge == status::ChargeState::Charging) item.tooltip += Detail(L"Charging");
+            if (item.powerSource == status::PowerSource::External) item.tooltip += Detail(L"External power");
             if (available && s.battery.remaining && s.battery.remaining->count() >= 0) {
                 const auto minutes = std::chrono::duration_cast<std::chrono::minutes>(*s.battery.remaining).count();
-                item.tooltip += std::format(L"\nEstimated remaining: {} h {} min", minutes / 60, minutes % 60);
+                item.tooltip += L"\n" + TrFormat(L"Estimated remaining: {} h {} min", minutes / 60, minutes % 60);
             }
             if (!config.showBatteryPercent) item.text.clear();
-            item.tooltip += L"\nClick to open power settings";
+            item.tooltip += Line(L"Click to open power settings");
             item.accessibleName = item.tooltip;
             result.push_back(std::move(item));
         }
-        auto clock = Item(ItemKind::Clock, L"—", L"Clock status unavailable", true);
+        auto clock = Item(ItemKind::Clock, L"—", std::wstring(Tr(L"Clock status unavailable")), true);
         status::ClockFormatOptions options;
         options.format = static_cast<status::TimeFormat>(config.clockFormat);
         options.showSeconds = config.showSeconds;
@@ -220,7 +228,7 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             clock.tooltip = longDate ? longDate.value() : time.value();
             if (!s.clock.timeZoneName.empty()) clock.tooltip += L"\n" + s.clock.timeZoneName;
         } else clock.unknown = true;
-        clock.tooltip += L"\nClick to open calendar and notifications";
+        clock.tooltip += Line(L"Click to open calendar and notifications");
         clock.accessibleName = clock.tooltip;
         result.push_back(std::move(clock));
         // D27 removed the trailing native-taskbar arrow; recovery stays in Settings, the logo menu and the CLI.

@@ -502,15 +502,41 @@ std::optional<std::wstring_view> SystemToolFile(std::wstring_view parsingName) n
     return tool->file;
 }
 
+namespace {
+// D70: an entry's name in `language`: its English and French names are written here, the others come from the
+// interface's catalog (English when it has none). Every other language's name joins the keywords, so that the entry
+// is found whatever language the person types in.
+std::pair<std::wstring, std::wstring> NamesIn(i18n::Language language, std::wstring_view english, std::wstring_view french) {
+    const auto nameIn = [&](i18n::Language which) -> std::wstring_view {
+        if (which == i18n::Language::English) return english;
+        if (which == i18n::Language::French) return french;
+        return i18n::Tr(english, which);
+    };
+    std::wstring display(nameIn(language)), others;
+    for (const auto& info : i18n::Languages()) {
+        const auto name = nameIn(info.language);
+        if (name.empty() || text::EqualsIgnoreCase(name, display) || others.find(name) != std::wstring::npos) continue;
+        if (!others.empty()) others += L" ";
+        others += name;
+    }
+    return {std::move(display), std::move(others)};
+}
+}  // namespace
+
 std::vector<ApplicationInfo> SystemToolApplications(bool french, const std::function<bool(std::wstring_view file)>& exists) {
+    return SystemToolApplications(french ? i18n::Language::French : i18n::Language::English, exists);
+}
+
+std::vector<ApplicationInfo> SystemToolApplications(i18n::Language language, const std::function<bool(std::wstring_view file)>& exists) {
     std::vector<ApplicationInfo> tools;
     for (const auto& tool : kSystemTools) {
         if (!exists(tool.file)) continue;
         ApplicationInfo app;
         app.kind = ApplicationKind::Other;
-        app.displayName = std::wstring(french ? tool.french : tool.english);
+        auto [display, others] = NamesIn(language, tool.english, tool.french);
+        app.displayName = std::move(display);
         app.parsingName = std::wstring(kSystemToolPrefix) + std::wstring(tool.file);
-        app.keywords = std::wstring(french ? tool.english : tool.french) + L" " + std::wstring(StemOf(tool.file)) + L" " + std::wstring(tool.keywords);
+        app.keywords = others + L" " + std::wstring(StemOf(tool.file)) + L" " + std::wstring(tool.keywords);
         app.detail = L"Windows tool";
         auto finished = Finish(std::move(app));
         if (finished.decision == CatalogDecision::Include) tools.push_back(std::move(finished.app));
@@ -525,13 +551,18 @@ bool IsSettingsPageName(std::wstring_view parsingName) noexcept {
 }
 
 std::vector<ApplicationInfo> SettingsPageApplications(bool french) {
+    return SettingsPageApplications(french ? i18n::Language::French : i18n::Language::English);
+}
+
+std::vector<ApplicationInfo> SettingsPageApplications(i18n::Language language) {
     std::vector<ApplicationInfo> pages;
     for (const auto& entry : kSettingsPages) {
         ApplicationInfo app;
         app.kind = ApplicationKind::Other;
-        app.displayName = std::wstring(french ? entry.french : entry.english);
+        auto [display, others] = NamesIn(language, entry.english, entry.french);
+        app.displayName = std::move(display);
         app.parsingName = std::wstring(kSettingsPrefix) + std::wstring(entry.page);
-        app.keywords = std::wstring(french ? entry.english : entry.french) + L" " + std::wstring(entry.keywords);
+        app.keywords = others + L" " + std::wstring(entry.keywords);
         app.detail = L"Settings";
         auto finished = Finish(std::move(app));
         if (finished.decision == CatalogDecision::Include) pages.push_back(std::move(finished.app));

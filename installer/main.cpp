@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/Install.h"
+#include "core/Localization.h"
 #include "install/LifecyclePolicy.h"
 #include "core/Dispatcher.h"
 #include "core/Strings.h"
@@ -408,7 +409,7 @@ public:
         if(!platform::RegisterWindowClassOnce(wc))return 1;
         RefreshTheme();
         const UINT systemDpi=::GetDpiForSystem();
-        window_=::CreateWindowExW(WS_EX_CONTROLPARENT,wc.lpszClassName,L"Aether Shell Setup",WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,
+        window_=::CreateWindowExW(WS_EX_CONTROLPARENT,wc.lpszClassName,std::wstring(aether::i18n::Tr(L"Aether Shell Setup")).c_str(),WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,
             ::MulDiv(kWidth,static_cast<int>(systemDpi),96),::MulDiv(kHeight,static_cast<int>(systemDpi),96),nullptr,nullptr,wc.hInstance,this);
         if(!window_)return 1;
         if(auto attached=surface_.Attach(window_,tokens_,motion_);attached) {
@@ -418,7 +419,7 @@ public:
         }
         // A renderer-free FormSurface already supplies the supported opaque native fallback.
         // A failed attachment/scroll host is an initialization failure, not a usable wizard.
-        if(!styled_){::MessageBoxW(window_,L"Setup could not create its interface. Close it and try again, or use the documented silent setup options.",L"Aether Shell Setup",MB_OK|MB_ICONERROR);return 1;}
+        if(!styled_){::MessageBoxW(window_,std::wstring(aether::i18n::Tr(L"Setup could not create its interface. Close it and try again, or use the documented silent setup options.")).c_str(),std::wstring(aether::i18n::Tr(L"Aether Shell Setup")).c_str(),MB_OK|MB_ICONERROR);return 1;}
         CreateFrame();
         RECT initial{};::GetWindowRect(window_,&initial);Constrain(initial);Build();::ShowWindow(window_,SW_SHOWNORMAL);
         // IsDialogMessage claims every message of the window; only keyboard input may move the page to
@@ -475,25 +476,25 @@ private:
     }
     void Style(HWND hwnd,form::ControlSpec spec){if(styled_ && hwnd)(void)surface_.Register(hwnd,spec);}
     HWND Label(HWND parent,const std::wstring& text,form::TextRole role,int id=0,form::Severity severity=form::Severity::None,std::optional<graphics::Glyph> glyph={}) {
-        HWND label=Make(parent,L"STATIC",text,(styled_?SS_OWNERDRAW:0u)|SS_NOPREFIX,id);
+        HWND label=Make(parent,L"STATIC",std::wstring(aether::i18n::Tr(text)),(styled_?SS_OWNERDRAW:0u)|SS_NOPREFIX,id);   // D70
         form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=role;spec.severity=severity;spec.glyph=glyph;
         Style(label,spec);return label;
     }
     HWND Button(HWND parent,const std::wstring& text,int id,form::ButtonStyle style,std::optional<graphics::Glyph> glyph={},DWORD extra=0) {
-        HWND button=Make(parent,L"BUTTON",text,WS_TABSTOP|BS_PUSHBUTTON|extra,id);
+        HWND button=Make(parent,L"BUTTON",std::wstring(aether::i18n::Tr(text)),WS_TABSTOP|BS_PUSHBUTTON|extra,id);
         form::ControlSpec spec;spec.role=form::ControlRole::Button;spec.button=style;spec.glyph=glyph;Style(button,spec);return button;
     }
     HWND Switch(HWND parent,const std::wstring& text,const std::wstring& description,int id,bool checked,bool check=false) {
-        HWND box=Make(parent,L"BUTTON",text,WS_TABSTOP|BS_AUTOCHECKBOX,id);
+        HWND box=Make(parent,L"BUTTON",std::wstring(aether::i18n::Tr(text)),WS_TABSTOP|BS_AUTOCHECKBOX,id);
         ::SendMessageW(box,BM_SETCHECK,checked?BST_CHECKED:BST_UNCHECKED,0);
-        form::ControlSpec spec;spec.role=check?form::ControlRole::Check:form::ControlRole::Switch;spec.description=description;Style(box,spec);
+        form::ControlSpec spec;spec.role=check?form::ControlRole::Check:form::ControlRole::Switch;spec.description=aether::i18n::Tr(description);Style(box,spec);
         return box;
     }
 
     // --- frame: header, footer and the status line stay across pages ---
     void CreateFrame() {
         title_=Label(window_,L"Aether Shell",form::TextRole::Title,kTitleId);
-        version_=Label(window_,L"Version "+std::wstring(build::kVersionW),form::TextRole::Caption);
+        version_=Label(window_,aether::i18n::TrFormat(L"Version {}",std::wstring(build::kVersionW)),form::TextRole::Caption);
         step_=Label(window_,L"",form::TextRole::Caption,kStepId);
         status_=Label(window_,L"",form::TextRole::Status,kStatusId);
     }
@@ -503,8 +504,9 @@ private:
         for(const wchar_t c:text){if(c==L'\n' && (result.empty() || result.back()!=L'\r'))result.push_back(L'\r');result.push_back(c);}
         return result;
     }
-    [[nodiscard]] static const wchar_t* StepName(int page) {
-        switch(page){case 0:return L"Welcome";case 1:return L"Licence";case 2:return L"Options";case 3:return L"Install";default:return L"Done";}
+    [[nodiscard]] static std::wstring_view StepName(int page) {
+        switch(page){case 0:return aether::i18n::Tr(L"Welcome");case 1:return aether::i18n::Tr(L"Licence");case 2:return aether::i18n::Tr(L"Options");
+                     case 3:return aether::i18n::Tr(L"Install");default:return aether::i18n::Tr(L"Done");}
     }
     void PaintHeader(ID2D1DeviceContext* target,const graphics::DesignTokens& tokens) {
         graphics::PaintBrandMark(target,brandMark_,tokens);
@@ -522,7 +524,8 @@ private:
             target->FillEllipse(D2D1::Ellipse(D2D1::Point2F(stepDots_.left+spacing*static_cast<float>(i),y),radius,radius),brush.get());
         }
     }
-    void SetStatus(const std::wstring& text,form::Severity severity=form::Severity::None) {
+    void SetStatus(const std::wstring& english,form::Severity severity=form::Severity::None) {
+        const std::wstring text(aether::i18n::Tr(english));
         ::SetWindowTextW(status_,text.c_str());
         if(styled_){form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=form::TextRole::Status;spec.severity=severity;surface_.SetSpec(status_,spec);}
         ::InvalidateRect(status_,nullptr,FALSE);
@@ -606,15 +609,16 @@ private:
                 text(L"After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.",form::TextRole::Body);
                 name_=Make(parent,L"EDIT",options_.welcomeName.value_or(options_.savedWelcomeName),WS_TABSTOP|ES_AUTOHSCROLL,26);
                 ::SendMessageW(name_,EM_SETLIMITTEXT,settings::kMaximumDisplayNameLength,0);
-                ::SendMessageW(name_,EM_SETCUEBANNER,TRUE,reinterpret_cast<LPARAM>(L"Your first name"));
-                {form::ControlSpec spec;spec.role=form::ControlRole::Field;spec.accessibleName=L"Name to greet you with";Style(name_,spec);}
+                ::SendMessageW(name_,EM_SETCUEBANNER,TRUE,reinterpret_cast<LPARAM>(aether::i18n::Tr(L"Your first name").data()));
+                {form::ControlSpec spec;spec.role=form::ControlRole::Field;spec.accessibleName=aether::i18n::Tr(L"Name to greet you with");Style(name_,spec);}
                 items_.push_back(Item{Item::Field,name_,nullptr});
                 text(L"Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.",form::TextRole::Helper);
                 text(L"Shortcuts and startup",form::TextRole::Section);
                 shortcut_=Switch(parent,L"Create Start menu shortcuts",L"Aether Shell and Restore Windows taskbar.",23,!options_.noShortcuts);control(shortcut_);
                 desktop_=Switch(parent,L"Create a desktop shortcut",L"",25,options_.desktopShortcut);control(desktop_);
                 startup_=Switch(parent,L"Start Aether Shell when I sign in",
-                    std::wstring(options_.existingInstall?L"Shows your current choice. ":L"Recommended. ")+L"Clear it to opt out; Task Manager disables are respected.",21,options_.startup);
+                    std::wstring(aether::i18n::Tr(options_.existingInstall?L"Shows your current choice.":L"Recommended."))+L" "+
+                    std::wstring(aether::i18n::Tr(L"Clear it to opt out; Task Manager disables are respected.")),21,options_.startup);
                 control(startup_);
                 text(L"Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.",form::TextRole::Helper);
             }
@@ -632,7 +636,7 @@ private:
             items_.push_back(Item{Item::Text,Label(parent,success_?(uninstall?L"Aether Shell was uninstalled.":L"Aether Shell is ready."):cancelled?L"Setup was cancelled.":L"Setup could not complete.",form::TextRole::Status,0,severity),nullptr,form::TextRole::Status});
             text(success_?(uninstall?L"Your data was kept unless you explicitly chose to remove it.":L"You can repair or uninstall it from Windows Settings > Apps > Installed apps."):
                   cancelled?L"The operation was cancelled before activation. Go back to Options to try again.":
-                  L"Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: "+error_,form::TextRole::Body);
+                  aether::i18n::TrFormat(L"Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}",error_),form::TextRole::Body);
             if(!success_) {
                 text(L"Setup log",form::TextRole::Strong);
                 HWND log=Make(parent,L"EDIT",options_.log.wstring(),WS_TABSTOP|ES_AUTOHSCROLL|ES_READONLY);
@@ -648,7 +652,7 @@ private:
         else if(page_==2)primary_=Button(window_,uninstall?L"&Uninstall":repair?L"&Repair":L"&Install",2,uninstall?form::ButtonStyle::Danger:form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
         else if(page_==3){if(!uninstall)cancel_=Button(window_,L"Cancel",4,form::ButtonStyle::Secondary);}
         else primary_=Button(window_,L"&Close",3,form::ButtonStyle::Primary,{},BS_DEFPUSHBUTTON);
-        ::SetWindowTextW(step_,(L"Step "+std::to_wstring(page_+1)+L" of "+std::to_wstring(kPages)+L": "+StepName(page_)).c_str());
+        ::SetWindowTextW(step_,aether::i18n::TrFormat(L"Step {} of {}: {}",page_+1,kPages,std::wstring(StepName(page_))).c_str());
         SetStatus(L"");
         if(styled_){scroll_.ScrollTo(0);Layout();surface_.FadeIn(scroll_.Viewport());}
         else Layout();
@@ -764,7 +768,7 @@ private:
     void Browse() {
         winrt::com_ptr<IFileOpenDialog> dialog;
         if(FAILED(::CoCreateInstance(CLSID_FileOpenDialog,nullptr,CLSCTX_INPROC_SERVER,IID_PPV_ARGS(dialog.put()))))return;
-        DWORD flags=0;dialog->GetOptions(&flags);dialog->SetOptions(flags|FOS_PICKFOLDERS|FOS_FORCEFILESYSTEM);dialog->SetTitle(L"Choose the Aether Shell installation folder");
+        DWORD flags=0;dialog->GetOptions(&flags);dialog->SetOptions(flags|FOS_PICKFOLDERS|FOS_FORCEFILESYSTEM);dialog->SetTitle(std::wstring(aether::i18n::Tr(L"Choose the Aether Shell installation folder")).c_str());
         if(FAILED(dialog->Show(window_)))return;
         winrt::com_ptr<IShellItem> item;if(FAILED(dialog->GetResult(item.put())))return;
         PWSTR path=nullptr;if(SUCCEEDED(item->GetDisplayName(SIGDN_FILESYSPATH,&path))) {::SetWindowTextW(folder_,path);::CoTaskMemFree(path);}
@@ -776,7 +780,7 @@ private:
         else {options_.startup=::SendMessageW(startup_,BM_GETCHECK,0,0)==BST_CHECKED;options_.startupExplicit=true;options_.noShortcuts=::SendMessageW(shortcut_,BM_GETCHECK,0,0)!=BST_CHECKED;options_.desktopShortcut=::SendMessageW(desktop_,BM_GETCHECK,0,0)==BST_CHECKED;options_.welcomeName=WindowText(name_);}
         if(!options_.root.is_absolute()) {
             // Inline validation: the field is marked and the message stays next to it.
-            ::SetWindowTextW(folderError_,L"Choose a complete folder path, for example one that starts with a drive letter.");
+            ::SetWindowTextW(folderError_,std::wstring(aether::i18n::Tr(L"Choose a complete folder path, for example one that starts with a drive letter.")).c_str());
             if(styled_)surface_.SetError(folder_,true);
             SetStatus(L"The install folder must be an absolute path.",form::Severity::Error);
             ::SetFocus(folder_);
@@ -819,7 +823,7 @@ private:
             if(msg==WM_APP+74 && self->options_.testNoRegistration && self->page_==2){self->testOperationGate_.Reset(::CreateEventW(nullptr,TRUE,FALSE,nullptr));return self->testOperationGate_?1:0;}
             if(msg==WM_APP+75 && self->options_.testNoRegistration && self->page_==3 && self->testOperationGate_)return ::SetEvent(self->testOperationGate_.Get());
 #endif
-            if(msg==WM_COMMAND){if(HIWORD(wParam)==BN_SETFOCUS || HIWORD(wParam)==EN_SETFOCUS){self->EnsureFocusVisible();return 0;}if(HIWORD(wParam)!=BN_CLICKED)return 0;switch(LOWORD(wParam)){case 1:self->CaptureControls();++self->page_;self->Build();return 0;case 2:self->Install();return 0;case 3:self->Finish();return 0;case 4:self->cancellation_.Cancel();if(HWND cancel=::GetDlgItem(hwnd,4)){::SetWindowTextW(cancel,L"Cancelling...");::EnableWindow(cancel,FALSE);}self->SetStatus(L"Setup stops at the next safe point.",form::Severity::Busy);return 0;case 8:self->CaptureControls();self->page_=self->page_==4?2:self->page_-1;self->Build();return 0;case 9:self->Browse();return 0;}}
+            if(msg==WM_COMMAND){if(HIWORD(wParam)==BN_SETFOCUS || HIWORD(wParam)==EN_SETFOCUS){self->EnsureFocusVisible();return 0;}if(HIWORD(wParam)!=BN_CLICKED)return 0;switch(LOWORD(wParam)){case 1:self->CaptureControls();++self->page_;self->Build();return 0;case 2:self->Install();return 0;case 3:self->Finish();return 0;case 4:self->cancellation_.Cancel();if(HWND cancel=::GetDlgItem(hwnd,4)){::SetWindowTextW(cancel,std::wstring(aether::i18n::Tr(L"Cancelling...")).c_str());::EnableWindow(cancel,FALSE);}self->SetStatus(L"Setup stops at the next safe point.",form::Severity::Busy);return 0;case 8:self->CaptureControls();self->page_=self->page_==4?2:self->page_-1;self->Build();return 0;case 9:self->Browse();return 0;}}
             if(msg==WM_GETMINMAXINFO){auto* info=reinterpret_cast<MINMAXINFO*>(lParam);const UINT dpi=self->Dpi();RECT frame{0,0,::MulDiv(420,static_cast<int>(dpi),96),::MulDiv(360,static_cast<int>(dpi),96)};::AdjustWindowRectExForDpi(&frame,WS_OVERLAPPEDWINDOW,FALSE,WS_EX_CONTROLPARENT,dpi);info->ptMinTrackSize=POINT{frame.right-frame.left,frame.bottom-frame.top};return 0;}
             if(msg==WM_DPICHANGED){self->CaptureControls();const auto& r=*reinterpret_cast<RECT*>(lParam);self->Constrain(r);self->Layout();return 0;}
             if(msg==WM_SETTINGCHANGE || msg==WM_THEMECHANGED || msg==WM_SYSCOLORCHANGE){self->RefreshTheme();self->Layout();return 0;}
@@ -856,6 +860,7 @@ private:
 
 int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
     try {
+        aether::i18n::SetLanguage(aether::i18n::SystemLanguage());   // D70: setup speaks the Windows display language
         auto parsed=Parse();if(!parsed)return 2;
         aether::WorkerPool bootstrap({1,L"Aether setup bootstrap",aether::ComApartment::None});
         std::promise<aether::Result<void>> promise;auto future=promise.get_future();

@@ -10,6 +10,7 @@ namespace aether::graphics {
 void TextCache::Initialize(IDWriteFactory* factory, std::wstring textFamily, std::wstring displayFamily) {
     factory_.copy_from(factory);
     formats_.clear();
+    layouts_.clear();
     tabular_ = nullptr;
     textFamily_ = ResolveFamily(textFamily);
     displayFamily_ = ResolveFamily(displayFamily);
@@ -72,16 +73,30 @@ winrt::com_ptr<IDWriteTextLayout> TextCache::TabularLayout(std::wstring_view tex
     return layout;
 }
 
+IDWriteTextLayout* TextCache::CachedLayout(std::wstring_view text, const TextStyle& style, IDWriteTextFormat* format, float width,
+                                           float height) {
+    // Sizes to a hundredth of a DIP: a box that moves by less draws the same text.
+    LayoutKey key{std::wstring(text), style.display, static_cast<int>(std::lround(style.size * 100.0f)), static_cast<int>(style.weight),
+                  static_cast<int>(style.alignment), static_cast<int>(style.verticalAlignment), style.ellipsis, style.opticalSmall,
+                  style.tabularFigures, static_cast<int>(std::lround(width * 100.0f)), static_cast<int>(std::lround(height * 100.0f))};
+    if (auto found = layouts_.find(key); found != layouts_.end()) return found->second.get();
+    winrt::com_ptr<IDWriteTextLayout> layout;
+    if (style.tabularFigures) layout = TabularLayout(text, format, width, height);
+    else if (FAILED(factory_->CreateTextLayout(text.data(), static_cast<UINT32>(text.size()), format, std::max(1.0f, width),
+                                               std::max(1.0f, height), layout.put())))
+        layout = nullptr;
+    if (!layout) return nullptr;
+    // Bounded: a clock with seconds makes a new text every second. Starting again costs one layout per label.
+    if (layouts_.size() >= 192) layouts_.clear();
+    auto* raw = layout.get();
+    layouts_.emplace(std::move(key), std::move(layout));
+    return raw;
+}
+
 D2D1_SIZE_F TextCache::Measure(std::wstring_view text, const TextStyle& style, float maxWidth) {
     auto* format = Format(style);
     if (!format || text.empty()) return D2D1::SizeF(0.0f, style.size * 1.33f);
-    winrt::com_ptr<IDWriteTextLayout> layout;
-    if (style.tabularFigures) {
-        layout = TabularLayout(text, format, maxWidth, style.size * 4.0f);
-    } else if (FAILED(factory_->CreateTextLayout(text.data(), static_cast<UINT32>(text.size()), format, maxWidth,
-                                                 style.size * 4.0f, layout.put()))) {
-        layout = nullptr;
-    }
+    auto* layout = CachedLayout(text, style, format, maxWidth, style.size * 4.0f);
     if (!layout) return D2D1::SizeF(0.0f, style.size * 1.33f);
     DWRITE_TEXT_METRICS metrics{};
     layout->GetMetrics(&metrics);
@@ -92,12 +107,10 @@ void TextCache::Draw(ID2D1DeviceContext* context, std::wstring_view text, const 
                      const TextStyle& style, ID2D1Brush* brush) {
     auto* format = Format(style);
     if (!format || text.empty() || !brush) return;
-    if (style.tabularFigures) {
-        if (auto layout = TabularLayout(text, format, rect.right - rect.left, rect.bottom - rect.top)) {
-            context->DrawTextLayout(D2D1::Point2F(rect.left, rect.top), layout.get(), brush,
-                                    D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT);
-            return;
-        }
+    if (auto* layout = CachedLayout(text, style, format, rect.right - rect.left, rect.bottom - rect.top)) {
+        context->DrawTextLayout(D2D1::Point2F(rect.left, rect.top), layout, brush,
+                                D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT);
+        return;
     }
     context->DrawTextW(text.data(), static_cast<UINT32>(text.size()), format, rect, brush,
                        D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT);

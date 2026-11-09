@@ -29,7 +29,7 @@ class FrameScheduler;
 
 namespace aether::settings::ui {
 
-enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop, Appearance, Welcome };
+enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Desktop, Appearance, Welcome, Language };   // D70: Language last
 
 // Tone of a footer status message (drawn as a status badge; high contrast keeps the text alone).
 enum class StatusTone { Neutral, Info, Success, Warning, Error, Busy };
@@ -91,6 +91,8 @@ public:
     // motion. Drafts, consent checkboxes, focus, selection and scroll position are preserved; nothing
     // is committed. The application calls it from its settings/theme/system-change route.
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
+    // D70: shows every text in the current interface language (i18n::CurrentLanguage), rebuilding the open page.
+    void Relocalize();
 
     // The scrolling content region (pixels), for tests and diagnostics.
     struct ContentScroll {

@@ -94,6 +94,7 @@ void Fields(S& s, F&& f) {
     f("general", "liquidTint", s.general.liquidTint);
     f("general", "liquidTintStrength", s.general.liquidTintStrength);
     f("general", "animationSpeed", s.general.animationSpeed);
+    f("general", "language", s.general.language);
 }
 
 template <class E> struct EnumNames;
@@ -119,7 +120,14 @@ template <> struct EnumNames<UpdateChannel> {
 };
 template <> struct EnumNames<GreetingLanguage> {
     static constexpr std::array values{std::pair{GreetingLanguage::Automatic, "automatic"},
-        std::pair{GreetingLanguage::French, "french"}, std::pair{GreetingLanguage::English, "english"}};
+        std::pair{GreetingLanguage::French, "french"}, std::pair{GreetingLanguage::English, "english"},
+        std::pair{GreetingLanguage::Spanish, "spanish"}};
+};
+template <> struct EnumNames<InterfaceLanguage> {
+    static constexpr std::array values{std::pair{InterfaceLanguage::Automatic, "automatic"},
+        std::pair{InterfaceLanguage::English, "english"}, std::pair{InterfaceLanguage::French, "french"},
+        std::pair{InterfaceLanguage::Spanish, "spanish"}, std::pair{InterfaceLanguage::Chinese, "chinese"},
+        std::pair{InterfaceLanguage::Hindi, "hindi"}};
 };
 template <> struct EnumNames<ThemePreference> {
     static constexpr std::array values{std::pair{ThemePreference::System, "system"},

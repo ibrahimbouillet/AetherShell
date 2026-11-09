@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/Install.h"
+#include "core/Localization.h"
 #include "install/LifecyclePolicy.h"
 #include "install/LauncherSupervisor.h"
 #include "core/Strings.h"
@@ -99,7 +100,8 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
             if(busy)return 3;  // release this image promptly while setup owns the lifecycle lock
             for(const auto& value:arguments)if(value==L"--autostart")return 4;
             // Documented native fallback: the launcher has no renderer and the app did not start.
-            ::MessageBoxW(nullptr,L"Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.",L"Aether Shell",MB_OK|MB_ICONERROR);return 4;
+            aether::i18n::SetLanguage(aether::i18n::SystemLanguage());   // D70
+            ::MessageBoxW(nullptr,aether::i18n::Tr(L"Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.").data(),L"Aether Shell",MB_OK|MB_ICONERROR);return 4;
         }
         aether::install::CrashRestartPolicy restarts;
         for(;;) {

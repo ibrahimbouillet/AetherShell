@@ -72,8 +72,13 @@ public:
 
     // The desktop picture: top-down BGRA, opaque. Shared, so that callers can keep it without a copy.
     // `placementPx` is where Windows shows it, in virtual-screen pixels; surfaces read it to place it behind them.
+    // The renderer keeps the CPU copy only until it is on the device: a device loss then drops the picture (HasPicture
+    // turns false) and the caller reads it again when it next needs it.
     void SetPicture(std::shared_ptr<const std::vector<std::uint8_t>> bgra, UINT width, UINT height, D2D1_RECT_F placementPx = {});
     [[nodiscard]] bool HasPicture() const noexcept;
+    // What only the arrival and the Settings previews use, given back once they are over: every frame's target (the
+    // arrival's is the size of the screen) and, unless `keepPicture`, the desktop picture. Recreated on the next frame.
+    void ReleaseTransient(bool keepPicture) noexcept;
     [[nodiscard]] SIZE PictureSize() const noexcept;
     [[nodiscard]] D2D1_RECT_F PicturePlacement() const noexcept;
     // Bumped by each SetPicture: surfaces that drew the old picture redraw.
@@ -82,6 +87,11 @@ public:
     // Renders the scene into a texture of `sizePx` and returns it as a bitmap of `context`, which must belong to
     // the same device. Call outside the context's own drawing or after Flush(); nothing else is touched.
     [[nodiscard]] Result<winrt::com_ptr<ID2D1Bitmap1>> Render(ID2D1DeviceContext* context, const MaterialScene& scene, D2D1_SIZE_U sizePx);
+    // D69: renders the scene straight into the texture `context` is drawing into, at `originPx` there (the context's
+    // own offset in a composition surface), without a texture of its own nor a copy: for a frame that covers the whole
+    // window (the arrival). The scene is in the frame's pixels. True when drawn; false when this target cannot take it
+    // (another device, a texture it cannot write): then draw through Render(). Flushes the context first.
+    [[nodiscard]] Result<bool> RenderInto(ID2D1DeviceContext* context, const MaterialScene& scene, D2D1_SIZE_U sizePx, POINT originPx);
     // The same frame's pixels (top-down BGRA, premultiplied), for a surface painted by another device.
     [[nodiscard]] Result<void> RenderToMemory(const MaterialScene& scene, D2D1_SIZE_U sizePx, std::vector<std::uint8_t>& bgra);
 

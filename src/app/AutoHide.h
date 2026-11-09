@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string_view>
 
 namespace aether::app {
@@ -69,6 +70,9 @@ private:
 // D59: nothing covers a bar while the desktop itself is in front (Show desktop, a click on it), even with
 // windows still behind it: back on the desktop, both bars return.
 [[nodiscard]] bool ApplicationWindowCovers(const RECT& zone) noexcept;
+// The same for several zones in one pass over the windows (both bars, four times a second): bit i is set when
+// zones[i] is covered. A window's rectangle is compared first; only one that reaches a zone is examined further.
+[[nodiscard]] std::uint32_t ApplicationWindowsCover(std::span<const RECT> zones) noexcept;
 [[nodiscard]] bool IsDesktopWindowClass(std::wstring_view name) noexcept;
 
 }  // namespace aether::app

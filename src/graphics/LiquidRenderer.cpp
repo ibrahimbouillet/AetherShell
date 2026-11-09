@@ -138,6 +138,9 @@ struct LiquidRenderer::Impl {
     winrt::com_ptr<ID3D11ShaderResourceView> pictureView, markView;
     struct Target { winrt::com_ptr<ID3D11Texture2D> texture; winrt::com_ptr<ID3D11RenderTargetView> view; winrt::com_ptr<ID3D11Texture2D> staging; };
     std::map<std::pair<UINT, UINT>, Target> targets;   // one per size: the Dock, the Top Bar, the arrival, previews
+    // D69: the texture a Direct2D context was drawing into when the arrival last rendered straight into it, and its view.
+    winrt::com_ptr<ID3D11Texture2D> directTexture;
+    winrt::com_ptr<ID3D11RenderTargetView> directView;
     std::shared_ptr<const std::vector<std::uint8_t>> picture;
     UINT pictureWidth = 0, pictureHeight = 0;
     D2D1_RECT_F placement{};
@@ -167,13 +170,15 @@ struct LiquidRenderer::Impl {
     }
 
     Result<void> EnsureResources() {
-        if (!pictureUploaded) {
+        if (!pictureUploaded && (picture || !pictureView)) {   // the stand-in is made once, not with every frame
             static const std::uint8_t kDark[4] = {24, 22, 26, 255};   // until the picture arrives: a quiet dark
             auto view = picture && pictureWidth && pictureHeight ? MipmappedTexture(picture->data(), pictureWidth, pictureHeight)
                                                                  : MipmappedTexture(kDark, 1, 1);
             if (!view) return view.error();
             pictureView = std::move(*view);
             pictureUploaded = picture != nullptr;
+            // On the device now: the CPU copy (a whole screen of pixels) is not kept beside it.
+            picture.reset();
         }
         if (!markView) {
             if (mark.empty()) mark = RasterizeMark(kMarkSize);
@@ -208,6 +213,11 @@ struct LiquidRenderer::Impl {
     }
 
     Result<void> Draw(const MaterialScene& scene, Target& target, D2D1_SIZE_U size) {
+        return Draw(scene, target.view.get(), D3D11_VIEWPORT{0.0f, 0.0f, static_cast<float>(size.width), static_cast<float>(size.height), 0.0f, 1.0f});
+    }
+    // `viewport` is where the frame goes in `view`'s texture; the scene's coordinates are in that texture's pixels.
+    Result<void> Draw(const MaterialScene& scene, ID3D11RenderTargetView* view, const D3D11_VIEWPORT& viewport) {
+        const D2D1_SIZE_U size{static_cast<UINT32>(viewport.Width), static_cast<UINT32>(viewport.Height)};
         if (auto ready = EnsureResources(); !ready) return ready;
         Constants c{};
         for (int i = 0; i < 2; ++i) {
@@ -247,10 +257,9 @@ struct LiquidRenderer::Impl {
         winrt::com_ptr<ID3DDeviceContextState> previous;
         context->SwapDeviceContextState(state.get(), previous.put());
         context->UpdateSubresource(constants.get(), 0, nullptr, &c, 0, 0);
-        ID3D11RenderTargetView* views[] = {target.view.get()};
+        ID3D11RenderTargetView* views[] = {view};
         context->OMSetRenderTargets(1, views, nullptr);
         context->OMSetBlendState(nullptr, nullptr, 0xffffffff);
-        const D3D11_VIEWPORT viewport{0.0f, 0.0f, static_cast<float>(size.width), static_cast<float>(size.height), 0.0f, 1.0f};
         context->RSSetViewports(1, &viewport);
         context->RSSetState(nullptr);
         context->IASetInputLayout(nullptr);
@@ -320,8 +329,12 @@ Result<void> LiquidRenderer::Initialize(ID3D11Device* device) try {
 void LiquidRenderer::Reset() noexcept {
     auto& m = *impl_;
     m.targets.clear();
+    m.directView = nullptr;
+    m.directTexture = nullptr;
     m.pictureView = nullptr;
     m.markView = nullptr;
+    // A picture that was only on the lost device is gone: the caller reads it again (HasPicture is false).
+    if (m.pictureUploaded && !m.picture) { m.pictureWidth = m.pictureHeight = 0; }
     m.pictureUploaded = false;
     m.sampler = nullptr;
     m.constants = nullptr;
@@ -346,7 +359,19 @@ void LiquidRenderer::SetPicture(std::shared_ptr<const std::vector<std::uint8_t>>
     m.pictureView = nullptr;
 }
 
-bool LiquidRenderer::HasPicture() const noexcept { return impl_->picture != nullptr; }
+bool LiquidRenderer::HasPicture() const noexcept { return impl_->picture != nullptr || (impl_->pictureUploaded && impl_->pictureView); }
+
+void LiquidRenderer::ReleaseTransient(bool keepPicture) noexcept {
+    auto& m = *impl_;
+    m.targets.clear();
+    m.directView = nullptr;
+    m.directTexture = nullptr;
+    if (keepPicture) return;
+    m.picture.reset();
+    m.pictureView = nullptr;
+    m.pictureUploaded = false;
+    m.pictureWidth = m.pictureHeight = 0;
+}
 SIZE LiquidRenderer::PictureSize() const noexcept { return {static_cast<LONG>(impl_->pictureWidth), static_cast<LONG>(impl_->pictureHeight)}; }
 D2D1_RECT_F LiquidRenderer::PicturePlacement() const noexcept { return impl_->placement; }
 std::uint64_t LiquidRenderer::PictureGeneration() const noexcept { return impl_->generation; }
@@ -367,6 +392,54 @@ Result<winrt::com_ptr<ID2D1Bitmap1>> LiquidRenderer::Render(ID2D1DeviceContext* 
     const HRESULT hr = context->CreateBitmapFromDxgiSurface(surface.get(), &properties, bitmap.put());
     if (FAILED(hr)) return Failed("material bitmap could not be created", hr);
     return bitmap;
+} catch (...) {
+    return MakeError(ErrorCode::Internal, "material frame failed");
+}
+
+Result<bool> LiquidRenderer::RenderInto(ID2D1DeviceContext* context, const MaterialScene& scene, D2D1_SIZE_U sizePx, POINT originPx) try {
+    if (!Ready()) return MakeError(ErrorCode::Unavailable, "material renderer is not ready");
+    if (!context || sizePx.width == 0 || sizePx.height == 0) return MakeError(ErrorCode::InvalidArgument, "material target is empty");
+    auto& m = *impl_;
+    winrt::com_ptr<ID2D1Image> image;
+    context->GetTarget(image.put());
+    const auto bitmap = image.try_as<ID2D1Bitmap1>();
+    if (!bitmap) return false;
+    winrt::com_ptr<IDXGISurface> surface;
+    if (FAILED(bitmap->GetSurface(surface.put())) || !surface) return false;
+    const auto texture = surface.try_as<ID3D11Texture2D>();
+    if (!texture) return false;
+    D3D11_TEXTURE2D_DESC desc{};
+    texture->GetDesc(&desc);
+    winrt::com_ptr<ID3D11Device> owner;
+    texture->GetDevice(owner.put());
+    // Only a plain render target of this very device, holding the whole frame where it is asked to go.
+    if (owner.get() != static_cast<ID3D11Device*>(m.device.get()) || !(desc.BindFlags & D3D11_BIND_RENDER_TARGET) ||
+        desc.SampleDesc.Count != 1 || desc.ArraySize != 1 || originPx.x < 0 || originPx.y < 0 ||
+        static_cast<UINT>(originPx.x) + sizePx.width > desc.Width || static_cast<UINT>(originPx.y) + sizePx.height > desc.Height)
+        return false;
+    if (m.directTexture.get() != texture.get() || !m.directView) {
+        m.directView = nullptr;
+        m.directTexture = texture;
+        D3D11_RENDER_TARGET_VIEW_DESC view{};
+        view.Format = desc.Format;
+        view.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        if (const HRESULT hr = m.device->CreateRenderTargetView(texture.get(), &view, m.directView.put()); FAILED(hr)) {
+            m.directTexture = nullptr;
+            return false;   // the caller draws through a texture of its own instead
+        }
+    }
+    // The scene in the target texture's pixels: the frame's top-left lies at originPx there.
+    auto shifted = scene;
+    const float dx = static_cast<float>(originPx.x), dy = static_cast<float>(originPx.y);
+    for (auto& body : shifted.bodies) { body.cx += dx; body.cy += dy; }
+    shifted.logoCx += dx; shifted.logoCy += dy;
+    shifted.picture.left += dx; shifted.picture.right += dx;
+    shifted.picture.top += dy; shifted.picture.bottom += dy;
+    context->Flush();   // Direct2D's work so far reaches the texture first
+    if (auto drawn = m.Draw(shifted, m.directView.get(),
+                            D3D11_VIEWPORT{dx, dy, static_cast<float>(sizePx.width), static_cast<float>(sizePx.height), 0.0f, 1.0f}); !drawn)
+        return drawn.error();
+    return true;
 } catch (...) {
     return MakeError(ErrorCode::Internal, "material frame failed");
 }

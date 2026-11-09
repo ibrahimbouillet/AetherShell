@@ -3187,3 +3187,30 @@ from Windows' own copy into Pictures and applied again (Fill). No repository fil
 `4caef0753717de946cf6b0c97a4fb18669a3bd4d4e84ce48e13abdd996c29571`, built by `scripts/package.ps1` from the tree committed
 with this entry (its embedded revision is the commit before, `ba50bbc`). Test 4.3's build moved to `dist/test-4.3/`. Not
 pushed, tagged, published or installed.
+
+### S-073 — Alpha 4, test 4.5: five languages; lighter at rest and when switching style (Claude, 2026-11-09)
+
+**What changed:** D69 (Top Bar partial redraws without a per-second fade, backdrop and layout caching, one window pass for
+Auto-Hide, previews wait for the arrival, arrival in one pass, transient picture/targets released with a trim) and D70
+(748-text catalog in five languages, Settings → Language, five-language Search names, translated user documentation).
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Non-network unit gate | 24/24; new: localization (lookup, fallback, patterns, catalog placeholders), settings `general.language`, five-language Search names |
+| Integration (desktop) | 15/17 first run: window-corner pixel case (known since S-067) and one Quick Settings touch-paging case that then passed twice alone; settings_ui and ui_form pass after the Language page moved to its own page |
+| Catalog check | 748 texts, none untranslated; every key found in the source |
+| A/B on the owner's PC, same settings copy, private profile, 60 s at rest after 50 s settle, both orders | 4.4: 51.8 and 48.6 ms CPU/s, 90 MB private, 142 MB working set; 4.5: 12.5 and 11.7 ms CPU/s (-76%), 45-48 MB private (-50%), 21-22 MB working set |
+| Settings window captured (own window only, local) in Chinese, Hindi, French | Text shaped and laid out; found and fixed: navigation sized for 8 pages (Welcome was already hidden), the magnification unit's mojibake, Hindi unit truncation |
+| Native settings_ui after those fixes | 40/40; new: every page, the Language page included, lays out without overlap in each of the five languages; the navigation lists ten pages |
+
+**Not executed, so not claimed:** the style switch measured end to end; the arrival's frame rate; each language on the bars
+and Quick Settings on screen; the setup run itself.
+
+**Test build 4.5:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 8295936 bytes, SHA-256
+`5da11720ebe6f3b1669971337b1f098a1116dab71382ced41e4182e83b6c2313`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4`
+(privacy audit passed) from the uncommitted tree described here. Test 4.4's build moved to `dist/test-4.4/`. A first package
+from `build/package` carried a stale `alpha.3` label (`dist/AetherShell-0.4.0-alpha.3-*`, not for use; left in place). Not
+committed, pushed, tagged, published or installed.

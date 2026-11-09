@@ -8,6 +8,9 @@
 #include "platform/windows/OsVersion.h"
 #include "platform/windows/Win32Error.h"
 
+#include <d3d11.h>
+#include <dxgi1_3.h>
+
 #include <algorithm>
 #include <iterator>
 
@@ -108,6 +111,23 @@ Result<void> GraphicsDevice::HandleDeviceLost() {
     if (auto result = CreateDevices(); !result) return result.error();
     DeviceReplaced.Emit();
     return Ok();
+}
+
+void GraphicsDevice::Trim() noexcept {
+    try {
+        if (d3dDevice_) {
+            winrt::com_ptr<ID3D11DeviceContext> immediate;
+            d3dDevice_->GetImmediateContext(immediate.put());
+            // Trim requires nothing bound by the application; Direct2D keeps its own state apart.
+            if (immediate) { immediate->ClearState(); immediate->Flush(); }
+            if (const auto dxgi = d3dDevice_.try_as<IDXGIDevice3>()) dxgi->Trim();
+        }
+        if (compositionDevice_) {
+            if (const auto device = compositionDevice_.try_as<wuc::ICompositionGraphicsDevice3>()) device.Trim();
+        }
+    } catch (...) {
+        // Only a hint to the driver: nothing depends on it.
+    }
 }
 
 LiquidRenderer* GraphicsDevice::Material() noexcept {

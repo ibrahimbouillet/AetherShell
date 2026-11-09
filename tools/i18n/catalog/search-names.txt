@@ -1,0 +1,368 @@
+# D70: Windows' tools and Settings pages as Search names them (src/applications/CatalogRules.cpp). The French is the
+# name written there; Search shows the interface's language and finds an entry by any of the five.
+
+en: Disk Management
+fr: Gestion des disques
+es: Administración de discos
+zh: 磁盘管理
+hi: डिस्क प्रबंधन
+
+en: Local Users and Groups
+fr: Utilisateurs et groupes locaux
+es: Usuarios y grupos locales
+zh: 本地用户和组
+hi: स्थानीय उपयोगकर्ता और समूह
+
+en: Local Group Policy Editor
+fr: Éditeur de stratégie de groupe locale
+es: Editor de directivas de grupo local
+zh: 本地组策略编辑器
+hi: स्थानीय समूह नीति संपादक
+
+en: Manage User Certificates
+fr: Gérer les certificats utilisateur
+es: Administrar certificados de usuario
+zh: 管理用户证书
+hi: उपयोगकर्ता प्रमाणपत्र प्रबंधित करें
+
+en: Manage Computer Certificates
+fr: Gérer les certificats de l'ordinateur
+es: Administrar certificados de equipo
+zh: 管理计算机证书
+hi: कंप्यूटर प्रमाणपत्र प्रबंधित करें
+
+en: Shared Folders
+fr: Dossiers partagés
+es: Carpetas compartidas
+zh: 共享文件夹
+hi: साझा फ़ोल्डर
+
+en: TPM Management
+fr: Gestion du module de plateforme sécurisée
+es: Administración de TPM
+zh: TPM 管理
+hi: TPM प्रबंधन
+
+en: Network Connections
+fr: Connexions réseau
+es: Conexiones de red
+zh: 网络连接
+hi: नेटवर्क कनेक्शन
+
+en: System Properties
+fr: Propriétés système
+es: Propiedades del sistema
+zh: 系统属性
+hi: सिस्टम गुण
+
+en: About Windows
+fr: À propos de Windows
+es: Acerca de Windows
+zh: 关于 Windows
+hi: Windows के बारे में
+
+en: DirectX Diagnostic Tool
+fr: Outil de diagnostic DirectX
+es: Herramienta de diagnóstico de DirectX
+zh: DirectX 诊断工具
+hi: DirectX डायग्नोस्टिक टूल
+
+en: Windows Features
+fr: Fonctionnalités de Windows
+es: Características de Windows
+zh: Windows 功能
+hi: Windows सुविधाएँ
+
+en: System Restore
+fr: Restauration du système
+es: Restaurar sistema
+zh: 系统还原
+hi: सिस्टम पुनर्स्थापना
+
+en: Advanced System Settings
+fr: Paramètres système avancés
+es: Configuración avanzada del sistema
+zh: 高级系统设置
+hi: उन्नत सिस्टम सेटिंग्स
+
+en: Volume Mixer
+fr: Mélangeur de volume
+es: Mezclador de volumen
+zh: 音量合成器
+hi: वॉल्यूम मिक्सर
+
+en: Microsoft Management Console
+fr: Console de gestion Microsoft
+es: Consola de administración de Microsoft
+zh: Microsoft 管理控制台
+hi: Microsoft प्रबंधन कंसोल
+
+en: User Accounts (Advanced)
+fr: Comptes d'utilisateurs (avancé)
+es: Cuentas de usuario (avanzado)
+zh: 用户帐户（高级）
+hi: उपयोगकर्ता खाते (उन्नत)
+
+en: Display settings
+fr: Paramètres d'affichage
+es: Configuración de pantalla
+zh: 显示设置
+hi: डिस्प्ले सेटिंग्स
+
+en: Night light settings
+fr: Paramètres de l'éclairage nocturne
+es: Configuración de la luz nocturna
+zh: 夜间模式设置
+hi: रात्रि प्रकाश सेटिंग्स
+
+en: Graphics settings
+fr: Paramètres graphiques
+es: Configuración de gráficos
+zh: 图形设置
+hi: ग्राफ़िक्स सेटिंग्स
+
+en: Sound settings
+fr: Paramètres du son
+es: Configuración de sonido
+zh: 声音设置
+hi: ध्वनि सेटिंग्स
+
+en: Notification settings
+fr: Paramètres de notification
+es: Configuración de notificaciones
+zh: 通知设置
+hi: सूचना सेटिंग्स
+
+en: Power & battery settings
+fr: Paramètres d'alimentation et de batterie
+es: Configuración de energía y batería
+zh: 电源和电池设置
+hi: पावर और बैटरी सेटिंग्स
+
+en: Energy saver settings
+fr: Paramètres de l'économiseur d'énergie
+es: Configuración del ahorro de energía
+zh: 节能模式设置
+hi: ऊर्जा बचत सेटिंग्स
+
+en: Storage settings
+fr: Paramètres de stockage
+es: Configuración de almacenamiento
+zh: 存储设置
+hi: स्टोरेज सेटिंग्स
+
+en: Multitasking settings
+fr: Paramètres du mode multitâche
+es: Configuración de multitarea
+zh: 多任务处理设置
+hi: मल्टीटास्किंग सेटिंग्स
+
+en: Clipboard settings
+fr: Paramètres du Presse-papiers
+es: Configuración del Portapapeles
+zh: 剪贴板设置
+hi: क्लिपबोर्ड सेटिंग्स
+
+en: Remote Desktop settings
+fr: Paramètres du Bureau à distance
+es: Configuración de Escritorio remoto
+zh: 远程桌面设置
+hi: रिमोट डेस्कटॉप सेटिंग्स
+
+en: About your PC
+fr: Informations système
+es: Acerca de tu PC
+zh: 关于你的电脑
+hi: आपके PC के बारे में
+
+en: Bluetooth & devices settings
+fr: Paramètres Bluetooth et appareils
+es: Configuración de Bluetooth y dispositivos
+zh: 蓝牙和其他设备设置
+hi: ब्लूटूथ और डिवाइस सेटिंग्स
+
+en: Printers & scanners settings
+fr: Paramètres des imprimantes et scanners
+es: Configuración de impresoras y escáneres
+zh: 打印机和扫描仪设置
+hi: प्रिंटर और स्कैनर सेटिंग्स
+
+en: Mouse settings
+fr: Paramètres de la souris
+es: Configuración del mouse
+zh: 鼠标设置
+hi: माउस सेटिंग्स
+
+en: Touchpad settings
+fr: Paramètres du pavé tactile
+es: Configuración del panel táctil
+zh: 触摸板设置
+hi: टचपैड सेटिंग्स
+
+en: Network & internet settings
+fr: Paramètres réseau et Internet
+es: Configuración de red e Internet
+zh: 网络和 Internet 设置
+hi: नेटवर्क और इंटरनेट सेटिंग्स
+
+en: Wi-Fi settings
+fr: Paramètres Wi-Fi
+es: Configuración de Wi-Fi
+zh: WLAN 设置
+hi: Wi-Fi सेटिंग्स
+
+en: VPN settings
+fr: Paramètres VPN
+es: Configuración de VPN
+zh: VPN 设置
+hi: VPN सेटिंग्स
+
+en: Proxy settings
+fr: Paramètres du proxy
+es: Configuración de proxy
+zh: 代理设置
+hi: प्रॉक्सी सेटिंग्स
+
+en: Airplane mode settings
+fr: Paramètres du mode Avion
+es: Configuración del modo avión
+zh: 飞行模式设置
+hi: हवाई जहाज़ मोड सेटिंग्स
+
+en: Mobile hotspot settings
+fr: Paramètres du point d'accès mobile
+es: Configuración de la zona con cobertura inalámbrica móvil
+zh: 移动热点设置
+hi: मोबाइल हॉटस्पॉट सेटिंग्स
+
+en: Background settings
+fr: Paramètres de l'arrière-plan
+es: Configuración del fondo
+zh: 背景设置
+hi: पृष्ठभूमि सेटिंग्स
+
+en: Color settings
+fr: Paramètres des couleurs
+es: Configuración de colores
+zh: 颜色设置
+hi: रंग सेटिंग्स
+
+en: Theme settings
+fr: Paramètres des thèmes
+es: Configuración de temas
+zh: 主题设置
+hi: थीम सेटिंग्स
+
+en: Lock screen settings
+fr: Paramètres de l'écran de verrouillage
+es: Configuración de la pantalla de bloqueo
+zh: 锁屏界面设置
+hi: लॉक स्क्रीन सेटिंग्स
+
+en: Taskbar settings
+fr: Paramètres de la barre des tâches
+es: Configuración de la barra de tareas
+zh: 任务栏设置
+hi: टास्कबार सेटिंग्स
+
+en: Font settings
+fr: Paramètres des polices
+es: Configuración de fuentes
+zh: 字体设置
+hi: फ़ॉन्ट सेटिंग्स
+
+en: Installed apps
+fr: Applications installées
+es: Aplicaciones instaladas
+zh: 已安装的应用
+hi: इंस्टॉल किए गए ऐप्स
+
+en: Default apps settings
+fr: Paramètres des applications par défaut
+es: Configuración de aplicaciones predeterminadas
+zh: 默认应用设置
+hi: डिफ़ॉल्ट ऐप्स सेटिंग्स
+
+en: Startup apps settings
+fr: Paramètres des applications de démarrage
+es: Configuración de aplicaciones de arranque
+zh: 启动应用设置
+hi: स्टार्टअप ऐप्स सेटिंग्स
+
+en: Account info
+fr: Informations du compte
+es: Información de la cuenta
+zh: 帐户信息
+hi: खाते की जानकारी
+
+en: Sign-in options
+fr: Options de connexion
+es: Opciones de inicio de sesión
+zh: 登录选项
+hi: साइन-इन विकल्प
+
+en: Other users settings
+fr: Paramètres des autres utilisateurs
+es: Configuración de otros usuarios
+zh: 其他用户设置
+hi: अन्य उपयोगकर्ता सेटिंग्स
+
+en: Date & time settings
+fr: Paramètres de date et d'heure
+es: Configuración de fecha y hora
+zh: 日期和时间设置
+hi: दिनांक और समय सेटिंग्स
+
+en: Language & region settings
+fr: Paramètres de langue et région
+es: Configuración de idioma y región
+zh: 语言和区域设置
+hi: भाषा और क्षेत्र सेटिंग्स
+
+en: Typing settings
+fr: Paramètres de saisie
+es: Configuración de escritura
+zh: 输入设置
+hi: टाइपिंग सेटिंग्स
+
+en: Accessibility settings
+fr: Paramètres d'accessibilité
+es: Configuración de accesibilidad
+zh: 辅助功能设置
+hi: सुगम्यता सेटिंग्स
+
+en: Privacy & security settings
+fr: Paramètres de confidentialité et sécurité
+es: Configuración de privacidad y seguridad
+zh: 隐私和安全性设置
+hi: गोपनीयता और सुरक्षा सेटिंग्स
+
+en: Location settings
+fr: Paramètres de localisation
+es: Configuración de ubicación
+zh: 位置设置
+hi: स्थान सेटिंग्स
+
+en: Windows Update settings
+fr: Paramètres de Windows Update
+es: Configuración de Windows Update
+zh: Windows 更新设置
+hi: Windows Update सेटिंग्स
+
+en: Recovery settings
+fr: Paramètres de récupération
+es: Configuración de recuperación
+zh: 恢复设置
+hi: रिकवरी सेटिंग्स
+
+en: Activation settings
+fr: Paramètres d'activation
+es: Configuración de activación
+zh: 激活设置
+hi: सक्रियण सेटिंग्स
+
+en: For developers settings
+fr: Paramètres pour les développeurs
+es: Configuración para desarrolladores
+zh: 开发者选项设置
+hi: डेवलपर सेटिंग्स

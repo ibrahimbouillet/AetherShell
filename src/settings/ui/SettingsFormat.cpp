@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "settings/ui/SettingsFormat.h"
 
+#include "core/Localization.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cwchar>
@@ -84,9 +86,8 @@ bool InRange(double stored, const NumberFormat& format) noexcept {
 std::wstring RangeText(const NumberFormat& format) {
     NumberFormat displayed = format;
     displayed.scale = 1.0;
-    std::wstring text = L"From " + FormatNumber(format.minimum, displayed) + L" to " + FormatNumber(format.maximum, displayed);
-    if (!format.unit.empty()) text += L" " + format.unit;
-    return text;
+    const std::wstring unit = format.unit.empty() ? std::wstring() : L" " + std::wstring(i18n::Tr(format.unit));
+    return i18n::TrFormat(L"From {} to {}", FormatNumber(format.minimum, displayed), FormatNumber(format.maximum, displayed) + unit);
 }
 
 }  // namespace aether::settings::ui

@@ -49,20 +49,39 @@ constexpr std::array<std::wstring_view, 8> kShellClasses{
 
 bool IsDesktopWindowClass(std::wstring_view name) noexcept { return name == L"Progman" || name == L"WorkerW"; }
 
-bool ApplicationWindowCovers(const RECT& zone) noexcept {
-    if (zone.right <= zone.left || zone.bottom <= zone.top) return false;
+bool ApplicationWindowCovers(const RECT& zone) noexcept { return (ApplicationWindowsCover(std::span<const RECT>(&zone, 1)) & 1u) != 0; }
+
+std::uint32_t ApplicationWindowsCover(std::span<const RECT> zones) noexcept {
+    struct Search {
+        std::span<const RECT> zones;
+        RECT reach{};            // every zone together: most windows are rejected by this one comparison
+        DWORD self = 0;
+        std::uint32_t wanted = 0, found = 0;
+    } search{zones, {}, ::GetCurrentProcessId()};
+    for (std::size_t i = 0; i < zones.size() && i < 32; ++i) {
+        const RECT& zone = zones[i];
+        if (zone.right <= zone.left || zone.bottom <= zone.top) continue;
+        search.wanted |= 1u << i;
+        if (::IsRectEmpty(&search.reach)) search.reach = zone;
+        else ::UnionRect(&search.reach, &search.reach, &zone);
+    }
+    if (!search.wanted) return 0;
     try {
-        if (const HWND front = ::GetForegroundWindow(); front && IsDesktopWindowClass(platform::WindowClassName(front))) return false;
+        if (const HWND front = ::GetForegroundWindow(); front && IsDesktopWindowClass(platform::WindowClassName(front))) return 0;
     } catch (...) {
     }
-    struct Search { RECT zone; DWORD self; bool found = false; } search{zone, ::GetCurrentProcessId()};
     ::EnumWindows([](HWND window, LPARAM parameter) -> BOOL {
         auto& state = *reinterpret_cast<Search*>(parameter);
         if (!::IsWindowVisible(window) || ::IsIconic(window)) return TRUE;
-        DWORD process = 0;
-        if (!::GetWindowThreadProcessId(window, &process)) return TRUE;
+        // The window's whole rectangle (resize borders included) holds its visible frame: one that does not reach any
+        // zone cannot cover it, and nothing else about it is read. These reads stay in this process.
+        RECT outer{};
+        RECT touched{};
+        if (!::GetWindowRect(window, &outer) || !::IntersectRect(&touched, &outer, &state.reach)) return TRUE;
         const auto extended = static_cast<DWORD>(::GetWindowLongPtrW(window, GWL_EXSTYLE));
         if (extended & (WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE)) return TRUE;
+        DWORD process = 0;
+        if (!::GetWindowThreadProcessId(window, &process)) return TRUE;
         if (platform::IsWindowCloaked(window)) return TRUE;
         try {
             const auto name = platform::WindowClassName(window);
@@ -76,12 +95,14 @@ bool ApplicationWindowCovers(const RECT& zone) noexcept {
         }
         // The visible frame, without the invisible resize borders of ordinary windows.
         RECT bounds{};
-        if (FAILED(::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &bounds, sizeof(bounds))) && !::GetWindowRect(window, &bounds))
-            return TRUE;
-        RECT overlap{};
-        if (!::IntersectRect(&overlap, &bounds, &state.zone)) return TRUE;
-        state.found = true;
-        return FALSE;
+        if (FAILED(::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &bounds, sizeof(bounds)))) bounds = outer;
+        for (std::size_t i = 0; i < state.zones.size() && i < 32; ++i) {
+            const std::uint32_t bit = 1u << i;
+            if (!(state.wanted & bit) || (state.found & bit)) continue;
+            RECT overlap{};
+            if (::IntersectRect(&overlap, &bounds, &state.zones[i])) state.found |= bit;
+        }
+        return state.found == state.wanted ? FALSE : TRUE;   // every zone answered: the rest need not be read
     }, reinterpret_cast<LPARAM>(&search));
     return search.found;
 }

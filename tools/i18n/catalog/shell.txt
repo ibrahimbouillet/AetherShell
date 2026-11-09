@@ -1,0 +1,1327 @@
+# D70: the Top Bar, the Dock, Search, menus and Quick Settings.
+
+en: &Resume taskbar replacement
+fr: &Reprendre le remplacement de la barre des tâches
+es: &Reanudar la sustitución de la barra de tareas
+zh: 恢复替换任务栏(&R)
+hi: टास्कबार प्रतिस्थापन फिर शुरू करें(&R)
+
+en: Show Windows &notification area for 60 seconds
+fr: Afficher la zone de &notification de Windows pendant 60 secondes
+es: Mostrar el área de &notificación de Windows durante 60 segundos
+zh: 显示 Windows 通知区域 60 秒(&N)
+hi: Windows सूचना क्षेत्र 60 सेकंड के लिए दिखाएँ(&N)
+
+en: &Search…
+fr: &Rechercher…
+es: &Buscar…
+zh: 搜索(&S)…
+hi: खोजें(&S)…
+
+en: &Settings…
+fr: &Paramètres…
+es: &Configuración…
+zh: 设置(&S)…
+hi: सेटिंग्स(&S)…
+
+en: View available &update…
+fr: Voir la mise à jour &disponible…
+es: Ver la &actualización disponible…
+zh: 查看可用更新(&U)…
+hi: उपलब्ध अपडेट देखें(&U)…
+
+en: &Check for updates…
+fr: Rechercher des &mises à jour…
+es: &Buscar actualizaciones…
+zh: 检查更新(&C)…
+hi: अपडेट जाँचें(&C)…
+
+en: &About Aether Shell
+fr: À &propos d'Aether Shell
+es: &Acerca de Aether Shell
+zh: 关于 Aether Shell(&A)
+hi: Aether Shell के बारे में(&A)
+
+en: &Quit Aether Shell
+fr: &Quitter Aether Shell
+es: &Salir de Aether Shell
+zh: 退出 Aether Shell(&Q)
+hi: Aether Shell बंद करें(&Q)
+
+en: Switch &input language\tWin+Space
+fr: Changer la langue de &saisie\tWin+Espace
+es: Cambiar el idioma de &entrada\tWin+Espacio
+zh: 切换输入语言(&I)\tWin+空格
+hi: इनपुट भाषा बदलें(&I)\tWin+Space
+
+en: Open &network controls…
+fr: Ouvrir les commandes &réseau…
+es: Abrir los controles de &red…
+zh: 打开网络控制(&N)…
+hi: नेटवर्क नियंत्रण खोलें(&N)…
+
+en: &Weather settings…
+fr: Paramètres &météo…
+es: Configuración del &tiempo…
+zh: 天气设置(&W)…
+hi: मौसम सेटिंग्स(&W)…
+
+en: Toggle output &mute
+fr: Activer ou couper le &son
+es: Activar o silenciar el &sonido
+zh: 切换输出静音(&M)
+hi: आउटपुट म्यूट चालू/बंद करें(&M)
+
+en: &Sound settings…
+fr: Paramètres du s&on…
+es: Configuración de s&onido…
+zh: 声音设置(&S)…
+hi: ध्वनि सेटिंग्स(&S)…
+
+en: Toggle microphone &mute
+fr: Activer ou couper le &microphone
+es: Activar o silenciar el &micrófono
+zh: 切换麦克风静音(&M)
+hi: माइक्रोफ़ोन म्यूट चालू/बंद करें(&M)
+
+en: Start Windows &voice typing\tWin+H
+fr: Lancer la saisie &vocale de Windows\tWin+H
+es: Iniciar el dictado por &voz de Windows\tWin+H
+zh: 启动 Windows 语音输入(&V)\tWin+H
+hi: Windows वॉइस टाइपिंग शुरू करें(&V)\tWin+H
+
+en: Microphone &privacy settings…
+fr: Paramètres de &confidentialité du microphone…
+es: Configuración de &privacidad del micrófono…
+zh: 麦克风隐私设置(&P)…
+hi: माइक्रोफ़ोन गोपनीयता सेटिंग्स(&P)…
+
+en: &Power settings…
+fr: Paramètres d'&alimentation…
+es: Configuración de &energía…
+zh: 电源设置(&P)…
+hi: पावर सेटिंग्स(&P)…
+
+en: Open &notifications and calendar
+fr: Ouvrir les &notifications et le calendrier
+es: Abrir las &notificaciones y el calendario
+zh: 打开通知和日历(&N)
+hi: सूचनाएँ और कैलेंडर खोलें(&N)
+
+en: Open &calendar\tWin+Alt+D
+fr: Ouvrir le &calendrier\tWin+Alt+D
+es: Abrir el &calendario\tWin+Alt+D
+zh: 打开日历(&C)\tWin+Alt+D
+hi: कैलेंडर खोलें(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+fr: Afficher les icônes &cachées
+es: Mostrar los iconos &ocultos
+zh: 显示隐藏的图标(&H)
+hi: छिपे हुए आइकन दिखाएँ(&H)
+
+en: Initializing
+fr: Initialisation
+es: Iniciando
+zh: 正在初始化
+hi: शुरू हो रहा है
+
+en: Unavailable
+fr: Indisponible
+es: No disponible
+zh: 不可用
+hi: उपलब्ध नहीं
+
+en: Unsupported
+fr: Non pris en charge
+es: No compatible
+zh: 不支持
+hi: समर्थित नहीं
+
+en: Error
+fr: Erreur
+es: Error
+zh: 错误
+hi: त्रुटि
+
+en: Available
+fr: Disponible
+es: Disponible
+zh: 可用
+hi: उपलब्ध
+
+en: Unknown
+fr: Inconnu
+es: Desconocido
+zh: 未知
+hi: अज्ञात
+
+en: Internet access
+fr: Accès à Internet
+es: Acceso a Internet
+zh: 可访问 Internet
+hi: इंटरनेट उपलब्ध
+
+en: Local network only
+fr: Réseau local uniquement
+es: Solo red local
+zh: 仅限本地网络
+hi: केवल स्थानीय नेटवर्क
+
+en: Limited Internet access
+fr: Accès à Internet limité
+es: Acceso a Internet limitado
+zh: Internet 访问受限
+hi: सीमित इंटरनेट
+
+en: No network connection
+fr: Aucune connexion réseau
+es: Sin conexión de red
+zh: 无网络连接
+hi: कोई नेटवर्क कनेक्शन नहीं
+
+en: Connectivity unknown
+fr: Connectivité inconnue
+es: Conectividad desconocida
+zh: 连接状态未知
+hi: कनेक्टिविटी अज्ञात
+
+en: Ethernet
+fr: Ethernet
+es: Ethernet
+zh: 以太网
+hi: ईथरनेट
+
+en: Cellular
+fr: Cellulaire
+es: Datos móviles
+zh: 手机网络
+hi: सेल्युलर
+
+en: Network
+fr: Réseau
+es: Red
+zh: 网络
+hi: नेटवर्क
+
+en: Offline
+fr: Hors connexion
+es: Sin conexión
+zh: 离线
+hi: ऑफ़लाइन
+
+en: Network status unavailable
+fr: État du réseau indisponible
+es: Estado de la red no disponible
+zh: 网络状态不可用
+hi: नेटवर्क की स्थिति उपलब्ध नहीं
+
+en: Quick controls
+fr: Commandes rapides
+es: Controles rápidos
+zh: 快捷控制
+hi: क्विक कंट्रोल
+
+en: Aether Shell menu
+fr: Menu d'Aether Shell
+es: Menú de Aether Shell
+zh: Aether Shell 菜单
+hi: Aether Shell मेनू
+
+en: Weather status unavailable
+fr: État de la météo indisponible
+es: Estado del tiempo no disponible
+zh: 天气状态不可用
+hi: मौसम की स्थिति उपलब्ध नहीं
+
+en: Cached weather
+fr: Météo en cache
+es: Tiempo en caché
+zh: 缓存的天气
+hi: कैश किया गया मौसम
+
+en: Observation (UTC): {}
+fr: Observation (UTC) : {}
+es: Observación (UTC): {}
+zh: 观测时间（UTC）：{}
+hi: अवलोकन (UTC): {}
+
+en: Weather: {}
+fr: Météo : {}
+es: Tiempo: {}
+zh: 天气：{}
+hi: मौसम: {}
+
+en: Click to open weather settings
+fr: Cliquez pour ouvrir les paramètres météo
+es: Haz clic para abrir la configuración del tiempo
+zh: 单击打开天气设置
+hi: मौसम सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Show hidden icons
+fr: Afficher les icônes cachées
+es: Mostrar los iconos ocultos
+zh: 显示隐藏的图标
+hi: छिपे हुए आइकन दिखाएँ
+
+en: Opens Windows' notification-area overflow
+fr: Ouvre le dépassement de la zone de notification de Windows
+es: Abre el desbordamiento del área de notificación de Windows
+zh: 打开 Windows 通知区域的溢出菜单
+hi: Windows सूचना क्षेत्र का ओवरफ़्लो खोलता है
+
+en: Input language: {}
+fr: Langue de saisie : {}
+es: Idioma de entrada: {}
+zh: 输入语言：{}
+hi: इनपुट भाषा: {}
+
+en: Fallback input layout
+fr: Disposition de secours
+es: Distribución de reserva
+zh: 备用输入布局
+hi: वैकल्पिक इनपुट लेआउट
+
+en: Click to switch input language (Win+Space)
+fr: Cliquez pour changer la langue de saisie (Win+Espace)
+es: Haz clic para cambiar el idioma de entrada (Win+Espacio)
+zh: 单击切换输入语言（Win+空格）
+hi: इनपुट भाषा बदलने के लिए क्लिक करें (Win+Space)
+
+en: Network: {}
+fr: Réseau : {}
+es: Red: {}
+zh: 网络：{}
+hi: नेटवर्क: {}
+
+en: Signal strength unavailable
+fr: Force du signal indisponible
+es: Intensidad de la señal no disponible
+zh: 信号强度不可用
+hi: सिग्नल की ताकत उपलब्ध नहीं
+
+en: Click to open Windows network settings
+fr: Cliquez pour ouvrir les paramètres réseau de Windows
+es: Haz clic para abrir la configuración de red de Windows
+zh: 单击打开 Windows 网络设置
+hi: Windows नेटवर्क सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Audio output
+fr: Sortie audio
+es: Salida de audio
+zh: 音频输出
+hi: ऑडियो आउटपुट
+
+en: Audio: {}
+fr: Audio : {}
+es: Audio: {}
+zh: 音频：{}
+hi: ऑडियो: {}
+
+en: volume unknown
+fr: volume inconnu
+es: volumen desconocido
+zh: 音量未知
+hi: वॉल्यूम अज्ञात
+
+en: Muted
+fr: Muet
+es: Silenciado
+zh: 已静音
+hi: म्यूट
+
+en: Sound on
+fr: Son activé
+es: Sonido activado
+zh: 声音已开启
+hi: ध्वनि चालू
+
+en: Microphone: {}
+fr: Microphone : {}
+es: Micrófono: {}
+zh: 麦克风：{}
+hi: माइक्रोफ़ोन: {}
+
+en: Endpoint unmuted
+fr: Microphone actif
+es: Micrófono activado
+zh: 未静音
+hi: माइक्रोफ़ोन चालू
+
+en: Recording detection unsupported
+fr: Détection d'enregistrement non prise en charge
+es: Detección de grabación no compatible
+zh: 不支持检测录音
+hi: रिकॉर्डिंग पहचान समर्थित नहीं
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+fr: Cliquez pour couper ou rétablir le son ; clic droit pour la saisie vocale de Windows et la confidentialité du microphone
+es: Haz clic para silenciar o activar; clic derecho para el dictado por voz de Windows y la privacidad del micrófono
+zh: 单击切换静音；右键单击可使用 Windows 语音输入和麦克风隐私设置
+hi: म्यूट चालू/बंद करने के लिए क्लिक करें; Windows वॉइस टाइपिंग और माइक्रोफ़ोन गोपनीयता सेटिंग्स के लिए राइट-क्लिक करें
+
+en: Battery: {}
+fr: Batterie : {}
+es: Batería: {}
+zh: 电池：{}
+hi: बैटरी: {}
+
+en: Battery {}
+fr: Batterie {}
+es: Batería {}
+zh: 电池 {}
+hi: बैटरी {}
+
+en: Battery status unavailable
+fr: État de la batterie indisponible
+es: Estado de la batería no disponible
+zh: 电池状态不可用
+hi: बैटरी की स्थिति उपलब्ध नहीं
+
+en: Charging
+fr: En charge
+es: Cargando
+zh: 正在充电
+hi: चार्ज हो रही है
+
+en: External power
+fr: Alimentation secteur
+es: Alimentación externa
+zh: 外接电源
+hi: बाहरी बिजली
+
+en: Estimated remaining: {} h {} min
+fr: Autonomie estimée : {} h {} min
+es: Tiempo restante estimado: {} h {} min
+zh: 预计剩余：{} 小时 {} 分钟
+hi: अनुमानित शेष: {} घंटे {} मिनट
+
+en: Click to open power settings
+fr: Cliquez pour ouvrir les paramètres d'alimentation
+es: Haz clic para abrir la configuración de energía
+zh: 单击打开电源设置
+hi: पावर सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Clock status unavailable
+fr: État de l'horloge indisponible
+es: Estado del reloj no disponible
+zh: 时钟状态不可用
+hi: घड़ी की स्थिति उपलब्ध नहीं
+
+en: Click to open calendar and notifications
+fr: Cliquez pour ouvrir le calendrier et les notifications
+es: Haz clic para abrir el calendario y las notificaciones
+zh: 单击打开日历和通知
+hi: कैलेंडर और सूचनाएँ खोलने के लिए क्लिक करें
+
+en: Action failed: {}
+fr: Échec de l'action : {}
+es: La acción falló: {}
+zh: 操作失败：{}
+hi: कार्य विफल: {}
+
+en: Aether Shell status bar
+fr: Barre d'état d'Aether Shell
+es: Barra de estado de Aether Shell
+zh: Aether Shell 状态栏
+hi: Aether Shell स्टेटस बार
+
+en: Update available
+fr: Mise à jour disponible
+es: Actualización disponible
+zh: 有可用更新
+hi: अपडेट उपलब्ध
+
+en: Cached
+fr: En cache
+es: En caché
+zh: 已缓存
+hi: कैश किया गया
+
+en: Start
+fr: Démarrer
+es: Inicio
+zh: 开始
+hi: स्टार्ट
+
+en: Search
+fr: Rechercher
+es: Buscar
+zh: 搜索
+hi: खोजें
+
+en: Task View
+fr: Vue des tâches
+es: Vista de tareas
+zh: 任务视图
+hi: टास्क व्यू
+
+en: Application
+fr: Application
+es: Aplicación
+zh: 应用
+hi: ऐप्लिकेशन
+
+en: Running application
+fr: Application ouverte
+es: Aplicación en ejecución
+zh: 正在运行的应用
+hi: चल रहा ऐप्लिकेशन
+
+en: More applications
+fr: Autres applications
+es: Más aplicaciones
+zh: 更多应用
+hi: और ऐप्लिकेशन
+
+en: Aether Shell window previews
+fr: Aperçus des fenêtres d'Aether Shell
+es: Vistas previas de ventanas de Aether Shell
+zh: Aether Shell 窗口预览
+hi: Aether Shell विंडो पूर्वावलोकन
+
+en: Minimized — preview unavailable
+fr: Réduite — aperçu indisponible
+es: Minimizada — vista previa no disponible
+zh: 已最小化——无法预览
+hi: छोटा किया गया — पूर्वावलोकन उपलब्ध नहीं
+
+en: Preview unavailable
+fr: Aperçu indisponible
+es: Vista previa no disponible
+zh: 无法预览
+hi: पूर्वावलोकन उपलब्ध नहीं
+
+en: {} windows
+fr: Fenêtres de {}
+es: Ventanas de {}
+zh: {} 的窗口
+hi: {} की विंडो
+
+en: {} window
+fr: Fenêtre de {}
+es: Ventana de {}
+zh: {} 窗口
+hi: {} विंडो
+
+en: Switches to this window
+fr: Bascule vers cette fenêtre
+es: Cambia a esta ventana
+zh: 切换到此窗口
+hi: इस विंडो पर जाता है
+
+en: Minimized, preview unavailable
+fr: Réduite, aperçu indisponible
+es: Minimizada, vista previa no disponible
+zh: 已最小化，无法预览
+hi: छोटा किया गया, पूर्वावलोकन उपलब्ध नहीं
+
+en: Minimized
+fr: Réduite
+es: Minimizada
+zh: 已最小化
+hi: छोटा किया गया
+
+en: Close {}
+fr: Fermer {}
+es: Cerrar {}
+zh: 关闭 {}
+hi: {} बंद करें
+
+en: Asks this window to close; the application can still ask to save or cancel
+fr: Demande à cette fenêtre de se fermer ; l'application peut encore proposer d'enregistrer ou d'annuler
+es: Pide a esta ventana que se cierre; la aplicación aún puede pedir guardar o cancelar
+zh: 请求关闭此窗口；应用仍可提示保存或取消
+hi: इस विंडो को बंद होने के लिए कहता है; ऐप्लिकेशन अब भी सहेजने या रद्द करने को कह सकता है
+
+en: Close requested
+fr: Fermeture demandée
+es: Cierre solicitado
+zh: 已请求关闭
+hi: बंद करने का अनुरोध किया गया
+
+en: Previous applications
+fr: Applications précédentes
+es: Aplicaciones anteriores
+zh: 上一批应用
+hi: पिछले ऐप्लिकेशन
+
+en: Open
+fr: Ouvrir
+es: Abrir
+zh: 打开
+hi: खोलें
+
+en: New instance
+fr: Nouvelle instance
+es: Nueva instancia
+zh: 新实例
+hi: नया इंस्टेंस
+
+en: Unpin from Dock
+fr: Désépingler du Dock
+es: Desanclar del Dock
+zh: 从程序坞取消固定
+hi: डॉक से अनपिन करें
+
+en: Pin to Dock
+fr: Épingler au Dock
+es: Anclar al Dock
+zh: 固定到程序坞
+hi: डॉक पर पिन करें
+
+en: Move left
+fr: Déplacer à gauche
+es: Mover a la izquierda
+zh: 左移
+hi: बाएँ ले जाएँ
+
+en: Move right
+fr: Déplacer à droite
+es: Mover a la derecha
+zh: 右移
+hi: दाएँ ले जाएँ
+
+en: Dock settings...
+fr: Paramètres du Dock...
+es: Configuración del Dock...
+zh: 程序坞设置...
+hi: डॉक सेटिंग्स...
+
+en: Import Windows taskbar pins
+fr: Importer les épingles de la barre des tâches Windows
+es: Importar los anclajes de la barra de tareas de Windows
+zh: 导入 Windows 任务栏固定项
+hi: Windows टास्कबार पिन आयात करें
+
+en: Open Windows Start
+fr: Ouvrir Démarrer de Windows
+es: Abrir el Inicio de Windows
+zh: 打开 Windows 开始菜单
+hi: Windows स्टार्ट खोलें
+
+en: Aether Shell Dock
+fr: Dock d'Aether Shell
+es: Dock de Aether Shell
+zh: Aether Shell 程序坞
+hi: Aether Shell डॉक
+
+en: Pinned
+fr: Épinglée
+es: Anclada
+zh: 已固定
+hi: पिन किया गया
+
+en: Running
+fr: Ouverte
+es: En ejecución
+zh: 正在运行
+hi: चल रहा है
+
+en: Needs attention
+fr: Demande votre attention
+es: Requiere atención
+zh: 需要注意
+hi: ध्यान चाहिए
+
+en: Up arrow shows window previews
+fr: La flèche haut affiche les aperçus des fenêtres
+es: La flecha arriba muestra las vistas previas de las ventanas
+zh: 按上箭头显示窗口预览
+hi: ऊपर तीर विंडो पूर्वावलोकन दिखाता है
+
+en: Installed application
+fr: Application installée
+es: Aplicación instalada
+zh: 已安装的应用
+hi: इंस्टॉल किया गया ऐप्लिकेशन
+
+en: Desktop application
+fr: Application de bureau
+es: Aplicación de escritorio
+zh: 桌面应用
+hi: डेस्कटॉप ऐप्लिकेशन
+
+en: File
+fr: Fichier
+es: Archivo
+zh: 文件
+hi: फ़ाइल
+
+en: Folder
+fr: Dossier
+es: Carpeta
+zh: 文件夹
+hi: फ़ोल्डर
+
+en: Windows tool
+fr: Outil Windows
+es: Herramienta de Windows
+zh: Windows 工具
+hi: Windows टूल
+
+en: Control Panel
+fr: Panneau de configuration
+es: Panel de control
+zh: 控制面板
+hi: कंट्रोल पैनल
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+fr: ↑↓ Naviguer   ·   Entrée Ouvrir   ·   Échap Fermer
+es: ↑↓ Navegar   ·   Intro Abrir   ·   Esc Cerrar
+zh: ↑↓ 导航   ·   Enter 打开   ·   Esc 关闭
+hi: ↑↓ नेविगेट   ·   Enter खोलें   ·   Esc बंद करें
+
+en: Search apps, settings and files
+fr: Rechercher des applications, des paramètres et des fichiers
+es: Buscar aplicaciones, configuración y archivos
+zh: 搜索应用、设置和文件
+hi: ऐप, सेटिंग्स और फ़ाइलें खोजें
+
+en: Search could not be completed.
+fr: La recherche n'a pas pu aboutir.
+es: No se pudo completar la búsqueda.
+zh: 无法完成搜索。
+hi: खोज पूरी नहीं हो सकी।
+
+en: Results
+fr: Résultats
+es: Resultados
+zh: 结果
+hi: परिणाम
+
+en: Indexing applications…
+fr: Indexation des applications…
+es: Indexando aplicaciones…
+zh: 正在索引应用…
+hi: ऐप्लिकेशन इंडेक्स हो रहे हैं…
+
+en: Type to search apps, settings and files
+fr: Tapez pour rechercher des applications, des paramètres et des fichiers
+es: Escribe para buscar aplicaciones, configuración y archivos
+zh: 输入以搜索应用、设置和文件
+hi: ऐप, सेटिंग्स और फ़ाइलें खोजने के लिए लिखें
+
+en: Nothing matches
+fr: Aucun résultat
+es: No hay coincidencias
+zh: 没有匹配项
+hi: कुछ नहीं मिला
+
+en: Windows could not open this application.
+fr: Windows n'a pas pu ouvrir cette application.
+es: Windows no pudo abrir esta aplicación.
+zh: Windows 无法打开此应用。
+hi: Windows यह ऐप्लिकेशन नहीं खोल सका।
+
+en: Menu
+fr: Menu
+es: Menú
+zh: 菜单
+hi: मेनू
+
+en: Opens a submenu
+fr: Ouvre un sous-menu
+es: Abre un submenú
+zh: 打开子菜单
+hi: उप-मेनू खोलता है
+
+en: , opens a submenu
+fr: , ouvre un sous-menu
+es: , abre un submenú
+zh: ，打开子菜单
+hi: , उप-मेनू खोलता है
+
+en: Selected
+fr: Sélectionné
+es: Seleccionado
+zh: 已选择
+hi: चयनित
+
+en: Checked
+fr: Coché
+es: Marcado
+zh: 已选中
+hi: चुना गया
+
+en: Bluetooth
+fr: Bluetooth
+es: Bluetooth
+zh: 蓝牙
+hi: ब्लूटूथ
+
+en: Airplane mode
+fr: Mode Avion
+es: Modo avión
+zh: 飞行模式
+hi: हवाई जहाज़ मोड
+
+en: Accessibility
+fr: Accessibilité
+es: Accesibilidad
+zh: 辅助功能
+hi: सुगम्यता
+
+en: Energy saver
+fr: Économiseur d'énergie
+es: Ahorro de energía
+zh: 节能模式
+hi: ऊर्जा बचत
+
+en: Live captions
+fr: Sous-titres en direct
+es: Subtítulos en directo
+zh: 实时字幕
+hi: लाइव कैप्शन
+
+en: Night light
+fr: Éclairage nocturne
+es: Luz nocturna
+zh: 夜间模式
+hi: रात्रि प्रकाश
+
+en: Mobile hotspot
+fr: Point d'accès mobile
+es: Zona con cobertura inalámbrica móvil
+zh: 移动热点
+hi: मोबाइल हॉटस्पॉट
+
+en: Nearby sharing
+fr: Partage de proximité
+es: Uso compartido en proximidad
+zh: 就近共享
+hi: आस-पास साझाकरण
+
+en: Cast
+fr: Caster
+es: Transmitir
+zh: 投放
+hi: कास्ट
+
+en: Project
+fr: Projeter
+es: Proyectar
+zh: 投影
+hi: प्रोजेक्ट
+
+en: All settings
+fr: Tous les paramètres
+es: Toda la configuración
+zh: 所有设置
+hi: सभी सेटिंग्स
+
+en: Connected
+fr: Connecté
+es: Conectado
+zh: 已连接
+hi: कनेक्ट है
+
+en: Not connected
+fr: Non connecté
+es: No conectado
+zh: 未连接
+hi: कनेक्ट नहीं है
+
+en: , on
+fr: , activé
+es: , activado
+zh: ，开启
+hi: , चालू
+
+en: , off
+fr: , désactivé
+es: , desactivado
+zh: ，关闭
+hi: , बंद
+
+en: , state unknown
+fr: , état inconnu
+es: , estado desconocido
+zh: ，状态未知
+hi: , स्थिति अज्ञात
+
+en: , opens Windows Settings
+fr: , ouvre les Paramètres de Windows
+es: , abre la Configuración de Windows
+zh: ，打开 Windows 设置
+hi: , Windows सेटिंग्स खोलता है
+
+en: , shows accessibility features
+fr: , affiche les fonctions d'accessibilité
+es: , muestra las funciones de accesibilidad
+zh: ，显示辅助功能
+hi: , सुगम्यता सुविधाएँ दिखाता है
+
+en: , requires Windows 11 version 22H2
+fr: , nécessite Windows 11 version 22H2
+es: , requiere Windows 11 versión 22H2
+zh: ，需要 Windows 11 版本 22H2
+hi: , Windows 11 संस्करण 22H2 चाहिए
+
+en: Now playing: {}
+fr: En cours de lecture : {}
+es: Reproduciendo: {}
+zh: 正在播放：{}
+hi: अभी चल रहा है: {}
+
+en: Untitled media
+fr: Média sans titre
+es: Contenido sin título
+zh: 无标题媒体
+hi: बिना शीर्षक का मीडिया
+
+en: , switch source
+fr: , changer de source
+es: , cambiar de fuente
+zh: ，切换来源
+hi: , स्रोत बदलें
+
+en: Previous media item
+fr: Élément précédent
+es: Elemento anterior
+zh: 上一项
+hi: पिछला मीडिया आइटम
+
+en: Pause
+fr: Pause
+es: Pausa
+zh: 暂停
+hi: रोकें
+
+en: Play
+fr: Lecture
+es: Reproducir
+zh: 播放
+hi: चलाएँ
+
+en: Next media item
+fr: Élément suivant
+es: Elemento siguiente
+zh: 下一项
+hi: अगला मीडिया आइटम
+
+en: {} details
+fr: Détails : {}
+es: Detalles de {}
+zh: {} 详细信息
+hi: {} का विवरण
+
+en: Page {} of {}
+fr: Page {} sur {}
+es: Página {} de {}
+zh: 第 {} 页，共 {} 页
+hi: पेज {} / {}
+
+en: Next page
+fr: Page suivante
+es: Página siguiente
+zh: 下一页
+hi: अगला पेज
+
+en: First page
+fr: Première page
+es: Primera página
+zh: 第一页
+hi: पहला पेज
+
+en: Brightness
+fr: Luminosité
+es: Brillo
+zh: 亮度
+hi: चमक
+
+en: Brightness, unavailable on this display
+fr: Luminosité, indisponible sur cet écran
+es: Brillo, no disponible en esta pantalla
+zh: 亮度，此显示器不可用
+hi: चमक, इस डिस्प्ले पर उपलब्ध नहीं
+
+en: Volume
+fr: Volume
+es: Volumen
+zh: 音量
+hi: वॉल्यूम
+
+en: Volume, unavailable
+fr: Volume, indisponible
+es: Volumen, no disponible
+zh: 音量，不可用
+hi: वॉल्यूम, उपलब्ध नहीं
+
+en: Unmute
+fr: Rétablir le son
+es: Activar el sonido
+zh: 取消静音
+hi: म्यूट हटाएँ
+
+en: Mute
+fr: Couper le son
+es: Silenciar
+zh: 静音
+hi: म्यूट करें
+
+en: Sound output and volume mixer
+fr: Sortie audio et mélangeur de volume
+es: Salida de sonido y mezclador de volumen
+zh: 声音输出和音量合成器
+hi: ध्वनि आउटपुट और वॉल्यूम मिक्सर
+
+en: Back
+fr: Retour
+es: Atrás
+zh: 返回
+hi: वापस
+
+en: , secured
+fr: , sécurisé
+es: , protegida
+zh: ，安全
+hi: , सुरक्षित
+
+en: , open
+fr: , ouvert
+es: , abierta
+zh: ，开放
+hi: , खुला
+
+en: , connected
+fr: , connecté
+es: , conectada
+zh: ，已连接
+hi: , कनेक्ट है
+
+en: Disconnect
+fr: Déconnecter
+es: Desconectar
+zh: 断开连接
+hi: डिस्कनेक्ट करें
+
+en: Show available networks
+fr: Afficher les réseaux disponibles
+es: Mostrar las redes disponibles
+zh: 显示可用网络
+hi: उपलब्ध नेटवर्क दिखाएँ
+
+en: More Wi-Fi settings
+fr: Plus de paramètres Wi-Fi
+es: Más configuración de Wi-Fi
+zh: 更多 WLAN 设置
+hi: और Wi-Fi सेटिंग्स
+
+en: Bluetooth and devices settings
+fr: Paramètres Bluetooth et appareils
+es: Configuración de Bluetooth y dispositivos
+zh: 蓝牙和设备设置
+hi: ब्लूटूथ और डिवाइस सेटिंग्स
+
+en: Magnifier
+fr: Loupe
+es: Lupa
+zh: 放大镜
+hi: मैग्निफ़ायर
+
+en: Narrator
+fr: Narrateur
+es: Narrador
+zh: 讲述人
+hi: नैरेटर
+
+en: On-screen keyboard
+fr: Clavier visuel
+es: Teclado en pantalla
+zh: 屏幕键盘
+hi: ऑन-स्क्रीन कीबोर्ड
+
+en: Sticky keys
+fr: Touches rémanentes
+es: Teclas especiales
+zh: 粘滞键
+hi: स्टिकी कुंजियाँ
+
+en: More accessibility settings
+fr: Plus de paramètres d'accessibilité
+es: Más configuración de accesibilidad
+zh: 更多辅助功能设置
+hi: और सुगम्यता सेटिंग्स
+
+en: Volume mixer
+fr: Mélangeur de volume
+es: Mezclador de volumen
+zh: 音量合成器
+hi: वॉल्यूम मिक्सर
+
+en: Choose output in Sound settings
+fr: Choisir la sortie dans les paramètres du son
+es: Elegir la salida en la configuración de sonido
+zh: 在声音设置中选择输出
+hi: ध्वनि सेटिंग्स में आउटपुट चुनें
+
+en: Power and battery settings
+fr: Paramètres d'alimentation et de batterie
+es: Configuración de energía y batería
+zh: 电源和电池设置
+hi: पावर और बैटरी सेटिंग्स
+
+en: Battery {} percent, {}
+fr: Batterie à {} pour cent, {}
+es: Batería al {} por ciento, {}
+zh: 电池 {}%，{}
+hi: बैटरी {} प्रतिशत, {}
+
+en: All Windows settings
+fr: Tous les paramètres de Windows
+es: Toda la configuración de Windows
+zh: 所有 Windows 设置
+hi: सभी Windows सेटिंग्स
+
+en: The requested action could not be dispatched
+fr: L'action demandée n'a pas pu être transmise
+es: No se pudo enviar la acción solicitada
+zh: 无法执行所请求的操作
+hi: अनुरोधित कार्य भेजा नहीं जा सका
+
+en: Aether Shell quick controls
+fr: Commandes rapides d'Aether Shell
+es: Controles rápidos de Aether Shell
+zh: Aether Shell 快捷控制
+hi: Aether Shell क्विक कंट्रोल
+
+en: Media session active
+fr: Session multimédia active
+es: Sesión multimedia activa
+zh: 媒体会话进行中
+hi: मीडिया सत्र सक्रिय
+
+en: No media session
+fr: Aucune session multimédia
+es: Ninguna sesión multimedia
+zh: 无媒体会话
+hi: कोई मीडिया सत्र नहीं
+
+en: Current page
+fr: Page actuelle
+es: Página actual
+zh: 当前页
+hi: वर्तमान पेज
+
+en:  - secured
+fr:  - sécurisé
+es:  - protegida
+zh:  - 安全
+hi:  - सुरक्षित
+
+en:  - open
+fr:  - ouvert
+es:  - abierta
+zh:  - 开放
+hi:  - खुला
+
+en:  - opens in Windows
+fr:  - s'ouvre dans Windows
+es:  - se abre en Windows
+zh:  - 在 Windows 中打开
+hi:  - Windows में खुलता है
+
+en: Turned off by hardware or policy
+fr: Désactivé par le matériel ou une stratégie
+es: Desactivado por el hardware o por una directiva
+zh: 已被硬件或策略关闭
+hi: हार्डवेयर या नीति द्वारा बंद
+
+en: State unavailable - use Windows settings
+fr: État indisponible - utilisez les paramètres de Windows
+es: Estado no disponible - usa la configuración de Windows
+zh: 状态不可用 - 请使用 Windows 设置
+hi: स्थिति उपलब्ध नहीं - Windows सेटिंग्स का उपयोग करें
+
+en: Off
+fr: Désactivé
+es: Desactivado
+zh: 关闭
+hi: बंद
+
+en:  - signal {} of 5
+fr:  - signal {} sur 5
+es:  - señal {} de 5
+zh:  - 信号 {}/5
+hi:  - सिग्नल 5 में से {}
+
+en: , no internet
+fr: , pas d'Internet
+es: , sin Internet
+zh: ，无 Internet
+hi: , इंटरनेट नहीं
+
+en: On - not connected
+fr: Activé - non connecté
+es: Activado - no conectado
+zh: 已开启 - 未连接
+hi: चालू - कनेक्ट नहीं है
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+fr: Windows n'autorise pas les applications à lister les réseaux : vérifiez la localisation dans les paramètres de confidentialité
+es: Windows no permite que las aplicaciones enumeren redes: revisa Ubicación en la configuración de privacidad
+zh: Windows 不允许应用列出网络：请检查隐私设置中的“位置”
+hi: Windows ऐप्स को नेटवर्क सूचीबद्ध करने नहीं दे रहा: गोपनीयता सेटिंग्स में स्थान जाँचें
+
+en: No Wi-Fi adapter found
+fr: Aucun adaptateur Wi-Fi trouvé
+es: No se encontró ningún adaptador Wi-Fi
+zh: 未找到 WLAN 适配器
+hi: कोई Wi-Fi अडैप्टर नहीं मिला
+
+en: Connecting to {}...
+fr: Connexion à {}...
+es: Conectando a {}...
+zh: 正在连接到 {}...
+hi: {} से कनेक्ट हो रहा है...
+
+en:  - looking for networks
+fr:  - recherche de réseaux
+es:  - buscando redes
+zh:  - 正在查找网络
+hi:  - नेटवर्क खोजे जा रहे हैं
+
+en: On
+fr: Activé
+es: Activado
+zh: 开启
+hi: चालू
+
+en: A screen reader is running
+fr: Un lecteur d'écran est en cours d'exécution
+es: Hay un lector de pantalla en ejecución
+zh: 屏幕阅读器正在运行
+hi: एक स्क्रीन रीडर चल रहा है
+
+en: Windows accessibility features
+fr: Fonctions d'accessibilité de Windows
+es: Funciones de accesibilidad de Windows
+zh: Windows 辅助功能
+hi: Windows सुगम्यता सुविधाएँ
+
+en: Sound output
+fr: Sortie audio
+es: Salida de sonido
+zh: 声音输出
+hi: ध्वनि आउटपुट
+
+en: Default output device
+fr: Périphérique de sortie par défaut
+es: Dispositivo de salida predeterminado
+zh: 默认输出设备
+hi: डिफ़ॉल्ट आउटपुट डिवाइस
+
+en: No output device available
+fr: Aucun périphérique de sortie disponible
+es: No hay ningún dispositivo de salida disponible
+zh: 没有可用的输出设备
+hi: कोई आउटपुट डिवाइस उपलब्ध नहीं
+
+en: Battery unknown
+fr: Batterie inconnue
+es: Batería desconocida
+zh: 电池未知
+hi: बैटरी अज्ञात
+
+en: Status refresh could not be started
+fr: L'actualisation de l'état n'a pas pu démarrer
+es: No se pudo iniciar la actualización del estado
+zh: 无法开始刷新状态
+hi: स्थिति रीफ़्रेश शुरू नहीं हो सका
+
+en: Status refresh unavailable
+fr: Actualisation de l'état indisponible
+es: Actualización del estado no disponible
+zh: 无法刷新状态
+hi: स्थिति रीफ़्रेश उपलब्ध नहीं
+
+en: Excellent signal
+fr: Excellent signal
+es: Señal excelente
+zh: 信号极佳
+hi: बहुत अच्छा सिग्नल
+
+en: Good signal
+fr: Bon signal
+es: Buena señal
+zh: 信号良好
+hi: अच्छा सिग्नल
+
+en: Fair signal
+fr: Signal moyen
+es: Señal aceptable
+zh: 信号一般
+hi: ठीक-ठाक सिग्नल
+
+en: Weak signal
+fr: Signal faible
+es: Señal débil
+zh: 信号弱
+hi: कमज़ोर सिग्नल
+
+en: Clear sky
+fr: Ciel dégagé
+es: Cielo despejado
+zh: 晴朗
+hi: साफ़ आसमान
+
+en: Mainly clear
+fr: Plutôt dégagé
+es: Mayormente despejado
+zh: 大致晴朗
+hi: ज़्यादातर साफ़
+
+en: Partly cloudy
+fr: Partiellement nuageux
+es: Parcialmente nublado
+zh: 局部多云
+hi: आंशिक रूप से बादल
+
+en: Overcast
+fr: Couvert
+es: Cubierto
+zh: 阴天
+hi: घने बादल
+
+en: Fog
+fr: Brouillard
+es: Niebla
+zh: 雾
+hi: कोहरा
+
+en: Drizzle
+fr: Bruine
+es: Llovizna
+zh: 毛毛雨
+hi: बूँदाबाँदी
+
+en: Rain
+fr: Pluie
+es: Lluvia
+zh: 雨
+hi: बारिश
+
+en: Snow
+fr: Neige
+es: Nieve
+zh: 雪
+hi: बर्फ़
+
+en: Rain showers
+fr: Averses
+es: Chubascos
+zh: 阵雨
+hi: बौछारें
+
+en: Snow showers
+fr: Averses de neige
+es: Chubascos de nieve
+zh: 阵雪
+hi: बर्फ़ की बौछारें
+
+en: Thunderstorm
+fr: Orage
+es: Tormenta
+zh: 雷暴
+hi: आँधी-तूफ़ान

@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "ui/PopupMenu.h"
 
+#include "core/Localization.h"
+
 #include <set>
 
 namespace aether::ui {
@@ -97,7 +99,9 @@ const MenuEntry* FindIn(std::span<const MenuEntry> entries, std::uint32_t id) no
 MenuEntry MenuEntry::Command(std::uint32_t id, std::wstring text, bool enabled) {
     MenuEntry entry;
     entry.id = id;
-    entry.text = std::move(text);
+    // D70: a menu's labels are interface text, shown in the interface's language (a name that is not in the
+    // catalog, such as an application's, stays as it is).
+    entry.text = std::wstring(i18n::Tr(text));
     entry.enabled = enabled;
     return entry;
 }
@@ -110,7 +114,7 @@ MenuEntry MenuEntry::Separator() {
 
 MenuEntry MenuEntry::Submenu(std::wstring text, std::vector<MenuEntry> entries, bool enabled) {
     MenuEntry entry;
-    entry.text = std::move(text);
+    entry.text = std::wstring(i18n::Tr(text));
     entry.submenu = std::move(entries);
     entry.enabled = enabled;
     return entry;

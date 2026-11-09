@@ -380,7 +380,7 @@ AETHER_TEST("settings UI: Desktop replacement requires Apply and status refresh 
     };
     settings::ui::SettingsWindow window(service,dispatcher,std::move(callbacks));editor=&window;
     REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
-    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),9);
+    CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCOUNT,0,0),10);   // D70: Language is the tenth page
     CHECK_EQ(::SendMessageW(window.Control(100),LB_GETCURSEL,0,0),6);
     CHECK_EQ(ControlText(window.Control(318)),desktopStatus);
     REQUIRE(window.Control(200));CHECK_FALSE(service.Current().general.replaceWindowsTaskbar);

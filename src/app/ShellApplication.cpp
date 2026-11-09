@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/ShellApplication.h"
+#include "core/Localization.h"
 #include "app/AutoHide.h"
 #include "app/DesktopPolicy.h"
 #include "app/HiddenIcons.h"
@@ -61,6 +62,7 @@
 #include <shellapi.h>
 #include <shobjidl.h>
 #include <wtsapi32.h>
+#include <array>
 #include <future>
 #include <atomic>
 #include <set>
@@ -86,6 +88,9 @@ constexpr int kWelcomeEscapeHotkey = 3;              // Escape skips the greetin
 constexpr std::uint64_t kWelcomeBackdropWaitMs = 400; // for the desktop picture, before going on without it
 constexpr std::uint64_t kWelcomeRevealMs = 4000;     // D66: the bars stay out this long after the welcome hands over
 constexpr std::uint64_t kArrivalReplayLimitMs = 8000; // D66: a replay of the arrival never stays longer
+constexpr UINT_PTR kGraphicsTrimTimer = 0xA379;       // D69: transient graphics given back once quiet
+constexpr UINT kGraphicsTrimDelayMs = 15000;          // D69: after the last frame that needed the desktop picture
+constexpr UINT kStartupTrimDelayMs = 45000;           // D69: startup's one-off work (discovery, first frames) is over
 constexpr std::uint64_t kBrightnessSettleMs = 4000;   // the panel keeps showing a request about this long
 constexpr std::uint64_t kWiFiRescanMs = 20000;        // while the Wi-Fi view stays open
 
@@ -172,6 +177,9 @@ struct ShellApplication::Impl {
     std::shared_ptr<const welcome::BackdropImage> welcomeBackdrop;
     std::uint64_t welcomeBackdropRequest = 0, welcomeBackdropAsked = 0;
     std::uint64_t desktopPictureRequest = 0;   // D63: 0 until the Liquid material or the arrival first needs the picture
+    bool desktopPicturePending = false;        // D69: a read of the picture is under way
+    std::uint64_t materialUsedAt = 0;          // D69: the last frame that needed the picture (arrival, previews)
+    bool graphicsTrimArmed = false;
     std::uint64_t brightnessSettleUntil = 0;
     std::uint64_t launchedAt = ::GetTickCount64();
     std::uint64_t lastWiFiScan = 0;
@@ -295,12 +303,14 @@ struct ShellApplication::Impl {
     // away from the UI thread when first needed and again when the wallpaper or the display changes.
     void RequestDesktopPicture() {
         const auto request = ++desktopPictureRequest;
+        desktopPicturePending = true;
         const auto monitor = platform::PrimaryMonitor().bounds;
         const auto weak = std::weak_ptr<bool>(alive);
         pictureWorker.Post([this, weak, request, monitor] {
             auto picture = welcome::LoadDesktopBackdrop(monitor, 1.0f);
             dispatcher.Post([this, weak, request, monitor, picture = std::move(picture)]() mutable {
                 if (const auto live = weak.lock(); !live || !*live || request != desktopPictureRequest) return;
+                desktopPicturePending = false;
                 auto* renderer = graphics.Material();
                 if (!renderer) return;
                 auto image = std::make_shared<welcome::BackdropImage>();
@@ -320,6 +330,47 @@ struct ShellApplication::Impl {
                 if (welcomeWindow) welcomeWindow->Invalidate();
             });
         });
+    }
+    // D69: the picture is read when something is about to show it, and given back when nothing has for a while.
+    [[nodiscard]] bool DesktopPictureHeld() {
+        if (desktopPicturePending) return true;
+        auto* renderer = graphics.ExistingMaterial();
+        return renderer && renderer->HasPicture();
+    }
+    void EnsureDesktopPicture() {
+        MaterialUsed();
+        if (!DesktopPictureHeld()) RequestDesktopPicture();
+    }
+    // A frame that needed the picture: what only such frames use is given back once they have been quiet a while.
+    void MaterialUsed() {
+        materialUsedAt = ::GetTickCount64();
+        ScheduleGraphicsTrim(kGraphicsTrimDelayMs);
+    }
+    void ScheduleGraphicsTrim(UINT delayMs) {
+        if (closing) return;
+        graphicsTrimArmed = ::SetTimer(events.Handle(), kGraphicsTrimTimer, delayMs, nullptr) != 0;
+    }
+    // D69: the arrival's full-screen target, the previews' targets and the desktop picture (about 30 MB between the
+    // CPU copy, the mipmapped texture and the frame) are used for a few seconds at a time: they are not kept between.
+    // Then the driver and the compositor are asked to trim, the heap to compact, and the working set is handed back
+    // to Windows (pages come back from the standby list in microseconds the next time they are touched).
+    void TrimGraphics() {
+        ::KillTimer(events.Handle(), kGraphicsTrimTimer);
+        graphicsTrimArmed = false;
+        if (closing) return;
+        const auto now = ::GetTickCount64();
+        const bool busy = welcomeWindow || arrivalReplay || welcomeController.Presenting() || welcomeController.Covering();
+        if (busy || now - materialUsedAt < kGraphicsTrimDelayMs) {
+            ScheduleGraphicsTrim(kGraphicsTrimDelayMs);
+            return;
+        }
+        if (auto* renderer = graphics.ExistingMaterial()) renderer->ReleaseTransient(false);
+        ++desktopPictureRequest;   // a read still under way is not wanted any more
+        desktopPicturePending = false;
+        graphics.Trim();
+        (void)::HeapCompact(::GetProcessHeap(), 0);
+        (void)::SetProcessWorkingSetSizeEx(::GetCurrentProcess(), static_cast<SIZE_T>(-1), static_cast<SIZE_T>(-1), 0);
+        AETHER_LOG_DEBUG("app", "transient graphics given back");
     }
     // D54: the desktop picture is decoded away from the UI thread, once per lock or greeting.
     void RequestWelcomeBackdrop() {
@@ -407,7 +458,7 @@ struct ShellApplication::Impl {
         try {
             EnsureWelcomeWindow();
             if (!welcomeBackdrop && !welcomeBackdropPending) RequestWelcomeBackdrop();
-            if (!desktopPictureRequest) RequestDesktopPicture();   // D62: the arrival shows the picture itself
+            EnsureDesktopPicture();   // D62: the arrival shows the picture itself
             // Without its timer a greeting is not allowed to stay. The surface is simply kept hidden
             // for the next time, since nothing would release it. The cover only waits, and rarely checks.
             if (!::SetTimer(events.Handle(), kWelcomeTimer, action == Action::Cover ? 500 : 50, nullptr)) {
@@ -447,7 +498,7 @@ struct ShellApplication::Impl {
             const auto layout = ArrivalLayoutOn(monitor.bounds);
             if (!layout) return;
             EnsureWelcomeWindow();
-            if (!desktopPictureRequest) RequestDesktopPicture();
+            EnsureDesktopPicture();
             welcomeWindow->SetArrival(layout, ArrivalStyle());
             if (auto shown = welcomeWindow->PresentArrival(shellTokens, shellMotion, monitor.bounds); !shown) {
                 AETHER_LOG_INFO("app", "arrival replay unavailable ({})", ToString(shown.error().code));
@@ -491,7 +542,7 @@ struct ShellApplication::Impl {
         }
         if (!welcomeController.Presenting()) {
             // Gone from the screen: a rarely used full-screen surface does not stay allocated.
-            if (!welcomeWindow->IsShown()) { EndWelcomeInput(); welcomeSkip.Disconnect(); welcomeWindow.reset(); }
+            if (!welcomeWindow->IsShown()) { EndWelcomeInput(); welcomeSkip.Disconnect(); welcomeWindow.reset(); MaterialUsed(); }
             return;
         }
         ShowWelcomeWhenReady();
@@ -610,7 +661,7 @@ struct ShellApplication::Impl {
         controlState.wifi.connecting.clear();
         switch (outcome) {
             case Connection::Connected:
-                controlState.wifi.message = L"Connected to " + ssid;
+                controlState.wifi.message = i18n::TrFormat(L"Connected to {}", ssid);
                 if (providers) providers->network->Refresh();
                 ScanWiFi();
                 break;
@@ -619,11 +670,11 @@ struct ShellApplication::Impl {
                 PublishControls();
                 PromptWiFiPassword(ssid, offered);
                 return;
-            case Connection::NotInRange: controlState.wifi.message = ssid + L" is out of range"; break;
-            case Connection::TimedOut: controlState.wifi.message = L"Connecting to " + ssid + L" took too long"; break;
-            case Connection::Unsupported: controlState.wifi.message = L"Use Windows to join " + ssid; break;
-            case Connection::Denied: controlState.wifi.message = L"Windows did not allow this connection"; break;
-            case Connection::Failed: controlState.wifi.message = L"Could not connect to " + ssid; break;
+            case Connection::NotInRange: controlState.wifi.message = i18n::TrFormat(L"{} is out of range", ssid); break;
+            case Connection::TimedOut: controlState.wifi.message = i18n::TrFormat(L"Connecting to {} took too long", ssid); break;
+            case Connection::Unsupported: controlState.wifi.message = i18n::TrFormat(L"Use Windows to join {}", ssid); break;
+            case Connection::Denied: controlState.wifi.message = i18n::Tr(L"Windows did not allow this connection"); break;
+            case Connection::Failed: controlState.wifi.message = i18n::TrFormat(L"Could not connect to {}", ssid); break;
         }
         PublishControls();
     }
@@ -632,7 +683,7 @@ struct ShellApplication::Impl {
         if (closing || wifiPromptOpen) return;
         wifiPromptOpen = true;
         ui::form::ConfirmRequest request;
-        request.title = L"Connect to " + ssid;
+        request.title = i18n::TrFormat(L"Connect to {}", ssid);
         request.message = rejected ? L"That password was not accepted. Check it and try again." : L"Enter this network's password.";
         request.severity = rejected ? ui::form::Severity::Warning : ui::form::Severity::None;
         request.primary = L"&Connect";
@@ -757,8 +808,11 @@ struct ShellApplication::Impl {
         const bool pointer = ::GetCursorPos(&cursor) != FALSE && cursor.x >= monitor.bounds.left && cursor.x < monitor.bounds.right;
         const auto now = ::GetTickCount64();
         if (autoHideTick++ % 5 == 0) {
-            topCovered = topOn && ApplicationWindowCovers(topbar->BoundsPx());
-            dockCovered = dockOn && ApplicationWindowCovers(dock->PanelBoundsPx());
+            // One pass over the windows answers for both bars.
+            const std::array<RECT, 2> zones{topOn ? topbar->BoundsPx() : RECT{}, dockOn ? dock->PanelBoundsPx() : RECT{}};
+            const auto covered = ApplicationWindowsCover(zones);
+            topCovered = topOn && (covered & 1u) != 0;
+            dockCovered = dockOn && (covered & 2u) != 0;
         }
         if (topOn) {
             AutoHideSample sample;
@@ -1265,7 +1319,7 @@ void ShellApplication::Impl::HandleControl(controlcenter::ControlIntent intent) 
             const auto done=controlcenter::DisconnectWiFi(cancel);
             dispatcher.Post([this,weak,failed=!done]{
                 if(const auto live=weak.lock();!live||!*live||closing)return;
-                controlState.wifi.message=failed?L"Could not disconnect":L"";
+                controlState.wifi.message=failed?std::wstring(i18n::Tr(L"Could not disconnect")):std::wstring();
                 if(providers)providers->network->Refresh();
                 ScanWiFi();
             });
@@ -1365,9 +1419,22 @@ graphics::LiquidGlassTokens LiquidGlassFrom(const settings::Settings& value, con
     return glass;
 }
 
+// D70: the interface's language from Settings: the Windows display language when it follows Windows.
+static bool ApplyInterfaceLanguage(const settings::Settings& value) {
+    const auto chosen = value.general.language;
+    const auto language = chosen == settings::InterfaceLanguage::Automatic
+        ? i18n::SystemLanguage() : static_cast<i18n::Language>(static_cast<int>(chosen) - 1);
+    const auto revision = i18n::Revision();
+    i18n::SetLanguage(language, chosen != settings::InterfaceLanguage::Automatic);
+    if (i18n::Revision() == revision) return false;
+    AETHER_LOG_INFO("app", "interface language: {}{}", i18n::Info(language).code, chosen == settings::InterfaceLanguage::Automatic ? " (Windows)" : "");
+    return true;
+}
+
 void ShellApplication::Impl::ApplySettings() {
     if (!settings || !settings->Loaded()) return;
     const auto& value = settings->Current();
+    const bool relocalized = ApplyInterfaceLanguage(value);
     graphics::AppearanceOptions appearance;
     appearance.theme = static_cast<graphics::ThemePreference>(value.general.themeMode);
     appearance.accent = static_cast<graphics::AccentSource>(value.general.accentSource);
@@ -1395,6 +1462,26 @@ void ShellApplication::Impl::ApplySettings() {
     appTokens = graphics::MakeAppDesignTokens(appearance);
     appMotion = motion;
     if (settingsWindow) settingsWindow->SetTheme(appTokens, appMotion);
+    if (relocalized) {
+        // The bars rebuilt their texts with their theme above; these keep texts made when they were built.
+        if (settingsWindow) settingsWindow->Relocalize();
+        if (searchWindow) searchWindow->Relocalize();
+        if (topbar) topbar->SetSettings(value.topBar, value.weather.enabled);
+        // Windows' tools and Settings pages are named in the interface's language when the catalog is read.
+        if (catalogReady && catalog && !closing) {
+            const auto weak = std::weak_ptr<bool>(alive);
+            const auto cancel = cancellation.Token();
+            worker.Post([this, weak, cancel] {
+                auto discovered = catalog->DiscoverApplications(cancel);
+                dispatcher.Post([this, weak, discovered = std::move(discovered)]() mutable {
+                    if (const auto live = weak.lock(); !live || !*live || !discovered) return;
+                    applications = std::move(*discovered);
+                    (void)search->Rebuild(applications);
+                    if (dock) (void)dock->SetApplicationCatalog(applications);
+                });
+            });
+        }
+    }
     if (taskbar && taskbarRequested != value.general.replaceWindowsTaskbar) {
         taskbarRequested = value.general.replaceWindowsTaskbar;
         taskbarReservationFailed = false;
@@ -1518,7 +1605,10 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.stylePreview = [this](bool liquid, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
         auto* renderer = graphics.Material();
         if (!renderer || width == 0 || height == 0) return false;
-        if (!desktopPictureRequest) RequestDesktopPicture();
+        // D69: while the arrival plays over the whole screen (a style just chosen) the previews, under it, wait for it
+        // to end and then play: the two never compete for the graphics processor.
+        if (arrivalReplay || (welcomeWindow && welcomeWindow->IsShown())) return false;
+        EnsureDesktopPicture();
         if (!renderer->HasPicture()) return false;
         // A 1280 x 720-DIP screen with the default bars (as in the prototype), drawn at the tile's size.
         graphics::ArrivalLayout layout;
@@ -1642,7 +1732,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (desktopPictureRequest) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (DesktopPictureHeld()) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -1653,7 +1743,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
     connections.push_back(events.SettingChanged.Connect([this](UINT action, const std::wstring& section){
-        if (action == SPI_SETDESKWALLPAPER && desktopPictureRequest) RequestDesktopPicture();   // D63: the water shows the new picture
+        if (action == SPI_SETDESKWALLPAPER && DesktopPictureHeld()) RequestDesktopPicture();   // D63: the water shows the new picture
         // AS4-08: a work-area broadcast (every AppBar change, Auto-Hide included) is answered by the
         // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
         switch (ClassifySettingChange(action, section)) {
@@ -1705,6 +1795,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     if (command.action == StartupAction::OpenSearch) searchWindow->Open();
     else if (command.action == StartupAction::OpenSettings) OpenSettings();
     AETHER_LOG_INFO("app", "native Dock and Top Status Bar started");
+    ScheduleGraphicsTrim(kStartupTrimDelayMs);   // D69: once startup's one-off work is over
     LogStartupDiagnostics();
     return Ok();
 }
@@ -1790,8 +1881,8 @@ void ShellApplication::Impl::ImportTaskbarPins(bool manual, unsigned retry) {
             }, [this, weak, count](Result<void> persisted) {
                 if (const auto live = weak.lock(); live && *live && settingsWindow)
                     settingsWindow->ReportActionStatus(persisted ?
-                        L"Saved " + std::to_wstring(count) + L" additional pinned applications. Some Windows pins may remain unavailable." :
-                        L"Pins changed in memory; saving failed. Apply in Settings to retry.");
+                        i18n::TrFormat(L"Saved {} additional pinned applications. Some Windows pins may remain unavailable.", count) :
+                        std::wstring(i18n::Tr(L"Pins changed in memory; saving failed. Apply in Settings to retry.")));
             });
             importingPins = false;
             if (settingsWindow) settingsWindow->ReportActionStatus(changed ? L"Pins updated in memory; saving..." : L"Imported pins could not be applied");
@@ -1897,7 +1988,7 @@ bool ShellApplication::Impl::ConfirmQuitWithoutSaving() {
 void ShellApplication::Impl::ExportDiagnostics() {
     winrt::com_ptr<IFileSaveDialog> dialog;
     if (FAILED(::CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(dialog.put())))) return;
-    dialog->SetTitle(L"Export basic diagnostics — app version and Windows build, no logs or personal data");
+    dialog->SetTitle(std::wstring(i18n::Tr(L"Export basic diagnostics — app version and Windows build, no logs or personal data")).c_str());
     dialog->SetFileName(L"aethershell-diagnostics.txt"); dialog->SetDefaultExtension(L"txt");
     if (FAILED(dialog->Show(settingsWindow ? settingsWindow->Handle() : nullptr))) return;
     winrt::com_ptr<IShellItem> item; if (FAILED(dialog->GetResult(item.put()))) return;
@@ -2028,6 +2119,10 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             impl_->WelcomeTick();
             return true;
         }
+        if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kGraphicsTrimTimer) {
+            impl_->TrimGraphics();
+            return true;
+        }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kAutoHideTimer) {
             impl_->AutoHideTick();
             return true;
@@ -2071,11 +2166,12 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
     impl_->settings = std::make_unique<settings::SettingsService>(impl_->paths.configDir / L"settings.json", impl_->dispatcher);
     if (auto loading = impl_->settings->Load([this](Result<settings::LoadReport> result){
         // Documented native fallback: no surface or renderer exists before settings load.
-        if(!result) { ::MessageBoxW(nullptr,L"Settings could not be read safely. The existing file was preserved.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); return; }
+        if(!result) { ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Settings could not be read safely. The existing file was preserved.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); return; }
         if (impl_->command.action == StartupAction::Quit) { ::PostQuitMessage(0); return; }
         if (impl_->command.action == StartupAction::RestoreTaskbar) (void)impl_->settings->Update([](settings::Settings& s) { s.general.replaceWindowsTaskbar = false; });
+        (void)ApplyInterfaceLanguage(impl_->settings->Current());   // D70: before any surface makes its texts
         // Documented native fallback: the surfaces (and so the shared presentation) failed to start.
-        if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,L"Aether Shell could not start its desktop surfaces.",L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
+        if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Aether Shell could not start its desktop surfaces.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
         else if(result->status==settings::LoadStatus::Defaults&&impl_->nativeTaskbarAccess&&impl_->command.action==StartupAction::None)
             impl_->OpenSettings(settings::ui::SettingsPage::Welcome);  // first run: explains the optional name
     }); !loading) return loading.error();

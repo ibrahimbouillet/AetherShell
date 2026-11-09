@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "dock/DockModel.h"
 
+#include "core/Localization.h"
 #include "applications/ApplicationIdentity.h"
 #include "applications/KnownApplications.h"
 #include "applications/IconResource.h"
@@ -71,14 +72,14 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
         std::vector<DockItem> items;
         if (settings.showStartButton) {
             DockItem start; start.kind = DockItemKind::Start; start.id = L"aether:start";
-            start.displayName = L"Start"; items.push_back(std::move(start));
+            start.displayName = i18n::Tr(L"Start"); items.push_back(std::move(start));
         }
         DockItem search;
-        search.id = L"aether:search"; search.displayName = L"Search";
+        search.id = L"aether:search"; search.displayName = i18n::Tr(L"Search");
         items.push_back(std::move(search));
         if (settings.showTaskViewButton) {
             DockItem taskView; taskView.kind = DockItemKind::TaskView; taskView.id = L"aether:task-view";
-            taskView.displayName = L"Task View"; items.push_back(std::move(taskView));
+            taskView.displayName = i18n::Tr(L"Task View"); items.push_back(std::move(taskView));
         }
         const auto fixedCount = items.size();
         const apps::ApplicationIndex emptyCatalog;
@@ -88,7 +89,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
             if (pin.id.empty() || !used.insert(text::ToLower(pin.id)).second) continue;
             DockItem item;
             item.kind = DockItemKind::Pinned; item.id = pin.id;
-            item.displayName = pin.displayName.empty() ? L"Application" : pin.displayName;
+            item.displayName = pin.displayName.empty() ? std::wstring(i18n::Tr(L"Application")) : pin.displayName;
             item.application = FromPin(pin);
             if (const auto* match = catalog.FindByAumid(pin.appUserModelId)) item.application.iconResource = match->iconResource;
             for (const auto& app : running) {
@@ -137,7 +138,7 @@ Result<std::vector<DockItem>> BuildDockItems(const DockModelInputs& inputs) {
                 }
                 DockItem item;
                 item.kind = DockItemKind::Running; item.id = app.id;
-                item.displayName = app.displayName.empty() ? L"Running application" : app.displayName;
+                item.displayName = app.displayName.empty() ? std::wstring(i18n::Tr(L"Running application")) : app.displayName;
                 item.application = apps::ResolveRunningPresentation(app, catalog);
                 item.runningApplication = app; item.running = true; item.foreground = app.foreground;
                 item.attentionRequested = app.attentionRequested;
@@ -192,7 +193,7 @@ Result<FittedDock> FitDockItems(const std::vector<DockItem>& items, const settin
         }
         if (!result.overflow.empty() && Width(result.items.size() + 1, result.iconSize, spacing, magnification) <= availableWidthDip) {
             DockItem more; more.kind = DockItemKind::Overflow; more.id = L"aether:overflow";
-            more.displayName = L"More applications";
+            more.displayName = i18n::Tr(L"More applications");
             more.attentionRequested = std::any_of(result.overflow.begin(), result.overflow.end(),
                 [](const auto& item) { return item.attentionRequested; });
             result.items.push_back(std::move(more));

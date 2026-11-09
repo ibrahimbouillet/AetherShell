@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "controlcenter/ControlCenterWindow.h"
 
+#include "core/Localization.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
 #include "graphics/ScrollPhysics.h"
@@ -65,23 +66,26 @@ constexpr int kPages = 2;
 
 enum class Detail { None, WiFi, Bluetooth, Accessibility, Output };
 
-const wchar_t* Label(SystemControl value) noexcept {
+// D70: in the interface's language.
+std::wstring Label(SystemControl value) {
+    const wchar_t* english = L"Settings";
     switch (value) {
-        case SystemControl::WiFi: return L"Wi-Fi";
-        case SystemControl::Bluetooth: return L"Bluetooth";
-        case SystemControl::FlightMode: return L"Airplane mode";
-        case SystemControl::Accessibility: return L"Accessibility";
-        case SystemControl::EnergySaver: return L"Energy saver";
-        case SystemControl::LiveCaptions: return L"Live captions";
-        case SystemControl::NightLight: return L"Night light";
-        case SystemControl::MobileHotspot: return L"Mobile hotspot";
-        case SystemControl::NearbySharing: return L"Nearby sharing";
-        case SystemControl::Cast: return L"Cast";
-        case SystemControl::Project: return L"Project";
-        case SystemControl::Settings: return L"All settings";
+        case SystemControl::WiFi: english = L"Wi-Fi"; break;
+        case SystemControl::Bluetooth: english = L"Bluetooth"; break;
+        case SystemControl::FlightMode: english = L"Airplane mode"; break;
+        case SystemControl::Accessibility: english = L"Accessibility"; break;
+        case SystemControl::EnergySaver: english = L"Energy saver"; break;
+        case SystemControl::LiveCaptions: english = L"Live captions"; break;
+        case SystemControl::NightLight: english = L"Night light"; break;
+        case SystemControl::MobileHotspot: english = L"Mobile hotspot"; break;
+        case SystemControl::NearbySharing: english = L"Nearby sharing"; break;
+        case SystemControl::Cast: english = L"Cast"; break;
+        case SystemControl::Project: english = L"Project"; break;
+        case SystemControl::Settings: english = L"All settings"; break;
     }
-    return L"Settings";
+    return std::wstring(i18n::Tr(english));
 }
+std::wstring T(std::wstring_view english) { return std::wstring(i18n::Tr(english)); }
 
 Symbol SymbolFor(SystemControl value) noexcept {
     switch (value) {
@@ -276,20 +280,20 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             const auto& radio = state.system.wifi;
             const bool wireless = state.network.state == status::ProviderState::Available && state.network.kind == status::ConnectionKind::WiFi;
             // Privacy (FR-008): never the network name, only the connection state.
-            if (radio.enabled == true) return wireless ? L"Connected" : L"Not connected";
-            return L"Wi-Fi";
+            if (radio.enabled == true) return T(wireless ? L"Connected" : L"Not connected");
+            return T(L"Wi-Fi");
         }
         return Label(control);
     }
     std::wstring TileName(SystemControl control) const {
         std::wstring name = Label(control);
         const auto value = TileState(control);
-        if (Radio(control)) name += value ? (*value ? L", on" : L", off") : L", state unknown";
+        if (Radio(control)) name += T(value ? (*value ? L", on" : L", off") : L", state unknown");
         if (control == SystemControl::WiFi && value == true) name += L", " + TileCaption(control);
-        if (control == SystemControl::EnergySaver && value) name += *value ? L", on" : L", off";
-        if (OpensSettings(control)) name += L", opens Windows Settings";
-        if (control == SystemControl::Accessibility) name += L", shows accessibility features";
-        if (!TileEnabled(control)) name += L", requires Windows 11 version 22H2";
+        if (control == SystemControl::EnergySaver && value) name += T(*value ? L", on" : L", off");
+        if (OpensSettings(control)) name += T(L", opens Windows Settings");
+        if (control == SystemControl::Accessibility) name += T(L", shows accessibility features");
+        if (!TileEnabled(control)) name += T(L", requires Windows 11 version 22H2");
         return name;
     }
     std::optional<int> Displayed(int id, std::optional<int> observed, double now) const {
@@ -303,7 +307,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         Target target;
         target.id = id;
         target.rect = rect;
-        target.name = std::move(name);
+        target.name = T(name);   // a fixed name in the interface's language; a composed one is already
         target.enabled = enabled;
         target.radius = radius;
         building->push_back(std::move(target));
@@ -316,8 +320,8 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         const float left = kMargin, right = kMargin + kPanelWidth;
         if (const auto* session = Session()) {
             Add(kSession, D2D1::RectF(left + 12.0f, kMargin + 10.0f, left + 232.0f, kMargin + 58.0f),
-                L"Now playing: " + (session->title.empty() ? std::wstring(L"Untitled media") : session->title) +
-                    (state.media.sessions.size() > 1 ? L", switch source" : L""),
+                i18n::TrFormat(L"Now playing: {}", session->title.empty() ? T(L"Untitled media") : session->title) +
+                    (state.media.sessions.size() > 1 ? T(L", switch source") : std::wstring()),
                 state.media.sessions.size() > 1);
             const float cy = kMargin + 34.0f;
             Add(kPrevious, Box(left + 258.0f, cy, 32.0f), L"Previous media item", session->canPrevious);
@@ -342,13 +346,13 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 out.push_back(main);
                 if (split) {
                     Add(kChevron + index, D2D1::RectF(tile.left + kSplitMain, tile.top, tile.right, tile.bottom),
-                        std::wstring(Label(control)) + L" details");
+                        i18n::TrFormat(L"{} details", Label(control)));
                 }
             }
             const float top = BodyTop();
             for (int dot = 0; dot < kPages; ++dot) {
                 Add(kPageDot + dot, Box(left + kPageColumn, top + 99.0f + 13.0f * static_cast<float>(dot), 14.0f),
-                    L"Page " + std::to_wstring(dot + 1) + L" of " + std::to_wstring(kPages));
+                    i18n::TrFormat(L"Page {} of {}", dot + 1, kPages));
             }
             Add(kNextPage, Box(left + kPageColumn, top + 130.0f, 20.0f), page + 1 < kPages ? L"Next page" : L"First page");
             const auto add = [&](int id, std::wstring name, bool enabled, std::optional<int> value) {
@@ -356,7 +360,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 Target slider;
                 slider.id = id;
                 slider.rect = D2D1::RectF(left + kTrackLeft - 10.0f, cy - 16.0f, left + kTrackRight + 10.0f, cy + 16.0f);
-                slider.name = std::move(name);
+                slider.name = T(name);
                 slider.enabled = enabled;
                 slider.slider = true;
                 slider.value = value;
@@ -391,8 +395,8 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                     // cannot show or join.
                     for (std::size_t i = 0; i < state.wifi.networks.size(); ++i) {
                         const auto& network = state.wifi.networks[i];
-                        std::wstring name = network.ssid + L", " + WiFiSignalWord(network.bars) + (network.secured ? L", secured" : L", open");
-                        if (network.connected) name += L", connected";
+                        std::wstring name = network.ssid + L", " + T(WiFiSignalWord(network.bars)) + T(network.secured ? L", secured" : L", open");
+                        if (network.connected) name += T(L", connected");
                         Add(kNetworkRow + static_cast<int>(i), WiFiRow(static_cast<int>(i)), std::move(name), state.wifi.connecting.empty(), 6.0f);
                         if (network.connected) {
                             const auto r = WiFiRow(static_cast<int>(i));
@@ -413,7 +417,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 Target sticky;
                 sticky.id = kDetailRow + 4;
                 sticky.rect = DetailRow(4);
-                sticky.name = L"Sticky keys";
+                sticky.name = T(L"Sticky keys");
                 sticky.enabled = state.system.stickyKeys.has_value();
                 sticky.toggle = state.system.stickyKeys ? (*state.system.stickyKeys ? ToggleState_On : ToggleState_Off)
                                                         : ToggleState_Indeterminate;
@@ -424,7 +428,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 Target mute;
                 mute.id = kDetailRow;
                 mute.rect = DetailRow(0);
-                mute.name = L"Mute";
+                mute.name = T(L"Mute");
                 mute.enabled = Muted().has_value();
                 mute.toggle = Muted() ? (*Muted() ? ToggleState_On : ToggleState_Off) : ToggleState_Indeterminate;
                 mute.radius = 6.0f;
@@ -436,8 +440,8 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         const float footer = FooterTop();
         const bool batteryKnown = state.battery.state == status::ProviderState::Available;
         if (!batteryKnown || state.battery.batteryPresent) {
-            std::wstring name = L"Power and battery settings";
-            if (batteryKnown && state.battery.percent) name = L"Battery " + std::to_wstring(*state.battery.percent) + L" percent, " + name;
+            std::wstring name = T(L"Power and battery settings");
+            if (batteryKnown && state.battery.percent) name = i18n::TrFormat(L"Battery {} percent, {}", *state.battery.percent, name);
             Add(kBattery, D2D1::RectF(left + 12.0f, footer + 8.0f, left + 124.0f, footer + 40.0f), std::move(name));
         }
         Add(kSettings, Box(right - 30.0f, footer + kFooterHeight / 2.0f, 32.0f), L"All Windows settings");
@@ -547,7 +551,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         try {
             owner.Requested.Emit(value);
         } catch (...) {
-            state.message = L"The requested action could not be dispatched";
+            state.message = T(L"The requested action could not be dispatched");
             owner.Invalidate();
         }
     }
@@ -844,7 +848,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     }
 
     // --- UI Automation ---
-    std::wstring RootName() const override { return L"Aether Shell quick controls"; }
+    std::wstring RootName() const override { return T(L"Aether Shell quick controls"); }
     CONTROLTYPEID RootControlType() const override { return UIA_PaneControlTypeId; }
     std::size_t ItemCount() const override { return targets.size(); }
     ui::accessibility::AccessibleItem Item(std::size_t index) const override {
@@ -853,8 +857,8 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         item.id = target.id;
         item.name = target.name;
         item.helpText = target.help;
-        if (target.id == kSession) item.helpText = Session() ? L"Media session active" : L"No media session";
-        if (target.id >= kPageDot && target.id < kPageDot + kPages) item.itemStatus = target.id - kPageDot == page ? L"Current page" : L"";
+        if (target.id == kSession) item.helpText = T(Session() ? L"Media session active" : L"No media session");
+        if (target.id >= kPageDot && target.id < kPageDot + kPages) item.itemStatus = target.id - kPageDot == page ? T(L"Current page") : std::wstring();
         item.isEnabled = Admitted() && target.enabled;
         item.isFocusable = true;
         item.isOffscreen = !owner.IsShown();
@@ -1090,7 +1094,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         const auto track = D2D1::RectF(left, cy - h / 2.0f, right, cy + h / 2.0f);
         if (!target->enabled) {
             g.Fill(track, h / 2.0f, g.palette.track.WithAlpha(g.palette.track.a * 0.35f));
-            g.Text(L"Unavailable", D2D1::RectF(left, cy - 22.0f, right, cy - 6.0f), tokens.textSecondary, 11.0f);
+            g.Text(T(L"Unavailable"), D2D1::RectF(left, cy - 22.0f, right, cy - 6.0f), tokens.textSecondary, 11.0f);
             return;
         }
         const auto shown = Displayed(id, target->value, g.now);
@@ -1162,14 +1166,14 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             g.Glyph(level, r.left + 20.0f, cy, 16.0f, glyph);
             const float textRight = network.connected ? r.right - 96.0f : r.right - 12.0f;
             g.Text(network.ssid, D2D1::RectF(r.left + 42.0f, r.top + 4.0f, textRight, r.top + 24.0f), glyph, 13.0f, network.connected);
-            std::wstring caption = network.connected ? L"Connected" : WiFiSignalWord(network.bars);
-            caption += network.personal ? (network.secured ? L" - secured" : L" - open") : L" - opens in Windows";
+            std::wstring caption = network.connected ? T(L"Connected") : T(WiFiSignalWord(network.bars));
+            caption += T(network.personal ? (network.secured ? L" - secured" : L" - open") : L" - opens in Windows");
             g.Text(caption, D2D1::RectF(r.left + 42.0f, r.top + 24.0f, textRight, r.bottom), tokens.textSecondary, 11.0f);
             g.Focus(target);
         }
         if (const auto* disconnect = Find(kDisconnect)) {
             g.Highlight(*disconnect);
-            g.Text(L"Disconnect", disconnect->rect, g.TextColor(disconnect->enabled), 12.0f, false, DWRITE_TEXT_ALIGNMENT_CENTER);
+            g.Text(T(L"Disconnect"), disconnect->rect, g.TextColor(disconnect->enabled), 12.0f, false, DWRITE_TEXT_ALIGNMENT_CENTER);
             g.Focus(*disconnect);
         }
         g.dc->PopAxisAlignedClip();
@@ -1193,15 +1197,16 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             else if (!*radio.enabled) status = L"Off";
             else if (wireless) {
                 status = L"Connected";
-                if (state.network.signalBars) status += L" - signal " + std::to_wstring(*state.network.signalBars) + L" of 5";
-                if (state.network.connectivity == status::InternetConnectivity::LocalOnly) status += L", no internet";
+                status = T(status);
+                if (state.network.signalBars) status += i18n::TrFormat(L" - signal {} of 5", *state.network.signalBars);
+                if (state.network.connectivity == status::InternetConnectivity::LocalOnly) status += T(L", no internet");
             } else status = L"On - not connected";
             if (radio.enabled == true) {
                 if (state.wifi.access == WiFiAccess::Denied) status = L"Windows is not letting apps list networks: check Location in Privacy settings";
                 else if (state.wifi.access == WiFiAccess::NoAdapter) status = L"No Wi-Fi adapter found";
-                else if (!state.wifi.connecting.empty()) status = L"Connecting to " + state.wifi.connecting + L"...";
+                else if (!state.wifi.connecting.empty()) status = i18n::TrFormat(L"Connecting to {}...", state.wifi.connecting);
                 else if (!state.wifi.message.empty()) status = state.wifi.message;
-                else if (state.wifi.scanning) status += L" - looking for networks";
+                else if (state.wifi.scanning) status = T(status) + T(L" - looking for networks");
             }
         } else if (kind == Detail::Bluetooth) {
             title = L"Bluetooth";
@@ -1217,8 +1222,9 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
                 status = state.audio.deviceName.empty() ? L"Default output device" : state.audio.deviceName;
             else status = L"No output device available";
         }
-        g.Text(title, D2D1::RectF(left + 50.0f, top + 14.0f, right - 70.0f, top + 42.0f), tokens.textPrimary, 15.0f, true);
-        g.Text(status, D2D1::RectF(left + 20.0f, top + 44.0f, right - 20.0f, top + 64.0f), tokens.textSecondary, 12.0f);
+        // Fixed titles and states are translated here; a device's or a network's name is not in the catalog and stays.
+        g.Text(T(title), D2D1::RectF(left + 50.0f, top + 14.0f, right - 70.0f, top + 42.0f), tokens.textPrimary, 15.0f, true);
+        g.Text(T(status), D2D1::RectF(left + 20.0f, top + 44.0f, right - 20.0f, top + 64.0f), tokens.textSecondary, 12.0f);
         if (const auto* toggle = Find(kDetailSwitch)) {
             g.Switch(D2D1::RectF(toggle->rect.left + 6.0f, toggle->rect.top + 2.0f, toggle->rect.right - 2.0f, toggle->rect.bottom - 2.0f),
                      kDetailSwitch, toggle->enabled);
@@ -1252,7 +1258,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             } else if (external) {
                 g.Glyph(Symbol::OpenExternal, r.right - 20.0f, cy, 12.0f, tokens.textSecondary);
             } else if (target.enabled) {
-                g.Text(L"Start", D2D1::RectF(r.right - 70.0f, r.top, r.right - 14.0f, r.bottom), tokens.textSecondary, 12.0f, false,
+                g.Text(T(L"Start"), D2D1::RectF(r.right - 70.0f, r.top, r.right - 14.0f, r.bottom), tokens.textSecondary, 12.0f, false,
                        DWRITE_TEXT_ALIGNMENT_TRAILING);
             }
             if (!target.enabled && kind == Detail::Accessibility && row == 2) {
@@ -1303,7 +1309,7 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
             const Color color = known && b.lowOrCritical.value_or(false) ? graphics::BatteryStatusColor(tokens, b.percent, b.lowOrCritical)
                                                                         : tokens.textPrimary;
             g.Glyph(symbol, kMargin + 30.0f, cy, 18.0f, color);
-            std::wstring label = known && b.percent ? std::to_wstring(*b.percent) + L"%" : L"Battery unknown";
+            std::wstring label = known && b.percent ? std::to_wstring(*b.percent) + L"%" : T(L"Battery unknown");
             g.Text(label, D2D1::RectF(kMargin + 44.0f, top, kMargin + 140.0f, top + kFooterHeight), tokens.textPrimary, 12.5f, false,
                    DWRITE_TEXT_ALIGNMENT_LEADING, true);
             g.Focus(*battery);
@@ -1387,7 +1393,7 @@ Result<void> ControlCenterWindow::Toggle(const RECT& anchor, bool keyboard) {
     try {
         RefreshRequested.Emit();
     } catch (...) {
-        p.state.message = L"Status refresh could not be started";
+        p.state.message = T(L"Status refresh could not be started");
     }
     return Ok();
 }
@@ -1843,7 +1849,7 @@ std::optional<LRESULT> ControlCenterWindow::OnMessage(UINT message, WPARAM wPara
             try {
                 RefreshRequested.Emit();
             } catch (...) {
-                p.state.message = L"Status refresh unavailable";
+                p.state.message = T(L"Status refresh unavailable");
             }
         }
         return 0;

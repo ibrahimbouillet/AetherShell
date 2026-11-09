@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "dock/DockPreviewWindow.h"
 
+#include "core/Localization.h"
 #include "core/Strings.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
@@ -41,7 +42,7 @@ Result<void> DockPreviewWindow::Initialize(HWND owner, Callbacks callbacks) {
     text_.Initialize(Device().DWriteFactory(), tokens_.fontFamily, tokens_.displayFontFamily);
     ui::SurfaceWindowOptions options;
     options.className = L"AetherShell.DockPreview";
-    options.title = L"Aether Shell window previews";
+    options.title = i18n::Tr(L"Aether Shell window previews");
     options.owner = owner;  // stays above the Dock without being part of its region
     if (auto created = Create(options, RECT{0, 0, 1, 1}); !created) return created;
     return accessible_.Connect(Handle(), *this);
@@ -453,7 +454,7 @@ void DockPreviewWindow::OnRender(const ui::RenderContext& context) {
             pending ? disabled.get() : hoverClose ? onFill.get() : secondary.get(), tokens_.glyph.stroke);
         if (!tile.thumbnail) {
             d2d->FillRoundedRectangle(D2D1::RoundedRect(geometry.thumbnailBox, tokens_.radii.card, tokens_.radii.card), placeholder.get());
-            text_.Draw(d2d, tile.minimized ? L"Minimized \x2014 preview unavailable" : L"Preview unavailable",
+            text_.Draw(d2d, i18n::Tr(tile.minimized ? L"Minimized \x2014 preview unavailable" : L"Preview unavailable"),
                 geometry.thumbnailBox, centered, secondary.get());
         }
         if (keyboard_ && focus_ / 2 == index) {
@@ -600,7 +601,7 @@ void DockPreviewWindow::OnDestroying() {
 }
 
 std::wstring DockPreviewWindow::RootName() const {
-    return (applicationName_.empty() ? std::wstring(L"Application") : applicationName_) + L" windows";
+    return i18n::TrFormat(L"{} windows", applicationName_.empty() ? std::wstring(i18n::Tr(L"Application")) : applicationName_);
 }
 
 ui::accessibility::AccessibleItem DockPreviewWindow::Item(std::size_t index) const {
@@ -609,7 +610,7 @@ ui::accessibility::AccessibleItem DockPreviewWindow::Item(std::size_t index) con
     if (index / 2 >= tiles_.size() || index / 2 >= layout_.tiles.size()) { item.isOffscreen = true; item.isEnabled = false; return item; }
     const auto& tile = tiles_[index / 2];
     const auto& geometry = layout_.tiles[index / 2];
-    const std::wstring title = tile.title.empty() ? applicationName_ + L" window" : tile.title;
+    const std::wstring title = tile.title.empty() ? i18n::TrFormat(L"{} window", applicationName_) : tile.title;
     item.isOffscreen = !IsPresenting();
     item.isEnabled = !item.isOffscreen;
     item.supportsInvoke = true;
@@ -617,15 +618,15 @@ ui::accessibility::AccessibleItem DockPreviewWindow::Item(std::size_t index) con
     if (index % 2 == 0) {
         item.id = tile.bodyId;
         item.name = title;
-        item.helpText = L"Switches to this window";
-        if (tile.thumbnail == nullptr) item.itemStatus = tile.minimized ? L"Minimized, preview unavailable" : L"Preview unavailable";
-        else if (tile.minimized) item.itemStatus = L"Minimized";
+        item.helpText = i18n::Tr(L"Switches to this window");
+        if (tile.thumbnail == nullptr) item.itemStatus = i18n::Tr(tile.minimized ? L"Minimized, preview unavailable" : L"Preview unavailable");
+        else if (tile.minimized) item.itemStatus = i18n::Tr(L"Minimized");
         item.boundsPx = ScreenRect(geometry.tile);
     } else {
         item.id = tile.closeId;
-        item.name = L"Close " + title;
-        item.helpText = L"Asks this window to close; the application can still ask to save or cancel";
-        if (tile.closeRequestedAt >= 0) item.itemStatus = L"Close requested";
+        item.name = i18n::TrFormat(L"Close {}", title);
+        item.helpText = i18n::Tr(L"Asks this window to close; the application can still ask to save or cancel");
+        if (tile.closeRequestedAt >= 0) item.itemStatus = i18n::Tr(L"Close requested");
         item.boundsPx = ScreenRect(geometry.close);
     }
     return item;

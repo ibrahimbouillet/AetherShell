@@ -7,7 +7,33 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.4: Search finds everything by name; Enter never opens the hovered row (`0.4.0-alpha.4`, D68, S-072, 2026-11-08)
+## Current checkpoint — Alpha 4, test 4.5: five languages, and lighter at rest and when switching style (`0.4.0-alpha.4`, D69, D70, S-073, 2026-11-09)
+
+The owner reported that switching Liquid/Grain made the PC lag and Alpha 4 took more memory, asked for a complete
+optimisation without lowering quality (at least 10% less load), the desktop wallpaper back (black), and the interface
+and its documentation in the five most used languages with flags in the README.
+
+- **Wallpaper:** Windows' wallpaper still pointed at the deleted file in Downloads (the registry named the copy in
+  Pictures, `SystemParametersInfo` did not); applied again with `SPI_SETDESKWALLPAPER` to the Pictures copy, at the
+  owner's request. No repository file involved.
+- **D69, lighter:** measured on the owner's PC with a stack sampler: 80% of the idle CPU was composition/Direct2D work for
+  frames that changed nothing. The Top Bar re-ran its entrance fade at every clock second (about ten full renders a
+  second); now one partial redraw of the digits. Unchanged backdrops are not resent; labels keep their layouts; Auto-Hide
+  reads the windows once for both bars; Settings previews wait for the arrival; the arrival renders in one pass; the
+  picture and transient targets are given back after use, with a driver/compositor trim. Numbers in S-073.
+- **D70, five languages:** English, Chinese (Simplified), Hindi, Spanish, French through one catalog (`core/Localization`,
+  `tools/i18n`, 748 texts); Settings → Language (tenth page); Search names in the interface's language, found in all five;
+  setup/updater/launcher follow Windows; welcome greets in Spanish; README, user guide and installation guide translated
+  (`README.<code>.md`, `docs/i18n/<code>/`). FR-042, T55, T56.
+- **Contribution commit:** at the owner's request, a README note "Coming soon: Alpha 4" was committed on top of the
+  published `main` (`bc27a5c`) and pushed, then merged into local `main` (`674d55c`). The Alpha 4 commits are still unpushed
+  (D65). This round is committed locally at the owner's word, not pushed; the setup test build is in `dist/`
+(SHA-256 in S-073). A mislabeled first package, `dist/AetherShell-0.4.0-alpha.3-*`, is not for use.
+- **Next:** the owner's trial of 4.5 (each language; the switch between styles; the Task Manager figures); a native
+  speaker's look at the Chinese and Hindi; then the remaining Alpha 4 items (Liquid for Settings, menus, Search, Quick
+  Settings; the arrival after setup's Close; signing).
+
+## Earlier — Alpha 4, test 4.4: Search finds everything by name; Enter never opens the hovered row (`0.4.0-alpha.4`, D68, S-072, 2026-11-08)
 
 The owner liked test 4.3's render and asked for Search to find everything as Start does, and for Enter never to open the
 row merely under the pointer (D68, amending FR-012 and FR-013). Search now brings Windows' tools by either language's name

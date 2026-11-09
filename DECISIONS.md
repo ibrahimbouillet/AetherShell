@@ -111,6 +111,54 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D70 — The interface in five languages, and its documentation
+
+Owner, 2026-11-09: the application gets five languages, "the five best known, the ones people will use most",
+everything translated, the documentation too, shown in the README with their flags. Chosen by number of speakers
+(Ethnologue): **English, Mandarin Chinese (Simplified), Hindi, Spanish, French**. Arabic, sixth, needs a right-to-left
+layout the surfaces do not have yet.
+
+- **One catalog, English as the key** (`core/Localization`, generated `core/Translations.inc` from
+  `tools/i18n/catalog/*.txt` by `tools/i18n/make_catalog.py`). Interface text is translated where it becomes a control,
+  a menu entry, a tooltip or a message (`i18n::Tr`, `i18n::TrFormat` for sentences with values). A text missing from
+  the catalog shows in English; a translation whose `{}` or access key differs from the English is refused when the
+  catalog is generated, and never shown broken at run time. 748 texts, none untranslated.
+- **What is never translated:** names that belong to the person or to other programs (applications, files, Wi-Fi
+  networks, the welcome's name), key names, the MIT licence's legal text, and the languages' own names.
+- **The choice:** Settings → Language (its own page, the tenth, so that no other page's controls move): Follow Windows
+  (the default: Windows' display language when it is one of the five, English otherwise) or one of the five, each named
+  in its own language. It applies at once: bars, menus, Search (Windows' tools and Settings pages are named in it and
+  found in all five), Settings. A chosen language also writes the Top Bar's date; Follow Windows keeps the person's
+  regional format. Setup, the updater and the launcher follow Windows' display language.
+- **The welcome's pen writes Latin letters:** it greets in French, English or Spanish (Hola, new); in Chinese or Hindi
+  it greets in English. Writing Han or Devanagari by hand would need new pen paths, not done here.
+- **Documentation:** README, user guide and installation guide in the five languages (`README.<code>.md`,
+  `docs/i18n/<code>/`), a language bar with flags at the top of each and a Languages table. The engineering documents
+  (AGENTS, HANDOFF, DECISIONS, PROJECT_SPEC, TASKS, TEST_STATUS) stay in English: they are the assistants' contract.
+
+### D69 — Lighter, not lesser: Alpha 4's work where nothing changes, measured first
+
+Owner, 2026-11-09: switching between Liquid and Grain makes the computer lag, Alpha 4 takes more memory; optimise
+"completely", at least 10% less load, without lowering quality ("une utilisation plus calculée"). Measured on the
+owner's PC (i5-10310U, UHD Graphics) with a stack sampler on the installed test 4.4: 3.4% of one core while nothing
+happened, 80% of it composition and Direct2D work for frames that changed nothing visible.
+
+- **The Top Bar no longer fades its whole content every second.** A clock with seconds re-ran the entrance fade
+  (0.70 → 1.0) at every tick: about ten full renders a second. Only a change of the items themselves fades now; a
+  changed text redraws only its own items (`SurfaceWindow::InvalidateArea`, `CompositionSurface::Draw(update rect)`:
+  Direct2D and the driver touch only those pixels). Assistive technology hears only the items that changed.
+- **No repeated work per frame:** an unchanged backdrop is not given to the compositor again (each property set was a
+  cross-process message); DirectWrite layouts of repeated labels are kept (`TextCache`).
+- **Auto-Hide asks the windows once for both bars,** comparing each window's rectangle before anything costly.
+- **Switching style:** the Settings previews wait while the full-screen arrival plays over them (they were rendered,
+  with a GPU read-back each, under it); the arrival renders straight into its surface (one full-screen pass a frame
+  instead of three).
+- **Memory comes back after use:** the desktop picture's CPU copy is dropped once on the device; the picture, the
+  arrival's full-screen target and the previews' targets are given back 15 s after their last frame (read again when
+  next needed), the driver and the compositor are asked to trim, the heap is compacted and the working set handed
+  back, also once 45 s after startup.
+- Nothing visible changes: same pixels, same timings, same motion. Receipts in TEST_STATUS S-073.
+
 ### D68 — Search finds everything Start finds by name; the pointer never chooses what Enter opens
 
 Owner, 2026-11-08, after test 4.3 ("très bon rendu"): Search must show everything, like Windows' Start menu, files,

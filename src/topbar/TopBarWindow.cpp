@@ -8,6 +8,7 @@
 #include "graphics/Glyphs.h"
 #include "graphics/ScrollPhysics.h"
 #include "graphics/SystemSymbols.h"
+#include "core/Localization.h"
 #include "graphics/TextCache.h"
 #include "graphics/Transition.h"
 #include "platform/windows/MonitorUtilities.h"
@@ -23,6 +24,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <optional>
 #include <utility>
 
 namespace aether::topbar {
@@ -189,7 +191,7 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         // Keep its model cleanup, but never resurrect a tooltip above a hidden/disabled surface.
         if (fullscreen || !owner.Handle() || !owner.IsShown() || !::IsWindowEnabled(owner.Handle())) return;
         const auto found = std::find_if(placed.begin(), placed.end(), [id](const auto& item) { return item.item.id == id; });
-        if (found != placed.end()) tooltip.ShowFor(L"Action failed: " + text::Widen(ToString(result.error().code)),
+        if (found != placed.end()) tooltip.ShowFor(i18n::TrFormat(L"Action failed: {}", text::Widen(ToString(result.error().code))),
             ItemBounds(found->rect), ui::TooltipPlacement::Below);
     }
     status::audio::ControlCompletion Completion(int id) {
@@ -208,15 +210,15 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         reservedBounds.reset();
         (void)::SHAppBarMessage(ABM_REMOVE, &data);
     }
-    std::wstring RootName() const override { return L"Aether Shell status bar"; }
+    std::wstring RootName() const override { return std::wstring(i18n::Tr(L"Aether Shell status bar")); }
     CONTROLTYPEID RootControlType() const override { return UIA_ToolBarControlTypeId; }
     std::size_t ItemCount() const override { return placed.size(); }
     ui::accessibility::AccessibleItem Item(std::size_t index) const override {
         const auto& entry = placed.at(index);
         ui::accessibility::AccessibleItem item;
         item.id = entry.item.id; item.name = entry.item.accessibleName; item.helpText = entry.item.tooltip;
-        item.itemStatus = entry.item.kind == ItemKind::Logo && updateAvailable ? L"Update available" :
-            entry.item.cached ? L"Cached" : entry.item.unknown ? L"Unavailable" : L"";
+        item.itemStatus = i18n::Tr(entry.item.kind == ItemKind::Logo && updateAvailable ? L"Update available" :
+            entry.item.cached ? L"Cached" : entry.item.unknown ? L"Unavailable" : L"");
         item.controlType = entry.item.actionable ? UIA_ButtonControlTypeId : UIA_TextControlTypeId;
         item.boundsPx = ItemBounds(entry.rect); item.isFocusable = entry.item.actionable;
         item.isEnabled = !destroyed && owner.IsShown() && !fullscreen && ::IsWindowEnabled(owner.Handle());
@@ -401,15 +403,24 @@ std::uint64_t TopBarWindow::RenderCount() const noexcept { return impl_->frames;
 
 void TopBarWindow::Rebuild() {
     if (impl_->destroyed || !Handle()) return;
-    auto items = BuildDisplayItems(impl_->snapshots, impl_->settings, impl_->weatherEnabled, {}, impl_->taskbar);
+    auto items = BuildDisplayItems(impl_->snapshots, impl_->settings, impl_->weatherEnabled, i18n::FormattingLocale(), impl_->taskbar);
     if (!items) return;
     if (impl_->context.groupQuickControls) { items=GroupQuickControlItems(std::move(*items));if(!items)return; }
     for (auto& item : items.value()) if (!item.secondaryText.empty() &&
         24.0f * impl_->tokens.textScale > impl_->panel.bottom - impl_->panel.top) item.secondaryText.clear();
     if (impl_->updateAvailable) for (auto& item : items.value()) if (item.kind == ItemKind::Logo) {
-        item.tooltip += L" · Update available"; item.accessibleName = item.tooltip;
+        item.tooltip += L" \u00B7 " + std::wstring(i18n::Tr(L"Update available")); item.accessibleName = item.tooltip;
     }
     if (!impl_->layoutDirty && items.value() == impl_->displayed) return;
+    // The same items in the same order, only some of their contents changed (the clock's digits, every second; a level):
+    // no entrance fade over the whole bar, and only what changed is drawn again.
+    const auto sameItems = [](const std::vector<DisplayItem>& a, const std::vector<DisplayItem>& b) {
+        return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](const DisplayItem& x, const DisplayItem& y) {
+            return x.id == y.id && x.kind == y.kind;
+        });
+    };
+    const bool structural = impl_->layoutDirty || !sameItems(items.value(), impl_->displayed);
+    const auto previous = impl_->placed;
     impl_->displayed = items.value();
     impl_->layoutDirty = false;
     std::vector<float> widths;
@@ -434,20 +445,36 @@ void TopBarWindow::Rebuild() {
         item.rect.left += impl_->panel.left; item.rect.right += impl_->panel.left;
         item.rect.top += impl_->panel.top; item.rect.bottom += impl_->panel.top;
     }
-    if (impl_->motion.reduced || impl_->tokens.mode == graphics::ThemeMode::HighContrast) impl_->transition.SnapTo(1.0f);
-    else {
-        impl_->transition.SnapTo(0.70f);
-        impl_->transition.AnimateTo(1.0f, graphics::FrameScheduler::Now(), impl_->motion.Scale(impl_->tokens.durationFast),
-            impl_->tokens.curves.standard);
-        RequestAnimationFrame();
+    // Only where every item kept its place can the rest of the bar stay as drawn.
+    const bool samePlaces = !structural && previous.size() == impl_->placed.size() &&
+        std::equal(previous.begin(), previous.end(), impl_->placed.begin(), [](const PlacedItem& a, const PlacedItem& b) {
+            return a.item.id == b.item.id && a.rect.left == b.rect.left && a.rect.top == b.rect.top && a.rect.right == b.rect.right &&
+                   a.rect.bottom == b.rect.bottom;
+        });
+    if (structural) {
+        if (impl_->motion.reduced || impl_->tokens.mode == graphics::ThemeMode::HighContrast) impl_->transition.SnapTo(1.0f);
+        else {
+            impl_->transition.SnapTo(0.70f);
+            impl_->transition.AnimateTo(1.0f, graphics::FrameScheduler::Now(), impl_->motion.Scale(impl_->tokens.durationFast),
+                impl_->tokens.curves.standard);
+            RequestAnimationFrame();
+        }
+        const auto notified = impl_->accessibility.NotifyStructureChanged(); (void)notified;
     }
-    const auto notified = impl_->accessibility.NotifyStructureChanged(); (void)notified;
-    for (const auto& item : impl_->placed) {
+    std::optional<D2D1_RECT_F> changed;
+    for (std::size_t index = 0; index < impl_->placed.size(); ++index) {
+        const auto& item = impl_->placed[index];
+        const bool itemChanged = !samePlaces || !(previous[index].item == item.item);
+        if (!itemChanged) continue;   // its name and value are what assistive technology already has
         const auto property = impl_->accessibility.NotifyPropertyChanged(item.item.id); (void)property;
         if (impl_->hover == item.item.id && Handle() && IsShown() && !impl_->fullscreen && ::IsWindowEnabled(Handle()))
             impl_->tooltip.ShowFor(item.item.tooltip, impl_->ItemBounds(item.rect), ui::TooltipPlacement::Below);
+        if (samePlaces) changed = changed ? D2D1::RectF(std::min(changed->left, item.rect.left), std::min(changed->top, item.rect.top),
+                                                        std::max(changed->right, item.rect.right), std::max(changed->bottom, item.rect.bottom))
+                                          : item.rect;
     }
-    Invalidate();
+    if (!samePlaces) Invalidate();
+    else if (changed) InvalidateArea(*changed);
 }
 
 void TopBarWindow::Relayout() {

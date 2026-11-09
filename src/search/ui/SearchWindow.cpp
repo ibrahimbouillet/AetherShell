@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "search/ui/SearchWindow.h"
 
+#include "core/Localization.h"
+
 #include "core/Strings.h"
 #include "graphics/GlassPainter.h"
 #include "graphics/Glyphs.h"
@@ -31,7 +33,7 @@ const wchar_t* KindLabel(apps::ApplicationKind kind) noexcept {
 }
 // D68: what a result is, under its name: its own description (Settings, Control Panel, a file's kind and folder), or its kind.
 std::wstring_view LabelOf(const apps::ApplicationInfo& app) noexcept {
-    return app.detail.empty() ? std::wstring_view(KindLabel(app.kind)) : std::wstring_view(app.detail);
+    return i18n::Tr(app.detail.empty() ? std::wstring_view(KindLabel(app.kind)) : std::wstring_view(app.detail));   // D70
 }
 // Panel layout in DIPs, relative to the panel's top-left corner.
 constexpr float kPanelWidth = 680.0f;
@@ -78,9 +80,15 @@ SearchWindow::~SearchWindow() {
     if (editFont_) ::DeleteObject(editFont_);
 }
 
+void SearchWindow::Relocalize() {
+    if (Handle()) ::SetWindowTextW(Handle(), std::wstring(i18n::Tr(L"Search apps, settings and files")).c_str());
+    if (edit_) ::SendMessageW(edit_, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(i18n::Tr(L"Search apps, settings and files").data()));
+    Invalidate();
+}
+
 Result<void> SearchWindow::Initialize() {
     aether::ui::SurfaceWindowOptions options;
-    options.className = L"AetherShell.Search"; options.title = L"Search apps, settings and files"; options.noActivate = false;
+    options.className = L"AetherShell.Search"; options.title = i18n::Tr(L"Search apps, settings and files"); options.noActivate = false;
     const auto created = Create(options, RECT{0, 0, 640, 400});
     if (!created) return created;
     // The native edit retains IME, selection and its standard accessibility provider.
@@ -95,10 +103,10 @@ Result<void> SearchWindow::Initialize() {
     HRESULT propertyStatus = ::CoCreateInstance(CLSID_AccPropServices, nullptr, CLSCTX_INPROC_SERVER,
                                                 IID_PPV_ARGS(properties.put()));
     if (SUCCEEDED(propertyStatus)) propertyStatus = properties->SetHwndPropStr(edit_, static_cast<DWORD>(OBJID_CLIENT), CHILDID_SELF,
-                                                                            PROPID_ACC_NAME, L"Search apps, settings and files");
+                                                                            PROPID_ACC_NAME, i18n::Tr(L"Search apps, settings and files").data());
     if (FAILED(propertyStatus)) { Destroy(); return MakeError(ErrorCode::Platform, "search input accessibility could not be configured"); }
     ::SendMessageW(edit_, EM_SETLIMITTEXT, 128, 0);
-    ::SendMessageW(edit_, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(L"Search apps, settings and files"));
+    ::SendMessageW(edit_, EM_SETCUEBANNER, TRUE, reinterpret_cast<LPARAM>(i18n::Tr(L"Search apps, settings and files").data()));
     ::SetWindowSubclass(edit_, &EditProc, 1, reinterpret_cast<DWORD_PTR>(this));
     if (auto connected = accessible_.Connect(Handle(), *this); !connected) return connected;
     const auto weak = std::weak_ptr<bool>(alive_);
@@ -314,7 +322,7 @@ void SearchWindow::RefreshResults() {
     results_ = queried ? std::move(queried.value()) : std::vector<SearchResult>{};
     selected_ = firstVisible_ = 0;
     hovered_.reset();
-    if (!queried) error_ = L"Search could not be completed.";
+    if (!queried) error_ = i18n::Tr(L"Search could not be completed.");
     for (const auto& result : results_) {
         if (!accessibleIds_.contains(result.application.id)) accessibleIds_.emplace(result.application.id, nextAccessibleId_++);
     }
@@ -451,7 +459,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     }
     if (query_.empty()) {
         brush->SetColor(tokens_.textSecondary.ToD2D());
-        text_.Draw(dc, L"Search apps, settings and files", inputBounds, textStyle, brush.get());
+        text_.Draw(dc, i18n::Tr(L"Search apps, settings and files"), inputBounds, textStyle, brush.get());
     }
     dc->PopAxisAlignedClip();
 
@@ -459,7 +467,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     graphics::TextStyle caption; caption.size = tokens_.type.caption * textScale; caption.weight = DWRITE_FONT_WEIGHT_SEMI_BOLD;
     brush->SetColor(tokens_.textSecondary.ToD2D());
     const float captionTop = panel.top + kPadding + kFieldHeight + kCaptionGap;
-    text_.Draw(dc, L"Results", D2D1::RectF(panel.left + kPadding + 4.0f, captionTop, panel.right - kPadding, captionTop + kCaptionHeight),
+    text_.Draw(dc, i18n::Tr(L"Results"), D2D1::RectF(panel.left + kPadding + 4.0f, captionTop, panel.right - kPadding, captionTop + kCaptionHeight),
                caption, brush.get());
 
     // Rows.
@@ -515,8 +523,8 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     }
     if (results_.empty()) {
         brush->SetColor(tokens_.textSecondary.ToD2D());
-        const auto message = search_.Current().state == IndexState::Building ? L"Indexing applications…" :
-                             query_.empty() ? L"Type to search apps, settings and files" : L"Nothing matches";
+        const auto message = i18n::Tr(search_.Current().state == IndexState::Building ? L"Indexing applications…" :
+                             query_.empty() ? L"Type to search apps, settings and files" : L"Nothing matches");
         nameStyle.size = tokens_.type.body * textScale;
         text_.Draw(dc, message, D2D1::RectF(panel.left + kPadding + 8.0f, panel.top + kRowTop, panel.right - kPadding, panel.top + kRowTop + kRowPill),
                    nameStyle, brush.get());
@@ -539,7 +547,7 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     dc->DrawLine(D2D1::Point2F(panel.left + 1.0f, footerTop + 0.5f), D2D1::Point2F(panel.right - 1.0f, footerTop + 0.5f), brush.get(), 1.0f);
     brush->SetColor(tokens_.textSecondary.ToD2D());
     graphics::TextStyle hint; hint.size = tokens_.type.caption * textScale;
-    text_.Draw(dc, kFooterHint, D2D1::RectF(panel.left + kPadding + 4.0f, footerTop, panel.right - kPadding, panel.bottom), hint, brush.get());
+    text_.Draw(dc, i18n::Tr(kFooterHint), D2D1::RectF(panel.left + kPadding + 4.0f, footerTop, panel.right - kPadding, panel.bottom), hint, brush.get());
     dc->PopAxisAlignedClip();
 }
 
@@ -758,7 +766,7 @@ void SearchWindow::Launch(std::size_t index) {
     launcher_.LaunchAsync(results_[index].application, [this, weak](Result<void> result) {
         if (const auto live = weak.lock(); live && *live) {
             if (result) Close();
-            else { error_ = L"Windows could not open this application."; EnsureVisible(); SetPanelTarget(true); MoveIndicator(false); Invalidate(); }
+            else { error_ = i18n::Tr(L"Windows could not open this application."); EnsureVisible(); SetPanelTarget(true); MoveIndicator(false); Invalidate(); }
         }
     });
 }

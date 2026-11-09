@@ -114,6 +114,10 @@ public:
     [[nodiscard]] Result<void> AnimateExit(std::chrono::milliseconds duration, float offsetDip = -8.0f);
 
     void Invalidate();               // render once on the next frame
+    // Render only `areaDip` (window DIPs) on the next frame, the rest of the surface staying as drawn: for a change that
+    // touches one item (a clock's digits). Several areas before the frame are joined; any Invalidate() or animation
+    // frame, a resize, a DPI or device change, or a surface never drawn whole yet, makes it a whole render instead.
+    void InvalidateArea(const D2D1_RECT_F& areaDip);
     void RequestAnimationFrame();    // call OnAnimate() on the next frame
 
     [[nodiscard]] float ToPx(float dip) const noexcept { return dip * static_cast<float>(dpi_) / 96.0f; }
@@ -195,6 +199,15 @@ private:
     float backdropOpacity_ = 1.0f;
     bool backdropBlurRequested_ = false;
     std::optional<graphics::LiquidGlassTokens> backdropGlass_;
+    // The backdrop as last given to the compositor: an unchanged request (every frame repeats it) sends nothing, since
+    // each property set is a message to the compositor and part of its next batch.
+    bool backdropApplied_ = false;
+    // Partial renders (InvalidateArea): what a whole render last drew, and what is waiting.
+    bool fullDirty_ = true;
+    std::optional<D2D1_RECT_F> dirtyArea_;
+    SIZE drawnSize_{};
+    UINT drawnDpi_ = 0;
+    std::uint64_t drawnGeneration_ = 0;
     bool hiding_ = false;
     bool shown_ = false;
     bool presented_ = false;

@@ -8,9 +8,16 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [0.4.0-alpha.4] — in progress, not published
 
-Alpha 4 (D62–D68). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D70). Its test builds keep this number until the owner calls Alpha 4 complete.
 
 ### Added
+
+- **Five languages** (D70): English, 中文 (Chinese, simplified), हिन्दी (Hindi), Español and Français, everywhere: bars,
+  menus, tooltips, Search, Quick Settings, Settings, setup, the updater, messages. Settings → Language (a new page) follows
+  Windows' display language by default or keeps the one you choose; the change applies at once, and a chosen language also
+  writes the Top Bar's date. Windows' tools and Settings pages are named in it and found by their name in any of the five.
+  Names of applications, files and networks are never translated. The welcome can greet in Spanish ("Hola").
+- **The documentation in the five languages:** README, user guide and installation guide, with a language bar.
 
 - **Two styles, Liquid and Grain** (Settings → Appearance → Style). Liquid draws the Dock and the Top Bar as glass over the
   page behind them, live: its colours and shapes show through, softened and a little livelier, kept in a band of brightness
@@ -26,6 +33,15 @@ Alpha 4 (D62–D68). Its test builds keep this number until the owner calls Alph
 - **Search finds everything by name, as Start does:** Windows' tools in either language and by their command (Device
   Manager by "devmgmt"), Windows' Settings pages, and the files and folders in your own folders, from Windows' own index
   (names only, never contents), each with what it is and where.
+
+### Changed
+
+- **Lighter at rest and when switching style** (D69), with the same pixels and motion: the Top Bar no longer redraws its
+  whole content about ten times a second with a seconds clock (only the digits that change are drawn, once a second);
+  unchanged backdrops are not sent to the compositor again; repeated labels keep their text layout; Auto-Hide reads the
+  windows once for both bars; the Settings previews wait for the full-screen arrival instead of rendering under it; the
+  arrival draws each frame in one full-screen pass instead of three; the desktop picture and the arrival's full-screen
+  frame are given back after use instead of staying in memory.
 
 ### Fixed
 

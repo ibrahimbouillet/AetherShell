@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "settings/ui/SettingsWindow.h"
 
+#include "core/Localization.h"
 #include "aether/BuildInfo.h"
 #include "core/Strings.h"
 #include "core/WorkerPool.h"
@@ -128,12 +129,15 @@ form::Severity SeverityFor(StatusTone tone) noexcept {
 }
 
 std::wstring FormatBytes(std::uint64_t bytes) {
-    if (bytes < 1024) return std::to_wstring(bytes) + L" bytes";
+    if (bytes < 1024) return i18n::TrFormat(L"{} bytes", std::to_wstring(bytes));
     wchar_t text[48]{};
     const double kilo = static_cast<double>(bytes) / 1024.0;
-    if (kilo < 1024.0) std::swprintf(text, 48, L"%.0f KB", kilo);
-    else std::swprintf(text, 48, L"%.1f MB", kilo / 1024.0);
-    return text;
+    if (kilo < 1024.0) {
+        std::swprintf(text, 48, L"%.0f", kilo);
+        return i18n::TrFormat(L"{} KB", std::wstring(text));
+    }
+    std::swprintf(text, 48, L"%.1f", kilo / 1024.0);
+    return i18n::TrFormat(L"{} MB", std::wstring(text));
 }
 
 std::wstring FormatLocalTime(std::chrono::system_clock::time_point point) {
@@ -396,8 +400,8 @@ struct SettingsWindow::Impl {
                 target->DrawRoundedRectangle(D2D1::RoundedRect(tile, 10.0f, 10.0f), brush.get(), chosen ? 2.0f : 1.0f);
             brush = nullptr;
             if (previewCaption && SUCCEEDED(target->CreateSolidColorBrush(theme.textPrimary.ToD2D(), brush.put()))) {
-                const wchar_t* caption = liquid ? L"Liquid" : L"Grain";
-                target->DrawText(caption, static_cast<UINT32>(std::wcslen(caption)), previewCaption.get(),
+                const auto caption = i18n::Tr(liquid ? L"Liquid" : L"Grain");
+                target->DrawText(caption.data(), static_cast<UINT32>(caption.size()), previewCaption.get(),
                                  D2D1::RectF(left, top + tileHeight + 6.0f, left + tileWidth, top + tileHeight + 26.0f), brush.get());
             }
         }
@@ -683,7 +687,9 @@ struct SettingsWindow::Impl {
         }
     }
     HWND Label(HWND parent, const std::wstring& text, TextRole role, int id = 0, Severity severity = Severity::None, bool wrap = true) {
-        HWND label = Make(parent, L"STATIC", text, SS_OWNERDRAW | SS_NOPREFIX, id);
+        // D70: interface text is translated where it becomes a control; a text that is not in the catalog (a version,
+        // a name, a status already translated) stays as it is.
+        HWND label = Make(parent, L"STATIC", std::wstring(i18n::Tr(text)), SS_OWNERDRAW | SS_NOPREFIX, id);
         form::ControlSpec spec;
         spec.role = ControlRole::Label;
         spec.text = role;
@@ -694,7 +700,7 @@ struct SettingsWindow::Impl {
     }
     HWND Button(HWND parent, const std::wstring& text, int id, ButtonStyle style = ButtonStyle::Secondary,
                 std::optional<Glyph> glyph = std::nullopt, DWORD extra = 0) {
-        HWND button = Make(parent, L"BUTTON", text, WS_TABSTOP | BS_PUSHBUTTON | BS_MULTILINE | extra, id);
+        HWND button = Make(parent, L"BUTTON", std::wstring(i18n::Tr(text)), WS_TABSTOP | BS_PUSHBUTTON | BS_MULTILINE | extra, id);
         form::ControlSpec spec;
         spec.role = ControlRole::Button;
         spec.button = style;
@@ -777,11 +783,11 @@ struct SettingsWindow::Impl {
         const auto value = binding.read(service.Current());
         HWND canvas = Canvas();
         if (binding.kind == FieldKind::Check) {
-            HWND box = Make(canvas, L"BUTTON", binding.label, WS_TABSTOP | BS_AUTOCHECKBOX, id);
+            HWND box = Make(canvas, L"BUTTON", std::wstring(i18n::Tr(binding.label)), WS_TABSTOP | BS_AUTOCHECKBOX, id);
             ::SendMessageW(box, BM_SETCHECK, value == L"1" ? BST_CHECKED : BST_UNCHECKED, 0);
             form::ControlSpec spec;
             spec.role = ControlRole::Switch;
-            spec.description = binding.helper;
+            spec.description = std::wstring(i18n::Tr(binding.helper));
             Style(box, spec);
             AddRow(RowKind::Switch).primary = box;
             return;
@@ -790,14 +796,18 @@ struct SettingsWindow::Impl {
         row.kind = RowKind::Control;
         row.label = Label(canvas, binding.label, TextRole::Body);
         if (!binding.helper.empty()) row.helper = Label(canvas, binding.helper, TextRole::Helper);
+        const std::wstring accessibleName(i18n::Tr(binding.label)), description(i18n::Tr(binding.helper));
         if (binding.kind == FieldKind::Choice) {
             HWND combo = Make(canvas, L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWNLIST | WS_VSCROLL, id);
-            for (const auto& option : binding.choices) ::SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(option.c_str()));
+            for (const auto& option : binding.choices) {
+                const std::wstring shown(i18n::Tr(option));
+                ::SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(shown.c_str()));
+            }
             ::SendMessageW(combo, CB_SETCURSEL, std::wcstol(value.c_str(), nullptr, 10), 0);
             form::ControlSpec spec;
             spec.role = ControlRole::ComboBox;
-            spec.accessibleName = binding.label;
-            spec.description = binding.helper;
+            spec.accessibleName = accessibleName;
+            spec.description = description;
             Style(combo, spec);
             row.trailing = {combo};
             row.widths = {0.0f};
@@ -807,8 +817,8 @@ struct SettingsWindow::Impl {
             ::SendMessageW(hotkey, HKM_SETHOTKEY, static_cast<WPARAM>(std::wcstoul(value.c_str(), nullptr, 10)), 0);
             form::ControlSpec spec;
             spec.role = ControlRole::Field;
-            spec.accessibleName = binding.label;
-            spec.description = binding.helper;
+            spec.accessibleName = accessibleName;
+            spec.description = description;
             Style(hotkey, spec);
             row.trailing = {hotkey};
             row.widths = {tokens.form.comboMinWidth};
@@ -817,31 +827,31 @@ struct SettingsWindow::Impl {
             ::SendMessageW(edit, EM_SETLIMITTEXT, kMaximumDisplayNameLength, 0);
             form::ControlSpec spec;
             spec.role = ControlRole::Field;
-            spec.accessibleName = binding.label;
-            spec.description = binding.helper;
+            spec.accessibleName = accessibleName;
+            spec.description = description;
             Style(edit, spec);
             row.trailing = {edit};
             row.widths = {tokens.form.comboMinWidth};
         } else {
             const auto& format = binding.number;
-            HWND slider = Make(canvas, TRACKBAR_CLASSW, binding.label, WS_TABSTOP | TBS_HORZ | TBS_NOTICKS, kFirstSlider + static_cast<int>(index));
+            HWND slider = Make(canvas, TRACKBAR_CLASSW, accessibleName, WS_TABSTOP | TBS_HORZ | TBS_NOTICKS, kFirstSlider + static_cast<int>(index));
             ::SendMessageW(slider, TBM_SETRANGE, FALSE, MAKELPARAM(0, SliderSteps(format)));
             ::SendMessageW(slider, TBM_SETPAGESIZE, 0, std::max(1, SliderSteps(format) / 10));
             if (const auto stored = ParseNumber(value, format)) ::SendMessageW(slider, TBM_SETPOS, TRUE, SliderPosition(*stored, format));
             form::ControlSpec sliderSpec;
             sliderSpec.role = ControlRole::Slider;
-            sliderSpec.accessibleName = binding.label;
-            sliderSpec.description = binding.helper;
+            sliderSpec.accessibleName = accessibleName;
+            sliderSpec.description = description;
             Style(slider, sliderSpec);
             HWND edit = Make(canvas, L"EDIT", value, WS_TABSTOP | ES_AUTOHSCROLL | ES_RIGHT, id);
             form::ControlSpec fieldSpec;
             fieldSpec.role = ControlRole::Field;
-            fieldSpec.accessibleName = binding.label;
-            fieldSpec.description = binding.helper;
+            fieldSpec.accessibleName = accessibleName;
+            fieldSpec.description = description;
             Style(edit, fieldSpec);
             HWND unit = Label(canvas, format.unit, TextRole::Caption, 0, Severity::None, false);
             row.trailing = {slider, edit, unit};
-            row.widths = {tokens.form.sliderWidth, tokens.form.valueFieldWidth, 28.0f};
+            row.widths = {tokens.form.sliderWidth, tokens.form.valueFieldWidth, 40.0f};   // D70: room for a translated unit
         }
         if (sections.empty()) BeginSection(L"");
         sections.back().rows.push_back(std::move(row));
@@ -849,6 +859,7 @@ struct SettingsWindow::Impl {
 
     void Message(std::wstring text, StatusTone tone = StatusTone::Neutral) {
         if (!status) return;
+        text = std::wstring(i18n::Tr(text));
         ::SetWindowTextW(status, text.c_str());
         if (surfaceReady) {
             form::ControlSpec spec;
@@ -862,6 +873,15 @@ struct SettingsWindow::Impl {
         if (!building) Layout();
     }
 
+    // The pages' names in the navigation, in the current language.
+    void FillNavigation() {
+        if (!navigation) return;
+        ::SendMessageW(navigation, LB_RESETCONTENT, 0, 0);
+        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance",L"Welcome",L"Language"}) {
+            const std::wstring shown(i18n::Tr(name));
+            ::SendMessageW(navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(shown.c_str()));
+        }
+    }
     void BuildPage();
     void BuildUpdatesStatus();
     void RefreshUpdates();
@@ -920,13 +940,13 @@ void SettingsWindow::Impl::BuildPage() {
     const auto pixels = [](double minimum, double maximum) { NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.unit = L"px"; return f; };
     const auto percent = [] { NumberFormat f; f.minimum = 30; f.maximum = 100; f.scale = 100; f.unit = L"%"; return f; };
     const auto factor = [](double minimum, double maximum) {
-        NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.step = 0.05; f.decimals = 2; f.unit = L"Ã"; return f;
+        NumberFormat f; f.minimum = minimum; f.maximum = maximum; f.step = 0.05; f.decimals = 2; f.unit = L"×"; return f;   // the multiplication sign
     };
     if (page == SettingsPage::Dock) {
         header(L"Dock", L"Size, spacing, motion and the applications pinned to the Dock.");
         BeginSection(L"Size and spacing");
         const auto icon = pixels(32, 96);
-        Number(L"Icon size", RangeText(icon) + L", scaled with the Windows display scale.", icon,
+        Number(L"Icon size", i18n::TrFormat(L"{}, scaled with the Windows display scale.", RangeText(icon)), icon,
                [](const Settings& s){return s.dock.iconSize;}, [](Settings& s,double v){s.dock.iconSize=static_cast<int>(v);});
         const auto bottom = pixels(0, 200);
         Number(L"Bottom margin", L"Space between the Dock and the bottom of the screen.", bottom,
@@ -1073,7 +1093,8 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Greeting");
         Check(L"Show the welcome at sign-in and unlock", L"It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.",
               [](const Settings& s){return s.welcome.enabled;}, [](Settings& s,bool v){s.welcome.enabled=v;});
-        Choice(L"Greeting language", L"Salut in French, Hello in English.", {L"Follow Windows",L"Français",L"English"},
+        Choice(L"Greeting language", L"Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in Chinese and Hindi it greets in English.",
+               {L"Follow Windows",L"Fran\u00e7ais",L"English",L"Espa\u00f1ol"},
                [](const Settings& s){return s.welcome.language;}, [](Settings& s,int v){s.welcome.language=static_cast<GreetingLanguage>(v);});
         BeginSection(L"Your name");
         Text(L"Name to greet you with", L"Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.",
@@ -1117,6 +1138,18 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Windows taskbar pins");
         Check(L"Add newly discovered Windows taskbar pins", L"While the taskbar is replaced, new Windows pins are added to the Dock.",
               [](const Settings& s){return s.general.syncTaskbarPins;}, [](Settings& s,bool v){s.general.syncTaskbarPins=v;});
+    } else if (page == SettingsPage::Language) {
+        // D70: the interface in five languages, each named in its own language; the change applies at once.
+        header(L"Language", L"The language of the bars, menus, Search, Settings and setup.");
+        BeginSection(L"Interface language");
+        std::vector<std::wstring> languages{L"Follow Windows"};
+        for (const auto& language : i18n::Languages()) languages.emplace_back(language.nativeName);
+        Choice(L"Interface language", L"Follow Windows uses the Windows display language when it is one of these, and English otherwise.",
+               std::move(languages), [](const Settings& s){return s.general.language;},
+               [](Settings& s,int v){s.general.language=static_cast<InterfaceLanguage>(std::clamp(v, 0, 5));});
+        TextRow(L"Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. "
+                L"With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.");
+        TextRow(L"The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.");
     } else if (page == SettingsPage::Desktop) {
         header(L"Desktop", L"Reversible replacement of the Windows taskbar by the Dock.");
         BeginSection(L"Taskbar replacement");
@@ -1137,7 +1170,8 @@ void SettingsWindow::Impl::BuildPage() {
         ButtonsRow({import});
         TextRow(L"Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.");
     } else {
-        header(L"Aether Shell", (L"Version " + text::Widen(build::kVersion)).c_str());
+        const auto versionLine = i18n::TrFormat(L"Version {}", text::Widen(build::kVersion));
+        header(L"Aether Shell", versionLine.c_str());
         BeginSection(L"About");
         TextRow(L"Created by Ibrahim Bouillet", TextRole::Strong);
         TextRow(L"A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.", TextRole::Body);
@@ -1193,71 +1227,73 @@ void SettingsWindow::Impl::BuildUpdatesStatus() {
 // recreated, so focus, scroll position and edits elsewhere on the page survive every refresh.
 void SettingsWindow::Impl::RefreshUpdates() {
     if (page != SettingsPage::Updates || !controls.contains(kUpdateSummary)) return;
+    // D70: each sentence is translated whole, with its values in place, and the sentences follow one another.
     const auto version = [this] {
-        return update.manifest ? text::Widen(update.manifest->version.ToString()) : std::wstring(L"the new version");
+        return update.manifest ? text::Widen(update.manifest->version.ToString()) : std::wstring(i18n::Tr(L"the new version"));
     };
     std::wstring headline;
-    std::wstring summary = L"Installed: " + text::Widen(build::kVersion) + L".";
+    std::wstring summary = i18n::TrFormat(L"Installed: {}.", text::Widen(build::kVersion));
+    const auto add = [&summary](std::wstring_view sentence) { summary += L" "; summary += sentence; };
     StatusTone tone = StatusTone::Info;
     std::optional<double> fraction;
     bool showProgress = false;
     switch (update.state) {
         case updates::UpdateState::Disabled:
-            headline = L"Automatic update checks are off";
-            summary += L" Check now looks for a newer release once.";
+            headline = i18n::Tr(L"Automatic update checks are off");
+            add(i18n::Tr(L"Check now looks for a newer release once."));
             break;
         case updates::UpdateState::Idle:
-            headline = update.lastCheck ? L"Last checked " + FormatLocalTime(*update.lastCheck) : L"Not checked yet";
+            headline = update.lastCheck ? i18n::TrFormat(L"Last checked {}", FormatLocalTime(*update.lastCheck)) : std::wstring(i18n::Tr(L"Not checked yet"));
             break;
         case updates::UpdateState::Checking:
-            headline = L"Checking for updates...";
+            headline = i18n::Tr(L"Checking for updates...");
             tone = StatusTone::Busy;
             showProgress = true;
             break;
         case updates::UpdateState::UpToDate:
-            headline = L"Aether Shell is up to date";
+            headline = i18n::Tr(L"Aether Shell is up to date");
             tone = StatusTone::Success;
-            if (update.latestVersion) summary += L" Latest published release: " + text::Widen(update.latestVersion->ToString()) + L".";
+            if (update.latestVersion) add(i18n::TrFormat(L"Latest published release: {}.", text::Widen(update.latestVersion->ToString())));
             break;
         case updates::UpdateState::UpdateAvailable:
-            headline = L"Version " + version() + L" is available";
-            if (update.downloadSize) summary += L" Download size: " + FormatBytes(*update.downloadSize) + L".";
+            headline = i18n::TrFormat(L"Version {} is available", version());
+            if (update.downloadSize) add(i18n::TrFormat(L"Download size: {}.", FormatBytes(*update.downloadSize)));
             break;
         case updates::UpdateState::Downloading:
-            headline = L"Downloading version " + version() + L"...";
+            headline = i18n::TrFormat(L"Downloading version {}...", version());
             tone = StatusTone::Busy;
             showProgress = true;
-            summary += L" Received " + FormatBytes(update.progress.received);
             if (update.progress.total) {
                 fraction = std::clamp(static_cast<double>(update.progress.received) / static_cast<double>(update.progress.total), 0.0, 1.0);
                 const auto percent = static_cast<unsigned>(std::lround(*fraction * 100.0));
-                summary += L" of " + FormatBytes(update.progress.total) + L" (" + std::to_wstring(percent) + L"%).";
-            } else summary += L"; total size unknown.";
+                add(i18n::TrFormat(L"Received {} of {} ({}%).", FormatBytes(update.progress.received), FormatBytes(update.progress.total),
+                                   std::to_wstring(percent)));
+            } else add(i18n::TrFormat(L"Received {}; total size unknown.", FormatBytes(update.progress.received)));
             break;
         case updates::UpdateState::ReadyToInstall:
-            headline = L"Version " + version() + L" is ready to install";
+            headline = i18n::TrFormat(L"Version {} is ready to install", version());
             tone = StatusTone::Success;
-            summary += L" Verified with the signed release manifest and SHA-256.";
+            add(i18n::Tr(L"Verified with the signed release manifest and SHA-256."));
             break;
         case updates::UpdateState::Error:
-            headline = L"The update could not be completed";
+            headline = i18n::Tr(L"The update could not be completed");
             tone = StatusTone::Error;
             break;
     }
     if (update.failure && update.failure->manualVersion) {
         // D60: nothing failed. A newer version is out, and for now it installs by hand.
-        headline = L"Version " + text::Widen(update.failure->manualVersion->ToString()) + L" is available";
+        headline = i18n::TrFormat(L"Version {} is available", text::Widen(update.failure->manualVersion->ToString()));
         tone = StatusTone::Info;
-        summary += L" It installs by hand for now: open Release details, then download and run its setup.";
+        add(i18n::Tr(L"It installs by hand for now: open Release details, then download and run its setup."));
     } else if (update.failure) {
         tone = StatusTone::Error;
-        if (const auto* sentence = FailureSentence(update.failure->error.code)) summary += std::wstring(L" ") + sentence + L" ";
-        else summary += L" Failure: " + text::Widen(ToString(update.failure->error.code)) + L". ";
-        summary += CanDownloadOrInstall(update) ? L"Choose Retry Download to try again." : L"Use Check now to try again.";
+        if (const auto* sentence = FailureSentence(update.failure->error.code)) add(i18n::Tr(sentence));
+        else add(i18n::TrFormat(L"Failure: {}.", text::Widen(ToString(update.failure->error.code))));
+        add(i18n::Tr(CanDownloadOrInstall(update) ? L"Choose Retry Download to try again." : L"Use Check now to try again."));
     }
     if (update.nextCheck && update.automaticChecks && update.state != updates::UpdateState::Checking &&
         update.state != updates::UpdateState::Downloading)
-        summary += L" Next automatic check: " + FormatLocalTime(*update.nextCheck) + L".";
+        add(i18n::TrFormat(L"Next automatic check: {}.", FormatLocalTime(*update.nextCheck)));
     ::SetWindowTextW(controls[kUpdateHeadline], headline.c_str());
     ::SetWindowTextW(controls[kUpdateSummary], summary.c_str());
     if (surfaceReady) {
@@ -1280,9 +1316,9 @@ void SettingsWindow::Impl::RefreshUpdates() {
     if (WindowText(controls[kReleaseNotes]) != notes) ::SetWindowTextW(controls[kReleaseNotes], notes.c_str());
     ::ShowWindow(controls[kReleaseNotes], update.releaseNotes.empty() ? SW_HIDE : SW_SHOWNA);
     HWND install = controls[kInstallUpdate];
-    const wchar_t* label = update.prepared ? L"&Install update" : update.failure && CanDownloadOrInstall(update) ? L"Retry &Download"
-                                                                                                             : L"&Download and install";
-    if (WindowText(install) != label) ::SetWindowTextW(install, label);
+    const std::wstring label(i18n::Tr(update.prepared ? L"&Install update" : update.failure && CanDownloadOrInstall(update) ? L"Retry &Download"
+                                                                                                                      : L"&Download and install"));
+    if (WindowText(install) != label) ::SetWindowTextW(install, label.c_str());
     ::EnableWindow(install, !startupBusy && CanDownloadOrInstall(update));
     const bool offer = static_cast<bool>(update.manifest);
     for (const int id : {kPostpone, kSkip}) {
@@ -1344,7 +1380,9 @@ void SettingsWindow::Impl::Layout() {
     Place(brandLabel, 52.0f, caption + 14.0f, navWidth - 8.0f, caption + 44.0f);
     surface.SetNavigationCompact(navigation, narrow);
     const float navTop = caption + 56.0f;
-    const float navBottom = std::min(navTop + 8.0f * f.navItemHeight + 4.0f, footerTop - 8.0f);
+    // Every page's entry (ten since D70; the ninth used to fall below a list sized for eight).
+    const auto pages = static_cast<float>(std::max<LRESULT>(1, ::SendMessageW(navigation, LB_GETCOUNT, 0, 0)));
+    const float navBottom = std::min(navTop + pages * f.navItemHeight + 4.0f, footerTop - 8.0f);
     Place(navigation, 8.0f, navTop, navWidth - 4.0f, navBottom);
 
     const float buttonTop = stackStatus ? footerTop + 8.0f + statusHeight + f.relatedGap
@@ -1728,7 +1766,8 @@ void SettingsWindow::Impl::RefreshConsentHint(std::size_t index) {
     const bool staged = index < fieldBaseline.size() && value != fieldBaseline[index];
     form::ControlSpec spec = surface.Spec(control) ? *surface.Spec(control) : form::ControlSpec{};
     spec.role = ControlRole::Switch;
-    spec.description = bindings[index].helper + (index == startupBinding ? StartupStatusText() : std::wstring()) + (staged ? std::wstring(L" ") + kApplyHint : std::wstring());
+    spec.description = std::wstring(i18n::Tr(bindings[index].helper)) + (index == startupBinding ? StartupStatusText() : std::wstring()) +
+                       (staged ? std::wstring(L" ") + std::wstring(i18n::Tr(kApplyHint)) : std::wstring());
     surface.SetSpec(control, spec);
     if (staged) Message(kApplyHint, StatusTone::Info);
     LayoutCanvas();
@@ -1746,14 +1785,14 @@ void SettingsWindow::Impl::ReadStartupState() {
     } catch (...) { startupUnreadable = true; }
 }
 std::wstring SettingsWindow::Impl::StartupStatusText() const {
-    if (startupUnreadable) return L" Windows' startup state could not be read in this session.";
+    if (startupUnreadable) return L" " + std::wstring(i18n::Tr(L"Windows' startup state could not be read in this session."));
     if (!startupState) return {};
     switch (*startupState) {
-        case settings::StartupState::Enabled: return L" Windows will start it at your next sign-in.";
-        case settings::StartupState::Disabled: return L" Right now it will not start at sign-in.";
-        case settings::StartupState::DisabledByUser: return L" It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.";
-        case settings::StartupState::DifferentTarget: return L" Windows would start another copy of Aether Shell.";
-        case settings::StartupState::UnknownApproval: return L" Windows reports a startup state this version cannot read.";
+        case settings::StartupState::Enabled: return L" " + std::wstring(i18n::Tr(L"Windows will start it at your next sign-in."));
+        case settings::StartupState::Disabled: return L" " + std::wstring(i18n::Tr(L"Right now it will not start at sign-in."));
+        case settings::StartupState::DisabledByUser: return L" " + std::wstring(i18n::Tr(L"It is turned off in Task Manager or Windows Settings, which decide until it is turned on there."));
+        case settings::StartupState::DifferentTarget: return L" " + std::wstring(i18n::Tr(L"Windows would start another copy of Aether Shell."));
+        case settings::StartupState::UnknownApproval: return L" " + std::wstring(i18n::Tr(L"Windows reports a startup state this version cannot read."));
     }
     return {};
 }
@@ -2156,7 +2195,7 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         const auto area = platform::PrimaryMonitor().workArea;
         const int width = std::min(::MulDiv(960, static_cast<int>(systemDpi), 96), static_cast<int>((area.right - area.left) * 9 / 10));
         const int height = std::min(::MulDiv(700, static_cast<int>(systemDpi), 96), static_cast<int>((area.bottom - area.top) * 9 / 10));
-        const auto window = ::CreateWindowExW(WS_EX_CONTROLPARENT, kClass, L"Aether Shell Settings", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+        const auto window = ::CreateWindowExW(WS_EX_CONTROLPARENT, kClass, std::wstring(i18n::Tr(L"Aether Shell Settings")).c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
             area.left+(area.right-area.left-width)/2, area.top+(area.bottom-area.top-height)/2, width, height, nullptr, nullptr, ::GetModuleHandleW(nullptr), impl_.get());
         if (!window) return MakeError(ErrorCode::Platform, "settings window could not be created");
         if (auto attached = impl.surface.Attach(window, impl.tokens, impl.motion, impl.callbacks.scheduler); attached) {
@@ -2195,10 +2234,10 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         // so the strip still drags the window). The window text stays the accessible/Alt+Tab title.
         impl.captionTitle = impl.Label(window, L"Aether Shell Settings", TextRole::Caption, kCaptionTitle, Severity::None, false);
         impl.navigation = impl.Make(window, L"LISTBOX", L"", WS_TABSTOP | LBS_NOTIFY | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT, kNavigation);
-        for (const auto* name : {L"Dock",L"Top Bar",L"Weather",L"Updates",L"General",L"About",L"Desktop",L"Appearance",L"Welcome"}) ::SendMessageW(impl.navigation, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(name));
+        impl.FillNavigation();
         { form::ControlSpec spec; spec.role = ControlRole::Navigation; impl.Style(impl.navigation, spec); }
         impl.surface.SetNavigationGlyphs(impl.navigation, {Glyph::Dock, Glyph::TopBar, Glyph::Weather, Glyph::Updates, Glyph::General,
-                                                          Glyph::About, Glyph::Desktop, Glyph::Appearance, Glyph::General});
+                                                          Glyph::About, Glyph::Desktop, Glyph::Appearance, Glyph::General, Glyph::Settings});
         if (auto created = impl.scroll.Create(impl.surface, window, kScrollView); !created) {
             ::DestroyWindow(window);
             impl.window = nullptr;
@@ -2247,6 +2286,26 @@ bool SettingsWindow::PreTranslate(MSG& message) {
 }
 HWND SettingsWindow::Handle() const noexcept { return impl_->window; }
 HWND SettingsWindow::Control(int id) const noexcept { const auto found = impl_->controls.find(id); return found == impl_->controls.end() ? nullptr : found->second; }
+void SettingsWindow::Relocalize() {
+    auto& impl = *impl_;
+    if (!impl.window) return;
+    try {
+        // D70: every text of the window in the language just chosen. The page is built again, as on navigation; its
+        // values are the saved ones (a language change has just been saved).
+        ::SetWindowTextW(impl.window, std::wstring(i18n::Tr(L"Aether Shell Settings")).c_str());
+        if (impl.brandLabel) ::SetWindowTextW(impl.brandLabel, std::wstring(i18n::Tr(L"Settings")).c_str());
+        if (impl.captionTitle) ::SetWindowTextW(impl.captionTitle, std::wstring(i18n::Tr(L"Aether Shell Settings")).c_str());
+        if (impl.resetButton) ::SetWindowTextW(impl.resetButton, std::wstring(i18n::Tr(L"Reset defaults...")).c_str());
+        if (impl.applyButton) ::SetWindowTextW(impl.applyButton, std::wstring(i18n::Tr(L"&Apply")).c_str());
+        impl.FillNavigation();
+        ::SendMessageW(impl.navigation, LB_SETCURSEL, static_cast<WPARAM>(impl.page), 0);
+        impl.BuildPage();
+        impl.UpdateFrame();
+    } catch (...) {
+        AETHER_LOG_WARN("settings", "settings language update failed");
+    }
+}
+
 void SettingsWindow::SetUpdateSnapshot(updates::UpdateSnapshot snapshot) {
     impl_->update = std::move(snapshot);
     if (impl_->window && impl_->page == SettingsPage::Updates) {
@@ -2257,10 +2316,10 @@ void SettingsWindow::SetUpdateSnapshot(updates::UpdateSnapshot snapshot) {
 void SettingsWindow::RefreshDesktopStatus() {
     if (!impl_->window || impl_->page != SettingsPage::Desktop || !impl_->controls.contains(kDesktopStatus)) return;
     try {
-        const auto status = impl_->callbacks.taskbarStatus ? impl_->callbacks.taskbarStatus() :
-            L"Desktop status is unavailable in this session.";
+        const std::wstring status(i18n::Tr(impl_->callbacks.taskbarStatus ? impl_->callbacks.taskbarStatus() :
+            L"Desktop status is unavailable in this session."));
         ::SetWindowTextW(impl_->controls.at(kDesktopStatus), status.c_str());
-    } catch (...) { ::SetWindowTextW(impl_->controls.at(kDesktopStatus), L"Desktop status is unavailable."); }
+    } catch (...) { ::SetWindowTextW(impl_->controls.at(kDesktopStatus), std::wstring(i18n::Tr(L"Desktop status is unavailable.")).c_str()); }
     if (!impl_->building) impl_->LayoutCanvas();
 }
 void SettingsWindow::ReportActionStatus(std::wstring_view message) { ReportActionStatus(message, StatusTone::Info); }

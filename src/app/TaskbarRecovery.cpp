@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "app/TaskbarRecovery.h"
 
+#include "core/Localization.h"
+
 #include "core/FileSystem.h"
 #include "settings/SettingsStore.h"
 
@@ -35,24 +37,26 @@ Result<TaskbarRecoveryReport> RecoverTaskbarWithoutInstance(const std::filesyste
 } catch (...) { return MakeError(ErrorCode::Internal, "taskbar recovery failed"); }
 
 std::wstring DescribeTaskbarRecovery(const Result<TaskbarRecoveryReport>& result) {
+    using i18n::Tr;   // D70
     if (!result) {
-        return L"Aether Shell could not restore the Windows taskbar.\n\n"
-               L"Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.";
+        return std::wstring(Tr(L"Aether Shell could not restore the Windows taskbar.")) + L"\n\n" +
+               std::wstring(Tr(L"Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again."));
     }
     std::wstring message;
     switch (result->outcome) {
         case platform::TaskbarRecovery::RestoredFromBaseline:
-            message = L"The Windows taskbar was restored to its saved state."; break;
+            message = Tr(L"The Windows taskbar was restored to its saved state."); break;
         case platform::TaskbarRecovery::ShownWithoutBaseline:
-            message = L"No saved taskbar state was found. The Windows taskbar was made visible; "
-                      L"its auto-hide setting was not changed."; break;
+            message = Tr(L"No saved taskbar state was found. The Windows taskbar was made visible; "
+                         L"its auto-hide setting was not changed."); break;
         case platform::TaskbarRecovery::NothingToRestore:
-            message = L"There was nothing to restore."; break;
+            message = Tr(L"There was nothing to restore."); break;
     }
+    message += L"\n\n";
     message += result->replacementTurnedOff
-        ? L"\n\nTaskbar replacement is turned off."
-        : L"\n\nTaskbar replacement could not be turned off automatically. Turn it off in "
-          L"Aether Shell Settings > Desktop.";
+        ? Tr(L"Taskbar replacement is turned off.")
+        : Tr(L"Taskbar replacement could not be turned off automatically. Turn it off in "
+             L"Aether Shell Settings > Desktop.");
     return message;
 }
 

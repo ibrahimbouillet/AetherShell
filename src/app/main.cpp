@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
+#include "core/Localization.h"
 #include "app/ShellApplication.h"
 #include "app/CrashHandler.h"
 #include "app/WindowCorners.h"
@@ -15,13 +16,14 @@
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     using namespace aether;
     try {
+        i18n::SetLanguage(i18n::SystemLanguage());   // D70: until Settings are read, the Windows display language
         const auto arguments = app::ProcessArguments();
         auto guard = app::DispatchWindowCornerGuard(arguments);
         if (!guard) return 2;
         if (guard->has_value()) return **guard;
         auto command = app::ParseCommandLine(arguments);
         // Documented native fallbacks: these run before any window or renderer exists.
-        if (!command) { ::MessageBoxW(nullptr,L"Unrecognized or invalid Aether Shell command line.",L"Aether Shell",MB_OK|MB_ICONERROR); return 2; }
+        if (!command) { ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Unrecognized or invalid Aether Shell command line.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); return 2; }
         if (command->showVersion) { ::MessageBoxW(nullptr, (L"Aether Shell " + std::wstring(build::kVersionW)).c_str(), L"Aether Shell", MB_OK); return 0; }
         // Bootstrap IO completes before the UI exists; it still executes on a background worker.
         WorkerPool bootstrap{{1,L"Aether bootstrap",ComApartment::None}};
@@ -31,12 +33,12 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
             catch (...) { promise.set_value(MakeError(ErrorCode::Internal,"application bootstrap failed")); }
         });
         auto paths=future.get(); bootstrap.Shutdown();
-        if(!paths) { ::MessageBoxW(nullptr,L"Aether Shell could not create its local data folders.",L"Aether Shell",MB_OK|MB_ICONERROR); return 1; }
+        if(!paths) { ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Aether Shell could not create its local data folders.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); return 1; }
         platform::EnsurePerMonitorDpiAwareness(); platform::ComApartment apartment;
         if(!apartment.IsUsable())return 1;
         INITCOMMONCONTROLSEX controls{sizeof(controls),ICC_STANDARD_CLASSES|ICC_WIN95_CLASSES|ICC_HOTKEY_CLASS}; ::InitCommonControlsEx(&controls);
         int code=1;
         { app::ShellApplication application; auto result=application.Run(std::move(*command),std::move(*paths)); if(result)code=*result; }
         diag::Logger::Shutdown(); return code;
-    } catch (...) { ::MessageBoxW(nullptr,L"Aether Shell stopped after an unexpected error.",L"Aether Shell",MB_OK|MB_ICONERROR); return 1; }
+    } catch (...) { ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Aether Shell stopped after an unexpected error.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); return 1; }
 }

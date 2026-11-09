@@ -27,6 +27,8 @@ enum class AccentSource { Windows, Aether };              // Windows accent colo
 // D63, D66: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
 // Liquid is glass in layers over what lies behind: a blur layer, the liquid's light, then the icons and text.
 enum class SurfaceStyle { Grain, Liquid };
+// D70: the interface's language. Automatic follows the Windows display language (English when it is none of the five).
+enum class InterfaceLanguage { Automatic, English, French, Spanish, Chinese, Hindi };
 // D67: the colour of Liquid's blur layer. Automatic adds none (the glass's own adaptation only).
 enum class LiquidTint { Automatic, White, Black, Accent, Blue, Violet, Pink, Red, Orange, Yellow, Green, Teal };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
@@ -159,11 +161,12 @@ struct GeneralSettings {
     HotkeyChord searchHotkey{};
     HotkeyChord focusDockHotkey{0x0003, 0x44};
     std::string logLevel = "info";  // trace|debug|info|warning|error
+    InterfaceLanguage language = InterfaceLanguage::Automatic;   // D70
 };
 
 // FR-041: the optional greeting after sign-in and unlock. The name is entered by the person, stays in
 // this file on this PC, and is never logged, transmitted or read from the Windows account.
-enum class GreetingLanguage { Automatic, French, English };
+enum class GreetingLanguage { Automatic, French, English, Spanish };   // D70: Hola; the pen writes Latin letters only
 inline constexpr std::size_t kMaximumDisplayNameLength = 64;
 struct WelcomeSettings {
     bool enabled = true;

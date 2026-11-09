@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "install/Install.h"
+#include "core/Localization.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "platform/windows/SingleInstance.h"
@@ -130,9 +131,9 @@ LRESULT CALLBACK WindowProc(HWND window,UINT message,WPARAM wparam,LPARAM lparam
         if(data->styled)data->surface.SetDecorator([data](ID2D1DeviceContext* target,const D2D1_RECT_F&,const graphics::DesignTokens& tokens){graphics::PaintBrandMark(target,data->mark,tokens);});
         else platform::ApplyImmersiveDarkMode(window,platform::SystemPrefersDarkApps());
         const DWORD labelStyle=(data->styled?SS_OWNERDRAW:0u)|SS_NOPREFIX;
-        data->title=Child(window,L"STATIC",L"Updating Aether Shell",labelStyle);
+        data->title=Child(window,L"STATIC",aether::i18n::Tr(L"Updating Aether Shell").data(),labelStyle);
         {form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=form::TextRole::Section;Register(*data,data->title,spec);}
-        data->label=Child(data->scroll.Canvas(),L"STATIC",L"Verifying the signed package and applying the update.",labelStyle);
+        data->label=Child(data->scroll.Canvas(),L"STATIC",aether::i18n::Tr(L"Verifying the signed package and applying the update.").data(),labelStyle);
         {form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=form::TextRole::Body;Register(*data,data->label,spec);}
         data->bar=Child(data->scroll.Canvas(),PROGRESS_CLASSW,nullptr,PBS_MARQUEE);
         {form::ControlSpec spec;spec.role=form::ControlRole::Progress;Register(*data,data->bar,spec);}
@@ -145,13 +146,13 @@ LRESULT CALLBACK WindowProc(HWND window,UINT message,WPARAM wparam,LPARAM lparam
         ::ShowWindow(data->bar,SW_HIDE);
         {
             std::lock_guard lock(data->mutex);
-            ::SetWindowTextW(data->title,data->succeeded?L"Update completed":L"The update did not complete");
+            ::SetWindowTextW(data->title,(data->succeeded?aether::i18n::Tr(L"Update completed"):aether::i18n::Tr(L"The update did not complete")).data());
             ::SetWindowTextW(data->label,data->outcome);
             form::ControlSpec spec;spec.role=form::ControlRole::Label;spec.text=form::TextRole::Status;
             spec.severity=data->succeeded?form::Severity::Success:form::Severity::Error;
             if(data->styled)data->surface.SetSpec(data->label,spec);
         }
-        data->close=Child(window,L"BUTTON",L"Close",WS_TABSTOP|BS_PUSHBUTTON|BS_DEFPUSHBUTTON,1);
+        data->close=Child(window,L"BUTTON",aether::i18n::Tr(L"Close").data(),WS_TABSTOP|BS_PUSHBUTTON|BS_DEFPUSHBUTTON,1);
         {form::ControlSpec spec;spec.role=form::ControlRole::Button;spec.button=form::ButtonStyle::Primary;Register(*data,data->close,spec);}
         Layout(window,*data);::SetFocus(data->close);return 0;
     }
@@ -168,6 +169,7 @@ LRESULT CALLBACK WindowProc(HWND window,UINT message,WPARAM wparam,LPARAM lparam
 }
 #ifndef AETHER_UPDATER_PRESENTATION_TEST
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
+    aether::i18n::SetLanguage(aether::i18n::SystemLanguage());   // D70
     using namespace aether;
     try {
         int count=0; auto* argv=::CommandLineToArgvW(::GetCommandLineW(),&count); if(!argv) return 2;
@@ -192,7 +194,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
         else { std::array<wchar_t,32768> local{}; const DWORD size=::GetEnvironmentVariableW(L"LOCALAPPDATA",local.data(),static_cast<DWORD>(local.size())); if(!size || size>=local.size()) return 2; dataRoot=std::filesystem::path(local.data())/L"AetherShell"; }
         if(!dataRoot.is_absolute())return 2;
         platform::ComApartment apartment;
-        if(!apartment.IsUsable()){::MessageBoxW(nullptr,L"The update interface could not start. The update has not been applied. Try again or use Repair.",L"Aether Shell Update",MB_OK|MB_ICONERROR);return 3;}
+        if(!apartment.IsUsable()){::MessageBoxW(nullptr,std::wstring(aether::i18n::Tr(L"The update interface could not start. The update has not been applied. Try again or use Repair.")).c_str(),std::wstring(aether::i18n::Tr(L"Aether Shell Update")).c_str(),MB_OK|MB_ICONERROR);return 3;}
         struct ShutdownLog { ~ShutdownLog(){diag::Logger::Shutdown();} } shutdown;
         INITCOMMONCONTROLSEX controls{sizeof(controls),ICC_PROGRESS_CLASS}; ::InitCommonControlsEx(&controls);
         platform::EnsurePerMonitorDpiAwareness();
@@ -201,8 +203,8 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
         windowClass.hCursor=::LoadCursorW(nullptr,IDC_ARROW);
         windowClass.hIcon=::LoadIconW(instance,L"IDI_AETHER");
         if(!::RegisterClassW(&windowClass)) return 3;
-        Progress progress;const UINT dpi=::GetDpiForSystem();HWND window=::CreateWindowExW(0,className,L"Aether Shell Update",WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,::MulDiv(520,static_cast<int>(dpi),96),::MulDiv(224,static_cast<int>(dpi),96),nullptr,nullptr,instance,&progress);
-        if(!window){::MessageBoxW(nullptr,L"The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.",L"Aether Shell Update",MB_OK|MB_ICONERROR);return 3;} ::ShowWindow(window,show);
+        Progress progress;const UINT dpi=::GetDpiForSystem();HWND window=::CreateWindowExW(0,className,std::wstring(aether::i18n::Tr(L"Aether Shell Update")).c_str(),WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_CLIPCHILDREN,CW_USEDEFAULT,CW_USEDEFAULT,::MulDiv(520,static_cast<int>(dpi),96),::MulDiv(224,static_cast<int>(dpi),96),nullptr,nullptr,instance,&progress);
+        if(!window){::MessageBoxW(nullptr,std::wstring(aether::i18n::Tr(L"The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.")).c_str(),std::wstring(aether::i18n::Tr(L"Aether Shell Update")).c_str(),MB_OK|MB_ICONERROR);return 3;} ::ShowWindow(window,show);
         int outcome=1;
         std::jthread worker([&] {
             Result<void> result=MakeError(ErrorCode::Io,"update failed");
@@ -214,7 +216,7 @@ int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
                     if(!result)AETHER_LOG_ERROR("updater","update failed: {}",ToString(result.error().code));
                 }
             }catch(...){result=MakeError(ErrorCode::Io,"update worker failed");}
-            { std::lock_guard lock(progress.mutex); progress.succeeded=result.ok(); progress.outcome=result?L"Update completed.":L"Update did not complete. See the updater log or use Repair."; }
+            { std::lock_guard lock(progress.mutex); progress.succeeded=result.ok(); progress.outcome=(result?aether::i18n::Tr(L"Update completed."):aether::i18n::Tr(L"Update did not complete. See the updater log or use Repair.")).data(); }
             outcome=result?0:1; progress.busy=false; ::PostMessageW(window,WM_APP+1,0,0);
         });
         MSG message{}; while(::GetMessageW(&message,nullptr,0,0)>0) { if(!aether::ui::form::FormScrollView::RoutePointer(message) && !::IsDialogMessageW(window,&message)) { ::TranslateMessage(&message); ::DispatchMessageW(&message); } }

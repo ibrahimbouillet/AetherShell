@@ -391,10 +391,10 @@ Result<std::vector<ApplicationInfo>> Discover(const ShellApplicationCatalog::Opt
     if (options.includeSystemTools) {
         auto system = ReadControlPanelItems(cancel);
         if (cancel.IsCancelled()) return CancelledError();
-        const bool french = PRIMARYLANGID(::GetUserDefaultUILanguage()) == LANG_FRENCH;
-        auto tools = SystemToolApplications(french, SystemFileExists);
+        const auto language = i18n::CurrentLanguage();   // D70: the interface's language, found in all five
+        auto tools = SystemToolApplications(language, SystemFileExists);
         system.insert(system.end(), std::make_move_iterator(tools.begin()), std::make_move_iterator(tools.end()));
-        auto pages = SettingsPageApplications(french);   // D68: Windows' Settings pages, as Start finds them
+        auto pages = SettingsPageApplications(language);   // D68: Windows' Settings pages, as Start finds them
         system.insert(system.end(), std::make_move_iterator(pages.begin()), std::make_move_iterator(pages.end()));
         applications = AddSystemEntries(std::move(applications), std::move(system));
     }

@@ -143,6 +143,13 @@ AETHER_TEST("settings schema: new enums use stable lower-case JSON names") {
     settings.general.surfaceStyle = SurfaceStyle::Liquid;
     CHECK_EQ(Member(settings, "general", "surfaceStyle"), std::string("liquid"));
     CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"surfaceStyle":"liquid"}})").value.general.surfaceStyle, SurfaceStyle::Liquid);
+    // D70: the interface's language, in plain words; Automatic until chosen, an unknown word falls back to it.
+    CHECK_EQ(Member(settings, "general", "language"), std::string("automatic"));
+    settings.general.language = InterfaceLanguage::Hindi;
+    CHECK_EQ(Member(settings, "general", "language"), std::string("hindi"));
+    CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"language":"chinese"}})").value.general.language, InterfaceLanguage::Chinese);
+    CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"language":"klingon"}})").value.general.language, InterfaceLanguage::Automatic);
+    CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"welcome":{"language":"spanish"}})").value.welcome.language, GreetingLanguage::Spanish);
     // D67: Liquid's blur layer, its cover and its color, in plain words; out of range is brought back.
     CHECK_EQ(Member(settings, "general", "liquidTint"), std::string("automatic"));
     settings.general.liquidTint = LiquidTint::Teal;

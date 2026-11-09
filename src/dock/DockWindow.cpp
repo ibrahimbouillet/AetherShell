@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "dock/DockWindow.h"
 
+#include "core/Localization.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
 #include "dock/DockModel.h"
@@ -466,7 +467,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         // A launch completion can arrive after fullscreen suppression or shutdown has closed input.
         if (!window.Handle() || suppressed || dragging || !window.IsShown() || window.IsTransitioning() ||
             !::IsWindowEnabled(window.Handle()) || index >= layout.items.size()) return;
-        tooltip.ShowFor(text::Widen(error.message), Anchor(index), ui::TooltipPlacement::Above);
+        tooltip.ShowFor(std::wstring(i18n::Tr(text::Widen(error.message))), Anchor(index), ui::TooltipPlacement::Above);
         ::SetTimer(window.Handle(), kErrorTimer, 3000, nullptr);
     }
     void Emit(Signal<>& signal) {
@@ -770,7 +771,7 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         }
     }
 
-    std::wstring RootName() const override { return L"Aether Shell Dock"; }
+    std::wstring RootName() const override { return std::wstring(i18n::Tr(L"Aether Shell Dock")); }
     CONTROLTYPEID RootControlType() const override { return UIA_ToolBarControlTypeId; }
     std::size_t ItemCount() const override { return fitted.items.size(); }
     ui::accessibility::AccessibleItem Item(std::size_t index) const override {
@@ -780,10 +781,10 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         result.boundsPx = Anchor(index); result.hasKeyboardFocus = keyboard && focused == index;
         result.isOffscreen = suppressed || !window.IsShown();
         result.isEnabled = !result.isOffscreen && !window.IsTransitioning() && ::IsWindowEnabled(window.Handle());
-        if (item.kind == DockItemKind::Pinned) result.itemStatus = L"Pinned";
-        if (item.running) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Running"; }
-        if (item.attentionRequested) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += L"Needs attention"; }
-        if (Previewable(item)) result.helpText = L"Up arrow shows window previews";
+        if (item.kind == DockItemKind::Pinned) result.itemStatus = i18n::Tr(L"Pinned");
+        if (item.running) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += i18n::Tr(L"Running"); }
+        if (item.attentionRequested) { if (!result.itemStatus.empty()) result.itemStatus += L", "; result.itemStatus += i18n::Tr(L"Needs attention"); }
+        if (Previewable(item)) result.helpText = i18n::Tr(L"Up arrow shows window previews");
         return result;
     }
     Result<void> Invoke(int id) override {

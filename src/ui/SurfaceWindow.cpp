@@ -83,6 +83,7 @@ Result<void> SurfaceWindow::Create(const SurfaceWindowOptions& options, const RE
     }
     deviceReplaced_ = device_.DeviceReplaced.Connect([this] {
         OnDeviceReplaced();
+        backdropApplied_ = false;   // the compositor's objects are new: the backdrop is given again
         if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_, backdropGlass_ ? &*backdropGlass_ : nullptr);
         Invalidate();
     });
@@ -219,6 +220,13 @@ bool SurfaceWindow::PaintLiquidPanel(const RenderContext& context, const D2D1_RE
 
 void SurfaceWindow::SetBackdropPanel(const D2D1_RECT_F& panelDip, float cornerRadiusDip, bool blur, float backdropOpacity,
                                      const graphics::LiquidGlassTokens* glass) {
+    // Every frame repeats the same request: only a change reaches the compositor.
+    const bool sameGlass = glass ? backdropGlass_.has_value() && *backdropGlass_ == *glass : !backdropGlass_.has_value();
+    if (backdropApplied_ && sameGlass && backdropBlurRequested_ == blur && backdropOpacity_ == backdropOpacity &&
+        backdropRadiusDip_ == cornerRadiusDip && backdropPanelDip_.left == panelDip.left && backdropPanelDip_.top == panelDip.top &&
+        backdropPanelDip_.right == panelDip.right && backdropPanelDip_.bottom == panelDip.bottom)
+        return;
+    backdropApplied_ = true;
     backdropPanelDip_ = panelDip;
     backdropRadiusDip_ = cornerRadiusDip;
     backdropOpacity_ = backdropOpacity;
@@ -302,6 +310,19 @@ void SurfaceWindow::HideAnimated(const graphics::Transition& transition) {
 
 void SurfaceWindow::Invalidate() {
     if (!hwnd_) return;
+    fullDirty_ = true;
+    dirtyArea_.reset();
+    renderPending_ = true;
+    scheduler_.RequestFrame(this);
+}
+
+void SurfaceWindow::InvalidateArea(const D2D1_RECT_F& areaDip) {
+    if (!hwnd_) return;
+    if (!fullDirty_ && areaDip.right > areaDip.left && areaDip.bottom > areaDip.top) {
+        if (!dirtyArea_) dirtyArea_ = areaDip;
+        else dirtyArea_ = D2D1::RectF(std::min(dirtyArea_->left, areaDip.left), std::min(dirtyArea_->top, areaDip.top),
+                                      std::max(dirtyArea_->right, areaDip.right), std::max(dirtyArea_->bottom, areaDip.bottom));
+    }
     renderPending_ = true;
     scheduler_.RequestFrame(this);
 }
@@ -323,6 +344,7 @@ void SurfaceWindow::OnFrame(double now) {
             AETHER_LOG_ERROR("ui", "animation step threw an exception");
         }
         renderPending_ = true;
+        fullDirty_ = true;   // an animation may move anything
     }
     if (renderPending_) Render(now);
     if (keepAnimating) RequestAnimationFrame();
@@ -337,13 +359,31 @@ void SurfaceWindow::Render(double now) {
     context.widthDip = ToDip(static_cast<float>(bounds_.right - bounds_.left));
     context.heightDip = ToDip(static_cast<float>(bounds_.bottom - bounds_.top));
     context.now = now;
-    auto result = surface_.Draw(dpi_, [&](ID2D1DeviceContext* d2d) {
+    // A partial render keeps the rest of the last whole frame: only while that frame is still what the surface holds.
+    const SIZE size = surface_.PixelSize();
+    const bool whole = fullDirty_ || !dirtyArea_ || !presented_ || size.cx != drawnSize_.cx || size.cy != drawnSize_.cy ||
+                       dpi_ != drawnDpi_ || device_.Generation() != drawnGeneration_;
+    const auto area = dirtyArea_;
+    fullDirty_ = false;
+    dirtyArea_.reset();
+    const auto paint = [&](ID2D1DeviceContext* d2d) {
         context.d2d = d2d;
         OnRender(context);
-    });
+    };
+    Result<void> result = Ok();
+    if (whole) {
+        result = surface_.Draw(dpi_, paint);
+        if (result) { drawnSize_ = size; drawnDpi_ = dpi_; drawnGeneration_ = device_.Generation(); }
+    } else {
+        // A pixel of margin: antialiased edges reach just outside what changed.
+        const RECT updatePx{static_cast<LONG>(std::floor(ToPx(area->left))) - 1, static_cast<LONG>(std::floor(ToPx(area->top))) - 1,
+                            static_cast<LONG>(std::ceil(ToPx(area->right))) + 1, static_cast<LONG>(std::ceil(ToPx(area->bottom))) + 1};
+        result = surface_.Draw(dpi_, updatePx, paint);
+    }
     inRender_ = false;
     if (result) presented_ = true;
     if (!result) {
+        fullDirty_ = true;   // whatever the surface holds now, the next frame is drawn whole
         if (result.error().code == ErrorCode::Unavailable) {
             // AS4-25: one shared, bounded recovery for every surface; it retries on its own timer,
             // so an idle surface is redrawn without waiting for unrelated input.
@@ -444,6 +484,7 @@ LRESULT SurfaceWindow::HandleMessage(UINT message, WPARAM wParam, LPARAM lParam)
         case WM_DPICHANGED: {
             dpi_ = HIWORD(wParam);
             OnDpiChanged(dpi_, *reinterpret_cast<const RECT*>(lParam));
+            backdropApplied_ = false;   // the same DIPs are other pixels now
             if (backdropBlurRequested_) SetBackdropPanel(backdropPanelDip_, backdropRadiusDip_, true, backdropOpacity_, backdropGlass_ ? &*backdropGlass_ : nullptr);
             Invalidate();
             return 0;
