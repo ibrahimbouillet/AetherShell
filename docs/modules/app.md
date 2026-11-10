@@ -173,12 +173,21 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   the chevron's bounds with a 6-DIP gap, inside the chevron monitor's work area. It holds the place
   for 0.6 s with at most six corrections and stops quietly when the overflow is dismissed; a lost
   tug of war is only logged (S-056). No icon is enumerated, copied or drawn by Aether.
-- **Maximized perimeter (`WindowCorners`, ADR 0012):** the guard clips eligible maximized windows
-  inside their rounded outline by `CornerRimWidthPx` and keeps one click-through ring window
-  (`AetherShell.WindowCornerGuard.Rim`) directly beneath each clipped window, shaped to the band and
-  filled with a neutral system-theme color. Captioned, resizable `WS_EX_LAYERED` windows are now
-  eligible; an abandoned window gets one fresh attempt after it leaves the maximized presentation.
-  Native tests verify cutouts, a continuous ring and rim lifecycle over a private two-phase backdrop.
+- **Maximized perimeter (`WindowCorners`, ADR 0014, D72; replaces ADR 0012's mechanism):** the guard writes to
+  no window but its own. `ClassifyCornerWindow` (pure) decides from what Windows reports whether a window is a
+  maximized application between the bars; the first one front to back on each monitor gets two click-through
+  windows directly above it: `AetherShell.WindowCornerGuard.Corners`, whose rectangles (`CornerPieceRects`) each
+  show the desktop through a DWM thumbnail of the desktop window, and `AetherShell.WindowCornerGuard.Rim`
+  (`CornerRimRects`). They are always-on-top only when their target is. Events (foreground, reorder, the target's
+  or a maximized window's show, hide, move, minimize, cloak; display and work-area broadcasts; Explorer restart)
+  ask for one look after the waiting messages are read; a two-second check runs only while something is shown.
+  Tests give the guard a private window to stand for the desktop: it never shows the real one in a test.
+  Native tests verify the live desktop pixel for pixel in the corners, a continuous rim, an unchanged
+  application, stacking, a hung application and the removal of an earlier version's abandoned clip.
+- **Written Top Bar (D71):** `RequestTopBarBackdrop` measures the strip of the desktop picture under the bar on the
+  picture worker (`welcome::LoadDesktopBackdrop`, `topbar::MeasureBackdrop`) when the Text presentation is chosen,
+  when the bar's place changes and on wallpaper or display changes; only luminance leaves the worker. The Auto-Hide
+  sample also tells the bar whether a window is under it (`SetOverWindows`).
 
 ## D47 additions — Auto-Hide and hidden-icons toggle (S-057)
 

@@ -52,9 +52,11 @@ AETHER_TEST("settings UI: appearance controls preserve custom size and opt-out w
     ::SendMessageW(window.Control(208),BM_SETCHECK,BST_UNCHECKED,0);
     ::SendMessageW(window.Control(209),BM_SETCHECK,BST_UNCHECKED,0);
     ::SendMessageW(window.Control(210),BM_SETCHECK,BST_CHECKED,0);
-    ::SendMessageW(window.Control(211),CB_SETCURSEL,1,0);
-    ::SendMessageW(window.Control(212),CB_SETCURSEL,0,0);
-    ::SendMessageW(window.Control(213),BM_SETCHECK,BST_UNCHECKED,0);
+    CHECK_EQ(::SendMessageW(window.Control(211),CB_GETCURSEL,0,0),LRESULT{0});  // D71: the floating bar by default
+    ::SendMessageW(window.Control(211),CB_SETCURSEL,1,0);  // Text on the desktop
+    ::SendMessageW(window.Control(212),CB_SETCURSEL,1,0);
+    ::SendMessageW(window.Control(213),CB_SETCURSEL,0,0);
+    ::SendMessageW(window.Control(214),BM_SETCHECK,BST_UNCHECKED,0);
     ::SendMessageW(window.Control(101),BM_CLICK,0,0);
     REQUIRE(Pump(dispatcher,[&]{return service.Current().general.themeMode==settings::ThemePreference::Dark && !service.Dirty();}));
     CHECK_EQ(service.Current().dock.iconSize,64);
@@ -67,6 +69,7 @@ AETHER_TEST("settings UI: appearance controls preserve custom size and opt-out w
     CHECK_EQ(service.Current().general.animationSpeed,1.25);
     CHECK_FALSE(service.Current().dock.showStartButton);CHECK_FALSE(service.Current().dock.showTaskViewButton);
     CHECK(service.Current().dock.reserveAnimationSpace);
+    CHECK_EQ(service.Current().topBar.presentation,settings::TopBarPresentation::Text);
     CHECK_EQ(service.Current().topBar.weatherPlacement,settings::WeatherPlacement::Right);
     CHECK_EQ(service.Current().topBar.keyboardIndicator,settings::KeyboardIndicatorStyle::Compact);
     CHECK_FALSE(service.Current().general.syncTaskbarPins);

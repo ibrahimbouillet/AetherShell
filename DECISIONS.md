@@ -111,6 +111,72 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D73 — A dragged icon never leaves the Dock: it stretches after it, and springs back
+
+Owner, 2026-11-10, with a screenshot: an icon dragged in the Dock could be carried far to the side, out of the Dock,
+anywhere in the band the Dock's window spans; "it looks like a buggy application". The owner's rule: the Dock's room is
+its own shape and about twenty pixels at its sides, nothing above; a dragged icon always stays in the Dock; pulled
+further, the Dock follows like a rubber band, and let go it shrinks back with a bounce.
+
+- **Cause, from source:** the drag clamped the icon to the Dock *window's* width, which is the work area's, and each
+  icon's own rectangle was part of the window's shape wherever it went.
+- **Now:** between the panel's ends the icon follows the hand. Past an end it goes only as far as that end stretches:
+  one for one at first, then less and less, never by more than 24 DIPs however far the hand goes (`DockRubberBand`,
+  `PullDockIcon`, pure and unit tested). The panel is always drawn around a lifted icon with 4 DIPs of room, so the
+  window's shape ends with the panel. On release the stretch springs back (stiffness 320, damping 16: one clear
+  bounce, limited to 6 DIPs inwards so that it never cuts into the icons) while the icon slides to its place.
+  Reduced motion and high contrast: the icon simply stops at the ends.
+- **Not changed:** the strip Windows keeps free for maximized windows runs the whole width of the screen, because that
+  is what an application bar reserves; beside the Dock nothing of Aether's takes input, and ordinary windows can lie
+  there. Auto-Hide is the way to give maximized windows that strip.
+
+FR-004, T59. Evidence: TEST_STATUS S-074.
+
+### D72 — Rounded corners for every maximized window, without touching the application
+
+Owner, 2026-11-10: the rounded corners of "the pages" are a very big bug that could not be solved, drawing them brings
+faults with it, and every page must be able to be rounded. Decision, in [ADR 0014](docs/decisions/0014-window-corner-pieces.md):
+**the guard never writes to another application's window again.** No region, no DWM attribute, no property, no message.
+
+- It reads what Windows reports about top-level windows and keeps two click-through windows of its own directly above
+  the front maximized window of a monitor: the **corner pieces**, which show the desktop that lies there, live, through
+  DWM thumbnails of the desktop window (measured on this PC: identical to the desktop pixel for pixel), and the
+  **rim**. Whatever is in front of the maximized window is in front of them.
+- **Every kind of window is served:** browsers, Electron, File Explorer, packaged and elevated applications. Before,
+  they were left square by rule or took their shape back. Applications keep their caption buttons, material and
+  placement, since nothing of theirs is changed.
+- **Nothing can be left behind:** if the guard stops or dies, its windows go with it. Once, at start, it removes the
+  clip and marks an earlier version's dead guard left on a window.
+- **What it costs:** a corner shows the desktop, not a window that is not maximized and lies behind exactly there.
+  Corners and rim are still not antialiased.
+
+This replaces ADR 0012's mechanism for other applications (D40, D45, D46 and D56's retries). D56's rule stands: a
+maximize that fills the monitor stays square. Aether's own Settings window keeps its own rounded frame. AS4-01, AS4-03,
+AS4-05 and AS4-07 lose their object: there is no write to delay, reconcile or take over. Whether the blank pages the
+owner saw came from those writes is not established; they are no longer made. FR-036, T58. Evidence: TEST_STATUS S-074.
+
+### D71 — The Top Bar as text on the desktop
+
+Owner, 2026-11-10: a third version of the Top Bar, chosen in Settings, "like Apple's": only text, at the very top,
+always there, the same content as the Top Bar but with no bar holding it, "as if written on the background".
+
+- **A choice of the Top Bar's own:** Settings → Top Bar → Presentation (also under Appearance → Top Bar): *Floating
+  bar* (the default, and what every earlier settings file means) or *Text on the desktop* (`topBar.presentation`:
+  `floating`, `text`). It is not a third Style: Grain and Liquid are materials of every surface, the Dock included.
+- **Text on the desktop:** no panel, backdrop, border or shadow. The same items, with the same actions, tooltips, menus
+  and accessibility, flush with the top of the screen across its whole width; the mark is written like the rest.
+- **It reads over the picture.** The strip of the desktop picture under the bar is measured once per picture, as
+  luminance only, in 64 columns. Each side of the bar (the mark and left weather; the status items and clock) takes
+  light ink, or dark ink where even the darkest part behind it is light, and a soft halo of the opposite tone as strong
+  as that part needs for 4.5:1, never none. Unknown picture: the theme's ink under a strong halo.
+- **Always there, by default:** the strip is kept free of windows whatever "Reserve screen space" says, so text never
+  lies over an application. The top margin and glass opacity do not apply.
+- **It can still hide:** with Auto-Hide it leaves while a window covers it and returns at the top edge, then on a square
+  strip of the style's glass from edge to edge, for as long as a window is under it.
+- **High contrast keeps the bar.** The arrival still spreads its upper drop along the top, then gives way to the text.
+
+FR-043, T57. Evidence: TEST_STATUS S-074.
+
 ### D70 — The interface in five languages, and its documentation
 
 Owner, 2026-11-09: the application gets five languages, "the five best known, the ones people will use most",

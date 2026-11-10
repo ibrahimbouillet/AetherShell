@@ -336,3 +336,13 @@ once when an exit is reversed mid-way. Full-screen suppression keeps priority (`
 no longer shows an auto-hidden Dock). `Engaged()` reports pointer, drag, menu (its modal loop),
 preview or keyboard use; `PanelBoundsPx()` is the area an application window covers. An auto-hidden
 Dock registers no AppBar, also in replacement mode, so maximized windows take the full height.
+
+## A dragged icon stays in the Dock (D73/FR-004, S-074)
+
+`MoveDrag` no longer clamps to the window's width. `PullDockIcon` (pure, `DockMotion`) lets the icon's centre move
+freely between the panel's ends (and always as far as the first and last places it can take), and past an end only as
+far as `DockRubberBand` stretches that end: `reach * d / (d + reach)` with a reach of 24 DIPs. `Arrange` keeps the
+unstretched panel in `restPanel`, moves each end out by its stretch, and always by enough to hold a lifted icon with
+`kDockDragInset` of room, so the window's shape ends with the panel. `FinishDrag` lets the two stretch springs go from
+where the panel is drawn (stiffness 320, damping 16), `OnAnimate` steps them, and their bounce is limited to 6 DIPs
+inwards. Without motion the reach is zero.

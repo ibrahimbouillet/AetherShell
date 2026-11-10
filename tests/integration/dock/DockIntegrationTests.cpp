@@ -5,6 +5,7 @@
 #include "LiquidScenes.h"
 
 #include "core/FileSystem.h"
+#include "dock/DockMotion.h"
 #include "dock/DockWindow.h"
 #include "platform/windows/ComApartment.h"
 #include "platform/windows/MessageLoop.h"
@@ -806,7 +807,7 @@ AETHER_TEST("dock integration: captured drag follows continuously and neighbour 
     CHECK(center(sliding.items[1].icon) > center(initialA));
     CHECK(sliding.items[2].icon.top < liftStart); // lift begins over time, not at pointer-down
     const float neighbourBefore = center(sliding.items[1].icon);
-    const float secondX = center(initialC) + 14;
+    const float secondX = center(initialC) + 5;   // still inside the Dock: past its end the icon no longer follows one for one (D73)
     ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(secondX, y));
     crossed = geometry(); REQUIRE_EQ(settings.Current().dock.pinned[2].id, L"exe:motion-A");
     CHECK(std::abs(center(crossed.items[3].icon) - secondX) <= 1.0f);
@@ -861,6 +862,122 @@ AETHER_TEST("dock integration: captured drag follows continuously and neighbour 
     RunFor(loop, 200); const auto reduced = geometry(); RunFor(loop, 200);
     CHECK(std::abs(geometry().items[3].icon.top - reduced.items[3].icon.top) < 0.01f);
     RECT workAfter{}; REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA, 0, &workAfter, 0)); CHECK(::EqualRect(&workBefore, &workAfter));
+    window.Destroy(); loop.RemoveMessageFilter(filter);
+}
+
+AETHER_TEST("dock integration: a dragged icon never leaves the Dock; pulled past an end the Dock stretches after it and springs back (D73)") {
+    platform::ComApartment com(COINIT_APARTMENTTHREADED);
+    platform::MessageLoop loop; graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok()); ManualDispatcher dispatcher;
+    settings::SettingsService settings(test::MakeTempDirectory("dock-elastic") / L"settings.json", dispatcher);
+    REQUIRE(settings.Load({}).ok());
+    const auto deadline = std::chrono::steady_clock::now() + 5s;
+    while (!settings.Loaded() && std::chrono::steady_clock::now() < deadline) { dispatcher.RunPending(); std::this_thread::sleep_for(1ms); }
+    REQUIRE(settings.Loaded());
+    REQUIRE(settings.Update([](settings::Settings& value) {
+        value.dock.showStartButton = false; value.dock.showTaskViewButton = false;
+        value.dock.magnification = 1;   // the panel's width then changes with the pull alone, not with hover scale
+        for (const auto* name : {L"A", L"B", L"C"}) {
+            settings::PinnedApp pin; pin.id = std::wstring(L"exe:elastic-") + name;
+            pin.displayName = std::wstring(L"Synthetic ") + name; pin.parsingName = std::wstring(L"Synthetic.Elastic.") + name;
+            value.dock.pinned.push_back(std::move(pin));
+        }
+    }).ok());
+    FakeLauncher launcher; FakeIcons icons;
+    const RECT area{0, 0, 1000, 600}; Backdrop backdrop(area); REQUIRE(backdrop.hwnd);
+    dock::DockWindow window({device, scheduler, dispatcher, launcher, icons, settings});
+    dock::DockWindowOptions options; options.workAreaPx = area; options.allowWorkAreaReservation = false; options.owner = backdrop.hwnd;
+    REQUIRE(window.Create(options).ok());
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), {}, settings.Current().dock).ok());
+    const auto filter = loop.AddMessageFilter([hwnd = window.Handle()](MSG& message) {
+        return message.hwnd == hwnd && (message.message == WM_MOUSEMOVE || message.message == WM_MOUSELEAVE);
+    });
+    window.Show(false); RunFor(loop, 350);
+    const auto geometry = [&]() { auto value = window.Geometry(); REQUIRE(value.ok()); return *value; };
+    const auto center = [](const D2D1_RECT_F& rect) { return (rect.left + rect.right) / 2; };
+    // Positions well outside the window are part of the test: coordinates travel as signed 16-bit values.
+    const auto at = [&](float x, float y) {
+        return MAKELPARAM(static_cast<WORD>(static_cast<short>(std::lround(window.ToPx(x)))), static_cast<WORD>(static_cast<short>(std::lround(window.ToPx(y)))));
+    };
+    const auto rest = geometry(); REQUIRE_EQ(rest.items.size(), 4u);
+    const float y = (rest.items[1].icon.top + rest.items[1].icon.bottom) / 2;
+    const float windowWidth = window.ToDip(static_cast<float>(window.BoundsPx().right - window.BoundsPx().left));
+    // The dragged icon, wherever the hand is: inside the panel, which is never stretched beyond its room.
+    const auto inside = [&](const dock::DockLayout& now) {
+        REQUIRE(now.raisedItem.has_value());
+        const auto& icon = now.items[*now.raisedItem].icon;
+        CHECK(icon.left >= now.panel.left); CHECK(icon.right <= now.panel.right);
+        CHECK(now.panel.right <= rest.panel.right + dock::kDockElasticReach + dock::kDockDragInset + 1.0f);
+        CHECK(now.panel.left >= rest.panel.left - dock::kDockElasticReach - dock::kDockDragInset - 1.0f);
+        return icon;
+    };
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, 0, at(center(rest.items[1].icon), y));
+    REQUIRE_EQ(::GetCapture(), window.Handle());
+    // Pulled to the right, further and further: far past the Dock, to the window's end, and beyond the screen.
+    float previousRight = rest.panel.right, previousCenter = 0;
+    for (const float x : {rest.panel.right + 30.0f, rest.panel.right + 150.0f, windowWidth - 10.0f, windowWidth + 400.0f, 9000.0f}) {
+        ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(x, y));
+        RunFor(loop, 40);
+        const auto now = geometry();
+        const auto icon = inside(now);
+        CHECK(now.panel.right > previousRight);            // the Dock follows a little more each time
+        CHECK(center(icon) > previousCenter);
+        CHECK(std::abs(now.panel.left - rest.panel.left) < 0.5f);   // only the pulled end moves
+        previousRight = now.panel.right; previousCenter = center(icon);
+    }
+    CHECK(previousRight > rest.panel.right + 12.0f);       // a real stretch, well short of where the hand went
+    // The window's own shape ends with the panel: the icon is not out there on its own, catching clicks.
+    {
+        HRGN shape = ::CreateRectRgn(0, 0, 0, 0); REQUIRE(shape != nullptr);
+        REQUIRE(::GetWindowRgn(window.Handle(), shape) != ERROR);
+        const int row = static_cast<int>(std::lround(window.ToPx(y)));
+        CHECK(::PtInRegion(shape, static_cast<int>(std::lround(window.ToPx(previousRight - 3.0f))), row) != FALSE);
+        CHECK(::PtInRegion(shape, static_cast<int>(std::lround(window.ToPx(previousRight + 6.0f))), row) == FALSE);
+        CHECK(::PtInRegion(shape, static_cast<int>(std::lround(window.ToPx(windowWidth - 60.0f))), row) == FALSE);
+        ::DeleteObject(shape);
+    }
+    // And to the left, the same way: the right end comes back while the left one stretches.
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(-600.0f, y));
+    RunFor(loop, 40);
+    {
+        const auto now = geometry();
+        const auto icon = inside(now);
+        CHECK(now.panel.left < rest.panel.left - 12.0f);
+        CHECK(std::abs(now.panel.right - rest.panel.right) < 0.5f);
+        CHECK(center(icon) < center(rest.items[1].icon));
+    }
+    // Let go: the Dock springs back past its own shape, then settles on it exactly, with the icon in a place of its own.
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, at(-600.0f, y));
+    float narrowest = rest.panel.left, widest = rest.panel.left;
+    for (int step = 0; step < 40; ++step) {
+        RunFor(loop, 16);
+        const auto now = geometry();
+        narrowest = std::max(narrowest, now.panel.left); widest = std::min(widest, now.panel.left);
+        for (const auto& item : now.items) { CHECK(item.icon.left >= now.panel.left - 0.01f); CHECK(item.icon.right <= now.panel.right + 0.01f); }
+    }
+    CHECK(narrowest > rest.panel.left + 0.3f);   // the bounce: the end came in past its resting place
+    ::SendMessageW(window.Handle(), WM_MOUSELEAVE, 0, 0); RunFor(loop, 1500);
+    const auto settled = geometry();
+    CHECK(std::abs(settled.panel.left - rest.panel.left) < 0.05f); CHECK(std::abs(settled.panel.right - rest.panel.right) < 0.05f);
+    CHECK_FALSE(settled.raisedItem.has_value());
+    CHECK_EQ(settings.Current().dock.pinned[0].id, L"exe:elastic-A");   // pulled left from the first place: still first
+    CHECK_EQ(launcher.launches, 0); CHECK_EQ(launcher.activations, 0);
+    // Without motion the icon simply stops at the Dock's ends, and the Dock keeps its shape.
+    REQUIRE(window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::Dark), graphics::MotionPolicy{true}, settings.Current().dock).ok());
+    RunFor(loop, 200);
+    const auto still = geometry();
+    ::SendMessageW(window.Handle(), WM_LBUTTONDOWN, 0, at(center(still.items[1].icon), y));
+    ::SendMessageW(window.Handle(), WM_MOUSEMOVE, MK_LBUTTON, at(9000.0f, y));
+    RunFor(loop, 60);
+    {
+        const auto now = geometry();
+        REQUIRE(now.raisedItem.has_value());
+        const auto& icon = now.items[*now.raisedItem].icon;
+        CHECK(icon.right <= now.panel.right + 0.01f);
+        CHECK(now.panel.right <= still.panel.right + dock::kDockDragInset + 2.0f);
+    }
+    ::SendMessageW(window.Handle(), WM_LBUTTONUP, 0, at(9000.0f, y));
+    RunFor(loop, 300);
     window.Destroy(); loop.RemoveMessageFilter(filter);
 }
 

@@ -15,6 +15,23 @@ namespace aether::dock {
 [[nodiscard]] std::optional<std::size_t> CrossedDockSlot(std::span<const float> restingCenters,
     std::size_t current, float draggedCenter) noexcept;
 
+// D73: a dragged icon never leaves the Dock. Between the panel's ends it follows the hand. Pulled past an end,
+// the Dock stretches after it like a rubber band: one for one at first, then less and less, never by more than
+// `reach`; let go, the Dock springs back and bounces once or twice.
+inline constexpr float kDockElasticReach = 24.0f;   // DIPs: what no pull, however far, stretches the Dock beyond
+inline constexpr float kDockDragInset = 4.0f;       // DIPs kept between a dragged icon and the panel's end
+// How far a band that never exceeds `reach` follows a pull of `distance`. Zero for no pull or no reach.
+[[nodiscard]] float DockRubberBand(float distance, float reach) noexcept;
+struct DockPull {
+    float center = 0;         // where the dragged icon's centre goes
+    float stretchLeft = 0;    // how far the panel's left end follows it outwards
+    float stretchRight = 0;   // and its right end
+    bool operator==(const DockPull&) const = default;
+};
+// `low` and `high` are the centres between which the icon moves freely (the panel's ends, less the icon's half
+// width). With no reach (reduced motion) the icon simply stops at them.
+[[nodiscard]] DockPull PullDockIcon(float wantedCenter, float low, float high, float reach) noexcept;
+
 inline constexpr double kDockAttentionDuration = 2.4;
 struct DockAttentionVisual { float opacity = 0; float height = 0; };
 // Three soft finite pulses per real request. Motion policy and static accessible cues are owned

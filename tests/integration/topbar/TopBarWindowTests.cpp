@@ -15,6 +15,7 @@
 #include "status/WinRtSupport.h"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <cstdint>
@@ -23,6 +24,7 @@
 #include <functional>
 #include <optional>
 #include <stdexcept>
+#include <string>
 #include <thread>
 #include <vector>
 #include <UIAutomation.h>
@@ -387,6 +389,226 @@ AETHER_TEST("topbar integration: Liquid's glass keeps text readable and its edge
         }
     }
     if (!shaped.empty()) lq::SavePng(lq::Sheet(shaped), output / L"topbar-liquid-shaped-sheet.png");
+    window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
+}
+
+AETHER_TEST("topbar integration: written on the desktop the bar is its items alone, read over eight scenes, and sits on glass over a window (D71)") {
+    namespace lq = aether::test::liquid;
+    platform::ComApartment com;
+    REQUIRE(SUCCEEDED(com.Status()));
+    platform::MessageLoop loop;
+    graphics::GraphicsDevice device; REQUIRE(device.Initialize().ok());
+    graphics::FrameScheduler scheduler; REQUIRE(scheduler.Initialize(loop).ok());
+    platform::Win32UiDispatcher dispatcher; REQUIRE(dispatcher.Initialize().ok());
+    lq::Photo() = lq::LoadPhoto();
+    if (lq::Photo().width <= 0) TEST_NOTE("the photograph was not found near the build: that scene is a plain grey");
+    const auto monitor = platform::PrimaryMonitor();
+    const float scale = static_cast<float>(monitor.dpi) / 96.0f;
+    const int width = static_cast<int>(std::min<LONG>(1100, monitor.workArea.right - monitor.workArea.left - 80));
+    const int height = static_cast<int>(std::lround(32 * scale));
+    const RECT captureBounds{monitor.workArea.left + 40, monitor.workArea.top + 140,
+        monitor.workArea.left + 40 + width, monitor.workArea.top + 140 + height + 48};
+    RECT privateBounds = captureBounds;
+    ::InflateRect(&privateBounds, 128, 128);
+    lq::SceneBackdrop backdrop; REQUIRE(backdrop.Create(privateBounds));
+    const RECT barBounds{captureBounds.left + 10, captureBounds.top + 20, captureBounds.right - 10, captureBounds.top + 20 + height};
+    TopBarContext context{device, scheduler, dispatcher}; context.allowAppBar = false;
+    TopBarWindow window(context); REQUIRE(window.Create(barBounds).ok());
+    settings::TopBarSettings settings; settings.reserveSpace = false; settings.clockFormat = settings::ClockFormat::Hours24;
+    settings.presentation = settings::TopBarPresentation::Text;
+    auto tokens = graphics::MakeDesignTokens(graphics::ThemeMode::Dark); tokens.transparencyEnabled = true;
+    window.SetTheme(tokens, graphics::MotionPolicy{true, 1});
+    window.SetSettings(settings, true); window.SetSnapshots(Synthetic());
+    REQUIRE(window.TextPresentation());
+    // Flush: the window is the strip itself, with nothing kept at its ends, above it or around it.
+    const RECT flush = window.BoundsPx();
+    CHECK(::EqualRect(&flush, &barBounds) != FALSE);
+    const auto output = std::filesystem::temp_directory_path() / "AetherShellTests";
+    std::filesystem::create_directories(output);
+    const int barTop = barBounds.top - captureBounds.top, barLeft = barBounds.left - captureBounds.left;
+    const int screenWidth = monitor.bounds.right - monitor.bounds.left;
+    // One look at the scene, with or without the bar over it; nothing when a foreign window passes.
+    const auto look = [&](bool withBar) -> std::optional<lq::Image> {
+        if (withBar) window.Show(false); else window.Hide();
+        ::SetWindowPos(backdrop.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        if (withBar) ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        RunFor(loop, 260);
+        bool privateNow = false;
+        for (int attempt = 0; attempt < 6 && !privateNow; ++attempt) {
+            privateNow = PrivateCrop(backdrop.hwnd, privateBounds);
+            if (!privateNow) RunFor(loop, 250);
+        }
+        if (!privateNow) { TEST_NOTE("inconclusive, a foreign window passed"); return std::nullopt; }
+        const auto captured = CaptureOwnBackdrop(backdrop.hwnd, privateBounds, captureBounds);
+        return lq::Image{captured.width, captured.height, captured.bytes};
+    };
+    const auto at = [](const lq::Image& image, int x, int y) { return image.bgra.data() + (static_cast<std::size_t>(y) * image.width + x) * 4; };
+    const auto grey = [&](const lq::Image& image, int x, int y) { const auto* p = at(image, x, y); return (p[0] + p[1] + p[2]) / 3.0; };
+    // What the host measures: the strip under the bar, in columns across the whole screen.
+    const auto profileOf = [&](const lq::Image& scene) {
+        std::vector<std::uint8_t> strip(static_cast<std::size_t>(screenWidth) * height * 4);
+        for (int y = 0; y < height; ++y) for (int x = 0; x < screenWidth; ++x) {
+            const int sx = std::clamp(x + static_cast<int>(monitor.bounds.left - captureBounds.left), 0, scene.width - 1);
+            std::copy_n(at(scene, sx, barTop + y), 4, strip.data() + (static_cast<std::size_t>(y) * screenWidth + x) * 4);
+        }
+        return MeasureBackdrop(strip, screenWidth, height, RECT{0, 0, screenWidth, height}, 64);
+    };
+    // The two sides of the bar, in capture pixels, and the ink each takes over `profile`, as the bar chooses it.
+    struct Side { int left = 0, right = 0; TextInk ink; };
+    const auto sidesOf = [&](const BackdropProfile& profile) {
+        std::array<Side, 2> sides{};
+        std::array<bool, 2> any{};
+        for (const auto& entry : window.Items()) {
+            const std::size_t side = entry.item.kind == ItemKind::Logo ||
+                (entry.item.kind == ItemKind::Weather && settings.weatherPlacement == settings::WeatherPlacement::Left) ? 0u : 1u;
+            const int left = barLeft + static_cast<int>(std::floor(entry.rect.left * scale)), right = barLeft + static_cast<int>(std::ceil(entry.rect.right * scale));
+            sides[side].left = any[side] ? std::min(sides[side].left, left) : left;
+            sides[side].right = any[side] ? std::max(sides[side].right, right) : right;
+            any[side] = true;
+        }
+        for (auto& side : sides) {
+            const auto across = [&](int capturePx) { return static_cast<float>(capturePx + captureBounds.left - monitor.bounds.left) / static_cast<float>(screenWidth); };
+            side.ink = ChooseTextInk(&profile, across(side.left), across(side.right), false);
+        }
+        return sides;
+    };
+    // The same bar over plain white and plain black gives what it draws, pixel by pixel: how much of the ink covers a
+    // pixel. A stroke's own pixels are then compared with the pixels right around it, as they appear over the scene.
+    struct Reading { double worst = 0.0, low = 0.0, median = 0.0; std::size_t strokes = 0; };
+    const auto read = [&](const lq::Image& overWhite, const lq::Image& overBlack, const lq::Image& overScene, const Side& side) {
+        const auto cover = [&](int x, int y) {
+            const double white = grey(overWhite, x, y), black = grey(overBlack, x, y);
+            const double drawn = 1.0 - (white - black) / 255.0;   // ink and halo together
+            return side.ink.dark ? drawn - black / 255.0 : black / 255.0;
+        };
+        std::vector<double> contrasts;
+        for (int y = barTop + 2; y < barTop + height - 2; ++y) for (int x = std::max(2, side.left); x < std::min(overScene.width - 2, side.right); ++x) {
+            if (cover(x, y) < 0.7) continue;
+            double around = 0.0; int count = 0;
+            for (int dy = -2; dy <= 2; ++dy) for (int dx = -2; dx <= 2; ++dx)
+                if (cover(x + dx, y + dy) <= 0.12) { around += lq::Luminance(at(overScene, x + dx, y + dy)); ++count; }
+            if (count) contrasts.push_back(lq::Contrast(lq::Luminance(at(overScene, x, y)), around / count));
+        }
+        Reading reading;
+        reading.strokes = contrasts.size();
+        if (contrasts.empty()) return reading;
+        std::sort(contrasts.begin(), contrasts.end());
+        reading.worst = contrasts.front();
+        reading.low = contrasts[contrasts.size() / 20];
+        reading.median = contrasts[contrasts.size() / 2];
+        return reading;
+    };
+    std::vector<std::vector<lq::Image>> rows;
+    for (int scene = 0; scene < static_cast<int>(lq::kSceneNames.size()); ++scene) {
+        const std::string name = lq::kSceneNames[static_cast<std::size_t>(scene)];
+        backdrop.Show(scene);
+        const auto bare = look(false);
+        if (!bare) continue;
+        const auto profile = profileOf(*bare);
+        REQUIRE_FALSE(profile.columns.empty());
+        window.SetBackdropProfile(profile);
+        const auto over = look(true);
+        backdrop.Show(0); const auto overWhite = look(true);
+        backdrop.Show(1); const auto overBlack = look(true);
+        if (!over || !overWhite || !overBlack) continue;
+        lq::SavePng(*over, output / ("topbar-written-" + name + ".png"));
+        rows.push_back({*bare, *over});
+        const auto sides = sidesOf(profile);
+        // No bar: between its two sides the scene is exactly what it is without the bar.
+        int touched = 0;
+        for (int y = barTop; y < barTop + height; ++y) for (int x = sides[0].right + 24; x < sides[1].left - 24; ++x)
+            for (int channel = 0; channel < 3; ++channel) touched = std::max(touched, std::abs(static_cast<int>(at(*over, x, y)[channel]) - static_cast<int>(at(*bare, x, y)[channel])));
+        CHECK(sides[1].left - sides[0].right > 100);
+        CHECK(touched <= 2);
+        for (std::size_t index = 0; index < sides.size(); ++index) {
+            const auto reading = read(*overWhite, *overBlack, *over, sides[index]);
+            char line[200];
+            std::snprintf(line, sizeof(line), "%s, %s side: %s ink, halo %.2f; strokes against what surrounds them: worst %.2f:1, low %.2f:1, median %.2f:1 (%zu pixels)",
+                          name.c_str(), index == 0 ? "left" : "right", sides[index].ink.dark ? "dark" : "light", sides[index].ink.halo,
+                          reading.worst, reading.low, reading.median, reading.strokes);
+            TEST_NOTE(line);
+            CHECK(reading.strokes > 40);
+            // What a desktop shows: plain colours, a split, every hue, a photograph. A page of an application
+            // (scenes 4 to 6) is not what the written bar lies over: there it sits on glass, checked below.
+            if (scene >= 4 && scene <= 6) continue;
+            CHECK(reading.low >= 4.5);      // nineteen stroke pixels in twenty stand at 4.5:1 (WCAG) or more from their surroundings
+            CHECK(reading.median >= 7.0);
+        }
+    }
+    if (!rows.empty()) lq::SavePng(lq::Sheet(rows), output / L"topbar-written-sheet.png");
+    // Each side takes the ink of its own part of the picture. Over the hues the left side lies on yellow and takes
+    // dark ink, while the right side, which crosses blue, takes light ink. Over the split, the left side lies on
+    // black with a light halo, and the right side crosses black and white at once: light ink under a strong halo.
+    {
+        backdrop.Show(3);
+        if (const auto bare = look(false)) {
+            const auto sides = sidesOf(profileOf(*bare));
+            CHECK(sides[0].ink.dark);
+            CHECK_FALSE(sides[1].ink.dark);
+        }
+        backdrop.Show(2);
+        if (const auto bare = look(false)) {
+            const auto sides = sidesOf(profileOf(*bare));
+            CHECK_FALSE(sides[0].ink.dark);
+            CHECK(sides[0].ink.halo <= 0.35f);
+            CHECK_FALSE(sides[1].ink.dark);
+            CHECK(sides[1].ink.halo >= 0.8f);
+        }
+    }
+    // Over an application window (Auto-Hide brought the bar back there) the items sit on the style's glass, square,
+    // from edge to edge; back on the desktop the glass is gone.
+    std::vector<std::vector<lq::Image>> plates;
+    for (const int scene : {4, 5}) {
+        backdrop.Show(scene);
+        const auto bare = look(false);
+        if (!bare) continue;
+        window.SetBackdropProfile(profileOf(*bare));
+        const auto sides = sidesOf(profileOf(*bare));
+        const auto material = [&](const lq::Image& image) {
+            long difference = 0, samples = 0;
+            for (int x = sides[0].right + 24; x < sides[1].left - 24; x += 2, ++samples) for (int channel = 0; channel < 3; ++channel)
+                difference += std::abs(static_cast<int>(at(image, x, barTop + height / 2)[channel]) - static_cast<int>(at(*bare, x, barTop + height / 2)[channel]));
+            return samples ? static_cast<double>(difference) / static_cast<double>(samples) : 0.0;
+        };
+        std::vector<lq::Image> row{*bare};
+        for (const bool liquid : {false, true}) {
+            auto styled = graphics::MakeDesignTokens(graphics::ThemeMode::Dark); styled.transparencyEnabled = true; styled.liquid = liquid;
+            window.SetTheme(styled, graphics::MotionPolicy{true, 1});
+            window.SetOverWindows(true);
+            RunFor(loop, 300);   // the compositor's backdrop catches up
+            const auto plated = look(true);
+            if (!plated) continue;
+            row.push_back(*plated);
+            lq::SavePng(*plated, output / (std::string("topbar-written-plate-") + (liquid ? "liquid-" : "grain-") + lq::kSceneNames[static_cast<std::size_t>(scene)] + ".png"));
+            char line[160];
+            std::snprintf(line, sizeof(line), "%s, %s glass under the items: the strip differs from the page by %.1f per pixel", lq::kSceneNames[static_cast<std::size_t>(scene)], liquid ? "Liquid" : "Grain", material(*plated));
+            TEST_NOTE(line);
+            CHECK(material(*plated) > 10.0);
+            // The glass reaches the window's edges and corners: no rounded corner left open.
+            int corner = 0;
+            for (int channel = 0; channel < 3; ++channel) corner += std::abs(static_cast<int>(at(*plated, barLeft + 1, barTop + 1)[channel]) - static_cast<int>(at(*bare, barLeft + 1, barTop + 1)[channel]));
+            CHECK(corner > 6);
+            window.SetOverWindows(false);
+            const auto back = look(true);
+            if (back) CHECK(material(*back) <= 2.0);
+        }
+        plates.push_back(std::move(row));
+    }
+    if (!plates.empty()) lq::SavePng(lq::Sheet(plates), output / L"topbar-written-plate-sheet.png");
+    // At rest nothing is drawn again.
+    window.SetTheme(tokens, graphics::MotionPolicy{true, 1});
+    window.Show(false);
+    int quietIntervals = 0;
+    for (int attempt = 0; attempt < 12 && quietIntervals < 2; ++attempt) {
+        const auto before = window.RenderCount(); RunFor(loop, 120);
+        quietIntervals = window.RenderCount() == before ? quietIntervals + 1 : 0;
+    }
+    CHECK_EQ(quietIntervals, 2);
+    // High contrast keeps the bar: its text stays on the system's own colours.
+    window.SetTheme(graphics::MakeDesignTokens(graphics::ThemeMode::HighContrast), graphics::MotionPolicy{true, 1});
+    CHECK_FALSE(window.TextPresentation());
+    const RECT bar = window.BoundsPx();
+    CHECK(::EqualRect(&bar, &barBounds) == FALSE);
     window.Destroy(); dispatcher.Shutdown(); scheduler.Shutdown();
 }
 

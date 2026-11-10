@@ -63,6 +63,7 @@
 #include <shobjidl.h>
 #include <wtsapi32.h>
 #include <array>
+#include <cmath>
 #include <future>
 #include <atomic>
 #include <set>
@@ -177,6 +178,9 @@ struct ShellApplication::Impl {
     std::shared_ptr<const welcome::BackdropImage> welcomeBackdrop;
     std::uint64_t welcomeBackdropRequest = 0, welcomeBackdropAsked = 0;
     std::uint64_t desktopPictureRequest = 0;   // D63: 0 until the Liquid material or the arrival first needs the picture
+    // D71: the written Top Bar's backdrop is measured once per place of the bar, and again for a new picture.
+    std::uint64_t topBarBackdropRequest = 0;
+    std::optional<std::tuple<LONG, LONG, LONG, LONG>> topBarBackdropMeasured;
     bool desktopPicturePending = false;        // D69: a read of the picture is under way
     std::uint64_t materialUsedAt = 0;          // D69: the last frame that needed the picture (arrival, previews)
     bool graphicsTrimArmed = false;
@@ -330,6 +334,52 @@ struct ShellApplication::Impl {
                 if (welcomeWindow) welcomeWindow->Invalidate();
             });
         });
+    }
+    // D71: what the written Top Bar lies over. The strip of the desktop picture under the bar is measured away from
+    // the UI thread, as luminance only: the picture itself is not kept, logged or stored. A plain desktop colour is
+    // measured as that colour.
+    void RequestTopBarBackdrop() {
+        if (!topbar || closing) return;
+        const auto request = ++topBarBackdropRequest;
+        const auto monitor = platform::PrimaryMonitor().bounds;
+        const RECT bar = topbar->BoundsPx();
+        const auto weak = std::weak_ptr<bool>(alive);
+        pictureWorker.Post([this, weak, request, monitor, bar] {
+            topbar::BackdropProfile profile;
+            if (const auto picture = welcome::LoadDesktopBackdrop(monitor, 0.5f); picture && picture->width && picture->height) {
+                const auto width = static_cast<float>(monitor.right - monitor.left), height = static_cast<float>(monitor.bottom - monitor.top);
+                const auto cover = welcome::CoverRect(static_cast<float>(picture->width), static_cast<float>(picture->height), width, height);
+                const float sx = static_cast<float>(picture->width) / std::max(1.0f, cover.right - cover.left);
+                const float sy = static_cast<float>(picture->height) / std::max(1.0f, cover.bottom - cover.top);
+                RECT strip{static_cast<LONG>(std::lround(-cover.left * sx)), static_cast<LONG>(std::lround((static_cast<float>(bar.top - monitor.top) - cover.top) * sy)),
+                           static_cast<LONG>(std::lround((width - cover.left) * sx)), static_cast<LONG>(std::lround((static_cast<float>(bar.bottom - monitor.top) - cover.top) * sy))};
+                strip.bottom = std::max(strip.bottom, strip.top + 1);
+                profile = topbar::MeasureBackdrop(picture->pixels, static_cast<int>(picture->width), static_cast<int>(picture->height), strip, 64);
+            } else {
+                const COLORREF colour = ::GetSysColor(COLOR_DESKTOP);
+                const std::array<std::uint8_t, 4> pixel{GetBValue(colour), GetGValue(colour), GetRValue(colour), 255};
+                profile = topbar::MeasureBackdrop(pixel, 1, 1, RECT{0, 0, 1, 1}, 1);
+            }
+            dispatcher.Post([this, weak, request, profile = std::move(profile)]() mutable {
+                if (const auto live = weak.lock(); !live || !*live || request != topBarBackdropRequest || !topbar) return;
+                if (profile.columns.empty()) topbar->SetBackdropProfile(std::nullopt);
+                else topbar->SetBackdropProfile(std::move(profile));
+            });
+        });
+    }
+    // Only while the bar is written on the desktop, and only when its place or the picture (`changed`) is new.
+    void UpdateTopBarBackdrop(bool changed = false) {
+        if (!topbar || closing) return;
+        if (!topbar->TextPresentation()) {
+            topBarBackdropMeasured.reset();
+            ++topBarBackdropRequest;   // a measure still under way is not wanted any more
+            return;
+        }
+        const RECT bar = topbar->BoundsPx();
+        const auto place = std::tuple{bar.left, bar.top, bar.right, bar.bottom};
+        if (!changed && topBarBackdropMeasured == place) return;
+        topBarBackdropMeasured = place;
+        RequestTopBarBackdrop();
     }
     // D69: the picture is read when something is about to show it, and given back when nothing has for a while.
     [[nodiscard]] bool DesktopPictureHeld() {
@@ -780,7 +830,7 @@ struct ShellApplication::Impl {
         if (closing || !settings || !settings->Loaded()) return;
         const auto& value = settings->Current();
         const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
-        if (!topOn) { topAutoHide.Reset(); if (topbar) topbar->SetAutoHidden(false); }
+        if (!topOn) { topAutoHide.Reset(); if (topbar) { topbar->SetAutoHidden(false); topbar->SetOverWindows(false); } }
         if (!dockOn) { dockAutoHide.Reset(); if (dock) dock->SetAutoHidden(false); }
         autoHideWatchesTouch = topOn || dockOn;
         UpdateTouchWatch();
@@ -813,6 +863,8 @@ struct ShellApplication::Impl {
             const auto covered = ApplicationWindowsCover(zones);
             topCovered = topOn && (covered & 1u) != 0;
             dockCovered = dockOn && (covered & 2u) != 0;
+            // D71: a written Top Bar brought back over an application sits on glass, never straight on its page.
+            if (topOn) topbar->SetOverWindows(topCovered);
         }
         if (topOn) {
             AutoHideSample sample;
@@ -1452,6 +1504,7 @@ void ShellApplication::Impl::ApplySettings() {
         }
     }
     if (topbar) { topbar->SetTheme(tokens, motion); topbar->SetSettings(value.topBar, value.weather.enabled); }
+    UpdateTopBarBackdrop();   // D71
     shellTokens = tokens;
     shellMotion = motion;
     UpdateSideInsets();
@@ -1732,7 +1785,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (DesktopPictureHeld()) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (DesktopPictureHeld()) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); UpdateTopBarBackdrop(true); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -1744,6 +1797,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
     connections.push_back(events.SettingChanged.Connect([this](UINT action, const std::wstring& section){
         if (action == SPI_SETDESKWALLPAPER && DesktopPictureHeld()) RequestDesktopPicture();   // D63: the water shows the new picture
+        if (action == SPI_SETDESKWALLPAPER) UpdateTopBarBackdrop(true);                        // D71: the ink reads over the new picture
         // AS4-08: a work-area broadcast (every AppBar change, Auto-Hide included) is answered by the
         // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
         switch (ClassifySettingChange(action, section)) {

@@ -299,3 +299,15 @@ transitions by the panel's extent) without touching full-screen suppression, whi
 bar registers no AppBar. The hidden-icons chevron shows Windows' overflow state (`SetHiddenIconsOpen`:
 up while open, down when closed) and the focus ring is drawn only after keyboard navigation of the
 bar (`FocusCuesVisible`); a click hides it.
+
+## Text on the desktop (D71/FR-043, S-074)
+
+`topBar.presentation = text` (never in high contrast): `Relayout` places the window flush with the top of the screen
+across its width (`ComputeTopBarPlacement` with no margin, shadow or side) and keeps the AppBar reservation unless
+Auto-Hide is on. `OnRender` draws no panel and asks the compositor for no backdrop; `PaintWritten` draws each side of
+the bar (`ClusterOf`: the mark and left weather; everything else) in the ink `ChooseTextInk` gives for its part of the
+`BackdropProfile` the host set (`SetBackdropProfile`), over `PaintHalo`: that side's own shapes recorded to a command
+list, widened three DIPs (morphology) and blurred twice (shadow effect), in the opposite tone. Labels are a weight
+heavier (`ItemWeight`), in measuring and drawing alike. `SetOverWindows(true)` (the host's Auto-Hide observation)
+draws the style's glass as a square strip under the items instead. The halo's context and effects live as long as the
+Direct2D device (`OnDeviceReplaced`).

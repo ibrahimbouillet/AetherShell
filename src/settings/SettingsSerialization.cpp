@@ -62,6 +62,7 @@ void Fields(S& s, F&& f) {
     f("topBar", "showNotificationAreaButton", s.topBar.showNotificationAreaButton);
     f("topBar", "showHiddenIconsButton", s.topBar.showHiddenIconsButton);
     f("topBar", "showBatteryPercent", s.topBar.showBatteryPercent);
+    f("topBar", "presentation", s.topBar.presentation);
     f("welcome", "enabled", s.welcome.enabled);
     f("welcome", "displayName", s.welcome.displayName);
     f("welcome", "language", s.welcome.language);
@@ -155,6 +156,11 @@ template <> struct EnumNames<WeatherPlacement> {
 template <> struct EnumNames<KeyboardIndicatorStyle> {
     static constexpr std::array values{std::pair{KeyboardIndicatorStyle::TwoLine, "two-line"},
         std::pair{KeyboardIndicatorStyle::Compact, "compact"}};
+};
+
+template <> struct EnumNames<TopBarPresentation> {
+    static constexpr std::array values{std::pair{TopBarPresentation::Floating, "floating"},
+        std::pair{TopBarPresentation::Text, "text"}};
 };
 
 // Version 1 (0.1) wrote the Dock size defaults 48/10 and no dock.metricsVersion.

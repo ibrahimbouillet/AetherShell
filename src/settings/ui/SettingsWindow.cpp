@@ -991,6 +991,12 @@ void SettingsWindow::Impl::BuildPage() {
     } else if (page == SettingsPage::TopBar) {
         header(L"Top Bar", L"Position, clock and the status items shown in the Top Status Bar.");
         BeginSection(L"Position and glass");
+        // D71: the bar, or its items written straight on the desktop at the very top of the screen.
+        Choice(L"Presentation", L"Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, "
+                                L"straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. "
+                                L"With automatic hiding, the text comes back on a strip of glass while a window is under it.",
+               {L"Floating bar", L"Text on the desktop"},
+               [](const Settings& s){return s.topBar.presentation;}, [](Settings& s,int v){s.topBar.presentation=static_cast<TopBarPresentation>(v);});
         const auto top = pixels(0, 100);
         Number(L"Top margin", L"Space between the Top Bar and the top of the screen.", top,
                [](const Settings& s){return s.topBar.topMargin;}, [](Settings& s,double v){s.topBar.topMargin=static_cast<int>(v);});
@@ -1133,6 +1139,12 @@ void SettingsWindow::Impl::BuildPage() {
         Check(L"Reserve extra space for Dock animations", L"Keeps magnification and launch bounce clear of maximized windows.",
               [](const Settings& s){return s.dock.reserveAnimationSpace;}, [](Settings& s,bool v){s.dock.reserveAnimationSpace=v;});
         BeginSection(L"Top Bar");
+        // D71: the bar, or its items written straight on the desktop at the very top of the screen.
+        Choice(L"Presentation", L"Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, "
+                                L"straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. "
+                                L"With automatic hiding, the text comes back on a strip of glass while a window is under it.",
+               {L"Floating bar", L"Text on the desktop"},
+               [](const Settings& s){return s.topBar.presentation;}, [](Settings& s,int v){s.topBar.presentation=static_cast<TopBarPresentation>(v);});
         Choice(L"Weather position", L"", {L"Left", L"Right"}, [](const Settings& s){return s.topBar.weatherPlacement;}, [](Settings& s,int v){s.topBar.weatherPlacement=static_cast<WeatherPlacement>(v);});
         Choice(L"Keyboard indicator", L"", {L"Compact", L"Two lines"}, [](const Settings& s){return s.topBar.keyboardIndicator;}, [](Settings& s,int v){s.topBar.keyboardIndicator=static_cast<KeyboardIndicatorStyle>(v);});
         BeginSection(L"Windows taskbar pins");

@@ -21,6 +21,28 @@ std::optional<std::size_t> CrossedDockSlot(std::span<const float> centers,
     return target;
 }
 
+float DockRubberBand(float distance, float reach) noexcept {
+    if (!std::isfinite(distance) || !std::isfinite(reach) || distance <= 0 || reach <= 0) return 0;
+    return reach * distance / (distance + reach);
+}
+
+DockPull PullDockIcon(float wantedCenter, float low, float high, float reach) noexcept {
+    DockPull pull;
+    if (!std::isfinite(low) || !std::isfinite(high)) { pull.center = std::isfinite(wantedCenter) ? wantedCenter : 0; return pull; }
+    if (high < low) high = low = (low + high) / 2;   // a panel narrower than the icon: its middle
+    if (!std::isfinite(wantedCenter)) { pull.center = std::isfinite(low) ? low : 0; return pull; }
+    if (wantedCenter > high) {
+        pull.stretchRight = DockRubberBand(wantedCenter - high, reach);
+        pull.center = high + pull.stretchRight;
+    } else if (wantedCenter < low) {
+        pull.stretchLeft = DockRubberBand(low - wantedCenter, reach);
+        pull.center = low - pull.stretchLeft;
+    } else {
+        pull.center = wantedCenter;
+    }
+    return pull;
+}
+
 DockAttentionVisual DockAttentionAt(double elapsed) noexcept {
     if (!std::isfinite(elapsed) || elapsed <= 0 || elapsed >= kDockAttentionDuration) return {};
     constexpr double cycle = kDockAttentionDuration / 3;

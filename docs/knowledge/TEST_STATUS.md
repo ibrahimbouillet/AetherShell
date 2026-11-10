@@ -3214,3 +3214,66 @@ and Quick Settings on screen; the setup run itself.
 (privacy audit passed) from the uncommitted tree described here. Test 4.4's build moved to `dist/test-4.4/`. A first package
 from `build/package` carried a stale `alpha.3` label (`dist/AetherShell-0.4.0-alpha.3-*`, not for use; left in place). Not
 committed, pushed, tagged, published or installed.
+
+### S-074 — Alpha 4, test 4.6: text Top Bar, corners without touching applications, elastic Dock drag (Claude, 2026-11-10)
+
+**What changed:** D71 (the Top Bar as text on the desktop, FR-043), D72 (ADR 0014: the corner guard writes to no window
+but its own; corner pieces showing the live desktop, and the rim, above the front maximized window) and D73 (a dragged
+icon stays in the Dock, which stretches after it and springs back). The owner first said not to deliver the work, then,
+back at the desk, asked for the test build: it is committed locally and packaged as test 4.6. Not pushed (D65), not
+installed: the installed version is still 4.5 and still runs the earlier guard.
+
+**Executed, Release `/W4 /WX`, `0.4.0-alpha.4`, build directory `build/wf-claude-v4`:**
+
+| Check | Result |
+| --- | --- |
+| Build, all targets, warnings as errors | Pass |
+| Non-network unit gate (`-Test -TestExclude 'network\|integration'`) | 25/25 suites |
+| Unit, new or changed | topbar 28 (flush geometry, backdrop measure, ink choice); settings 60 (`topBar.presentation` default, names, round trip, fallback); app 77 (corners: 9 cases, of which 5 new for the window rule, the D56 rule, shapes of its own, the outline, and the pieces and rim tiling the outline pixel for pixel over ten sizes; the 26 lease cases went with the lease); dock 66 (rubber band and pull) |
+| Catalog check | 752 texts, none untranslated (four new, in five languages) |
+| Native topbar | 9/9; new: text presentation over eight scenes, glass strip over a window, idle frames, high contrast keeps the bar |
+| Native app | 19/19; corners 10: four pixel cases (standard frame, client-drawn frame, composition window with Windows' material, layered), stacking, shape of its own, parent death, abandoned clip, D56, hung application |
+| Native dock | 17/17; new: elastic drag; the existing captured-drag case now drops inside the Dock |
+| Native settings_ui | 40/40; Appearance's Presentation row set and persisted; every page still lays out without overlap in the five languages |
+
+**Measured.**
+
+- *Text Top Bar, own window over the private scenes, 150% scale.* Between the bar's two sides the screen is the scene
+  itself (difference at most 2 of 255: no material). Stroke pixels against the pixels right around them, as composed:
+  nineteen in twenty at **7.54:1 or more** on every scene (white 10.4 and 11.0, black 11.1 and 12.4, split 11.1 and 7.5,
+  every hue 9.1 and 9.5, photograph 9.2 and 7.6; and, though the bar is not meant to lie there, light page 9.3 and 8.1,
+  dark text 8.4 and 8.4, light application 9.4 and 10.8); medians 12.2 to 21.0; the single worst pixel 3.42:1 (dark
+  text). Before the halo's shape was widened ahead of the blur, dark ink over blue measured 2.63:1: found by this
+  measure and corrected. Over a window the glass strip differs from the page by 113 to 363 per pixel in Grain and Liquid.
+- *Corners, own windows over a private window standing for the desktop, in both of its pictures.* Every corner pixel
+  outside the outline equals the desktop's own, pixel for pixel, in both pictures, for all four window families; the
+  rim is one colour on every corner arc and the middle of every side; the application's region, material, styles,
+  placement, bounds and properties are unchanged while the guard runs and after it stops. The pieces followed a newly
+  raised maximized window after **1 to 5 ms**; with one application not answering they reached it after 4 to 30 ms and
+  the guard stopped without waiting. Guard counters for a pixel case: 13 events, 6 looks, 4 restackings, longest look
+  12 to 26 ms (the first, which registers the thumbnails).
+- *Dock.* Pulled 30, 150, to the window's end, past it and to 9000 DIPs: the icon inside the panel every time, the panel
+  stretched more each time and never beyond 24 DIPs plus the icon's room; the window's shape ended with the panel; on
+  release the end came in past its resting place (the bounce) and settled on it exactly.
+- *The real desktop, numbers only, nothing saved or shown:* a probe window with a DWM thumbnail of the desktop window,
+  over a strip of bare desktop in the side margin, twice (plain and layered click-through): difference from the strip
+  itself **0** on average, 0 at worst; the same probe without the thumbnail, 94 and 153 on average. Read-only look at
+  the desktop's window tree: the icons are in Progman, with no separate picture window (Windows 11 build 26300).
+
+**Found on the way and corrected:** DWM draws a thumbnail over its whole rectangle whatever the region of the window
+that holds it (corners came out square: now one thumbnail per rectangle); Windows makes a window always-on-top when it
+is placed right behind an always-on-top one (the pieces then lay over a window in front: now they are always-on-top
+only with their target, and the native case asserts it); a blurred halo of strokes one or two pixels wide leaves almost
+nothing (now widened first).
+
+**Not executed, so not claimed:** any real application under the new guard, since that needs the new version running
+in place of the installed one; the D56 native case on this Windows build, which keeps a maximized window inside the
+work area whatever the window answers (the rule is unit tested from exact facts; the native case reports itself
+skipped); a live-wallpaper arrangement; a second monitor; 192 DPI; the text bar on the real desktop and its ink from
+the real picture end to end; the arrival's upper drop over a text bar; the new Settings row seen on screen in each
+language beyond the layout test; the setup run itself.
+
+**Test build 4.6:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 8307712 bytes, SHA-256
+`d99dd66b4d1485a86714d555aeaba468995c54aff35a4db3f1b4c93048ca76d0`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4`
+(privacy and source-freshness audit passed) from the tree this entry describes. Test 4.5's build moved to `dist/test-4.5/`
+(its hash checked against S-073's). Committed locally; not pushed, tagged, published or installed.

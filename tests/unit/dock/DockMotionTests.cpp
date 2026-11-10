@@ -211,3 +211,45 @@ AETHER_TEST("dock indicator: observed activation of a hovered marker continues w
     partial.Step(1.0 / 60);
     CHECK(partial.Width() > before);
 }
+
+AETHER_TEST("dock motion: a dragged icon stays in the Dock, which stretches after it like a rubber band (D73)") {
+    // The band follows one for one at first, then less and less, and never reaches its limit.
+    CHECK_EQ(DockRubberBand(0, kDockElasticReach), 0.0f);
+    CHECK_EQ(DockRubberBand(-30, kDockElasticReach), 0.0f);
+    CHECK_EQ(DockRubberBand(30, 0), 0.0f);
+    CHECK(DockRubberBand(1, kDockElasticReach) > 0.95f);
+    float previous = 0, previousGain = 1;
+    for (int pull = 1; pull <= 4000; pull += pull < 100 ? 1 : 97) {
+        const float followed = DockRubberBand(static_cast<float>(pull), kDockElasticReach);
+        CHECK(followed > previous);                       // pulling further always stretches a little more
+        CHECK(followed < kDockElasticReach);              // but never beyond the Dock's own room
+        CHECK(followed < static_cast<float>(pull));
+        const float gain = followed / static_cast<float>(pull);
+        CHECK(gain <= previousGain + 0.0001f);            // with more and more resistance
+        previous = followed; previousGain = gain;
+    }
+    CHECK(DockRubberBand(4000, kDockElasticReach) > kDockElasticReach - 0.5f);
+    // Between the panel's ends the icon is where the hand is, and nothing stretches.
+    const float low = 120, high = 480;
+    for (const float wanted : {120.0f, 121.5f, 300.0f, 480.0f}) CHECK((PullDockIcon(wanted, low, high, kDockElasticReach) == DockPull{wanted, 0, 0}));
+    // Past an end the icon goes only as far as that end stretches, however far the hand goes: never out of the Dock.
+    for (const float beyond : {1.0f, 10.0f, 60.0f, 500.0f, 20000.0f}) {
+        const auto right = PullDockIcon(high + beyond, low, high, kDockElasticReach);
+        CHECK(right.stretchRight > 0); CHECK(right.stretchLeft == 0);
+        CHECK(std::abs(right.center - (high + right.stretchRight)) < 0.001f);
+        CHECK(right.center < high + kDockElasticReach);
+        const auto left = PullDockIcon(low - beyond, low, high, kDockElasticReach);
+        CHECK(left.stretchLeft > 0); CHECK(left.stretchRight == 0);
+        CHECK(std::abs(left.center - (low - left.stretchLeft)) < 0.001f);
+        CHECK(left.center > low - kDockElasticReach);
+        CHECK(std::abs(left.stretchLeft - right.stretchRight) < 0.001f);   // the same band on both sides
+    }
+    // Without motion (reduced motion, high contrast) the icon simply stops at the ends.
+    CHECK((PullDockIcon(900, low, high, 0) == DockPull{high, 0, 0}));
+    CHECK((PullDockIcon(-900, low, high, 0) == DockPull{low, 0, 0}));
+    // Senseless input never puts the icon somewhere senseless.
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    CHECK((PullDockIcon(nan, low, high, kDockElasticReach) == DockPull{low, 0, 0}));
+    CHECK(PullDockIcon(300, 480, 120, kDockElasticReach).center > 120 - kDockElasticReach);
+    CHECK(PullDockIcon(300, 480, 120, kDockElasticReach).center < 480 + kDockElasticReach);
+}

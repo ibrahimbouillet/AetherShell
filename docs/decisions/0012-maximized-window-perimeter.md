@@ -1,5 +1,8 @@
 # ADR 0012: Rounded perimeter for genuinely maximized windows
 
+**Superseded for other applications' windows by [ADR 0014](0014-window-corner-pieces.md) (D72, 2026-11-10):** the
+region, the material lease and the ring beneath are no longer used. The part on Aether's own Settings window stands.
+
 Status: implemented decision under D45/D46 and FR-036/FR-037 (Claude, 2026-10-26/27). The owner chose
 the external technique ("rim window underneath") when asked in the implementing session. Owned and
 foreign paths are qualified separately; owner visual acceptance and broad compatibility are pending.

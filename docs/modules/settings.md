@@ -152,7 +152,8 @@ All new members are additive; 0.1 ignores them with a warning, so rolling back i
   30 DIP and the Top Bar falls back to compact below that), `showNotificationAreaButton` (true;
   legacy D27 field, still never shows the old arrow), `showHiddenIconsButton` (true; D45 hidden-icons
   chevron, independent of the legacy field so a stored legacy `false` does not hide it),
-  `showBatteryPercent` (true) and `autoHide` (false; D47 Auto-Hide of the Top Bar). `dock.autoHide`
+  `showBatteryPercent` (true), `presentation` (`floating`, default and meaning of every earlier file, or `text`;
+  D71) and `autoHide` (false; D47 Auto-Hide of the Top Bar). `dock.autoHide`
   (false) is the Dock's own Auto-Hide; both are independent and absent in Alpha 2 files.
 - `general`: `syncTaskbarPins` (true), `themeMode` (`system`/`light`/`dark`), `accentSource`
   (`windows`/`aether`), `animationSpeed` (1.0, 0.5..1.5).

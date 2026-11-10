@@ -21,7 +21,9 @@
 #include "ui/accessibility/AccessibleSurface.h"
 
 #include <shellapi.h>
+#include <d2d1effects.h>
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <functional>
 #include <optional>
@@ -93,6 +95,18 @@ void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
     }
 }
 
+// D71: the items written on the desktop instead of on a bar. High contrast keeps the bar: its text must sit on the
+// system's own window colour.
+bool IsTextPresentation(const settings::TopBarSettings& settings, const graphics::DesignTokens& tokens) noexcept {
+    return settings.presentation == settings::TopBarPresentation::Text && tokens.mode != graphics::ThemeMode::HighContrast;
+}
+// How far the halo's shape is widened around the strokes before it is blurred, DIPs.
+constexpr UINT32 kHaloSpreadDip = 3;
+// One weight for measuring and drawing. Written over a picture, the labels are a little heavier, as a menu bar's are.
+DWRITE_FONT_WEIGHT ItemWeight(ItemKind kind, bool written) noexcept {
+    return kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : written ? DWRITE_FONT_WEIGHT_MEDIUM : DWRITE_FONT_WEIGHT_NORMAL;
+}
+
 }  // namespace
 
 struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
@@ -148,6 +162,148 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     HWINEVENTHOOK foregroundHook = nullptr;
     UINT explorerMessage = 0;
     std::uint64_t frames = 0;
+    // D71, the Text presentation: what lies behind the bar on the desktop, the screen it was measured across, whether
+    // an application window is under the bar, and what draws the halo under the ink (kept while the device lives).
+    std::optional<BackdropProfile> backdrop;
+    RECT screen{};
+    bool overWindows = false;
+    winrt::com_ptr<ID2D1Device> haloDevice;
+    winrt::com_ptr<ID2D1DeviceContext> haloRecorder;
+    winrt::com_ptr<ID2D1Effect> haloSpread;
+    std::array<winrt::com_ptr<ID2D1Effect>, 2> haloEffects;
+
+    void ReleaseHalo() noexcept {
+        for (auto& effect : haloEffects) effect = nullptr;
+        haloSpread = nullptr;
+        haloRecorder = nullptr;
+        haloDevice = nullptr;
+    }
+    // 0: the items laid out from the left (the logo, weather when it is placed there); 1: the status items and the clock.
+    [[nodiscard]] int ClusterOf(const PlacedItem& entry) const noexcept {
+        return entry.item.kind == ItemKind::Logo ||
+               (entry.item.kind == ItemKind::Weather && settings.weatherPlacement == aether::settings::WeatherPlacement::Left) ? 0 : 1;
+    }
+    // The items in `tokens`' colours at opacity `shown`; `cluster` 0 or 1 draws only that side of the bar.
+    void PaintItems(ID2D1DeviceContext* dc, const graphics::DesignTokens& colors, float shown, bool focus, std::optional<int> cluster = {}) {
+        winrt::com_ptr<ID2D1SolidColorBrush> brush;
+        if (FAILED(dc->CreateSolidColorBrush(colors.textPrimary.ToD2D(), brush.put()))) return;
+        const bool written = IsTextPresentation(settings, tokens);
+        for (const auto& entry : placed) {
+            if (cluster && ClusterOf(entry) != *cluster) continue;
+            if (focus && focusedWindow && keyboardCues && focused == entry.item.id) {
+                const auto inset = D2D1::RectF(entry.rect.left+2,entry.rect.top+3,entry.rect.right-2,entry.rect.bottom-3);
+                graphics::PaintFocusRing(dc,inset,6,colors);
+            }
+            const auto colorOf = [&](bool unknown) { return (unknown ? colors.textSecondary : colors.textPrimary).WithAlpha(shown); };
+            const auto color = colorOf(entry.item.unknown);
+            brush->SetColor(color.ToD2D());
+            if (entry.item.kind == ItemKind::NotificationArea) {
+                const float cx = (entry.rect.left + entry.rect.right) * 0.5f, cy = (entry.rect.top + entry.rect.bottom) * 0.5f;
+                const auto chevron = hiddenIconsOpen ? graphics::Symbol::ChevronUp : graphics::Symbol::ChevronDown;
+                symbols.Draw(dc, chevron, D2D1::RectF(cx - 8, cy - 8, cx + 8, cy + 8), brush.get(), 12.0f);
+                continue;
+            }
+            const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
+            if(entry.item.kind==ItemKind::QuickControls){
+                float x=entry.rect.left+10;
+                for(const auto& component:entry.item.components){brush->SetColor(colorOf(component.unknown).ToD2D());
+                    Glyph(dc,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),colors,false);x+=27;}
+            }else if (glyph) Glyph(dc, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
+                brush.get(), colors, updateAvailable);
+            brush->SetColor(color.ToD2D());
+            graphics::TextStyle style; style.size = tokens.fontSizeBar * tokens.textScale;
+            style.weight = ItemWeight(entry.item.kind, written);
+            style.tabularFigures = entry.item.kind == ItemKind::Clock || entry.item.kind == ItemKind::Battery;
+            const float textInset=entry.item.kind==ItemKind::QuickControls?10.0f+static_cast<float>(entry.item.components.size())*27.0f:(glyph?34.0f:10.0f);
+            auto textBounds = D2D1::RectF(entry.rect.left + textInset, entry.rect.top,
+                entry.rect.right - 10, entry.rect.bottom);
+            if (!entry.item.secondaryText.empty()) {
+                style.alignment = DWRITE_TEXT_ALIGNMENT_CENTER;
+                style.opticalSmall = true;
+                style.size = std::min(12.0f * tokens.textScale, (entry.rect.bottom - entry.rect.top) * 0.36f);
+                textBounds.bottom = (entry.rect.top + entry.rect.bottom) * 0.5f;
+                textCache.Draw(dc, entry.item.text, textBounds, style, brush.get());
+                textBounds.top = textBounds.bottom; textBounds.bottom = entry.rect.bottom;
+                textCache.Draw(dc, entry.item.secondaryText, textBounds, style, brush.get());
+            } else textCache.Draw(dc, entry.item.text, textBounds, style, brush.get());
+        }
+    }
+    // The soft halo under one side's items: their own shapes, widened then blurred, in the tone opposite to the ink.
+    // Widening first is what makes it hold: a stroke a pixel or two wide, only blurred, leaves almost nothing around
+    // itself. Close to the strokes it carries the contrast asked for; wider, it lifts them off a busy picture.
+    // Recorded once per frame and drawn by Direct2D; where the device cannot, the ink is simply drawn without it.
+    void PaintHalo(ID2D1DeviceContext* dc, const graphics::DesignTokens& written, int cluster, const graphics::Color& tone, float strength) {
+        if (!(strength > 0.01f)) return;
+        winrt::com_ptr<ID2D1Device> device;
+        dc->GetDevice(device.put());
+        if (!device) return;
+        if (device != haloDevice || !haloRecorder) {
+            ReleaseHalo();
+            if (FAILED(device->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, haloRecorder.put()))) return;
+            haloDevice = device;
+        }
+        winrt::com_ptr<ID2D1CommandList> list;
+        if (FAILED(haloRecorder->CreateCommandList(list.put()))) return;
+        float dpiX = 96.0f, dpiY = 96.0f;
+        dc->GetDpi(&dpiX, &dpiY);
+        haloRecorder->SetDpi(dpiX, dpiY);
+        haloRecorder->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+        haloRecorder->SetTarget(list.get());
+        haloRecorder->BeginDraw();
+        haloRecorder->SetTransform(D2D1::Matrix3x2F::Identity());
+        PaintItems(haloRecorder.get(), written, 1.0f, false, cluster);
+        const bool recorded = SUCCEEDED(haloRecorder->EndDraw()) && SUCCEEDED(list->Close());
+        haloRecorder->SetTarget(nullptr);
+        if (!recorded) { ReleaseHalo(); return; }
+        if (!haloSpread) {
+            if (FAILED(haloRecorder->CreateEffect(CLSID_D2D1Morphology, haloSpread.put()))) { haloSpread = nullptr; return; }
+            (void)haloSpread->SetValue(D2D1_MORPHOLOGY_PROP_MODE, D2D1_MORPHOLOGY_MODE_DILATE);
+            (void)haloSpread->SetValue(D2D1_MORPHOLOGY_PROP_WIDTH, kHaloSpreadDip);
+            (void)haloSpread->SetValue(D2D1_MORPHOLOGY_PROP_HEIGHT, kHaloSpreadDip);
+        }
+        haloSpread->SetInput(0, list.get());
+        // Near the strokes the first layer reaches about the strength asked; the second only softens its end.
+        struct Layer { float deviation, gain; };
+        static constexpr Layer kLayers[] = {{1.3f, 1.25f}, {4.0f, 0.45f}};
+        for (std::size_t index = 0; index < haloEffects.size(); ++index) {
+            auto& effect = haloEffects[index];
+            if (!effect && FAILED(haloRecorder->CreateEffect(CLSID_D2D1Shadow, effect.put()))) { effect = nullptr; break; }
+            effect->SetInputEffect(0, haloSpread.get());
+            (void)effect->SetValue(D2D1_SHADOW_PROP_BLUR_STANDARD_DEVIATION, kLayers[index].deviation);
+            (void)effect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(tone.r, tone.g, tone.b, std::clamp(strength * kLayers[index].gain, 0.0f, 1.0f)));
+            dc->DrawImage(effect.get());
+        }
+        haloSpread->SetInput(0, nullptr);   // the frame's recording is not kept
+    }
+    // D71: the items written straight on what lies behind the bar. Each side takes the ink that reads over its own
+    // part of the desktop picture, and a halo of the opposite tone as strong as that part needs.
+    void PaintWritten(ID2D1DeviceContext* dc, float shown) {
+        const auto bounds = owner.BoundsPx();
+        const float screenWidth = static_cast<float>(std::max<LONG>(1, screen.right - screen.left));
+        const auto across = [&](float dip) { return (static_cast<float>(bounds.left - screen.left) + owner.ToPx(dip)) / screenWidth; };
+        for (int cluster = 0; cluster < 2; ++cluster) {
+            float left = 0.0f, right = 0.0f;
+            bool any = false;
+            for (const auto& entry : placed) {
+                if (ClusterOf(entry) != cluster) continue;
+                left = any ? std::min(left, entry.rect.left) : entry.rect.left;
+                right = any ? std::max(right, entry.rect.right) : entry.rect.right;
+                any = true;
+            }
+            if (!any) continue;
+            const auto ink = ChooseTextInk(backdrop ? &*backdrop : nullptr, across(left), across(right), tokens.mode == graphics::ThemeMode::Light);
+            const auto colour = ink.dark ? graphics::Color::FromHex(0x0B0C0E) : graphics::Color::FromHex(0xFFFFFF);
+            const auto tone = ink.dark ? graphics::Color::FromHex(0xFFFFFF) : graphics::Color::FromHex(0x000000);
+            auto written = tokens;
+            written.textPrimary = colour;
+            written.textSecondary = ink.dark ? graphics::Color::FromHex(0x33353A) : graphics::Color::FromHex(0xD9D9DC);
+            written.brandPrimary = written.brandSecondary = colour;   // the mark is written like the rest
+            written.glass.tint = tone;                                // what glyphs knock out of one another
+            written.glyph.halo = tone;
+            PaintHalo(dc, written, cluster, tone, ink.halo * shown);
+            PaintItems(dc, written, shown, true, cluster);
+        }
+    }
 
     void EmitRequest(Signal<>& request, std::optional<HWND> inputTarget = {}) noexcept {
         try {
@@ -425,13 +581,14 @@ void TopBarWindow::Rebuild() {
     impl_->layoutDirty = false;
     std::vector<float> widths;
     graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
+    const bool written = IsTextPresentation(impl_->settings, impl_->tokens);
     for (const auto& item : items.value()) {
         if (item.kind == ItemKind::NotificationArea) {
             widths.push_back(30.0f);  // a compact chevron, like Windows' own
             continue;
         }
         const bool glyph = item.kind != ItemKind::Keyboard && item.kind != ItemKind::Clock;
-        style.weight = item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
+        style.weight = ItemWeight(item.kind, written);
         style.tabularFigures = item.kind == ItemKind::Clock || item.kind == ItemKind::Battery;
         const auto primary = impl_->textCache.Measure(item.text, style).width;
         const auto secondary = item.secondaryText.empty() ? 0.0f :
@@ -484,18 +641,24 @@ void TopBarWindow::Relayout() {
     const auto dpi = impl_->testBounds ? Dpi() : monitor.dpi;
     const int textHeight = static_cast<int>(std::ceil(impl_->tokens.fontSizeBar * impl_->tokens.textScale * 1.3f + 6.0f));
     const int height = std::clamp(std::max(impl_->settings.height, textHeight), 24, 48);
-    const int margin = impl_->testBounds ? 0 : std::clamp(impl_->settings.topMargin, 0, 100);
-    const float shadow = std::max(4.0f, std::ceil(graphics::ShadowExtent(impl_->tokens.elevation.bar)));
+    // D71: written on the desktop, the bar is flush with the top of the screen and spans it: no margin above it, no
+    // shadow around it, no space at its ends.
+    const bool written = IsTextPresentation(impl_->settings, impl_->tokens);
+    const int margin = impl_->testBounds || written ? 0 : std::clamp(impl_->settings.topMargin, 0, 100);
+    const float shadow = written ? 0.0f : std::max(4.0f, std::ceil(graphics::ShadowExtent(impl_->tokens.elevation.bar)));
+    const float sides = written ? 0.0f : 12.0f;
+    impl_->screen = monitor.bounds;
     RECT base = monitor.workArea;
     if (impl_->testBounds) {
         base = *impl_->testBounds;
-        const int side = static_cast<int>(std::lround(12.0f * static_cast<float>(dpi) / 96.0f));
+        const int side = static_cast<int>(std::lround(sides * static_cast<float>(dpi) / 96.0f));
         base.left -= side; base.right += side;
     } else {
-        const auto footprint = ComputeTopBarPlacement(monitor.bounds, dpi, height, margin, shadow);
+        const auto footprint = ComputeTopBarPlacement(monitor.bounds, dpi, height, margin, shadow, sides);
         if (!footprint) { impl_->relayouting = false; return; }
         // D47: an auto-hidden bar reserves nothing; maximized windows take the screen's top edge.
-        if (impl_->context.allowAppBar && impl_->settings.reserveSpace && !impl_->settings.autoHide) {
+        // D71: text with no bar under it must not lie over an application: its strip is always kept free of windows.
+        if (impl_->context.allowAppBar && (impl_->settings.reserveSpace || written) && !impl_->settings.autoHide) {
             APPBARDATA data{sizeof(data)}; data.hWnd = Handle(); data.uCallbackMessage = kAppBarMessage;
             if (!impl_->registered) impl_->registered = ::SHAppBarMessage(ABM_NEW, &data) != 0;
             if (impl_->registered) {
@@ -511,7 +674,7 @@ void TopBarWindow::Relayout() {
             }
         } else impl_->RemoveAppBar();
     }
-    const auto placed = ComputeTopBarPlacement(base, dpi, height, margin, shadow);
+    const auto placed = ComputeTopBarPlacement(base, dpi, height, margin, shadow, sides);
     if (!placed) { impl_->relayouting = false; return; }
     SetBoundsPx(placed->windowBoundsPx);
     const auto& panel = placed->panelBoundsPx;
@@ -568,6 +731,19 @@ bool TopBarWindow::Engaged() const noexcept {
            impl_->touch.CurrentPhase() != graphics::TouchGesture::Phase::Idle;
 }
 
+bool TopBarWindow::TextPresentation() const noexcept { return IsTextPresentation(impl_->settings, impl_->tokens); }
+void TopBarWindow::SetBackdropProfile(std::optional<BackdropProfile> profile) {
+    if (impl_->destroyed || impl_->backdrop == profile) return;
+    impl_->backdrop = std::move(profile);
+    if (Handle() && TextPresentation()) Invalidate();
+}
+void TopBarWindow::SetOverWindows(bool over) {
+    if (impl_->destroyed || impl_->overWindows == over) return;
+    impl_->overWindows = over;
+    if (Handle() && TextPresentation()) Invalidate();
+}
+void TopBarWindow::OnDeviceReplaced() { impl_->ReleaseHalo(); Invalidate(); }
+
 void TopBarWindow::SetHiddenIconsOpen(bool open) {
     if (impl_->hiddenIconsOpen == open) return;
     impl_->hiddenIconsOpen = open;
@@ -597,67 +773,33 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
 void TopBarWindow::OnRender(const ui::RenderContext& context) {
     ++impl_->frames;
     const auto panel = impl_->panel;
+    // D71: written on the desktop, the bar has no material at all: only its items are drawn. Where Auto-Hide brings
+    // it back over an application window, they sit on a square strip of the style's glass, from edge to edge.
+    const bool written = IsTextPresentation(impl_->settings, impl_->tokens);
+    const bool plate = !written || impl_->overWindows;
+    const float radius = written ? 0.0f : impl_->tokens.barCornerRadius;
     // D66: Liquid is the regular glass (the live backdrop adapted by the compositor) under its light; Grain is the
     // frosted glass. Without transparency, or where the compositor offers no glass, Grain.
-    const bool blur = impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
+    const bool blur = plate && impl_->tokens.mode != graphics::ThemeMode::HighContrast && impl_->tokens.transparencyEnabled;
     const bool wantGlass = blur && impl_->tokens.liquid;
-    SetBackdropPanel(panel, impl_->tokens.barCornerRadius, blur, wantGlass ? impl_->tokens.liquidGlass.blurOpacity : impl_->tokens.glass.backdropOpacity,
+    SetBackdropPanel(panel, radius, blur, wantGlass ? impl_->tokens.liquidGlass.blurOpacity : impl_->tokens.glass.backdropOpacity,
                      wantGlass ? &impl_->tokens.liquidGlass : nullptr);
+    const float shown = impl_->transition.Value(context.now);
+    if (!plate) {
+        impl_->PaintWritten(context.d2d, shown);
+        return;
+    }
     // No exterior shadow: the window's region ends at the panel and would cut it into square corners.
-    const bool liquid = wantGlass && BackdropGlassActive() && PaintLiquidPanel(context, panel, impl_->tokens.barCornerRadius, 0.0f);
+    const bool liquid = wantGlass && BackdropGlassActive() && PaintLiquidPanel(context, panel, radius, 0.0f);
     if (!liquid) {
         graphics::GlassStyle glass;
-        glass.cornerRadius = impl_->tokens.barCornerRadius; glass.opacity = static_cast<float>(impl_->settings.opacity);
+        glass.cornerRadius = radius; glass.opacity = static_cast<float>(impl_->settings.opacity);
         glass.backdropBlur = BackdropBlurActive(); glass.elevation = graphics::Elevation::Bar;
         graphics::PaintGlassPanel(context.d2d, panel, impl_->tokens, glass);
     }
-    winrt::com_ptr<ID2D1SolidColorBrush> brush;
-    if (FAILED(context.d2d->CreateSolidColorBrush(impl_->tokens.textPrimary.ToD2D(), brush.put()))) return;
-    const float shown = impl_->transition.Value(context.now);
-    // `tokens` are the bar's own; `ink`, when given, paints every item in one colour.
-    const auto paintItems = [&](const graphics::DesignTokens& tokens, const graphics::Color* ink, bool focus) {
-    for (const auto& entry : impl_->placed) {
-        if (focus && impl_->focusedWindow && impl_->keyboardCues && impl_->focused == entry.item.id) {
-            const auto inset = D2D1::RectF(entry.rect.left+2,entry.rect.top+3,entry.rect.right-2,entry.rect.bottom-3);
-            graphics::PaintFocusRing(context.d2d,inset,6,tokens);
-        }
-        const auto colorOf = [&](bool unknown) { return ink ? ink->WithAlpha(ink->a * shown) : (unknown ? tokens.textSecondary : tokens.textPrimary).WithAlpha(shown); };
-        const auto color = colorOf(entry.item.unknown);
-        brush->SetColor(color.ToD2D());
-        if (entry.item.kind == ItemKind::NotificationArea) {
-            const float cx = (entry.rect.left + entry.rect.right) * 0.5f, cy = (entry.rect.top + entry.rect.bottom) * 0.5f;
-            const auto chevron = impl_->hiddenIconsOpen ? graphics::Symbol::ChevronUp : graphics::Symbol::ChevronDown;
-            impl_->symbols.Draw(context.d2d, chevron, D2D1::RectF(cx - 8, cy - 8, cx + 8, cy + 8), brush.get(), 12.0f);
-            continue;
-        }
-        const bool glyph = entry.item.kind != ItemKind::Keyboard && entry.item.kind != ItemKind::Clock;
-        if(entry.item.kind==ItemKind::QuickControls){
-            float x=entry.rect.left+10;
-            for(const auto& component:entry.item.components){brush->SetColor(colorOf(component.unknown).ToD2D());
-                Glyph(context.d2d,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),tokens,false);x+=27;}
-        }else if (glyph) Glyph(context.d2d, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
-            brush.get(), tokens, impl_->updateAvailable);
-        brush->SetColor(color.ToD2D());
-        graphics::TextStyle style; style.size = impl_->tokens.fontSizeBar * impl_->tokens.textScale;
-        style.weight = entry.item.kind == ItemKind::Clock ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL;
-        style.tabularFigures = entry.item.kind == ItemKind::Clock || entry.item.kind == ItemKind::Battery;
-        const float textInset=entry.item.kind==ItemKind::QuickControls?10.0f+static_cast<float>(entry.item.components.size())*27.0f:(glyph?34.0f:10.0f);
-        auto textBounds = D2D1::RectF(entry.rect.left + textInset, entry.rect.top,
-            entry.rect.right - 10, entry.rect.bottom);
-        if (!entry.item.secondaryText.empty()) {
-            style.alignment = DWRITE_TEXT_ALIGNMENT_CENTER;
-            style.opticalSmall = true;
-            style.size = std::min(12.0f * impl_->tokens.textScale, (entry.rect.bottom - entry.rect.top) * 0.36f);
-            textBounds.bottom = (entry.rect.top + entry.rect.bottom) * 0.5f;
-            impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
-            textBounds.top = textBounds.bottom; textBounds.bottom = entry.rect.bottom;
-            impl_->textCache.Draw(context.d2d, entry.item.secondaryText, textBounds, style, brush.get());
-        } else impl_->textCache.Draw(context.d2d, entry.item.text, textBounds, style, brush.get());
-    }
-    };
     // D66: no shadow under the text in Liquid any more: the regular glass keeps its brightness where the text reads,
     // and the labels stay sharp.
-    paintItems(impl_->tokens, nullptr, true);
+    impl_->PaintItems(context.d2d, impl_->tokens, shown, true);
 }
 bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(now); }
 
@@ -887,6 +1029,7 @@ void TopBarWindow::OnDestroying() {
     std::erase(watchedWindows, Handle());
     for (auto& stop : impl_->stops) stop();
     impl_->stops.clear();
+    impl_->ReleaseHalo();
     impl_->RemoveAppBar(); impl_->accessibility.Disconnect(); impl_->tooltip.Destroy();
 }
 

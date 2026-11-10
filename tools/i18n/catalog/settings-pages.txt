@@ -294,6 +294,31 @@ es: Posición, reloj y elementos de estado de la barra superior.
 zh: 顶部状态栏的位置、时钟和状态项。
 hi: शीर्ष स्टेटस बार की स्थिति, घड़ी और उसमें दिखने वाले स्टेटस आइटम।
 
+# D71: the Top Bar's presentation
+en: Presentation
+fr: Présentation
+es: Presentación
+zh: 呈现方式
+hi: प्रस्तुति
+
+en: Floating bar
+fr: Barre flottante
+es: Barra flotante
+zh: 浮动栏
+hi: तैरती बार
+
+en: Text on the desktop
+fr: Texte sur le bureau
+es: Texto sobre el escritorio
+zh: 桌面上的文字
+hi: डेस्कटॉप पर टेक्स्ट
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+fr: Barre flottante : la barre de verre sous le haut de l'écran. Texte sur le bureau : pas de barre, les mêmes éléments écrits tout en haut de l'écran, directement sur le fond d'écran ; cette bande reste libre de fenêtres, et la marge supérieure et l'opacité du verre ne s'appliquent pas. Avec le masquage automatique, le texte revient sur une bande de verre tant qu'une fenêtre se trouve dessous.
+es: Barra flotante: la barra de cristal bajo el borde superior de la pantalla. Texto sobre el escritorio: sin barra, los mismos elementos escritos en lo más alto de la pantalla, directamente sobre el fondo de escritorio; esa franja queda libre de ventanas, y el margen superior y la opacidad del cristal no se aplican. Con la ocultación automática, el texto vuelve sobre una franja de cristal mientras haya una ventana debajo.
+zh: 浮动栏：屏幕顶部下方的玻璃栏。桌面上的文字：没有栏，相同的项目直接写在屏幕最顶部的桌面壁纸上；这一条区域不会被窗口占用，顶部边距和玻璃不透明度不适用。启用自动隐藏时，只要下方有窗口，文字就会回到一条玻璃带上。
+hi: तैरती बार: स्क्रीन के ऊपरी किनारे के नीचे की ग्लास बार। डेस्कटॉप पर टेक्स्ट: कोई बार नहीं, वही आइटम स्क्रीन के सबसे ऊपर सीधे डेस्कटॉप वॉलपेपर पर लिखे जाते हैं; यह पट्टी विंडो से खाली रहती है, और ऊपर का मार्जिन तथा ग्लास की अपारदर्शिता लागू नहीं होते। अपने-आप छिपाने के साथ, जब तक नीचे कोई विंडो हो, टेक्स्ट ग्लास की एक पट्टी पर लौटता है।
+
 en: Position and glass
 fr: Position et verre
 es: Posición y cristal

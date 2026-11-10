@@ -7,7 +7,34 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.5: five languages, and lighter at rest and when switching style (`0.4.0-alpha.4`, D69, D70, S-073, 2026-11-09)
+## Current checkpoint — Alpha 4, test 4.6: text Top Bar, corners redone, elastic Dock drag (`0.4.0-alpha.4`, D71–D73, S-074, 2026-11-10)
+
+**Committed locally and packaged as test 4.6, at the owner's word; not pushed (D65), not installed.** The owner had first
+said not to deliver this round, then asked for the test build once back. The setup is in `dist/` (SHA-256 in S-074);
+test 4.5's moved to `dist/test-4.5/`. The installed version is still 4.5.
+
+The owner asked for three things in one session:
+
+- **D71, the Top Bar as text on the desktop** (FR-043, T57): Settings → Top Bar → Presentation (also under Appearance).
+  No bar: the same items at the very top of the screen, ink and halo chosen per side from the measured desktop picture,
+  the strip always kept free of windows, a glass strip under the text when Auto-Hide brings it back over a window.
+- **D72, rounded corners for every window, without the faults** (FR-036, T58, [ADR 0014](docs/decisions/0014-window-corner-pieces.md)):
+  the guard no longer writes to other applications' windows at all. Two click-through windows of its own, directly above
+  the front maximized window, show the live desktop in the corners (DWM thumbnails) and draw the rim. The lease, its
+  backend and their tests are gone; `WindowCorners.cpp` went from 1098 to about 800 lines.
+- **D73, a dragged icon stays in the Dock** (FR-004, T59): elastic pull past the panel's ends, spring back with a bounce.
+
+All tests pass (S-074: 25/25 unit suites; native topbar 9/9, app 19/19, dock 17/17, settings_ui 40/40), on test
+windows. **None of it has been seen on the real desktop:** the new guard cannot be tried beside the installed one, which
+clips the same windows.
+
+**Next:** the owner's trial of 4.6: the text bar over
+their picture, the clock in it, every application maximized between the bars (Chrome, the Claude application, File
+Explorer first: the three that were square or went wrong), and the feel of the Dock's band. Possible refinements, not
+started: antialiased corner edges (thumbnails carry an opacity), the arrival ending on text rather than a strip, and
+Liquid for Settings, menus, Search and Quick Settings from the earlier list.
+
+## Earlier — Alpha 4, test 4.5: five languages, and lighter at rest and when switching style (`0.4.0-alpha.4`, D69, D70, S-073, 2026-11-09)
 
 The owner reported that switching Liquid/Grain made the PC lag and Alpha 4 took more memory, asked for a complete
 optimisation without lowering quality (at least 10% less load), the desktop wallpaper back (black), and the interface

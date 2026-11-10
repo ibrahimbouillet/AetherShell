@@ -40,6 +40,11 @@ Nothing below is committed, installed or released; the installed Alpha 3 still r
 | AS4-25 | **Source-established; fixed in part** | One shared bounded recovery with unit-tested policy. The device-loss path itself was not injected. |
 | AS4-26 | **Observed; unresolved** | Not worked on. The Search benchmark passed in this session's combined runs, which is not a fix. |
 
+**D72 (2026-11-10, S-074):** the guard no longer writes to other applications' windows at all (ADR 0014). AS4-03,
+AS4-05 and AS4-07 described how to write into them safely and have no object left; the hung-target fixtures now show a
+window that does not answer being rounded like any other, within 4 to 30 ms, with nothing waiting on it. AS4-01 stays
+reported and not reproduced: its suspected mechanism is gone, its cause was never established.
+
 Observed during this work, unexplained: Windows can give a standard frame a shape of its own (one
 rectangle while maximized, a few matching the window once restored) after a clip is written or removed.
 The guard treats that as not its own and leaves it. Its effect on real applications is unqualified.

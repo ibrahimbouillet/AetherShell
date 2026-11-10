@@ -70,6 +70,15 @@ public:
     [[nodiscard]] D2D1_RECT_F PanelDip() const noexcept;
     // In use: the pointer is over the bar, one of its menus is open or it has keyboard navigation.
     [[nodiscard]] bool Engaged() const noexcept;
+    // D71, the Text presentation: the items written at the very top of the screen, with no bar under them. Never in
+    // high contrast, which keeps the bar.
+    [[nodiscard]] bool TextPresentation() const noexcept;
+    // What lies behind the written items on the desktop, measured by the host from the desktop picture: it decides
+    // their ink. Nothing: the theme decides, under a stronger halo.
+    void SetBackdropProfile(std::optional<BackdropProfile> profile);
+    // An application window lies under the bar (the host's Auto-Hide observation): the written items then sit on a
+    // strip of the style's glass, from edge to edge, instead of straight on that window.
+    void SetOverWindows(bool over);
     // A host action started from `item` failed: a short explanation below that item, never over a
     // hidden, suppressed or disabled bar.
     void ReportItemFailure(ItemKind item, std::wstring_view message);
@@ -114,6 +123,7 @@ protected:
     bool OnKeyDown(UINT key) override;
     void OnFocusChanged(bool focused) override;
     void OnDpiChanged(UINT dpi, const RECT& suggested) override;
+    void OnDeviceReplaced() override;
     std::optional<LRESULT> OnMessage(UINT message, WPARAM wParam, LPARAM lParam) override;
     void OnDestroying() override;
 

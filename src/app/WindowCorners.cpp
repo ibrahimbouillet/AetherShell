@@ -16,91 +16,32 @@
 #include <array>
 #include <atomic>
 #include <charconv>
-#include <cwctype>
+#include <cmath>
 #include <cstring>
 #include <map>
-#include <mutex>
-#include <set>
 #include <string>
 #include <thread>
 
 namespace aether::app {
 namespace {
+// Marks an earlier version's guard left on the windows it clipped (before D72 it gave other applications'
+// windows a rounded region). They are only read here, and removed with such a clip once the guard that made
+// it is gone.
 constexpr wchar_t kLeaseProperty[] = L"AetherShell.WindowCornerGuard.Lease";
 constexpr wchar_t kLeaseOwnerProperty[] = L"AetherShell.WindowCornerLeaseOwner";
-constexpr UINT_PTR kRefreshTimer = 71;
-constexpr std::size_t kMaxLeases = 128;
-// An application can re-assert its material without any window event, so leased windows are also
-// looked at on this slow schedule (D46). Other windows cost nothing between events (AS4-07).
-constexpr ULONGLONG kLeaseCheckMs = 2000;
-Error NativeError(const char* text) { return MakeError(ErrorCode::Platform, text, ::GetLastError()); }
-
-Result<CornerRegion> SerializeRegion(HRGN region) {
-    const DWORD size = ::GetRegionData(region, 0, nullptr);
-    if (!size || size > 1024 * 1024) return NativeError("Window corner region cannot be read");
-    CornerRegion result(size);
-    if (::GetRegionData(region, size, reinterpret_cast<RGNDATA*>(result.data())) != size)
-        return NativeError("Window corner region changed while reading");
-    return result;
-}
-platform::UniqueRegion DeserializeRegion(const CornerRegion& bytes) {
-    if (bytes.size() < sizeof(RGNDATAHEADER) || bytes.size() > 1024 * 1024) return {};
-    RGNDATAHEADER header{}; std::memcpy(&header, bytes.data(), sizeof(header));
-    if (header.dwSize != sizeof(header) || header.iType != RDH_RECTANGLES ||
-        header.nCount > (bytes.size() - sizeof(header)) / sizeof(RECT)) return {};
-    return platform::UniqueRegion(::ExtCreateRegion(nullptr, static_cast<DWORD>(bytes.size()),
-        reinterpret_cast<const RGNDATA*>(bytes.data())));
-}
-bool SimpleRegionContainsClip(const CornerRegion& bytes, const CornerWindowObservation& observation) {
-    auto region = DeserializeRegion(bytes); if (!region) return false;
-    RECT bounds{};
-    if (::GetRgnBox(region.Get(), &bounds) != SIMPLEREGION) return false;
-    auto layout = settings::ui::experimental::ComputeMaximizedCornerLayout(
-        observation.bounds, observation.frame, observation.work, observation.dpi);
-    if (!layout) return false;
-    const auto& clip = layout->clipPx;
-    return bounds.left <= clip.left && bounds.top <= clip.top &&
-        bounds.right >= clip.right && bounds.bottom >= clip.bottom;
-}
-Result<CornerRegion> RoundedRegion(const CornerWindowObservation& observation,
-    const std::optional<CornerRegion>& original) {
-    const auto geometry = settings::ui::experimental::ComputeMaximizedCornerLayout(
-        observation.bounds, observation.frame, observation.work, observation.dpi);
-    if (!geometry) return geometry.error();
-    const auto& rect = geometry->clipPx;
-    // Inset by the rim (D45): the ring window beneath fills the band between this clip and the
-    // outer rounded edge, with the same rasterized geometry, so there is no gap or overlap.
-    const int width = CornerRimWidthPx(observation.dpi);
-    const int radius = std::max(0, geometry->radiusPx - width);
-    if (rect.right - rect.left <= 2 * width || rect.bottom - rect.top <= 2 * width)
-        return MakeError(ErrorCode::Unsupported, "Window corner target is too small for a rim");
-    platform::UniqueRegion region(::CreateRoundRectRgn(rect.left + width, rect.top + width, rect.right - width,
-        rect.bottom - width, radius * 2, radius * 2));
-    if (!region) return NativeError("Window corner rounded region allocation failed");
-    if (original) {
-        auto prior = DeserializeRegion(*original);
-        if (!prior || ::CombineRgn(region.Get(), region.Get(), prior.Get(), RGN_AND) == ERROR)
-            return NativeError("Window corner prior rectangular region cannot be intersected");
-    }
-    return SerializeRegion(region.Get());
-}
-std::optional<CornerRim> RimFor(const CornerWindowObservation& observation) {
-    const auto geometry = settings::ui::experimental::ComputeMaximizedCornerLayout(
-        observation.bounds, observation.frame, observation.work, observation.dpi);
-    if (!geometry) return std::nullopt;
-    CornerRim rim;
-    rim.bounds = geometry->clipPx;
-    ::OffsetRect(&rim.bounds, observation.bounds.left, observation.bounds.top);
-    rim.radiusPx = geometry->radiusPx;
-    rim.widthPx = CornerRimWidthPx(observation.dpi);
-    return rim;
-}
-
-// --- rim windows (D45) ---------------------------------------------------------------------------
-// One per clipped window, owned by this guard: a click-through layered popup directly beneath its
-// target, shaped to the ring between the target's inset clip and the outer rounded edge and filled
-// with one neutral color. It never covers the target, takes input or activation, or has a taskbar entry.
 constexpr wchar_t kRimClass[] = L"AetherShell.WindowCornerGuard.Rim";
+constexpr wchar_t kPiecesClass[] = L"AetherShell.WindowCornerGuard.Corners";
+// Stacking can change with no event the guard hears, so while it shows anything it also looks on this slow
+// schedule. With nothing shown it has no timer at all.
+constexpr UINT kCheckMs = 2000;
+// An application that keeps putting itself above the guard's windows is not fought: after this many
+// restackings within kPlacementWindowMs the guard leaves that monitor alone for kPlacementRestMs.
+constexpr int kPlacementBurst = 12;
+constexpr ULONGLONG kPlacementWindowMs = 2000;
+constexpr ULONGLONG kPlacementRestMs = 2000;
+
+Error NativeError(const char* text) { return MakeError(ErrorCode::Platform, text, ::GetLastError()); }
+void Count(std::atomic<std::uint64_t>* counter) noexcept { if (counter) counter->fetch_add(1, std::memory_order_relaxed); }
 
 // A restrained neutral perimeter for the system theme: lighter than dark content, darker than light
 // content. High contrast uses the system's window frame color.
@@ -114,7 +55,31 @@ COLORREF RimColor() noexcept {
     return light ? RGB(0xC6, 0xC6, 0xC8) : RGB(0x4D, 0x4D, 0x4F);
 }
 
-LRESULT CALLBACK RimProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
+// In a corner whose arc has its centre at (radius, radius): the first pixel of row `y`, counted from the
+// outline's edge, whose centre lies within `reach` of that centre. `radius` when the row has none.
+int ArcStart(int radius, int y, double reach) noexcept {
+    const double dy = static_cast<double>(radius) - (static_cast<double>(y) + 0.5);
+    if (!(reach > 0.0) || dy > reach) return radius;
+    const double dx = std::sqrt(reach * reach - dy * dy);
+    return std::clamp(static_cast<int>(std::ceil(static_cast<double>(radius) - dx - 0.5)), 0, radius);
+}
+
+// Rows of equal extent that lie one under the other become one rectangle: fewer pieces to draw.
+std::vector<RECT> MergeRows(std::vector<RECT> rects) {
+    std::sort(rects.begin(), rects.end(), [](const RECT& a, const RECT& b) {
+        return a.left != b.left ? a.left < b.left : a.right != b.right ? a.right < b.right : a.top < b.top;
+    });
+    std::vector<RECT> merged;
+    merged.reserve(rects.size());
+    for (const RECT& rect : rects) {
+        if (!merged.empty() && merged.back().left == rect.left && merged.back().right == rect.right && merged.back().bottom == rect.top)
+            merged.back().bottom = rect.bottom;
+        else merged.push_back(rect);
+    }
+    return merged;
+}
+
+LRESULT CALLBACK OverlayProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
     switch (message) {
         case WM_NCHITTEST: return HTTRANSPARENT;
         case WM_MOUSEACTIVATE: return MA_NOACTIVATE;
@@ -137,440 +102,274 @@ LRESULT CALLBACK RimProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam
     }
 }
 
-class RimWindow {
+// A window of the guard's own, shaped by rectangles: click-through, never activated, with no taskbar entry
+// and absent from Alt+Tab. It is created hidden; the guard shows it when it stacks it.
+class ShapedWindow {
 public:
-    RimWindow() = default;
-    RimWindow(const RimWindow&) = delete;
-    RimWindow& operator=(const RimWindow&) = delete;
-    ~RimWindow() { if (window_) ::DestroyWindow(window_); }
-
-    // Places the ring for `rim` directly beneath `target`; false if the ring cannot be shown.
-    bool Sync(HWND target, const CornerRim& rim, COLORREF color) {
-        if (!window_ && !Create()) return false;
-        const int width = rim.bounds.right - rim.bounds.left, height = rim.bounds.bottom - rim.bounds.top;
-        if (!shape_ || !(*shape_ == rim)) {
-            const int inner = std::max(0, rim.radiusPx - rim.widthPx);
-            platform::UniqueRegion outer(::CreateRoundRectRgn(0, 0, width, height, rim.radiusPx * 2, rim.radiusPx * 2));
-            platform::UniqueRegion hole(::CreateRoundRectRgn(rim.widthPx, rim.widthPx, width - rim.widthPx, height - rim.widthPx,
-                                                             inner * 2, inner * 2));
-            if (!outer || !hole || ::CombineRgn(outer.Get(), outer.Get(), hole.Get(), RGN_DIFF) == ERROR) return false;
-            if (!::SetWindowRgn(window_, outer.Get(), TRUE)) return false;
-            (void)outer.Release();  // owned by the window now
-            shape_ = rim;
-        }
-        if (color != color_) {
-            color_ = color;
-            (void)::SetWindowLongPtrW(window_, GWLP_USERDATA, static_cast<LONG_PTR>(color));
-            ::InvalidateRect(window_, nullptr, TRUE);
-        }
-        RECT placed{};
-        const bool moved = !::GetWindowRect(window_, &placed) || !::EqualRect(&placed, &rim.bounds);
-        if (moved || !::IsWindowVisible(window_) || ::GetWindow(target, GW_HWNDNEXT) != window_) {
-            if (!::SetWindowPos(window_, target, rim.bounds.left, rim.bounds.top, width, height,
-                                SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW))
-                return false;
-        }
-        return true;
-    }
-
-private:
-    bool Create() {
+    explicit ShapedWindow(const wchar_t* className) noexcept : class_(className) {}
+    ShapedWindow(const ShapedWindow&) = delete;
+    ShapedWindow& operator=(const ShapedWindow&) = delete;
+    ~ShapedWindow() { if (window_) ::DestroyWindow(window_); }
+    [[nodiscard]] HWND Handle() const noexcept { return window_; }
+    bool Ensure() {
+        if (window_) return true;
         WNDCLASSEXW type{sizeof(type)};
         type.hInstance = ::GetModuleHandleW(nullptr);
-        type.lpszClassName = kRimClass;
-        type.lpfnWndProc = RimProc;
+        type.lpszClassName = class_;
+        type.lpfnWndProc = OverlayProc;
         if (!platform::RegisterWindowClassOnce(type)) return false;
-        window_ = ::CreateWindowExW(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, kRimClass, L"",
+        window_ = ::CreateWindowExW(WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW, class_, L"",
                                     WS_POPUP, 0, 0, 0, 0, nullptr, nullptr, type.hInstance, nullptr);
         if (!window_) return false;
         (void)::SetLayeredWindowAttributes(window_, 0, 255, LWA_ALPHA);
         return true;
     }
+    // Gives the window the shape of `rects` (its own coordinates) at `bounds` (screen pixels).
+    bool Shape(const RECT& bounds, const std::vector<RECT>& rects) {
+        platform::UniqueRegion combined(::CreateRectRgn(0, 0, 0, 0));
+        if (!combined) return false;
+        for (const RECT& rect : rects) {
+            platform::UniqueRegion part(::CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom));
+            if (!part || ::CombineRgn(combined.Get(), combined.Get(), part.Get(), RGN_OR) == ERROR) return false;
+        }
+        if (!::SetWindowPos(window_, nullptr, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top,
+                            SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER)) return false;
+        if (!::SetWindowRgn(window_, combined.Get(), TRUE)) return false;
+        (void)combined.Release();  // owned by the window now
+        return true;
+    }
+    void Color(COLORREF color) {
+        if (color == color_) return;
+        color_ = color;
+        (void)::SetWindowLongPtrW(window_, GWLP_USERDATA, static_cast<LONG_PTR>(color));
+        ::InvalidateRect(window_, nullptr, TRUE);
+    }
+    void Hide() noexcept { if (window_ && ::IsWindowVisible(window_)) ::ShowWindow(window_, SW_HIDE); }
+
+private:
+    const wchar_t* class_;
     HWND window_ = nullptr;
-    std::optional<CornerRim> shape_;
     COLORREF color_ = CLR_INVALID;
 };
 
-bool ExcludedClass(HWND window) {
-    const auto name = platform::WindowClassName(window);
-    return name.empty() || name.starts_with(L"Aether") || name.starts_with(L"Shell_") ||
-        name.starts_with(L"Windows.UI.") || name.starts_with(L"Xaml") || name == L"Progman" ||
-        name == L"WorkerW" || name == L"#32770" || name == L"TaskManagerWindow";
-}
-bool ExcludedProcess(HANDLE process) {
-    std::array<wchar_t, 32768> image{}; DWORD length = static_cast<DWORD>(image.size());
-    if (!::QueryFullProcessImageNameW(process, 0, image.data(), &length)) return true;
-    auto name = std::filesystem::path(std::wstring_view(image.data(), length)).filename().native();
-    std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::towlower(c)); });
-    // Shell/security/infrastructure are excluded even when a window happens to look standard.
-    constexpr std::array excluded{L"explorer.exe", L"sihost.exe", L"dwm.exe", L"taskmgr.exe",
-        L"logonui.exe", L"winlogon.exe", L"consent.exe", L"credentialuibroker.exe", L"securityhealthsystray.exe",
-        L"sechealthui.exe", L"msmpeng.exe", L"searchhost.exe", L"startmenuexperiencehost.exe",
-        L"shellexperiencehost.exe", L"applicationframehost.exe", L"aethershell.exe", L"aethershellapp.exe"};
-    return std::find(excluded.begin(), excluded.end(), name) != excluded.end();
-}
-Result<std::vector<std::byte>> TokenInformation(HANDLE token, TOKEN_INFORMATION_CLASS kind) {
-    DWORD size = 0; (void)::GetTokenInformation(token, kind, nullptr, 0, &size);
-    if (!size || size > 65536) return NativeError("Window corner process token unavailable");
-    std::vector<std::byte> bytes(size);
-    if (!::GetTokenInformation(token, kind, bytes.data(), size, &size))
-        return NativeError("Window corner process token unavailable");
-    return bytes;
-}
-bool SafeUserProcess(DWORD process, bool testOnly) {
-    platform::UniqueHandle handle(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, process));
-    if (!handle || (!testOnly && ExcludedProcess(handle.Get()))) return false;
-    DWORD session = 0, ownSession = 0;
-    if (!::ProcessIdToSessionId(process, &session) || !::ProcessIdToSessionId(::GetCurrentProcessId(), &ownSession) ||
-        session != ownSession) return false;
-    PROCESS_PROTECTION_LEVEL_INFORMATION protection{};
-    if (!::GetProcessInformation(handle.Get(), ProcessProtectionLevelInfo, &protection, sizeof(protection)) ||
-        protection.ProtectionLevel != PROTECTION_LEVEL_NONE) return false;
-    platform::UniqueHandle token, ownToken;
-    if (!::OpenProcessToken(handle.Get(), TOKEN_QUERY, token.Put()) ||
-        !::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, ownToken.Put())) return false;
-    TOKEN_ELEVATION elevation{}; DWORD size = 0;
-    if (!::GetTokenInformation(token.Get(), TokenElevation, &elevation, sizeof(elevation), &size) ||
-        elevation.TokenIsElevated) return false;
-    auto user = TokenInformation(token.Get(), TokenUser);
-    auto ownUser = TokenInformation(ownToken.Get(), TokenUser);
-    auto integrity = TokenInformation(token.Get(), TokenIntegrityLevel);
-    if (!user || !ownUser || !integrity) return false;
-    const auto sid = reinterpret_cast<const TOKEN_USER*>(user->data())->User.Sid;
-    const auto ownSid = reinterpret_cast<const TOKEN_USER*>(ownUser->data())->User.Sid;
-    const auto level = reinterpret_cast<const TOKEN_MANDATORY_LABEL*>(integrity->data())->Label.Sid;
-    if (!::IsValidSid(sid) || !::IsValidSid(ownSid) || !::EqualSid(sid, ownSid) || !::IsValidSid(level)) return false;
-    const auto count = *::GetSidSubAuthorityCount(level);
-    return count && *::GetSidSubAuthority(level, count - 1) <= SECURITY_MANDATORY_MEDIUM_RID;
-}
-
-// A region write runs on its own short-lived thread: SetWindowRgn sends the target synchronous
-// position messages, so a target that stops answering inside the write must cost the guard at most
-// kRegionWriteWaitMs, never every other lease (AS4-03). The record outlives a pending write.
-constexpr DWORD kRegionWriteWaitMs = 250;
-struct RegionWrite {
-    platform::UniqueHandle done{::CreateEventW(nullptr, TRUE, FALSE, nullptr)};
-    std::atomic<bool> finished{false};
-    BOOL result = FALSE;
-    DWORD error = 0;
-};
-void Count(std::atomic<std::uint64_t>* counter) noexcept { if (counter) counter->fetch_add(1, std::memory_order_relaxed); }
-
-class NativeBackend final : public IWindowCornerBackend {
+// D45: the thin continuous perimeter, the band just inside the rounded outline, in one neutral color.
+class RimWindow {
 public:
-    explicit NativeBackend(DWORD excluded, const WindowCornerGuardOptions& options)
-        : excluded_(excluded), options_(options) {}
-    // AS4-07: a process's identity and token do not change during its life, so one validation per
-    // process instance is enough. The creation time guards against a reused process id.
-    bool SafeProcess(DWORD process, bool testOnly) {
-        platform::UniqueHandle handle(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, process));
-        FILETIME created{}, exited{}, kernel{}, user{};
-        if (!handle || !::GetProcessTimes(handle.Get(), &created, &exited, &kernel, &user)) return false;
-        const auto stamp = (static_cast<std::uint64_t>(created.dwHighDateTime) << 32) | created.dwLowDateTime;
-        if (const auto known = processes_.find(process); known != processes_.end() && known->second.created == stamp) return known->second.safe;
-        const bool safe = SafeUserProcess(process, testOnly);
-        if (processes_.size() >= 512) processes_.clear();
-        processes_[process] = KnownProcess{stamp, safe};
-        return safe;
-    }
-    bool Responsive(HWND window) noexcept override {
-        if (const auto pending = writes_.find(window); pending != writes_.end()) {
-            if (!pending->second->finished.load(std::memory_order_acquire)) return false;
-            writes_.erase(pending);
+    [[nodiscard]] HWND Handle() const noexcept { return window_.Handle(); }
+    bool Sync(const CornerRim& rim, COLORREF color) {
+        if (!window_.Ensure()) return false;
+        if (!shape_ || !(*shape_ == rim)) {
+            shape_.reset();
+            if (!window_.Shape(rim.bounds, CornerRimRects(rim.bounds.right - rim.bounds.left, rim.bounds.bottom - rim.bounds.top,
+                                                          rim.radiusPx, rim.widthPx))) return false;
+            shape_ = rim;
         }
-        if (::IsHungAppWindow(window)) return false;
-        // WM_NULL checks responsiveness without invoking an application command.
-        DWORD_PTR ignored = 0;
-        return ::SendMessageTimeoutW(window, WM_NULL, 0, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 50, &ignored) != 0;
-    }
-    Result<CornerWindowObservation> Observe(HWND window) override {
-        CornerWindowObservation result;
-        result.thread = ::GetWindowThreadProcessId(window, &result.process);
-        if (!result.thread) return MakeError(ErrorCode::NotFound, "Window corner target no longer exists");
-        if (options_.onlyProcess && (result.process != options_.onlyProcess ||
-            std::find(options_.onlyWindows.begin(), options_.onlyWindows.end(), window) == options_.onlyWindows.end()))
-            return result;
-        if ((!options_.onlyProcess && (result.process == excluded_ || result.process == ::GetCurrentProcessId())) ||
-            !::IsWindowVisible(window) || ::IsIconic(window) || !::IsZoomed(window) ||
-            ::GetAncestor(window, GA_ROOT) != window || ::GetWindow(window, GW_OWNER) ||
-            (!options_.onlyProcess && ExcludedClass(window))) return result;
-        const auto style = ::GetWindowLongPtrW(window, GWL_STYLE);
-        const auto extended = ::GetWindowLongPtrW(window, GWL_EXSTYLE);
-        // D45: a layered window that is also captioned, resizable and genuinely maximized is an ordinary
-        // application window (Chromium/Electron use WS_EX_LAYERED for transparency); click-through
-        // overlays stay excluded through WS_EX_TRANSPARENT and the caption/frame requirement.
-        const auto excludedExtended = WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT | WS_EX_LAYOUTRTL |
-            (options_.onlyProcess ? 0 : WS_EX_NOACTIVATE);
-        // Responsiveness is not eligibility (AS4-03): a busy page stays clipped; only mutations wait.
-        if ((style & WS_CAPTION) != WS_CAPTION || !(style & WS_THICKFRAME) || (style & WS_CHILD) ||
-            (extended & excludedExtended) ||
-            platform::IsWindowCloaked(window) || !SafeProcess(result.process, options_.onlyProcess != 0)) return result;
-        if (!::GetWindowRect(window, &result.bounds) || FAILED(::DwmGetWindowAttribute(window,
-            DWMWA_EXTENDED_FRAME_BOUNDS, &result.frame, sizeof(result.frame)))) return result;
-        MONITORINFO monitor{sizeof(monitor)};
-        if (!::GetMonitorInfoW(::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor)) return result;
-        result.work = monitor.rcWork;
-        // D56, the owner's rule: rounding belongs to a maximized window sitting between the bars. One that
-        // covers the whole monitor (both bars auto-hidden) simply takes the screen, as does full screen.
-        if (result.frame.left <= monitor.rcMonitor.left && result.frame.top <= monitor.rcMonitor.top &&
-            result.frame.right >= monitor.rcMonitor.right && result.frame.bottom >= monitor.rcMonitor.bottom) return result;
-        result.dpi = ::GetDpiForWindow(window);
-        result.eligible = true;
-        return result;
-    }
-    Result<std::optional<CornerRegion>> ReadRegion(HWND window) override {
-        platform::UniqueRegion region(::CreateRectRgn(0, 0, 0, 0));
-        if (!region) return NativeError("Window corner region allocation failed");
-        if (::GetWindowRgn(window, region.Get()) == ERROR) return std::optional<CornerRegion>{};
-        auto data = SerializeRegion(region.Get()); if (!data) return data.error();
-        return std::optional<CornerRegion>{std::move(*data)};
-    }
-    Result<void> WriteRegion(HWND window, const std::optional<CornerRegion>& region) override try {
-        std::erase_if(writes_, [](const auto& entry) { return entry.second->finished.load(std::memory_order_acquire); });
-        if (writes_.contains(window)) return MakeError(ErrorCode::Timeout, "Window corner region update is still pending");
-        platform::UniqueRegion native;
-        if (region) {
-            native = DeserializeRegion(*region);
-            if (!native) return NativeError("Window corner region reconstruction failed");
-        }
-        auto write = std::make_shared<RegionWrite>();
-        if (!write->done) return NativeError("Window corner region update event unavailable");
-        HRGN handle = native.Get();
-        std::thread([write, window, handle] {
-            const BOOL set = ::SetWindowRgn(window, handle, TRUE);
-            write->error = set ? 0 : ::GetLastError();
-            if (!set && handle) ::DeleteObject(handle);  // the system owns only an installed region
-            write->result = set;
-            write->finished.store(true, std::memory_order_release);
-            (void)::SetEvent(write->done.Get());
-        }).detach();
-        (void)native.Release();  // now the writer thread's
-        if (::WaitForSingleObject(write->done.Get(), kRegionWriteWaitMs) == WAIT_OBJECT_0) {
-            if (!write->result) return MakeError(ErrorCode::Platform, "Window corner region update failed", write->error);
-            Count(options_.statistics ? &options_.statistics->regionWrites : nullptr);
-            return Ok();
-        }
-        writes_[window] = std::move(write);
-        Count(options_.statistics ? &options_.statistics->pendingWrites : nullptr);
-        return MakeError(ErrorCode::Timeout, "Window corner region update is still pending");
-    } catch (...) { return MakeError(ErrorCode::Internal, "Window corner region writer unavailable"); }
-    Result<std::optional<DWORD>> ReadBackdrop(HWND window) override {
-        DWORD value = 0;
-        const auto hr = ::DwmGetWindowAttribute(window, DWMWA_SYSTEMBACKDROP_TYPE, &value, sizeof(value));
-        // SYSTEMBACKDROP_TYPE is documented only on Windows 11 build 22621 and later.
-        if (hr == E_INVALIDARG || hr == E_NOTIMPL) return std::optional<DWORD>{};
-        if (FAILED(hr)) return MakeError(ErrorCode::Platform, "Window corner backdrop cannot be read", hr);
-        if (value > DWMSBT_TABBEDWINDOW)
-            return MakeError(ErrorCode::Unsupported, "Window corner backdrop type is not supported");
-        return std::optional<DWORD>{value};
-    }
-    Result<void> WriteBackdrop(HWND window, DWORD value) override {
-        const auto hr = ::DwmSetWindowAttribute(window, DWMWA_SYSTEMBACKDROP_TYPE, &value, sizeof(value));
-        if (FAILED(hr)) return MakeError(ErrorCode::Platform, "Window corner backdrop update failed", hr);
-        return Ok();
-    }
-    bool Owns(HWND window, std::uintptr_t token) noexcept override {
-        return ::GetPropW(window, kLeaseProperty) == reinterpret_cast<HANDLE>(token);
-    }
-    bool ClearAbandonedClaim(HWND window) noexcept override {
-        if (!::GetPropW(window, kLeaseProperty)) return false;
-        const auto owner = static_cast<DWORD>(reinterpret_cast<std::uintptr_t>(::GetPropW(window, kLeaseOwnerProperty)));
-        if (!owner || owner == ::GetCurrentProcessId()) return false;
-        // Only a guard that is really gone: a process of that id that still runs keeps its claim.
-        if (const HANDLE process = ::OpenProcess(SYNCHRONIZE, FALSE, owner)) {
-            const bool running = ::WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
-            ::CloseHandle(process);
-            if (running) return false;
-        } else if (::GetLastError() != ERROR_INVALID_PARAMETER) {
-            return false;
-        }
-        (void)::RemovePropW(window, kLeaseProperty);
-        (void)::RemovePropW(window, kLeaseOwnerProperty);
+        window_.Color(color);
         return true;
     }
-    Result<void> Claim(HWND window, std::uintptr_t token) override {
-        if (::GetPropW(window, kLeaseProperty)) return MakeError(ErrorCode::AlreadyExists, "Window corner lease already exists");
-        (void)::SetPropW(window, kLeaseOwnerProperty, reinterpret_cast<HANDLE>(static_cast<std::uintptr_t>(::GetCurrentProcessId())));
-        if (!::SetPropW(window, kLeaseProperty, reinterpret_cast<HANDLE>(token)))
-            return NativeError("Window corner lifetime marker could not be installed");
-        return Ok();
-    }
-    void Release(HWND window, std::uintptr_t token) noexcept override {
-        if (Owns(window, token)) { (void)::RemovePropW(window, kLeaseProperty); (void)::RemovePropW(window, kLeaseOwnerProperty); }
-    }
+    void Hide() noexcept { window_.Hide(); }
+
 private:
-    DWORD excluded_;
-    const WindowCornerGuardOptions& options_;
-    std::map<HWND, std::shared_ptr<RegionWrite>> writes_;
-    struct KnownProcess { std::uint64_t created = 0; bool safe = false; };
-    std::map<DWORD, KnownProcess> processes_;
+    ShapedWindow window_{kRimClass};
+    std::optional<CornerRim> shape_;
+};
+
+// D72: the four corners outside the rounded outline. Each rectangle of them shows the desktop that lies at its own
+// place, live, through a DWM thumbnail of the desktop window at its natural size: what a cut-out corner would let
+// through. One thumbnail per rectangle, because DWM draws a thumbnail over its whole rectangle whatever the shape
+// of the window that holds it (measured: one per corner square came out square).
+class PiecesWindow {
+public:
+    PiecesWindow() = default;
+    PiecesWindow(const PiecesWindow&) = delete;
+    PiecesWindow& operator=(const PiecesWindow&) = delete;
+    ~PiecesWindow() { Unmap(); }
+    [[nodiscard]] HWND Handle() const noexcept { return window_.Handle(); }
+    bool Sync(const CornerRim& rim, HWND source) {
+        if (!window_.Ensure()) return false;
+        if (!shape_ || !(*shape_ == rim)) {
+            shape_.reset();
+            Unmap();
+            rects_ = CornerPieceRects(rim.bounds.right - rim.bounds.left, rim.bounds.bottom - rim.bounds.top, rim.radiusPx);
+            if (rects_.empty() || !window_.Shape(rim.bounds, rects_)) return false;
+            shape_ = rim;
+        }
+        RECT from{};
+        if (!source || !::GetWindowRect(source, &from)) { Unmap(); return false; }
+        if (source == source_ && mapped_ && ::EqualRect(&from, &sourceBounds_)) return true;
+        Unmap();
+        thumbnails_.assign(rects_.size(), nullptr);
+        for (std::size_t index = 0; index < rects_.size(); ++index) {
+            RECT there = rects_[index];
+            ::OffsetRect(&there, rim.bounds.left - from.left, rim.bounds.top - from.top);
+            // A corner that is not on the desktop window has nothing to show: better square than wrong.
+            if (there.left < 0 || there.top < 0 || there.right > from.right - from.left || there.bottom > from.bottom - from.top) { Unmap(); return false; }
+            if (FAILED(::DwmRegisterThumbnail(window_.Handle(), source, &thumbnails_[index]))) {
+                thumbnails_[index] = nullptr;
+                Unmap();
+                return false;
+            }
+            DWM_THUMBNAIL_PROPERTIES properties{};
+            properties.dwFlags = DWM_TNP_RECTDESTINATION | DWM_TNP_RECTSOURCE | DWM_TNP_OPACITY | DWM_TNP_VISIBLE | DWM_TNP_SOURCECLIENTAREAONLY;
+            properties.rcDestination = rects_[index];
+            properties.rcSource = there;
+            properties.opacity = 255;
+            properties.fVisible = TRUE;
+            properties.fSourceClientAreaOnly = FALSE;
+            if (FAILED(::DwmUpdateThumbnailProperties(thumbnails_[index], &properties))) { Unmap(); return false; }
+        }
+        source_ = source;
+        sourceBounds_ = from;
+        mapped_ = true;
+        return true;
+    }
+    void Hide() noexcept { window_.Hide(); }
+
+private:
+    void Unmap() noexcept {
+        for (auto& thumbnail : thumbnails_) {
+            if (thumbnail) (void)::DwmUnregisterThumbnail(thumbnail);
+            thumbnail = nullptr;
+        }
+        thumbnails_.clear();
+        source_ = nullptr;
+        mapped_ = false;
+    }
+    ShapedWindow window_{kPiecesClass};
+    std::optional<CornerRim> shape_;
+    std::vector<RECT> rects_;
+    std::vector<HTHUMBNAIL> thumbnails_;
+    HWND source_ = nullptr;
+    RECT sourceBounds_{};
+    bool mapped_ = false;
+};
+
+// The window whose picture is the desktop. Windows draws the desktop picture and its icons in Progman. Where
+// the icons were moved into a WorkerW of their own (what live-wallpaper programs ask Windows to do), the
+// picture is the WorkerW right behind that one.
+HWND FindDesktopSource() noexcept {
+    const HWND progman = ::FindWindowW(L"Progman", nullptr);
+    if (progman && ::FindWindowExW(progman, nullptr, L"SHELLDLL_DefView", nullptr)) return ::IsWindowVisible(progman) ? progman : nullptr;
+    for (HWND worker = ::FindWindowExW(nullptr, nullptr, L"WorkerW", nullptr); worker; worker = ::FindWindowExW(nullptr, worker, L"WorkerW", nullptr)) {
+        if (!::FindWindowExW(worker, nullptr, L"SHELLDLL_DefView", nullptr)) continue;
+        const HWND picture = ::FindWindowExW(nullptr, worker, L"WorkerW", nullptr);
+        if (picture && ::IsWindowVisible(picture)) return picture;
+        break;
+    }
+    return progman && ::IsWindowVisible(progman) ? progman : nullptr;
+}
+
+// What one monitor shows: the front maximized window there, and the guard's two windows directly above it.
+struct Frame {
+    HWND target = nullptr;
+    CornerRim rim;
+    PiecesWindow pieces;
+    RimWindow ring;
+    int placements = 0;
+    ULONGLONG burstStart = 0;
+    ULONGLONG restUntil = 0;
+    void Hide() noexcept { pieces.Hide(); ring.Hide(); }
 };
 
 struct Observer {
-    NativeBackend backend;
     const WindowCornerGuardOptions& options;
-    std::map<HWND, std::unique_ptr<WindowCornerLease>> leases;
-    // A window given back to its application: its identity, and when a re-asserted material may be
-    // clipped again (0: not before the window is maximized anew).
-    struct Abandoned { DWORD process = 0; DWORD thread = 0; ULONGLONG retryAt = 0; };
-    std::map<HWND, Abandoned> abandoned;
-    struct Retries { int attempts = 0; ULONGLONG last = 0; };
-    std::map<HWND, Retries> materialRetries;  // re-assertions of a maximized window (D46, D56)
-    std::map<HWND, std::unique_ptr<RimWindow>> rims;  // D45: one perimeter ring per clipped window
-    // AS4-03: a target that did not answer waits out a growing delay while the others proceed.
-    struct Deferral { ULONGLONG until = 0; int attempts = 0; };
-    std::map<HWND, Deferral> deferred;
-    // AS4-07: events mark the windows they concern; only display/settings broadcasts (and the
-    // first pass) enumerate every top-level window.
-    std::set<HWND> dirty;
-    bool fullSweep = true;
-    bool allLeases = false;           // activation can change every leased window's stacking and material
-    ULONGLONG nextLeaseCheck = 0;
-    std::uintptr_t nextToken = 1;
+    std::map<HMONITOR, std::unique_ptr<Frame>> frames;
+    HWND source = nullptr;
     UINT_PTR timer = 0;
-    ULONGLONG timerDue = 0;
+    bool pending = true;
     bool stopping = false;
-    Observer(DWORD excluded, const WindowCornerGuardOptions& value) : backend(excluded, value), options(value) {}
+    explicit Observer(const WindowCornerGuardOptions& value) noexcept : options(value) {}
     std::atomic<std::uint64_t>* Statistic(std::atomic<std::uint64_t> WindowCornerGuardStatistics::* field) const noexcept {
         return options.statistics ? &(options.statistics->*field) : nullptr;
     }
-    // One pending refresh; an earlier request replaces a later one.
-    void Queue(UINT delay = 40) noexcept {
-        if (stopping) return;
-        const ULONGLONG due = ::GetTickCount64() + delay;
-        if (timer && due >= timerDue) return;
-        if (timer) ::KillTimer(nullptr, timer);
-        timer = ::SetTimer(nullptr, kRefreshTimer, delay, nullptr);
-        timerDue = due;
+    // Tests name the only windows that may be looked at.
+    [[nodiscard]] bool Allowed(HWND window) const noexcept {
+        return !options.onlyProcess || std::find(options.onlyWindows.begin(), options.onlyWindows.end(), window) != options.onlyWindows.end();
     }
-    void MarkDirty(HWND window, UINT delay = 40) noexcept {
-        try { dirty.insert(window); } catch (...) { fullSweep = true; }
-        Queue(delay);
+    [[nodiscard]] bool IsOwn(HWND window) const noexcept {
+        for (const auto& [monitor, frame] : frames) if (window == frame->pieces.Handle() || window == frame->ring.Handle()) return true;
+        return false;
     }
-    void MarkAll() noexcept { fullSweep = true; Queue(); }
-    static UINT DeferralDelay(int attempts) noexcept { return static_cast<UINT>(std::min(4000, 250 << std::min(attempts, 4))); }
-    // Acquires a lease for a new candidate, or honours the application's own choice (D46).
-    void Visit(HWND window, std::set<HWND>& again) {
-        const bool presented = ::IsZoomed(window) && !::IsIconic(window) && ::IsWindowVisible(window);
-        if (!presented) materialRetries.erase(window);
-        if (leases.size() >= kMaxLeases || leases.contains(window)) return;
-        if (const auto old = abandoned.find(window); old != abandoned.end()) {
-            DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
-            if (old->second.process == process && old->second.thread == thread) {
-                // The application's own region/material wins for as long as this maximized presentation
-                // lasts. Once the window leaves it (restored or minimized), its next maximize is a new
-                // presentation and gets one fresh attempt. D46: a merely re-asserted previous material
-                // is clipped again once its bounded delay has passed; never immediately.
-                if (!presented) { abandoned.erase(old); return; }
-                if (!old->second.retryAt) return;
-                const ULONGLONG now = ::GetTickCount64();
-                if (now < old->second.retryAt) { MarkDirty(window, static_cast<UINT>(old->second.retryAt - now)); return; }
-            }
-            abandoned.erase(old);
+    [[nodiscard]] bool IsTarget(HWND window) const noexcept {
+        for (const auto& [monitor, frame] : frames) if (window == frame->target) return true;
+        return false;
+    }
+    // Something changed that may matter: one look once the waiting messages have been read.
+    void Heard() noexcept {
+        Count(Statistic(&WindowCornerGuardStatistics::events));
+        pending = true;
+    }
+    // Everything the guard learns of a window. A window that is not visible and maximized is asked nothing more.
+    [[nodiscard]] CornerWindowFacts Read(HWND window) const noexcept {
+        CornerWindowFacts facts;
+        facts.visible = ::IsWindowVisible(window) != FALSE;
+        facts.maximized = ::IsZoomed(window) != FALSE;
+        if (!facts.visible || !facts.maximized) return facts;
+        facts.minimized = ::IsIconic(window) != FALSE;
+        facts.topLevel = ::GetAncestor(window, GA_ROOT) == window;
+        facts.cloaked = platform::IsWindowCloaked(window);
+        const auto extended = ::GetWindowLongPtrW(window, GWL_EXSTYLE);
+        facts.toolWindow = (extended & WS_EX_TOOLWINDOW) != 0;
+        facts.clickThrough = (extended & WS_EX_TRANSPARENT) != 0;
+        // The shell's own windows shape themselves (its Settings window rounds itself), and the fixtures of its
+        // tests are no application's: outside a test, neither is the guard's business.
+        facts.own = IsOwn(window) || (!options.onlyProcess && platform::WindowClassName(window).starts_with(L"AetherShell."));
+        MONITORINFO monitor{sizeof(monitor)};
+        if (!::GetWindowRect(window, &facts.bounds) ||
+            FAILED(::DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &facts.frame, sizeof(facts.frame))) ||
+            !::GetMonitorInfoW(::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST), &monitor)) {
+            facts.visible = false;
+            return facts;
         }
-        if (!presented) return;
-        auto lease = WindowCornerLease::Acquire(backend, window, ++nextToken);
-        if (lease) {
-            leases.emplace(window, std::move(*lease));
-            // Also revisit a first application that retained a material snapshot after a
-            // failed region write. Do not rely on that failed write raising a WinEvent.
-            again.insert(window);
-        } else if (lease.error().code == ErrorCode::InvalidState) {
-            // A synchronous application replacement during first application wins too.
-            // Its own WinEvents must not cause repeated acquisition/material writes.
-            DWORD process = 0;
-            const auto thread = ::GetWindowThreadProcessId(window, &process);
-            if (thread) abandoned[window] = Abandoned{process, thread, 0};
-        } else if (lease.error().code == ErrorCode::Timeout) {
-            again.insert(window);  // the target did not answer before its first clip; try again later
-        }
+        facts.monitor = monitor.rcMonitor;
+        facts.work = monitor.rcWork;
+        facts.dpi = ::GetDpiForWindow(window);
+        facts.regionKind = ::GetWindowRgnBox(window, &facts.regionBox);
+        return facts;
     }
+    struct Top { HWND window = nullptr; CornerRim rim; };
+    void Consider(HWND window, std::map<HMONITOR, Top>& tops) const {
+        if (!Allowed(window)) return;
+        const auto observed = ClassifyCornerWindow(Read(window));
+        if (!observed.eligible) return;
+        const HMONITOR monitor = ::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
+        if (!monitor || tops.contains(monitor)) return;  // windows come front to back: the first is the front one
+        if (const auto rim = CornerFrameFor(observed)) tops.emplace(monitor, Top{window, *rim});
+    }
+    // One look: the front maximized window of each monitor, and the guard's windows shaped, mapped and stacked
+    // for it. Only the guard's own windows are ever changed.
     void Refresh() {
-        if (timer) { ::KillTimer(nullptr, timer); timer = 0; }
+        pending = false;
+        if (stopping) return;
         LARGE_INTEGER started{}, finished{}, frequency{};
         (void)::QueryPerformanceCounter(&started);
         Count(Statistic(&WindowCornerGuardStatistics::sweeps));
-        const bool full = fullSweep;
-        fullSweep = false;
-        std::set<HWND> targets;
-        targets.swap(dirty);
-        std::set<HWND> again;
-        const ULONGLONG now = ::GetTickCount64();
-        const bool everyLease = full || allLeases || now >= nextLeaseCheck;
-        allLeases = false;
-        if (everyLease) nextLeaseCheck = now + kLeaseCheckMs;
-        for (auto it = leases.begin(); it != leases.end();) {
-            const auto window = it->first;
-            if (!everyLease && !targets.contains(window)) { ++it; continue; }
-            if (const auto wait = deferred.find(window); wait != deferred.end() && now < wait->second.until) {
-                MarkDirty(window, static_cast<UINT>(wait->second.until - now));
-                ++it; continue;
-            }
-            Count(Statistic(&WindowCornerGuardStatistics::leaseRefreshes));
-            auto refreshed = it->second->Refresh();
-            if (refreshed && *refreshed) { deferred.erase(window); ++it; continue; }
-            if (!refreshed) {
-                // A temporary observation/allocation/native-write failure must not discard the
-                // only prior-region snapshot while this guard still owns a clipped window.
-                if (it->second->HasOwnership()) {
-                    if (refreshed.error().code == ErrorCode::Timeout) {
-                        auto& wait = deferred[window];
-                        const UINT delay = DeferralDelay(wait.attempts++);
-                        wait.until = ::GetTickCount64() + delay;
-                        Count(Statistic(&WindowCornerGuardStatistics::deferrals));
-                        MarkDirty(window, delay);
-                    } else again.insert(window);
-                    ++it; continue;
-                }
-                DWORD process = 0; const auto thread = ::GetWindowThreadProcessId(window, &process);
-                if (thread) {
-                    Abandoned entry{process, thread, 0};
-                    auto& retry = materialRetries[window];
-                    const ULONGLONG at = ::GetTickCount64();  // from now: the restoration itself takes time
-                    // D56: the budget limits a burst, not a whole session. A browser re-asserts on every
-                    // activation; left at one budget per maximize it ends up square for good.
-                    if (at - retry.last >= kCornerRetryRestMs) retry.attempts = 0;
-                    retry.last = at;
-                    const auto replacement = it->second->Replacement();
-                    if (const auto delay = CornerRetryDelay(replacement, retry.attempts)) {
-                        ++retry.attempts;
-                        entry.retryAt = at + static_cast<ULONGLONG>(delay->count());
-                        MarkDirty(window, static_cast<UINT>(delay->count()));
-                    } else if (CornerRetryDelay(replacement, 0)) {
-                        entry.retryAt = at + kCornerRetryRestMs;
-                        MarkDirty(window, kCornerRetryRestMs);
-                    }
-                    abandoned[window] = entry;
-                }
-            }
-            deferred.erase(window);
-            it = leases.erase(it);
+        // A test shows only the private window it names, never the real desktop.
+        if (options.onlyProcess) source = options.desktopSource;
+        else if (!source || !::IsWindow(source)) source = FindDesktopSource();
+        std::map<HMONITOR, Top> tops;
+        struct Context { Observer* self; std::map<HMONITOR, Top>* tops; } context{this, &tops};
+        (void)::EnumWindows([](HWND window, LPARAM value) noexcept -> BOOL {
+            auto& state = *reinterpret_cast<Context*>(value);
+            try { state.self->Consider(window, *state.tops); return TRUE; }
+            catch (...) { return FALSE; }
+        }, reinterpret_cast<LPARAM>(&context));
+        for (auto it = frames.begin(); it != frames.end();) {
+            if (tops.contains(it->first)) ++it;
+            else it = frames.erase(it);
         }
-        if (full) {
-            Count(Statistic(&WindowCornerGuardStatistics::fullSweeps));
-            if (options.onlyProcess) { for (const auto window : options.onlyWindows) Visit(window, again); }
-            else {
-                struct Context { Observer* self; std::set<HWND>* again; } context{this, &again};
-                (void)::EnumWindows([](HWND window, LPARAM value) noexcept -> BOOL {
-                    auto& state = *reinterpret_cast<Context*>(value);
-                    try { state.self->Visit(window, *state.again); return TRUE; }
-                    catch (...) { return FALSE; }
-                }, reinterpret_cast<LPARAM>(&context));
-            }
-        } else {
-            for (const auto window : targets) {
-                if (leases.contains(window) || !::IsWindow(window)) continue;
-                // The test restriction also bounds dirty-only passes to the fixture windows.
-                if (options.onlyProcess && std::find(options.onlyWindows.begin(), options.onlyWindows.end(), window) == options.onlyWindows.end()) continue;
-                Visit(window, again);
-            }
+        const COLORREF color = RimColor();
+        for (const auto& [monitor, top] : tops) {
+            auto& frame = frames[monitor];
+            if (!frame) frame = std::make_unique<Frame>();
+            frame->target = top.window;
+            frame->rim = top.rim;
+            // Without the desktop's picture the corners stay square: a rim alone would draw arcs over them.
+            if (!source || !frame->pieces.Sync(top.rim, source) || !frame->ring.Sync(top.rim, color)) { frame->Hide(); continue; }
+            Place(*frame);
         }
-        for (const auto window : again) MarkDirty(window, 250);
-        SyncRims();
-        if (!leases.empty()) {
-            const ULONGLONG current = ::GetTickCount64();
-            Queue(static_cast<UINT>(nextLeaseCheck > current ? nextLeaseCheck - current : 1));
-        }
+        if (!frames.empty() && !timer) timer = ::SetTimer(nullptr, 0, kCheckMs, nullptr);
+        else if (frames.empty() && timer) { ::KillTimer(nullptr, timer); timer = 0; }
         (void)::QueryPerformanceCounter(&finished);
         (void)::QueryPerformanceFrequency(&frequency);
         if (auto* longest = Statistic(&WindowCornerGuardStatistics::longestSweepMicros); longest && frequency.QuadPart > 0) {
@@ -579,82 +378,103 @@ struct Observer {
             while (micros > previous && !longest->compare_exchange_weak(previous, micros, std::memory_order_relaxed)) {}
         }
     }
-    // Rings follow their leases: shown, reshaped, recolored and kept directly beneath each clipped
-    // window; removed with the clip. A ring that cannot be shown leaves the clip as it is.
-    void SyncRims() noexcept {
+    // Keeps the frame's two windows directly above its target, which is itself never moved or restacked.
+    // A window in front of the target is therefore in front of them too.
+    void Place(Frame& frame) noexcept {
+        const HWND pieces = frame.pieces.Handle(), ring = frame.ring.Handle();
+        HWND above = ::GetWindow(frame.target, GW_HWNDPREV);
+        bool piecesThere = false, ringThere = false;
+        while (above && (above == pieces || above == ring)) {
+            (above == pieces ? piecesThere : ringThere) = true;
+            above = ::GetWindow(above, GW_HWNDPREV);
+        }
+        const auto isTopmost = [](HWND window) noexcept { return (::GetWindowLongPtrW(window, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0; };
+        // Always-on-top like the target, and only then: an always-on-top piece over an ordinary window would also
+        // lie over whatever comes in front of that window.
+        const bool topmost = isTopmost(frame.target);
+        if (piecesThere && ringThere && ::IsWindowVisible(pieces) && ::IsWindowVisible(ring) && isTopmost(pieces) == topmost &&
+            isTopmost(ring) == topmost) return;
+        const ULONGLONG now = ::GetTickCount64();
+        if (now < frame.restUntil) return;
+        if (now - frame.burstStart > kPlacementWindowMs) { frame.burstStart = now; frame.placements = 0; }
+        if (++frame.placements > kPlacementBurst) {
+            frame.restUntil = now + kPlacementRestMs;
+            frame.placements = 0;
+            return;
+        }
+        // Windows makes a window always-on-top when it is placed right behind an always-on-top one. Above an ordinary
+        // target that is the front ordinary window, the place asked for is therefore the top of the ordinary windows.
+        const HWND after = !above || (!topmost && isTopmost(above)) ? HWND_TOP : above;
+        for (const HWND overlay : {ring, pieces}) {
+            if (isTopmost(overlay) != topmost)
+                (void)::SetWindowPos(overlay, topmost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+            (void)::SetWindowPos(overlay, after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW);
+            Count(Statistic(&WindowCornerGuardStatistics::placements));
+        }
+    }
+    // Before D72 the guard clipped other applications' windows with a rounded region and marked them. A guard
+    // that was killed left its clips behind, and the window stayed cut after it was restored. The guard that made
+    // them is gone and cannot take them back: this one removes them, once, when it starts. A window that still
+    // has its guard (an earlier version running beside a trial of this one) is left to it.
+    void ReleaseAbandonedClips() noexcept {
         try {
-            for (auto it = rims.begin(); it != rims.end();) {
-                const auto lease = leases.find(it->first);
-                if (stopping || lease == leases.end() || !lease->second->Rim()) it = rims.erase(it);
-                else ++it;
+            std::vector<HWND> marked;
+            struct Context { const Observer* self; std::vector<HWND>* marked; } context{this, &marked};
+            (void)::EnumWindows([](HWND window, LPARAM value) noexcept -> BOOL {
+                auto& state = *reinterpret_cast<Context*>(value);
+                try { if (state.self->Allowed(window) && ::GetPropW(window, kLeaseProperty)) state.marked->push_back(window); return TRUE; }
+                catch (...) { return FALSE; }
+            }, reinterpret_cast<LPARAM>(&context));
+            for (const HWND window : marked) {
+                const auto owner = static_cast<DWORD>(reinterpret_cast<std::uintptr_t>(::GetPropW(window, kLeaseOwnerProperty)));
+                if (!owner || owner == ::GetCurrentProcessId()) continue;
+                if (const HANDLE process = ::OpenProcess(SYNCHRONIZE, FALSE, owner)) {
+                    const bool running = ::WaitForSingleObject(process, 0) == WAIT_TIMEOUT;
+                    ::CloseHandle(process);
+                    if (running) continue;
+                } else if (::GetLastError() != ERROR_INVALID_PARAMETER) {
+                    continue;
+                }
+                RECT box{};
+                // Such a window only ever had no region or a plain rectangle before it was clipped: a shape on a
+                // window that still carries the dead guard's mark is that guard's clip.
+                const bool clipped = ::GetWindowRgnBox(window, &box) == COMPLEXREGION;
+                Count(clipped ? Statistic(&WindowCornerGuardStatistics::abandonedClips) : nullptr);
+                // Removing a region sends the window messages: one that does not answer must not hold the guard.
+                std::thread([window, clipped] {
+                    if (clipped) (void)::SetWindowRgn(window, nullptr, TRUE);
+                    (void)::RemovePropW(window, kLeaseProperty);
+                    (void)::RemovePropW(window, kLeaseOwnerProperty);
+                }).detach();
             }
-            if (stopping) return;
-            const COLORREF color = RimColor();
-            for (const auto& [window, lease] : leases) {
-                const auto& rim = lease->Rim();
-                if (!rim) continue;
-                auto& ring = rims[window];
-                if (!ring) ring = std::make_unique<RimWindow>();
-                if (!ring->Sync(window, *rim, color)) rims.erase(window);
-            }
-        } catch (...) {
-            rims.clear();
-        }
-    }
-    bool RestoreAll() {
-        for (auto it = leases.begin(); it != leases.end();) {
-            auto restored = it->second->Restore();
-            if (restored || !it->second->HasOwnership()) it = leases.erase(it);
-            else ++it;
-        }
-        SyncRims();
-        return leases.empty();
-    }
-    ~Observer() {
-        stopping = true;
-        if (timer) ::KillTimer(nullptr, timer);
-        // Covers every error/exception exit too. This process may outlive the UI parent while a
-        // target is hung or native recovery is temporarily unavailable; never drop its snapshot.
-        for (;;) {
-            try { if (RestoreAll()) break; } catch (...) {}
-            ::Sleep(250);
-        }
+        } catch (...) {}
     }
 };
 thread_local Observer* currentObserver = nullptr;
+UINT ExplorerStartedMessage() noexcept {
+    static const UINT message = ::RegisterWindowMessageW(L"TaskbarCreated");
+    return message;
+}
 LRESULT CALLBACK BroadcastProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
-    if ((message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE || message == WM_DPICHANGED) && currentObserver) {
-        Count(currentObserver->Statistic(&WindowCornerGuardStatistics::events));
-        currentObserver->MarkAll();
+    // The display, the work area between the bars, the theme or the desktop window itself (Explorer started again).
+    if ((message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE || message == WM_DPICHANGED ||
+         (message && message == ExplorerStartedMessage())) && currentObserver) {
+        if (message == ExplorerStartedMessage()) currentObserver->source = nullptr;
+        currentObserver->Heard();
     }
     return ::DefWindowProcW(window, message, wParam, lParam);
 }
 void CALLBACK EventHook(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LONG child, DWORD, DWORD) noexcept {
-    if (!currentObserver || !window) return;
+    if (!currentObserver || currentObserver->stopping) return;
     auto& observer = *currentObserver;
-    if (event >= EVENT_OBJECT_CREATE && (object != OBJID_WINDOW || child != CHILDID_SELF)) return;
-    Count(observer.Statistic(&WindowCornerGuardStatistics::events));
-    if (event == EVENT_OBJECT_DESTROY && !::IsWindow(window)) {
-        observer.abandoned.erase(window);
-        observer.materialRetries.erase(window);
-        observer.deferred.erase(window);
-        if (observer.leases.contains(window)) observer.MarkDirty(window);
-        return;
-    }
-    if (observer.leases.contains(window)) {
-        if (event == EVENT_SYSTEM_FOREGROUND) observer.allLeases = true;
-        observer.MarkDirty(window);
-        return;
-    }
-    // Activation restacks windows: the rings must stay directly beneath their targets. It is also
-    // when applications tend to re-assert their material.
-    if (event == EVENT_SYSTEM_FOREGROUND && !observer.leases.empty()) { observer.allLeases = true; observer.Queue(); }
-    // Child windows never qualify, and the guard's own rings move with their targets.
-    if (::GetAncestor(window, GA_ROOT) != window || platform::WindowClassName(window) == kRimClass) return;
-    // A maximized top-level window may be a new candidate; a window the guard gave back must be
-    // seen leaving its presentation. Ordinary moves of restored windows are not the guard's concern.
-    if (::IsZoomed(window) || observer.abandoned.contains(window) || observer.materialRetries.contains(window))
-        observer.MarkDirty(window);
+    // Stacking: a window came to the front, or the top-level windows changed order.
+    if (event == EVENT_SYSTEM_FOREGROUND || (event == EVENT_OBJECT_REORDER && window == ::GetDesktopWindow())) { observer.Heard(); return; }
+    if (!window || object != OBJID_WINDOW || child != CHILDID_SELF) return;
+    if (observer.IsTarget(window)) { observer.Heard(); return; }
+    // Otherwise only a maximized top-level window matters: it may be the next front one. Ordinary moves of
+    // other windows are not the guard's concern, since whatever is in front of the target covers its corners.
+    if (!observer.Allowed(window) || observer.IsOwn(window)) return;
+    if (::IsZoomed(window) && ::GetAncestor(window, GA_ROOT) == window) observer.Heard();
 }
 
 struct GuardSession {
@@ -664,11 +484,11 @@ struct GuardSession {
     void Stop() noexcept {
         if (!process) return;
         (void)::SetEvent(stop.Get());
-        // If a target became hung inside SetWindowRgn the helper is deliberately left alive to
-        // restore when that application responds. Terminating it would abandon foreign regions.
+        // The helper has nothing to put back (D72): it only has its own windows, which leave with it.
+        // It is still never terminated; one that is slow to leave is noted and left to finish.
         const auto waited = ::WaitForSingleObject(process.Get(), 5000);
         if (waited == WAIT_OBJECT_0) AETHER_LOG_INFO("app", "window corner guard stopped");
-        else AETHER_LOG_WARN("app", "window corner guard is still restoring a nonresponsive application");
+        else AETHER_LOG_WARN("app", "window corner guard has not left yet");
         process.Reset(); stop.Reset();
     }
 };
@@ -719,191 +539,91 @@ Result<std::unique_ptr<GuardSession>> StartGuard(const std::filesystem::path& ex
 
 int CornerRimWidthPx(UINT dpi) noexcept { return std::max(1, ::MulDiv(1, static_cast<int>(dpi ? dpi : 96), 96)); }
 
-std::optional<std::chrono::milliseconds> CornerRetryDelay(CornerReplacement replacement, int attempt) noexcept {
-    const bool reasserted = replacement == CornerReplacement::MaterialReasserted || replacement == CornerReplacement::RegionReasserted;
-    if (!reasserted || attempt < 0 || attempt >= kCornerMaterialRetries) return std::nullopt;
-    return std::chrono::milliseconds{std::min(8000, 250 << std::min(attempt, 5))};  // 0.25, 0.5, 1, 2, 4, 8 s, ...
+CornerWindowObservation ClassifyCornerWindow(const CornerWindowFacts& facts) noexcept {
+    CornerWindowObservation result;
+    result.bounds = facts.bounds;
+    result.frame = facts.frame;
+    result.work = facts.work;
+    result.dpi = facts.dpi;
+    if (!facts.visible || facts.minimized || !facts.maximized || !facts.topLevel || facts.cloaked || facts.toolWindow ||
+        facts.clickThrough || facts.own) return result;
+    // D56, the owner's rule: rounding belongs to a maximized window sitting between the bars. One that covers
+    // the whole monitor (both bars auto-hidden) simply takes the screen, as does full screen.
+    if (facts.frame.left <= facts.monitor.left && facts.frame.top <= facts.monitor.top &&
+        facts.frame.right >= facts.monitor.right && facts.frame.bottom >= facts.monitor.bottom) return result;
+    // A shape of its own stays its own. A plain rectangle that still shows the whole frame is no shape: a
+    // browser keeps its maximized window to the work area that way.
+    if (facts.regionKind == COMPLEXREGION || facts.regionKind == NULLREGION) return result;
+    try {
+        const auto layout = settings::ui::experimental::ComputeMaximizedCornerLayout(facts.bounds, facts.frame, facts.work, facts.dpi);
+        if (!layout) return result;
+        if (facts.regionKind == SIMPLEREGION) {
+            const auto& clip = layout->clipPx;
+            if (facts.regionBox.left > clip.left || facts.regionBox.top > clip.top || facts.regionBox.right < clip.right ||
+                facts.regionBox.bottom < clip.bottom) return result;
+        }
+    } catch (...) {
+        return result;
+    }
+    result.eligible = true;
+    return result;
 }
 
-WindowCornerLease::WindowCornerLease(IWindowCornerBackend& backend, HWND window, std::uintptr_t token,
-    DWORD process, DWORD thread) noexcept : backend_(backend), window_(window), token_(token), process_(process), thread_(thread) {}
-WindowCornerLease::~WindowCornerLease() { try { (void)Restore(); } catch (...) {} }
-Result<std::unique_ptr<WindowCornerLease>> WindowCornerLease::Acquire(IWindowCornerBackend& backend,
-    HWND window, std::uintptr_t token) try {
-    if (!window || !token) return MakeError(ErrorCode::InvalidArgument, "Window corner identity is invalid");
-    auto observed = backend.Observe(window); if (!observed) return observed.error();
-    if (!observed->eligible || !observed->process || !observed->thread)
-        return MakeError(ErrorCode::Unsupported, "Window corner target is not eligible");
-    auto original = backend.ReadRegion(window); if (!original) return original.error();
-    // AS4-05: a guard that died took its memory of what it replaced with it. If the window still has exactly
-    // the clip that guard would have left, this one takes it over, with no region to put back; eligible windows
-    // only ever had none or a plain rectangle, so that is the fail-open choice. Anything else is the
-    // application's and stays untouched.
-    bool adopted = false;
-    if (backend.ClearAbandonedClaim(window) && *original) {
-        const auto rounded = RoundedRegion(*observed, std::nullopt);
-        adopted = rounded && *rounded == **original;
-    }
-    if (*original && !adopted && !SimpleRegionContainsClip(**original, *observed))
-        return MakeError(ErrorCode::Unsupported, "Window owns a nonstandard custom region");
-    auto lease = std::unique_ptr<WindowCornerLease>(new WindowCornerLease(backend, window, token,
-        observed->process, observed->thread));
-    lease->original_ = adopted ? std::optional<CornerRegion>{} : *original;
-    lease->installed_ = *original;
-    lease->applied_ = adopted;
-    auto backdrop = backend.ReadBackdrop(window); if (!backdrop) return backdrop.error();
-    lease->originalBackdrop_ = *backdrop;
-    if (auto claim = backend.Claim(window, token); !claim) return claim.error();
-    lease->claimed_ = true;
-    auto applied = lease->Refresh();
-    if (!applied) {
-        // A material write may have succeeded before the region write failed. Keep that lease
-        // in the observer so a failed rollback cannot discard its only recovery snapshot.
-        if (lease->claimed_ && (lease->applied_ || lease->backdropApplied_ || lease->uncertain_)) return lease;
-        return applied.error();
-    }
-    if (!*applied) return MakeError(ErrorCode::Unavailable, "Window corner target changed before application");
-    return lease;
-} catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease allocation failed"); }
-Result<CornerWindowObservation> WindowCornerLease::ObserveOwned() {
-    if (!claimed_ || !backend_.Owns(window_, token_)) {
-        claimed_ = false;
-        return MakeError(ErrorCode::InvalidState, "Window corner lifetime is no longer owned");
-    }
-    auto observed = backend_.Observe(window_);
-    if (!observed) {
-        if (!backend_.Owns(window_, token_)) claimed_ = false;
-        return observed.error();
-    }
-    if (observed->process != process_ || observed->thread != thread_) {
-        claimed_ = false;
-        return MakeError(ErrorCode::InvalidState, "Window corner process identity changed");
-    }
-    return observed;
+std::optional<CornerRim> CornerFrameFor(const CornerWindowObservation& observation) {
+    const auto geometry = settings::ui::experimental::ComputeMaximizedCornerLayout(
+        observation.bounds, observation.frame, observation.work, observation.dpi);
+    if (!geometry) return std::nullopt;
+    CornerRim rim;
+    rim.bounds = geometry->clipPx;
+    ::OffsetRect(&rim.bounds, observation.bounds.left, observation.bounds.top);
+    rim.radiusPx = geometry->radiusPx;
+    rim.widthPx = CornerRimWidthPx(observation.dpi);
+    return rim;
 }
-namespace {
-Error Deferred() { return MakeError(ErrorCode::Timeout, "Window corner target is not responding; change deferred"); }
+
+std::vector<RECT> CornerPieceRects(int widthPx, int heightPx, int radiusPx) {
+    std::vector<RECT> rects;
+    const int radius = std::min({radiusPx, widthPx / 2, heightPx / 2});
+    if (widthPx <= 0 || heightPx <= 0 || radius <= 0) return rects;
+    rects.reserve(static_cast<std::size_t>(radius) * 4);
+    for (int y = 0; y < radius; ++y) {
+        const int outside = ArcStart(radius, y, radius);  // this many pixels of the row lie outside the outline
+        if (outside <= 0) continue;
+        rects.push_back({0, y, outside, y + 1});
+        rects.push_back({widthPx - outside, y, widthPx, y + 1});
+        rects.push_back({0, heightPx - 1 - y, outside, heightPx - y});
+        rects.push_back({widthPx - outside, heightPx - 1 - y, widthPx, heightPx - y});
+    }
+    return MergeRows(std::move(rects));
 }
-// A region write that outlived its bounded wait may still land. Its outcome is read back once the
-// target answers again: the requested value, the previous one (it failed), or the application's own.
-Result<void> WindowCornerLease::Reconcile() {
-    if (!uncertain_) return Ok();
-    if (!backend_.Responsive(window_)) return Deferred();
-    auto current = backend_.ReadRegion(window_); if (!current) return current.error();
-    if (*current == *uncertain_) {
-        installed_ = std::move(*uncertain_);
-        applied_ = installed_ != original_;
+
+std::vector<RECT> CornerRimRects(int widthPx, int heightPx, int radiusPx, int rimPx) {
+    std::vector<RECT> rects;
+    if (widthPx <= 0 || heightPx <= 0 || rimPx <= 0) return rects;
+    const int radius = std::max(0, std::min({radiusPx, widthPx / 2, heightPx / 2}));
+    const int rim = std::min({rimPx, (widthPx + 1) / 2, (heightPx + 1) / 2});
+    // Rows nearer than this to the top or the bottom are not plain sides: the rim's own rows, and the corners.
+    const int band = std::max(radius, rim);
+    const int rows = std::min(band, (heightPx + 1) / 2);
+    rects.reserve(static_cast<std::size_t>(rows) * 4 + 2);
+    const auto both = [&](int y, int left, int right) {
+        if (right <= left) return;
+        rects.push_back({left, y, right, y + 1});
+        if (heightPx - 1 - y != y) rects.push_back({left, heightPx - 1 - y, right, heightPx - y});
+    };
+    for (int y = 0; y < rows; ++y) {
+        const int from = y < radius ? ArcStart(radius, y, radius) : 0;   // where the outline begins on this row
+        if (y < rim) { both(y, from, widthPx - from); continue; }       // one of the rim's own rows, edge to edge
+        const int to = ArcStart(radius, y, static_cast<double>(radius) - rim);   // where the inside begins
+        both(y, from, to);
+        both(y, widthPx - to, widthPx - from);
     }
-    uncertain_.reset();
-    return Ok();
+    if (heightPx - 2 * band > 0) {
+        rects.push_back({0, band, rim, heightPx - band});
+        rects.push_back({widthPx - rim, band, widthPx, heightPx - band});
+    }
+    return MergeRows(std::move(rects));
 }
-// Every region mutation goes through here: never into a target that is not answering (AS4-03). The
-// result is read back, because a successful call on another thread's window has been observed not to
-// have landed yet: ownership must not end on a clip that is still there. Anything other than the old
-// value (the wanted one, or a shape the application or Windows gave the window) means it did land.
-Result<void> WindowCornerLease::WriteOwnedRegion(const std::optional<CornerRegion>& value) {
-    if (!backend_.Responsive(window_)) return Deferred();
-    if (auto written = backend_.WriteRegion(window_, value); !written) {
-        if (written.error().code == ErrorCode::Timeout) uncertain_ = value;
-        return written;
-    }
-    auto landed = backend_.ReadRegion(window_);
-    if (!landed || (*landed != value && *landed == installed_)) {
-        uncertain_ = value;
-        return Deferred();
-    }
-    return Ok();
-}
-Result<bool> WindowCornerLease::Refresh() try {
-    auto observed = ObserveOwned(); if (!observed) return observed.error();
-    if (auto reconciled = Reconcile(); !reconciled) return reconciled.error();
-    auto current = backend_.ReadRegion(window_); if (!current) return current.error();
-    if (*current != installed_) {
-        // The app's region wins, but our separately leased material still needs restoration. D56: no region,
-        // or a plain rectangle around the clip (Chromium keeps a maximized window to the work area this
-        // way), is no shape of its own: like a re-asserted material, it does not end the rounding.
-        const bool plain = !*current || SimpleRegionContainsClip(**current, *observed);
-        auto restored = Restore(); if (!restored) return restored.error();
-        replacement_ = plain ? CornerReplacement::RegionReasserted : CornerReplacement::Region;
-        return MakeError(ErrorCode::InvalidState, "Application replaced its window region");
-    }
-    if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
-    if (originalBackdrop_) {
-        auto backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
-        if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
-        const DWORD expected = backdropApplied_ ? DWMSBT_NONE : *originalBackdrop_;
-        if (**backdrop != expected) {
-            const auto chosen = **backdrop;
-            auto restored = Restore(); if (!restored) return restored.error();
-            replacement_ = chosen == *originalBackdrop_ ? CornerReplacement::MaterialReasserted : CornerReplacement::Material;
-            return MakeError(ErrorCode::InvalidState, "Application replaced its system backdrop");
-        }
-        if (*originalBackdrop_ >= DWMSBT_MAINWINDOW && !backdropApplied_) {
-            // DWM's system material fills the full rectangular bounds independently of the
-            // window region. Lease NONE while clipped; do not disable non-client rendering.
-            if (!backend_.Responsive(window_)) return Deferred();
-            if (auto written = backend_.WriteBackdrop(window_, DWMSBT_NONE); !written) return written.error();
-            backdropApplied_ = true;
-            // The material change may recalculate the visible frame; use a fresh observation.
-            observed = ObserveOwned(); if (!observed) return observed.error();
-            if (!observed->eligible) { auto restored = Restore(); if (!restored) return restored.error(); return false; }
-            backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
-            if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop temporarily unavailable");
-            if (**backdrop != DWMSBT_NONE) {
-                const auto chosen = **backdrop;
-                auto restored = Restore(); if (!restored) return restored.error();
-                replacement_ = chosen == *originalBackdrop_ ? CornerReplacement::MaterialReasserted : CornerReplacement::Material;
-                return MakeError(ErrorCode::InvalidState, "Application replaced its backdrop during update");
-            }
-            current = backend_.ReadRegion(window_); if (!current) return current.error();
-            if (*current != installed_) {
-                auto restored = Restore(); if (!restored) return restored.error();
-                replacement_ = CornerReplacement::Region;
-                return MakeError(ErrorCode::InvalidState, "Application replaced its region during backdrop update");
-            }
-        }
-    }
-    auto rounded = RoundedRegion(*observed, original_); if (!rounded) return rounded.error();
-    std::optional<CornerRegion> next{std::move(*rounded)};
-    rim_ = RimFor(*observed);  // also follows a same-size move to another position or monitor
-    if (next == installed_) return true;
-    if (auto written = WriteOwnedRegion(next); !written) return written.error();
-    installed_ = std::move(next); applied_ = true;
-    if (!backend_.Owns(window_, token_)) {
-        claimed_ = false;
-        return MakeError(ErrorCode::InvalidState, "Window corner lifetime changed during application");
-    }
-    return true;
-} catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease refresh failed"); }
-Result<void> WindowCornerLease::Restore() try {
-    rim_.reset();  // the rim leaves with the clip, never stays around an unclipped window
-    if (!claimed_) return Ok();
-    // Before a successful clip there is no region mutation to undo. This also releases a claim
-    // if allocation or the first native write failed during Acquire. A write still in flight is
-    // a mutation that may yet land, so it keeps the claim until it is reconciled.
-    if (!applied_ && !backdropApplied_ && !uncertain_) { backend_.Release(window_, token_); claimed_ = false; return Ok(); }
-    auto observed = ObserveOwned();
-    if (!observed) return observed.error();
-    if (auto reconciled = Reconcile(); !reconciled) return reconciled.error();
-    if (applied_) {
-        auto current = backend_.ReadRegion(window_); if (!current) return current.error();
-        if (*current == installed_) {
-            if (auto written = WriteOwnedRegion(original_); !written) return written;
-            installed_ = original_;
-        }
-        applied_ = false;
-    }
-    if (backdropApplied_) {
-        auto backdrop = backend_.ReadBackdrop(window_); if (!backdrop) return backdrop.error();
-        if (!*backdrop) return MakeError(ErrorCode::Unavailable, "Window corner backdrop restoration unavailable");
-        if (**backdrop == DWMSBT_NONE) {
-            if (!backend_.Responsive(window_)) return Deferred();
-            if (auto written = backend_.WriteBackdrop(window_, *originalBackdrop_); !written) return written;
-        }
-        backdropApplied_ = false;
-    }
-    backend_.Release(window_, token_); claimed_ = false; return Ok();
-} catch (...) { return MakeError(ErrorCode::Internal, "Window corner lease restoration failed"); }
 
 Result<int> RunWindowCornerGuard(HANDLE parent, HANDLE ready, HANDLE stop,
     const WindowCornerGuardOptions& options) try {
@@ -919,8 +639,13 @@ Result<int> RunWindowCornerGuard(HANDLE parent, HANDLE ready, HANDLE stop,
         if (options.onlyProcess != ::GetCurrentProcessId() || process != options.onlyProcess)
             return MakeError(ErrorCode::AccessDenied, "Window corner test restriction must own every window");
     }
+    if (options.desktopSource) {
+        DWORD process = 0; (void)::GetWindowThreadProcessId(options.desktopSource, &process);
+        if (!options.onlyProcess || process != options.onlyProcess)
+            return MakeError(ErrorCode::AccessDenied, "Window corner test desktop must be the test's own window");
+    }
     platform::EnsurePerMonitorDpiAwareness();
-    Observer observer(::GetProcessId(parent), options);
+    Observer observer(options);
     if (currentObserver) return MakeError(ErrorCode::InvalidState, "Window corner observer already runs on this thread");
     currentObserver = &observer;
     struct Reset { ~Reset() { currentObserver = nullptr; } } reset;
@@ -934,15 +659,18 @@ Result<int> RunWindowCornerGuard(HANDLE parent, HANDLE ready, HANDLE stop,
         0, 0, 0, 0, nullptr, nullptr, broadcastClass.hInstance, nullptr);
     if (!broadcastWindow) return NativeError("Window corner broadcast observer unavailable");
     struct Destroy { HWND value; ~Destroy() { ::DestroyWindow(value); } } destroy{broadcastWindow};
-    std::array<HWINEVENTHOOK, 3> hooks{};
-    struct Unhook { std::array<HWINEVENTHOOK, 3>& values; ~Unhook() { for (auto hook : values) if (hook) ::UnhookWinEvent(hook); } } cleanup{hooks};
+    std::array<HWINEVENTHOOK, 4> hooks{};
+    struct Unhook { std::array<HWINEVENTHOOK, 4>& values; ~Unhook() { for (auto hook : values) if (hook) ::UnhookWinEvent(hook); } } cleanup{hooks};
     constexpr DWORD hookFlags = WINEVENT_OUTOFCONTEXT;
     hooks[0] = ::SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_LOCATIONCHANGE, nullptr, EventHook, 0, 0, hookFlags);
     hooks[1] = ::SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, EventHook, 0, 0, hookFlags);
     hooks[2] = ::SetWinEventHook(EVENT_SYSTEM_MINIMIZESTART, EVENT_SYSTEM_MINIMIZEEND, nullptr, EventHook, 0, 0, hookFlags);
+    // A maximized window arriving from, or leaving for, another virtual desktop.
+    hooks[3] = ::SetWinEventHook(EVENT_OBJECT_CLOAKED, EVENT_OBJECT_UNCLOAKED, nullptr, EventHook, 0, 0, hookFlags);
     if (std::any_of(hooks.begin(), hooks.end(), [](auto hook) { return !hook; }))
         return NativeError("Window corner event observation unavailable");
     if (::WaitForSingleObject(parent, 0) != WAIT_TIMEOUT || ::WaitForSingleObject(stop, 0) == WAIT_OBJECT_0) return 0;
+    observer.ReleaseAbandonedClips();
     observer.Refresh();
     if (!::SetEvent(ready)) return NativeError("Window corner readiness notification failed");
     const HANDLE waiting[]{parent, stop};
@@ -954,22 +682,17 @@ Result<int> RunWindowCornerGuard(HANDLE parent, HANDLE ready, HANDLE stop,
         MSG message{};
         while (::PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) { exit = true; break; }
-            if (message.message == WM_TIMER && message.wParam == observer.timer) observer.Refresh();
+            if (message.message == WM_TIMER && !message.hwnd && message.wParam == observer.timer) observer.pending = true;
             else { ::TranslateMessage(&message); ::DispatchMessageW(&message); }
         }
+        // However many events arrived together, the windows are looked at once.
+        if (!exit && observer.pending) observer.Refresh();
     }
-    // No new acquisitions while stopping. Exit is the restoration acknowledgement, so retain
-    // recoverable failures here rather than dropping the lease snapshot in a destructor.
+    // Leaving is all there is to do: the guard's windows go, and no application was ever changed.
     observer.stopping = true;
     if (observer.timer) { ::KillTimer(nullptr, observer.timer); observer.timer = 0; }
     for (auto& hook : hooks) if (hook) { ::UnhookWinEvent(hook); hook = nullptr; }
-    while (!observer.RestoreAll()) {
-        (void)::MsgWaitForMultipleObjectsEx(0, nullptr, 250, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
-        MSG message{};
-        while (::PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
-            ::TranslateMessage(&message); ::DispatchMessageW(&message);
-        }
-    }
+    observer.frames.clear();
     return 0;
 } catch (...) { return MakeError(ErrorCode::Internal, "Window corner guard stopped unexpectedly"); }
 
@@ -1027,7 +750,7 @@ struct WindowCorners::Impl {
         }
         if (session) {
             if (::WaitForSingleObject(session->process.Get(), 0) == WAIT_TIMEOUT) { state = CornerGuardState::Ready; return; }
-            // The helper exited on its own: its leases restored themselves unless it crashed (AS4-05).
+            // The helper exited on its own: its windows went with it, and no application was changed (D72).
             session.reset();
             if (::GetTickCount64() - readyAt > 5 * 60 * 1000) failures = 0;  // a long healthy run starts a new budget
             Fail("exited unexpectedly");

@@ -444,3 +444,34 @@ AETHER_TEST("settings schema: auto-hide is off by default, independent for Dock 
     CHECK(both.value.topBar.autoHide);
     CHECK(both.value.topBar.reserveSpace);  // the reservation choice is kept for when auto-hide is off
 }
+
+AETHER_TEST("settings schema: the Top Bar's presentation is the floating bar unless Text is chosen, and persists (D71)") {
+    // Every earlier file has no such key: the bar stays the floating one.
+    const Settings defaults{};
+    CHECK(defaults.topBar.presentation == TopBarPresentation::Floating);
+    const auto earlier = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"reserveSpace":true}})");
+    CHECK(earlier.warnings.empty());
+    CHECK(earlier.value.topBar.presentation == TopBarPresentation::Floating);
+    // The choice of text on the desktop survives a round trip under its stable name, with the other choices kept.
+    const auto chosen = ParseText(R"({"dock":{"metricsVersion":2},"topBar":{"presentation":"text","reserveSpace":false,"autoHide":true,"topMargin":20}})");
+    CHECK(chosen.warnings.empty());
+    CHECK(chosen.value.topBar.presentation == TopBarPresentation::Text);
+    const auto again = RoundTrip(chosen.value);
+    CHECK(again.value.topBar.presentation == TopBarPresentation::Text);
+    CHECK_FALSE(again.value.topBar.reserveSpace);
+    CHECK(again.value.topBar.autoHide);
+    CHECK_EQ(again.value.topBar.topMargin, 20);
+    auto document = ToJson(chosen.value);
+    REQUIRE(document.ok());
+    const auto* topBar = document->Find("topBar");
+    REQUIRE(topBar != nullptr);
+    REQUIRE(topBar->Find("presentation") != nullptr);
+    REQUIRE(topBar->Find("presentation")->AsString() != nullptr);
+    CHECK(*topBar->Find("presentation")->AsString() == "text");
+    // An unknown name or a wrong type falls back to the floating bar, with a warning.
+    for (const char* text : {R"({"dock":{"metricsVersion":2},"topBar":{"presentation":"menu"}})", R"({"dock":{"metricsVersion":2},"topBar":{"presentation":1}})"}) {
+        const auto unknown = ParseText(text);
+        CHECK_FALSE(unknown.warnings.empty());
+        CHECK(unknown.value.topBar.presentation == TopBarPresentation::Floating);
+    }
+}

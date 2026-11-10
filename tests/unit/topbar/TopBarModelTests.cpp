@@ -4,7 +4,11 @@
 #include "topbar/TopBarModel.h"
 
 #include <algorithm>
+#include <cmath>
+#include <cstdint>
 #include <limits>
+#include <span>
+#include <vector>
 
 using namespace aether;
 using namespace aether::topbar;
@@ -288,4 +292,106 @@ AETHER_TEST("topbar battery: real Windows low flag propagates without inventing 
     CHECK(Find(*items,ItemKind::Battery)->lowOrCritical==true);
     state.battery.lowOrCritical.reset();items=BuildDisplayItems(state,config,false);REQUIRE(items.ok());
     CHECK_FALSE(Find(*items,ItemKind::Battery)->lowOrCritical.has_value());
+}
+
+AETHER_TEST("topbar geometry: written on the desktop the bar is flush with the top and spans the screen (D71)") {
+    for (const UINT dpi : {96u, 144u, 192u}) for (const int height : {24, 32, 48}) {
+        const RECT area{-1920, -200, 0, 880};
+        const auto placement = ComputeTopBarPlacement(area, dpi, height, 0, 0.0f, 0.0f);
+        REQUIRE(placement.ok());
+        const auto& p = placement.value();
+        const int heightPx = height * static_cast<int>(dpi) / 96;
+        CHECK_EQ(p.windowBoundsPx.left, area.left);
+        CHECK_EQ(p.windowBoundsPx.right, area.right);
+        CHECK_EQ(p.windowBoundsPx.top, area.top);
+        CHECK_EQ(p.windowBoundsPx.bottom, area.top + heightPx);
+        CHECK_EQ(p.reservationHeightPx, heightPx);   // exactly the strip: no margin, no shadow
+        CHECK_EQ(p.panelBoundsPx.left, 0); CHECK_EQ(p.panelBoundsPx.top, 0);
+        CHECK_EQ(p.panelBoundsPx.right, area.right - area.left); CHECK_EQ(p.panelBoundsPx.bottom, heightPx);
+    }
+    // The floating bar keeps its 12 DIPs at each end, and a senseless side is refused.
+    const RECT area{0, 0, 1920, 1080};
+    const auto floating = ComputeTopBarPlacement(area, 96, 32, 6, 4.0f);
+    REQUIRE(floating.ok());
+    CHECK_EQ(floating->windowBoundsPx.left + floating->panelBoundsPx.left, 12);
+    CHECK_FALSE(ComputeTopBarPlacement(area, 96, 32, 0, 0.0f, -1.0f).ok());
+    CHECK_FALSE(ComputeTopBarPlacement(area, 96, 32, 0, 0.0f, std::numeric_limits<float>::quiet_NaN()).ok());
+}
+
+namespace {
+// A picture `width` x `height` whose left half is `left` and right half `right` (grey levels 0..255).
+std::vector<std::uint8_t> Halves(int width, int height, std::uint8_t left, std::uint8_t right) {
+    std::vector<std::uint8_t> pixels(static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 4u, 255);
+    for (int y = 0; y < height; ++y) for (int x = 0; x < width; ++x) {
+        auto* pixel = pixels.data() + (static_cast<std::size_t>(y) * static_cast<std::size_t>(width) + static_cast<std::size_t>(x)) * 4u;
+        pixel[0] = pixel[1] = pixel[2] = x < width / 2 ? left : right;
+    }
+    return pixels;
+}
+float ContrastWith(float ink, float backdrop) { return (std::max(ink, backdrop) + 0.05f) / (std::min(ink, backdrop) + 0.05f); }
+}
+
+AETHER_TEST("topbar backdrop: the strip under the bar is measured as luminance, column by column (D71)") {
+    const auto pixels = Halves(64, 16, 0, 255);
+    const auto profile = MeasureBackdrop(pixels, 64, 16, RECT{0, 0, 64, 8}, 8);
+    REQUIRE_EQ(profile.columns.size(), std::size_t{8});
+    for (std::size_t column = 0; column < 8; ++column) {
+        const float expected = column < 4 ? 0.0f : 1.0f;
+        CHECK(std::abs(profile.columns[column].mean - expected) < 0.001f);
+        CHECK(std::abs(profile.columns[column].low - expected) < 0.001f);
+        CHECK(std::abs(profile.columns[column].high - expected) < 0.001f);
+    }
+    // A column that holds both keeps its darkest and its lightest parts, not only their average.
+    const auto wide = MeasureBackdrop(pixels, 64, 16, RECT{0, 0, 64, 8}, 1);
+    REQUIRE_EQ(wide.columns.size(), std::size_t{1});
+    CHECK(wide.columns[0].low < 0.01f); CHECK(wide.columns[0].high > 0.99f);
+    CHECK(std::abs(wide.columns[0].mean - 0.5f) < 0.01f);
+    // Mid grey is measured in linear light (sRGB 128 is about 0.216), and a strip beyond the picture is clipped to it.
+    const auto grey = Halves(32, 8, 128, 128);
+    const auto clipped = MeasureBackdrop(grey, 32, 8, RECT{-50, -50, 500, 500}, 4);
+    REQUIRE_EQ(clipped.columns.size(), std::size_t{4});
+    CHECK(std::abs(clipped.columns[0].mean - 0.2158f) < 0.002f);
+    // Nothing to measure is no profile at all, never an invented one.
+    CHECK(MeasureBackdrop(grey, 32, 8, RECT{40, 0, 60, 8}, 4).columns.empty());
+    CHECK(MeasureBackdrop(grey, 32, 8, RECT{0, 0, 32, 8}, 0).columns.empty());
+    CHECK(MeasureBackdrop(std::span<const std::uint8_t>(grey.data(), 16), 32, 8, RECT{0, 0, 32, 8}, 4).columns.empty());
+    CHECK(MeasureBackdrop({}, 0, 0, RECT{0, 0, 1, 1}, 1).columns.empty());
+}
+
+AETHER_TEST("topbar ink: each side of the written bar reads at 4.5:1 over its own part of the picture (D71)") {
+    // Over any plain backdrop, from black to white, the chosen ink over what the halo leaves of the backdrop keeps
+    // 4.5:1 (WCAG): white ink over a backdrop darkened by a dark halo, dark ink over one lightened by a light halo.
+    for (int level = 0; level <= 100; ++level) {
+        const float luminance = static_cast<float>(level) / 100.0f;
+        const BackdropProfile profile{{{luminance, luminance, luminance}}};
+        const auto ink = ChooseTextInk(&profile, 0.0f, 1.0f, false);
+        CHECK(ink.halo >= 0.20f); CHECK(ink.halo <= 0.85f);
+        const float under = ink.dark ? luminance + (1.0f - luminance) * ink.halo : luminance * (1.0f - ink.halo);
+        CHECK(ContrastWith(ink.dark ? 0.0f : 1.0f, under) >= 4.5f);
+    }
+    // Light ink over black and mid tones, as on a photograph; dark ink once the backdrop is clearly light.
+    const BackdropProfile black{{{0.0f, 0.0f, 0.0f}}}, dim{{{0.15f, 0.15f, 0.15f}}}, pale{{{0.6f, 0.6f, 0.6f}}}, white{{{1.0f, 1.0f, 1.0f}}};
+    CHECK_FALSE(ChooseTextInk(&black, 0.0f, 1.0f, true).dark);
+    CHECK_FALSE(ChooseTextInk(&dim, 0.0f, 1.0f, true).dark);
+    CHECK(ChooseTextInk(&pale, 0.0f, 1.0f, false).dark);
+    CHECK(ChooseTextInk(&white, 0.0f, 1.0f, false).dark);
+    // A busy part, dark and light at once: light ink, under a strong halo.
+    const BackdropProfile busy{{{0.02f, 0.3f, 0.7f}}};
+    const auto over = ChooseTextInk(&busy, 0.0f, 1.0f, false);
+    CHECK_FALSE(over.dark); CHECK(over.halo >= 0.7f);
+    // Each side reads its own part: a picture dark on the left and light on the right gives two inks.
+    const auto pixels = Halves(64, 16, 10, 245);
+    const auto split = MeasureBackdrop(pixels, 64, 16, RECT{0, 0, 64, 8}, 16);
+    CHECK_FALSE(ChooseTextInk(&split, 0.0f, 0.2f, false).dark);
+    CHECK(ChooseTextInk(&split, 0.7f, 1.0f, false).dark);
+    CHECK(ChooseTextInk(&split, 1.0f, 0.7f, false).dark);   // either order of the ends
+    CHECK_FALSE(ChooseTextInk(&split, -3.0f, 0.1f, false).dark);
+    // Nothing known of the backdrop: the theme decides the ink, under a strong halo.
+    const BackdropProfile none;
+    for (const BackdropProfile* unknown : {static_cast<const BackdropProfile*>(nullptr), &none}) {
+        CHECK_FALSE(ChooseTextInk(unknown, 0.0f, 1.0f, false).dark);
+        CHECK(ChooseTextInk(unknown, 0.0f, 1.0f, true).dark);
+        CHECK(ChooseTextInk(unknown, 0.0f, 1.0f, true).halo >= 0.6f);
+    }
+    CHECK(ChooseTextInk(&white, std::numeric_limits<float>::quiet_NaN(), 1.0f, false).halo >= 0.6f);
 }

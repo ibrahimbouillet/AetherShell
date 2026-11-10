@@ -165,3 +165,17 @@ region while active. The standard-frame native case therefore requires all corne
 left and right rim edges, and records the top edge as observed (D46 limit). Not yet qualified: the pictured
 application after the change, other rendering families, 192 DPI, negative monitor coordinates on a
 physical second monitor and owner visual acceptance.
+
+## The region is given up — D72, ADR 0014, S-074, 2026-11-10
+
+Everything above describes clipping another application's window, which is no longer done. The owner asked for
+rounded corners on every page and an end to the faults that drawing them brought. Measured on this PC before
+deciding: a DWM thumbnail of the desktop window, at natural size in a layered click-through window, is identical to
+the live desktop under it pixel for pixel (difference 0 over two strips of bare desktop; a control window without the
+thumbnail differed by 94 and 153 on average); and DWM does not clip a thumbnail to its window's region (one thumbnail
+per corner square came out square), hence one thumbnail per rectangle of the corner's shape.
+
+The guard now reads windows and draws with its own two, directly above the front maximized window
+([ADR 0014](../decisions/0014-window-corner-pieces.md)). The standard-frame case, which under a region lost its
+caption buttons and its top rim while active, now keeps its buttons and shows the rim on all four sides.
+`MaximizedCornerPrototype` is still what Aether's own Settings window uses for itself.

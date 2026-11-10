@@ -86,6 +86,18 @@ et un fin liseré, sans changer leur taille ni leur état agrandi ; Aether annul
 applications et certains types de fenêtres gardent des coins carrés. Depuis la 3.3, seulement entre les barres. Quand
 les deux barres sont masquées, une fenêtre agrandie occupe tout l'écran, avec des coins carrés.
 
+Depuis l'Alpha 4 (D72) : toute fenêtre agrandie entre les barres a ses coins arrondis, quelle que soit l'application
+(navigateurs, Explorateur de fichiers, applications empaquetées ou lancées en administrateur), et elle garde ses propres
+boutons de titre. Aether ne touche plus du tout à la fenêtre de l'application : de petites pièces qui lui appartiennent,
+posées sur les quatre coins, montrent le bureau qui se trouve là, en direct, avec le fin liseré autour. Les coins ne sont
+pas lissés. Une fenêtre placée devant la fenêtre agrandie les recouvre comme le reste.
+
+**La barre du haut en texte sur le bureau** (Alpha 4, D71) : Paramètres → Barre du haut → **Présentation** → **Texte sur le
+bureau** supprime la barre elle-même. Les mêmes éléments sont écrits tout en haut de l'écran, directement sur le fond
+d'écran, à l'encre claire ou sombre selon l'image qui se trouve dessous, avec un halo doux. Cette bande reste libre de
+fenêtres ; la marge supérieure et l'opacité du verre ne s'appliquent pas. Avec **Masquer automatiquement la barre du
+haut**, le texte revient sur une bande de verre tant qu'une fenêtre se trouve dessous. Le contraste élevé garde la barre.
+
 **Bienvenue** (depuis la 3.3) : après l'ouverture de session ou le déverrouillage, Aether Shell écrit à la main un
 court message qui remplit l'écran, sur votre fond d'écran flouté, et les barres apparaissent quand il se termine :
 « Salut », « Hello » ou « Hola », avec votre prénom si vous en avez saisi un. Au déverrouillage, il est déjà là, à la

@@ -110,6 +110,10 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     float dragCenter = 0;
     float grabOffsetX = 0;
     bool dragging = false;
+    // D73: how far each end of the panel is stretched after a dragged icon (DIPs, outwards), and the panel as it
+    // lies without that stretch. A dragged icon never leaves the panel: the panel follows it, then springs back.
+    graphics::Spring stretchLeft{0}, stretchRight{0};
+    D2D1_RECT_F restPanel{};
     bool suppressed = false;
     bool autoHidden = false;  // D47: slid away by Auto-Hide (independent of full-screen suppression)
     bool menuOpen = false;    // a Dock menu is running its modal loop
@@ -188,12 +192,23 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
                 spring.SetTarget(0); reorderOffsets.insert_or_assign(fitted.items[*index].id, spring);
             }
         }
+        const bool wasDragging = dragging;
         pressed.reset(); dragId.clear(); dragging = false;
         for (auto& [id, spring] : presses) { (void)id; spring.SetTarget(0); }
         if (settle && AllowsDecoration()) {
             for (auto& [id, spring] : lifts) { (void)id; spring.SetTarget(0); }
+            if (wasDragging) {
+                // The band is let go from where it is drawn: it springs back to the Dock's own shape, past it a
+                // little, and settles.
+                graphics::Spring::Parameters band;
+                band.stiffness = 320.0f;
+                band.damping = 16.0f;   // well under critical (about 36): one clear bounce
+                for (auto* spring : {&stretchLeft, &stretchRight}) { spring->SetParameters(motion.ScaleSpring(band)); spring->SetTarget(0); }
+                stretchLeft.SnapTo(std::max(0.0f, restPanel.left - layout.panel.left)); stretchLeft.SetTarget(0);
+                stretchRight.SnapTo(std::max(0.0f, layout.panel.right - restPanel.right)); stretchRight.SetTarget(0);
+            }
             window.RequestAnimationFrame();
-        } else { lifts.clear(); presses.clear(); }
+        } else { lifts.clear(); presses.clear(); stretchLeft.SnapTo(0); stretchRight.SnapTo(0); }
     }
     void BeginDrag() {
         if (dragging || dragId.empty() || !DragIndex()) return;
@@ -339,6 +354,18 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             }
         }
         if (dragging) layout.raisedItem = DragIndex();
+        // D73: the panel's ends follow a pulled icon, and whatever the band's own motion, an icon that is lifted
+        // (dragged, or settling back after the drop) stays inside the panel with a little room. The stretch never
+        // leaves the window, and its bounce never cuts into the icons at rest.
+        restPanel = layout.panel;
+        float left = stretchLeft.Value(), right = stretchRight.Value();
+        if (layout.raisedItem && *layout.raisedItem < layout.items.size()) {
+            const auto& raised = layout.items[*layout.raisedItem].icon;
+            left = std::max(left, restPanel.left - (raised.left - kDockDragInset));
+            right = std::max(right, raised.right + kDockDragInset - restPanel.right);
+        }
+        layout.panel.left -= std::clamp(left, -6.0f, std::max(0.0f, restPanel.left - 2.0f));
+        layout.panel.right += std::clamp(right, -6.0f, std::max(0.0f, width - 2.0f - restPanel.right));
         std::vector<RECT> regions{Pixels(layout.panel, static_cast<float>(window.Dpi()) / 96)};
         for (const auto& item : layout.items) regions.push_back(Pixels(item.icon, static_cast<float>(window.Dpi()) / 96));
         window.SetInputRegionPx(regions);
@@ -436,9 +463,6 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     void MoveDrag(float pointerX) {
         const auto source = DragIndex();
         if (!source || !std::isfinite(pointerX)) return;
-        const float half = fitted.iconSize * fitted.magnification * graphics::Motion().liftScale / 2;
-        dragCenter = std::clamp(pointerX - grabOffsetX, kDockShadowMargin + half,
-            std::max(kDockShadowMargin + half, width - kDockShadowMargin - half));
         std::vector<float> centers;
         std::vector<std::size_t> slots;
         const float baseWidth = static_cast<float>(fitted.items.size()) * fitted.iconSize +
@@ -450,6 +474,15 @@ struct DockWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
             centers.push_back(start + static_cast<float>(index) * (fitted.iconSize + static_cast<float>(settings.iconSpacing)) + fitted.iconSize / 2);
             slots.push_back(index);
         }
+        // D73: the icon moves freely between the panel's ends (always as far as the first and last places it can
+        // take), and past them only as far as the Dock stretches after it.
+        const float scale = *source < springs.size() ? std::clamp(springs[*source].Value(), 1.0f, fitted.magnification) : 1.0f;
+        const float half = fitted.iconSize * scale * graphics::Motion().liftScale / 2;
+        float low = restPanel.left + kDockDragInset + half, high = restPanel.right - kDockDragInset - half;
+        if (!centers.empty()) { low = std::min(low, centers.front()); high = std::max(high, centers.back()); }
+        const auto pull = PullDockIcon(pointerX - grabOffsetX, low, high, AllowsDecoration() ? kDockElasticReach : 0.0f);
+        dragCenter = pull.center;
+        stretchLeft.SnapTo(pull.stretchLeft); stretchRight.SnapTo(pull.stretchRight);
         const auto destination = CrossedDockSlot(centers, current, dragCenter);
         if (!destination || *destination == current) return;
         auto moved = ReorderDockItems(DockModelInputs{context.settings.Current().dock, running, sessionOrder, &catalog},
@@ -1090,6 +1123,11 @@ bool DockWindow::OnAnimate(double now) {
     std::erase_if(impl_->presses, [](const auto& entry) { return entry.second.Target() == 0 && entry.second.IsSettled(); });
     for (auto& [id, spring] : impl_->lifts) { (void)id; spring.Step(dt); if (!spring.IsSettled()) moving = true; }
     std::erase_if(impl_->lifts, [](const auto& entry) { return entry.second.Target() == 0 && entry.second.IsSettled(); });
+    if (!impl_->dragging) for (auto* band : {&impl_->stretchLeft, &impl_->stretchRight}) {   // D73: the Dock springs back
+        if (!impl_->AllowsDecoration()) { band->SnapTo(0); continue; }
+        band->Step(dt);
+        if (band->IsSettled()) band->SnapTo(0); else moving = true;
+    }
     std::erase_if(impl_->reorderOffsets, [](const auto& pair) { return pair.second.IsSettled(); });
     std::erase_if(impl_->bounces, [&](const auto& bounce) {
         return !impl_->AllowsDecoration() || now - bounce.second >= graphics::LaunchBounceDuration() * impl_->motion.EffectiveScale();

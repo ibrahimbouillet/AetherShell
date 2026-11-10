@@ -25,8 +25,18 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive) is found, by name, never by content; with
   Windows Search off there are no files. Settings pages are a fixed list of 44 with English and French names; others are
   reached through Windows' own Settings.
+- Alpha 4, test 4.6 (D71–D73, S-074), built and not yet installed: **text Top Bar**: the ink is chosen
+  from the desktop picture as Windows' "Fill" shows it, once per picture and per side of the bar, so another fit, a
+  slideshow's crossfade or a picture that is light and dark within one side is read through the halo alone; over an
+  application's page the text is only readable on the glass strip Auto-Hide gives it. **Rounded corners**: a corner shows
+  the desktop, not a window that is not maximized and lies behind exactly there; corners and rim are not antialiased; one
+  frame can show square corners when another maximized window comes to the front; arrangements where a live-wallpaper
+  program moved the desktop's icons were not available to test; real applications were not observed, because the
+  installed version still runs the earlier guard. **Dock**: the strip kept free for maximized windows is as wide as the
+  screen (an application bar cannot reserve less).
 - Reported by the owner and not yet reproduced or diagnosed: application pages going blank (AS4-01), and the Claude desktop
-  application's window disappearing (2026-11-05). Neither is known to be caused or fixed by any version.
+  application's window disappearing (2026-11-05). Since D72 Aether no longer writes to other applications' windows, which
+  is what both were suspected of; whether that was their cause is not established.
 - 3.5 (D61, S-067): the setup's name field has run only in the isolated test setup, and the welcome's fallback to Windows' copy of the
   picture was established on the owner's machine by reading what Windows reports, not yet seen at a real lock. The incremental ink edge
   was compared with the old whole blur offscreen, on a software renderer; the pen's pace on a real screen is logged, not yet measured.
@@ -153,6 +163,7 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   below its chevron, about one frame later. Checked live on one Windows 11 build (26300); Windows 10,
   other builds and other monitors are unverified. If Explorer shows no such button (for example when no icon is hidden), the chevron
   reports that it is unavailable and nothing else happens.
+- **Superseded by D72 since test 4.6 (S-074); still true of every published and installed version:** the next entry.
 - V3 rounded maximized windows (D45/D46, since Alpha 3): an eligible maximized application is
   clipped about one DIP inside its rounded outline and a click-through Aether ring beneath it draws the
   thin perimeter. Applications whose caption buttons are drawn by Windows lose them while clipped,

@@ -33,6 +33,9 @@ enum class InterfaceLanguage { Automatic, English, French, Spanish, Chinese, Hin
 enum class LiquidTint { Automatic, White, Black, Accent, Blue, Violet, Pink, Red, Orange, Yellow, Green, Teal };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
 enum class KeyboardIndicatorStyle { Compact, TwoLine };   // "FR" or a two-line "FRA / FR" indicator
+// D71: how the Top Bar presents itself. Floating is the glass bar below the top of the screen. Text has no bar
+// at all: the same items, written at the very top of the screen straight over the desktop picture.
+enum class TopBarPresentation { Floating, Text };
 
 // Version of the Dock size defaults. 1 is 0.1's 48/10; 2 is the compact 40/4 introduced in 0.2.
 inline constexpr int kCurrentDockMetricsVersion = 2;
@@ -110,6 +113,10 @@ struct TopBarSettings {
     // legacy false above (every Alpha 2 file) cannot hide it; absent means shown.
     bool showHiddenIconsButton = true;
     bool showBatteryPercent = true;
+    // D71: Text writes the items on the desktop, flush with the top of the screen: topMargin and opacity do not
+    // apply, and the strip is kept free of windows whatever reserveSpace says (unless autoHide is on). An absent
+    // key, every earlier file, is Floating.
+    TopBarPresentation presentation = TopBarPresentation::Floating;
 };
 
 struct WeatherSettings {

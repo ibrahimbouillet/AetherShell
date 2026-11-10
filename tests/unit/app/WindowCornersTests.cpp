@@ -3,169 +3,173 @@
 #include "AetherTest.h"
 #include "app/WindowCorners.h"
 
+#include <algorithm>
+#include <cmath>
+#include <vector>
+
 using namespace aether;
 using namespace aether::app;
 namespace {
-class FakeCorners final : public IWindowCornerBackend {
-public:
-    CornerWindowObservation observed{12, 34, {-8, -8, 1008, 708}, {0, 0, 1000, 700}, {12, 60, 988, 650}, 96, true};
-    std::optional<CornerRegion> region;
-    std::uintptr_t owner = 0;
-    unsigned writes = 0;
-    bool denyWrite = false;
-    bool denyClaim = false;
-    bool denyObserve = false;
-    bool denyRead = false;
-    std::optional<DWORD> backdrop;
-    unsigned backdropWrites = 0;
-    bool denyBackdropRead = false;
-    bool denyBackdropWrite = false;
-    bool replaceBackdropOnWrite = false;
-    // AS4-03: a target that stops answering, and a write that outlives its bounded wait.
-    bool responsive = true;
-    bool stallWrites = false;
-    std::optional<std::optional<CornerRegion>> stalled;
-    unsigned probes = 0;
-    bool Responsive(HWND) noexcept override { ++probes; return responsive; }
-    Result<CornerWindowObservation> Observe(HWND) override {
-        if (denyObserve) return MakeError(ErrorCode::Unavailable, "synthetic observation failure");
-        return observed;
+// A maximized application window between the bars of a 1920 x 1080 monitor, as Windows reports one: its
+// bounds overflow the frame by the hidden resize border, and the work area leaves room for the bars.
+CornerWindowFacts Maximized() {
+    CornerWindowFacts facts;
+    facts.visible = true; facts.maximized = true; facts.topLevel = true;
+    facts.monitor = {0, 0, 1920, 1080};
+    facts.work = {18, 63, 1902, 990};
+    facts.frame = facts.work;
+    facts.bounds = {facts.work.left - 8, facts.work.top - 8, facts.work.right + 8, facts.work.bottom + 8};
+    facts.dpi = 144;
+    return facts;
+}
+// One mark per pixel of a `width` x `height` outline from `rects`; a pixel named twice counts twice.
+std::vector<int> Paint(const std::vector<RECT>& rects, int width, int height) {
+    std::vector<int> pixels(static_cast<std::size_t>(width) * static_cast<std::size_t>(height), 0);
+    for (const RECT& rect : rects) {
+        REQUIRE(rect.left >= 0); REQUIRE(rect.top >= 0); REQUIRE(rect.right <= width); REQUIRE(rect.bottom <= height);
+        REQUIRE(rect.right > rect.left); REQUIRE(rect.bottom > rect.top);
+        for (LONG y = rect.top; y < rect.bottom; ++y) for (LONG x = rect.left; x < rect.right; ++x)
+            ++pixels[static_cast<std::size_t>(y) * static_cast<std::size_t>(width) + static_cast<std::size_t>(x)];
     }
-    Result<std::optional<CornerRegion>> ReadRegion(HWND) override {
-        if (denyRead) return MakeError(ErrorCode::Platform, "synthetic region read failure");
-        return region;
-    }
-    Result<void> WriteRegion(HWND, const std::optional<CornerRegion>& value) override {
-        if (denyWrite) return MakeError(ErrorCode::Platform, "synthetic region failure");
-        if (stallWrites) { stalled = value; return MakeError(ErrorCode::Timeout, "synthetic pending write"); }
-        region = value; ++writes; return Ok();
-    }
-    Result<std::optional<DWORD>> ReadBackdrop(HWND) override {
-        if (denyBackdropRead) return MakeError(ErrorCode::Platform, "synthetic backdrop read failure");
-        return backdrop;
-    }
-    Result<void> WriteBackdrop(HWND, DWORD value) override {
-        if (denyBackdropWrite) return MakeError(ErrorCode::Platform, "synthetic backdrop write failure");
-        backdrop = replaceBackdropOnWrite ? 4u : value; ++backdropWrites; return Ok();
-    }
-    bool Owns(HWND, std::uintptr_t token) noexcept override { return owner == token; }
-    Result<void> Claim(HWND, std::uintptr_t token) override {
-        if (denyClaim || owner) return MakeError(ErrorCode::AccessDenied, "synthetic claim failure");
-        owner = token; return Ok();
-    }
-    void Release(HWND, std::uintptr_t token) noexcept override { if (owner == token) owner = 0; }
-    bool abandoned = false;
-    bool ClearAbandonedClaim(HWND) noexcept override { const bool was = abandoned; if (was) owner = 0; abandoned = false; return was; }
-};
-const auto window = reinterpret_cast<HWND>(std::uintptr_t{17});
+    return pixels;
+}
+// The definition the rectangles must reproduce: a pixel belongs to the rounded outline of radius `radius`
+// (inset by `inset`) when its centre lies inside it.
+bool InsideOutline(int x, int y, int width, int height, int radius, int inset) {
+    if (x < inset || y < inset || x >= width - inset || y >= height - inset) return false;
+    const double r = static_cast<double>(radius) - inset;
+    const double px = x + 0.5, py = y + 0.5;
+    const double cx = px < radius ? radius : px > width - radius ? width - radius : px;
+    const double cy = py < radius ? radius : py > height - radius ? height - radius : py;
+    if (cx == px || cy == py) return true;   // not in a corner
+    if (!(r > 0.0)) return false;
+    return (px - cx) * (px - cx) + (py - cy) * (py - cy) <= r * r;
+}
 }
 
-AETHER_TEST("window corners: lease clips genuine observed geometry and skips unchanged writes") {
-    FakeCorners backend;
-    auto lease = WindowCornerLease::Acquire(backend, window, 1); REQUIRE(lease.ok());
-    REQUIRE(backend.region.has_value()); CHECK_EQ(backend.writes, 1u);
-    auto refreshed = (*lease)->Refresh(); REQUIRE(refreshed.ok()); CHECK(*refreshed);
-    CHECK_EQ(backend.writes, 1u);
-    backend.observed.dpi = 144;
-    REQUIRE((*lease)->Refresh().ok()); CHECK_EQ(backend.writes, 2u);
-    REQUIRE((*lease)->Restore().ok()); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
-    CHECK_EQ(backend.writes, 3u);
+AETHER_TEST("window corners: a visible maximized window between the bars is served, whatever kind of application it is (D72)") {
+    const auto facts = Maximized();
+    const auto plain = ClassifyCornerWindow(facts);
+    CHECK(plain.eligible);
+    CHECK(::EqualRect(&plain.frame, &facts.frame) != FALSE);
+    CHECK_EQ(plain.dpi, 144u);
+    // Nothing about the application is asked or needed: no process, privilege, frame style or rendering family.
+    // Only what is not a maximized application window in view is left out.
+    const auto without = [](void (*change)(CornerWindowFacts&)) { auto facts = Maximized(); change(facts); return ClassifyCornerWindow(facts).eligible; };
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.visible = false; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.minimized = true; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.maximized = false; }));   // a window merely sized to the work area: Windows rounds it
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.topLevel = false; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.cloaked = true; }));      // on another virtual desktop
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.toolWindow = true; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.clickThrough = true; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.own = true; }));          // the guard's own pieces
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.dpi = 0; }));
+    CHECK_FALSE(without([](CornerWindowFacts& f) { f.frame = {0, 0, 0, 0}; }));
 }
-AETHER_TEST("window corners: restore minimize or ineligibility removes only the leased region") {
-    FakeCorners backend;
-    auto lease = WindowCornerLease::Acquire(backend, window, 2); REQUIRE(lease.ok());
-    backend.observed.eligible = false;
-    auto refreshed = (*lease)->Refresh(); REQUIRE(refreshed.ok()); CHECK_FALSE(*refreshed);
-    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
+
+AETHER_TEST("window corners: a maximize that fills the monitor takes the screen and stays square (D56)") {
+    auto facts = Maximized();
+    facts.work = facts.monitor;   // both bars auto-hidden: nothing is reserved
+    facts.frame = facts.monitor;
+    facts.bounds = {-8, -8, 1928, 1088};
+    CHECK_FALSE(ClassifyCornerWindow(facts).eligible);
+    // Only one bar hidden: the window still sits against the other, and is rounded.
+    facts.work = {0, 0, 1920, 990};
+    facts.frame = facts.work;
+    facts.bounds = {-8, -8, 1928, 998};
+    CHECK(ClassifyCornerWindow(facts).eligible);
 }
-AETHER_TEST("window corners: custom existing and replaced application regions are preserved") {
-    FakeCorners backend;
-    const CornerRegion custom{std::byte{1}, std::byte{2}};
-    backend.region = custom;
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 3).ok()); CHECK_EQ(backend.writes, 0u);
-    backend.region.reset();
-    auto lease = WindowCornerLease::Acquire(backend, window, 3); REQUIRE(lease.ok());
-    backend.region = custom;
-    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
-    REQUIRE((*lease)->Restore().ok());
-    CHECK(backend.region == custom); CHECK_EQ(backend.writes, 1u); CHECK_EQ(backend.owner, 0u);
+
+AETHER_TEST("window corners: a window with a shape of its own keeps it; a plain rectangle around the frame is no shape") {
+    auto facts = Maximized();
+    // A browser keeps its maximized window to the work area with a plain rectangular region: still served.
+    facts.regionKind = SIMPLEREGION;
+    facts.regionBox = {8, 8, 8 + (facts.work.right - facts.work.left), 8 + (facts.work.bottom - facts.work.top)};
+    CHECK(ClassifyCornerWindow(facts).eligible);
+    // A rectangle that hides part of the frame is the application's own cut.
+    facts.regionBox.right -= 40;
+    CHECK_FALSE(ClassifyCornerWindow(facts).eligible);
+    // A real shape (Aether's own maximized Settings rounds itself; a clip left by an earlier version): left alone.
+    facts.regionKind = COMPLEXREGION;
+    facts.regionBox = {8, 8, 8 + (facts.work.right - facts.work.left), 8 + (facts.work.bottom - facts.work.top)};
+    CHECK_FALSE(ClassifyCornerWindow(facts).eligible);
+    facts.regionKind = NULLREGION;
+    CHECK_FALSE(ClassifyCornerWindow(facts).eligible);
 }
-// AS4-05: the helper's memory of the original region dies with it. Windows must not stay stranded.
-AETHER_TEST("window corners: a dead guard's clip is taken over and removed; anything else is left alone") {
-    FakeCorners backend;
-    {
-        auto first = WindowCornerLease::Acquire(backend, window, 3);
-        REQUIRE(first.ok());
-        REQUIRE(backend.region.has_value());
-        const auto clip = backend.region;
-        // The guard dies here: its lease never restores, and its claim stays on the window.
-        const auto surviving = backend.owner;
-        CHECK(surviving != 0u);
-        backend.abandoned = true;
-        auto second = WindowCornerLease::Acquire(backend, window, 4);
-        REQUIRE(second.ok());
-        CHECK(backend.region == clip);          // no flicker: the clip stays as it is
-        CHECK_EQ(backend.owner, 4u);
-        REQUIRE((*second)->Restore().ok());
-        CHECK_FALSE(backend.region.has_value()); // and is gone when the new guard lets go
-        CHECK_EQ(backend.owner, 0u);
+
+AETHER_TEST("window corners: the outline is the visible frame inside the work area, with a 12 DIP radius and a one DIP rim") {
+    for (const UINT dpi : {96u, 120u, 144u, 192u}) {
+        auto facts = Maximized();
+        facts.dpi = dpi;
+        const auto observed = ClassifyCornerWindow(facts);
+        REQUIRE(observed.eligible);
+        const auto rim = CornerFrameFor(observed);
+        REQUIRE(rim.has_value());
+        CHECK(::EqualRect(&rim->bounds, &facts.work) != FALSE);   // screen pixels
+        CHECK_EQ(rim->radiusPx, static_cast<int>(std::lround(12.0 * dpi / 96.0)));
+        CHECK_EQ(rim->widthPx, CornerRimWidthPx(dpi));
+        CHECK(rim->widthPx >= 1);
     }
-    // A claim of a dead guard over a shape that is not its clip: that shape is the application's.
-    FakeCorners other;
-    const CornerRegion custom{std::byte{1}, std::byte{2}};
-    other.region = custom;
-    other.owner = 9;
-    other.abandoned = true;
-    CHECK_FALSE(WindowCornerLease::Acquire(other, window, 5).ok());
-    CHECK(other.region == custom);
-    CHECK_EQ(other.writes, 0u);
+    CHECK_EQ(CornerRimWidthPx(0), 1); CHECK_EQ(CornerRimWidthPx(96), 1); CHECK_EQ(CornerRimWidthPx(120), 1); CHECK_EQ(CornerRimWidthPx(144), 2); CHECK_EQ(CornerRimWidthPx(192), 2);
+    // A frame that spills over the work area is cut to it; one outside it has no outline at all.
+    auto facts = Maximized();
+    facts.frame = {0, 40, 1920, 1000};
+    const auto cut = CornerFrameFor(ClassifyCornerWindow(facts));
+    REQUIRE(cut.has_value());
+    CHECK(::EqualRect(&cut->bounds, &facts.work) != FALSE);
+    CornerWindowObservation nowhere;
+    nowhere.bounds = {0, 0, 100, 100}; nowhere.frame = {0, 0, 100, 100}; nowhere.work = {500, 500, 900, 900};
+    CHECK_FALSE(CornerFrameFor(nowhere).has_value());
 }
-AETHER_TEST("window corners: lost lifetime and changed process identity never restore another window") {
-    for (bool lifetimeLost : {false, true}) {
-        FakeCorners backend;
-        auto lease = WindowCornerLease::Acquire(backend, window, 4); REQUIRE(lease.ok());
-        if (lifetimeLost) backend.owner = 99;
-        else ++backend.observed.process;
-        CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
-        REQUIRE((*lease)->Restore().ok());
-        CHECK_EQ(backend.writes, 1u);
+
+AETHER_TEST("window corners: the corner pieces and the rim tile the outline's edge exactly, pixel for pixel") {
+    struct Case { int width, height, radius, rim; };
+    for (const auto& c : {Case{400, 300, 18, 1}, Case{401, 299, 18, 2}, Case{1884, 927, 12, 1}, Case{640, 480, 24, 2}, Case{97, 61, 36, 3},
+                          Case{64, 40, 15, 1}, Case{50, 50, 25, 4}, Case{300, 200, 1, 1}, Case{300, 200, 2, 3}, Case{31, 9, 12, 1}}) {
+        const int radius = std::min({c.radius, c.width / 2, c.height / 2});
+        const auto pieces = Paint(CornerPieceRects(c.width, c.height, c.radius), c.width, c.height);
+        const auto rim = Paint(CornerRimRects(c.width, c.height, c.radius, c.rim), c.width, c.height);
+        int wrong = 0, rimPixels = 0, piecePixels = 0;
+        for (int y = 0; y < c.height; ++y) for (int x = 0; x < c.width; ++x) {
+            const auto index = static_cast<std::size_t>(y) * static_cast<std::size_t>(c.width) + static_cast<std::size_t>(x);
+            const bool outline = InsideOutline(x, y, c.width, c.height, radius, 0);
+            const bool inside = InsideOutline(x, y, c.width, c.height, radius, c.rim);
+            const int wantPiece = outline ? 0 : 1, wantRim = outline && !inside ? 1 : 0;
+            if (pieces[index] != wantPiece || rim[index] != wantRim) ++wrong;   // also catches a pixel named twice
+            piecePixels += pieces[index]; rimPixels += rim[index];
+        }
+        CHECK_EQ(wrong, 0);
+        CHECK(rimPixels > 0);
+        if (radius >= 3) CHECK(piecePixels > 0);   // a corner of a pixel or two has nothing outside its arc
+        // The pieces are four corners only: nothing of them along the sides.
+        for (const RECT& rect : CornerPieceRects(c.width, c.height, c.radius)) {
+            CHECK((rect.right <= radius || rect.left >= c.width - radius));
+            CHECK((rect.bottom <= radius || rect.top >= c.height - radius));
+        }
+        // The rim is continuous: every edge's middle belongs to it, and round a corner each row of it touches the next.
+        const auto in = [&](int x, int y) { return rim[static_cast<std::size_t>(y) * static_cast<std::size_t>(c.width) + static_cast<std::size_t>(x)] == 1; };
+        CHECK(in(c.width / 2, 0)); CHECK(in(c.width / 2, c.height - 1)); CHECK(in(0, c.height / 2)); CHECK(in(c.width - 1, c.height / 2));
+        int broken = 0, previousFirst = 0, previousLast = -1;
+        for (int y = 0; y < radius; ++y) {
+            int first = -1, last = -1;
+            for (int x = 0; x <= radius && x < c.width; ++x) if (in(x, y)) { if (first < 0) first = x; last = x; }
+            if (first < 0) { ++broken; continue; }
+            if (y > 0 && (first > previousLast + 1 || last < previousFirst - 1)) ++broken;   // not even corner to corner
+            previousFirst = first; previousLast = last;
+        }
+        CHECK_EQ(broken, 0);
     }
+    // No radius: no corner piece, and the rim is the plain rectangle's border.
+    CHECK(CornerPieceRects(200, 100, 0).empty());
+    const auto square = Paint(CornerRimRects(200, 100, 0, 2), 200, 100);
+    CHECK_EQ(static_cast<int>(std::count(square.begin(), square.end(), 1)), 200 * 100 - 196 * 96);
+    CHECK_EQ(static_cast<int>(std::count_if(square.begin(), square.end(), [](int value) { return value > 1; })), 0);
+    // Nothing to draw gives nothing, never a rectangle outside the outline.
+    CHECK(CornerPieceRects(0, 100, 12).empty()); CHECK(CornerPieceRects(100, -5, 12).empty());
+    CHECK(CornerRimRects(100, 100, 12, 0).empty()); CHECK(CornerRimRects(0, 0, 12, 1).empty());
 }
-AETHER_TEST("window corners: refused application and invalid geometry leave no armed property") {
-    FakeCorners backend;
-    backend.denyClaim = true;
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.writes, 0u);
-    backend.denyClaim = false; backend.denyWrite = true;
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.owner, 0u);
-    backend.denyWrite = false; backend.observed.frame = {};
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok()); CHECK_EQ(backend.owner, 0u);
-    backend.observed.eligible = false;
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 5).ok());
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, nullptr, 5).ok());
-    CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 0).ok());
-}
-AETHER_TEST("window corners: destructor restores a region while its identity remains owned") {
-    FakeCorners backend;
-    { auto lease = WindowCornerLease::Acquire(backend, window, 6); REQUIRE(lease.ok()); }
-    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.writes, 2u); CHECK_EQ(backend.owner, 0u);
-}
-AETHER_TEST("window corners: temporary observation read and write failures retain exact recovery ownership") {
-    for (int kind : {0, 1, 2}) {
-        FakeCorners backend;
-        auto lease = WindowCornerLease::Acquire(backend, window, 7); REQUIRE(lease.ok());
-        const auto clipped = backend.region;
-        backend.observed.dpi = 144; // force a real geometry write in the third case
-        if (kind == 0) backend.denyObserve = true;
-        if (kind == 1) backend.denyRead = true;
-        if (kind == 2) backend.denyWrite = true;
-        CHECK_FALSE((*lease)->Refresh().ok()); CHECK((*lease)->HasOwnership());
-        CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
-        CHECK(backend.region == clipped); CHECK_EQ(backend.owner, 7u);
-        backend.denyObserve = backend.denyRead = backend.denyWrite = false;
-        REQUIRE((*lease)->Restore().ok()); CHECK_FALSE((*lease)->HasOwnership());
-        CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
-    }
-}
+
 AETHER_TEST("window corners: internal dispatch rejects malformed handles and preserves normal arguments") {
     auto normal = DispatchWindowCornerGuard({L"--settings"}); REQUIRE(normal.ok()); CHECK_FALSE(normal->has_value());
     CHECK_FALSE(DispatchWindowCornerGuard({L"--window-corner-guard"}).ok());
@@ -177,188 +181,6 @@ AETHER_TEST("window corners: isolated controller refuses native access without s
     WindowCorners controller(false, L"not-an-executable");
     CHECK_FALSE(controller.Request(true).ok()); REQUIRE(controller.Request(false).ok());
     controller.Stop(); CHECK_FALSE(controller.Request(true).ok());
-}
-
-AETHER_TEST("window corners: full-window system materials are leased and restored exactly") {
-    for (const DWORD material : {2u, 3u, 4u}) {
-        FakeCorners backend; backend.backdrop = material;
-        auto lease = WindowCornerLease::Acquire(backend, window, 8); REQUIRE(lease.ok());
-        CHECK(backend.backdrop == 1u); CHECK_EQ(backend.backdropWrites, 1u);
-        REQUIRE((*lease)->Refresh().ok()); CHECK_EQ(backend.backdropWrites, 1u);
-        REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == material);
-        CHECK_EQ(backend.backdropWrites, 2u); CHECK_FALSE(backend.region.has_value());
-        CHECK_FALSE((*lease)->HasOwnership());
-    }
-}
-AETHER_TEST("window corners: absent automatic and absent-material policies are never rewritten") {
-    for (const auto material : {std::optional<DWORD>{}, std::optional<DWORD>{0}, std::optional<DWORD>{1}}) {
-        FakeCorners backend; backend.backdrop = material;
-        { auto lease = WindowCornerLease::Acquire(backend, window, 9); REQUIRE(lease.ok()); }
-        CHECK(backend.backdrop == material); CHECK_EQ(backend.backdropWrites, 0u);
-        CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
-    }
-}
-AETHER_TEST("window corners: app region replacement still restores the separately leased material") {
-    FakeCorners backend; backend.backdrop = 2;
-    auto lease = WindowCornerLease::Acquire(backend, window, 10); REQUIRE(lease.ok());
-    const CornerRegion replacement{std::byte{5}}; backend.region = replacement;
-    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
-    CHECK(backend.region == replacement); CHECK(backend.backdrop == 2u);
-    CHECK_EQ(backend.writes, 1u); CHECK_EQ(backend.backdropWrites, 2u);
-}
-AETHER_TEST("window corners: app material replacement wins and releases the leased region") {
-    FakeCorners backend; backend.backdrop = 2;
-    auto lease = WindowCornerLease::Acquire(backend, window, 11); REQUIRE(lease.ok());
-    backend.backdrop = 4;
-    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
-    CHECK_FALSE(backend.region.has_value()); CHECK(backend.backdrop == 4u);
-    CHECK_EQ(backend.backdropWrites, 1u);
-}
-AETHER_TEST("window corners: partial first application retains the material recovery snapshot") {
-    FakeCorners backend; backend.backdrop = 3; backend.denyWrite = true;
-    auto lease = WindowCornerLease::Acquire(backend, window, 12); REQUIRE(lease.ok());
-    CHECK((*lease)->HasOwnership()); CHECK(backend.backdrop == 1u); CHECK_FALSE(backend.region.has_value());
-    backend.denyBackdropWrite = true;
-    CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
-    backend.denyBackdropWrite = false;
-    REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == 3u); CHECK_EQ(backend.owner, 0u);
-}
-AETHER_TEST("window corners: material read and restore failures retain recovery independently of region") {
-    for (const bool failRead : {false, true}) {
-        FakeCorners backend; backend.backdrop = 2;
-        auto lease = WindowCornerLease::Acquire(backend, window, 13); REQUIRE(lease.ok());
-        if (failRead) backend.denyBackdropRead = true;
-        else backend.denyBackdropWrite = true;
-        CHECK_FALSE((*lease)->Restore().ok()); CHECK((*lease)->HasOwnership());
-        CHECK_FALSE(backend.region.has_value()); CHECK(backend.backdrop == 1u);
-        backend.denyBackdropRead = backend.denyBackdropWrite = false;
-        REQUIRE((*lease)->Restore().ok()); CHECK(backend.backdrop == 2u); CHECK_EQ(backend.owner, 0u);
-    }
-}
-AETHER_TEST("window corners: material acquisition failures never leave untracked mutations") {
-    for (const bool failRead : {false, true}) {
-        FakeCorners backend; backend.backdrop = 2;
-        if (failRead) backend.denyBackdropRead = true;
-        else backend.denyBackdropWrite = true;
-        CHECK_FALSE(WindowCornerLease::Acquire(backend, window, 14).ok());
-        CHECK(backend.backdrop == 2u); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
-    }
-}
-AETHER_TEST("window corners: synchronous application material reassertion is not overwritten or clipped") {
-    FakeCorners backend; backend.backdrop = 2; backend.replaceBackdropOnWrite = true;
-    auto lease = WindowCornerLease::Acquire(backend, window, 15);
-    REQUIRE(!lease.ok()); CHECK(lease.error().code == ErrorCode::InvalidState);
-    CHECK(backend.backdrop == 4u); CHECK_FALSE(backend.region.has_value());
-    CHECK_EQ(backend.writes, 0u); CHECK_EQ(backend.backdropWrites, 1u); CHECK_EQ(backend.owner, 0u);
-}
-AETHER_TEST("window corners: later application material opt-in relinquishes an automatic-policy clip") {
-    FakeCorners backend; backend.backdrop = 0;
-    auto lease = WindowCornerLease::Acquire(backend, window, 16); REQUIRE(lease.ok());
-    backend.backdrop = 2;
-    CHECK_FALSE((*lease)->Refresh().ok()); CHECK_FALSE((*lease)->HasOwnership());
-    CHECK(backend.backdrop == 2u); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.backdropWrites, 0u);
-}
-AETHER_TEST("window corners: a give-back records whether the app re-asserted its own material, chose another or its own region") {
-    // D46: Chromium re-applying the very Mica it had before the clip is distinguishable from a new choice.
-    FakeCorners reasserted; reasserted.backdrop = 2;
-    auto lease = WindowCornerLease::Acquire(reasserted, window, 30); REQUIRE(lease.ok());
-    CHECK((*lease)->Replacement() == CornerReplacement::None);
-    reasserted.backdrop = 2;
-    CHECK_FALSE((*lease)->Refresh().ok());
-    CHECK((*lease)->Replacement() == CornerReplacement::MaterialReasserted);
-    CHECK(reasserted.backdrop == 2u); CHECK_FALSE(reasserted.region.has_value());  // still given back at once
-
-    FakeCorners other; other.backdrop = 2;
-    lease = WindowCornerLease::Acquire(other, window, 31); REQUIRE(lease.ok());
-    other.backdrop = 4;
-    CHECK_FALSE((*lease)->Refresh().ok());
-    CHECK((*lease)->Replacement() == CornerReplacement::Material);
-
-    FakeCorners region;
-    lease = WindowCornerLease::Acquire(region, window, 32); REQUIRE(lease.ok());
-    region.region = CornerRegion{std::byte{1}, std::byte{2}};
-    CHECK_FALSE((*lease)->Refresh().ok());
-    CHECK((*lease)->Replacement() == CornerReplacement::Region);
-}
-AETHER_TEST("window corners: only a re-asserted previous material is clipped again, later each time and a bounded number of times") {
-    using std::chrono::milliseconds;
-    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 0) == milliseconds{250});
-    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 1) == milliseconds{500});
-    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 4) == milliseconds{4000});
-    CHECK(CornerRetryDelay(CornerReplacement::MaterialReasserted, 7) == milliseconds{8000});
-    CHECK_FALSE(CornerRetryDelay(CornerReplacement::MaterialReasserted, kCornerMaterialRetries).has_value());
-    CHECK_FALSE(CornerRetryDelay(CornerReplacement::MaterialReasserted, -1).has_value());
-    for (const auto other : {CornerReplacement::None, CornerReplacement::Region, CornerReplacement::Material})
-        CHECK_FALSE(CornerRetryDelay(other, 0).has_value());  // the application's own choice wins
-}
-
-AETHER_TEST("window corners: an unresponsive target keeps its clip and snapshot; changes wait (AS4-03)") {
-    FakeCorners backend;
-    auto lease = WindowCornerLease::Acquire(backend, window, 40); REQUIRE(lease.ok());
-    const auto clipped = backend.region; REQUIRE(clipped.has_value());
-    REQUIRE_EQ(backend.writes, 1u);
-    backend.responsive = false;
-    // A busy page is not given back: unchanged geometry needs no mutation and is not a deferral.
-    auto steady = (*lease)->Refresh(); REQUIRE(steady.ok()); CHECK(*steady);
-    // A geometry change waits instead of writing into the unresponsive target.
-    backend.observed.dpi = 144;
-    auto changed = (*lease)->Refresh(); REQUIRE_FALSE(changed.ok());
-    CHECK_EQ(changed.error().code, ErrorCode::Timeout);
-    CHECK((*lease)->HasOwnership()); CHECK_EQ(backend.writes, 1u); CHECK(backend.region == clipped);
-    // Restoration (the window left its maximize while hung) waits too; the snapshot is retained.
-    backend.observed.eligible = false;
-    auto restore = (*lease)->Refresh(); REQUIRE_FALSE(restore.ok());
-    CHECK_EQ(restore.error().code, ErrorCode::Timeout);
-    CHECK((*lease)->HasOwnership()); CHECK_EQ(backend.writes, 1u); CHECK(backend.region == clipped);
-    // Once it answers again the recovery completes exactly once, conditionally.
-    backend.responsive = true;
-    auto recovered = (*lease)->Refresh(); REQUIRE(recovered.ok()); CHECK_FALSE(*recovered);
-    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u); CHECK_EQ(backend.writes, 2u);
-}
-AETHER_TEST("window corners: first acquisition of an unresponsive target writes nothing and keeps no claim") {
-    FakeCorners backend;
-    backend.responsive = false;
-    auto lease = WindowCornerLease::Acquire(backend, window, 41);
-    REQUIRE_FALSE(lease.ok()); CHECK_EQ(lease.error().code, ErrorCode::Timeout);
-    CHECK_EQ(backend.writes, 0u); CHECK_EQ(backend.owner, 0u); CHECK_FALSE(backend.region.has_value());
-}
-AETHER_TEST("window corners: a pending write is reconciled from what actually landed") {
-    FakeCorners backend;
-    auto lease = WindowCornerLease::Acquire(backend, window, 42); REQUIRE(lease.ok());
-    const auto first = backend.region;
-    backend.stallWrites = true;
-    backend.observed.dpi = 144;
-    auto pending = (*lease)->Refresh(); REQUIRE_FALSE(pending.ok());
-    CHECK_EQ(pending.error().code, ErrorCode::Timeout); CHECK((*lease)->HasOwnership());
-    REQUIRE(backend.stalled.has_value()); REQUIRE(backend.stalled->has_value());
-    // The stalled write lands later: it is adopted, not mistaken for an application replacement.
-    backend.region = *backend.stalled;
-    backend.stallWrites = false;
-    auto adopted = (*lease)->Refresh(); REQUIRE(adopted.ok()); CHECK(*adopted);
-    CHECK_EQ(backend.writes, 1u);  // no further write: the landed region is the wanted one
-    CHECK((*lease)->HasOwnership());
-    // A pending write that never landed is retried from the unchanged region.
-    backend.stallWrites = true;
-    backend.observed.dpi = 192;
-    REQUIRE_FALSE((*lease)->Refresh().ok());
-    backend.stallWrites = false;
-    auto retried = (*lease)->Refresh(); REQUIRE(retried.ok()); CHECK(*retried);
-    CHECK_EQ(backend.writes, 2u); CHECK(backend.region != first);
-    REQUIRE((*lease)->Restore().ok()); CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
-}
-AETHER_TEST("window corners: restoration with a write still pending keeps the claim until it is known") {
-    FakeCorners backend;
-    auto lease = WindowCornerLease::Acquire(backend, window, 43); REQUIRE(lease.ok());
-    backend.stallWrites = true;
-    auto restore = (*lease)->Restore(); REQUIRE_FALSE(restore.ok());
-    CHECK_EQ(restore.error().code, ErrorCode::Timeout); CHECK((*lease)->HasOwnership());
-    backend.responsive = false;
-    CHECK_EQ((*lease)->Restore().error().code, ErrorCode::Timeout);
-    backend.responsive = true;
-    backend.region = *backend.stalled;  // the restoration landed meanwhile
-    backend.stallWrites = false;
-    REQUIRE((*lease)->Restore().ok());
-    CHECK_FALSE(backend.region.has_value()); CHECK_EQ(backend.owner, 0u);
 }
 AETHER_TEST("window corners: helper start failures are bounded, reported and retried only with budget (AS4-04)") {
     WindowCornersOptions options; options.firstRetryDelay = std::chrono::milliseconds(5); options.maximumAttempts = 3;

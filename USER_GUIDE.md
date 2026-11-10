@@ -82,6 +82,18 @@ changing their size or maximize state; Aether undoes this when it exits. Some ap
 window types keep square corners. Since 3.3, only between the bars. With both bars hidden, a maximized
 window takes the whole screen, square.
 
+Since Alpha 4 (D72): every maximized window between the bars is rounded, whatever the application (browsers, File
+Explorer, packaged and elevated applications), and keeps its own caption buttons. Aether no longer touches the
+application's window at all: small pieces of its own, placed over the four corners, show the desktop that lies there,
+live, with the thin rim around. The corners are not antialiased. A window in front of the maximized one covers them like
+anything else.
+
+**Top Bar as text on the desktop** (Alpha 4, D71): Settings → Top Bar → **Presentation** → **Text on the desktop** removes
+the bar itself. The same items are written at the very top of the screen, straight over the desktop picture, in light or
+dark ink chosen from the picture under them, with a soft halo. That strip stays free of windows; the top margin and glass
+opacity do not apply. With **Automatically hide the Top Bar**, the text comes back on a strip of glass while a window is
+under it. High contrast keeps the bar.
+
 **Welcome** (since 3.3): after you sign in or unlock, Aether Shell writes a short greeting by hand,
 filling the screen, over your blurred desktop picture, and the bars come out when it ends: "Salut", "Hello" or "Hola", with your name if you entered one. When you
 unlock, it is already there, in place of the desktop. Touch, click or press Escape to skip it. Setup asks for

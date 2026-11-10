@@ -7,6 +7,7 @@
 #include "status/ClockFormatter.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <format>
 #include <numeric>
@@ -286,13 +287,14 @@ std::vector<PlacedItem> LayoutItems(const std::vector<DisplayItem>& items, const
 }
 
 Result<TopBarPlacement> ComputeTopBarPlacement(const RECT& area, UINT dpi, int heightDip,
-                                              int topMarginDip, float shadowDip) {
+                                              int topMarginDip, float shadowDip, float sideDip) {
     if (dpi < 48 || dpi > 768 || heightDip < 24 || heightDip > 48 || topMarginDip < 0 || topMarginDip > 100 ||
-        !std::isfinite(shadowDip) || shadowDip < 0 || shadowDip > 128 || area.right <= area.left) {
+        !std::isfinite(shadowDip) || shadowDip < 0 || shadowDip > 128 || !std::isfinite(sideDip) || sideDip < 0 ||
+        sideDip > 64 || area.right <= area.left) {
         return MakeError(ErrorCode::InvalidArgument, "invalid Top Bar geometry");
     }
     const float scale = static_cast<float>(dpi) / 96.0f;
-    const int side = static_cast<int>(std::lround(12.0f * scale));
+    const int side = static_cast<int>(std::lround(sideDip * scale));
     const int height = static_cast<int>(std::lround(static_cast<float>(heightDip) * scale));
     const int top = static_cast<int>(std::lround(static_cast<float>(topMarginDip) * scale));
     const int shadow = static_cast<int>(std::ceil(shadowDip * scale));
@@ -304,6 +306,81 @@ Result<TopBarPlacement> ComputeTopBarPlacement(const RECT& area, UINT dpi, int h
     placed.panelBoundsPx = {shadow, shadow, shadow + width, shadow + height};
     placed.reservationHeightPx = top + height + shadow;
     return placed;
+}
+
+BackdropProfile MeasureBackdrop(std::span<const std::uint8_t> bgra, int width, int height, const RECT& strip, int columns) {
+    BackdropProfile profile;
+    if (width <= 0 || height <= 0 || columns <= 0 || columns > 4096 ||
+        bgra.size() < static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 4u) return profile;
+    const int left = std::clamp(static_cast<int>(strip.left), 0, width), right = std::clamp(static_cast<int>(strip.right), 0, width);
+    const int top = std::clamp(static_cast<int>(strip.top), 0, height), bottom = std::clamp(static_cast<int>(strip.bottom), 0, height);
+    if (right <= left || bottom <= top) return profile;
+    static const auto linear = [] {
+        std::array<float, 256> table{};
+        for (std::size_t i = 0; i < table.size(); ++i) {
+            const float s = static_cast<float>(i) / 255.0f;
+            table[i] = s <= 0.04045f ? s / 12.92f : std::pow((s + 0.055f) / 1.055f, 2.4f);
+        }
+        return table;
+    }();
+    // Small cells rather than single pixels: a letter is read against what surrounds it, not against one speck.
+    const int cell = std::max(2, (bottom - top) / 4);
+    profile.columns.reserve(static_cast<std::size_t>(columns));
+    for (int column = 0; column < columns; ++column) {
+        const int x0 = left + static_cast<int>(static_cast<std::int64_t>(right - left) * column / columns);
+        const int x1 = std::min(right, std::max(x0 + 1, left + static_cast<int>(static_cast<std::int64_t>(right - left) * (column + 1) / columns)));
+        double sum = 0.0;
+        std::size_t count = 0;
+        float low = 1.0f, high = 0.0f;
+        for (int cy = top; cy < bottom; cy += cell) {
+            for (int cx = x0; cx < x1; cx += cell) {
+                double cellSum = 0.0;
+                std::size_t cellCount = 0;
+                for (int y = cy; y < std::min(cy + cell, bottom); ++y) {
+                    const auto* pixel = bgra.data() + (static_cast<std::size_t>(y) * static_cast<std::size_t>(width) + static_cast<std::size_t>(cx)) * 4u;
+                    for (int x = cx; x < std::min(cx + cell, x1); ++x, pixel += 4, ++cellCount)
+                        cellSum += 0.0722 * linear[pixel[0]] + 0.7152 * linear[pixel[1]] + 0.2126 * linear[pixel[2]];
+                }
+                if (!cellCount) continue;
+                const float average = static_cast<float>(cellSum / static_cast<double>(cellCount));
+                low = std::min(low, average);
+                high = std::max(high, average);
+                sum += cellSum;
+                count += cellCount;
+            }
+        }
+        if (!count) { profile.columns.clear(); return profile; }
+        profile.columns.push_back({low, static_cast<float>(sum / static_cast<double>(count)), high});
+    }
+    return profile;
+}
+
+TextInk ChooseTextInk(const BackdropProfile* profile, float left, float right, bool lightTheme) noexcept {
+    // Nothing known of what lies behind: the theme's ink, under a halo strong enough for either extreme.
+    if (!profile || profile->columns.empty() || !std::isfinite(left) || !std::isfinite(right)) return {lightTheme, 0.60f};
+    const int count = static_cast<int>(profile->columns.size());
+    const float from = std::clamp(std::min(left, right), 0.0f, 1.0f), to = std::clamp(std::max(left, right), 0.0f, 1.0f);
+    const int first = std::clamp(static_cast<int>(std::floor(from * static_cast<float>(count))), 0, count - 1);
+    const int last = std::clamp(static_cast<int>(std::ceil(to * static_cast<float>(count))) - 1, first, count - 1);
+    float low = 1.0f, high = 0.0f;
+    for (int index = first; index <= last; ++index) {
+        low = std::min(low, profile->columns[static_cast<std::size_t>(index)].low);
+        high = std::max(high, profile->columns[static_cast<std::size_t>(index)].high);
+    }
+    low = std::clamp(low, 0.0f, 1.0f);
+    high = std::clamp(high, low, 1.0f);
+    TextInk ink;
+    // Light ink over a dark halo reads over anything, as a desktop's icon labels do: it is what a picture is read
+    // with. Dark ink only where even the darkest part behind it is light enough for it, without counting on a halo
+    // (WCAG 2: black keeps 5:1 from a luminance of 0.2 up).
+    ink.dark = low >= 0.20f;
+    // The halo brings the part of the backdrop that fights the ink to where the ink keeps 4.5:1 over it:
+    // white needs a backdrop no lighter than 0.183, black one no darker than 0.175.
+    const float needed = ink.dark ? (low < 0.175f ? (0.175f - low) / (1.0f - low) : 0.0f)
+                                  : (high > 0.1833f ? 1.0f - 0.1833f / high : 0.0f);
+    // Never without a little of it: the measure is of the picture, and a window may pass behind.
+    ink.halo = std::clamp(std::max(ink.dark ? 0.20f : 0.30f, needed + 0.08f), 0.0f, 0.85f);
+    return ink;
 }
 
 std::optional<int> HitTest(const std::vector<PlacedItem>& items, D2D1_POINT_2F point) noexcept {

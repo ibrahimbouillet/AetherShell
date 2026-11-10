@@ -8,9 +8,14 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [0.4.0-alpha.4] — in progress, not published
 
-Alpha 4 (D62–D70). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alpha 4 complete.
 
 ### Added
+
+- **The Top Bar as text on the desktop** (D71): Settings → Top Bar → Presentation → *Text on the desktop* removes the bar
+  and writes its items at the very top of the screen, straight over the desktop picture, in light or dark ink chosen from
+  the picture under each side, with a soft halo. The strip stays free of windows. With Auto-Hide the text comes back on a
+  strip of glass while a window is under it. *Floating bar* stays the default.
 
 - **Five languages** (D70): English, 中文 (Chinese, simplified), हिन्दी (Hindi), Español and Français, everywhere: bars,
   menus, tooltips, Search, Quick Settings, Settings, setup, the updater, messages. Settings → Language (a new page) follows
@@ -36,6 +41,11 @@ Alpha 4 (D62–D70). Its test builds keep this number until the owner calls Alph
 
 ### Changed
 
+- **Rounded corners for every maximized window, without touching the application** (D72, ADR 0014): Aether no longer
+  gives other applications' windows a region or changes their material. Small windows of its own, directly above the
+  maximized window, show the live desktop in the four corners and draw the thin rim. Browsers, File Explorer, packaged
+  and elevated applications are all rounded, and keep their own caption buttons. If Aether stops, nothing is left on any
+  window; a clip left by an earlier version is removed at start.
 - **Lighter at rest and when switching style** (D69), with the same pixels and motion: the Top Bar no longer redraws its
   whole content about ten times a second with a seconds clock (only the digits that change are drawn, once a second);
   unchanged backdrops are not sent to the compositor again; repeated labels keep their text layout; Auto-Hide reads the
@@ -45,6 +55,8 @@ Alpha 4 (D62–D70). Its test builds keep this number until the owner calls Alph
 
 ### Fixed
 
+- **A dragged Dock icon no longer leaves the Dock** (D73): pulled past an end, the Dock stretches after it like a rubber
+  band, by a little over twenty pixels at most, and springs back with a bounce when the icon is let go.
 - With Auto-Hide on, the Dock and the Top Bar left at once after the greeting at an unlock, because the page left open covered
   them; they now stay out a few seconds, as when they are used.
 - In Search, Enter opened the row under the mouse pointer instead of the one chosen; the pointer now only lights a row, and

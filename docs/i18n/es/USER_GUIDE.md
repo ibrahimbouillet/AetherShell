@@ -85,6 +85,19 @@ su tamaño ni su estado maximizado; Aether lo deshace al cerrarse. Algunas aplic
 esquinas rectas. Desde la 3.3, solo entre las barras. Con las dos barras ocultas, una ventana maximizada ocupa toda la
 pantalla, con esquinas rectas.
 
+Desde la Alpha 4 (D72): toda ventana maximizada entre las barras tiene las esquinas redondeadas, sea cual sea la
+aplicación (navegadores, Explorador de archivos, aplicaciones empaquetadas o con privilegios elevados), y conserva sus
+propios botones de título. Aether ya no toca la ventana de la aplicación: unas piezas pequeñas suyas, colocadas sobre las
+cuatro esquinas, muestran el escritorio que hay ahí, en directo, con el borde fino alrededor. Las esquinas no están
+suavizadas. Una ventana situada delante de la maximizada las cubre como a lo demás.
+
+**La barra superior como texto sobre el escritorio** (Alpha 4, D71): Configuración → Barra superior → **Presentación** →
+**Texto sobre el escritorio** quita la barra en sí. Los mismos elementos se escriben en lo más alto de la pantalla,
+directamente sobre el fondo de escritorio, con tinta clara u oscura según la imagen que haya debajo, y un halo suave. Esa
+franja queda libre de ventanas; el margen superior y la opacidad del cristal no se aplican. Con **Ocultar la barra
+superior automáticamente**, el texto vuelve sobre una franja de cristal mientras haya una ventana debajo. El contraste
+alto conserva la barra.
+
 **Bienvenida** (desde la 3.3): tras iniciar sesión o desbloquear, Aether Shell escribe a mano un breve saludo que llena
 la pantalla, sobre tu fondo de pantalla desenfocado, y las barras aparecen cuando termina: «Salut», «Hello» o «Hola»,
 con tu nombre si lo has escrito. Al desbloquear ya está ahí, en lugar del escritorio. Toca, haz clic o pulsa Esc para
