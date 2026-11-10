@@ -27,7 +27,8 @@ Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under th
 
 > **Coming soon: Alpha 4.** The next version is in development: two styles to choose from, *Liquid* (clear
 > water glass) and *Grain* (today's frosted material), a Search that also finds Windows' Settings pages, files
-> and folders, and a lighter, smoother shell. [Watch the releases](https://github.com/ibrahimbouillet/AetherShell/releases)
+> and folders, an interface in several languages that follows your Windows display language, and a lighter,
+> smoother shell. [Watch the releases](https://github.com/ibrahimbouillet/AetherShell/releases)
 > to know when it is out.
 
 <h2 align="center">A New Desktop. A New Atmosphere.</h2>
