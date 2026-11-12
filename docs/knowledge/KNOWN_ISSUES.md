@@ -41,8 +41,6 @@ silently changes PROJECT_SPEC acceptance requirements.
   (2,652 notes, 2 MB). A query for "backdrop blur" returned ~6.6 k characters (70 nodes, some noise);
   grep for the known identifier returned 23 exact hits in < 1 k characters. Use grep when the
   identifier is known; use Graphify for dependency/impact questions and unfamiliar areas.
-- Obsidian CLI (`Obsidian.com`) only works while the Obsidian app runs and after it is enabled in
-  Settings → General; plain file reads are the fallback.
-- Obsidian 1.14.4 was independently rechecked running this session: vault-qualified read/search,
-  HOME links and unresolved-link query succeeded for the repository's `docs/` vault. These Markdown
-  edits update the same files; no exported graph or Obsidian configuration was modified.
+- Obsidian was retired by the owner on 2026-11-12 (D12). It had been installed and checked working
+  on 2026-10-18, but the ten retained Claude sessions (2026-11-03 to 11-12) contain no Obsidian
+  command, while ordinary file searches ran thousands of times. `docs/` is plain Markdown.

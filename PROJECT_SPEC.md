@@ -280,9 +280,9 @@ the current file map remain in [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).
 | `docs/knowledge/TEST_STATUS.md` | Executed commands/results and qualification gaps | Product requirements or unverified claims |
 | `docs/specs/`, `docs/modules/` | Detailed work orders and implementation references | Authority to override this spec or claim absent modules exist |
 
-The Obsidian vault is the same `docs/` directory, not a second copy to synchronize. Root files sit
-outside that vault and use relative Markdown links. Graphify data and its export are optional,
-generated, local and uncommitted. Inferred graph edges are hints, never proof of behavior.
+`docs/` holds plain Markdown notes, with no second copy to synchronize and no editor required. Root
+files sit outside `docs/` and use relative Markdown links. Graphify data is optional, generated,
+local and uncommitted. Inferred graph edges are hints, never proof of behavior.
 
 ## F. Invariants and change control
 

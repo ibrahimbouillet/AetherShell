@@ -40,6 +40,6 @@ See [BUILDING.md](BUILDING.md). Short version (Visual Studio 2022+ Build Tools w
 
 ## Optional development tools
 
-[Graphify](https://github.com/Graphify-Labs/graphify) (code knowledge graph) and
-[Obsidian](https://obsidian.md) (knowledge vault rooted at `docs/`) are optional developer aids. They
-are never required to build or run Aether Shell, and their generated outputs are not committed.
+[Graphify](https://github.com/Graphify-Labs/graphify) (code knowledge graph) is an optional developer
+aid. It is never required to build or run Aether Shell, and its generated output is not committed.
+The notes in `docs/` are plain Markdown: any editor works.

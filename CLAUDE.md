@@ -18,7 +18,7 @@ Claude Code specifics.
   inside the shared checkout. Usage limits can interrupt runs; resume from the workflow cache.
 - Workflow scripts from earlier sessions (for example `phase-a.js` / `phase-b.js`) targeted the old
   archive copy and modules that are now implemented. Never resume them; write new, scoped workflows.
-- Do not read the whole knowledge vault or graph report; follow the targeted-retrieval order in
+- Do not read all of `docs/knowledge/` or the whole graph report; follow the targeted-retrieval order in
   `AGENTS.md` ("Efficient context gathering").
 
 ## graphify

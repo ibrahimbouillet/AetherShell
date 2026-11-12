@@ -34,6 +34,17 @@ Explorer first: the three that were square or went wrong), and the feel of the D
 started: antialiased corner edges (thumbnails carry an opacity), the arrival ending on text rather than a strip, and
 Liquid for Settings, menus, Search and Quick Settings from the earlier list.
 
+### Side note, 2026-11-12: Obsidian retired (documentation only)
+
+The owner asked whether Obsidian helped the assistants' work. It did not: the ten retained Claude sessions
+(2026-11-03 to 11-12) contain no Obsidian command, while ordinary file searches ran thousands of times; the vault
+was last opened on 2026-10-18. The owner chose to uninstall it. The current-state documents no longer describe it as
+a working tool (D12 amended; AGENTS tool table, PROJECT_SPEC, PROJECT_CONTEXT, TASKS, CONTRIBUTING, THIRD_PARTY_NOTICES,
+`docs/knowledge/` notes; HOME.md's `[[...]]` links became Markdown links). Historical records (older handoff sections,
+TEST_STATUS, DEVELOPMENT_LOG entries, GAP-012, past prompts) are left as written. `.gitignore` still ignores
+`.obsidian/`; the local `docs/.obsidian/` and the owner's `docs/Untitled.canvas` were not touched. No product file
+changed and no test build was made. The uncommitted D74 work in the tree was left alone.
+
 ## Earlier — Alpha 4, test 4.5: five languages, and lighter at rest and when switching style (`0.4.0-alpha.4`, D69, D70, S-073, 2026-11-09)
 
 The owner reported that switching Liquid/Grain made the PC lag and Alpha 4 took more memory, asked for a complete

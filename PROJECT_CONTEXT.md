@@ -60,7 +60,7 @@ No third-party C++ dependencies. Python stdlib scripts for releases. GitHub Acti
 | `src/platform/net`, `src/updates`, `src/applications`, `src/status`, `src/weather` | services (see `TASKS.md` for status) |
 | `docs/decisions/` | ADRs 0001–0009 |
 | `docs/modules/` | per-module reference docs |
-| `docs/knowledge/` | Obsidian vault notes: module index, test status, known issues, log (same files, no second copy) |
+| `docs/knowledge/` | Markdown notes: module index, test status, known issues, log |
 | `tests/{unit,integration,network}/<module>` | tests |
 | `.github/workflows/ci.yml` | CI (Release, /WX, unit tests) |
 
@@ -106,8 +106,8 @@ Version 1 acceptance.
 - V2 taskbar mode is a compatibility feature, not official native-taskbar or Windows Settings
   registration. Helper/app double failure, Windows changes, and actual Explorer recovery still need
   qualification. Windows pin import reads available shortcuts only and may miss pins/order.
-- Graphify launcher currently fails; the stale graph is not current evidence. Obsidian CLI works
-  while its app runs; root docs remain outside the `docs/` vault.
+- No Graphify graph exists for this checkout; source and Markdown are the working references.
+  Obsidian was retired on 2026-11-12 (D12); `docs/` is read as plain Markdown.
 
 ## Environment and configuration (no secrets here)
 - Build machine: Windows 11 x64, VS Build Tools with C++ workload, Windows SDK 10.0.26100.

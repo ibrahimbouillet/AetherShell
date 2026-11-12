@@ -241,10 +241,10 @@ TEST_STATUS S-011. The native alpha is installed; the public source uses indepen
 - T-DOC-1 → NFR-010: PROJECT_SPEC and canonical links independently reviewed; all 34 requirement IDs
   covered by task/evidence map, 22 document link/whitespace checks passed (TEST_STATUS S-004).
 - Docs: ADRs 0001–0003, 0005, 0006; BUILDING, SECURITY, CONTRIBUTING, CHANGELOG, THIRD_PARTY_NOTICES;
-  knowledge vault; continuity files (this set).
-- Tooling: Obsidian 1.14.4 + CLI works while its app runs. Graphify 0.9.92 runs from an ordinary
-  shell but not inside the Codex sandbox; no graph exists for this checkout (GAP-004). Neither is a
-  product dependency.
+  knowledge notes (`docs/knowledge/`); continuity files (this set).
+- Tooling: Graphify 0.9.92 runs from an ordinary shell but not inside the Codex sandbox; no graph
+  exists for this checkout (GAP-004). It is not a product dependency. Obsidian, unused, was retired
+  on 2026-11-12 (D12).
 - T-DOC-2 → NFR-010 (Claude, 2026-10-18): PROJECT_SPEC cross-checked against the owner's original
   brief. Added FR-025 (diagnostics), the Version 1 release gate, milestones and long-term direction;
   completed FR-004/010/015/018/019/020/022/023 and NFR-001/002 acceptance from the brief; recorded

@@ -35,5 +35,5 @@ No standalone third-party icon pack or font is distributed. Detailed provenance 
 
 ## Development tools (not distributed)
 
-Graphify, Obsidian, Python and OpenSSL may be used by developers and the release pipeline. None of
+Graphify, Python and OpenSSL may be used by developers and the release pipeline. None of
 them is shipped with or required by Aether Shell.

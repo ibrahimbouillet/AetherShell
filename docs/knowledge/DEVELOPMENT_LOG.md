@@ -50,3 +50,7 @@ Short milestone summaries; use `git log` for detail.
 - Clean source pushed at `4eed02879fb79aa60376e9b50c698b295bae163e`; [Windows CI](https://github.com/ibrahimbouillet/AetherShell/actions/runs/39123368917) succeeded.
 - [0.1.0-alpha.1 prerelease](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.1.0-alpha.1) published with audited setup/checksums only.
 - Local installation repaired to the CI package; startup disabled. Complete delivery receipts in S-012.
+
+## 2026-11-12
+- Obsidian retired by the owner (D12): no assistant had used it. `docs/` stays plain Markdown;
+  `docs/knowledge/HOME.md` now uses ordinary Markdown links instead of Obsidian's `[[...]]` links.
