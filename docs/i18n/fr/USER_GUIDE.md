@@ -1,7 +1,8 @@
 # Utiliser Aether Shell
 
 🇬🇧 [English](../../../USER_GUIDE.md) · 🇫🇷 Français · 🇪🇸 [Español](../es/USER_GUIDE.md) ·
-🇨🇳 [中文](../zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](../hi/USER_GUIDE.md)
+🇨🇳 [中文](../zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](../hi/USER_GUIDE.md) · 🇧🇷 [Português](../pt/USER_GUIDE.md) · 🇷🇺 [Русский](../ru/USER_GUIDE.md) ·
+🇸🇦 [العربية](../ar/USER_GUIDE.md) · 🇧🇩 [বাংলা](../bn/USER_GUIDE.md) · 🇵🇰 [اردو](../ur/USER_GUIDE.md)
 
 Lancez Aether Shell depuis son raccourci du menu Démarrer ou depuis le lanceur installé. Il ouvre deux éléments de
 bureau : le Dock en bas et la barre d'état en haut. L'Explorateur Windows continue de fonctionner normalement. Les
@@ -49,13 +50,16 @@ le Wi-Fi, le Bluetooth, l'accessibilité et la sortie audio ; les interrupteurs 
 page correspondante des Paramètres de Windows. Sous Windows 11, **Utiliser les paramètres rapides de Windows
 (Windows 11)** sur la même page ouvre plutôt le panneau de Windows.
 
-**Langue** (Alpha 4) : Aether Shell, installation comprise, parle anglais, chinois (simplifié), hindi, espagnol et
-français. Paramètres → **Langue** permet d'en choisir une ; **Comme Windows**, le réglage par
-défaut, utilise la langue d'affichage de Windows si c'est l'une des cinq, et l'anglais sinon. Le changement
-s'applique aussitôt aux barres, aux menus, à la recherche et aux Paramètres. Avec une langue choisie, la barre du
-haut écrit la date dans cette langue ; avec « Comme Windows », la date garde votre format régional de Windows. Les
-noms des applications, des fichiers et des réseaux ne sont jamais traduits. La recherche affiche les outils de
-Windows et les pages des Paramètres dans la langue de l'interface, et les trouve par leur nom dans chacune des cinq.
+**Langue** (Alpha 4) : Aether Shell, installation comprise, parle anglais, chinois (simplifié), hindi, espagnol,
+français, portugais, russe, arabe, bengali et ourdou. Paramètres → **Langue** permet d'en choisir une ; **Comme
+Windows**, le réglage par défaut, parcourt vos langues d'affichage de Windows dans l'ordre où vous les avez classées et
+prend la première qui fait partie des dix, et l'anglais sinon. Le changement s'applique aussitôt aux barres, aux menus,
+à la recherche et aux Paramètres, et votre choix est gardé dans vos paramètres, que chaque version lit : une nouvelle
+version, une réparation ou une réinstallation le retrouve, et l'installation, la mise à jour et le lanceur parlent
+cette langue. Avec une langue choisie, la barre du haut écrit la date dans cette langue ; avec « Comme Windows », la
+date garde votre format régional de Windows. Les noms des applications, des fichiers et des réseaux ne sont jamais
+traduits. La recherche affiche les outils de Windows et les pages des Paramètres dans la langue de l'interface, et les
+trouve par leur nom dans chacune des dix. L'arabe et l'ourdou se lisent de droite à gauche.
 
 Les Paramètres comportent les pages Dock, Barre du haut, Météo, Mises à jour, Général, À propos, Bureau, Apparence,
 Bienvenue et Langue. La météo est désactivée au départ. Choisissez la position automatique de Windows (avec votre accord) ou

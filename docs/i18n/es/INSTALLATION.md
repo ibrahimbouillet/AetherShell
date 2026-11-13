@@ -1,15 +1,17 @@
 # Instalación
 
 🇬🇧 [English](../../../INSTALLATION.md) · 🇫🇷 [Français](../fr/INSTALLATION.md) · 🇪🇸 Español ·
-🇨🇳 [中文](../zh-CN/INSTALLATION.md) · 🇮🇳 [हिन्दी](../hi/INSTALLATION.md)
+🇨🇳 [中文](../zh-CN/INSTALLATION.md) · 🇮🇳 [हिन्दी](../hi/INSTALLATION.md) · 🇧🇷 [Português](../pt/INSTALLATION.md) · 🇷🇺 [Русский](../ru/INSTALLATION.md) ·
+🇸🇦 [العربية](../ar/INSTALLATION.md) · 🇧🇩 [বাংলা](../bn/INSTALLATION.md) · 🇵🇰 [اردو](../ur/INSTALLATION.md)
 
 Usa solo el ejecutable de instalación de la [página de versiones del repositorio oficial](https://github.com/ibrahimbouillet/AetherShell/releases).
 La versión actual, 3.5 [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3), es
 una versión preliminar de instalación manual; la cualificación más amplia de la versión 1 sigue abierta. La versión
 anterior [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) sigue disponible.
 
-Ejecuta la instalación con tu usuario habitual de Windows. Desde la Alpha 4, la instalación habla el idioma de Windows
-cuando es inglés, chino, hindi, español o francés y, si no, inglés. El asistente presenta el producto, muestra la licencia
+Ejecuta la instalación con tu usuario habitual de Windows. Desde la Alpha 4, la instalación habla el idioma que
+elegiste en la Configuración de Aether Shell o, si no hay ninguno, el primero de tus idiomas de Windows que sea uno de
+los diez de la interfaz y, si no, inglés. El asistente presenta el producto, muestra la licencia
 MIT y te deja elegir una carpeta (de forma predeterminada `%LOCALAPPDATA%\Programs\AetherShell`), los accesos directos y
 el inicio opcional. Instala un iniciador estable, un programa de mantenimiento y archivos de programa con versión. Puede
 crear un acceso directo en el menú Inicio y una entrada por usuario en las aplicaciones instaladas de Windows. No se

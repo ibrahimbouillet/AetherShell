@@ -1,15 +1,16 @@
 # Installation
 
 🇬🇧 English · 🇫🇷 [Français](docs/i18n/fr/INSTALLATION.md) · 🇪🇸 [Español](docs/i18n/es/INSTALLATION.md) ·
-🇨🇳 [中文](docs/i18n/zh-CN/INSTALLATION.md) · 🇮🇳 [हिन्दी](docs/i18n/hi/INSTALLATION.md)
+🇨🇳 [中文](docs/i18n/zh-CN/INSTALLATION.md) · 🇮🇳 [हिन्दी](docs/i18n/hi/INSTALLATION.md) · 🇧🇷 [Português](docs/i18n/pt/INSTALLATION.md) · 🇷🇺 [Русский](docs/i18n/ru/INSTALLATION.md) ·
+🇸🇦 [العربية](docs/i18n/ar/INSTALLATION.md) · 🇧🇩 [বাংলা](docs/i18n/bn/INSTALLATION.md) · 🇵🇰 [اردو](docs/i18n/ur/INSTALLATION.md)
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
 The current release, 3.5 [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3),
 is a manual-install preview; wider Version 1 qualification remains open. The earlier
 [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) remains available.
 
-Run setup as your ordinary Windows user. Since Alpha 4 setup speaks Windows' display language when it is English,
-Chinese, Hindi, Spanish or French, and English otherwise. The wizard explains the product, displays the MIT license,
+Run setup as your ordinary Windows user. Since Alpha 4 setup speaks the language you chose in Aether Shell's Settings
+or, without one, the first of your Windows display languages that is one of the interface's ten, and English otherwise. The wizard explains the product, displays the MIT license,
 and lets you choose a folder (default `%LOCALAPPDATA%\Programs\AetherShell`), shortcuts and optional
 startup. It installs a stable launcher, a maintenance setup and versioned program files. It can
 create a Start Menu shortcut and a per-user entry in Windows Installed apps. No administrator

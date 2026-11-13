@@ -1,7 +1,8 @@
 # Usar Aether Shell
 
 🇬🇧 [English](../../../USER_GUIDE.md) · 🇫🇷 [Français](../fr/USER_GUIDE.md) · 🇪🇸 Español ·
-🇨🇳 [中文](../zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](../hi/USER_GUIDE.md)
+🇨🇳 [中文](../zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](../hi/USER_GUIDE.md) · 🇧🇷 [Português](../pt/USER_GUIDE.md) · 🇷🇺 [Русский](../ru/USER_GUIDE.md) ·
+🇸🇦 [العربية](../ar/USER_GUIDE.md) · 🇧🇩 [বাংলা](../bn/USER_GUIDE.md) · 🇵🇰 [اردو](../ur/USER_GUIDE.md)
 
 Abre Aether Shell desde su acceso directo del menú Inicio o desde el iniciador instalado. Abre dos elementos de
 escritorio: el Dock en la parte inferior y la barra de estado en la superior. El Explorador de Windows sigue
@@ -48,13 +49,16 @@ sonido; los interruptores que Windows se reserva abren la página correspondient
 Windows 11, **Usar la configuración rápida de Windows (Windows 11)** en la misma página abre en su lugar el panel de
 Windows.
 
-**Idioma** (Alpha 4): Aether Shell, instalación incluida, habla inglés, chino (simplificado), hindi, español y francés.
-Configuración → **Idioma** permite elegir uno; **Igual que Windows**, la opción predeterminada,
-usa el idioma de Windows si es uno de los cinco y, si no, el inglés. El cambio se aplica al momento a las barras, los
-menús, la búsqueda y la Configuración. Con un idioma elegido, la barra superior escribe la fecha en ese idioma; con
-«Igual que Windows», la fecha conserva tu formato regional de Windows. Los nombres de aplicaciones, archivos y redes
-nunca se traducen. La búsqueda muestra las herramientas de Windows y las páginas de Configuración en el idioma de la
-interfaz y las encuentra por su nombre en cualquiera de los cinco.
+**Idioma** (Alpha 4): Aether Shell, instalación incluida, habla inglés, chino (simplificado), hindi, español,
+francés, portugués, ruso, árabe, bengalí y urdu. Configuración → **Idioma** permite elegir uno; **Igual que
+Windows**, la opción predeterminada, recorre tus idiomas de Windows en el orden en que los colocaste y usa el primero
+que sea uno de los diez y, si no, el inglés. El cambio se aplica al momento a las barras, los menús, la búsqueda y la
+Configuración, y tu elección se guarda en tu configuración, que lee cada versión: una nueva versión, una reparación o
+una reinstalación la vuelve a encontrar, y la instalación, el actualizador y el lanzador hablan ese idioma. Con un
+idioma elegido, la barra superior escribe la fecha en ese idioma; con «Igual que Windows», la fecha conserva tu
+formato regional de Windows. Los nombres de aplicaciones, archivos y redes nunca se traducen. La búsqueda muestra las
+herramientas de Windows y las páginas de Configuración en el idioma de la interfaz y las encuentra por su nombre en
+cualquiera de los diez. El árabe y el urdu se leen de derecha a izquierda.
 
 La Configuración tiene las páginas Dock, Barra superior, Tiempo, Actualizaciones, General, Acerca de, Escritorio,
 Apariencia, Bienvenida e Idioma. El tiempo empieza desactivado. Antes de activarlo, elige la ubicación automática de Windows

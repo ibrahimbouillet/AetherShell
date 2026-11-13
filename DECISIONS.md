@@ -160,8 +160,9 @@ person's choice, including from the folder of the previous version after an inst
   application's first message boxes now read it too (`i18n::StartupLanguage`) instead of only Windows' language.
 - **Right to left:** Arabic and Urdu set DirectWrite's reading direction in the shared text cache (shaping and alignment); the
   layout of bars, Dock and panels is not mirrored (KNOWN_LIMITATIONS).
-- **Documentation:** README, user guide and installation guide are translated only into the first five (D70); the new five are
-  English there for now.
+- **Documentation:** README, user guide and installation guide in all ten (the new five added on 2026-11-13 at the owner's
+  request, as `README.<code>.md` and `docs/i18n/<code>/`); Arabic and Urdu pages wrap their prose in `dir="rtl"` blocks and
+  their code in `dir="ltr"` blocks.
 
 FR-042, T56, T61. Evidence: TEST_STATUS S-075. No native speaker has reviewed the new translations.
 

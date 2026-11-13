@@ -26,7 +26,10 @@ Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alph
 - **Ten languages** (D74): Portuguese, Russian, Arabic, Bengali and Urdu join the five. "Follow Windows" now goes through
   every display language the person ranked in Windows, not only the first; the language chosen in Settings is also read by
   setup, the updater and the launcher, which read the settings file every version shares. Arabic and Urdu are shaped and
-  aligned right to left. Only the interface is translated into the new five; their documentation is still English.
+  aligned right to left.
+- **The documentation in the ten languages:** README, user guide and installation guide in Portuguese, Russian, Arabic
+  (right to left), Bengali and Urdu (right to left), and every language bar and table lists all ten. The French, Spanish,
+  Chinese and Hindi documents now describe the ten languages and the setup's remembered language.
 
 - **Two styles, Liquid and Grain** (Settings → Appearance → Style). Liquid draws the Dock and the Top Bar as glass over the
   page behind them, live: its colours and shapes show through, softened and a little livelier, kept in a band of brightness

@@ -1,7 +1,8 @@
 # Using Aether Shell
 
 🇬🇧 English · 🇫🇷 [Français](docs/i18n/fr/USER_GUIDE.md) · 🇪🇸 [Español](docs/i18n/es/USER_GUIDE.md) ·
-🇨🇳 [中文](docs/i18n/zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](docs/i18n/hi/USER_GUIDE.md)
+🇨🇳 [中文](docs/i18n/zh-CN/USER_GUIDE.md) · 🇮🇳 [हिन्दी](docs/i18n/hi/USER_GUIDE.md) · 🇧🇷 [Português](docs/i18n/pt/USER_GUIDE.md) · 🇷🇺 [Русский](docs/i18n/ru/USER_GUIDE.md) ·
+🇸🇦 [العربية](docs/i18n/ar/USER_GUIDE.md) · 🇧🇩 [বাংলা](docs/i18n/bn/USER_GUIDE.md) · 🇵🇰 [اردو](docs/i18n/ur/USER_GUIDE.md)
 
 Start Aether Shell from its Start Menu shortcut or installed launcher. It opens two desktop
 surfaces: the Dock near the bottom and the Top Status Bar near the top. Windows Explorer continues

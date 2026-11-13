@@ -3,6 +3,8 @@
 <p align="center">
   🇬🇧 <strong>English</strong> · 🇫🇷 <a href="README.fr.md">Français</a> · 🇪🇸 <a href="README.es.md">Español</a>
   · 🇨🇳 <a href="README.zh-CN.md">中文</a> · 🇮🇳 <a href="README.hi.md">हिन्दी</a>
+  · 🇧🇷 <a href="README.pt.md">Português</a> · 🇷🇺 <a href="README.ru.md">Русский</a> · 🇸🇦 <a href="README.ar.md">العربية</a>
+  · 🇧🇩 <a href="README.bn.md">বাংলা</a> · 🇵🇰 <a href="README.ur.md">اردو</a>
 </p>
 
 <p align="center">
@@ -91,8 +93,7 @@ less work per frame. Read the [release notes](docs/releases/0.3.5-alpha.3.md) an
 ## Languages
 
 Aether Shell speaks the ten most spoken languages in the world. Every menu, panel, Settings page, message and setup
-screen is translated. The documentation is translated into the first five of the table below; for the other five it is
-still in English.
+screen is translated, and so is this documentation.
 
 | | Language | Interface | Documentation |
 |---|---|---|---|
@@ -101,11 +102,11 @@ still in English.
 | 🇮🇳 | हिन्दी | ✅ | [README](README.hi.md) · [उपयोग गाइड](docs/i18n/hi/USER_GUIDE.md) · [इंस्टॉलेशन](docs/i18n/hi/INSTALLATION.md) |
 | 🇪🇸 | Español | ✅ | [README](README.es.md) · [Guía de uso](docs/i18n/es/USER_GUIDE.md) · [Instalación](docs/i18n/es/INSTALLATION.md) |
 | 🇫🇷 | Français | ✅ | [README](README.fr.md) · [Guide d'utilisation](docs/i18n/fr/USER_GUIDE.md) · [Installation](docs/i18n/fr/INSTALLATION.md) |
-| 🇧🇷 | Português | ✅ | English for now |
-| 🇷🇺 | Русский | ✅ | English for now |
-| 🇸🇦 | العربية | ✅ (right to left) | English for now |
-| 🇧🇩 | বাংলা | ✅ | English for now |
-| 🇵🇰 | اردو | ✅ (right to left) | English for now |
+| 🇧🇷 | Português | ✅ | [README](README.pt.md) · [Guia do usuário](docs/i18n/pt/USER_GUIDE.md) · [Instalação](docs/i18n/pt/INSTALLATION.md) |
+| 🇷🇺 | Русский | ✅ | [README](README.ru.md) · [Руководство](docs/i18n/ru/USER_GUIDE.md) · [Установка](docs/i18n/ru/INSTALLATION.md) |
+| 🇸🇦 | العربية | ✅ (right to left) | [README](README.ar.md) · [دليل الاستخدام](docs/i18n/ar/USER_GUIDE.md) · [التثبيت](docs/i18n/ar/INSTALLATION.md) |
+| 🇧🇩 | বাংলা | ✅ | [README](README.bn.md) · [ব্যবহারকারী নির্দেশিকা](docs/i18n/bn/USER_GUIDE.md) · [ইনস্টলেশন](docs/i18n/bn/INSTALLATION.md) |
+| 🇵🇰 | اردو | ✅ (right to left) | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
 **Follow Windows** (the default) goes through your Windows display languages (Settings → Time & language), in the order
 you ranked them, and takes the first that is one of these ten; English if none is. Choose another in

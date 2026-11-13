@@ -3327,3 +3327,23 @@ Settings' layout test ran them, and it checks overlap, not looks); Windows 10; t
 `41790ba4ca17d869ab5c7842e90a8d0d8e3f952a5237764d8b6a455ab147e837`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4`
 (privacy and source-freshness audit passed) from the tree this entry describes. Test 4.6's build moved to `dist/test-4.6/`.
 Committed locally; not pushed, tagged, published or installed.
+
+### S-076 — Alpha 4: the user documentation in the ten languages (Claude, 2026-11-13)
+
+**What changed (documentation only, no product file):** at the owner's request after test 4.7, the README, the user guide
+and the installation guide in Portuguese, Russian, Arabic, Bengali and Urdu (`README.<code>.md`, `docs/i18n/<code>/`),
+translated from the current English; every language bar and table of the thirty existing and new documents now lists
+the ten languages; the French, Spanish, Chinese and Hindi documents and the English installation guide now describe the
+ten languages and the setup's remembered language (D74). Arabic and Urdu prose sits in `<div dir="rtl">` blocks, their
+code in `<div dir="ltr">` blocks. The installer's payload carries no documentation (`installer/GeneratePayload.cmake`:
+the three programs, `LICENSE`, `THIRD_PARTY_NOTICES.md`), so test 4.7's package is unchanged by this.
+
+| Check | Result |
+| --- | --- |
+| Every relative link and image of the 30 user documents (`README*.md`, `USER_GUIDE.md`, `INSTALLATION.md`, `docs/i18n/*/*.md`) resolves to a file | 30 files, 0 missing (scratch checker, not committed) |
+| Every one of those documents' language bars names all ten languages | Pass |
+| `<div dir=...>` blocks balanced in the four right-to-left documents | Pass (7/7, 7/7, 5/5, 5/5, 1/1, 1/1) |
+| Stale "five languages" statements left in the older translations | None (the only "cinq"/"cinco" left are the five desktops of the slideshow) |
+
+**Not executed, so not claimed:** GitHub's rendering of the right-to-left pages (nothing is pushed, D65); a native
+speaker's reading of any of the new documents.

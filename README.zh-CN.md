@@ -3,6 +3,8 @@
 <p align="center">
   🇬🇧 <a href="README.md">English</a> · 🇫🇷 <a href="README.fr.md">Français</a> · 🇪🇸 <a href="README.es.md">Español</a>
   · 🇨🇳 <strong>中文</strong> · 🇮🇳 <a href="README.hi.md">हिन्दी</a>
+  · 🇧🇷 <a href="README.pt.md">Português</a> · 🇷🇺 <a href="README.ru.md">Русский</a> · 🇸🇦 <a href="README.ar.md">العربية</a>
+  · 🇧🇩 <a href="README.bn.md">বাংলা</a> · 🇵🇰 <a href="README.ur.md">اردو</a>
 </p>
 
 <p align="center">
@@ -31,7 +33,7 @@
 > 界面替代品。试用前请保存好工作，并阅读[已知限制](KNOWN_LIMITATIONS.md)。
 
 > **即将推出：Alpha 4。** 下一个版本正在开发中：两种可选风格——*液态*（清澈的水玻璃）和*磨砂*（现在的磨砂材质），
-> 还能找到 Windows 设置页面、文件和文件夹的搜索，五种语言的界面，以及更轻快、更流畅的体验。
+> 还能找到 Windows 设置页面、文件和文件夹的搜索，多种语言的界面，以及更轻快、更流畅的体验。
 > [关注发布页面](https://github.com/ibrahimbouillet/AetherShell/releases)，第一时间获知发布消息。
 
 <h2 align="center">全新的桌面，全新的氛围。</h2>
@@ -61,8 +63,8 @@
   日历，一个小箭头可打开通知区域中的隐藏图标，状态组合按钮则会打开 Aether 的快捷控制面板及其 WLAN 列表。
 - **搜索：** 查找并打开应用以及 Windows 自带的工具，例如设备管理器、服务或控制面板中的项目。
 - **自动隐藏：** 程序坞和顶部栏可分别在应用窗口遮住它们时滑开，指针移到屏幕边缘时再回来，让你拥有全屏工作区。
-- **五种语言：** 整个界面（包括安装程序）提供英语、中文、印地语、西班牙语和法语。它会跟随 Windows 的显示语言，
-  也可以在“设置 → 语言”中自行选择。参见[语言](#语言)。
+- **十种语言：** 整个界面（包括安装程序）提供英语、中文、印地语、西班牙语、法语、葡萄牙语、俄语、阿拉伯语、孟加拉语和
+  乌尔都语。它会跟随你的 Windows 显示语言，也可以在“设置 → 语言”中自行选择，并在不同版本之间记住这一选择。参见[语言](#语言)。
 - **欢迎问候：** 可选功能。登录或解锁电脑后，在模糊的壁纸上用法语、英语或西班牙语手写一段问候。安装程序可以
   询问问候时使用的名字。
 - **天气：** 可选择使用 Windows 位置权限获取大致位置和天气预报。如果无法定位或没有网络，天气会显示为不可用，
@@ -80,7 +82,7 @@
 
 ## 语言
 
-Aether Shell 支持世界上使用人数最多的五种语言。每个菜单、面板、设置页面、提示信息和安装界面都已翻译，本文档也一样。
+Aether Shell 支持世界上使用人数最多的十种语言。每个菜单、面板、设置页面、提示信息和安装界面都已翻译，本文档也一样。
 
 | | 语言 | 界面 | 文档 |
 |---|---|---|---|
@@ -89,11 +91,18 @@ Aether Shell 支持世界上使用人数最多的五种语言。每个菜单、�
 | 🇮🇳 | हिन्दी | ✅ | [README](README.hi.md) · [उपयोग गाइड](docs/i18n/hi/USER_GUIDE.md) · [इंस्टॉलेशन](docs/i18n/hi/INSTALLATION.md) |
 | 🇪🇸 | Español | ✅ | [README](README.es.md) · [Guía de uso](docs/i18n/es/USER_GUIDE.md) · [Instalación](docs/i18n/es/INSTALLATION.md) |
 | 🇫🇷 | Français | ✅ | [README](README.fr.md) · [Guide d'utilisation](docs/i18n/fr/USER_GUIDE.md) · [Installation](docs/i18n/fr/INSTALLATION.md) |
+| 🇧🇷 | Português | ✅ | [README](README.pt.md) · [Guia do usuário](docs/i18n/pt/USER_GUIDE.md) · [Instalação](docs/i18n/pt/INSTALLATION.md) |
+| 🇷🇺 | Русский | ✅ | [README](README.ru.md) · [Руководство](docs/i18n/ru/USER_GUIDE.md) · [Установка](docs/i18n/ru/INSTALLATION.md) |
+| 🇸🇦 | العربية | ✅ （从右到左） | [README](README.ar.md) · [دليل الاستخدام](docs/i18n/ar/USER_GUIDE.md) · [التثبيت](docs/i18n/ar/INSTALLATION.md) |
+| 🇧🇩 | বাংলা | ✅ | [README](README.bn.md) · [ব্যবহারকারী নির্দেশিকা](docs/i18n/bn/USER_GUIDE.md) · [ইনস্টলেশন](docs/i18n/bn/INSTALLATION.md) |
+| 🇵🇰 | اردو | ✅ （从右到左） | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
-**跟随 Windows**（默认设置）会在 Windows 显示语言属于这五种语言之一时使用它，否则使用英语。你也可以在
-**设置 → 语言**中选择其他语言，更改会立即生效。属于你或其他程序的名称（应用、文件、WLAN 网络）永远
-不会被翻译。手写欢迎只能书写拉丁字母，因此会用法语、英语或西班牙语问候。翻译文件位于
-[tools/i18n/catalog](tools/i18n/catalog)，欢迎提出修改建议。
+**跟随 Windows**（默认设置）会按你排列的顺序查看你的 Windows 显示语言（设置 → 时间和语言），并使用其中第一个属于这十种
+语言的语言；如果都不是，则使用英语。你也可以在**设置 → 语言**中选择其他语言，更改会立即生效，并保存在每个版本都会读取的
+设置中：安装新版本、修复或重新安装都会保留它，安装程序、更新程序和启动器也会使用这种语言。属于你或其他程序的名称（应用、
+文件、WLAN 网络）永远不会被翻译。手写欢迎只能书写拉丁字母，因此会用法语、英语或西班牙语问候。阿拉伯语和乌尔都语从右向左
+阅读：文字会相应地成形和对齐，而各个栏和面板保持原有布局。翻译文件位于 [tools/i18n/catalog](tools/i18n/catalog)，欢迎
+提出修改建议。
 
 ## 替换 Windows 任务栏
 

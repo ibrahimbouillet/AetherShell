@@ -3,6 +3,8 @@
 <p align="center">
   🇬🇧 <a href="README.md">English</a> · 🇫🇷 <strong>Français</strong> · 🇪🇸 <a href="README.es.md">Español</a>
   · 🇨🇳 <a href="README.zh-CN.md">中文</a> · 🇮🇳 <a href="README.hi.md">हिन्दी</a>
+  · 🇧🇷 <a href="README.pt.md">Português</a> · 🇷🇺 <a href="README.ru.md">Русский</a> · 🇸🇦 <a href="README.ar.md">العربية</a>
+  · 🇧🇩 <a href="README.bn.md">বাংলা</a> · 🇵🇰 <a href="README.ur.md">اردو</a>
 </p>
 
 <p align="center">
@@ -33,7 +35,7 @@ C++20 avec Win32, Direct2D/DirectWrite et Windows.UI.Composition, et publié sou
 
 > **Bientôt : Alpha 4.** La prochaine version est en préparation : deux styles au choix, *Liquide* (un verre
 > d'eau limpide) et *Grain* (la matière dépolie actuelle), une recherche qui trouve aussi les pages des Paramètres
-> de Windows, les fichiers et les dossiers, une interface en cinq langues, et une interface plus légère et plus
+> de Windows, les fichiers et les dossiers, une interface en plusieurs langues, et une interface plus légère et plus
 > fluide. [Suivez les versions](https://github.com/ibrahimbouillet/AetherShell/releases) pour savoir quand elle sort.
 
 <h2 align="center">Un nouveau bureau. Une nouvelle atmosphère.</h2>
@@ -68,9 +70,9 @@ Vrais bureaux, capturés sous Windows 11. Les fonds d'écran et les icônes d'ap
   périphériques, les Services ou les éléments du Panneau de configuration.
 - **Masquage automatique :** le Dock et la barre du haut, chacun de son côté, s'effacent quand une fenêtre les
   recouvre et reviennent quand le pointeur atteint leur bord de l'écran, pour un espace de travail plein écran.
-- **Cinq langues :** toute l'interface, installation comprise, en anglais, chinois, hindi, espagnol et français.
-  Elle suit la langue d'affichage de Windows, ou celle que vous choisissez dans Paramètres → Langue. Voir
-  [Langues](#langues).
+- **Dix langues :** toute l'interface, installation comprise, en anglais, chinois, hindi, espagnol, français,
+  portugais, russe, arabe, bengali et ourdou. Elle suit vos langues d'affichage de Windows, ou celle que vous
+  choisissez dans Paramètres → Langue, et se souvient de ce choix d'une version à l'autre. Voir [Langues](#langues).
 - **Accueil :** un message facultatif, écrit à la main en français, en anglais ou en espagnol sur votre fond
   d'écran flouté, après l'ouverture de session ou le déverrouillage du PC. L'installation peut demander le prénom
   avec lequel il vous salue.
@@ -93,7 +95,7 @@ le [journal des modifications](CHANGELOG.md) (en anglais).
 
 ## Langues
 
-Aether Shell parle les cinq langues les plus parlées au monde. Chaque menu, panneau, page des Paramètres,
+Aether Shell parle les dix langues les plus parlées au monde. Chaque menu, panneau, page des Paramètres,
 message et écran d'installation est traduit, tout comme cette documentation.
 
 | | Langue | Interface | Documentation |
@@ -103,13 +105,22 @@ message et écran d'installation est traduit, tout comme cette documentation.
 | 🇮🇳 | हिन्दी | ✅ | [README](README.hi.md) · [उपयोग गाइड](docs/i18n/hi/USER_GUIDE.md) · [इंस्टॉलेशन](docs/i18n/hi/INSTALLATION.md) |
 | 🇪🇸 | Español | ✅ | [README](README.es.md) · [Guía de uso](docs/i18n/es/USER_GUIDE.md) · [Instalación](docs/i18n/es/INSTALLATION.md) |
 | 🇫🇷 | Français | ✅ | [README](README.fr.md) · [Guide d'utilisation](docs/i18n/fr/USER_GUIDE.md) · [Installation](docs/i18n/fr/INSTALLATION.md) |
+| 🇧🇷 | Português | ✅ | [README](README.pt.md) · [Guia do usuário](docs/i18n/pt/USER_GUIDE.md) · [Instalação](docs/i18n/pt/INSTALLATION.md) |
+| 🇷🇺 | Русский | ✅ | [README](README.ru.md) · [Руководство](docs/i18n/ru/USER_GUIDE.md) · [Установка](docs/i18n/ru/INSTALLATION.md) |
+| 🇸🇦 | العربية | ✅ (de droite à gauche) | [README](README.ar.md) · [دليل الاستخدام](docs/i18n/ar/USER_GUIDE.md) · [التثبيت](docs/i18n/ar/INSTALLATION.md) |
+| 🇧🇩 | বাংলা | ✅ | [README](README.bn.md) · [ব্যবহারকারী নির্দেশিকা](docs/i18n/bn/USER_GUIDE.md) · [ইনস্টলেশন](docs/i18n/bn/INSTALLATION.md) |
+| 🇵🇰 | اردو | ✅ (de droite à gauche) | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
-**Comme Windows** (le réglage par défaut) utilise la langue d'affichage de Windows si c'est l'une de ces cinq, et
-l'anglais sinon. Choisissez-en une autre dans **Paramètres → Langue** ; le changement
-s'applique aussitôt. Les noms qui vous appartiennent ou qui appartiennent à d'autres programmes (applications,
-fichiers, réseaux Wi-Fi) ne sont jamais traduits. L'accueil écrit à la main trace des lettres latines : il salue
-donc en français, en anglais ou en espagnol. Les traductions se trouvent dans
-[tools/i18n/catalog](tools/i18n/catalog) ; les corrections sont les bienvenues.
+**Comme Windows** (le réglage par défaut) parcourt vos langues d'affichage de Windows (Paramètres → Heure et
+langue), dans l'ordre où vous les avez classées, et prend la première qui fait partie de ces dix ; l'anglais sinon.
+Choisissez-en une autre dans **Paramètres → Langue** ; le changement s'applique aussitôt et reste dans vos
+paramètres, que chaque version lit : installer une nouvelle version, réparer ou réinstaller le conserve, et
+l'installation, la mise à jour et le lanceur parlent aussi cette langue. Les noms qui vous appartiennent ou qui
+appartiennent à d'autres programmes (applications, fichiers, réseaux Wi-Fi) ne sont jamais traduits. L'accueil écrit
+à la main trace des lettres latines : il salue donc en français, en anglais ou en espagnol. L'arabe et l'ourdou se
+lisent de droite à gauche : le texte est formé et aligné en conséquence, tandis que les barres et les panneaux gardent
+leur disposition. Les traductions se trouvent dans [tools/i18n/catalog](tools/i18n/catalog) ; les corrections sont
+les bienvenues.
 
 ## Remplacer la barre des tâches de Windows
 

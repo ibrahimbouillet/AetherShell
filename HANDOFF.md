@@ -31,14 +31,15 @@ languages Windows offers; and the choices remembered across versions. Plus one G
   walks the person's ranked Windows display languages. The choice (`general.language`) lives in
   `%LOCALAPPDATA%\AetherShell\config\settings.json`, shared by every version (uninstall keeps it), and setup, the updater, the
   launcher and the app's first messages read it (`i18n::StartupLanguage`). Arabic/Urdu: DirectWrite reading direction only.
-  **Not done:** the README/guides for the new five (English for now), mirrored layout, native-speaker review.
+  README, user guide and installation guide in the ten languages (added the same day, at the owner’s request; S-076).
+  **Not done:** mirrored layout, native-speaker review.
 - **Persistence across versions:** already how the product works (settings are outside the version folders and survive
   install-over, repair and uninstall unless removal is chosen); what was missing was the language for the setup programs.
 - **Contribution:** `bd02322` on `origin/main` (README note mentions languages), merged locally as `1ffd850`. Nothing else pushed (D65).
 
 **Next:** the owner installs test 4.7 and tries: the weather in the Top Bar, switching between applications (corners), the
-height of maximized pages, a language other than French (and Windows' own language list), Arabic or Urdu for the look.
-Then the README and guides in the new five languages if the owner wants them.
+height of maximized pages, a language other than French (and Windows' own language list), Arabic or Urdu for the look;
+on GitHub once pushed, a look at the Arabic and Urdu README pages (right-to-left blocks).
 
 ## Earlier — Alpha 4, test 4.6: text Top Bar, corners redone, elastic Dock drag (`0.4.0-alpha.4`, D71–D73, S-074, 2026-11-10)
 

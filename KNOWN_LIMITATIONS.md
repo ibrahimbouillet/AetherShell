@@ -23,8 +23,9 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   languages that is one of the ten; a private profile started with `--data-dir` is not read by them. Windows' own windows
   (notifications, Quick Settings, Settings) keep Windows' language. Arabic and Urdu read right to left in the text drawn by
   Aether Shell (shaping, alignment); the layout of the bars, the Dock and the panels is not mirrored, and the standard
-  Windows controls inside Settings and setup keep their left-to-right layout. The documentation (README, user guide,
-  installation guide) is translated into English, French, Spanish, Chinese and Hindi only; the engineering documents stay in
+  Windows controls inside Settings and setup keep their left-to-right layout. The user documentation (README, user guide,
+  installation guide) is in all ten languages (the new five since 2026-11-13, unreviewed; their right-to-left pages rely on
+  GitHub honouring `dir="rtl"`); known limitations, release notes, the changelog and the engineering documents stay in
   English.
 - Alpha 4 Search (D68, S-072): files come from Windows' own index, so only what Windows Search has indexed in the person's
   folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive) is found, by name, never by content; with
