@@ -1099,7 +1099,7 @@ void SettingsWindow::Impl::BuildPage() {
         BeginSection(L"Greeting");
         Check(L"Show the welcome at sign-in and unlock", L"It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.",
               [](const Settings& s){return s.welcome.enabled;}, [](Settings& s,bool v){s.welcome.enabled=v;});
-        Choice(L"Greeting language", L"Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in Chinese and Hindi it greets in English.",
+        Choice(L"Greeting language", L"Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.",
                {L"Follow Windows",L"Fran\u00e7ais",L"English",L"Espa\u00f1ol"},
                [](const Settings& s){return s.welcome.language;}, [](Settings& s,int v){s.welcome.language=static_cast<GreetingLanguage>(v);});
         BeginSection(L"Your name");
@@ -1151,14 +1151,15 @@ void SettingsWindow::Impl::BuildPage() {
         Check(L"Add newly discovered Windows taskbar pins", L"While the taskbar is replaced, new Windows pins are added to the Dock.",
               [](const Settings& s){return s.general.syncTaskbarPins;}, [](Settings& s,bool v){s.general.syncTaskbarPins=v;});
     } else if (page == SettingsPage::Language) {
-        // D70: the interface in five languages, each named in its own language; the change applies at once.
+        // D70/D74: the interface in ten languages, each named in its own language; the change applies at once and is
+        // kept in settings.json, which every version reads.
         header(L"Language", L"The language of the bars, menus, Search, Settings and setup.");
         BeginSection(L"Interface language");
         std::vector<std::wstring> languages{L"Follow Windows"};
         for (const auto& language : i18n::Languages()) languages.emplace_back(language.nativeName);
-        Choice(L"Interface language", L"Follow Windows uses the Windows display language when it is one of these, and English otherwise.",
+        Choice(L"Interface language", L"Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.",
                std::move(languages), [](const Settings& s){return s.general.language;},
-               [](Settings& s,int v){s.general.language=static_cast<InterfaceLanguage>(std::clamp(v, 0, 5));});
+               [](Settings& s,int v){s.general.language=static_cast<InterfaceLanguage>(std::clamp(v, 0, static_cast<int>(i18n::kLanguageCount)));});
         TextRow(L"Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. "
                 L"With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.");
         TextRow(L"The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.");

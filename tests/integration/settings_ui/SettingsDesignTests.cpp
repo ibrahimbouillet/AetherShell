@@ -157,7 +157,7 @@ constexpr const char* kPageNames[] = {"dock", "topbar", "weather", "updates", "g
 
 // D70: the longer and the differently shaped texts of each language still fit, page by page, and every page's entry is
 // in the navigation.
-AETHER_TEST("settings design: every page lays out without overlap in each of the five languages") {
+AETHER_TEST("settings design: every page lays out without overlap in each of the ten languages") {
     Fixture f("settings-design-languages");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());

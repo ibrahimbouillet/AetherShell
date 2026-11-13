@@ -148,6 +148,9 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - **D71–D73 (2026-11-10): test 4.6, committed locally and packaged at the owner's word** (first withheld, then asked
   for). Not pushed (D65) and not installed. When the owner says not to deliver a round, D57's commit-and-build waits for
   their word.
+- **D74–D76 (2026-11-13): test 4.7** (weather, corners kept between windows, ten languages) is committed locally and
+  packaged under D57. Not pushed (D65) and not installed. The owner's one-commit-a-day contribution (2026-11-10, `bd02322`)
+  was made on `origin/main` alone, from a scratch index, without any Alpha 4 commit.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.

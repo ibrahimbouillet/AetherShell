@@ -6,6 +6,7 @@
 #include "AetherTest.h"
 
 #include "core/Json.h"
+#include "core/Localization.h"
 #include "settings/SettingsSerialization.h"
 
 #include <algorithm>
@@ -149,6 +150,16 @@ AETHER_TEST("settings schema: new enums use stable lower-case JSON names") {
     CHECK_EQ(Member(settings, "general", "language"), std::string("hindi"));
     CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"language":"chinese"}})").value.general.language, InterfaceLanguage::Chinese);
     CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"general":{"language":"klingon"}})").value.general.language, InterfaceLanguage::Automatic);
+    // D74: the ten languages, in core/Localization's order after Automatic, written with the names setup, the updater and
+    // the launcher read back (i18n::SavedChoice).
+    for (std::size_t index = 0; index < i18n::kLanguageCount; ++index) {
+        const auto& info = i18n::Info(static_cast<i18n::Language>(index));
+        const auto chosen = static_cast<InterfaceLanguage>(index + 1);
+        settings.general.language = chosen;
+        CHECK_EQ(Member(settings, "general", "language"), std::string(info.savedName));
+        const std::string text = "{\"dock\":{\"metricsVersion\":2},\"general\":{\"language\":\"" + std::string(info.savedName) + "\"}}";
+        CHECK_EQ(ParseText(text.c_str()).value.general.language, chosen);
+    }
     CHECK_EQ(ParseText(R"({"dock":{"metricsVersion":2},"welcome":{"language":"spanish"}})").value.welcome.language, GreetingLanguage::Spanish);
     // D67: Liquid's blur layer, its cover and its color, in plain words; out of range is brought back.
     CHECK_EQ(Member(settings, "general", "liquidTint"), std::string("automatic"));

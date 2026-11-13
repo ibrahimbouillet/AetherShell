@@ -6,477 +6,877 @@ fr: Installation d'Aether Shell
 es: Instalación de Aether Shell
 zh: Aether Shell 安装程序
 hi: Aether Shell सेटअप
+pt: Instalação do Aether Shell
+ru: Установка Aether Shell
+ar: إعداد Aether Shell
+bn: Aether Shell সেটআপ
+ur: Aether Shell سیٹ اپ
 
 en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
 fr: L'installation n'a pas pu créer son interface. Fermez-la et réessayez, ou utilisez les options d'installation silencieuse documentées.
 es: La instalación no pudo crear su interfaz. Ciérrala y vuelve a intentarlo, o usa las opciones de instalación silenciosa documentadas.
 zh: 安装程序无法创建界面。请关闭后重试，或使用文档中说明的静默安装选项。
 hi: सेटअप अपना इंटरफ़ेस नहीं बना सका। इसे बंद करके फिर कोशिश करें, या दस्तावेज़ में दिए साइलेंट सेटअप विकल्प उपयोग करें।
+pt: A instalação não conseguiu criar sua interface. Feche-a e tente novamente, ou use as opções de instalação silenciosa documentadas.
+ru: Программе установки не удалось создать свой интерфейс. Закройте её и повторите попытку или воспользуйтесь описанными параметрами тихой установки.
+ar: تعذّر على برنامج الإعداد إنشاء واجهته. أغلقه وأعد المحاولة، أو استخدم خيارات الإعداد الصامت الموثّقة.
+bn: সেটআপ তার ইন্টারফেস তৈরি করতে পারেনি। এটি বন্ধ করে আবার চেষ্টা করুন, অথবা নথিভুক্ত সাইলেন্ট সেটআপ বিকল্প ব্যবহার করুন।
+ur: سیٹ اپ اپنا انٹرفیس نہیں بنا سکا۔ اسے بند کر کے دوبارہ کوشش کریں، یا دستاویز شدہ خاموش سیٹ اپ اختیارات استعمال کریں۔
 
 en: Options
 fr: Options
 es: Opciones
 zh: 选项
 hi: विकल्प
+pt: Opções
+ru: Параметры
+ar: الخيارات
+bn: বিকল্প
+ur: اختیارات
 
 en: Install
 fr: Installation
 es: Instalación
 zh: 安装
 hi: इंस्टॉल
+pt: Instalar
+ru: Установить
+ar: تثبيت
+bn: ইনস্টল
+ur: انسٹال کریں
 
 en: Done
 fr: Terminé
 es: Listo
 zh: 完成
 hi: पूरा
+pt: Concluído
+ru: Готово
+ar: تم
+bn: সম্পন্ন
+ur: مکمل
 
 en: Remove Aether Shell
 fr: Supprimer Aether Shell
 es: Quitar Aether Shell
 zh: 移除 Aether Shell
 hi: Aether Shell हटाएँ
+pt: Remover o Aether Shell
+ru: Удалить Aether Shell
+ar: إزالة Aether Shell
+bn: Aether Shell সরান
+ur: Aether Shell ہٹائیں
 
 en: Repair Aether Shell
 fr: Réparer Aether Shell
 es: Reparar Aether Shell
 zh: 修复 Aether Shell
 hi: Aether Shell सुधारें
+pt: Reparar o Aether Shell
+ru: Восстановить Aether Shell
+ar: إصلاح Aether Shell
+bn: Aether Shell মেরামত করুন
+ur: Aether Shell کی مرمت کریں
 
 en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
 fr: Un Dock et une barre d'état en haut natifs pour Windows, qui fonctionnent aux côtés de l'Explorateur.
 es: Un Dock y una barra de estado superior nativos para Windows, que funcionan junto al Explorador.
 zh: 适用于 Windows 的原生程序坞和顶部状态栏，与资源管理器并行运行。
 hi: Windows के लिए एक मूल डॉक और शीर्ष स्टेटस बार, जो Explorer के साथ चलता है।
+pt: Um Dock nativo e uma Barra de Status superior para o Windows, funcionando junto com o Explorer.
+ru: Нативные Dock и верхняя панель состояния для Windows, работающие вместе с проводником.
+ar: Dock وشريط حالة علوي أصليان لنظام Windows، يعملان جنبًا إلى جنب مع مستكشف الملفات.
+bn: Windows-এর জন্য নেটিভ Dock ও উপরের স্ট্যাটাস বার, যা এক্সপ্লোরারের পাশাপাশি চলে।
+ur: Windows کے لیے مقامی Dock اور اوپری اسٹیٹس بار، جو ایکسپلورر کے ساتھ چلتے ہیں۔
 
 en: Replaces the Windows taskbar while it runs
 fr: Remplace la barre des tâches Windows pendant qu'il fonctionne
 es: Sustituye la barra de tareas de Windows mientras se ejecuta
 zh: 运行时替换 Windows 任务栏
 hi: चलते समय Windows टास्कबार की जगह लेता है
+pt: Substitui a barra de tarefas do Windows enquanto está em execução
+ru: Заменяет панель задач Windows, пока работает
+ar: يستبدل شريط مهام Windows أثناء تشغيله
+bn: চলার সময় Windows টাস্কবার প্রতিস্থাপন করে
+ur: چلنے کے دوران Windows ٹاسک بار کی جگہ لیتا ہے
 
 en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
 fr: Quittez Aether Shell, désactivez cette option dans Paramètres > Bureau, ou ouvrez « Restore Windows taskbar » dans le menu Démarrer pour retrouver la barre des tâches Windows.
 es: Sal de Aether Shell, desactívalo en Configuración > Escritorio, o abre «Restore Windows taskbar» en el menú Inicio para recuperar la barra de tareas de Windows.
 zh: 退出 Aether Shell、在“设置 > 桌面”中关闭此项，或在开始菜单中打开“Restore Windows taskbar”，即可找回 Windows 任务栏。
 hi: Windows टास्कबार वापस पाने के लिए Aether Shell बंद करें, सेटिंग्स > डेस्कटॉप में इसे बंद करें, या स्टार्ट मेनू में "Restore Windows taskbar" खोलें।
+pt: Encerre o Aether Shell, desative isto em Configurações > Área de trabalho, ou abra "Restaurar barra de tarefas do Windows" no menu Iniciar para recuperar a barra de tarefas do Windows.
+ru: Закройте Aether Shell, отключите это в параметрах > «Рабочий стол» или откройте «Восстановить панель задач Windows» в меню «Пуск», чтобы вернуть панель задач Windows.
+ar: أنهِ Aether Shell، أو أوقف هذا من الإعدادات > سطح المكتب، أو افتح "استعادة شريط مهام Windows" من قائمة ابدأ لإعادة شريط مهام Windows.
+bn: Windows টাস্কবার ফিরে পেতে Aether Shell বন্ধ করুন, সেটিংস > ডেস্কটপে এটি বন্ধ করুন, অথবা স্টার্ট মেনু থেকে "Windows টাস্কবার ফিরিয়ে আনুন" খুলুন।
+ur: Windows ٹاسک بار واپس پانے کے لیے Aether Shell بند کریں، ترتیبات > ڈیسک ٹاپ میں اسے بند کریں، یا اسٹارٹ مینو میں "Windows ٹاسک بار بحال کریں" کھولیں۔
 
 en: Starts when you sign in - your choice
 fr: Démarre à l'ouverture de session - à vous de choisir
 es: Se inicia al iniciar sesión - tú eliges
 zh: 登录时启动——由你选择
 hi: साइन इन पर शुरू होता है - आपकी पसंद
+pt: Inicia quando você entra - sua escolha
+ru: Запускается при входе — ваш выбор
+ar: يبدأ عند تسجيل دخولك - اختيارك
+bn: সাইন-ইনে চালু হয় - আপনার পছন্দ
+ur: سائن ان پر شروع ہوتا ہے - آپ کا انتخاب
 
 en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
 fr: Les nouvelles installations démarrent à l'ouverture de session par défaut. Vous pouvez décocher ce choix avant d'installer, ou le désactiver plus tard dans les Paramètres. Les choix de démarrage existants et les désactivations du Gestionnaire des tâches sont conservés.
 es: Las instalaciones nuevas se inician al iniciar sesión de forma predeterminada. Puedes desmarcar esa opción antes de instalar o desactivarla más tarde en Configuración. Se conservan las opciones de inicio existentes y las desactivaciones del Administrador de tareas.
 zh: 新安装默认在登录时启动。你可以在安装前取消该选项，或以后在设置中关闭。现有的启动选择和任务管理器中的禁用设置都会保留。
 hi: नए इंस्टॉलेशन डिफ़ॉल्ट रूप से साइन इन पर शुरू होते हैं। आप इंस्टॉल से पहले यह विकल्प हटा सकते हैं, या बाद में सेटिंग्स में बंद कर सकते हैं। मौजूदा स्टार्टअप विकल्प और टास्क मैनेजर में किए गए बंद बने रहते हैं।
+pt: Novas instalações iniciam no login por padrão. Você pode desmarcar essa escolha antes de instalar ou desativá-la depois nas Configurações. As escolhas de inicialização existentes e as desativações do Gerenciador de Tarefas são preservadas.
+ru: Новые установки по умолчанию запускаются при входе. Вы можете снять этот выбор перед установкой или отключить его позже в параметрах. Существующие настройки автозапуска и отключения в диспетчере задач сохраняются.
+ar: تبدأ التثبيتات الجديدة عند تسجيل الدخول افتراضيًا. يمكنك إلغاء هذا الاختيار قبل التثبيت أو إيقافه لاحقًا من الإعدادات. تُحفظ خيارات بدء التشغيل الحالية وحالات التعطيل من إدارة المهام.
+bn: নতুন ইনস্টলেশন ডিফল্টরূপে সাইন-ইনে চালু হয়। ইনস্টলের আগে এই পছন্দ বাদ দিতে পারেন, অথবা পরে সেটিংসে বন্ধ করতে পারেন। বিদ্যমান স্টার্টআপ পছন্দ ও টাস্ক ম্যানেজারে বন্ধ করা অবস্থা অক্ষুণ্ণ থাকে।
+ur: نئی انسٹالیشنز بطور ڈیفالٹ سائن ان پر شروع ہوتی ہیں۔ آپ انسٹال سے پہلے یہ انتخاب ہٹا سکتے ہیں یا بعد میں ترتیبات میں بند کر سکتے ہیں۔ موجودہ اسٹارٹ اپ انتخاب اور ٹاسک مینیجر میں بند کرنا برقرار رہتا ہے۔
 
 en: Installs for your account
 fr: S'installe pour votre compte
 es: Se instala para tu cuenta
 zh: 为你的帐户安装
 hi: आपके खाते के लिए इंस्टॉल होता है
+pt: Instala para a sua conta
+ru: Устанавливается для вашей учётной записи
+ar: يُثبَّت لحسابك
+bn: আপনার অ্যাকাউন্টের জন্য ইনস্টল হয়
+ur: آپ کے اکاؤنٹ کے لیے انسٹال ہوتا ہے
 
 en: No administrator rights are needed. Your settings and data stay in your user profile.
 fr: Aucun droit d'administrateur n'est nécessaire. Vos paramètres et vos données restent dans votre profil utilisateur.
 es: No se necesitan permisos de administrador. Tu configuración y tus datos se quedan en tu perfil de usuario.
 zh: 无需管理员权限。你的设置和数据都保存在你的用户配置文件中。
 hi: व्यवस्थापक अधिकारों की ज़रूरत नहीं। आपकी सेटिंग्स और डेटा आपकी उपयोगकर्ता प्रोफ़ाइल में रहते हैं।
+pt: Não são necessários direitos de administrador. Suas configurações e dados ficam no seu perfil de usuário.
+ru: Права администратора не требуются. Ваши параметры и данные хранятся в вашем профиле пользователя.
+ar: لا حاجة إلى صلاحيات المسؤول. تبقى إعداداتك وبياناتك في ملف المستخدم الخاص بك.
+bn: অ্যাডমিনিস্ট্রেটর অধিকার লাগে না। আপনার সেটিংস ও ডেটা আপনার ইউজার প্রোফাইলেই থাকে।
+ur: ایڈمنسٹریٹر کے حقوق درکار نہیں۔ آپ کی ترتیبات اور ڈیٹا آپ کے صارف پروفائل میں رہتے ہیں۔
 
 en: Uninstall keeps your settings and data unless you choose to remove them.
 fr: La désinstallation conserve vos paramètres et vos données, sauf si vous choisissez de les supprimer.
 es: La desinstalación conserva tu configuración y tus datos, salvo que elijas quitarlos.
 zh: 卸载会保留你的设置和数据，除非你选择删除它们。
 hi: अनइंस्टॉल आपकी सेटिंग्स और डेटा रखता है, जब तक आप उन्हें हटाना न चुनें।
+pt: A desinstalação mantém suas configurações e dados, a menos que você escolha removê-los.
+ru: При удалении ваши параметры и данные сохраняются, если вы не выберете их удаление.
+ar: تُبقي إزالة التثبيت إعداداتك وبياناتك ما لم تختر إزالتها.
+bn: আনইনস্টল করলে আপনার সেটিংস ও ডেটা থেকে যায়, যদি না আপনি সেগুলো মুছতে বেছে নেন।
+ur: اَن انسٹال کرنے پر آپ کی ترتیبات اور ڈیٹا برقرار رہتا ہے، جب تک آپ انہیں ہٹانا منتخب نہ کریں۔
 
 en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
 fr: La réparation rétablit les fichiers de ce paquet et conserve vos paramètres. Si Aether Shell a laissé la barre des tâches Windows masquée, la réparation la rétablit.
 es: La reparación restaura los archivos de este paquete y conserva tu configuración. Si Aether Shell dejó oculta la barra de tareas de Windows, la reparación la restaura.
 zh: 修复会还原此安装包的文件并保留你的设置。如果 Aether Shell 让 Windows 任务栏保持隐藏，修复也会将其恢复。
 hi: सुधार इस पैकेज की फ़ाइलें बहाल करता है और आपकी सेटिंग्स रखता है। अगर Aether Shell ने Windows टास्कबार छिपा छोड़ा हो, तो सुधार उसे बहाल करता है।
+pt: O reparo restaura os arquivos deste pacote e mantém suas configurações. Se o Aether Shell deixou a barra de tarefas do Windows oculta, o reparo a restaura.
+ru: Восстановление возвращает файлы этого пакета и сохраняет ваши параметры. Если Aether Shell оставил панель задач Windows скрытой, восстановление вернёт её.
+ar: يستعيد الإصلاح ملفات هذه الحزمة ويُبقي إعداداتك. وإذا ترك Aether Shell شريط مهام Windows مخفيًا فإن الإصلاح يعيده.
+bn: মেরামত এই প্যাকেজের ফাইল ফিরিয়ে আনে এবং আপনার সেটিংস রাখে। Aether Shell Windows টাস্কবার লুকানো অবস্থায় রেখে গেলে মেরামত সেটি ফিরিয়ে আনে।
+ur: مرمت اس پیکج کی فائلیں بحال کرتی ہے اور آپ کی ترتیبات برقرار رکھتی ہے۔ اگر Aether Shell نے Windows ٹاسک بار چھپا ہوا چھوڑ دیا ہو تو مرمت اسے بحال کر دیتی ہے۔
 
 en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
 fr: Installer par-dessus une version existante conserve vos paramètres. Un paquet plus ancien est refusé, sauf si vous autorisez explicitement un retour en arrière.
 es: Instalar sobre una versión existente conserva tu configuración. Se rechaza un paquete más antiguo, salvo que permitas expresamente volver a una versión anterior.
 zh: 覆盖安装现有版本会保留你的设置。较旧的安装包会被拒绝，除非你明确允许降级。
 hi: किसी मौजूदा संस्करण के ऊपर इंस्टॉल करने से आपकी सेटिंग्स बनी रहती हैं। पुराना पैकेज अस्वीकार किया जाता है, जब तक आप स्पष्ट रूप से डाउनग्रेड की अनुमति न दें।
+pt: Instalar sobre uma versão existente mantém suas configurações. Um pacote mais antigo é rejeitado, a menos que você permita explicitamente um downgrade.
+ru: Установка поверх существующей версии сохраняет ваши параметры. Более старый пакет отклоняется, если вы явно не разрешите переход на старую версию.
+ar: التثبيت فوق إصدار موجود يُبقي إعداداتك. ويُرفض الإصدار الأقدم ما لم تسمح صراحةً بالرجوع إلى إصدار أقدم.
+bn: বিদ্যমান সংস্করণের ওপর ইনস্টল করলে আপনার সেটিংস থাকে। পুরোনো প্যাকেজ প্রত্যাখ্যাত হয়, যদি না আপনি স্পষ্টভাবে ডাউনগ্রেডের অনুমতি দেন।
+ur: موجودہ ورژن پر انسٹال کرنے سے آپ کی ترتیبات برقرار رہتی ہیں۔ پرانا پیکج مسترد کر دیا جاتا ہے جب تک آپ ڈاؤن گریڈ کی واضح اجازت نہ دیں۔
 
 en: MIT License
 fr: Licence MIT
 es: Licencia MIT
 zh: MIT 许可证
 hi: MIT लाइसेंस
+pt: Licença MIT
+ru: Лицензия MIT
+ar: ترخيص MIT
+bn: MIT লাইসেন্স
+ur: MIT لائسنس
 
 en: The licence is also installed as LICENSE next to Aether Shell.
 fr: La licence est aussi installée sous le nom LICENSE à côté d'Aether Shell.
 es: La licencia también se instala como LICENSE junto a Aether Shell.
 zh: 许可证也会以 LICENSE 文件的形式安装在 Aether Shell 旁边。
 hi: लाइसेंस Aether Shell के पास LICENSE नाम से भी इंस्टॉल होता है।
+pt: A licença também é instalada como LICENSE ao lado do Aether Shell.
+ru: Лицензия также устанавливается как файл LICENSE рядом с Aether Shell.
+ar: يُثبَّت الترخيص أيضًا باسم LICENSE بجوار Aether Shell.
+bn: লাইসেন্সটি LICENSE নামে Aether Shell-এর পাশেও ইনস্টল করা হয়।
+ur: لائسنس LICENSE کے نام سے Aether Shell کے ساتھ بھی انسٹال ہوتا ہے۔
 
 en: Remove this installation
 fr: Supprimer cette installation
 es: Quitar esta instalación
 zh: 移除此安装
 hi: यह इंस्टॉलेशन हटाएँ
+pt: Remover esta instalação
+ru: Удалить эту установку
+ar: إزالة هذا التثبيت
+bn: এই ইনস্টলেশন সরান
+ur: یہ انسٹالیشن ہٹائیں
 
 en: Install location
 fr: Emplacement d'installation
 es: Ubicación de instalación
 zh: 安装位置
 hi: इंस्टॉल का स्थान
+pt: Local de instalação
+ru: Папка установки
+ar: موقع التثبيت
+bn: ইনস্টলের স্থান
+ur: انسٹالیشن کی جگہ
 
 en: &Browse...
 fr: &Parcourir...
 es: &Examinar...
 zh: 浏览(&B)...
 hi: ब्राउज़ करें(&B)...
+pt: &Procurar...
+ru: &Обзор...
+ar: استعراض... (&B)
+bn: ব্রাউজ করুন... (&B)
+ur: براؤز کریں... (&B)
 
 en: Also remove my settings, cache and logs
 fr: Supprimer aussi mes paramètres, le cache et les journaux
 es: Quitar también mi configuración, la caché y los registros
 zh: 同时删除我的设置、缓存和日志
 hi: मेरी सेटिंग्स, कैश और लॉग भी हटाएँ
+pt: Remover também minhas configurações, cache e logs
+ru: Также удалить мои параметры, кэш и журналы
+ar: إزالة إعداداتي والذاكرة المؤقتة والسجلات أيضًا
+bn: আমার সেটিংস, ক্যাশ ও লগও সরান
+ur: میری ترتیبات، کیش اور لاگز بھی ہٹائیں
 
 en: This cannot be undone.
 fr: Cette action est irréversible.
 es: Esto no se puede deshacer.
 zh: 此操作无法撤销。
 hi: इसे पूर्ववत नहीं किया जा सकता।
+pt: Isso não pode ser desfeito.
+ru: Это действие нельзя отменить.
+ar: لا يمكن التراجع عن هذا.
+bn: এটি আর ফেরানো যাবে না।
+ur: اسے واپس نہیں کیا جا سکتا۔
 
 en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
 fr: L'installation fermera proprement Aether Shell et supprimera ses fichiers installés, ses raccourcis, son entrée de démarrage et son inscription dans les applications installées. Les autres applications et les paramètres de Windows ne sont pas touchés.
 es: La instalación cerrará Aether Shell de forma ordenada y quitará sus archivos instalados, accesos directos, entrada de inicio y registro en Aplicaciones instaladas. No se tocan otras aplicaciones ni la configuración de Windows.
 zh: 安装程序会正常关闭 Aether Shell，并删除其已安装的文件、快捷方式、启动项以及“已安装的应用”中的注册。其他应用和 Windows 设置不受影响。
 hi: सेटअप Aether Shell को ठीक से बंद करेगा और उसकी इंस्टॉल की गई फ़ाइलें, शॉर्टकट, स्टार्टअप प्रविष्टि और इंस्टॉल किए गए ऐप्स का पंजीकरण हटाएगा। दूसरे ऐप्लिकेशन और Windows सेटिंग्स नहीं छुए जाते।
+pt: A instalação fechará o Aether Shell normalmente e removerá seus arquivos instalados, atalhos, entrada de inicialização e registro em Aplicativos instalados. Outros aplicativos e configurações do Windows não são alterados.
+ru: Программа установки штатно закроет Aether Shell и удалит его установленные файлы, ярлыки, запись автозапуска и регистрацию в разделе «Установленные приложения». Другие приложения и параметры Windows не затрагиваются.
+ar: سيغلق برنامج الإعداد Aether Shell بسلاسة ويزيل ملفاته المثبتة واختصاراته وإدخال بدء التشغيل وتسجيله في التطبيقات المثبتة. أما التطبيقات الأخرى وإعدادات Windows فلا تُمسّ.
+bn: সেটআপ Aether Shell স্বাভাবিকভাবে বন্ধ করে এর ইনস্টল করা ফাইল, শর্টকাট, স্টার্টআপ এন্ট্রি এবং ইনস্টল করা অ্যাপে নিবন্ধন সরিয়ে দেবে। অন্যান্য অ্যাপ ও Windows সেটিংস অক্ষত থাকবে।
+ur: سیٹ اپ Aether Shell کو شائستگی سے بند کرے گا اور اس کی انسٹال شدہ فائلیں، شارٹ کٹس، اسٹارٹ اپ اندراج اور انسٹال شدہ ایپس میں رجسٹریشن ہٹا دے گا۔ دیگر ایپس اور Windows کی ترتیبات کو نہیں چھیڑا جاتا۔
 
 en: Your welcome
 fr: Votre accueil
 es: Tu bienvenida
 zh: 你的欢迎问候
 hi: आपका स्वागत
+pt: Suas boas-vindas
+ru: Ваше приветствие
+ar: ترحيبك
+bn: আপনার স্বাগতম
+ur: آپ کا خیرمقدم
 
 en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
 fr: Après l'ouverture de session ou le déverrouillage de votre PC, Aether Shell écrit un court message à la main. Tapez le prénom avec lequel il doit vous saluer, ou laissez vide pour un simple bonjour.
 es: Al iniciar sesión o desbloquear el PC, Aether Shell escribe a mano un breve saludo. Escribe el nombre con el que debe saludarte, o déjalo vacío para un simple hola.
 zh: 登录或解锁电脑后，Aether Shell 会手写一段简短的问候。输入它问候你时使用的名字，或留空以简单地打招呼。
 hi: साइन इन करने या PC अनलॉक करने के बाद Aether Shell हाथ से एक छोटा अभिवादन लिखता है। वह नाम लिखें जिससे वह आपको अभिवादन करे, या सिर्फ़ नमस्ते के लिए खाली छोड़ें।
+pt: Depois que você entra ou desbloqueia o PC, o Aether Shell escreve uma breve saudação à mão. Digite o nome com que ele deve cumprimentar você ou deixe vazio para um simples olá.
+ru: После входа или разблокировки ПК Aether Shell от руки пишет короткое приветствие. Введите имя, по которому к вам обращаться, или оставьте поле пустым для простого приветствия.
+ar: بعد تسجيل الدخول أو فتح قفل الكمبيوتر يكتب Aether Shell تحية قصيرة بخط اليد. اكتب الاسم الذي يحيّيك به، أو اتركه فارغًا لتحية بسيطة.
+bn: আপনি সাইন ইন বা পিসি আনলক করার পর Aether Shell হাতে একটি ছোট অভিবাদন লেখে। যে নামে অভিবাদন জানাবে সেটি লিখুন, অথবা সাধারণ হ্যালোর জন্য খালি রাখুন।
+ur: سائن ان یا پی سی ان لاک کرنے کے بعد Aether Shell ہاتھ سے ایک مختصر سلامی لکھتا ہے۔ وہ نام لکھیں جس سے وہ آپ کو سلام کرے، یا سادہ سلام کے لیے خالی چھوڑ دیں۔
 
 en: Your first name
 fr: Votre prénom
 es: Tu nombre
 zh: 你的名字
 hi: आपका पहला नाम
+pt: Seu primeiro nome
+ru: Ваше имя
+ar: اسمك الأول
+bn: আপনার প্রথম নাম
+ur: آپ کا پہلا نام
 
 en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
 fr: Facultatif, par exemple un prénom. Il reste sur ce PC dans vos paramètres d'Aether Shell et n'est jamais envoyé nulle part. Modifiez-le, ou désactivez l'accueil, dans Paramètres > Bienvenue.
 es: Opcional, por ejemplo un nombre de pila. Se queda en este PC, en tu configuración de Aether Shell, y nunca se envía a ningún sitio. Cámbialo o desactiva la bienvenida en Configuración > Bienvenida.
 zh: 可选，例如名字。它只保存在这台电脑的 Aether Shell 设置中，绝不会发送到任何地方。可在“设置 > 欢迎”中更改，或关闭欢迎问候。
 hi: वैकल्पिक, जैसे कोई पहला नाम। यह इसी PC पर आपकी Aether Shell सेटिंग्स में रहता है और कभी कहीं नहीं भेजा जाता। इसे बदलें या स्वागत बंद करें: सेटिंग्स > स्वागत।
+pt: Opcional, por exemplo um primeiro nome. Ele fica neste PC, nas suas configurações do Aether Shell, e nunca é enviado a lugar nenhum. Altere-o, ou desative as boas-vindas, em Configurações > Boas-vindas.
+ru: Необязательно, например имя. Оно хранится на этом ПК в ваших параметрах Aether Shell и никуда не отправляется. Изменить его или отключить приветствие можно в разделе «Параметры» > «Приветствие».
+ar: اختياري، مثل اسمك الأول. يبقى على هذا الكمبيوتر في إعدادات Aether Shell الخاصة بك ولا يُرسل إلى أي مكان. غيّره أو أوقف الترحيب من الإعدادات > الترحيب.
+bn: ঐচ্ছিক, যেমন প্রথম নাম। এটি এই পিসিতে আপনার Aether Shell সেটিংসে থাকে এবং কোথাও পাঠানো হয় না। এটি বদলাতে বা স্বাগতম বন্ধ করতে সেটিংস > স্বাগতমে যান।
+ur: اختیاری، مثلاً پہلا نام۔ یہ اس پی سی پر آپ کی Aether Shell ترتیبات میں رہتا ہے اور کہیں نہیں بھیجا جاتا۔ اسے بدلیں یا خیرمقدم بند کریں: ترتیبات > خوش آمدید میں۔
 
 en: Shortcuts and startup
 fr: Raccourcis et démarrage
 es: Accesos directos e inicio
 zh: 快捷方式和启动
 hi: शॉर्टकट और स्टार्टअप
+pt: Atalhos e inicialização
+ru: Ярлыки и автозапуск
+ar: الاختصارات وبدء التشغيل
+bn: শর্টকাট ও স্টার্টআপ
+ur: شارٹ کٹس اور اسٹارٹ اپ
 
 en: Create Start menu shortcuts
 fr: Créer les raccourcis du menu Démarrer
 es: Crear accesos directos en el menú Inicio
 zh: 创建开始菜单快捷方式
 hi: स्टार्ट मेनू शॉर्टकट बनाएँ
+pt: Criar atalhos no menu Iniciar
+ru: Создать ярлыки в меню «Пуск»
+ar: إنشاء اختصارات في قائمة ابدأ
+bn: স্টার্ট মেনুতে শর্টকাট তৈরি করুন
+ur: اسٹارٹ مینو میں شارٹ کٹس بنائیں
 
 en: Aether Shell and Restore Windows taskbar.
 fr: Aether Shell et Restore Windows taskbar.
 es: Aether Shell y Restore Windows taskbar.
 zh: Aether Shell 和 Restore Windows taskbar。
 hi: Aether Shell और Restore Windows taskbar।
+pt: Aether Shell e Restaurar barra de tarefas do Windows.
+ru: Aether Shell и «Восстановить панель задач Windows».
+ar: Aether Shell و"استعادة شريط مهام Windows".
+bn: Aether Shell এবং Windows টাস্কবার ফিরিয়ে আনুন।
+ur: Aether Shell اور Windows ٹاسک بار بحال کریں۔
 
 en: Create a desktop shortcut
 fr: Créer un raccourci sur le bureau
 es: Crear un acceso directo en el escritorio
 zh: 创建桌面快捷方式
 hi: डेस्कटॉप शॉर्टकट बनाएँ
+pt: Criar um atalho na área de trabalho
+ru: Создать ярлык на рабочем столе
+ar: إنشاء اختصار على سطح المكتب
+bn: ডেস্কটপে একটি শর্টকাট তৈরি করুন
+ur: ڈیسک ٹاپ پر شارٹ کٹ بنائیں
 
 en: Shows your current choice.
 fr: Affiche votre choix actuel.
 es: Muestra tu elección actual.
 zh: 显示你当前的选择。
 hi: आपकी मौजूदा पसंद दिखाता है।
+pt: Mostra a sua escolha atual.
+ru: Показывает ваш текущий выбор.
+ar: يعرض اختيارك الحالي.
+bn: আপনার বর্তমান পছন্দ দেখায়।
+ur: آپ کا موجودہ انتخاب دکھاتا ہے۔
 
 en: Recommended.
 fr: Recommandé.
 es: Recomendado.
 zh: 推荐。
 hi: अनुशंसित।
+pt: Recomendado.
+ru: Рекомендуется.
+ar: موصى به.
+bn: প্রস্তাবিত।
+ur: تجویز کردہ۔
 
 en: Clear it to opt out; Task Manager disables are respected.
 fr: Décochez pour refuser ; les désactivations du Gestionnaire des tâches sont respectées.
 es: Desmárcalo para no participar; se respetan las desactivaciones del Administrador de tareas.
 zh: 取消勾选即可不启用；任务管理器中的禁用设置会被尊重。
 hi: न चाहें तो इसे हटाएँ; टास्क मैनेजर में किए गए बंद का सम्मान होता है।
+pt: Desmarque para optar por sair; as desativações do Gerenciador de Tarefas são respeitadas.
+ru: Снимите флажок, чтобы отказаться; отключения в диспетчере задач учитываются.
+ar: ألغِ التحديد لعدم الاشتراك؛ وتُحترم حالات التعطيل من إدارة المهام.
+bn: বাদ দিতে অচিহ্নিত করুন; টাস্ক ম্যানেজারে বন্ধ করা অবস্থা মানা হয়।
+ur: باہر رہنے کے لیے نشان ہٹا دیں؛ ٹاسک مینیجر میں بند کرنے کا احترام کیا جاتا ہے۔
 
 en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
 fr: Installer accepte le choix de démarrage ci-dessus. Le lanceur peut redémarrer Aether Shell après un plantage, avec un nombre limité de tentatives. Quitter et Restore Windows taskbar restent disponibles. La météo est désactivée par défaut. Des fichiers non signés peuvent déclencher un avertissement Windows SmartScreen.
 es: Al instalar aceptas la opción de inicio anterior. El iniciador puede reiniciar Aether Shell tras un fallo, con un número limitado de intentos. Salir y Restore Windows taskbar siguen disponibles. El tiempo está desactivado de forma predeterminada. Los archivos sin firmar pueden provocar una advertencia de Windows SmartScreen.
 zh: 安装即表示接受上方的启动选择。启动器可在崩溃后重新启动 Aether Shell，重试次数有限。“退出”和“Restore Windows taskbar”始终可用。天气默认关闭。未签名的程序可能会触发 Windows SmartScreen 警告。
 hi: इंस्टॉल करना ऊपर दिए स्टार्टअप विकल्प को स्वीकार करता है। क्रैश के बाद लॉन्चर Aether Shell को सीमित प्रयासों के साथ फिर शुरू कर सकता है। बंद करना और Restore Windows taskbar उपलब्ध रहते हैं। मौसम डिफ़ॉल्ट रूप से बंद है। बिना हस्ताक्षर वाली फ़ाइलें Windows SmartScreen चेतावनी दिखा सकती हैं।
+pt: Instalar aceita a escolha de inicialização acima. O iniciador pode reiniciar o Aether Shell após uma falha, com um limite de tentativas. Encerrar e Restaurar barra de tarefas do Windows continuam disponíveis. O clima vem desativado por padrão. Binários não assinados podem acionar um aviso do Windows SmartScreen.
+ru: Установка принимает выбор автозапуска, сделанный выше. Загрузчик может перезапустить Aether Shell после сбоя с ограниченным числом попыток. Команды «Выйти» и «Восстановить панель задач Windows» остаются доступными. Погода по умолчанию выключена. Неподписанные файлы могут вызвать предупреждение Windows SmartScreen.
+ar: يقبل التثبيت اختيار بدء التشغيل أعلاه. يمكن للمشغّل إعادة تشغيل Aether Shell بعد تعطّله، بحدّ أقصى لعدد المحاولات. ويظل "إنهاء" و"استعادة شريط مهام Windows" متاحين. الطقس متوقف افتراضيًا. قد تُظهر الملفات غير الموقّعة تحذير Windows SmartScreen.
+bn: ইনস্টল করলে ওপরের স্টার্টআপ পছন্দ গৃহীত হয়। ক্র্যাশের পর লঞ্চার সীমিত সংখ্যক পুনঃচেষ্টায় Aether Shell আবার চালু করতে পারে। বের হওয়া এবং Windows টাস্কবার ফিরিয়ে আনা উপলব্ধ থাকে। আবহাওয়া ডিফল্টে বন্ধ। স্বাক্ষরহীন বাইনারি Windows SmartScreen সতর্কতা দেখাতে পারে।
+ur: انسٹال اوپر کا اسٹارٹ اپ انتخاب قبول کرتا ہے۔ لانچر کریش کے بعد Aether Shell کو محدود کوششوں کے ساتھ دوبارہ شروع کر سکتا ہے۔ بند کرنا اور Windows ٹاسک بار بحال کرنا دستیاب رہتے ہیں۔ موسم بطور ڈیفالٹ بند ہے۔ بغیر دستخط والی بائنریز Windows SmartScreen کی وارننگ دے سکتی ہیں۔
 
 en: Removing this installation...
 fr: Suppression de cette installation...
 es: Quitando esta instalación...
 zh: 正在移除此安装...
 hi: यह इंस्टॉलेशन हटाया जा रहा है...
+pt: Removendo esta instalação...
+ru: Удаление этой установки...
+ar: جارٍ إزالة هذا التثبيت...
+bn: এই ইনস্টলেশন সরানো হচ্ছে...
+ur: یہ انسٹالیشن ہٹائی جا رہی ہے...
 
 en: Repairing Aether Shell...
 fr: Réparation d'Aether Shell...
 es: Reparando Aether Shell...
 zh: 正在修复 Aether Shell...
 hi: Aether Shell सुधारा जा रहा है...
+pt: Reparando o Aether Shell...
+ru: Восстановление Aether Shell...
+ar: جارٍ إصلاح Aether Shell...
+bn: Aether Shell মেরামত করা হচ্ছে...
+ur: Aether Shell کی مرمت ہو رہی ہے...
 
 en: Installing Aether Shell...
 fr: Installation d'Aether Shell...
 es: Instalando Aether Shell...
 zh: 正在安装 Aether Shell...
 hi: Aether Shell इंस्टॉल हो रहा है...
+pt: Instalando o Aether Shell...
+ru: Установка Aether Shell...
+ar: جارٍ تثبيت Aether Shell...
+bn: Aether Shell ইনস্টল করা হচ্ছে...
+ur: Aether Shell انسٹال ہو رہا ہے...
 
 en: Closing Aether Shell and removing its files.
 fr: Fermeture d'Aether Shell et suppression de ses fichiers.
 es: Cerrando Aether Shell y quitando sus archivos.
 zh: 正在关闭 Aether Shell 并删除其文件。
 hi: Aether Shell बंद करके उसकी फ़ाइलें हटाई जा रही हैं।
+pt: Fechando o Aether Shell e removendo seus arquivos.
+ru: Закрытие Aether Shell и удаление его файлов.
+ar: جارٍ إغلاق Aether Shell وإزالة ملفاته.
+bn: Aether Shell বন্ধ করে এর ফাইল সরানো হচ্ছে।
+ur: Aether Shell بند کر کے اس کی فائلیں ہٹائی جا رہی ہیں۔
 
 en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
 fr: Vérification du paquet intégré et installation de ses fichiers. La progression est indiquée comme une activité : l'installation ne connaît pas le temps restant.
 es: Verificando el paquete integrado e instalando sus archivos. El progreso se muestra como actividad: la instalación no sabe el tiempo restante.
 zh: 正在验证内置的安装包并安装其文件。进度仅显示为活动状态：安装程序不知道剩余时间。
 hi: अंतर्निहित पैकेज सत्यापित करके उसकी फ़ाइलें इंस्टॉल की जा रही हैं। प्रगति गतिविधि के रूप में दिखती है: सेटअप को बचा हुआ समय नहीं पता।
+pt: Verificando o pacote incorporado e instalando seus arquivos. O progresso é mostrado como atividade: a instalação não sabe o tempo restante.
+ru: Проверка встроенного пакета и установка его файлов. Ход показан как активность: программа установки не знает, сколько времени осталось.
+ar: جارٍ التحقق من الحزمة المضمّنة وتثبيت ملفاتها. يُعرض التقدم كنشاط: فبرنامج الإعداد لا يعرف الوقت المتبقي.
+bn: এম্বেড করা প্যাকেজ যাচাই করে এর ফাইল ইনস্টল করা হচ্ছে। অগ্রগতি কার্যকলাপ হিসেবে দেখানো হয়: সেটআপ বাকি সময় জানে না।
+ur: شامل پیکج کی تصدیق کر کے اس کی فائلیں انسٹال کی جا رہی ہیں۔ پیش رفت سرگرمی کے طور پر دکھائی جاتی ہے: سیٹ اپ کو باقی وقت معلوم نہیں۔
 
 en: Please wait while the removal completes.
 fr: Veuillez patienter pendant la suppression.
 es: Espera mientras termina la eliminación.
 zh: 请等待移除完成。
 hi: हटाना पूरा होने तक कृपया प्रतीक्षा करें।
+pt: Aguarde enquanto a remoção é concluída.
+ru: Подождите, пока завершится удаление.
+ar: يرجى الانتظار حتى تكتمل الإزالة.
+bn: অপসারণ শেষ হওয়া পর্যন্ত অপেক্ষা করুন।
+ur: براہ کرم انتظار کریں جب تک ہٹانا مکمل ہو۔
 
 en: Cancel is available until the new version is activated; then setup finishes safely.
 fr: Annuler reste possible jusqu'à l'activation de la nouvelle version ; ensuite, l'installation se termine en toute sécurité.
 es: Puedes cancelar hasta que se active la nueva versión; después, la instalación termina de forma segura.
 zh: 在新版本激活之前都可以取消；之后安装程序会安全地完成。
 hi: नया संस्करण सक्रिय होने तक रद्द किया जा सकता है; फिर सेटअप सुरक्षित रूप से पूरा होता है।
+pt: Cancelar fica disponível até a nova versão ser ativada; depois disso a instalação termina com segurança.
+ru: Отмена доступна, пока новая версия не активирована; затем установка безопасно завершается.
+ar: يظل الإلغاء متاحًا إلى أن يتم تنشيط الإصدار الجديد؛ وبعدها يُنهي برنامج الإعداد عمله بأمان.
+bn: নতুন সংস্করণ সক্রিয় না হওয়া পর্যন্ত বাতিল করা যায়; তারপর সেটআপ নিরাপদে শেষ হয়।
+ur: نیا ورژن فعال ہونے تک منسوخ کرنا ممکن ہے؛ اس کے بعد سیٹ اپ محفوظ طریقے سے مکمل ہوتا ہے۔
 
 en: Aether Shell was uninstalled.
 fr: Aether Shell a été désinstallé.
 es: Aether Shell se ha desinstalado.
 zh: 已卸载 Aether Shell。
 hi: Aether Shell अनइंस्टॉल हो गया।
+pt: O Aether Shell foi desinstalado.
+ru: Aether Shell удалён.
+ar: تمت إزالة تثبيت Aether Shell.
+bn: Aether Shell আনইনস্টল করা হয়েছে।
+ur: Aether Shell اَن انسٹال ہو گیا۔
 
 en: Aether Shell is ready.
 fr: Aether Shell est prêt.
 es: Aether Shell está listo.
 zh: Aether Shell 已准备就绪。
 hi: Aether Shell तैयार है।
+pt: O Aether Shell está pronto.
+ru: Aether Shell готов к работе.
+ar: Aether Shell جاهز.
+bn: Aether Shell প্রস্তুত।
+ur: Aether Shell تیار ہے۔
 
 en: Setup was cancelled.
 fr: L'installation a été annulée.
 es: Se canceló la instalación.
 zh: 安装已取消。
 hi: सेटअप रद्द किया गया।
+pt: A instalação foi cancelada.
+ru: Установка отменена.
+ar: تم إلغاء الإعداد.
+bn: সেটআপ বাতিল করা হয়েছে।
+ur: سیٹ اپ منسوخ کر دیا گیا۔
 
 en: Setup could not complete.
 fr: L'installation n'a pas pu aboutir.
 es: No se pudo completar la instalación.
 zh: 安装无法完成。
 hi: सेटअप पूरा नहीं हो सका।
+pt: Não foi possível concluir a instalação.
+ru: Не удалось завершить установку.
+ar: تعذّر إكمال الإعداد.
+bn: সেটআপ সম্পন্ন করা যায়নি।
+ur: سیٹ اپ مکمل نہیں ہو سکا۔
 
 en: Your data was kept unless you explicitly chose to remove it.
 fr: Vos données ont été conservées, sauf si vous avez explicitement choisi de les supprimer.
 es: Tus datos se han conservado, salvo que hayas elegido expresamente quitarlos.
 zh: 除非你明确选择删除，否则你的数据都已保留。
 hi: आपका डेटा रखा गया, जब तक आपने उसे हटाना स्पष्ट रूप से न चुना हो।
+pt: Seus dados foram mantidos, a menos que você tenha escolhido explicitamente removê-los.
+ru: Ваши данные сохранены, если вы явно не выбрали их удаление.
+ar: تم الاحتفاظ ببياناتك ما لم تختر إزالتها صراحةً.
+bn: আপনি স্পষ্টভাবে মুছতে না চাইলে আপনার ডেটা রাখা হয়েছে।
+ur: آپ کا ڈیٹا برقرار رکھا گیا ہے، جب تک آپ نے اسے ہٹانے کا واضح انتخاب نہ کیا ہو۔
 
 en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
 fr: Vous pouvez le réparer ou le désinstaller depuis Paramètres Windows > Applications > Applications installées.
 es: Puedes repararlo o desinstalarlo desde Configuración de Windows > Aplicaciones > Aplicaciones instaladas.
 zh: 你可以在 Windows 设置 > 应用 > 已安装的应用 中修复或卸载它。
 hi: आप इसे Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स से सुधार या अनइंस्टॉल कर सकते हैं।
+pt: Você pode repará-lo ou desinstalá-lo em Configurações do Windows > Aplicativos > Aplicativos instalados.
+ru: Его можно восстановить или удалить в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+ar: يمكنك إصلاحه أو إزالة تثبيته من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+bn: Windows সেটিংস > অ্যাপ > ইনস্টল করা অ্যাপ থেকে এটি মেরামত বা আনইনস্টল করতে পারেন।
+ur: آپ اسے Windows کی ترتیبات > ایپس > انسٹال شدہ ایپس سے مرمت یا اَن انسٹال کر سکتے ہیں۔
 
 en: The operation was cancelled before activation. Go back to Options to try again.
 fr: L'opération a été annulée avant l'activation. Revenez aux options pour réessayer.
 es: La operación se canceló antes de la activación. Vuelve a Opciones para intentarlo de nuevo.
 zh: 操作在激活前已取消。返回“选项”即可重试。
 hi: सक्रिय होने से पहले कार्य रद्द किया गया। फिर कोशिश करने के लिए विकल्पों पर वापस जाएँ।
+pt: A operação foi cancelada antes da ativação. Volte para Opções para tentar novamente.
+ru: Операция отменена до активации. Вернитесь к параметрам, чтобы повторить попытку.
+ar: تم إلغاء العملية قبل التنشيط. ارجع إلى الخيارات لإعادة المحاولة.
+bn: সক্রিয় করার আগেই কাজটি বাতিল হয়েছে। আবার চেষ্টা করতে বিকল্পে ফিরে যান।
+ur: عمل فعال ہونے سے پہلے منسوخ ہو گیا۔ دوبارہ کوشش کے لیے اختیارات پر واپس جائیں۔
 
 en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
 fr: Vérifiez l'accès aux fichiers et l'espace disque libre, puis réessayez. Si Aether Shell est déjà présent, la réparation peut rétablir ses fichiers. Catégorie d'erreur : {}
 es: Comprueba el acceso a los archivos y el espacio libre en disco, y vuelve a intentarlo. Si Aether Shell ya está instalado, la reparación puede restaurar sus archivos. Categoría del error: {}
 zh: 请检查文件访问权限和可用磁盘空间，然后重试。如果已安装 Aether Shell，修复可以还原其文件。错误类别：{}
 hi: फ़ाइल पहुँच और खाली डिस्क जगह जाँचें, फिर कोशिश करें। अगर Aether Shell पहले से है, तो सुधार उसकी फ़ाइलें बहाल कर सकता है। त्रुटि श्रेणी: {}
+pt: Verifique o acesso aos arquivos e o espaço livre em disco e tente novamente. Se o Aether Shell já estiver presente, o Reparo pode restaurar seus arquivos. Categoria do erro: {}
+ru: Проверьте доступ к файлам и свободное место на диске, затем повторите попытку. Если Aether Shell уже установлен, «Восстановление» может вернуть его файлы. Категория ошибки: {}
+ar: تحقق من الوصول إلى الملفات والمساحة الحرة على القرص ثم أعد المحاولة. وإذا كان Aether Shell موجودًا بالفعل فيمكن للإصلاح استعادة ملفاته. فئة الخطأ: {}
+bn: ফাইল অ্যাক্সেস ও ডিস্কের খালি জায়গা পরীক্ষা করে আবার চেষ্টা করুন। Aether Shell আগে থেকে থাকলে মেরামত এর ফাইল ফিরিয়ে আনতে পারে। ত্রুটির বিভাগ: {}
+ur: فائل تک رسائی اور ڈسک کی خالی جگہ جانچیں، پھر دوبارہ کوشش کریں۔ اگر Aether Shell پہلے سے موجود ہو تو مرمت اس کی فائلیں بحال کر سکتی ہے۔ خرابی کی قسم: {}
 
 en: Setup log
 fr: Journal d'installation
 es: Registro de instalación
 zh: 安装日志
 hi: सेटअप लॉग
+pt: Log da instalação
+ru: Журнал установки
+ar: سجل الإعداد
+bn: সেটআপ লগ
+ur: سیٹ اپ لاگ
 
 en: Launch Aether Shell
 fr: Lancer Aether Shell
 es: Abrir Aether Shell
 zh: 启动 Aether Shell
 hi: Aether Shell शुरू करें
+pt: Iniciar o Aether Shell
+ru: Запустить Aether Shell
+ar: تشغيل Aether Shell
+bn: Aether Shell চালু করুন
+ur: Aether Shell شروع کریں
 
 en: &Back
 fr: &Précédent
 es: &Atrás
 zh: 上一步(&B)
 hi: पीछे(&B)
+pt: &Voltar
+ru: &Назад
+ar: رجوع (&B)
+bn: পিছনে (&B)
+ur: پیچھے (&B)
 
 en: &Next
 fr: &Suivant
 es: &Siguiente
 zh: 下一步(&N)
 hi: आगे(&N)
+pt: &Avançar
+ru: &Далее
+ar: التالي (&N)
+bn: পরবর্তী (&N)
+ur: آگے (&N)
 
 en: &Continue
 fr: &Continuer
 es: &Continuar
 zh: 继续(&C)
 hi: जारी रखें(&C)
+pt: &Continuar
+ru: &Продолжить
+ar: متابعة (&C)
+bn: চালিয়ে যান (&C)
+ur: جاری رکھیں (&C)
 
 en: &Uninstall
 fr: &Désinstaller
 es: &Desinstalar
 zh: 卸载(&U)
 hi: अनइंस्टॉल करें(&U)
+pt: &Desinstalar
+ru: &Удалить
+ar: إلغاء التثبيت (&U)
+bn: আনইনস্টল (&U)
+ur: اَن انسٹال (&U)
 
 en: &Repair
 fr: &Réparer
 es: &Reparar
 zh: 修复(&R)
 hi: सुधारें(&R)
+pt: &Reparar
+ru: &Восстановить
+ar: إصلاح (&R)
+bn: মেরামত (&R)
+ur: مرمت (&R)
 
 en: &Install
 fr: &Installer
 es: &Instalar
 zh: 安装(&I)
 hi: इंस्टॉल करें(&I)
+pt: &Instalar
+ru: &Установить
+ar: تثبيت (&I)
+bn: ইনস্টল (&I)
+ur: انسٹال (&I)
 
 en: &Close
 fr: &Fermer
 es: &Cerrar
 zh: 关闭(&C)
 hi: बंद करें(&C)
+pt: &Fechar
+ru: &Закрыть
+ar: إغلاق (&C)
+bn: বন্ধ করুন (&C)
+ur: بند کریں (&C)
 
 en: Step {} of {}: {}
 fr: Étape {} sur {} : {}
 es: Paso {} de {}: {}
 zh: 第 {} 步，共 {} 步：{}
 hi: चरण {} / {}: {}
+pt: Etapa {} de {}: {}
+ru: Шаг {} из {}: {}
+ar: الخطوة {} من {}: {}
+bn: ধাপ {}/{}: {}
+ur: مرحلہ {} از {}: {}
 
 en: Choose the Aether Shell installation folder
 fr: Choisissez le dossier d'installation d'Aether Shell
 es: Elige la carpeta de instalación de Aether Shell
 zh: 选择 Aether Shell 的安装文件夹
 hi: Aether Shell का इंस्टॉल फ़ोल्डर चुनें
+pt: Escolha a pasta de instalação do Aether Shell
+ru: Выберите папку установки Aether Shell
+ar: اختر مجلد تثبيت Aether Shell
+bn: Aether Shell ইনস্টলের ফোল্ডার বেছে নিন
+ur: Aether Shell کی انسٹالیشن کا فولڈر منتخب کریں
 
 en: Choose a complete folder path, for example one that starts with a drive letter.
 fr: Choisissez un chemin de dossier complet, par exemple qui commence par une lettre de lecteur.
 es: Elige una ruta de carpeta completa, por ejemplo una que empiece por una letra de unidad.
 zh: 请选择完整的文件夹路径，例如以驱动器号开头的路径。
 hi: पूरा फ़ोल्डर पथ चुनें, जैसे कोई ड्राइव अक्षर से शुरू होने वाला।
+pt: Escolha um caminho de pasta completo, por exemplo um que comece com uma letra de unidade.
+ru: Укажите полный путь к папке, например начинающийся с буквы диска.
+ar: اختر مسار مجلد كاملًا، مثل مسار يبدأ بحرف محرك أقراص.
+bn: একটি সম্পূর্ণ ফোল্ডার পাথ বেছে নিন, যেমন ড্রাইভ অক্ষর দিয়ে শুরু হওয়া পাথ।
+ur: مکمل فولڈر کا راستہ منتخب کریں، مثلاً جو ڈرائیو کے حرف سے شروع ہو۔
 
 en: The install folder must be an absolute path.
 fr: Le dossier d'installation doit être un chemin absolu.
 es: La carpeta de instalación debe ser una ruta absoluta.
 zh: 安装文件夹必须是绝对路径。
 hi: इंस्टॉल फ़ोल्डर एक पूर्ण पथ होना चाहिए।
+pt: A pasta de instalação deve ser um caminho absoluto.
+ru: Папка установки должна быть указана абсолютным путём.
+ar: يجب أن يكون مجلد التثبيت مسارًا مطلقًا.
+bn: ইনস্টল ফোল্ডার অবশ্যই একটি পূর্ণ পাথ হতে হবে।
+ur: انسٹالیشن فولڈر مکمل (ایبسولیوٹ) راستہ ہونا چاہیے۔
 
 en: Setup stops at the next safe point.
 fr: L'installation s'arrête au prochain point sûr.
 es: La instalación se detiene en el siguiente punto seguro.
 zh: 安装程序将在下一个安全点停止。
 hi: सेटअप अगले सुरक्षित बिंदु पर रुकता है।
+pt: A instalação para no próximo ponto seguro.
+ru: Установка остановится в ближайшей безопасной точке.
+ar: سيتوقف برنامج الإعداد عند أقرب نقطة آمنة.
+bn: সেটআপ পরবর্তী নিরাপদ পর্যায়ে থামবে।
+ur: سیٹ اپ اگلے محفوظ مقام پر رک جائے گا۔
 
 en: Cancelling...
 fr: Annulation...
 es: Cancelando...
 zh: 正在取消...
 hi: रद्द हो रहा है...
+pt: Cancelando...
+ru: Отмена...
+ar: جارٍ الإلغاء...
+bn: বাতিল করা হচ্ছে...
+ur: منسوخ کیا جا رہا ہے...
 
 en: Setup is finishing the current step safely; please wait.
 fr: L'installation termine l'étape en cours en toute sécurité ; veuillez patienter.
 es: La instalación está terminando el paso actual de forma segura; espera, por favor.
 zh: 安装程序正在安全地完成当前步骤；请稍候。
 hi: सेटअप मौजूदा चरण सुरक्षित रूप से पूरा कर रहा है; कृपया प्रतीक्षा करें।
+pt: A instalação está concluindo a etapa atual com segurança; aguarde.
+ru: Программа установки безопасно завершает текущий шаг; подождите.
+ar: يُنهي برنامج الإعداد الخطوة الحالية بأمان؛ يرجى الانتظار.
+bn: সেটআপ বর্তমান ধাপ নিরাপদে শেষ করছে; অপেক্ষা করুন।
+ur: سیٹ اپ موجودہ مرحلہ محفوظ طریقے سے مکمل کر رہا ہے؛ براہ کرم انتظار کریں۔
 
 en: Updating Aether Shell
 fr: Mise à jour d'Aether Shell
 es: Actualizando Aether Shell
 zh: 正在更新 Aether Shell
 hi: Aether Shell अपडेट हो रहा है
+pt: Atualizando o Aether Shell
+ru: Обновление Aether Shell
+ar: جارٍ تحديث Aether Shell
+bn: Aether Shell হালনাগাদ হচ্ছে
+ur: Aether Shell اپ ڈیٹ ہو رہا ہے
 
 en: Verifying the signed package and applying the update.
 fr: Vérification du paquet signé et application de la mise à jour.
 es: Verificando el paquete firmado y aplicando la actualización.
 zh: 正在验证签名的安装包并应用更新。
 hi: हस्ताक्षरित पैकेज सत्यापित करके अपडेट लागू किया जा रहा है।
+pt: Verificando o pacote assinado e aplicando a atualização.
+ru: Проверка подписанного пакета и применение обновления.
+ar: جارٍ التحقق من الحزمة الموقّعة وتطبيق التحديث.
+bn: স্বাক্ষরিত প্যাকেজ যাচাই করে আপডেট প্রয়োগ করা হচ্ছে।
+ur: دستخط شدہ پیکج کی تصدیق اور اپ ڈیٹ کا اطلاق ہو رہا ہے۔
 
 en: Update completed
 fr: Mise à jour terminée
 es: Actualización completada
 zh: 更新已完成
 hi: अपडेट पूरा हुआ
+pt: Atualização concluída
+ru: Обновление завершено
+ar: اكتمل التحديث
+bn: আপডেট সম্পন্ন হয়েছে
+ur: اپ ڈیٹ مکمل ہو گئی
 
 en: The update did not complete
 fr: La mise à jour n'a pas abouti
 es: La actualización no se completó
 zh: 更新未完成
 hi: अपडेट पूरा नहीं हुआ
+pt: A atualização não foi concluída
+ru: Обновление не завершено
+ar: لم يكتمل التحديث
+bn: আপডেট সম্পন্ন হয়নি
+ur: اپ ڈیٹ مکمل نہیں ہوئی
 
 en: Close
 fr: Fermer
 es: Cerrar
 zh: 关闭
 hi: बंद करें
+pt: Fechar
+ru: Закрыть
+ar: إغلاق
+bn: বন্ধ করুন
+ur: بند کریں
 
 en: The update interface could not start. The update has not been applied. Try again or use Repair.
 fr: L'interface de mise à jour n'a pas pu démarrer. La mise à jour n'a pas été appliquée. Réessayez ou utilisez la réparation.
 es: No se pudo iniciar la interfaz de actualización. No se ha aplicado la actualización. Vuelve a intentarlo o usa Reparar.
 zh: 无法启动更新界面。更新未应用。请重试或使用“修复”。
 hi: अपडेट इंटरफ़ेस शुरू नहीं हो सका। अपडेट लागू नहीं हुआ। फिर कोशिश करें या सुधार का उपयोग करें।
+pt: A interface de atualização não pôde iniciar. A atualização não foi aplicada. Tente novamente ou use o Reparo.
+ru: Не удалось запустить интерфейс обновления. Обновление не применено. Повторите попытку или воспользуйтесь восстановлением.
+ar: تعذّر بدء واجهة التحديث. لم يتم تطبيق التحديث. أعد المحاولة أو استخدم الإصلاح.
+bn: আপডেটের ইন্টারফেস চালু করা যায়নি। আপডেট প্রয়োগ হয়নি। আবার চেষ্টা করুন বা মেরামত ব্যবহার করুন।
+ur: اپ ڈیٹ انٹرفیس شروع نہیں ہو سکا۔ اپ ڈیٹ لاگو نہیں ہوئی۔ دوبارہ کوشش کریں یا مرمت استعمال کریں۔
 
 en: Aether Shell Update
 fr: Mise à jour d'Aether Shell
 es: Actualización de Aether Shell
 zh: Aether Shell 更新
 hi: Aether Shell अपडेट
+pt: Atualização do Aether Shell
+ru: Обновление Aether Shell
+ar: تحديث Aether Shell
+bn: Aether Shell আপডেট
+ur: Aether Shell اپ ڈیٹ
 
 en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
 fr: L'interface de mise à jour n'a pas pu démarrer. La mise à jour n'a pas été appliquée. Réessayez ou utilisez la réparation dans Paramètres Windows > Applications > Applications installées.
 es: No se pudo iniciar la interfaz de actualización. No se ha aplicado la actualización. Vuelve a intentarlo o usa Reparar en Configuración de Windows > Aplicaciones > Aplicaciones instaladas.
 zh: 无法启动更新界面。更新未应用。请重试，或在 Windows 设置 > 应用 > 已安装的应用 中使用“修复”。
 hi: अपडेट इंटरफ़ेस शुरू नहीं हो सका। अपडेट लागू नहीं हुआ। फिर कोशिश करें या Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स में सुधार का उपयोग करें।
+pt: A interface de atualização não pôde iniciar. A atualização não foi aplicada. Tente novamente ou use o Reparo em Configurações do Windows > Aplicativos > Aplicativos instalados.
+ru: Не удалось запустить интерфейс обновления. Обновление не применено. Повторите попытку или воспользуйтесь восстановлением в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+ar: تعذّر بدء واجهة التحديث. لم يتم تطبيق التحديث. أعد المحاولة أو استخدم الإصلاح من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+bn: আপডেটের ইন্টারফেস চালু করা যায়নি। আপডেট প্রয়োগ হয়নি। আবার চেষ্টা করুন বা Windows সেটিংস > অ্যাপ > ইনস্টল করা অ্যাপে মেরামত ব্যবহার করুন।
+ur: اپ ڈیٹ انٹرفیس شروع نہیں ہو سکا۔ اپ ڈیٹ لاگو نہیں ہوئی۔ دوبارہ کوشش کریں یا Windows کی ترتیبات > ایپس > انسٹال شدہ ایپس میں مرمت استعمال کریں۔
 
 en: Update completed.
 fr: Mise à jour terminée.
 es: Actualización completada.
 zh: 更新已完成。
 hi: अपडेट पूरा हुआ।
+pt: Atualização concluída.
+ru: Обновление завершено.
+ar: اكتمل التحديث.
+bn: আপডেট সম্পন্ন হয়েছে।
+ur: اپ ڈیٹ مکمل ہو گئی۔
 
 en: Update did not complete. See the updater log or use Repair.
 fr: La mise à jour n'a pas abouti. Consultez le journal de mise à jour ou utilisez la réparation.
 es: La actualización no se completó. Consulta el registro de actualización o usa Reparar.
 zh: 更新未完成。请查看更新日志或使用“修复”。
 hi: अपडेट पूरा नहीं हुआ। अपडेटर लॉग देखें या सुधार का उपयोग करें।
+pt: A atualização não foi concluída. Veja o log do atualizador ou use o Reparo.
+ru: Обновление не завершено. Загляните в журнал программы обновления или воспользуйтесь восстановлением.
+ar: لم يكتمل التحديث. راجع سجل المحدّث أو استخدم الإصلاح.
+bn: আপডেট সম্পন্ন হয়নি। আপডেটারের লগ দেখুন বা মেরামত ব্যবহার করুন।
+ur: اپ ڈیٹ مکمل نہیں ہوئی۔ اپ ڈیٹر کا لاگ دیکھیں یا مرمت استعمال کریں۔
 
 en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
 fr: Aether Shell n'a pas pu démarrer. Choisissez Réparer dans Paramètres Windows > Applications > Applications installées.
 es: Aether Shell no pudo iniciarse. Elige Reparar en Configuración de Windows > Aplicaciones > Aplicaciones instaladas.
 zh: Aether Shell 无法启动。请在 Windows 设置 > 应用 > 已安装的应用 中选择“修复”。
 hi: Aether Shell शुरू नहीं हो सका। Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स में सुधार चुनें।
+pt: Não foi possível iniciar o Aether Shell. Escolha Reparar em Configurações do Windows > Aplicativos > Aplicativos instalados.
+ru: Не удалось запустить Aether Shell. Выберите «Восстановить» в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+ar: تعذّر بدء Aether Shell. اختر إصلاح من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+bn: Aether Shell চালু করা যায়নি। Windows সেটিংস > অ্যাপ > ইনস্টল করা অ্যাপে মেরামত বেছে নিন।
+ur: Aether Shell شروع نہیں ہو سکا۔ Windows کی ترتیبات > ایپس > انسٹال شدہ ایپس میں مرمت منتخب کریں۔
 
 en: Aether Shell Settings — update in progress
 fr: Paramètres d'Aether Shell — mise à jour en cours
 es: Configuración de Aether Shell — actualización en curso
 zh: Aether Shell 设置——正在更新
 hi: Aether Shell सेटिंग्स — अपडेट चल रहा है
+pt: Configurações do Aether Shell — atualização em andamento
+ru: Параметры Aether Shell — идёт обновление
+ar: إعدادات Aether Shell — التحديث قيد التنفيذ
+bn: Aether Shell সেটিংস — আপডেট চলছে
+ur: Aether Shell کی ترتیبات — اپ ڈیٹ جاری ہے

@@ -128,7 +128,9 @@ template <> struct EnumNames<InterfaceLanguage> {
     static constexpr std::array values{std::pair{InterfaceLanguage::Automatic, "automatic"},
         std::pair{InterfaceLanguage::English, "english"}, std::pair{InterfaceLanguage::French, "french"},
         std::pair{InterfaceLanguage::Spanish, "spanish"}, std::pair{InterfaceLanguage::Chinese, "chinese"},
-        std::pair{InterfaceLanguage::Hindi, "hindi"}};
+        std::pair{InterfaceLanguage::Hindi, "hindi"}, std::pair{InterfaceLanguage::Portuguese, "portuguese"},
+        std::pair{InterfaceLanguage::Russian, "russian"}, std::pair{InterfaceLanguage::Arabic, "arabic"},
+        std::pair{InterfaceLanguage::Bengali, "bengali"}, std::pair{InterfaceLanguage::Urdu, "urdu"}};
 };
 template <> struct EnumNames<ThemePreference> {
     static constexpr std::array values{std::pair{ThemePreference::System, "system"},

@@ -2,6 +2,9 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "core/Localization.h"
 
+#include "core/FileSystem.h"
+#include "core/Json.h"
+
 #include <windows.h>
 
 #include <atomic>
@@ -21,11 +24,16 @@ constexpr Entry kCatalog[] = {
 };
 
 constexpr std::array<LanguageInfo, kLanguageCount> kLanguages{{
-    {Language::English, "en", L"English", L"English"},
-    {Language::French, "fr", L"Français", L"French"},
-    {Language::Spanish, "es", L"Español", L"Spanish"},
-    {Language::Chinese, "zh-Hans", L"中文（简体）", L"Chinese (Simplified)"},
-    {Language::Hindi, "hi", L"हिन्दी", L"Hindi"},
+    {Language::English, "en", L"English", L"English", "english", false},
+    {Language::French, "fr", L"Français", L"French", "french", false},
+    {Language::Spanish, "es", L"Español", L"Spanish", "spanish", false},
+    {Language::Chinese, "zh-Hans", L"中文（简体）", L"Chinese (Simplified)", "chinese", false},
+    {Language::Hindi, "hi", L"हिन्दी", L"Hindi", "hindi", false},
+    {Language::Portuguese, "pt", L"Português", L"Portuguese", "portuguese", false},
+    {Language::Russian, "ru", L"Русский", L"Russian", "russian", false},
+    {Language::Arabic, "ar", L"العربية", L"Arabic", "arabic", true},
+    {Language::Bengali, "bn", L"বাংলা", L"Bengali", "bengali", false},
+    {Language::Urdu, "ur", L"اردو", L"Urdu", "urdu", true},
 }};
 
 std::atomic<Language> gLanguage{Language::English};
@@ -70,11 +78,84 @@ std::optional<Language> FromLangId(std::uint16_t langId) noexcept {
         case LANG_SPANISH: return Language::Spanish;
         case LANG_CHINESE: return Language::Chinese;   // Traditional Chinese readers read the Simplified better than English
         case LANG_HINDI: return Language::Hindi;
+        case LANG_PORTUGUESE: return Language::Portuguese;
+        case LANG_RUSSIAN: return Language::Russian;
+        case LANG_ARABIC: return Language::Arabic;
+        case LANG_BENGALI: return Language::Bengali;
+        case LANG_URDU: return Language::Urdu;
         default: return std::nullopt;
     }
 }
 
-Language SystemLanguage() noexcept { return FromLangId(::GetUserDefaultUILanguage()).value_or(Language::English); }
+bool IsRightToLeft(Language language) noexcept { return Info(language).rightToLeft; }
+
+std::optional<Language> FromLocaleName(std::wstring_view name) noexcept {
+    const auto end = name.find_first_of(L"-_");
+    const auto primary = name.substr(0, end);
+    if (primary.size() < 2 || primary.size() > 3) return std::nullopt;
+    wchar_t lower[4]{};
+    for (std::size_t i = 0; i < primary.size(); ++i) {
+        const wchar_t c = primary[i];
+        lower[i] = (c >= L'A' && c <= L'Z') ? static_cast<wchar_t>(c + (L'a' - L'A')) : c;
+    }
+    const std::wstring_view code(lower, primary.size());
+    // The primary language subtag decides (Traditional Chinese readers read the Simplified better than English).
+    if (code == L"en") return Language::English;
+    if (code == L"fr") return Language::French;
+    if (code == L"es") return Language::Spanish;
+    if (code == L"zh") return Language::Chinese;
+    if (code == L"hi") return Language::Hindi;
+    if (code == L"pt") return Language::Portuguese;
+    if (code == L"ru") return Language::Russian;
+    if (code == L"ar") return Language::Arabic;
+    if (code == L"bn") return Language::Bengali;
+    if (code == L"ur") return Language::Urdu;
+    return std::nullopt;
+}
+
+Language SystemLanguage() noexcept {
+    try {
+        // Windows lets a person rank several display languages. The first of them that is one of the ten wins, so a
+        // person whose first language is not translated still gets their second one, not English.
+        ULONG count = 0, size = 0;
+        if (::GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &count, nullptr, &size) && size > 1 && size < 4096) {
+            std::wstring names(size, L'\0');
+            if (::GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &count, names.data(), &size)) {
+                for (const wchar_t* name = names.c_str(); *name; name += std::wstring_view(name).size() + 1) {
+                    if (const auto language = FromLocaleName(name)) return *language;
+                }
+            }
+        }
+    } catch (...) {
+    }
+    return FromLangId(::GetUserDefaultUILanguage()).value_or(Language::English);
+}
+
+std::optional<Language> SavedChoice(const std::filesystem::path& settingsFile) noexcept {
+    try {
+        constexpr std::uint64_t kLimit = 1024 * 1024;
+        auto text = fs::ReadFile(settingsFile, kLimit);
+        if (!text) return std::nullopt;
+        json::ParseOptions options;
+        options.maxInputBytes = kLimit;
+        options.maxDepth = 16;
+        auto parsed = json::Parse(*text, options);
+        if (!parsed || !parsed->IsObject()) return std::nullopt;
+        const auto* general = parsed->Find("general");
+        if (!general || !general->IsObject()) return std::nullopt;
+        const auto* saved = general->Find("language");
+        if (!saved || !saved->AsString()) return std::nullopt;
+        for (const auto& info : kLanguages)
+            if (info.savedName == *saved->AsString()) return info.language;
+        return std::nullopt;   // "automatic", or a name written by a newer version
+    } catch (...) {
+        return std::nullopt;
+    }
+}
+
+Language StartupLanguage(const std::filesystem::path& settingsFile) noexcept {
+    return SavedChoice(settingsFile).value_or(SystemLanguage());
+}
 
 void SetLanguage(Language language, bool chosen) noexcept {
     if (static_cast<std::size_t>(language) >= kLanguageCount) language = Language::English;
@@ -90,6 +171,11 @@ std::wstring_view FormattingLocale() noexcept {
         case Language::Spanish: return L"es-ES";
         case Language::Chinese: return L"zh-CN";
         case Language::Hindi: return L"hi-IN";
+        case Language::Portuguese: return L"pt-BR";
+        case Language::Russian: return L"ru-RU";
+        case Language::Arabic: return L"ar-SA";
+        case Language::Bengali: return L"bn-BD";
+        case Language::Urdu: return L"ur-PK";
     }
     return {};
 }

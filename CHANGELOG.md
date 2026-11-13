@@ -23,6 +23,10 @@ Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alph
   writes the Top Bar's date. Windows' tools and Settings pages are named in it and found by their name in any of the five.
   Names of applications, files and networks are never translated. The welcome can greet in Spanish ("Hola").
 - **The documentation in the five languages:** README, user guide and installation guide, with a language bar.
+- **Ten languages** (D74): Portuguese, Russian, Arabic, Bengali and Urdu join the five. "Follow Windows" now goes through
+  every display language the person ranked in Windows, not only the first; the language chosen in Settings is also read by
+  setup, the updater and the launcher, which read the settings file every version shares. Arabic and Urdu are shaped and
+  aligned right to left. Only the interface is translated into the new five; their documentation is still English.
 
 - **Two styles, Liquid and Grain** (Settings → Appearance → Style). Liquid draws the Dock and the Top Bar as glass over the
   page behind them, live: its colours and shapes show through, softened and a little livelier, kept in a band of brightness
@@ -55,6 +59,13 @@ Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alph
 
 ### Fixed
 
+- **The weather loaded nothing** (D75): Open-Meteo's compressed answers made WinHTTP's decoder abort mid-body ("operation
+  aborted"), so every request failed as a network error although the service was reachable. Requests to Open-Meteo now ask for
+  the plain answer (under 1 KB), the log names the real failure, and a Network test covers both Open-Meteo requests.
+- **Rounded corners no longer lag when a window comes back** (D76): a monitor whose front window stopped being maximized used to
+  lose its corner windows and rebuild them (a window, two shapes and about forty DWM thumbnails: 40 to 100 ms) when a maximized
+  window came back. The frames are now kept hidden and shown again (about 9 ms), shapes are built in one call, the two windows
+  are stacked in one operation, and the look at the windows stops once every monitor has its front window.
 - **A dragged Dock icon no longer leaves the Dock** (D73): pulled past an end, the Dock stretches after it like a rubber
   band, by a little over twenty pixels at most, and springs back with a bounce when the icon is let go.
 - With Auto-Hide on, the Dock and the Top Bar left at once after the greeting at an unlock, because the page left open covered

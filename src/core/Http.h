@@ -46,6 +46,11 @@ struct HttpRequest {
     int maxRedirects = 5;
 
     bool allowInsecureLoopback = false;
+
+    // False turns off WinHTTP's automatic gzip/deflate handling for this request. Needed for services whose
+    // compressed stream WinHTTP's decoder aborts on (Open-Meteo: E_ABORT while reading the body). Only for
+    // small bodies, where compression saves nothing.
+    bool allowCompression = true;
 };
 
 struct HttpResponse {

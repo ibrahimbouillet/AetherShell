@@ -3277,3 +3277,53 @@ language beyond the layout test; the setup run itself.
 `d99dd66b4d1485a86714d555aeaba468995c54aff35a4db3f1b4c93048ca76d0`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4`
 (privacy and source-freshness audit passed) from the tree this entry describes. Test 4.5's build moved to `dist/test-4.5/`
 (its hash checked against S-073's). Committed locally; not pushed, tagged, published or installed.
+
+### S-075 — Alpha 4, test 4.7: the weather works, corners kept between windows, ten languages (Claude, 2026-11-13)
+
+**What changed:** D75 (the weather), D76 (corner frames kept hidden between windows), D74 (ten languages, ranked Windows
+languages, the saved choice read by setup, the updater and the launcher). The owner also asked for the day's GitHub
+contribution (`bd02322`, README only, on `origin/main`; nothing of Alpha 4 pushed, D65) and the Dock's animation reservation
+was switched off in the owner's own `settings.json` (HANDOFF). Committed locally and packaged as test 4.7; not pushed, not
+installed (the installed version is still 4.6).
+
+**The weather, reproduced before it was changed.** The owner's log showed `transport error Network` 30 to 260 ms after each
+attempt (Windows location itself worked). `curl` reached Open-Meteo, so the fault was in the application's WinHTTP client. A
+Network test sending the weather's exact request (`tests/network/net/OpenMeteoReachabilityTests.cpp`) failed with `reading the
+response body ... Operation aborted (0x80004004)`, and an option matrix (HTTP/2 on or off, automatic decompression on or
+off, `Accept-Encoding` empty, `identity` or `gzip`) showed it fails **only with decompression on**, on both Open-Meteo hosts;
+the same client reads GitHub's JSON (10 KB) in either mode. After `HttpRequest::allowCompression = false` for the weather's
+requests: forecast HTTP 200 (404 bytes) and place search HTTP 200, 6 of 6 Network cases pass on the final build, the third
+recording that the compressed request still fails. **Not seen in the running application:** the Top Bar showing a temperature.
+
+**Corners, measured on the guard's own fixtures (Release, this PC), per look at the windows.** Before: first look 42 to 53 ms
+(creates the frame), a look that only moved the front window 1 to 8 ms, **100 ms** for the look that rebuilt the frame when a
+maximized window came back after a non-maximized one (window 12 ms, corner shape 14 ms, rim shape 12 ms, thumbnails 31 ms,
+stacking 15 ms). After: the same return **8.7 ms**; first look 54 ms; the others 1 to 4 ms. All four pixel cases pass
+(the live desktop in the corners pixel for pixel, including after their existing hide-then-show of the target, which now
+shows a kept frame again).
+
+| Check | Result |
+| --- | --- |
+| Build, Release, warnings as errors (`scripts/package.ps1`) | Pass (0 warnings) |
+| Non-network unit gate, this build's module set | 24/24 suites pass. S-074 counted 25: `showcase` is outside this build's module set and its code uses nothing changed here |
+| Unit, new or changed | core: ten languages, right-to-left flags, `FromLangId`, `FromLocaleName`, `SavedChoice`/`StartupLanguage` against files, formats in the new five; settings: every language's saved name round trip; catalog test now needs all ten columns non-empty |
+| Catalog check | 752 texts, ten columns, none untranslated; placeholders and access keys match the English |
+| Network (net) | 6/6 |
+| Native settings_ui | 16/16 for `settings design` (every page, every one of the ten languages, no overlap); whole suite 40/40 on a rerun. **One earlier whole-suite run failed that one case** (70 controls "outside the client width") while the same case passed alone twice and in the rerun; not reproduced, cause not established |
+| Native app, `window corners` | 9/10, then 10/10 on some runs: the case "a clip left by an earlier version's dead guard is removed once" fails intermittently. **Measured on the committed 4.6 guard too: 6 failures in 48 runs (12%); with this change 4 in 17 (24%, too few runs to tell the two apart).** Pre-existing race (it checks one property just after the other is removed); not caused by D76, not fixed |
+| Native topbar | 8/9 in the batch (`written on the desktop ... CHECK(material(*back) <= 2.0)`), the case passed twice alone; not reproduced, cause not established |
+| Native dock | 17/17 |
+
+**Found on the way:** a hand-typed Python heredoc with an odd number of apostrophes silently wrote nothing (see memory note);
+the first draft of the catalog's "Greeting language" help still said that only Chinese and Hindi greet in English (now:
+every language but French, English and Spanish).
+
+**Not executed, so not claimed:** the new guard and the weather on the owner's real desktop; any language by a native speaker
+(the seven that are not French, English or Spanish were never reviewed); Arabic and Urdu on the real bars and panels (only
+Settings' layout test ran them, and it checks overlap, not looks); Windows 10; the documentation of the new five languages
+(English); a second display; changing Windows' language list while the app runs.
+
+**Test build 4.7:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 9755648 bytes, SHA-256
+`41790ba4ca17d869ab5c7842e90a8d0d8e3f952a5237764d8b6a455ab147e837`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4`
+(privacy and source-freshness audit passed) from the tree this entry describes. Test 4.6's build moved to `dist/test-4.6/`.
+Committed locally; not pushed, tagged, published or installed.

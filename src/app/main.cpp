@@ -16,7 +16,10 @@
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     using namespace aether;
     try {
-        i18n::SetLanguage(i18n::SystemLanguage());   // D70: until Settings are read, the Windows display language
+        {   // D70/D74: until Settings are read, the language saved by the earlier run (any version), else Windows'
+            const auto root = platform::DefaultDataRoot();
+            i18n::SetLanguage(root ? i18n::StartupLanguage(*root / L"config" / L"settings.json") : i18n::SystemLanguage());
+        }
         const auto arguments = app::ProcessArguments();
         auto guard = app::DispatchWindowCornerGuard(arguments);
         if (!guard) return 2;

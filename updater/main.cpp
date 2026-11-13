@@ -4,6 +4,7 @@
 #include "core/Localization.h"
 #include "core/Strings.h"
 #include "diagnostics/Logger.h"
+#include "platform/windows/AppPaths.h"
 #include "platform/windows/SingleInstance.h"
 #include "platform/windows/DpiUtilities.h"
 #include "platform/windows/ComApartment.h"
@@ -169,7 +170,11 @@ LRESULT CALLBACK WindowProc(HWND window,UINT message,WPARAM wparam,LPARAM lparam
 }
 #ifndef AETHER_UPDATER_PRESENTATION_TEST
 int WINAPI wWinMain(HINSTANCE instance,HINSTANCE,PWSTR,int show) {
-    aether::i18n::SetLanguage(aether::i18n::SystemLanguage());   // D70
+    {   // D70/D74: the language chosen in Settings, else the Windows display language
+        const auto root = aether::platform::DefaultDataRoot();
+        aether::i18n::SetLanguage(root ? aether::i18n::StartupLanguage(*root / L"config" / L"settings.json")
+                                       : aether::i18n::SystemLanguage());
+    }
     using namespace aether;
     try {
         int count=0; auto* argv=::CommandLineToArgvW(::GetCommandLineW(),&count); if(!argv) return 2;

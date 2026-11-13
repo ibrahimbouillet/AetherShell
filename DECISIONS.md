@@ -111,6 +111,60 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D76 — Rounded corners are kept between windows instead of rebuilt (amends D72)
+
+Owner, 2026-11-10: "every time I go to a page it recalculates the rounded corners... it takes time". Measured with the
+guard's own integration fixtures (release build, this PC): a sweep that had to build a monitor's frame took 40 to 100 ms
+(window 12 ms, corner shape 14 ms, rim shape 12 ms, about forty DWM thumbnails 31 ms, stacking 15 ms); a sweep that only
+moved the front window took 1 to 4 ms. The expensive case was every return of a maximized window after a window that was
+not (the frame was destroyed when its monitor had no eligible window).
+
+- **Now:** a monitor with no eligible window keeps its frame, hidden; coming back costs about 9 ms. Frames start again only on
+  a display change, a scale change or an Explorer restart. The slow look-again timer runs only while something is shown.
+- **Also:** a shape is built with one `ExtCreateRegion` call instead of OR-ing rectangles one at a time; the two windows are
+  stacked and shown in one `DeferWindowPos` batch (separate calls as a fallback); the sweep stops once every monitor has its
+  front window and does not read windows behind it.
+- **Unchanged:** D72's rule that the guard writes to no application's window; the pixel tests (four corners over the live
+  desktop, rim, untouched targets) all pass.
+
+FR-036, T58, T60. Evidence: TEST_STATUS S-075. Not seen on the owner's desktop yet.
+
+### D75 — The weather: Open-Meteo is asked for the plain answer
+
+Owner, 2026-11-10: the weather "still does not work". The log showed `transport error Network` within 30 to 260 ms of every
+attempt, from Windows location (which worked) to retries. Reproduced with the application's own WinHTTP client in a Network
+test: `reading the response body ... Operation aborted (0x80004004)` whenever WinHTTP's automatic decompression was on, on
+both Open-Meteo hosts, over HTTP/1.1 and HTTP/2, with or without an `Accept-Encoding` header; with it off, HTTP 200. GitHub's
+answers (used by updates) are not affected.
+
+- **Now:** `HttpRequest::allowCompression` (default true) turns WinHTTP's decompression off for one request; the weather
+  module sets it false (the bodies are under 1 KB, so nothing is lost). The weather log names the failing step and host
+  (never the coordinates), where it said only "Network".
+- **Tests:** `tests/network/net/OpenMeteoReachabilityTests.cpp` (forecast and place search succeed; a third case records that
+  the compressed request still fails, so that the option can be reconsidered if WinHTTP is fixed).
+
+FR-010, T34, T60. Evidence: TEST_STATUS S-075.
+
+### D74 — The interface in ten languages, following Windows' ranked languages, remembered across versions (amends D70)
+
+Owner, 2026-11-10: more languages (ten), detected from the languages Windows offers, and the application must remember the
+person's choice, including from the folder of the previous version after an installation of a new one.
+
+- **Languages:** Portuguese, Russian, Arabic, Bengali and Urdu join English, Chinese (Simplified), Hindi, Spanish and French:
+  the ten most spoken languages (the continuation of D70's criterion). All 752 interface texts are translated into each
+  (`tools/i18n/catalog`, checked for `{}` placeholders and `&` access keys); Search, the Settings page and setup follow.
+- **Detection:** "Follow Windows" walks `GetUserPreferredUILanguages` (the display languages the person ranked in Windows) and
+  takes the first that is one of the ten; then the default display language; then English.
+- **Memory:** the choice is `general.language` in `%LOCALAPPDATA%\AetherShell\config\settings.json`, which no version folder
+  holds (uninstall keeps it unless removal is chosen), so every version reads it. Setup, the updater, the launcher and the
+  application's first message boxes now read it too (`i18n::StartupLanguage`) instead of only Windows' language.
+- **Right to left:** Arabic and Urdu set DirectWrite's reading direction in the shared text cache (shaping and alignment); the
+  layout of bars, Dock and panels is not mirrored (KNOWN_LIMITATIONS).
+- **Documentation:** README, user guide and installation guide are translated only into the first five (D70); the new five are
+  English there for now.
+
+FR-042, T56, T61. Evidence: TEST_STATUS S-075. No native speaker has reviewed the new translations.
+
 ### D73 — A dragged icon never leaves the Dock: it stretches after it, and springs back
 
 Owner, 2026-11-10, with a screenshot: an icon dragged in the Dock could be carried far to the side, out of the Dock,

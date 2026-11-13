@@ -5,1323 +5,2428 @@ fr: &Reprendre le remplacement de la barre des tâches
 es: &Reanudar la sustitución de la barra de tareas
 zh: 恢复替换任务栏(&R)
 hi: टास्कबार प्रतिस्थापन फिर शुरू करें(&R)
+pt: &Retomar a substituição da barra de tarefas
+ru: &Возобновить замену панели задач
+ar: استئناف استبدال شريط المهام (&R)
+bn: টাস্কবার প্রতিস্থাপন আবার শুরু করুন (&R)
+ur: ٹاسک بار کا متبادل دوبارہ شروع کریں (&R)
 
 en: Show Windows &notification area for 60 seconds
 fr: Afficher la zone de &notification de Windows pendant 60 secondes
 es: Mostrar el área de &notificación de Windows durante 60 segundos
 zh: 显示 Windows 通知区域 60 秒(&N)
 hi: Windows सूचना क्षेत्र 60 सेकंड के लिए दिखाएँ(&N)
+pt: Mostrar a área de &notificação do Windows por 60 segundos
+ru: Показать область &уведомлений Windows на 60 секунд
+ar: إظهار منطقة إشعارات Windows لمدة 60 ثانية (&N)
+bn: ৬০ সেকেন্ডের জন্য Windows নোটিফিকেশন এলাকা দেখান (&N)
+ur: 60 سیکنڈ کے لیے Windows نوٹیفکیشن ایریا دکھائیں (&N)
 
 en: &Search…
 fr: &Rechercher…
 es: &Buscar…
 zh: 搜索(&S)…
 hi: खोजें(&S)…
+pt: &Pesquisar…
+ru: &Поиск…
+ar: بحث… (&S)
+bn: অনুসন্ধান… (&S)
+ur: تلاش… (&S)
 
 en: &Settings…
 fr: &Paramètres…
 es: &Configuración…
 zh: 设置(&S)…
 hi: सेटिंग्स(&S)…
+pt: &Configurações…
+ru: &Параметры…
+ar: الإعدادات… (&E)
+bn: সেটিংস… (&E)
+ur: ترتیبات… (&E)
 
 en: View available &update…
 fr: Voir la mise à jour &disponible…
 es: Ver la &actualización disponible…
 zh: 查看可用更新(&U)…
 hi: उपलब्ध अपडेट देखें(&U)…
+pt: Ver &atualização disponível…
+ru: Показать доступное &обновление…
+ar: عرض التحديث المتاح… (&U)
+bn: উপলব্ধ আপডেট দেখুন… (&U)
+ur: دستیاب اپ ڈیٹ دیکھیں… (&U)
 
 en: &Check for updates…
 fr: Rechercher des &mises à jour…
 es: &Buscar actualizaciones…
 zh: 检查更新(&C)…
 hi: अपडेट जाँचें(&C)…
+pt: &Verificar atualizações…
+ru: &Проверить обновления…
+ar: التحقق من التحديثات… (&C)
+bn: আপডেট যাচাই করুন… (&C)
+ur: اپ ڈیٹس جانچیں… (&C)
 
 en: &About Aether Shell
 fr: À &propos d'Aether Shell
 es: &Acerca de Aether Shell
 zh: 关于 Aether Shell(&A)
 hi: Aether Shell के बारे में(&A)
+pt: &Sobre o Aether Shell
+ru: &О программе Aether Shell
+ar: حول Aether Shell (&A)
+bn: Aether Shell সম্পর্কে (&A)
+ur: Aether Shell کے بارے میں (&A)
 
 en: &Quit Aether Shell
 fr: &Quitter Aether Shell
 es: &Salir de Aether Shell
 zh: 退出 Aether Shell(&Q)
 hi: Aether Shell बंद करें(&Q)
+pt: &Sair do Aether Shell
+ru: &Выйти из Aether Shell
+ar: إنهاء Aether Shell (&Q)
+bn: Aether Shell থেকে বের হন (&Q)
+ur: Aether Shell بند کریں (&Q)
 
 en: Switch &input language\tWin+Space
 fr: Changer la langue de &saisie\tWin+Espace
 es: Cambiar el idioma de &entrada\tWin+Espacio
 zh: 切换输入语言(&I)\tWin+空格
 hi: इनपुट भाषा बदलें(&I)\tWin+Space
+pt: Alternar &idioma de entrada\tWin+Space
+ru: Переключить &язык ввода\tWin+Space
+ar: تبديل لغة الإدخال (&I)\tWin+Space
+bn: ইনপুট ভাষা পাল্টান (&I)\tWin+Space
+ur: ان پٹ زبان تبدیل کریں (&I)\tWin+Space
 
 en: Open &network controls…
 fr: Ouvrir les commandes &réseau…
 es: Abrir los controles de &red…
 zh: 打开网络控制(&N)…
 hi: नेटवर्क नियंत्रण खोलें(&N)…
+pt: Abrir os controles de &rede…
+ru: Открыть элементы управления &сетью…
+ar: فتح عناصر التحكم بالشبكة… (&N)
+bn: নেটওয়ার্ক কন্ট্রোল খুলুন… (&N)
+ur: نیٹ ورک کنٹرولز کھولیں… (&N)
 
 en: &Weather settings…
 fr: Paramètres &météo…
 es: Configuración del &tiempo…
 zh: 天气设置(&W)…
 hi: मौसम सेटिंग्स(&W)…
+pt: Configurações do &clima…
+ru: Параметры &погоды…
+ar: إعدادات الطقس… (&W)
+bn: আবহাওয়ার সেটিংস… (&W)
+ur: موسم کی ترتیبات… (&W)
 
 en: Toggle output &mute
 fr: Activer ou couper le &son
 es: Activar o silenciar el &sonido
 zh: 切换输出静音(&M)
 hi: आउटपुट म्यूट चालू/बंद करें(&M)
+pt: Alternar &mudo da saída
+ru: Включить или выключить &звук на выходе
+ar: تبديل كتم خرج الصوت (&M)
+bn: আউটপুট মিউট চালু/বন্ধ করুন (&M)
+ur: آؤٹ پٹ خاموش کرنا بدلیں (&M)
 
 en: &Sound settings…
 fr: Paramètres du s&on…
 es: Configuración de s&onido…
 zh: 声音设置(&S)…
 hi: ध्वनि सेटिंग्स(&S)…
+pt: Configurações de &som…
+ru: Параметры &звука…
+ar: إعدادات الصوت… (&S)
+bn: সাউন্ড সেটিংস… (&S)
+ur: آواز کی ترتیبات… (&S)
 
 en: Toggle microphone &mute
 fr: Activer ou couper le &microphone
 es: Activar o silenciar el &micrófono
 zh: 切换麦克风静音(&M)
 hi: माइक्रोफ़ोन म्यूट चालू/बंद करें(&M)
+pt: Alternar &mudo do microfone
+ru: Включить или выключить &микрофон
+ar: تبديل كتم الميكروفون (&M)
+bn: মাইক্রোফোন মিউট চালু/বন্ধ করুন (&M)
+ur: مائیکروفون خاموش کرنا بدلیں (&M)
 
 en: Start Windows &voice typing\tWin+H
 fr: Lancer la saisie &vocale de Windows\tWin+H
 es: Iniciar el dictado por &voz de Windows\tWin+H
 zh: 启动 Windows 语音输入(&V)\tWin+H
 hi: Windows वॉइस टाइपिंग शुरू करें(&V)\tWin+H
+pt: Iniciar a digitação por &voz do Windows\tWin+H
+ru: Запустить &голосовой ввод Windows\tWin+H
+ar: بدء الكتابة الصوتية في Windows (&V)\tWin+H
+bn: Windows ভয়েস টাইপিং চালু করুন (&V)\tWin+H
+ur: Windows وائس ٹائپنگ شروع کریں (&V)\tWin+H
 
 en: Microphone &privacy settings…
 fr: Paramètres de &confidentialité du microphone…
 es: Configuración de &privacidad del micrófono…
 zh: 麦克风隐私设置(&P)…
 hi: माइक्रोफ़ोन गोपनीयता सेटिंग्स(&P)…
+pt: Configurações de &privacidade do microfone…
+ru: Параметры &конфиденциальности микрофона…
+ar: إعدادات خصوصية الميكروفون… (&P)
+bn: মাইক্রোফোনের গোপনীয়তা সেটিংস… (&P)
+ur: مائیکروفون کی رازداری کی ترتیبات… (&P)
 
 en: &Power settings…
 fr: Paramètres d'&alimentation…
 es: Configuración de &energía…
 zh: 电源设置(&P)…
 hi: पावर सेटिंग्स(&P)…
+pt: Configurações de &energia…
+ru: Параметры &питания…
+ar: إعدادات الطاقة… (&P)
+bn: পাওয়ার সেটিংস… (&P)
+ur: پاور کی ترتیبات… (&P)
 
 en: Open &notifications and calendar
 fr: Ouvrir les &notifications et le calendrier
 es: Abrir las &notificaciones y el calendario
 zh: 打开通知和日历(&N)
 hi: सूचनाएँ और कैलेंडर खोलें(&N)
+pt: Abrir &notificações e calendário
+ru: Открыть &уведомления и календарь
+ar: فتح الإشعارات والتقويم (&N)
+bn: বিজ্ঞপ্তি ও ক্যালেন্ডার খুলুন (&N)
+ur: اطلاعات اور کیلنڈر کھولیں (&N)
 
 en: Open &calendar\tWin+Alt+D
 fr: Ouvrir le &calendrier\tWin+Alt+D
 es: Abrir el &calendario\tWin+Alt+D
 zh: 打开日历(&C)\tWin+Alt+D
 hi: कैलेंडर खोलें(&C)\tWin+Alt+D
+pt: Abrir o &calendário\tWin+Alt+D
+ru: Открыть &календарь\tWin+Alt+D
+ar: فتح التقويم (&C)\tWin+Alt+D
+bn: ক্যালেন্ডার খুলুন (&C)\tWin+Alt+D
+ur: کیلنڈر کھولیں (&C)\tWin+Alt+D
 
 en: Show &hidden icons
 fr: Afficher les icônes &cachées
 es: Mostrar los iconos &ocultos
 zh: 显示隐藏的图标(&H)
 hi: छिपे हुए आइकन दिखाएँ(&H)
+pt: Mostrar ícones &ocultos
+ru: Показать &скрытые значки
+ar: إظهار الأيقونات المخفية (&H)
+bn: লুকানো আইকন দেখান (&H)
+ur: چھپے آئیکنز دکھائیں (&H)
 
 en: Initializing
 fr: Initialisation
 es: Iniciando
 zh: 正在初始化
 hi: शुरू हो रहा है
+pt: Inicializando
+ru: Инициализация
+ar: جارٍ التهيئة
+bn: শুরু হচ্ছে
+ur: شروع ہو رہا ہے
 
 en: Unavailable
 fr: Indisponible
 es: No disponible
 zh: 不可用
 hi: उपलब्ध नहीं
+pt: Indisponível
+ru: Недоступно
+ar: غير متاح
+bn: অনুপলব্ধ
+ur: دستیاب نہیں
 
 en: Unsupported
 fr: Non pris en charge
 es: No compatible
 zh: 不支持
 hi: समर्थित नहीं
+pt: Sem suporte
+ru: Не поддерживается
+ar: غير مدعوم
+bn: সমর্থিত নয়
+ur: غیر معاون
 
 en: Error
 fr: Erreur
 es: Error
 zh: 错误
 hi: त्रुटि
+pt: Erro
+ru: Ошибка
+ar: خطأ
+bn: ত্রুটি
+ur: خرابی
 
 en: Available
 fr: Disponible
 es: Disponible
 zh: 可用
 hi: उपलब्ध
+pt: Disponível
+ru: Доступно
+ar: متاح
+bn: উপলব্ধ
+ur: دستیاب
 
 en: Unknown
 fr: Inconnu
 es: Desconocido
 zh: 未知
 hi: अज्ञात
+pt: Desconhecido
+ru: Неизвестно
+ar: غير معروف
+bn: অজানা
+ur: نامعلوم
 
 en: Internet access
 fr: Accès à Internet
 es: Acceso a Internet
 zh: 可访问 Internet
 hi: इंटरनेट उपलब्ध
+pt: Acesso à Internet
+ru: Доступ в Интернет
+ar: الوصول إلى الإنترنت
+bn: ইন্টারনেট অ্যাক্সেস
+ur: انٹرنیٹ تک رسائی
 
 en: Local network only
 fr: Réseau local uniquement
 es: Solo red local
 zh: 仅限本地网络
 hi: केवल स्थानीय नेटवर्क
+pt: Somente rede local
+ru: Только локальная сеть
+ar: الشبكة المحلية فقط
+bn: শুধু লোকাল নেটওয়ার্ক
+ur: صرف مقامی نیٹ ورک
 
 en: Limited Internet access
 fr: Accès à Internet limité
 es: Acceso a Internet limitado
 zh: Internet 访问受限
 hi: सीमित इंटरनेट
+pt: Acesso limitado à Internet
+ru: Ограниченный доступ в Интернет
+ar: وصول محدود إلى الإنترنت
+bn: সীমিত ইন্টারনেট অ্যাক্সেস
+ur: انٹرنیٹ تک محدود رسائی
 
 en: No network connection
 fr: Aucune connexion réseau
 es: Sin conexión de red
 zh: 无网络连接
 hi: कोई नेटवर्क कनेक्शन नहीं
+pt: Sem conexão de rede
+ru: Нет подключения к сети
+ar: لا يوجد اتصال بالشبكة
+bn: নেটওয়ার্ক সংযোগ নেই
+ur: نیٹ ورک کنکشن نہیں
 
 en: Connectivity unknown
 fr: Connectivité inconnue
 es: Conectividad desconocida
 zh: 连接状态未知
 hi: कनेक्टिविटी अज्ञात
+pt: Conectividade desconhecida
+ru: Подключение неизвестно
+ar: الاتصال غير معروف
+bn: সংযোগ অজানা
+ur: کنیکٹیویٹی نامعلوم
 
 en: Ethernet
 fr: Ethernet
 es: Ethernet
 zh: 以太网
 hi: ईथरनेट
+pt: Ethernet
+ru: Ethernet
+ar: Ethernet
+bn: ইথারনেট
+ur: ایتھرنیٹ
 
 en: Cellular
 fr: Cellulaire
 es: Datos móviles
 zh: 手机网络
 hi: सेल्युलर
+pt: Celular
+ru: Сотовая сеть
+ar: شبكة الجوال
+bn: সেলুলার
+ur: سیلولر
 
 en: Network
 fr: Réseau
 es: Red
 zh: 网络
 hi: नेटवर्क
+pt: Rede
+ru: Сеть
+ar: الشبكة
+bn: নেটওয়ার্ক
+ur: نیٹ ورک
 
 en: Offline
 fr: Hors connexion
 es: Sin conexión
 zh: 离线
 hi: ऑफ़लाइन
+pt: Offline
+ru: Не в сети
+ar: غير متصل
+bn: অফলাইন
+ur: آف لائن
 
 en: Network status unavailable
 fr: État du réseau indisponible
 es: Estado de la red no disponible
 zh: 网络状态不可用
 hi: नेटवर्क की स्थिति उपलब्ध नहीं
+pt: Status da rede indisponível
+ru: Состояние сети недоступно
+ar: حالة الشبكة غير متاحة
+bn: নেটওয়ার্কের অবস্থা অনুপলব্ধ
+ur: نیٹ ورک کی حالت دستیاب نہیں
 
 en: Quick controls
 fr: Commandes rapides
 es: Controles rápidos
 zh: 快捷控制
 hi: क्विक कंट्रोल
+pt: Controles rápidos
+ru: Быстрые элементы управления
+ar: عناصر التحكم السريعة
+bn: দ্রুত কন্ট্রোল
+ur: فوری کنٹرولز
 
 en: Aether Shell menu
 fr: Menu d'Aether Shell
 es: Menú de Aether Shell
 zh: Aether Shell 菜单
 hi: Aether Shell मेनू
+pt: Menu do Aether Shell
+ru: Меню Aether Shell
+ar: قائمة Aether Shell
+bn: Aether Shell মেনু
+ur: Aether Shell مینو
 
 en: Weather status unavailable
 fr: État de la météo indisponible
 es: Estado del tiempo no disponible
 zh: 天气状态不可用
 hi: मौसम की स्थिति उपलब्ध नहीं
+pt: Status do clima indisponível
+ru: Состояние погоды недоступно
+ar: حالة الطقس غير متاحة
+bn: আবহাওয়ার অবস্থা অনুপলব্ধ
+ur: موسم کی حالت دستیاب نہیں
 
 en: Cached weather
 fr: Météo en cache
 es: Tiempo en caché
 zh: 缓存的天气
 hi: कैश किया गया मौसम
+pt: Clima em cache
+ru: Погода из кэша
+ar: طقس مخزّن مؤقتًا
+bn: ক্যাশ করা আবহাওয়া
+ur: کیش شدہ موسم
 
 en: Observation (UTC): {}
 fr: Observation (UTC) : {}
 es: Observación (UTC): {}
 zh: 观测时间（UTC）：{}
 hi: अवलोकन (UTC): {}
+pt: Observação (UTC): {}
+ru: Наблюдение (UTC): {}
+ar: الرصد (UTC): {}
+bn: পর্যবেক্ষণ (UTC): {}
+ur: مشاہدہ (UTC): {}
 
 en: Weather: {}
 fr: Météo : {}
 es: Tiempo: {}
 zh: 天气：{}
 hi: मौसम: {}
+pt: Clima: {}
+ru: Погода: {}
+ar: الطقس: {}
+bn: আবহাওয়া: {}
+ur: موسم: {}
 
 en: Click to open weather settings
 fr: Cliquez pour ouvrir les paramètres météo
 es: Haz clic para abrir la configuración del tiempo
 zh: 单击打开天气设置
 hi: मौसम सेटिंग्स खोलने के लिए क्लिक करें
+pt: Clique para abrir as configurações de clima
+ru: Нажмите, чтобы открыть параметры погоды
+ar: انقر لفتح إعدادات الطقس
+bn: আবহাওয়ার সেটিংস খুলতে ক্লিক করুন
+ur: موسم کی ترتیبات کھولنے کے لیے کلک کریں
 
 en: Show hidden icons
 fr: Afficher les icônes cachées
 es: Mostrar los iconos ocultos
 zh: 显示隐藏的图标
 hi: छिपे हुए आइकन दिखाएँ
+pt: Mostrar ícones ocultos
+ru: Показать скрытые значки
+ar: إظهار الأيقونات المخفية
+bn: লুকানো আইকন দেখান
+ur: چھپے آئیکنز دکھائیں
 
 en: Opens Windows' notification-area overflow
 fr: Ouvre le dépassement de la zone de notification de Windows
 es: Abre el desbordamiento del área de notificación de Windows
 zh: 打开 Windows 通知区域的溢出菜单
 hi: Windows सूचना क्षेत्र का ओवरफ़्लो खोलता है
+pt: Abre o excedente da área de notificação do Windows
+ru: Открывает скрытые значки области уведомлений Windows
+ar: يفتح الأيقونات الزائدة في منطقة إشعارات Windows
+bn: Windows নোটিফিকেশন এলাকার অতিরিক্ত আইকন খোলে
+ur: Windows نوٹیفکیشن ایریا کے اضافی آئیکنز کھولتا ہے
 
 en: Input language: {}
 fr: Langue de saisie : {}
 es: Idioma de entrada: {}
 zh: 输入语言：{}
 hi: इनपुट भाषा: {}
+pt: Idioma de entrada: {}
+ru: Язык ввода: {}
+ar: لغة الإدخال: {}
+bn: ইনপুট ভাষা: {}
+ur: ان پٹ زبان: {}
 
 en: Fallback input layout
 fr: Disposition de secours
 es: Distribución de reserva
 zh: 备用输入布局
 hi: वैकल्पिक इनपुट लेआउट
+pt: Layout de entrada alternativo
+ru: Резервная раскладка ввода
+ar: تخطيط إدخال احتياطي
+bn: বিকল্প ইনপুট লেআউট
+ur: متبادل ان پٹ لے آؤٹ
 
 en: Click to switch input language (Win+Space)
 fr: Cliquez pour changer la langue de saisie (Win+Espace)
 es: Haz clic para cambiar el idioma de entrada (Win+Espacio)
 zh: 单击切换输入语言（Win+空格）
 hi: इनपुट भाषा बदलने के लिए क्लिक करें (Win+Space)
+pt: Clique para alternar o idioma de entrada (Win+Space)
+ru: Нажмите, чтобы переключить язык ввода (Win+Space)
+ar: انقر لتبديل لغة الإدخال (Win+Space)
+bn: ইনপুট ভাষা পাল্টাতে ক্লিক করুন (Win+Space)
+ur: ان پٹ زبان تبدیل کرنے کے لیے کلک کریں (Win+Space)
 
 en: Network: {}
 fr: Réseau : {}
 es: Red: {}
 zh: 网络：{}
 hi: नेटवर्क: {}
+pt: Rede: {}
+ru: Сеть: {}
+ar: الشبكة: {}
+bn: নেটওয়ার্ক: {}
+ur: نیٹ ورک: {}
 
 en: Signal strength unavailable
 fr: Force du signal indisponible
 es: Intensidad de la señal no disponible
 zh: 信号强度不可用
 hi: सिग्नल की ताकत उपलब्ध नहीं
+pt: Intensidade do sinal indisponível
+ru: Уровень сигнала недоступен
+ar: قوة الإشارة غير متاحة
+bn: সিগন্যালের শক্তি অনুপলব্ধ
+ur: سگنل کی طاقت دستیاب نہیں
 
 en: Click to open Windows network settings
 fr: Cliquez pour ouvrir les paramètres réseau de Windows
 es: Haz clic para abrir la configuración de red de Windows
 zh: 单击打开 Windows 网络设置
 hi: Windows नेटवर्क सेटिंग्स खोलने के लिए क्लिक करें
+pt: Clique para abrir as configurações de rede do Windows
+ru: Нажмите, чтобы открыть сетевые параметры Windows
+ar: انقر لفتح إعدادات الشبكة في Windows
+bn: Windows নেটওয়ার্ক সেটিংস খুলতে ক্লিক করুন
+ur: Windows نیٹ ورک کی ترتیبات کھولنے کے لیے کلک کریں
 
 en: Audio output
 fr: Sortie audio
 es: Salida de audio
 zh: 音频输出
 hi: ऑडियो आउटपुट
+pt: Saída de áudio
+ru: Вывод звука
+ar: خرج الصوت
+bn: অডিও আউটপুট
+ur: آڈیو آؤٹ پٹ
 
 en: Audio: {}
 fr: Audio : {}
 es: Audio: {}
 zh: 音频：{}
 hi: ऑडियो: {}
+pt: Áudio: {}
+ru: Звук: {}
+ar: الصوت: {}
+bn: অডিও: {}
+ur: آڈیو: {}
 
 en: volume unknown
 fr: volume inconnu
 es: volumen desconocido
 zh: 音量未知
 hi: वॉल्यूम अज्ञात
+pt: volume desconhecido
+ru: громкость неизвестна
+ar: مستوى الصوت غير معروف
+bn: ভলিউম অজানা
+ur: والیوم نامعلوم
 
 en: Muted
 fr: Muet
 es: Silenciado
 zh: 已静音
 hi: म्यूट
+pt: Sem som
+ru: Звук отключён
+ar: مكتوم
+bn: নিঃশব্দ
+ur: خاموش
 
 en: Sound on
 fr: Son activé
 es: Sonido activado
 zh: 声音已开启
 hi: ध्वनि चालू
+pt: Som ligado
+ru: Звук включён
+ar: الصوت يعمل
+bn: শব্দ চালু
+ur: آواز چالو
 
 en: Microphone: {}
 fr: Microphone : {}
 es: Micrófono: {}
 zh: 麦克风：{}
 hi: माइक्रोफ़ोन: {}
+pt: Microfone: {}
+ru: Микрофон: {}
+ar: الميكروفون: {}
+bn: মাইক্রোফোন: {}
+ur: مائیکروفون: {}
 
 en: Endpoint unmuted
 fr: Microphone actif
 es: Micrófono activado
 zh: 未静音
 hi: माइक्रोफ़ोन चालू
+pt: Dispositivo com som ativado
+ru: Звук устройства включён
+ar: نقطة النهاية غير مكتومة
+bn: এন্ডপয়েন্ট মিউট করা নেই
+ur: اینڈ پوائنٹ خاموش نہیں
 
 en: Recording detection unsupported
 fr: Détection d'enregistrement non prise en charge
 es: Detección de grabación no compatible
 zh: 不支持检测录音
 hi: रिकॉर्डिंग पहचान समर्थित नहीं
+pt: Detecção de gravação não compatível
+ru: Определение записи не поддерживается
+ar: اكتشاف التسجيل غير مدعوم
+bn: রেকর্ডিং শনাক্তকরণ সমর্থিত নয়
+ur: ریکارڈنگ کی شناخت معاون نہیں
 
 en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
 fr: Cliquez pour couper ou rétablir le son ; clic droit pour la saisie vocale de Windows et la confidentialité du microphone
 es: Haz clic para silenciar o activar; clic derecho para el dictado por voz de Windows y la privacidad del micrófono
 zh: 单击切换静音；右键单击可使用 Windows 语音输入和麦克风隐私设置
 hi: म्यूट चालू/बंद करने के लिए क्लिक करें; Windows वॉइस टाइपिंग और माइक्रोफ़ोन गोपनीयता सेटिंग्स के लिए राइट-क्लिक करें
+pt: Clique para alternar o mudo; clique com o botão direito para a digitação por voz do Windows e as configurações de privacidade do microfone
+ru: Нажмите, чтобы включить или выключить звук; щёлкните правой кнопкой для голосового ввода Windows и параметров конфиденциальности микрофона
+ar: انقر لتبديل الكتم؛ وانقر بزر الماوس الأيمن للكتابة الصوتية في Windows وإعدادات خصوصية الميكروفون
+bn: মিউট চালু/বন্ধ করতে ক্লিক করুন; Windows ভয়েস টাইপিং ও মাইক্রোফোনের গোপনীয়তা সেটিংসের জন্য ডান-ক্লিক করুন
+ur: خاموشی بدلنے کے لیے کلک کریں؛ Windows وائس ٹائپنگ اور مائیکروفون کی رازداری کی ترتیبات کے لیے دایاں کلک کریں
 
 en: Battery: {}
 fr: Batterie : {}
 es: Batería: {}
 zh: 电池：{}
 hi: बैटरी: {}
+pt: Bateria: {}
+ru: Батарея: {}
+ar: البطارية: {}
+bn: ব্যাটারি: {}
+ur: بیٹری: {}
 
 en: Battery {}
 fr: Batterie {}
 es: Batería {}
 zh: 电池 {}
 hi: बैटरी {}
+pt: Bateria {}
+ru: Батарея {}
+ar: البطارية {}
+bn: ব্যাটারি {}
+ur: بیٹری {}
 
 en: Battery status unavailable
 fr: État de la batterie indisponible
 es: Estado de la batería no disponible
 zh: 电池状态不可用
 hi: बैटरी की स्थिति उपलब्ध नहीं
+pt: Status da bateria indisponível
+ru: Состояние батареи недоступно
+ar: حالة البطارية غير متاحة
+bn: ব্যাটারির অবস্থা অনুপলব্ধ
+ur: بیٹری کی حالت دستیاب نہیں
 
 en: Charging
 fr: En charge
 es: Cargando
 zh: 正在充电
 hi: चार्ज हो रही है
+pt: Carregando
+ru: Зарядка
+ar: قيد الشحن
+bn: চার্জ হচ্ছে
+ur: چارج ہو رہی ہے
 
 en: External power
 fr: Alimentation secteur
 es: Alimentación externa
 zh: 外接电源
 hi: बाहरी बिजली
+pt: Energia externa
+ru: Внешнее питание
+ar: طاقة خارجية
+bn: বাইরের পাওয়ার
+ur: بیرونی بجلی
 
 en: Estimated remaining: {} h {} min
 fr: Autonomie estimée : {} h {} min
 es: Tiempo restante estimado: {} h {} min
 zh: 预计剩余：{} 小时 {} 分钟
 hi: अनुमानित शेष: {} घंटे {} मिनट
+pt: Restante estimado: {} h {} min
+ru: Осталось примерно: {} ч {} мин
+ar: المتبقي تقريبًا: {} س {} د
+bn: আনুমানিক বাকি: {} ঘণ্টা {} মিনিট
+ur: اندازاً باقی: {} گھنٹے {} منٹ
 
 en: Click to open power settings
 fr: Cliquez pour ouvrir les paramètres d'alimentation
 es: Haz clic para abrir la configuración de energía
 zh: 单击打开电源设置
 hi: पावर सेटिंग्स खोलने के लिए क्लिक करें
+pt: Clique para abrir as configurações de energia
+ru: Нажмите, чтобы открыть параметры питания
+ar: انقر لفتح إعدادات الطاقة
+bn: পাওয়ার সেটিংস খুলতে ক্লিক করুন
+ur: پاور کی ترتیبات کھولنے کے لیے کلک کریں
 
 en: Clock status unavailable
 fr: État de l'horloge indisponible
 es: Estado del reloj no disponible
 zh: 时钟状态不可用
 hi: घड़ी की स्थिति उपलब्ध नहीं
+pt: Status do relógio indisponível
+ru: Состояние часов недоступно
+ar: حالة الساعة غير متاحة
+bn: ঘড়ির অবস্থা অনুপলব্ধ
+ur: گھڑی کی حالت دستیاب نہیں
 
 en: Click to open calendar and notifications
 fr: Cliquez pour ouvrir le calendrier et les notifications
 es: Haz clic para abrir el calendario y las notificaciones
 zh: 单击打开日历和通知
 hi: कैलेंडर और सूचनाएँ खोलने के लिए क्लिक करें
+pt: Clique para abrir o calendário e as notificações
+ru: Нажмите, чтобы открыть календарь и уведомления
+ar: انقر لفتح التقويم والإشعارات
+bn: ক্যালেন্ডার ও বিজ্ঞপ্তি খুলতে ক্লিক করুন
+ur: کیلنڈر اور اطلاعات کھولنے کے لیے کلک کریں
 
 en: Action failed: {}
 fr: Échec de l'action : {}
 es: La acción falló: {}
 zh: 操作失败：{}
 hi: कार्य विफल: {}
+pt: A ação falhou: {}
+ru: Действие не удалось: {}
+ar: فشل الإجراء: {}
+bn: কাজটি ব্যর্থ হয়েছে: {}
+ur: عمل ناکام رہا: {}
 
 en: Aether Shell status bar
 fr: Barre d'état d'Aether Shell
 es: Barra de estado de Aether Shell
 zh: Aether Shell 状态栏
 hi: Aether Shell स्टेटस बार
+pt: Barra de status do Aether Shell
+ru: Панель состояния Aether Shell
+ar: شريط حالة Aether Shell
+bn: Aether Shell স্ট্যাটাস বার
+ur: Aether Shell اسٹیٹس بار
 
 en: Update available
 fr: Mise à jour disponible
 es: Actualización disponible
 zh: 有可用更新
 hi: अपडेट उपलब्ध
+pt: Atualização disponível
+ru: Доступно обновление
+ar: يتوفر تحديث
+bn: আপডেট উপলব্ধ
+ur: اپ ڈیٹ دستیاب ہے
 
 en: Cached
 fr: En cache
 es: En caché
 zh: 已缓存
 hi: कैश किया गया
+pt: Em cache
+ru: Из кэша
+ar: مخزّن مؤقتًا
+bn: ক্যাশ করা
+ur: کیش شدہ
 
 en: Start
 fr: Démarrer
 es: Inicio
 zh: 开始
 hi: स्टार्ट
+pt: Iniciar
+ru: Пуск
+ar: ابدأ
+bn: স্টার্ট
+ur: اسٹارٹ
 
 en: Search
 fr: Rechercher
 es: Buscar
 zh: 搜索
 hi: खोजें
+pt: Pesquisar
+ru: Поиск
+ar: بحث
+bn: অনুসন্ধান
+ur: تلاش
 
 en: Task View
 fr: Vue des tâches
 es: Vista de tareas
 zh: 任务视图
 hi: टास्क व्यू
+pt: Visão de Tarefas
+ru: Представление задач
+ar: عرض المهام
+bn: টাস্ক ভিউ
+ur: ٹاسک ویو
 
 en: Application
 fr: Application
 es: Aplicación
 zh: 应用
 hi: ऐप्लिकेशन
+pt: Aplicativo
+ru: Приложение
+ar: تطبيق
+bn: অ্যাপ্লিকেশন
+ur: ایپلیکیشن
 
 en: Running application
 fr: Application ouverte
 es: Aplicación en ejecución
 zh: 正在运行的应用
 hi: चल रहा ऐप्लिकेशन
+pt: Aplicativo em execução
+ru: Запущенное приложение
+ar: تطبيق قيد التشغيل
+bn: চলমান অ্যাপ্লিকেশন
+ur: چلتی ہوئی ایپلیکیشن
 
 en: More applications
 fr: Autres applications
 es: Más aplicaciones
 zh: 更多应用
 hi: और ऐप्लिकेशन
+pt: Mais aplicativos
+ru: Другие приложения
+ar: المزيد من التطبيقات
+bn: আরও অ্যাপ্লিকেশন
+ur: مزید ایپلیکیشنز
 
 en: Aether Shell window previews
 fr: Aperçus des fenêtres d'Aether Shell
 es: Vistas previas de ventanas de Aether Shell
 zh: Aether Shell 窗口预览
 hi: Aether Shell विंडो पूर्वावलोकन
+pt: Pré-visualizações de janelas do Aether Shell
+ru: Миниатюры окон Aether Shell
+ar: معاينات نوافذ Aether Shell
+bn: Aether Shell উইন্ডো প্রিভিউ
+ur: Aether Shell ونڈو پیش نظارے
 
 en: Minimized — preview unavailable
 fr: Réduite — aperçu indisponible
 es: Minimizada — vista previa no disponible
 zh: 已最小化——无法预览
 hi: छोटा किया गया — पूर्वावलोकन उपलब्ध नहीं
+pt: Minimizada — pré-visualização indisponível
+ru: Свёрнуто — миниатюра недоступна
+ar: مصغّرة — المعاينة غير متاحة
+bn: ছোট করা — প্রিভিউ অনুপলব্ধ
+ur: چھوٹی کی گئی — پیش نظارہ دستیاب نہیں
 
 en: Preview unavailable
 fr: Aperçu indisponible
 es: Vista previa no disponible
 zh: 无法预览
 hi: पूर्वावलोकन उपलब्ध नहीं
+pt: Pré-visualização indisponível
+ru: Миниатюра недоступна
+ar: المعاينة غير متاحة
+bn: প্রিভিউ অনুপলব্ধ
+ur: پیش نظارہ دستیاب نہیں
 
 en: {} windows
 fr: Fenêtres de {}
 es: Ventanas de {}
 zh: {} 的窗口
 hi: {} की विंडो
+pt: {} janelas
+ru: Окон: {}
+ar: {} نوافذ
+bn: {}টি উইন্ডো
+ur: {} ونڈوز
 
 en: {} window
 fr: Fenêtre de {}
 es: Ventana de {}
 zh: {} 窗口
 hi: {} विंडो
+pt: {} janela
+ru: Окно: {}
+ar: {} نافذة
+bn: {}টি উইন্ডো
+ur: {} ونڈو
 
 en: Switches to this window
 fr: Bascule vers cette fenêtre
 es: Cambia a esta ventana
 zh: 切换到此窗口
 hi: इस विंडो पर जाता है
+pt: Alterna para esta janela
+ru: Переключает на это окно
+ar: ينتقل إلى هذه النافذة
+bn: এই উইন্ডোতে যায়
+ur: اس ونڈو پر جاتا ہے
 
 en: Minimized, preview unavailable
 fr: Réduite, aperçu indisponible
 es: Minimizada, vista previa no disponible
 zh: 已最小化，无法预览
 hi: छोटा किया गया, पूर्वावलोकन उपलब्ध नहीं
+pt: Minimizada, pré-visualização indisponível
+ru: Свёрнуто, миниатюра недоступна
+ar: مصغّرة، المعاينة غير متاحة
+bn: ছোট করা, প্রিভিউ অনুপলব্ধ
+ur: چھوٹی کی گئی، پیش نظارہ دستیاب نہیں
 
 en: Minimized
 fr: Réduite
 es: Minimizada
 zh: 已最小化
 hi: छोटा किया गया
+pt: Minimizada
+ru: Свёрнуто
+ar: مصغّرة
+bn: ছোট করা
+ur: چھوٹی کی گئی
 
 en: Close {}
 fr: Fermer {}
 es: Cerrar {}
 zh: 关闭 {}
 hi: {} बंद करें
+pt: Fechar {}
+ru: Закрыть {}
+ar: إغلاق {}
+bn: {} বন্ধ করুন
+ur: {} بند کریں
 
 en: Asks this window to close; the application can still ask to save or cancel
 fr: Demande à cette fenêtre de se fermer ; l'application peut encore proposer d'enregistrer ou d'annuler
 es: Pide a esta ventana que se cierre; la aplicación aún puede pedir guardar o cancelar
 zh: 请求关闭此窗口；应用仍可提示保存或取消
 hi: इस विंडो को बंद होने के लिए कहता है; ऐप्लिकेशन अब भी सहेजने या रद्द करने को कह सकता है
+pt: Pede que esta janela seja fechada; o aplicativo ainda pode pedir para salvar ou cancelar
+ru: Просит это окно закрыться; приложение всё равно может предложить сохранить изменения или отменить закрытие
+ar: يطلب إغلاق هذه النافذة؛ ويمكن للتطبيق أن يطلب الحفظ أو الإلغاء
+bn: এই উইন্ডো বন্ধ করার অনুরোধ জানায়; অ্যাপ তবুও সংরক্ষণ বা বাতিলের অনুরোধ করতে পারে
+ur: اس ونڈو کو بند کرنے کی درخواست کرتا ہے؛ ایپلیکیشن پھر بھی محفوظ کرنے یا منسوخ کرنے کو کہہ سکتی ہے
 
 en: Close requested
 fr: Fermeture demandée
 es: Cierre solicitado
 zh: 已请求关闭
 hi: बंद करने का अनुरोध किया गया
+pt: Fechamento solicitado
+ru: Закрытие запрошено
+ar: تم طلب الإغلاق
+bn: বন্ধ করার অনুরোধ পাঠানো হয়েছে
+ur: بند کرنے کی درخواست کر دی گئی
 
 en: Previous applications
 fr: Applications précédentes
 es: Aplicaciones anteriores
 zh: 上一批应用
 hi: पिछले ऐप्लिकेशन
+pt: Aplicativos anteriores
+ru: Предыдущие приложения
+ar: التطبيقات السابقة
+bn: আগের অ্যাপ্লিকেশন
+ur: پچھلی ایپلیکیشنز
 
 en: Open
 fr: Ouvrir
 es: Abrir
 zh: 打开
 hi: खोलें
+pt: Abrir
+ru: Открыть
+ar: فتح
+bn: খুলুন
+ur: کھولیں
 
 en: New instance
 fr: Nouvelle instance
 es: Nueva instancia
 zh: 新实例
 hi: नया इंस्टेंस
+pt: Nova instância
+ru: Новый экземпляр
+ar: نسخة جديدة
+bn: নতুন ইনস্ট্যান্স
+ur: نیا انسٹینس
 
 en: Unpin from Dock
 fr: Désépingler du Dock
 es: Desanclar del Dock
 zh: 从程序坞取消固定
 hi: डॉक से अनपिन करें
+pt: Desafixar do Dock
+ru: Открепить от Dock
+ar: إلغاء التثبيت من Dock
+bn: Dock থেকে আনপিন করুন
+ur: Dock سے ان پن کریں
 
 en: Pin to Dock
 fr: Épingler au Dock
 es: Anclar al Dock
 zh: 固定到程序坞
 hi: डॉक पर पिन करें
+pt: Fixar no Dock
+ru: Закрепить в Dock
+ar: التثبيت في Dock
+bn: Dock-এ পিন করুন
+ur: Dock میں پن کریں
 
 en: Move left
 fr: Déplacer à gauche
 es: Mover a la izquierda
 zh: 左移
 hi: बाएँ ले जाएँ
+pt: Mover para a esquerda
+ru: Сдвинуть влево
+ar: نقل لليسار
+bn: বামে সরান
+ur: بائیں لے جائیں
 
 en: Move right
 fr: Déplacer à droite
 es: Mover a la derecha
 zh: 右移
 hi: दाएँ ले जाएँ
+pt: Mover para a direita
+ru: Сдвинуть вправо
+ar: نقل لليمين
+bn: ডানে সরান
+ur: دائیں لے جائیں
 
 en: Dock settings...
 fr: Paramètres du Dock...
 es: Configuración del Dock...
 zh: 程序坞设置...
 hi: डॉक सेटिंग्स...
+pt: Configurações do Dock...
+ru: Параметры Dock...
+ar: إعدادات Dock...
+bn: Dock সেটিংস...
+ur: Dock کی ترتیبات...
 
 en: Import Windows taskbar pins
 fr: Importer les épingles de la barre des tâches Windows
 es: Importar los anclajes de la barra de tareas de Windows
 zh: 导入 Windows 任务栏固定项
 hi: Windows टास्कबार पिन आयात करें
+pt: Importar itens fixados da barra de tarefas do Windows
+ru: Импортировать закрепления панели задач Windows
+ar: استيراد عناصر شريط مهام Windows المثبتة
+bn: Windows টাস্কবার পিন ইমপোর্ট করুন
+ur: Windows ٹاسک بار کے پن درآمد کریں
 
 en: Open Windows Start
 fr: Ouvrir Démarrer de Windows
 es: Abrir el Inicio de Windows
 zh: 打开 Windows 开始菜单
 hi: Windows स्टार्ट खोलें
+pt: Abrir o Iniciar do Windows
+ru: Открыть меню «Пуск» Windows
+ar: فتح قائمة ابدأ في Windows
+bn: Windows স্টার্ট খুলুন
+ur: Windows اسٹارٹ کھولیں
 
 en: Aether Shell Dock
 fr: Dock d'Aether Shell
 es: Dock de Aether Shell
 zh: Aether Shell 程序坞
 hi: Aether Shell डॉक
+pt: Dock do Aether Shell
+ru: Dock Aether Shell
+ar: Dock الخاص بـ Aether Shell
+bn: Aether Shell Dock
+ur: Aether Shell Dock
 
 en: Pinned
 fr: Épinglée
 es: Anclada
 zh: 已固定
 hi: पिन किया गया
+pt: Fixado
+ru: Закреплено
+ar: مثبّت
+bn: পিন করা
+ur: پن شدہ
 
 en: Running
 fr: Ouverte
 es: En ejecución
 zh: 正在运行
 hi: चल रहा है
+pt: Em execução
+ru: Запущено
+ar: قيد التشغيل
+bn: চলছে
+ur: چل رہی ہے
 
 en: Needs attention
 fr: Demande votre attention
 es: Requiere atención
 zh: 需要注意
 hi: ध्यान चाहिए
+pt: Precisa de atenção
+ru: Требует внимания
+ar: يحتاج إلى انتباه
+bn: মনোযোগ দরকার
+ur: توجہ درکار ہے
 
 en: Up arrow shows window previews
 fr: La flèche haut affiche les aperçus des fenêtres
 es: La flecha arriba muestra las vistas previas de las ventanas
 zh: 按上箭头显示窗口预览
 hi: ऊपर तीर विंडो पूर्वावलोकन दिखाता है
+pt: A seta para cima mostra as pré-visualizações das janelas
+ru: Стрелка вверх показывает миниатюры окон
+ar: يعرض السهم لأعلى معاينات النوافذ
+bn: ওপরের তীর উইন্ডো প্রিভিউ দেখায়
+ur: اوپر کا تیر ونڈو کے پیش نظارے دکھاتا ہے
 
 en: Installed application
 fr: Application installée
 es: Aplicación instalada
 zh: 已安装的应用
 hi: इंस्टॉल किया गया ऐप्लिकेशन
+pt: Aplicativo instalado
+ru: Установленное приложение
+ar: تطبيق مثبّت
+bn: ইনস্টল করা অ্যাপ্লিকেশন
+ur: انسٹال شدہ ایپلیکیشن
 
 en: Desktop application
 fr: Application de bureau
 es: Aplicación de escritorio
 zh: 桌面应用
 hi: डेस्कटॉप ऐप्लिकेशन
+pt: Aplicativo de área de trabalho
+ru: Классическое приложение
+ar: تطبيق سطح المكتب
+bn: ডেস্কটপ অ্যাপ্লিকেশন
+ur: ڈیسک ٹاپ ایپلیکیشن
 
 en: File
 fr: Fichier
 es: Archivo
 zh: 文件
 hi: फ़ाइल
+pt: Arquivo
+ru: Файл
+ar: ملف
+bn: ফাইল
+ur: فائل
 
 en: Folder
 fr: Dossier
 es: Carpeta
 zh: 文件夹
 hi: फ़ोल्डर
+pt: Pasta
+ru: Папка
+ar: مجلد
+bn: ফোল্ডার
+ur: فولڈر
 
 en: Windows tool
 fr: Outil Windows
 es: Herramienta de Windows
 zh: Windows 工具
 hi: Windows टूल
+pt: Ferramenta do Windows
+ru: Средство Windows
+ar: أداة Windows
+bn: Windows টুল
+ur: Windows ٹول
 
 en: Control Panel
 fr: Panneau de configuration
 es: Panel de control
 zh: 控制面板
 hi: कंट्रोल पैनल
+pt: Painel de Controle
+ru: Панель управления
+ar: لوحة التحكم
+bn: কন্ট্রোল প্যানেল
+ur: کنٹرول پینل
 
 en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
 fr: ↑↓ Naviguer   ·   Entrée Ouvrir   ·   Échap Fermer
 es: ↑↓ Navegar   ·   Intro Abrir   ·   Esc Cerrar
 zh: ↑↓ 导航   ·   Enter 打开   ·   Esc 关闭
 hi: ↑↓ नेविगेट   ·   Enter खोलें   ·   Esc बंद करें
+pt: ↑↓ Navegar   ·   Enter Abrir   ·   Esc Fechar
+ru: ↑↓ Навигация   ·   Enter Открыть   ·   Esc Закрыть
+ar: ↑↓ تنقّل   ·   Enter فتح   ·   Esc إغلاق
+bn: ↑↓ চলাচল   ·   Enter খুলুন   ·   Esc বন্ধ করুন
+ur: ↑↓ نیویگیٹ کریں   ·   Enter کھولیں   ·   Esc بند کریں
 
 en: Search apps, settings and files
 fr: Rechercher des applications, des paramètres et des fichiers
 es: Buscar aplicaciones, configuración y archivos
 zh: 搜索应用、设置和文件
 hi: ऐप, सेटिंग्स और फ़ाइलें खोजें
+pt: Pesquisar aplicativos, configurações e arquivos
+ru: Поиск приложений, параметров и файлов
+ar: ابحث في التطبيقات والإعدادات والملفات
+bn: অ্যাপ, সেটিংস ও ফাইল খুঁজুন
+ur: ایپس، ترتیبات اور فائلیں تلاش کریں
 
 en: Search could not be completed.
 fr: La recherche n'a pas pu aboutir.
 es: No se pudo completar la búsqueda.
 zh: 无法完成搜索。
 hi: खोज पूरी नहीं हो सकी।
+pt: Não foi possível concluir a pesquisa.
+ru: Не удалось выполнить поиск.
+ar: تعذّر إكمال البحث.
+bn: অনুসন্ধান সম্পন্ন করা যায়নি।
+ur: تلاش مکمل نہیں ہو سکی۔
 
 en: Results
 fr: Résultats
 es: Resultados
 zh: 结果
 hi: परिणाम
+pt: Resultados
+ru: Результаты
+ar: النتائج
+bn: ফলাফল
+ur: نتائج
 
 en: Indexing applications…
 fr: Indexation des applications…
 es: Indexando aplicaciones…
 zh: 正在索引应用…
 hi: ऐप्लिकेशन इंडेक्स हो रहे हैं…
+pt: Indexando aplicativos…
+ru: Индексация приложений…
+ar: جارٍ فهرسة التطبيقات…
+bn: অ্যাপ ইনডেক্স করা হচ্ছে…
+ur: ایپس کی انڈیکسنگ ہو رہی ہے…
 
 en: Type to search apps, settings and files
 fr: Tapez pour rechercher des applications, des paramètres et des fichiers
 es: Escribe para buscar aplicaciones, configuración y archivos
 zh: 输入以搜索应用、设置和文件
 hi: ऐप, सेटिंग्स और फ़ाइलें खोजने के लिए लिखें
+pt: Digite para pesquisar aplicativos, configurações e arquivos
+ru: Введите запрос для поиска приложений, параметров и файлов
+ar: اكتب للبحث في التطبيقات والإعدادات والملفات
+bn: অ্যাপ, সেটিংস ও ফাইল খুঁজতে টাইপ করুন
+ur: ایپس، ترتیبات اور فائلیں تلاش کرنے کے لیے ٹائپ کریں
 
 en: Nothing matches
 fr: Aucun résultat
 es: No hay coincidencias
 zh: 没有匹配项
 hi: कुछ नहीं मिला
+pt: Nada corresponde
+ru: Ничего не найдено
+ar: لا يوجد ما يطابق
+bn: কিছুই মেলেনি
+ur: کچھ بھی مطابقت نہیں رکھتا
 
 en: Windows could not open this application.
 fr: Windows n'a pas pu ouvrir cette application.
 es: Windows no pudo abrir esta aplicación.
 zh: Windows 无法打开此应用。
 hi: Windows यह ऐप्लिकेशन नहीं खोल सका।
+pt: O Windows não conseguiu abrir este aplicativo.
+ru: Windows не удалось открыть это приложение.
+ar: تعذّر على Windows فتح هذا التطبيق.
+bn: Windows এই অ্যাপ্লিকেশন খুলতে পারেনি।
+ur: Windows یہ ایپلیکیشن نہیں کھول سکا۔
 
 en: Menu
 fr: Menu
 es: Menú
 zh: 菜单
 hi: मेनू
+pt: Menu
+ru: Меню
+ar: القائمة
+bn: মেনু
+ur: مینو
 
 en: Opens a submenu
 fr: Ouvre un sous-menu
 es: Abre un submenú
 zh: 打开子菜单
 hi: उप-मेनू खोलता है
+pt: Abre um submenu
+ru: Открывает вложенное меню
+ar: يفتح قائمة فرعية
+bn: একটি সাবমেনু খোলে
+ur: ذیلی مینو کھولتا ہے
 
 en: , opens a submenu
 fr: , ouvre un sous-menu
 es: , abre un submenú
 zh: ，打开子菜单
 hi: , उप-मेनू खोलता है
+pt: , abre um submenu
+ru: , открывает вложенное меню
+ar: ، يفتح قائمة فرعية
+bn: , একটি সাবমেনু খোলে
+ur: ، ذیلی مینو کھولتا ہے
 
 en: Selected
 fr: Sélectionné
 es: Seleccionado
 zh: 已选择
 hi: चयनित
+pt: Selecionado
+ru: Выбрано
+ar: محدّد
+bn: নির্বাচিত
+ur: منتخب
 
 en: Checked
 fr: Coché
 es: Marcado
 zh: 已选中
 hi: चुना गया
+pt: Marcado
+ru: Отмечено
+ar: محدَّد بعلامة
+bn: চিহ্নিত
+ur: نشان زدہ
 
 en: Bluetooth
 fr: Bluetooth
 es: Bluetooth
 zh: 蓝牙
 hi: ब्लूटूथ
+pt: Bluetooth
+ru: Bluetooth
+ar: Bluetooth
+bn: ব্লুটুথ
+ur: بلوٹوتھ
 
 en: Airplane mode
 fr: Mode Avion
 es: Modo avión
 zh: 飞行模式
 hi: हवाई जहाज़ मोड
+pt: Modo avião
+ru: Режим «в самолёте»
+ar: وضع الطائرة
+bn: ফ্লাইট মোড
+ur: ہوائی جہاز موڈ
 
 en: Accessibility
 fr: Accessibilité
 es: Accesibilidad
 zh: 辅助功能
 hi: सुगम्यता
+pt: Acessibilidade
+ru: Специальные возможности
+ar: إمكانية الوصول
+bn: অ্যাক্সেসিবিলিটি
+ur: رسائی
 
 en: Energy saver
 fr: Économiseur d'énergie
 es: Ahorro de energía
 zh: 节能模式
 hi: ऊर्जा बचत
+pt: Economia de energia
+ru: Режим энергосбережения
+ar: توفير الطاقة
+bn: এনার্জি সেভার
+ur: انرجی سیور
 
 en: Live captions
 fr: Sous-titres en direct
 es: Subtítulos en directo
 zh: 实时字幕
 hi: लाइव कैप्शन
+pt: Legendas em tempo real
+ru: Живые субтитры
+ar: التعليقات التوضيحية المباشرة
+bn: লাইভ ক্যাপশন
+ur: لائیو کیپشنز
 
 en: Night light
 fr: Éclairage nocturne
 es: Luz nocturna
 zh: 夜间模式
 hi: रात्रि प्रकाश
+pt: Luz noturna
+ru: Ночной свет
+ar: الإضاءة الليلية
+bn: নাইট লাইট
+ur: نائٹ لائٹ
 
 en: Mobile hotspot
 fr: Point d'accès mobile
 es: Zona con cobertura inalámbrica móvil
 zh: 移动热点
 hi: मोबाइल हॉटस्पॉट
+pt: Ponto de acesso móvel
+ru: Мобильная точка доступа
+ar: نقطة الاتصال المتنقلة
+bn: মোবাইল হটস্পট
+ur: موبائل ہاٹ اسپاٹ
 
 en: Nearby sharing
 fr: Partage de proximité
 es: Uso compartido en proximidad
 zh: 就近共享
 hi: आस-पास साझाकरण
+pt: Compartilhamento por proximidade
+ru: Обмен с устройствами поблизости
+ar: المشاركة القريبة
+bn: কাছাকাছি শেয়ারিং
+ur: قریبی شیئرنگ
 
 en: Cast
 fr: Caster
 es: Transmitir
 zh: 投放
 hi: कास्ट
+pt: Transmitir
+ru: Трансляция
+ar: إرسال الشاشة
+bn: কাস্ট
+ur: کاسٹ
 
 en: Project
 fr: Projeter
 es: Proyectar
 zh: 投影
 hi: प्रोजेक्ट
+pt: Projetar
+ru: Проецировать
+ar: عرض على شاشة أخرى
+bn: প্রজেক্ট
+ur: پروجیکٹ
 
 en: All settings
 fr: Tous les paramètres
 es: Toda la configuración
 zh: 所有设置
 hi: सभी सेटिंग्स
+pt: Todas as configurações
+ru: Все параметры
+ar: كل الإعدادات
+bn: সব সেটিংস
+ur: تمام ترتیبات
 
 en: Connected
 fr: Connecté
 es: Conectado
 zh: 已连接
 hi: कनेक्ट है
+pt: Conectado
+ru: Подключено
+ar: متصل
+bn: সংযুক্ত
+ur: منسلک
 
 en: Not connected
 fr: Non connecté
 es: No conectado
 zh: 未连接
 hi: कनेक्ट नहीं है
+pt: Não conectado
+ru: Не подключено
+ar: غير متصل
+bn: সংযুক্ত নয়
+ur: منسلک نہیں
 
 en: , on
 fr: , activé
 es: , activado
 zh: ，开启
 hi: , चालू
+pt: , ativado
+ru: , включено
+ar: ، قيد التشغيل
+bn: , চালু
+ur: ، چالو
 
 en: , off
 fr: , désactivé
 es: , desactivado
 zh: ，关闭
 hi: , बंद
+pt: , desativado
+ru: , выключено
+ar: ، متوقف
+bn: , বন্ধ
+ur: ، بند
 
 en: , state unknown
 fr: , état inconnu
 es: , estado desconocido
 zh: ，状态未知
 hi: , स्थिति अज्ञात
+pt: , estado desconhecido
+ru: , состояние неизвестно
+ar: ، الحالة غير معروفة
+bn: , অবস্থা অজানা
+ur: ، حالت نامعلوم
 
 en: , opens Windows Settings
 fr: , ouvre les Paramètres de Windows
 es: , abre la Configuración de Windows
 zh: ，打开 Windows 设置
 hi: , Windows सेटिंग्स खोलता है
+pt: , abre as Configurações do Windows
+ru: , открывает параметры Windows
+ar: ، يفتح إعدادات Windows
+bn: , Windows সেটিংস খোলে
+ur: ، Windows کی ترتیبات کھولتا ہے
 
 en: , shows accessibility features
 fr: , affiche les fonctions d'accessibilité
 es: , muestra las funciones de accesibilidad
 zh: ，显示辅助功能
 hi: , सुगम्यता सुविधाएँ दिखाता है
+pt: , mostra os recursos de acessibilidade
+ru: , показывает специальные возможности
+ar: ، يعرض ميزات إمكانية الوصول
+bn: , অ্যাক্সেসিবিলিটি ফিচার দেখায়
+ur: ، رسائی کی سہولیات دکھاتا ہے
 
 en: , requires Windows 11 version 22H2
 fr: , nécessite Windows 11 version 22H2
 es: , requiere Windows 11 versión 22H2
 zh: ，需要 Windows 11 版本 22H2
 hi: , Windows 11 संस्करण 22H2 चाहिए
+pt: , requer o Windows 11 versão 22H2
+ru: , требуется Windows 11 версии 22H2
+ar: ، يتطلب Windows 11 الإصدار 22H2
+bn: , Windows 11 সংস্করণ 22H2 লাগে
+ur: ، Windows 11 ورژن 22H2 درکار ہے
 
 en: Now playing: {}
 fr: En cours de lecture : {}
 es: Reproduciendo: {}
 zh: 正在播放：{}
 hi: अभी चल रहा है: {}
+pt: Tocando agora: {}
+ru: Сейчас играет: {}
+ar: قيد التشغيل الآن: {}
+bn: এখন চলছে: {}
+ur: ابھی چل رہا ہے: {}
 
 en: Untitled media
 fr: Média sans titre
 es: Contenido sin título
 zh: 无标题媒体
 hi: बिना शीर्षक का मीडिया
+pt: Mídia sem título
+ru: Мультимедиа без названия
+ar: وسائط بلا عنوان
+bn: শিরোনামহীন মিডিয়া
+ur: بلا عنوان میڈیا
 
 en: , switch source
 fr: , changer de source
 es: , cambiar de fuente
 zh: ，切换来源
 hi: , स्रोत बदलें
+pt: , trocar a origem
+ru: , сменить источник
+ar: ، تبديل المصدر
+bn: , উৎস পাল্টান
+ur: ، ماخذ تبدیل کریں
 
 en: Previous media item
 fr: Élément précédent
 es: Elemento anterior
 zh: 上一项
 hi: पिछला मीडिया आइटम
+pt: Item de mídia anterior
+ru: Предыдущий элемент
+ar: عنصر الوسائط السابق
+bn: আগের মিডিয়া আইটেম
+ur: پچھلا میڈیا آئٹم
 
 en: Pause
 fr: Pause
 es: Pausa
 zh: 暂停
 hi: रोकें
+pt: Pausar
+ru: Пауза
+ar: إيقاف مؤقت
+bn: বিরতি
+ur: وقفہ
 
 en: Play
 fr: Lecture
 es: Reproducir
 zh: 播放
 hi: चलाएँ
+pt: Reproduzir
+ru: Воспроизвести
+ar: تشغيل
+bn: চালান
+ur: چلائیں
 
 en: Next media item
 fr: Élément suivant
 es: Elemento siguiente
 zh: 下一项
 hi: अगला मीडिया आइटम
+pt: Próximo item de mídia
+ru: Следующий элемент
+ar: عنصر الوسائط التالي
+bn: পরের মিডিয়া আইটেম
+ur: اگلا میڈیا آئٹم
 
 en: {} details
 fr: Détails : {}
 es: Detalles de {}
 zh: {} 详细信息
 hi: {} का विवरण
+pt: Detalhes de {}
+ru: Сведения: {}
+ar: تفاصيل {}
+bn: {}-এর বিবরণ
+ur: {} کی تفصیلات
 
 en: Page {} of {}
 fr: Page {} sur {}
 es: Página {} de {}
 zh: 第 {} 页，共 {} 页
 hi: पेज {} / {}
+pt: Página {} de {}
+ru: Страница {} из {}
+ar: الصفحة {} من {}
+bn: পৃষ্ঠা {}/{}
+ur: صفحہ {} از {}
 
 en: Next page
 fr: Page suivante
 es: Página siguiente
 zh: 下一页
 hi: अगला पेज
+pt: Próxima página
+ru: Следующая страница
+ar: الصفحة التالية
+bn: পরের পৃষ্ঠা
+ur: اگلا صفحہ
 
 en: First page
 fr: Première page
 es: Primera página
 zh: 第一页
 hi: पहला पेज
+pt: Primeira página
+ru: Первая страница
+ar: الصفحة الأولى
+bn: প্রথম পৃষ্ঠা
+ur: پہلا صفحہ
 
 en: Brightness
 fr: Luminosité
 es: Brillo
 zh: 亮度
 hi: चमक
+pt: Brilho
+ru: Яркость
+ar: السطوع
+bn: উজ্জ্বলতা
+ur: چمک
 
 en: Brightness, unavailable on this display
 fr: Luminosité, indisponible sur cet écran
 es: Brillo, no disponible en esta pantalla
 zh: 亮度，此显示器不可用
 hi: चमक, इस डिस्प्ले पर उपलब्ध नहीं
+pt: Brilho, indisponível nesta tela
+ru: Яркость, недоступна на этом экране
+ar: السطوع، غير متاح على هذه الشاشة
+bn: উজ্জ্বলতা, এই ডিসপ্লেতে অনুপলব্ধ
+ur: چمک، اس ڈسپلے پر دستیاب نہیں
 
 en: Volume
 fr: Volume
 es: Volumen
 zh: 音量
 hi: वॉल्यूम
+pt: Volume
+ru: Громкость
+ar: مستوى الصوت
+bn: ভলিউম
+ur: والیوم
 
 en: Volume, unavailable
 fr: Volume, indisponible
 es: Volumen, no disponible
 zh: 音量，不可用
 hi: वॉल्यूम, उपलब्ध नहीं
+pt: Volume, indisponível
+ru: Громкость, недоступна
+ar: مستوى الصوت، غير متاح
+bn: ভলিউম, অনুপলব্ধ
+ur: والیوم، دستیاب نہیں
 
 en: Unmute
 fr: Rétablir le son
 es: Activar el sonido
 zh: 取消静音
 hi: म्यूट हटाएँ
+pt: Ativar o som
+ru: Включить звук
+ar: إلغاء الكتم
+bn: আনমিউট করুন
+ur: خاموشی ختم کریں
 
 en: Mute
 fr: Couper le son
 es: Silenciar
 zh: 静音
 hi: म्यूट करें
+pt: Silenciar
+ru: Отключить звук
+ar: كتم الصوت
+bn: মিউট করুন
+ur: خاموش کریں
 
 en: Sound output and volume mixer
 fr: Sortie audio et mélangeur de volume
 es: Salida de sonido y mezclador de volumen
 zh: 声音输出和音量合成器
 hi: ध्वनि आउटपुट और वॉल्यूम मिक्सर
+pt: Saída de som e mixer de volume
+ru: Вывод звука и микшер громкости
+ar: خرج الصوت وخلاط مستوى الصوت
+bn: সাউন্ড আউটপুট ও ভলিউম মিক্সার
+ur: آواز کی آؤٹ پٹ اور والیوم مکسر
 
 en: Back
 fr: Retour
 es: Atrás
 zh: 返回
 hi: वापस
+pt: Voltar
+ru: Назад
+ar: رجوع
+bn: পিছনে
+ur: پیچھے
 
 en: , secured
 fr: , sécurisé
 es: , protegida
 zh: ，安全
 hi: , सुरक्षित
+pt: , protegida
+ru: , защищена
+ar: ، مؤمّنة
+bn: , সুরক্ষিত
+ur: ، محفوظ
 
 en: , open
 fr: , ouvert
 es: , abierta
 zh: ，开放
 hi: , खुला
+pt: , aberta
+ru: , открытая
+ar: ، مفتوحة
+bn: , উন্মুক্ত
+ur: ، کھلی
 
 en: , connected
 fr: , connecté
 es: , conectada
 zh: ，已连接
 hi: , कनेक्ट है
+pt: , conectada
+ru: , подключена
+ar: ، متصلة
+bn: , সংযুক্ত
+ur: ، منسلک
 
 en: Disconnect
 fr: Déconnecter
 es: Desconectar
 zh: 断开连接
 hi: डिस्कनेक्ट करें
+pt: Desconectar
+ru: Отключить
+ar: قطع الاتصال
+bn: সংযোগ বিচ্ছিন্ন করুন
+ur: منقطع کریں
 
 en: Show available networks
 fr: Afficher les réseaux disponibles
 es: Mostrar las redes disponibles
 zh: 显示可用网络
 hi: उपलब्ध नेटवर्क दिखाएँ
+pt: Mostrar redes disponíveis
+ru: Показать доступные сети
+ar: إظهار الشبكات المتاحة
+bn: উপলব্ধ নেটওয়ার্ক দেখান
+ur: دستیاب نیٹ ورک دکھائیں
 
 en: More Wi-Fi settings
 fr: Plus de paramètres Wi-Fi
 es: Más configuración de Wi-Fi
 zh: 更多 WLAN 设置
 hi: और Wi-Fi सेटिंग्स
+pt: Mais configurações de Wi-Fi
+ru: Другие параметры Wi-Fi
+ar: المزيد من إعدادات Wi-Fi
+bn: আরও Wi-Fi সেটিংস
+ur: مزید Wi-Fi ترتیبات
 
 en: Bluetooth and devices settings
 fr: Paramètres Bluetooth et appareils
 es: Configuración de Bluetooth y dispositivos
 zh: 蓝牙和设备设置
 hi: ब्लूटूथ और डिवाइस सेटिंग्स
+pt: Configurações de Bluetooth e dispositivos
+ru: Параметры Bluetooth и устройств
+ar: إعدادات Bluetooth والأجهزة
+bn: Bluetooth ও ডিভাইস সেটিংস
+ur: Bluetooth اور آلات کی ترتیبات
 
 en: Magnifier
 fr: Loupe
 es: Lupa
 zh: 放大镜
 hi: मैग्निफ़ायर
+pt: Lupa
+ru: Экранная лупа
+ar: المكبّر
+bn: ম্যাগনিফায়ার
+ur: میگنیفائر
 
 en: Narrator
 fr: Narrateur
 es: Narrador
 zh: 讲述人
 hi: नैरेटर
+pt: Narrador
+ru: Экранный диктор
+ar: الراوي
+bn: ন্যারেটর
+ur: نریٹر
 
 en: On-screen keyboard
 fr: Clavier visuel
 es: Teclado en pantalla
 zh: 屏幕键盘
 hi: ऑन-स्क्रीन कीबोर्ड
+pt: Teclado na tela
+ru: Экранная клавиатура
+ar: لوحة المفاتيح على الشاشة
+bn: অন-স্ক্রিন কীবোর্ড
+ur: آن اسکرین کی بورڈ
 
 en: Sticky keys
 fr: Touches rémanentes
 es: Teclas especiales
 zh: 粘滞键
 hi: स्टिकी कुंजियाँ
+pt: Teclas de aderência
+ru: Залипание клавиш
+ar: المفاتيح اللاصقة
+bn: স্টিকি কী
+ur: اسٹکی کیز
 
 en: More accessibility settings
 fr: Plus de paramètres d'accessibilité
 es: Más configuración de accesibilidad
 zh: 更多辅助功能设置
 hi: और सुगम्यता सेटिंग्स
+pt: Mais configurações de acessibilidade
+ru: Другие параметры специальных возможностей
+ar: المزيد من إعدادات إمكانية الوصول
+bn: আরও অ্যাক্সেসিবিলিটি সেটিংস
+ur: مزید رسائی کی ترتیبات
 
 en: Volume mixer
 fr: Mélangeur de volume
 es: Mezclador de volumen
 zh: 音量合成器
 hi: वॉल्यूम मिक्सर
+pt: Mixer de volume
+ru: Микшер громкости
+ar: خلاط الصوت
+bn: ভলিউম মিক্সার
+ur: والیوم مکسر
 
 en: Choose output in Sound settings
 fr: Choisir la sortie dans les paramètres du son
 es: Elegir la salida en la configuración de sonido
 zh: 在声音设置中选择输出
 hi: ध्वनि सेटिंग्स में आउटपुट चुनें
+pt: Escolha a saída em Configurações de som
+ru: Выберите устройство вывода в параметрах звука
+ar: اختر جهاز الخرج من إعدادات الصوت
+bn: সাউন্ড সেটিংসে আউটপুট বেছে নিন
+ur: آواز کی ترتیبات میں آؤٹ پٹ منتخب کریں
 
 en: Power and battery settings
 fr: Paramètres d'alimentation et de batterie
 es: Configuración de energía y batería
 zh: 电源和电池设置
 hi: पावर और बैटरी सेटिंग्स
+pt: Configurações de energia e bateria
+ru: Параметры питания и батареи
+ar: إعدادات الطاقة والبطارية
+bn: পাওয়ার ও ব্যাটারি সেটিংস
+ur: پاور اور بیٹری کی ترتیبات
 
 en: Battery {} percent, {}
 fr: Batterie à {} pour cent, {}
 es: Batería al {} por ciento, {}
 zh: 电池 {}%，{}
 hi: बैटरी {} प्रतिशत, {}
+pt: Bateria {} por cento, {}
+ru: Батарея: {} процентов, {}
+ar: البطارية {} بالمائة، {}
+bn: ব্যাটারি {} শতাংশ, {}
+ur: بیٹری {} فیصد، {}
 
 en: All Windows settings
 fr: Tous les paramètres de Windows
 es: Toda la configuración de Windows
 zh: 所有 Windows 设置
 hi: सभी Windows सेटिंग्स
+pt: Todas as configurações do Windows
+ru: Все параметры Windows
+ar: كل إعدادات Windows
+bn: Windows-এর সব সেটিংস
+ur: Windows کی تمام ترتیبات
 
 en: The requested action could not be dispatched
 fr: L'action demandée n'a pas pu être transmise
 es: No se pudo enviar la acción solicitada
 zh: 无法执行所请求的操作
 hi: अनुरोधित कार्य भेजा नहीं जा सका
+pt: Não foi possível despachar a ação solicitada
+ru: Не удалось выполнить запрошенное действие
+ar: تعذّر تنفيذ الإجراء المطلوب
+bn: অনুরোধ করা কাজটি পাঠানো যায়নি
+ur: مطلوبہ عمل روانہ نہیں ہو سکا
 
 en: Aether Shell quick controls
 fr: Commandes rapides d'Aether Shell
 es: Controles rápidos de Aether Shell
 zh: Aether Shell 快捷控制
 hi: Aether Shell क्विक कंट्रोल
+pt: Controles rápidos do Aether Shell
+ru: Быстрые элементы управления Aether Shell
+ar: عناصر التحكم السريعة في Aether Shell
+bn: Aether Shell দ্রুত কন্ট্রোল
+ur: Aether Shell فوری کنٹرولز
 
 en: Media session active
 fr: Session multimédia active
 es: Sesión multimedia activa
 zh: 媒体会话进行中
 hi: मीडिया सत्र सक्रिय
+pt: Sessão de mídia ativa
+ru: Сеанс мультимедиа активен
+ar: جلسة وسائط نشطة
+bn: মিডিয়া সেশন সক্রিয়
+ur: میڈیا سیشن فعال
 
 en: No media session
 fr: Aucune session multimédia
 es: Ninguna sesión multimedia
 zh: 无媒体会话
 hi: कोई मीडिया सत्र नहीं
+pt: Nenhuma sessão de mídia
+ru: Нет сеанса мультимедиа
+ar: لا توجد جلسة وسائط
+bn: কোনো মিডিয়া সেশন নেই
+ur: کوئی میڈیا سیشن نہیں
 
 en: Current page
 fr: Page actuelle
 es: Página actual
 zh: 当前页
 hi: वर्तमान पेज
+pt: Página atual
+ru: Текущая страница
+ar: الصفحة الحالية
+bn: বর্তমান পৃষ্ঠা
+ur: موجودہ صفحہ
 
 en:  - secured
 fr:  - sécurisé
 es:  - protegida
 zh:  - 安全
 hi:  - सुरक्षित
+pt: - protegida
+ru: — защищена
+ar: - مؤمّنة
+bn: - সুরক্ষিত
+ur: - محفوظ
 
 en:  - open
 fr:  - ouvert
 es:  - abierta
 zh:  - 开放
 hi:  - खुला
+pt: - aberta
+ru: — открытая
+ar: - مفتوحة
+bn: - উন্মুক্ত
+ur: - کھلی
 
 en:  - opens in Windows
 fr:  - s'ouvre dans Windows
 es:  - se abre en Windows
 zh:  - 在 Windows 中打开
 hi:  - Windows में खुलता है
+pt: - abre no Windows
+ru: — открывается в Windows
+ar: - يُفتح في Windows
+bn: - Windows-এ খোলে
+ur: - Windows میں کھلتا ہے
 
 en: Turned off by hardware or policy
 fr: Désactivé par le matériel ou une stratégie
 es: Desactivado por el hardware o por una directiva
 zh: 已被硬件或策略关闭
 hi: हार्डवेयर या नीति द्वारा बंद
+pt: Desativado pelo hardware ou por política
+ru: Отключено оборудованием или политикой
+ar: معطّل بواسطة العتاد أو السياسة
+bn: হার্ডওয়্যার বা নীতির কারণে বন্ধ
+ur: ہارڈ ویئر یا پالیسی کی وجہ سے بند
 
 en: State unavailable - use Windows settings
 fr: État indisponible - utilisez les paramètres de Windows
 es: Estado no disponible - usa la configuración de Windows
 zh: 状态不可用 - 请使用 Windows 设置
 hi: स्थिति उपलब्ध नहीं - Windows सेटिंग्स का उपयोग करें
+pt: Estado indisponível - use as configurações do Windows
+ru: Состояние недоступно — используйте параметры Windows
+ar: الحالة غير متاحة - استخدم إعدادات Windows
+bn: অবস্থা অনুপলব্ধ - Windows সেটিংস ব্যবহার করুন
+ur: حالت دستیاب نہیں - Windows کی ترتیبات استعمال کریں
 
 en: Off
 fr: Désactivé
 es: Desactivado
 zh: 关闭
 hi: बंद
+pt: Desativado
+ru: Выкл.
+ar: متوقف
+bn: বন্ধ
+ur: بند
 
 en:  - signal {} of 5
 fr:  - signal {} sur 5
 es:  - señal {} de 5
 zh:  - 信号 {}/5
 hi:  - सिग्नल 5 में से {}
+pt: - sinal {} de 5
+ru: — сигнал {} из 5
+ar: - الإشارة {} من 5
+bn: - সিগন্যাল ৫-এর মধ্যে {}
+ur: - سگنل 5 میں سے {}
 
 en: , no internet
 fr: , pas d'Internet
 es: , sin Internet
 zh: ，无 Internet
 hi: , इंटरनेट नहीं
+pt: , sem internet
+ru: , нет Интернета
+ar: ، لا يوجد إنترنت
+bn: , ইন্টারনেট নেই
+ur: ، انٹرنیٹ نہیں
 
 en: On - not connected
 fr: Activé - non connecté
 es: Activado - no conectado
 zh: 已开启 - 未连接
 hi: चालू - कनेक्ट नहीं है
+pt: Ativado - não conectado
+ru: Вкл. — не подключено
+ar: قيد التشغيل - غير متصل
+bn: চালু - সংযুক্ত নয়
+ur: چالو - منسلک نہیں
 
 en: Windows is not letting apps list networks: check Location in Privacy settings
 fr: Windows n'autorise pas les applications à lister les réseaux : vérifiez la localisation dans les paramètres de confidentialité
 es: Windows no permite que las aplicaciones enumeren redes: revisa Ubicación en la configuración de privacidad
 zh: Windows 不允许应用列出网络：请检查隐私设置中的“位置”
 hi: Windows ऐप्स को नेटवर्क सूचीबद्ध करने नहीं दे रहा: गोपनीयता सेटिंग्स में स्थान जाँचें
+pt: O Windows não está permitindo que aplicativos listem redes: verifique Localização nas configurações de Privacidade
+ru: Windows не позволяет приложениям получать список сетей: проверьте раздел «Расположение» в параметрах конфиденциальности
+ar: لا يسمح Windows للتطبيقات بسرد الشبكات: تحقق من الموقع في إعدادات الخصوصية
+bn: Windows অ্যাপকে নেটওয়ার্কের তালিকা দেখতে দিচ্ছে না: গোপনীয়তা সেটিংসে লোকেশন পরীক্ষা করুন
+ur: Windows ایپس کو نیٹ ورکس کی فہرست نہیں دکھانے دے رہا: رازداری کی ترتیبات میں لوکیشن دیکھیں
 
 en: No Wi-Fi adapter found
 fr: Aucun adaptateur Wi-Fi trouvé
 es: No se encontró ningún adaptador Wi-Fi
 zh: 未找到 WLAN 适配器
 hi: कोई Wi-Fi अडैप्टर नहीं मिला
+pt: Nenhum adaptador Wi-Fi encontrado
+ru: Адаптер Wi-Fi не найден
+ar: لم يتم العثور على محوّل Wi-Fi
+bn: কোনো Wi-Fi অ্যাডাপ্টার পাওয়া যায়নি
+ur: کوئی Wi-Fi اڈاپٹر نہیں ملا
 
 en: Connecting to {}...
 fr: Connexion à {}...
 es: Conectando a {}...
 zh: 正在连接到 {}...
 hi: {} से कनेक्ट हो रहा है...
+pt: Conectando a {}...
+ru: Подключение к {}...
+ar: جارٍ الاتصال بـ {}...
+bn: {}-এর সাথে সংযোগ হচ্ছে...
+ur: {} سے منسلک ہو رہا ہے...
 
 en:  - looking for networks
 fr:  - recherche de réseaux
 es:  - buscando redes
 zh:  - 正在查找网络
 hi:  - नेटवर्क खोजे जा रहे हैं
+pt: - procurando redes
+ru: — поиск сетей
+ar: - جارٍ البحث عن شبكات
+bn: - নেটওয়ার্ক খোঁজা হচ্ছে
+ur: - نیٹ ورکس تلاش کیے جا رہے ہیں
 
 en: On
 fr: Activé
 es: Activado
 zh: 开启
 hi: चालू
+pt: Ativado
+ru: Вкл.
+ar: قيد التشغيل
+bn: চালু
+ur: چالو
 
 en: A screen reader is running
 fr: Un lecteur d'écran est en cours d'exécution
 es: Hay un lector de pantalla en ejecución
 zh: 屏幕阅读器正在运行
 hi: एक स्क्रीन रीडर चल रहा है
+pt: Um leitor de tela está em execução
+ru: Запущена программа чтения с экрана
+ar: قارئ الشاشة قيد التشغيل
+bn: একটি স্ক্রিন রিডার চলছে
+ur: اسکرین ریڈر چل رہا ہے
 
 en: Windows accessibility features
 fr: Fonctions d'accessibilité de Windows
 es: Funciones de accesibilidad de Windows
 zh: Windows 辅助功能
 hi: Windows सुगम्यता सुविधाएँ
+pt: Recursos de acessibilidade do Windows
+ru: Специальные возможности Windows
+ar: ميزات إمكانية الوصول في Windows
+bn: Windows অ্যাক্সেসিবিলিটি ফিচার
+ur: Windows کی رسائی کی سہولیات
 
 en: Sound output
 fr: Sortie audio
 es: Salida de sonido
 zh: 声音输出
 hi: ध्वनि आउटपुट
+pt: Saída de som
+ru: Вывод звука
+ar: خرج الصوت
+bn: সাউন্ড আউটপুট
+ur: آواز کی آؤٹ پٹ
 
 en: Default output device
 fr: Périphérique de sortie par défaut
 es: Dispositivo de salida predeterminado
 zh: 默认输出设备
 hi: डिफ़ॉल्ट आउटपुट डिवाइस
+pt: Dispositivo de saída padrão
+ru: Устройство вывода по умолчанию
+ar: جهاز الخرج الافتراضي
+bn: ডিফল্ট আউটপুট ডিভাইস
+ur: ڈیفالٹ آؤٹ پٹ ڈیوائس
 
 en: No output device available
 fr: Aucun périphérique de sortie disponible
 es: No hay ningún dispositivo de salida disponible
 zh: 没有可用的输出设备
 hi: कोई आउटपुट डिवाइस उपलब्ध नहीं
+pt: Nenhum dispositivo de saída disponível
+ru: Нет доступных устройств вывода
+ar: لا يوجد جهاز خرج متاح
+bn: কোনো আউটপুট ডিভাইস উপলব্ধ নেই
+ur: کوئی آؤٹ پٹ ڈیوائس دستیاب نہیں
 
 en: Battery unknown
 fr: Batterie inconnue
 es: Batería desconocida
 zh: 电池未知
 hi: बैटरी अज्ञात
+pt: Bateria desconhecida
+ru: Батарея неизвестна
+ar: بطارية غير معروفة
+bn: ব্যাটারি অজানা
+ur: بیٹری نامعلوم
 
 en: Status refresh could not be started
 fr: L'actualisation de l'état n'a pas pu démarrer
 es: No se pudo iniciar la actualización del estado
 zh: 无法开始刷新状态
 hi: स्थिति रीफ़्रेश शुरू नहीं हो सका
+pt: Não foi possível iniciar a atualização de status
+ru: Не удалось запустить обновление состояния
+ar: تعذّر بدء تحديث الحالة
+bn: অবস্থার রিফ্রেশ শুরু করা যায়নি
+ur: حالت کی تازہ کاری شروع نہیں ہو سکی
 
 en: Status refresh unavailable
 fr: Actualisation de l'état indisponible
 es: Actualización del estado no disponible
 zh: 无法刷新状态
 hi: स्थिति रीफ़्रेश उपलब्ध नहीं
+pt: Atualização de status indisponível
+ru: Обновление состояния недоступно
+ar: تحديث الحالة غير متاح
+bn: অবস্থার রিফ্রেশ অনুপলব্ধ
+ur: حالت کی تازہ کاری دستیاب نہیں
 
 en: Excellent signal
 fr: Excellent signal
 es: Señal excelente
 zh: 信号极佳
 hi: बहुत अच्छा सिग्नल
+pt: Sinal excelente
+ru: Отличный сигнал
+ar: إشارة ممتازة
+bn: চমৎকার সিগন্যাল
+ur: بہترین سگنل
 
 en: Good signal
 fr: Bon signal
 es: Buena señal
 zh: 信号良好
 hi: अच्छा सिग्नल
+pt: Sinal bom
+ru: Хороший сигнал
+ar: إشارة جيدة
+bn: ভালো সিগন্যাল
+ur: اچھا سگنل
 
 en: Fair signal
 fr: Signal moyen
 es: Señal aceptable
 zh: 信号一般
 hi: ठीक-ठाक सिग्नल
+pt: Sinal razoável
+ru: Средний сигнал
+ar: إشارة مقبولة
+bn: মোটামুটি সিগন্যাল
+ur: درمیانہ سگنل
 
 en: Weak signal
 fr: Signal faible
 es: Señal débil
 zh: 信号弱
 hi: कमज़ोर सिग्नल
+pt: Sinal fraco
+ru: Слабый сигнал
+ar: إشارة ضعيفة
+bn: দুর্বল সিগন্যাল
+ur: کمزور سگنل
 
 en: Clear sky
 fr: Ciel dégagé
 es: Cielo despejado
 zh: 晴朗
 hi: साफ़ आसमान
+pt: Céu limpo
+ru: Ясно
+ar: سماء صافية
+bn: পরিষ্কার আকাশ
+ur: صاف آسمان
 
 en: Mainly clear
 fr: Plutôt dégagé
 es: Mayormente despejado
 zh: 大致晴朗
 hi: ज़्यादातर साफ़
+pt: Predominantemente limpo
+ru: Преимущественно ясно
+ar: صافٍ في الغالب
+bn: প্রায় পরিষ্কার
+ur: زیادہ تر صاف
 
 en: Partly cloudy
 fr: Partiellement nuageux
 es: Parcialmente nublado
 zh: 局部多云
 hi: आंशिक रूप से बादल
+pt: Parcialmente nublado
+ru: Переменная облачность
+ar: غائم جزئيًا
+bn: আংশিক মেঘলা
+ur: جزوی ابر آلود
 
 en: Overcast
 fr: Couvert
 es: Cubierto
 zh: 阴天
 hi: घने बादल
+pt: Encoberto
+ru: Пасмурно
+ar: غائم كليًا
+bn: মেঘাচ্ছন্ন
+ur: مکمل ابر آلود
 
 en: Fog
 fr: Brouillard
 es: Niebla
 zh: 雾
 hi: कोहरा
+pt: Neblina
+ru: Туман
+ar: ضباب
+bn: কুয়াশা
+ur: دھند
 
 en: Drizzle
 fr: Bruine
 es: Llovizna
 zh: 毛毛雨
 hi: बूँदाबाँदी
+pt: Garoa
+ru: Морось
+ar: رذاذ
+bn: গুঁড়ি গুঁড়ি বৃষ্টি
+ur: ہلکی بوندا باندی
 
 en: Rain
 fr: Pluie
 es: Lluvia
 zh: 雨
 hi: बारिश
+pt: Chuva
+ru: Дождь
+ar: مطر
+bn: বৃষ্টি
+ur: بارش
 
 en: Snow
 fr: Neige
 es: Nieve
 zh: 雪
 hi: बर्फ़
+pt: Neve
+ru: Снег
+ar: ثلج
+bn: তুষারপাত
+ur: برف باری
 
 en: Rain showers
 fr: Averses
 es: Chubascos
 zh: 阵雨
 hi: बौछारें
+pt: Pancadas de chuva
+ru: Ливень
+ar: زخات مطر
+bn: ঝমঝমে বৃষ্টি
+ur: بارش کی بوچھاڑیں
 
 en: Snow showers
 fr: Averses de neige
 es: Chubascos de nieve
 zh: 阵雪
 hi: बर्फ़ की बौछारें
+pt: Pancadas de neve
+ru: Снегопад
+ar: زخات ثلج
+bn: তুষারঝড়
+ur: برفانی بوچھاڑیں
 
 en: Thunderstorm
 fr: Orage
 es: Tormenta
 zh: 雷暴
 hi: आँधी-तूफ़ान
+pt: Trovoadas
+ru: Гроза
+ar: عاصفة رعدية
+bn: বজ্রঝড়
+ur: گرج چمک کے ساتھ طوفان

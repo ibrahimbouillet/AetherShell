@@ -3,6 +3,7 @@
 #include "weather/WeatherProvider.h"
 
 #include "core/Cancellation.h"
+#include "core/Strings.h"
 #include "core/WorkerPool.h"
 #include "diagnostics/Logger.h"
 #include "weather/OpenMeteo.h"
@@ -424,8 +425,10 @@ FetchOutcome WeatherProvider::Impl::FetchOnce(const WeatherConfig& request, cons
                 }
                 case ErrorCode::Network:
                 case ErrorCode::Timeout:
+                    // The client's message names the host and the failing step, never the coordinates.
                     return MakeFailure(WeatherState::Offline, "Open-Meteo could not be reached (" + codeName + ").",
-                                       "transport error " + codeName);
+                                       "transport error " + codeName + ": " +
+                                           text::SanitizeForLog(response.error().message, 200));
                 case ErrorCode::Integrity:
                     return MakeFailure(WeatherState::RequestFailed, "The weather response was too large.",
                                        "response exceeded the size limit");

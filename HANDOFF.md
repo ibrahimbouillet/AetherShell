@@ -7,7 +7,40 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.6: text Top Bar, corners redone, elastic Dock drag (`0.4.0-alpha.4`, D71–D73, S-074, 2026-11-10)
+## Current checkpoint — Alpha 4, test 4.7: the weather works, corners kept between windows, ten languages (`0.4.0-alpha.4`, D74–D76, S-075, 2026-11-13)
+
+The owner, after trying 4.6, asked for: the weather to work; the app to be more fluid (it "recalculates the rounded
+corners" at each change of page); the too-large margin that takes height from pages; more languages (ten) matched to the
+languages Windows offers; and the choices remembered across versions. Plus one GitHub contribution for the day.
+
+- **Weather (D75, FR-010, T60):** root cause found by reproducing it with the application's own WinHTTP client:
+  `Operation aborted (0x80004004)` while reading Open-Meteo's body whenever WinHTTP's automatic decompression is on (both
+  hosts, HTTP/1.1 and HTTP/2). `HttpRequest::allowCompression=false` for the weather's requests; the log now names the
+  failing step. `tests/network/net/OpenMeteoReachabilityTests.cpp` (3 cases). **Not yet seen on the owner's desktop.**
+- **Corners (D76, FR-036, T60):** measured on the guard's fixtures: a sweep that rebuilt a monitor's frame took 40 to 100 ms
+  (return of a maximized window after a non-maximized one), a sweep that only moved the front window 1 to 4 ms. Frames are now
+  kept hidden (about 9 ms to show again); regions are built in one call; both windows are stacked in one `DeferWindowPos`.
+  The pixel tests (including their existing hide/show cycle) pass. **Not yet seen on the real desktop.**
+- **Margin:** the owner's work area was 835 px of 1080 (150% scale): 48 px above, **197 px below**, 18 px at each side. About
+  90 px of the bottom came from Settings → Appearance → "Reserve extra space for Dock animations", which was **on** in the
+  owner's `settings.json` (off in the 2026-10-29 backup; default off). It was switched off in that file
+  (`dock.reserveAnimationSpace`, backup `settings.json.before-margin-fix` beside it); the running 4.6 keeps it in memory
+  until restarted, and any Apply in Settings would write it back. What remains (about 107 px at the bottom) is the Dock's own
+  panel (67 DIPs) and its bottom margin.
+- **Ten languages (D74, FR-042, T61):** Portuguese, Russian, Arabic, Bengali and Urdu; 752 texts each. "Follow Windows"
+  walks the person's ranked Windows display languages. The choice (`general.language`) lives in
+  `%LOCALAPPDATA%\AetherShell\config\settings.json`, shared by every version (uninstall keeps it), and setup, the updater, the
+  launcher and the app's first messages read it (`i18n::StartupLanguage`). Arabic/Urdu: DirectWrite reading direction only.
+  **Not done:** the README/guides for the new five (English for now), mirrored layout, native-speaker review.
+- **Persistence across versions:** already how the product works (settings are outside the version folders and survive
+  install-over, repair and uninstall unless removal is chosen); what was missing was the language for the setup programs.
+- **Contribution:** `bd02322` on `origin/main` (README note mentions languages), merged locally as `1ffd850`. Nothing else pushed (D65).
+
+**Next:** the owner installs test 4.7 and tries: the weather in the Top Bar, switching between applications (corners), the
+height of maximized pages, a language other than French (and Windows' own language list), Arabic or Urdu for the look.
+Then the README and guides in the new five languages if the owner wants them.
+
+## Earlier — Alpha 4, test 4.6: text Top Bar, corners redone, elastic Dock drag (`0.4.0-alpha.4`, D71–D73, S-074, 2026-11-10)
 
 **Committed locally and packaged as test 4.6, at the owner's word; not pushed (D65), not installed.** The owner had first
 said not to deliver this round, then asked for the test build once back. The setup is in `dist/` (SHA-256 in S-074);

@@ -60,6 +60,9 @@ private:
     std::wstring smallFamily_;
     winrt::com_ptr<IDWriteTypography> tabular_;
     std::map<std::tuple<bool, int, int, int, int, bool, bool>, winrt::com_ptr<IDWriteTextFormat>> formats_;
+    // D74: whether the formats above were made for a right-to-left interface language (Arabic, Urdu). They start
+    // again when the language changes between the two directions.
+    bool rightToLeft_ = false;
 };
 
 }  // namespace aether::graphics

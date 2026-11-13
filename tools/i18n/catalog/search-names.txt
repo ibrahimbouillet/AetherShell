@@ -6,363 +6,668 @@ fr: Gestion des disques
 es: Administración de discos
 zh: 磁盘管理
 hi: डिस्क प्रबंधन
+pt: Gerenciamento de Disco
+ru: Управление дисками
+ar: إدارة الأقراص
+bn: ডিস্ক ম্যানেজমেন্ট
+ur: ڈسک مینیجمنٹ
 
 en: Local Users and Groups
 fr: Utilisateurs et groupes locaux
 es: Usuarios y grupos locales
 zh: 本地用户和组
 hi: स्थानीय उपयोगकर्ता और समूह
+pt: Usuários e Grupos Locais
+ru: Локальные пользователи и группы
+ar: المستخدمون والمجموعات المحلية
+bn: স্থানীয় ব্যবহারকারী ও গোষ্ঠী
+ur: مقامی صارفین اور گروپس
 
 en: Local Group Policy Editor
 fr: Éditeur de stratégie de groupe locale
 es: Editor de directivas de grupo local
 zh: 本地组策略编辑器
 hi: स्थानीय समूह नीति संपादक
+pt: Editor de Política de Grupo Local
+ru: Редактор локальной групповой политики
+ar: محرر نُهج المجموعة المحلية
+bn: স্থানীয় গ্রুপ পলিসি এডিটর
+ur: مقامی گروپ پالیسی ایڈیٹر
 
 en: Manage User Certificates
 fr: Gérer les certificats utilisateur
 es: Administrar certificados de usuario
 zh: 管理用户证书
 hi: उपयोगकर्ता प्रमाणपत्र प्रबंधित करें
+pt: Gerenciar Certificados de Usuário
+ru: Управление сертификатами пользователя
+ar: إدارة شهادات المستخدم
+bn: ব্যবহারকারীর সার্টিফিকেট পরিচালনা
+ur: صارف سرٹیفکیٹ کا نظم
 
 en: Manage Computer Certificates
 fr: Gérer les certificats de l'ordinateur
 es: Administrar certificados de equipo
 zh: 管理计算机证书
 hi: कंप्यूटर प्रमाणपत्र प्रबंधित करें
+pt: Gerenciar Certificados do Computador
+ru: Управление сертификатами компьютера
+ar: إدارة شهادات الكمبيوتر
+bn: কম্পিউটারের সার্টিফিকেট পরিচালনা
+ur: کمپیوٹر سرٹیفکیٹ کا نظم
 
 en: Shared Folders
 fr: Dossiers partagés
 es: Carpetas compartidas
 zh: 共享文件夹
 hi: साझा फ़ोल्डर
+pt: Pastas Compartilhadas
+ru: Общие папки
+ar: المجلدات المشتركة
+bn: শেয়ার করা ফোল্ডার
+ur: مشترکہ فولڈرز
 
 en: TPM Management
 fr: Gestion du module de plateforme sécurisée
 es: Administración de TPM
 zh: TPM 管理
 hi: TPM प्रबंधन
+pt: Gerenciamento do TPM
+ru: Управление TPM
+ar: إدارة TPM
+bn: TPM ব্যবস্থাপনা
+ur: TPM کا نظم
 
 en: Network Connections
 fr: Connexions réseau
 es: Conexiones de red
 zh: 网络连接
 hi: नेटवर्क कनेक्शन
+pt: Conexões de Rede
+ru: Сетевые подключения
+ar: اتصالات الشبكة
+bn: নেটওয়ার্ক সংযোগ
+ur: نیٹ ورک کنکشنز
 
 en: System Properties
 fr: Propriétés système
 es: Propiedades del sistema
 zh: 系统属性
 hi: सिस्टम गुण
+pt: Propriedades do Sistema
+ru: Свойства системы
+ar: خصائص النظام
+bn: সিস্টেমের বৈশিষ্ট্য
+ur: سسٹم کی خصوصیات
 
 en: About Windows
 fr: À propos de Windows
 es: Acerca de Windows
 zh: 关于 Windows
 hi: Windows के बारे में
+pt: Sobre o Windows
+ru: О программе Windows
+ar: حول Windows
+bn: Windows সম্পর্কে
+ur: Windows کے بارے میں
 
 en: DirectX Diagnostic Tool
 fr: Outil de diagnostic DirectX
 es: Herramienta de diagnóstico de DirectX
 zh: DirectX 诊断工具
 hi: DirectX डायग्नोस्टिक टूल
+pt: Ferramenta de Diagnóstico do DirectX
+ru: Средство диагностики DirectX
+ar: أداة تشخيص DirectX
+bn: DirectX ডায়াগনস্টিক টুল
+ur: DirectX تشخیصی ٹول
 
 en: Windows Features
 fr: Fonctionnalités de Windows
 es: Características de Windows
 zh: Windows 功能
 hi: Windows सुविधाएँ
+pt: Recursos do Windows
+ru: Компоненты Windows
+ar: ميزات Windows
+bn: Windows ফিচার
+ur: Windows کی خصوصیات
 
 en: System Restore
 fr: Restauration du système
 es: Restaurar sistema
 zh: 系统还原
 hi: सिस्टम पुनर्स्थापना
+pt: Restauração do Sistema
+ru: Восстановление системы
+ar: استعادة النظام
+bn: সিস্টেম রিস্টোর
+ur: سسٹم ری سٹور
 
 en: Advanced System Settings
 fr: Paramètres système avancés
 es: Configuración avanzada del sistema
 zh: 高级系统设置
 hi: उन्नत सिस्टम सेटिंग्स
+pt: Configurações Avançadas do Sistema
+ru: Дополнительные параметры системы
+ar: إعدادات النظام المتقدمة
+bn: উন্নত সিস্টেম সেটিংস
+ur: سسٹم کی جدید ترتیبات
 
 en: Volume Mixer
 fr: Mélangeur de volume
 es: Mezclador de volumen
 zh: 音量合成器
 hi: वॉल्यूम मिक्सर
+pt: Mixer de Volume
+ru: Микшер громкости
+ar: خلاط الصوت
+bn: ভলিউম মিক্সার
+ur: والیوم مکسر
 
 en: Microsoft Management Console
 fr: Console de gestion Microsoft
 es: Consola de administración de Microsoft
 zh: Microsoft 管理控制台
 hi: Microsoft प्रबंधन कंसोल
+pt: Console de Gerenciamento Microsoft
+ru: Консоль управления Microsoft
+ar: وحدة تحكم إدارة Microsoft
+bn: Microsoft ম্যানেজমেন্ট কনসোল
+ur: Microsoft مینجمنٹ کنسول
 
 en: User Accounts (Advanced)
 fr: Comptes d'utilisateurs (avancé)
 es: Cuentas de usuario (avanzado)
 zh: 用户帐户（高级）
 hi: उपयोगकर्ता खाते (उन्नत)
+pt: Contas de Usuário (Avançado)
+ru: Учётные записи пользователей (расширенные)
+ar: حسابات المستخدمين (متقدم)
+bn: ব্যবহারকারী অ্যাকাউন্ট (উন্নত)
+ur: صارف اکاؤنٹس (جدید)
 
 en: Display settings
 fr: Paramètres d'affichage
 es: Configuración de pantalla
 zh: 显示设置
 hi: डिस्प्ले सेटिंग्स
+pt: Configurações de vídeo
+ru: Параметры дисплея
+ar: إعدادات العرض
+bn: ডিসপ্লে সেটিংস
+ur: ڈسپلے کی ترتیبات
 
 en: Night light settings
 fr: Paramètres de l'éclairage nocturne
 es: Configuración de la luz nocturna
 zh: 夜间模式设置
 hi: रात्रि प्रकाश सेटिंग्स
+pt: Configurações da luz noturna
+ru: Параметры ночного света
+ar: إعدادات الإضاءة الليلية
+bn: নাইট লাইট সেটিংস
+ur: نائٹ لائٹ کی ترتیبات
 
 en: Graphics settings
 fr: Paramètres graphiques
 es: Configuración de gráficos
 zh: 图形设置
 hi: ग्राफ़िक्स सेटिंग्स
+pt: Configurações de gráficos
+ru: Параметры графики
+ar: إعدادات الرسومات
+bn: গ্রাফিক্স সেটিংস
+ur: گرافکس کی ترتیبات
 
 en: Sound settings
 fr: Paramètres du son
 es: Configuración de sonido
 zh: 声音设置
 hi: ध्वनि सेटिंग्स
+pt: Configurações de som
+ru: Параметры звука
+ar: إعدادات الصوت
+bn: সাউন্ড সেটিংস
+ur: آواز کی ترتیبات
 
 en: Notification settings
 fr: Paramètres de notification
 es: Configuración de notificaciones
 zh: 通知设置
 hi: सूचना सेटिंग्स
+pt: Configurações de notificação
+ru: Параметры уведомлений
+ar: إعدادات الإشعارات
+bn: বিজ্ঞপ্তি সেটিংস
+ur: اطلاعات کی ترتیبات
 
 en: Power & battery settings
 fr: Paramètres d'alimentation et de batterie
 es: Configuración de energía y batería
 zh: 电源和电池设置
 hi: पावर और बैटरी सेटिंग्स
+pt: Configurações de energia e bateria
+ru: Параметры питания и батареи
+ar: إعدادات الطاقة والبطارية
+bn: পাওয়ার ও ব্যাটারি সেটিংস
+ur: پاور اور بیٹری کی ترتیبات
 
 en: Energy saver settings
 fr: Paramètres de l'économiseur d'énergie
 es: Configuración del ahorro de energía
 zh: 节能模式设置
 hi: ऊर्जा बचत सेटिंग्स
+pt: Configurações da Economia de Energia
+ru: Параметры режима энергосбережения
+ar: إعدادات توفير الطاقة
+bn: এনার্জি সেভার সেটিংস
+ur: انرجی سیور کی ترتیبات
 
 en: Storage settings
 fr: Paramètres de stockage
 es: Configuración de almacenamiento
 zh: 存储设置
 hi: स्टोरेज सेटिंग्स
+pt: Configurações de armazenamento
+ru: Параметры хранилища
+ar: إعدادات التخزين
+bn: স্টোরেজ সেটিংস
+ur: اسٹوریج کی ترتیبات
 
 en: Multitasking settings
 fr: Paramètres du mode multitâche
 es: Configuración de multitarea
 zh: 多任务处理设置
 hi: मल्टीटास्किंग सेटिंग्स
+pt: Configurações de multitarefa
+ru: Параметры многозадачности
+ar: إعدادات تعدد المهام
+bn: মাল্টিটাস্কিং সেটিংস
+ur: ملٹی ٹاسکنگ کی ترتیبات
 
 en: Clipboard settings
 fr: Paramètres du Presse-papiers
 es: Configuración del Portapapeles
 zh: 剪贴板设置
 hi: क्लिपबोर्ड सेटिंग्स
+pt: Configurações da área de transferência
+ru: Параметры буфера обмена
+ar: إعدادات الحافظة
+bn: ক্লিপবোর্ড সেটিংস
+ur: کلپ بورڈ کی ترتیبات
 
 en: Remote Desktop settings
 fr: Paramètres du Bureau à distance
 es: Configuración de Escritorio remoto
 zh: 远程桌面设置
 hi: रिमोट डेस्कटॉप सेटिंग्स
+pt: Configurações da Área de Trabalho Remota
+ru: Параметры удалённого рабочего стола
+ar: إعدادات سطح المكتب البعيد
+bn: রিমোট ডেস্কটপ সেটিংস
+ur: ریموٹ ڈیسک ٹاپ کی ترتیبات
 
 en: About your PC
 fr: Informations système
 es: Acerca de tu PC
 zh: 关于你的电脑
 hi: आपके PC के बारे में
+pt: Sobre o seu PC
+ru: О вашем ПК
+ar: حول جهاز الكمبيوتر
+bn: আপনার পিসি সম্পর্কে
+ur: آپ کے پی سی کے بارے میں
 
 en: Bluetooth & devices settings
 fr: Paramètres Bluetooth et appareils
 es: Configuración de Bluetooth y dispositivos
 zh: 蓝牙和其他设备设置
 hi: ब्लूटूथ और डिवाइस सेटिंग्स
+pt: Configurações de Bluetooth e dispositivos
+ru: Параметры Bluetooth и устройств
+ar: إعدادات Bluetooth والأجهزة
+bn: Bluetooth ও ডিভাইস সেটিংস
+ur: Bluetooth اور آلات کی ترتیبات
 
 en: Printers & scanners settings
 fr: Paramètres des imprimantes et scanners
 es: Configuración de impresoras y escáneres
 zh: 打印机和扫描仪设置
 hi: प्रिंटर और स्कैनर सेटिंग्स
+pt: Configurações de impressoras e scanners
+ru: Параметры принтеров и сканеров
+ar: إعدادات الطابعات والماسحات الضوئية
+bn: প্রিন্টার ও স্ক্যানার সেটিংস
+ur: پرنٹرز اور اسکینرز کی ترتیبات
 
 en: Mouse settings
 fr: Paramètres de la souris
 es: Configuración del mouse
 zh: 鼠标设置
 hi: माउस सेटिंग्स
+pt: Configurações do mouse
+ru: Параметры мыши
+ar: إعدادات الماوس
+bn: মাউস সেটিংস
+ur: ماؤس کی ترتیبات
 
 en: Touchpad settings
 fr: Paramètres du pavé tactile
 es: Configuración del panel táctil
 zh: 触摸板设置
 hi: टचपैड सेटिंग्स
+pt: Configurações do touchpad
+ru: Параметры сенсорной панели
+ar: إعدادات لوحة اللمس
+bn: টাচপ্যাড সেটিংস
+ur: ٹچ پیڈ کی ترتیبات
 
 en: Network & internet settings
 fr: Paramètres réseau et Internet
 es: Configuración de red e Internet
 zh: 网络和 Internet 设置
 hi: नेटवर्क और इंटरनेट सेटिंग्स
+pt: Configurações de rede e internet
+ru: Параметры сети и Интернета
+ar: إعدادات الشبكة والإنترنت
+bn: নেটওয়ার্ক ও ইন্টারনেট সেটিংস
+ur: نیٹ ورک اور انٹرنیٹ کی ترتیبات
 
 en: Wi-Fi settings
 fr: Paramètres Wi-Fi
 es: Configuración de Wi-Fi
 zh: WLAN 设置
 hi: Wi-Fi सेटिंग्स
+pt: Configurações de Wi-Fi
+ru: Параметры Wi-Fi
+ar: إعدادات Wi-Fi
+bn: Wi-Fi সেটিংস
+ur: Wi-Fi کی ترتیبات
 
 en: VPN settings
 fr: Paramètres VPN
 es: Configuración de VPN
 zh: VPN 设置
 hi: VPN सेटिंग्स
+pt: Configurações de VPN
+ru: Параметры VPN
+ar: إعدادات VPN
+bn: VPN সেটিংস
+ur: VPN کی ترتیبات
 
 en: Proxy settings
 fr: Paramètres du proxy
 es: Configuración de proxy
 zh: 代理设置
 hi: प्रॉक्सी सेटिंग्स
+pt: Configurações de proxy
+ru: Параметры прокси-сервера
+ar: إعدادات الوكيل
+bn: প্রক্সি সেটিংস
+ur: پراکسی کی ترتیبات
 
 en: Airplane mode settings
 fr: Paramètres du mode Avion
 es: Configuración del modo avión
 zh: 飞行模式设置
 hi: हवाई जहाज़ मोड सेटिंग्स
+pt: Configurações do modo avião
+ru: Параметры режима «в самолёте»
+ar: إعدادات وضع الطائرة
+bn: ফ্লাইট মোড সেটিংস
+ur: ہوائی جہاز موڈ کی ترتیبات
 
 en: Mobile hotspot settings
 fr: Paramètres du point d'accès mobile
 es: Configuración de la zona con cobertura inalámbrica móvil
 zh: 移动热点设置
 hi: मोबाइल हॉटस्पॉट सेटिंग्स
+pt: Configurações do ponto de acesso móvel
+ru: Параметры мобильной точки доступа
+ar: إعدادات نقطة الاتصال المتنقلة
+bn: মোবাইল হটস্পট সেটিংস
+ur: موبائل ہاٹ اسپاٹ کی ترتیبات
 
 en: Background settings
 fr: Paramètres de l'arrière-plan
 es: Configuración del fondo
 zh: 背景设置
 hi: पृष्ठभूमि सेटिंग्स
+pt: Configurações de plano de fundo
+ru: Параметры фона
+ar: إعدادات الخلفية
+bn: ব্যাকগ্রাউন্ড সেটিংস
+ur: پس منظر کی ترتیبات
 
 en: Color settings
 fr: Paramètres des couleurs
 es: Configuración de colores
 zh: 颜色设置
 hi: रंग सेटिंग्स
+pt: Configurações de cores
+ru: Параметры цвета
+ar: إعدادات الألوان
+bn: রঙের সেটিংস
+ur: رنگوں کی ترتیبات
 
 en: Theme settings
 fr: Paramètres des thèmes
 es: Configuración de temas
 zh: 主题设置
 hi: थीम सेटिंग्स
+pt: Configurações de temas
+ru: Параметры тем
+ar: إعدادات السمات
+bn: থিম সেটিংস
+ur: تھیم کی ترتیبات
 
 en: Lock screen settings
 fr: Paramètres de l'écran de verrouillage
 es: Configuración de la pantalla de bloqueo
 zh: 锁屏界面设置
 hi: लॉक स्क्रीन सेटिंग्स
+pt: Configurações da tela de bloqueio
+ru: Параметры экрана блокировки
+ar: إعدادات شاشة القفل
+bn: লক স্ক্রিন সেটিংস
+ur: لاک اسکرین کی ترتیبات
 
 en: Taskbar settings
 fr: Paramètres de la barre des tâches
 es: Configuración de la barra de tareas
 zh: 任务栏设置
 hi: टास्कबार सेटिंग्स
+pt: Configurações da barra de tarefas
+ru: Параметры панели задач
+ar: إعدادات شريط المهام
+bn: টাস্কবার সেটিংস
+ur: ٹاسک بار کی ترتیبات
 
 en: Font settings
 fr: Paramètres des polices
 es: Configuración de fuentes
 zh: 字体设置
 hi: फ़ॉन्ट सेटिंग्स
+pt: Configurações de fontes
+ru: Параметры шрифтов
+ar: إعدادات الخطوط
+bn: ফন্ট সেটিংস
+ur: فونٹس کی ترتیبات
 
 en: Installed apps
 fr: Applications installées
 es: Aplicaciones instaladas
 zh: 已安装的应用
 hi: इंस्टॉल किए गए ऐप्स
+pt: Aplicativos instalados
+ru: Установленные приложения
+ar: التطبيقات المثبتة
+bn: ইনস্টল করা অ্যাপ
+ur: نصب شدہ ایپس
 
 en: Default apps settings
 fr: Paramètres des applications par défaut
 es: Configuración de aplicaciones predeterminadas
 zh: 默认应用设置
 hi: डिफ़ॉल्ट ऐप्स सेटिंग्स
+pt: Configurações de aplicativos padrão
+ru: Параметры приложений по умолчанию
+ar: إعدادات التطبيقات الافتراضية
+bn: ডিফল্ট অ্যাপ সেটিংস
+ur: ڈیفالٹ ایپس کی ترتیبات
 
 en: Startup apps settings
 fr: Paramètres des applications de démarrage
 es: Configuración de aplicaciones de arranque
 zh: 启动应用设置
 hi: स्टार्टअप ऐप्स सेटिंग्स
+pt: Configurações de aplicativos de inicialização
+ru: Параметры автозагрузки приложений
+ar: إعدادات تطبيقات بدء التشغيل
+bn: স্টার্টআপ অ্যাপ সেটিংস
+ur: اسٹارٹ اپ ایپس کی ترتیبات
 
 en: Account info
 fr: Informations du compte
 es: Información de la cuenta
 zh: 帐户信息
 hi: खाते की जानकारी
+pt: Informações da conta
+ru: Сведения об учётной записи
+ar: معلومات الحساب
+bn: অ্যাকাউন্টের তথ্য
+ur: اکاؤنٹ کی معلومات
 
 en: Sign-in options
 fr: Options de connexion
 es: Opciones de inicio de sesión
 zh: 登录选项
 hi: साइन-इन विकल्प
+pt: Opções de entrada
+ru: Параметры входа
+ar: خيارات تسجيل الدخول
+bn: সাইন-ইন বিকল্প
+ur: سائن ان کے اختیارات
 
 en: Other users settings
 fr: Paramètres des autres utilisateurs
 es: Configuración de otros usuarios
 zh: 其他用户设置
 hi: अन्य उपयोगकर्ता सेटिंग्स
+pt: Configurações de outros usuários
+ru: Параметры других пользователей
+ar: إعدادات المستخدمين الآخرين
+bn: অন্যান্য ব্যবহারকারীর সেটিংস
+ur: دیگر صارفین کی ترتیبات
 
 en: Date & time settings
 fr: Paramètres de date et d'heure
 es: Configuración de fecha y hora
 zh: 日期和时间设置
 hi: दिनांक और समय सेटिंग्स
+pt: Configurações de data e hora
+ru: Параметры даты и времени
+ar: إعدادات التاريخ والوقت
+bn: তারিখ ও সময়ের সেটিংস
+ur: تاریخ اور وقت کی ترتیبات
 
 en: Language & region settings
 fr: Paramètres de langue et région
 es: Configuración de idioma y región
 zh: 语言和区域设置
 hi: भाषा और क्षेत्र सेटिंग्स
+pt: Configurações de idioma e região
+ru: Параметры языка и региона
+ar: إعدادات اللغة والمنطقة
+bn: ভাষা ও অঞ্চলের সেটিংস
+ur: زبان اور خطے کی ترتیبات
 
 en: Typing settings
 fr: Paramètres de saisie
 es: Configuración de escritura
 zh: 输入设置
 hi: टाइपिंग सेटिंग्स
+pt: Configurações de digitação
+ru: Параметры ввода
+ar: إعدادات الكتابة
+bn: টাইপিং সেটিংস
+ur: ٹائپنگ کی ترتیبات
 
 en: Accessibility settings
 fr: Paramètres d'accessibilité
 es: Configuración de accesibilidad
 zh: 辅助功能设置
 hi: सुगम्यता सेटिंग्स
+pt: Configurações de acessibilidade
+ru: Параметры специальных возможностей
+ar: إعدادات إمكانية الوصول
+bn: অ্যাক্সেসিবিলিটি সেটিংস
+ur: رسائی کی ترتیبات
 
 en: Privacy & security settings
 fr: Paramètres de confidentialité et sécurité
 es: Configuración de privacidad y seguridad
 zh: 隐私和安全性设置
 hi: गोपनीयता और सुरक्षा सेटिंग्स
+pt: Configurações de privacidade e segurança
+ru: Параметры конфиденциальности и безопасности
+ar: إعدادات الخصوصية والأمان
+bn: গোপনীয়তা ও নিরাপত্তা সেটিংস
+ur: رازداری اور سلامتی کی ترتیبات
 
 en: Location settings
 fr: Paramètres de localisation
 es: Configuración de ubicación
 zh: 位置设置
 hi: स्थान सेटिंग्स
+pt: Configurações de localização
+ru: Параметры расположения
+ar: إعدادات الموقع
+bn: লোকেশন সেটিংস
+ur: لوکیشن کی ترتیبات
 
 en: Windows Update settings
 fr: Paramètres de Windows Update
 es: Configuración de Windows Update
 zh: Windows 更新设置
 hi: Windows Update सेटिंग्स
+pt: Configurações do Windows Update
+ru: Параметры Центра обновления Windows
+ar: إعدادات Windows Update
+bn: Windows Update সেটিংস
+ur: Windows Update کی ترتیبات
 
 en: Recovery settings
 fr: Paramètres de récupération
 es: Configuración de recuperación
 zh: 恢复设置
 hi: रिकवरी सेटिंग्स
+pt: Configurações de recuperação
+ru: Параметры восстановления
+ar: إعدادات الاسترداد
+bn: রিকভারি সেটিংস
+ur: بحالی کی ترتیبات
 
 en: Activation settings
 fr: Paramètres d'activation
 es: Configuración de activación
 zh: 激活设置
 hi: सक्रियण सेटिंग्स
+pt: Configurações de ativação
+ru: Параметры активации
+ar: إعدادات التنشيط
+bn: অ্যাক্টিভেশন সেটিংস
+ur: ایکٹیویشن کی ترتیبات
 
 en: For developers settings
 fr: Paramètres pour les développeurs
 es: Configuración para desarrolladores
 zh: 开发者选项设置
 hi: डेवलपर सेटिंग्स
+pt: Configurações para desenvolvedores
+ru: Параметры для разработчиков
+ar: إعدادات المطورين
+bn: ডেভেলপারদের জন্য সেটিংস
+ur: ڈیولپرز کے لیے ترتیبات

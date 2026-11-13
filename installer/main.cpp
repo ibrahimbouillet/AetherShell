@@ -860,7 +860,13 @@ private:
 
 int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
     try {
-        aether::i18n::SetLanguage(aether::i18n::SystemLanguage());   // D70: setup speaks the Windows display language
+        // D70/D74: setup speaks the language the person chose in Aether Shell's Settings (kept between versions),
+        // else their Windows display language.
+        {
+            const auto root = aether::platform::DefaultDataRoot();
+            aether::i18n::SetLanguage(root ? aether::i18n::StartupLanguage(*root / L"config" / L"settings.json")
+                                           : aether::i18n::SystemLanguage());
+        }
         auto parsed=Parse();if(!parsed)return 2;
         aether::WorkerPool bootstrap({1,L"Aether setup bootstrap",aether::ComApartment::None});
         std::promise<aether::Result<void>> promise;auto future=promise.get_future();

@@ -5,543 +5,998 @@ fr: Choisissez la position Windows pour activer la météo automatique.
 es: Elige la ubicación de Windows para activar el tiempo automático.
 zh: 选择 Windows 位置以启用自动天气。
 hi: स्वचालित मौसम चालू करने के लिए Windows स्थान चुनें।
+pt: Escolha a localização do Windows para ativar o clima automático.
+ru: Выберите расположение Windows, чтобы включить автоматическую погоду.
+ar: اختر موقع Windows لتفعيل الطقس التلقائي.
+bn: স্বয়ংক্রিয় আবহাওয়া চালু করতে Windows লোকেশন বেছে নিন।
+ur: خودکار موسم فعال کرنے کے لیے Windows لوکیشن منتخب کریں۔
 
 en: Windows taskbar visible
 fr: Barre des tâches Windows visible
 es: Barra de tareas de Windows visible
 zh: Windows 任务栏可见
 hi: Windows टास्कबार दिख रहा है
+pt: Barra de tarefas do Windows visível
+ru: Панель задач Windows видна
+ar: شريط مهام Windows ظاهر
+bn: Windows টাস্কবার দৃশ্যমান
+ur: Windows ٹاسک بار نظر آ رہا ہے
 
 en: Connected to {}
 fr: Connecté à {}
 es: Conectado a {}
 zh: 已连接到 {}
 hi: {} से कनेक्ट है
+pt: Conectado a {}
+ru: Подключено к {}
+ar: متصل بـ {}
+bn: {}-এর সাথে সংযুক্ত
+ur: {} سے منسلک
 
 en: {} is out of range
 fr: {} est hors de portée
 es: {} está fuera de alcance
 zh: {} 不在范围内
 hi: {} सीमा से बाहर है
+pt: {} está fora de alcance
+ru: {} вне зоны действия
+ar: {} خارج النطاق
+bn: {} পরিসরের বাইরে
+ur: {} دائرہ کار سے باہر ہے
 
 en: Connecting to {} took too long
 fr: La connexion à {} a pris trop de temps
 es: La conexión a {} tardó demasiado
 zh: 连接到 {} 的时间过长
 hi: {} से कनेक्ट होने में बहुत समय लगा
+pt: A conexão com {} demorou demais
+ru: Подключение к {} заняло слишком много времени
+ar: استغرق الاتصال بـ {} وقتًا طويلًا
+bn: {}-এর সাথে সংযোগে অনেক সময় লেগেছে
+ur: {} سے کنکشن میں بہت زیادہ وقت لگا
 
 en: Use Windows to join {}
 fr: Utilisez Windows pour rejoindre {}
 es: Usa Windows para unirte a {}
 zh: 请使用 Windows 加入 {}
 hi: {} से जुड़ने के लिए Windows का उपयोग करें
+pt: Use o Windows para entrar em {}
+ru: Используйте Windows, чтобы подключиться к {}
+ar: استخدم Windows للانضمام إلى {}
+bn: {}-এ যোগ দিতে Windows ব্যবহার করুন
+ur: {} میں شامل ہونے کے لیے Windows استعمال کریں
 
 en: Windows did not allow this connection
 fr: Windows n'a pas autorisé cette connexion
 es: Windows no permitió esta conexión
 zh: Windows 不允许此连接
 hi: Windows ने यह कनेक्शन अनुमति नहीं दी
+pt: O Windows não permitiu esta conexão
+ru: Windows не разрешила это подключение
+ar: لم يسمح Windows بهذا الاتصال
+bn: Windows এই সংযোগের অনুমতি দেয়নি
+ur: Windows نے اس کنکشن کی اجازت نہیں دی
 
 en: Could not connect to {}
 fr: Impossible de se connecter à {}
 es: No se pudo conectar a {}
 zh: 无法连接到 {}
 hi: {} से कनेक्ट नहीं हो सका
+pt: Não foi possível conectar a {}
+ru: Не удалось подключиться к {}
+ar: تعذّر الاتصال بـ {}
+bn: {}-এর সাথে সংযোগ করা যায়নি
+ur: {} سے منسلک نہیں ہو سکا
 
 en: Connect to {}
 fr: Se connecter à {}
 es: Conectarse a {}
 zh: 连接到 {}
 hi: {} से कनेक्ट करें
+pt: Conectar a {}
+ru: Подключиться к {}
+ar: الاتصال بـ {}
+bn: {}-এর সাথে সংযোগ করুন
+ur: {} سے منسلک ہوں
 
 en: That password was not accepted. Check it and try again.
 fr: Ce mot de passe n'a pas été accepté. Vérifiez-le et réessayez.
 es: No se aceptó esa contraseña. Revísala e inténtalo de nuevo.
 zh: 该密码未被接受。请检查后重试。
 hi: वह पासवर्ड स्वीकार नहीं हुआ। जाँचें और फिर कोशिश करें।
+pt: Essa senha não foi aceita. Verifique-a e tente novamente.
+ru: Этот пароль не принят. Проверьте его и повторите попытку.
+ar: لم يتم قبول كلمة المرور هذه. تحقق منها وحاول مرة أخرى.
+bn: ওই পাসওয়ার্ড গ্রহণ করা হয়নি। এটি যাচাই করে আবার চেষ্টা করুন।
+ur: یہ پاس ورڈ قبول نہیں ہوا۔ اسے جانچیں اور دوبارہ کوشش کریں۔
 
 en: Enter this network's password.
 fr: Saisissez le mot de passe de ce réseau.
 es: Escribe la contraseña de esta red.
 zh: 输入此网络的密码。
 hi: इस नेटवर्क का पासवर्ड डालें।
+pt: Digite a senha desta rede.
+ru: Введите пароль этой сети.
+ar: أدخل كلمة مرور هذه الشبكة.
+bn: এই নেটওয়ার্কের পাসওয়ার্ড লিখুন।
+ur: اس نیٹ ورک کا پاس ورڈ درج کریں۔
 
 en: &Connect
 fr: Se &connecter
 es: &Conectar
 zh: 连接(&C)
 hi: कनेक्ट करें(&C)
+pt: &Conectar
+ru: &Подключить
+ar: اتصال (&C)
+bn: সংযোগ করুন (&C)
+ur: منسلک کریں (&C)
 
 en: Windows Settings could not be opened
 fr: Les Paramètres de Windows n'ont pas pu être ouverts
 es: No se pudo abrir la Configuración de Windows
 zh: 无法打开 Windows 设置
 hi: Windows सेटिंग्स नहीं खुल सकीं
+pt: Não foi possível abrir as Configurações do Windows
+ru: Не удалось открыть параметры Windows
+ar: تعذّر فتح إعدادات Windows
+bn: Windows সেটিংস খোলা যায়নি
+ur: Windows کی ترتیبات نہیں کھل سکیں
 
 en: Dock space could not be reserved; restoring Windows taskbar
 fr: L'espace du Dock n'a pas pu être réservé ; rétablissement de la barre des tâches Windows
 es: No se pudo reservar el espacio del Dock; restaurando la barra de tareas de Windows
 zh: 无法为程序坞保留空间；正在恢复 Windows 任务栏
 hi: डॉक के लिए जगह आरक्षित नहीं हो सकी; Windows टास्कबार बहाल किया जा रहा है
+pt: Não foi possível reservar o espaço do Dock; restaurando a barra de tarefas do Windows
+ru: Не удалось зарезервировать место для Dock; восстанавливается панель задач Windows
+ar: تعذّر حجز مساحة Dock؛ جارٍ استعادة شريط مهام Windows
+bn: Dock-এর জায়গা সংরক্ষণ করা যায়নি; Windows টাস্কবার ফিরিয়ে আনা হচ্ছে
+ur: Dock کے لیے جگہ مختص نہیں ہو سکی؛ Windows ٹاسک بار بحال کیا جا رہا ہے
 
 en: Replacement unavailable: recovery observer could not start
 fr: Remplacement indisponible : le contrôle de récupération n'a pas pu démarrer
 es: Sustitución no disponible: no se pudo iniciar el supervisor de recuperación
 zh: 无法替换：恢复监视器无法启动
 hi: प्रतिस्थापन उपलब्ध नहीं: रिकवरी निगरानी शुरू नहीं हो सकी
+pt: Substituição indisponível: o observador de recuperação não pôde iniciar
+ru: Замена недоступна: не удалось запустить наблюдатель восстановления
+ar: الاستبدال غير متاح: تعذّر بدء مراقب الاسترداد
+bn: প্রতিস্থাপন অনুপলব্ধ: পুনরুদ্ধার পর্যবেক্ষক শুরু করা যায়নি
+ur: متبادل دستیاب نہیں: بحالی نگران شروع نہیں ہو سکا
 
 en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
 fr: Barre des tâches Windows rétablie. L'espace du Dock n'a pas pu être réservé ; désactivez puis réactivez le remplacement pour réessayer.
 es: Barra de tareas de Windows restaurada. No se pudo reservar el espacio del Dock; desactiva y vuelve a activar la sustitución para reintentarlo.
 zh: 已恢复 Windows 任务栏。无法为程序坞保留空间；请关闭再重新开启替换以重试。
 hi: Windows टास्कबार बहाल हुआ। डॉक के लिए जगह आरक्षित नहीं हो सकी; फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+pt: Barra de tarefas do Windows restaurada. Não foi possível reservar o espaço do Dock; desative e ative a substituição para tentar novamente.
+ru: Панель задач Windows восстановлена. Не удалось зарезервировать место для Dock; выключите и снова включите замену, чтобы повторить попытку.
+ar: تمت استعادة شريط مهام Windows. تعذّر حجز مساحة Dock؛ أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+bn: Windows টাস্কবার ফিরিয়ে আনা হয়েছে। Dock-এর জায়গা সংরক্ষণ করা যায়নি; আবার চেষ্টা করতে প্রতিস্থাপন বন্ধ করে চালু করুন।
+ur: Windows ٹاسک بار بحال ہو گیا۔ Dock کے لیے جگہ مختص نہیں ہو سکی؛ دوبارہ کوشش کے لیے متبادل بند کر کے دوبارہ چالو کریں۔
 
 en: Recovery observation is unavailable; restoring Windows taskbar
 fr: Le contrôle de récupération est indisponible ; rétablissement de la barre des tâches Windows
 es: La supervisión de recuperación no está disponible; restaurando la barra de tareas de Windows
 zh: 恢复监视不可用；正在恢复 Windows 任务栏
 hi: रिकवरी निगरानी उपलब्ध नहीं; Windows टास्कबार बहाल किया जा रहा है
+pt: A observação de recuperação não está disponível; restaurando a barra de tarefas do Windows
+ru: Наблюдение за восстановлением недоступно; восстанавливается панель задач Windows
+ar: مراقبة الاسترداد غير متاحة؛ جارٍ استعادة شريط مهام Windows
+bn: পুনরুদ্ধার পর্যবেক্ষণ অনুপলব্ধ; Windows টাস্কবার ফিরিয়ে আনা হচ্ছে
+ur: بحالی کی نگرانی دستیاب نہیں؛ Windows ٹاسک بار بحال کیا جا رہا ہے
 
 en: Windows notifications could not be opened
 fr: Les notifications de Windows n'ont pas pu être ouvertes
 es: No se pudieron abrir las notificaciones de Windows
 zh: 无法打开 Windows 通知
 hi: Windows सूचनाएँ नहीं खुल सकीं
+pt: Não foi possível abrir as notificações do Windows
+ru: Не удалось открыть уведомления Windows
+ar: تعذّر فتح إشعارات Windows
+bn: Windows বিজ্ঞপ্তি খোলা যায়নি
+ur: Windows کی اطلاعات نہیں کھل سکیں
 
 en: The Windows calendar could not be opened
 fr: Le calendrier de Windows n'a pas pu être ouvert
 es: No se pudo abrir el calendario de Windows
 zh: 无法打开 Windows 日历
 hi: Windows कैलेंडर नहीं खुल सका
+pt: Não foi possível abrir o calendário do Windows
+ru: Не удалось открыть календарь Windows
+ar: تعذّر فتح تقويم Windows
+bn: Windows ক্যালেন্ডার খোলা যায়নি
+ur: Windows کیلنڈر نہیں کھل سکا
 
 en: Windows did not show its hidden icons
 fr: Windows n'a pas affiché ses icônes cachées
 es: Windows no mostró sus iconos ocultos
 zh: Windows 未显示其隐藏图标
 hi: Windows ने अपने छिपे हुए आइकन नहीं दिखाए
+pt: O Windows não mostrou seus ícones ocultos
+ru: Windows не показала скрытые значки
+ar: لم يعرض Windows أيقوناته المخفية
+bn: Windows তার লুকানো আইকনগুলো দেখায়নি
+ur: Windows نے اپنے چھپے ہوئے آئیکن نہیں دکھائے
 
 en: Automatic location refresh is unavailable; retry in Weather settings.
 fr: L'actualisation automatique de la position est indisponible ; réessayez dans les paramètres Météo.
 es: La actualización automática de la ubicación no está disponible; vuelve a intentarlo en la configuración del Tiempo.
 zh: 无法自动刷新位置；请在“天气”设置中重试。
 hi: स्वचालित स्थान रीफ़्रेश उपलब्ध नहीं; मौसम सेटिंग्स में फिर कोशिश करें।
+pt: A atualização automática da localização não está disponível; tente novamente nas configurações de Clima.
+ru: Автоматическое обновление местоположения недоступно; повторите попытку в параметрах погоды.
+ar: تحديث الموقع التلقائي غير متاح؛ أعد المحاولة من إعدادات الطقس.
+bn: স্বয়ংক্রিয় লোকেশন রিফ্রেশ অনুপলব্ধ; আবহাওয়ার সেটিংসে আবার চেষ্টা করুন।
+ur: خودکار لوکیشن ریفریش دستیاب نہیں؛ موسم کی ترتیبات میں دوبارہ کوشش کریں۔
 
 en: Windows location
 fr: Position Windows
 es: Ubicación de Windows
 zh: Windows 位置
 hi: Windows स्थान
+pt: Localização do Windows
+ru: Расположение Windows
+ar: موقع Windows
+bn: Windows লোকেশন
+ur: Windows لوکیشن
 
 en: Reading approximate Windows location…
 fr: Lecture de la position approximative de Windows…
 es: Leyendo la ubicación aproximada de Windows…
 zh: 正在读取 Windows 的大致位置…
 hi: Windows का अनुमानित स्थान पढ़ा जा रहा है…
+pt: Lendo a localização aproximada do Windows…
+ru: Чтение приблизительного расположения Windows…
+ar: جارٍ قراءة موقع Windows التقريبي…
+bn: Windows-এর আনুমানিক লোকেশন পড়া হচ্ছে…
+ur: Windows کی تقریبی لوکیشن پڑھی جا رہی ہے…
 
 en: Automatic weather follows approximate Windows location.
 fr: La météo automatique suit la position approximative de Windows.
 es: El tiempo automático sigue la ubicación aproximada de Windows.
 zh: 自动天气会跟随 Windows 的大致位置。
 hi: स्वचालित मौसम Windows के अनुमानित स्थान के अनुसार चलता है।
+pt: O clima automático segue a localização aproximada do Windows.
+ru: Автоматическая погода следует приблизительному расположению Windows.
+ar: يتبع الطقس التلقائي موقع Windows التقريبي.
+bn: স্বয়ংক্রিয় আবহাওয়া Windows-এর আনুমানিক লোকেশন অনুসরণ করে।
+ur: خودکار موسم Windows کی تقریبی لوکیشن کی پیروی کرتا ہے۔
 
 en: Windows location access is blocked. Weather is unavailable.
 fr: L'accès à la position de Windows est bloqué. La météo est indisponible.
 es: El acceso a la ubicación de Windows está bloqueado. El tiempo no está disponible.
 zh: Windows 位置访问被阻止。天气不可用。
 hi: Windows स्थान की पहुँच अवरुद्ध है। मौसम उपलब्ध नहीं।
+pt: O acesso à localização do Windows está bloqueado. O clima não está disponível.
+ru: Доступ к расположению Windows заблокирован. Погода недоступна.
+ar: الوصول إلى موقع Windows محظور. الطقس غير متاح.
+bn: Windows লোকেশনে অ্যাক্সেস ব্লক করা আছে। আবহাওয়া অনুপলব্ধ।
+ur: Windows لوکیشن تک رسائی بلاک ہے۔ موسم دستیاب نہیں۔
 
 en: Windows could not provide a current location. Weather is unavailable.
 fr: Windows n'a pas pu fournir de position actuelle. La météo est indisponible.
 es: Windows no pudo proporcionar una ubicación actual. El tiempo no está disponible.
 zh: Windows 无法提供当前位置。天气不可用。
 hi: Windows मौजूदा स्थान नहीं दे सका। मौसम उपलब्ध नहीं।
+pt: O Windows não conseguiu fornecer uma localização atual. O clima não está disponível.
+ru: Windows не смогла определить текущее расположение. Погода недоступна.
+ar: تعذّر على Windows توفير موقع حالي. الطقس غير متاح.
+bn: Windows বর্তমান লোকেশন দিতে পারেনি। আবহাওয়া অনুপলব্ধ।
+ur: Windows موجودہ لوکیشن فراہم نہیں کر سکا۔ موسم دستیاب نہیں۔
 
 en: Location worker unavailable. Weather is unavailable.
 fr: Le service de localisation est indisponible. La météo est indisponible.
 es: El servicio de ubicación no está disponible. El tiempo no está disponible.
 zh: 定位服务不可用。天气不可用。
 hi: स्थान सेवा उपलब्ध नहीं। मौसम उपलब्ध नहीं।
+pt: Serviço de localização indisponível. O clima não está disponível.
+ru: Служба определения расположения недоступна. Погода недоступна.
+ar: خدمة الموقع غير متاحة. الطقس غير متاح.
+bn: লোকেশন সার্ভিস অনুপলব্ধ। আবহাওয়া অনুপলব্ধ।
+ur: لوکیشن سروس دستیاب نہیں۔ موسم دستیاب نہیں۔
 
 en: Waiting for Windows location permission…
 fr: En attente de l'autorisation de localisation de Windows…
 es: Esperando el permiso de ubicación de Windows…
 zh: 正在等待 Windows 位置权限…
 hi: Windows स्थान अनुमति की प्रतीक्षा है…
+pt: Aguardando a permissão de localização do Windows…
+ru: Ожидание разрешения на доступ к расположению Windows…
+ar: بانتظار إذن موقع Windows…
+bn: Windows লোকেশন অনুমতির অপেক্ষায়…
+ur: Windows لوکیشن کی اجازت کا انتظار ہے…
 
 en: The automatic weather choice could not be saved.
 fr: Le choix de météo automatique n'a pas pu être enregistré.
 es: No se pudo guardar la elección del tiempo automático.
 zh: 无法保存自动天气的选择。
 hi: स्वचालित मौसम का चुनाव सहेजा नहीं जा सका।
+pt: Não foi possível salvar a escolha de clima automático.
+ru: Не удалось сохранить выбор автоматической погоды.
+ar: تعذّر حفظ اختيار الطقس التلقائي.
+bn: স্বয়ংক্রিয় আবহাওয়ার পছন্দ সংরক্ষণ করা যায়নি।
+ur: خودکار موسم کا انتخاب محفوظ نہیں ہو سکا۔
 
 en: Windows location access is unavailable or was denied. Weather is unavailable.
 fr: L'accès à la position de Windows est indisponible ou a été refusé. La météo est indisponible.
 es: El acceso a la ubicación de Windows no está disponible o se denegó. El tiempo no está disponible.
 zh: Windows 位置访问不可用或已被拒绝。天气不可用。
 hi: Windows स्थान की पहुँच उपलब्ध नहीं या मना कर दी गई। मौसम उपलब्ध नहीं।
+pt: O acesso à localização do Windows não está disponível ou foi negado. O clima não está disponível.
+ru: Доступ к расположению Windows недоступен или отклонён. Погода недоступна.
+ar: الوصول إلى موقع Windows غير متاح أو تم رفضه. الطقس غير متاح.
+bn: Windows লোকেশনে অ্যাক্সেস অনুপলব্ধ বা প্রত্যাখ্যাত। আবহাওয়া অনুপলব্ধ।
+ur: Windows لوکیشن تک رسائی دستیاب نہیں یا مسترد کر دی گئی۔ موسم دستیاب نہیں۔
 
 en: Windows location could not request permission. Review Windows location settings.
 fr: La localisation de Windows n'a pas pu demander l'autorisation. Vérifiez les paramètres de localisation de Windows.
 es: La ubicación de Windows no pudo pedir permiso. Revisa la configuración de ubicación de Windows.
 zh: Windows 定位无法请求权限。请检查 Windows 位置设置。
 hi: Windows स्थान अनुमति नहीं माँग सका। Windows स्थान सेटिंग्स जाँचें।
+pt: A localização do Windows não pôde solicitar permissão. Revise as configurações de localização do Windows.
+ru: Не удалось запросить разрешение на доступ к расположению Windows. Проверьте параметры расположения Windows.
+ar: تعذّر على موقع Windows طلب الإذن. راجع إعدادات الموقع في Windows.
+bn: Windows লোকেশন অনুমতি চাইতে পারেনি। Windows লোকেশন সেটিংস দেখে নিন।
+ur: Windows لوکیشن اجازت طلب نہیں کر سکی۔ Windows کی لوکیشن ترتیبات دیکھیں۔
 
 en: Status worker unavailable
 fr: Service d'état indisponible
 es: Servicio de estado no disponible
 zh: 状态服务不可用
 hi: स्थिति सेवा उपलब्ध नहीं
+pt: Serviço de status indisponível
+ru: Служба состояния недоступна
+ar: خدمة الحالة غير متاحة
+bn: স্ট্যাটাস সার্ভিস অনুপলব্ধ
+ur: اسٹیٹس سروس دستیاب نہیں
 
 en: Windows could not complete this action. Review its settings.
 fr: Windows n'a pas pu effectuer cette action. Vérifiez ses paramètres.
 es: Windows no pudo completar esta acción. Revisa su configuración.
 zh: Windows 无法完成此操作。请检查相关设置。
 hi: Windows यह कार्य पूरा नहीं कर सका। इसकी सेटिंग्स जाँचें।
+pt: O Windows não conseguiu concluir esta ação. Revise as configurações dele.
+ru: Windows не смогла выполнить это действие. Проверьте её параметры.
+ar: تعذّر على Windows إكمال هذا الإجراء. راجع إعداداته.
+bn: Windows এই কাজটি সম্পন্ন করতে পারেনি। এর সেটিংস দেখে নিন।
+ur: Windows یہ عمل مکمل نہیں کر سکا۔ اس کی ترتیبات دیکھیں۔
 
 en: Reading Windows status; try the action again shortly
 fr: Lecture de l'état de Windows ; réessayez l'action dans un instant
 es: Leyendo el estado de Windows; vuelve a intentar la acción en un momento
 zh: 正在读取 Windows 状态；请稍后重试此操作
 hi: Windows की स्थिति पढ़ी जा रही है; थोड़ी देर में फिर कोशिश करें
+pt: Lendo o status do Windows; tente a ação novamente em instantes
+ru: Чтение состояния Windows; повторите действие через мгновение
+ar: جارٍ قراءة حالة Windows؛ أعد المحاولة بعد قليل
+bn: Windows-এর অবস্থা পড়া হচ্ছে; একটু পরে আবার চেষ্টা করুন
+ur: Windows کی حالت پڑھی جا رہی ہے؛ کچھ دیر بعد عمل دوبارہ آزمائیں
 
 en: Could not disconnect
 fr: Impossible de se déconnecter
 es: No se pudo desconectar
 zh: 无法断开连接
 hi: डिस्कनेक्ट नहीं हो सका
+pt: Não foi possível desconectar
+ru: Не удалось отключиться
+ar: تعذّر قطع الاتصال
+bn: সংযোগ বিচ্ছিন্ন করা যায়নি
+ur: منقطع نہیں ہو سکا
 
 en: The Windows accessibility feature could not be started
 fr: La fonction d'accessibilité de Windows n'a pas pu démarrer
 es: No se pudo iniciar la función de accesibilidad de Windows
 zh: 无法启动 Windows 辅助功能
 hi: Windows सुगम्यता सुविधा शुरू नहीं हो सकी
+pt: Não foi possível iniciar o recurso de acessibilidade do Windows
+ru: Не удалось запустить функцию специальных возможностей Windows
+ar: تعذّر تشغيل ميزة إمكانية الوصول في Windows
+bn: Windows অ্যাক্সেসিবিলিটি ফিচার চালু করা যায়নি
+ur: Windows کی رسائی کی سہولت شروع نہیں ہو سکی
 
 en: Windows could not change the audio output
 fr: Windows n'a pas pu changer la sortie audio
 es: Windows no pudo cambiar la salida de audio
 zh: Windows 无法更改音频输出
 hi: Windows ऑडियो आउटपुट नहीं बदल सका
+pt: O Windows não conseguiu alterar a saída de áudio
+ru: Windows не смогла изменить устройство вывода звука
+ar: تعذّر على Windows تغيير خرج الصوت
+bn: Windows অডিও আউটপুট পরিবর্তন করতে পারেনি
+ur: Windows آڈیو آؤٹ پٹ تبدیل نہیں کر سکا
 
 en: The Windows control could not be opened
 fr: La commande Windows n'a pas pu être ouverte
 es: No se pudo abrir el control de Windows
 zh: 无法打开 Windows 控件
 hi: Windows नियंत्रण नहीं खुल सका
+pt: Não foi possível abrir o controle do Windows
+ru: Не удалось открыть элемент управления Windows
+ar: تعذّر فتح عنصر التحكم في Windows
+bn: Windows কন্ট্রোল খোলা যায়নি
+ur: Windows کنٹرول نہیں کھل سکا
 
 en: Keyboard shortcuts disabled
 fr: Raccourcis clavier désactivés
 es: Atajos de teclado desactivados
 zh: 键盘快捷键已关闭
 hi: कीबोर्ड शॉर्टकट बंद हैं
+pt: Atalhos de teclado desativados
+ru: Сочетания клавиш отключены
+ar: اختصارات لوحة المفاتيح معطّلة
+bn: কীবোর্ড শর্টকাট বন্ধ
+ur: کی بورڈ شارٹ کٹ غیر فعال ہیں
 
 en: Both keyboard shortcuts registered
 fr: Les deux raccourcis clavier sont enregistrés
 es: Los dos atajos de teclado están registrados
 zh: 两个键盘快捷键均已注册
 hi: दोनों कीबोर्ड शॉर्टकट पंजीकृत हैं
+pt: Os dois atalhos de teclado foram registrados
+ru: Оба сочетания клавиш зарегистрированы
+ar: تم تسجيل اختصاري لوحة المفاتيح كليهما
+bn: দুটি কীবোর্ড শর্টকাটই নিবন্ধিত হয়েছে
+ur: دونوں کی بورڈ شارٹ کٹ رجسٹر ہو گئے
 
 en: A keyboard shortcut is already in use by another application
 fr: Un raccourci clavier est déjà utilisé par une autre application
 es: Otra aplicación ya usa un atajo de teclado
 zh: 某个键盘快捷键已被其他应用占用
 hi: एक कीबोर्ड शॉर्टकट पहले से किसी दूसरे ऐप्लिकेशन द्वारा उपयोग में है
+pt: Um atalho de teclado já está em uso por outro aplicativo
+ru: Сочетание клавиш уже используется другим приложением
+ar: اختصار لوحة المفاتيح مستخدم بالفعل من قِبل تطبيق آخر
+bn: একটি কীবোর্ড শর্টকাট ইতিমধ্যে অন্য অ্যাপ ব্যবহার করছে
+ur: ایک کی بورڈ شارٹ کٹ پہلے سے کسی دوسری ایپ میں استعمال ہو رہا ہے
 
 en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
 fr: Les paramètres rapides de Windows n'ont pas pu être ouverts. Décochez « Utiliser les paramètres rapides de Windows » dans les paramètres de la barre du haut pour utiliser les commandes d'Aether.
 es: No se pudo abrir la configuración rápida de Windows. Desmarca «Usar la configuración rápida de Windows» en la configuración de la barra superior para usar los controles de Aether.
 zh: 无法打开 Windows 快速设置。请在顶部栏设置中取消勾选“使用 Windows 快速设置”，以使用 Aether 控制。
 hi: Windows क्विक सेटिंग्स नहीं खुल सकीं। Aether कंट्रोल उपयोग करने के लिए शीर्ष बार सेटिंग्स में 'Windows क्विक सेटिंग्स का उपयोग करें' हटाएँ।
+pt: Não foi possível solicitar as Configurações rápidas do Windows. Desmarque "Usar as Configurações rápidas do Windows" nas configurações da Barra superior para usar os controles do Aether.
+ru: Не удалось вызвать быстрые параметры Windows. Снимите флажок «Использовать быстрые параметры Windows» в параметрах верхней панели, чтобы использовать элементы управления Aether.
+ar: تعذّر طلب الإعدادات السريعة في Windows. ألغِ تحديد "استخدام الإعدادات السريعة في Windows" في إعدادات الشريط العلوي لاستخدام عناصر تحكم Aether.
+bn: Windows দ্রুত সেটিংস অনুরোধ করা যায়নি। Aether-এর কন্ট্রোল ব্যবহার করতে উপরের বারের সেটিংসে "Windows দ্রুত সেটিংস ব্যবহার করুন" অচিহ্নিত করুন।
+ur: Windows فوری ترتیبات طلب نہیں کی جا سکیں۔ Aether کے کنٹرول استعمال کرنے کے لیے اوپری بار کی ترتیبات میں "Windows فوری ترتیبات استعمال کریں" کا نشان ہٹا دیں۔
 
 en: Windows Start could not be opened
 fr: Démarrer de Windows n'a pas pu être ouvert
 es: No se pudo abrir el Inicio de Windows
 zh: 无法打开 Windows 开始菜单
 hi: Windows स्टार्ट नहीं खुल सका
+pt: Não foi possível abrir o Iniciar do Windows
+ru: Не удалось открыть меню «Пуск» Windows
+ar: تعذّر فتح قائمة ابدأ في Windows
+bn: Windows স্টার্ট খোলা যায়নি
+ur: Windows اسٹارٹ نہیں کھل سکا
 
 en: Windows Task View could not be opened
 fr: La vue des tâches de Windows n'a pas pu être ouverte
 es: No se pudo abrir la Vista de tareas de Windows
 zh: 无法打开 Windows 任务视图
 hi: Windows टास्क व्यू नहीं खुल सका
+pt: Não foi possível abrir a Visão de Tarefas do Windows
+ru: Не удалось открыть представление задач Windows
+ar: تعذّر فتح عرض المهام في Windows
+bn: Windows টাস্ক ভিউ খোলা যায়নি
+ur: Windows ٹاسک ویو نہیں کھل سکا
 
 en: Windows keyboard layout switching was unavailable
 fr: Le changement de disposition du clavier de Windows était indisponible
 es: El cambio de distribución del teclado de Windows no estaba disponible
 zh: 无法切换 Windows 键盘布局
 hi: Windows कीबोर्ड लेआउट बदलना उपलब्ध नहीं था
+pt: A troca de layout de teclado do Windows não estava disponível
+ru: Переключение раскладки клавиатуры Windows было недоступно
+ar: كان تبديل تخطيط لوحة المفاتيح في Windows غير متاح
+bn: Windows কীবোর্ড লেআউট পরিবর্তন অনুপলব্ধ ছিল
+ur: Windows کی بورڈ لے آؤٹ کی تبدیلی دستیاب نہیں تھی
 
 en: Windows voice typing could not be opened
 fr: La saisie vocale de Windows n'a pas pu être ouverte
 es: No se pudo abrir el dictado por voz de Windows
 zh: 无法打开 Windows 语音输入
 hi: Windows वॉइस टाइपिंग नहीं खुल सकी
+pt: Não foi possível abrir a digitação por voz do Windows
+ru: Не удалось открыть голосовой ввод Windows
+ar: تعذّر فتح الكتابة الصوتية في Windows
+bn: Windows ভয়েস টাইপিং খোলা যায়নি
+ur: Windows وائس ٹائپنگ نہیں کھل سکی
 
 en: Windows taskbar could not be revealed
 fr: La barre des tâches Windows n'a pas pu être affichée
 es: No se pudo mostrar la barra de tareas de Windows
 zh: 无法显示 Windows 任务栏
 hi: Windows टास्कबार दिखाया नहीं जा सका
+pt: Não foi possível exibir a barra de tarefas do Windows
+ru: Не удалось показать панель задач Windows
+ar: تعذّر إظهار شريط مهام Windows
+bn: Windows টাস্কবার দেখানো যায়নি
+ur: Windows ٹاسک بار ظاہر نہیں ہو سکا
 
 en: Taskbar replacement could not resume; Windows remains available
 fr: Le remplacement de la barre des tâches n'a pas pu reprendre ; Windows reste disponible
 es: No se pudo reanudar la sustitución de la barra de tareas; Windows sigue disponible
 zh: 无法恢复替换任务栏；Windows 任务栏仍可用
 hi: टास्कबार प्रतिस्थापन फिर शुरू नहीं हो सका; Windows उपलब्ध है
+pt: A substituição da barra de tarefas não pôde ser retomada; o Windows continua disponível
+ru: Не удалось возобновить замену панели задач; Windows остаётся доступной
+ar: تعذّر استئناف استبدال شريط المهام؛ يظل Windows متاحًا
+bn: টাস্কবার প্রতিস্থাপন আবার শুরু করা যায়নি; Windows উপলব্ধ থাকছে
+ur: ٹاسک بار کا متبادل دوبارہ شروع نہیں ہو سکا؛ Windows دستیاب رہتا ہے
 
 en: Windows taskbar replacement is unavailable in this session
 fr: Le remplacement de la barre des tâches Windows est indisponible dans cette session
 es: La sustitución de la barra de tareas de Windows no está disponible en esta sesión
 zh: 此会话中无法替换 Windows 任务栏
 hi: इस सत्र में Windows टास्कबार प्रतिस्थापन उपलब्ध नहीं है
+pt: A substituição da barra de tarefas do Windows não está disponível nesta sessão
+ru: Замена панели задач Windows недоступна в этом сеансе
+ar: استبدال شريط مهام Windows غير متاح في هذه الجلسة
+bn: এই সেশনে Windows টাস্কবার প্রতিস্থাপন অনুপলব্ধ
+ur: اس سیشن میں Windows ٹاسک بار کا متبادل دستیاب نہیں
 
 en: Windows pin access is unavailable in this isolated session
 fr: L'accès aux épingles de Windows est indisponible dans cette session isolée
 es: El acceso a los anclajes de Windows no está disponible en esta sesión aislada
 zh: 在此隔离会话中无法访问 Windows 固定项
 hi: इस अलग सत्र में Windows पिन की पहुँच उपलब्ध नहीं है
+pt: O acesso aos itens fixados do Windows não está disponível nesta sessão isolada
+ru: Доступ к закреплённым элементам Windows недоступен в этом изолированном сеансе
+ar: الوصول إلى عناصر Windows المثبتة غير متاح في هذه الجلسة المعزولة
+bn: এই বিচ্ছিন্ন সেশনে Windows পিন অ্যাক্সেস অনুপলব্ধ
+ur: اس الگ تھلگ سیشن میں Windows کے پن شدہ آئٹمز تک رسائی دستیاب نہیں
 
 en: Windows pinned applications could not be read
 fr: Les applications épinglées de Windows n'ont pas pu être lues
 es: No se pudieron leer las aplicaciones ancladas de Windows
 zh: 无法读取 Windows 固定的应用
 hi: Windows के पिन किए गए ऐप्लिकेशन पढ़े नहीं जा सके
+pt: Não foi possível ler os aplicativos fixados do Windows
+ru: Не удалось прочитать закреплённые приложения Windows
+ar: تعذّرت قراءة التطبيقات المثبتة في Windows
+bn: Windows-এ পিন করা অ্যাপ পড়া যায়নি
+ur: Windows کی پن شدہ ایپس نہیں پڑھی جا سکیں
 
 en: Settings changed during pin import. Try import again.
 fr: Les paramètres ont changé pendant l'import des épingles. Relancez l'import.
 es: La configuración cambió durante la importación de anclajes. Vuelve a importar.
 zh: 导入固定项期间设置已更改。请重新导入。
 hi: पिन आयात के दौरान सेटिंग्स बदल गईं। फिर से आयात करें।
+pt: As configurações mudaram durante a importação dos itens fixados. Tente importar novamente.
+ru: Параметры изменились во время импорта закреплённых элементов. Повторите импорт.
+ar: تغيّرت الإعدادات أثناء استيراد العناصر المثبتة. أعد محاولة الاستيراد.
+bn: পিন ইমপোর্টের সময় সেটিংস বদলে গেছে। আবার ইমপোর্ট করার চেষ্টা করুন।
+ur: پن درآمد کے دوران ترتیبات بدل گئیں۔ دوبارہ درآمد کی کوشش کریں۔
 
 en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
 fr: {} applications épinglées supplémentaires enregistrées. Certaines épingles de Windows peuvent rester indisponibles.
 es: Se guardaron {} aplicaciones ancladas más. Puede que algunos anclajes de Windows sigan sin estar disponibles.
 zh: 已保存另外 {} 个固定的应用。部分 Windows 固定项可能仍不可用。
 hi: {} और पिन किए गए ऐप्लिकेशन सहेजे गए। कुछ Windows पिन अब भी उपलब्ध न हों।
+pt: {} aplicativos fixados adicionais foram salvos. Alguns itens fixados do Windows podem continuar indisponíveis.
+ru: Сохранено дополнительных закреплённых приложений: {}. Некоторые закрепления Windows могут остаться недоступными.
+ar: تم حفظ {} تطبيقات مثبتة إضافية. قد تظل بعض عناصر Windows المثبتة غير متاحة.
+bn: আরও {}টি পিন করা অ্যাপ সংরক্ষণ করা হয়েছে। Windows-এর কিছু পিন অনুপলব্ধ থাকতে পারে।
+ur: {} اضافی پن شدہ ایپس محفوظ کی گئیں۔ Windows کے کچھ پن شاید دستیاب نہ رہیں۔
 
 en: Pins changed in memory; saving failed. Apply in Settings to retry.
 fr: Épingles modifiées en mémoire ; l'enregistrement a échoué. Appliquez dans les Paramètres pour réessayer.
 es: Los anclajes cambiaron en memoria, pero no se pudieron guardar. Aplica en Configuración para reintentarlo.
 zh: 固定项已在内存中更改，但保存失败。请在设置中点击“应用”重试。
 hi: पिन मेमोरी में बदले; सहेजना विफल रहा। फिर कोशिश करने के लिए सेटिंग्स में लागू करें।
+pt: Os itens fixados mudaram na memória; falha ao salvar. Aplique nas Configurações para tentar novamente.
+ru: Закрепления изменены в памяти; сохранить не удалось. Нажмите «Применить» в параметрах, чтобы повторить.
+ar: تغيّرت العناصر المثبتة في الذاكرة؛ فشل الحفظ. اضغط تطبيق في الإعدادات لإعادة المحاولة.
+bn: মেমরিতে পিন বদলেছে; সংরক্ষণ ব্যর্থ হয়েছে। আবার চেষ্টা করতে সেটিংসে প্রয়োগ করুন।
+ur: میموری میں پن تبدیل ہوئے؛ محفوظ کرنا ناکام رہا۔ دوبارہ کوشش کے لیے ترتیبات میں لاگو کریں۔
 
 en: Pins updated in memory; saving...
 fr: Épingles mises à jour en mémoire ; enregistrement...
 es: Anclajes actualizados en memoria; guardando...
 zh: 固定项已在内存中更新；正在保存...
 hi: पिन मेमोरी में अपडेट हुए; सहेजे जा रहे हैं...
+pt: Itens fixados atualizados na memória; salvando...
+ru: Закрепления обновлены в памяти; сохранение...
+ar: تم تحديث العناصر المثبتة في الذاكرة؛ جارٍ الحفظ...
+bn: মেমরিতে পিন হালনাগাদ হয়েছে; সংরক্ষণ করা হচ্ছে...
+ur: میموری میں پن اپ ڈیٹ ہو گئے؛ محفوظ کیا جا رہا ہے...
 
 en: Imported pins could not be applied
 fr: Les épingles importées n'ont pas pu être appliquées
 es: No se pudieron aplicar los anclajes importados
 zh: 无法应用导入的固定项
 hi: आयात किए गए पिन लागू नहीं हो सके
+pt: Não foi possível aplicar os itens fixados importados
+ru: Не удалось применить импортированные закрепления
+ar: تعذّر تطبيق العناصر المثبتة المستوردة
+bn: ইমপোর্ট করা পিন প্রয়োগ করা যায়নি
+ur: درآمد شدہ پن لاگو نہیں ہو سکے
 
 en: Pin import is unavailable while closing
 fr: L'import des épingles est indisponible pendant la fermeture
 es: La importación de anclajes no está disponible durante el cierre
 zh: 关闭过程中无法导入固定项
 hi: बंद होते समय पिन आयात उपलब्ध नहीं है
+pt: A importação de itens fixados não está disponível durante o fechamento
+ru: Импорт закреплений недоступен во время закрытия
+ar: استيراد العناصر المثبتة غير متاح أثناء الإغلاق
+bn: বন্ধ করার সময় পিন ইমপোর্ট অনুপলব্ধ
+ur: بند ہونے کے دوران پن درآمد دستیاب نہیں
 
 en: Settings could not be saved
 fr: Les paramètres n'ont pas pu être enregistrés
 es: No se pudo guardar la configuración
 zh: 无法保存设置
 hi: सेटिंग्स सहेजी नहीं जा सकीं
+pt: Não foi possível salvar as configurações
+ru: Не удалось сохранить параметры
+ar: تعذّر حفظ الإعدادات
+bn: সেটিংস সংরক্ষণ করা যায়নি
+ur: ترتیبات محفوظ نہیں ہو سکیں
 
 en: Quit without saving the latest changes?
 fr: Quitter sans enregistrer les dernières modifications ?
 es: ¿Salir sin guardar los últimos cambios?
 zh: 要退出而不保存最近的更改吗？
 hi: नवीनतम बदलाव सहेजे बिना बाहर निकलें?
+pt: Sair sem salvar as alterações mais recentes?
+ru: Выйти, не сохранив последние изменения?
+ar: هل تريد الخروج دون حفظ آخر التغييرات؟
+bn: সর্বশেষ পরিবর্তনগুলো সংরক্ষণ না করেই বের হবেন?
+ur: تازہ ترین تبدیلیاں محفوظ کیے بغیر بند کریں؟
 
 en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
 fr: Votre fichier de paramètres précédent est conservé. Laissez Aether Shell ouvert pour réessayer d'enregistrer.
 es: Se conserva tu archivo de configuración anterior. Deja Aether Shell abierto para volver a intentar guardar.
 zh: 你之前的设置文件会保留。保持 Aether Shell 打开即可再次尝试保存。
 hi: आपकी पिछली सेटिंग्स फ़ाइल रखी गई है। फिर से सहेजने की कोशिश के लिए Aether Shell खुला रखें।
+pt: Seu arquivo de configurações anterior foi mantido. Mantenha o Aether Shell aberto para tentar salvar novamente.
+ru: Ваш прежний файл параметров сохранён. Оставьте Aether Shell открытым, чтобы повторить сохранение.
+ar: تم الاحتفاظ بملف إعداداتك السابق. أبقِ Aether Shell مفتوحًا لإعادة محاولة الحفظ.
+bn: আপনার আগের সেটিংস ফাইল রাখা হয়েছে। আবার সংরক্ষণের চেষ্টা করতে Aether Shell খোলা রাখুন।
+ur: آپ کی پچھلی ترتیبات کی فائل محفوظ رکھی گئی ہے۔ دوبارہ محفوظ کرنے کی کوشش کے لیے Aether Shell کھلا رکھیں۔
 
 en: &Quit without saving
 fr: &Quitter sans enregistrer
 es: &Salir sin guardar
 zh: 不保存并退出(&Q)
 hi: सहेजे बिना बाहर निकलें(&Q)
+pt: &Sair sem salvar
+ru: &Выйти без сохранения
+ar: إنهاء دون حفظ (&Q)
+bn: সংরক্ষণ ছাড়াই বের হন (&Q)
+ur: محفوظ کیے بغیر بند کریں (&Q)
 
 en: &Keep Aether Shell open
 fr: &Garder Aether Shell ouvert
 es: &Mantener Aether Shell abierto
 zh: 保持 Aether Shell 打开(&K)
 hi: Aether Shell खुला रखें(&K)
+pt: &Manter o Aether Shell aberto
+ru: &Оставить Aether Shell открытым
+ar: إبقاء Aether Shell مفتوحًا (&K)
+bn: Aether Shell খোলা রাখুন (&K)
+ur: Aether Shell کھلا رکھیں (&K)
 
 en: Export basic diagnostics — app version and Windows build, no logs or personal data
 fr: Exporter un diagnostic de base — version de l'application et build de Windows, sans journaux ni données personnelles
 es: Exportar un diagnóstico básico — versión de la aplicación y compilación de Windows, sin registros ni datos personales
 zh: 导出基本诊断信息——应用版本和 Windows 版本号，不含日志或个人数据
 hi: बुनियादी डायग्नोस्टिक्स निर्यात करें — ऐप संस्करण और Windows बिल्ड, कोई लॉग या निजी डेटा नहीं
+pt: Exportar diagnóstico básico — versão do app e build do Windows, sem logs nem dados pessoais
+ru: Экспорт базовой диагностики — версия приложения и сборка Windows, без журналов и личных данных
+ar: تصدير التشخيص الأساسي — إصدار التطبيق وبنية Windows، دون سجلات أو بيانات شخصية
+bn: মৌলিক ডায়াগনস্টিকস এক্সপোর্ট — অ্যাপ সংস্করণ ও Windows বিল্ড, কোনো লগ বা ব্যক্তিগত তথ্য ছাড়া
+ur: بنیادی تشخیصی معلومات برآمد کریں — ایپ ورژن اور Windows بلڈ، لاگ یا ذاتی ڈیٹا کے بغیر
 
 en: Diagnostics exported.
 fr: Diagnostic exporté.
 es: Diagnóstico exportado.
 zh: 已导出诊断信息。
 hi: डायग्नोस्टिक्स निर्यात हुआ।
+pt: Diagnóstico exportado.
+ru: Диагностика экспортирована.
+ar: تم تصدير التشخيص.
+bn: ডায়াগনস্টিকস এক্সপোর্ট হয়েছে।
+ur: تشخیصی معلومات برآمد ہو گئیں۔
 
 en: Diagnostics could not be saved to the chosen file.
 fr: Le diagnostic n'a pas pu être enregistré dans le fichier choisi.
 es: No se pudo guardar el diagnóstico en el archivo elegido.
 zh: 无法将诊断信息保存到所选文件。
 hi: डायग्नोस्टिक्स चुनी गई फ़ाइल में सहेजा नहीं जा सका।
+pt: Não foi possível salvar o diagnóstico no arquivo escolhido.
+ru: Не удалось сохранить диагностику в выбранный файл.
+ar: تعذّر حفظ التشخيص في الملف المختار.
+bn: নির্বাচিত ফাইলে ডায়াগনস্টিকস সংরক্ষণ করা যায়নি।
+ur: منتخب فائل میں تشخیصی معلومات محفوظ نہیں ہو سکیں۔
 
 en: Settings could not be read safely. The existing file was preserved.
 fr: Les paramètres n'ont pas pu être lus en toute sécurité. Le fichier existant a été conservé.
 es: No se pudo leer la configuración de forma segura. Se conservó el archivo existente.
 zh: 无法安全读取设置。已保留现有文件。
 hi: सेटिंग्स सुरक्षित रूप से पढ़ी नहीं जा सकीं। मौजूदा फ़ाइल सुरक्षित रखी गई।
+pt: Não foi possível ler as configurações com segurança. O arquivo existente foi preservado.
+ru: Не удалось безопасно прочитать параметры. Существующий файл сохранён.
+ar: تعذّرت قراءة الإعدادات بأمان. تم الاحتفاظ بالملف الحالي.
+bn: সেটিংস নিরাপদে পড়া যায়নি। বিদ্যমান ফাইলটি সংরক্ষিত আছে।
+ur: ترتیبات محفوظ طریقے سے نہیں پڑھی جا سکیں۔ موجودہ فائل برقرار رکھی گئی ہے۔
 
 en: Aether Shell could not start its desktop surfaces.
 fr: Aether Shell n'a pas pu démarrer ses éléments de bureau.
 es: Aether Shell no pudo iniciar sus elementos de escritorio.
 zh: Aether Shell 无法启动其桌面界面。
 hi: Aether Shell अपने डेस्कटॉप तत्व शुरू नहीं कर सका।
+pt: O Aether Shell não conseguiu iniciar suas superfícies da área de trabalho.
+ru: Aether Shell не удалось запустить свои элементы рабочего стола.
+ar: تعذّر على Aether Shell بدء أسطح سطح المكتب الخاصة به.
+bn: Aether Shell তার ডেস্কটপ সারফেস চালু করতে পারেনি।
+ur: Aether Shell اپنی ڈیسک ٹاپ سطحیں شروع نہیں کر سکا۔
 
 en: Windows taskbar restoration is pending. Retry or close Aether Shell.
 fr: Le rétablissement de la barre des tâches Windows est en attente. Réessayez ou fermez Aether Shell.
 es: La restauración de la barra de tareas de Windows está pendiente. Vuelve a intentarlo o cierra Aether Shell.
 zh: Windows 任务栏的恢复尚未完成。请重试或关闭 Aether Shell。
 hi: Windows टास्कबार की बहाली बाकी है। फिर कोशिश करें या Aether Shell बंद करें।
+pt: A restauração da barra de tarefas do Windows está pendente. Tente novamente ou feche o Aether Shell.
+ru: Восстановление панели задач Windows не завершено. Повторите попытку или закройте Aether Shell.
+ar: استعادة شريط مهام Windows معلّقة. أعد المحاولة أو أغلق Aether Shell.
+bn: Windows টাস্কবার ফিরিয়ে আনা বাকি আছে। আবার চেষ্টা করুন বা Aether Shell বন্ধ করুন।
+ur: Windows ٹاسک بار کی بحالی باقی ہے۔ دوبارہ کوشش کریں یا Aether Shell بند کریں۔
 
 en: The Windows taskbar is shown temporarily.
 fr: La barre des tâches Windows est affichée temporairement.
 es: La barra de tareas de Windows se muestra temporalmente.
 zh: Windows 任务栏暂时显示。
 hi: Windows टास्कबार अस्थायी रूप से दिख रहा है।
+pt: A barra de tarefas do Windows é exibida temporariamente.
+ru: Панель задач Windows временно показана.
+ar: يظهر شريط مهام Windows مؤقتًا.
+bn: Windows টাস্কবার সাময়িকভাবে দেখানো হচ্ছে।
+ur: Windows ٹاسک بار عارضی طور پر دکھایا گیا ہے۔
 
 en: Windows taskbar restored.
 fr: Barre des tâches Windows rétablie.
 es: Barra de tareas de Windows restaurada.
 zh: 已恢复 Windows 任务栏。
 hi: Windows टास्कबार बहाल हुआ।
+pt: Barra de tarefas do Windows restaurada.
+ru: Панель задач Windows восстановлена.
+ar: تمت استعادة شريط مهام Windows.
+bn: Windows টাস্কবার ফিরিয়ে আনা হয়েছে।
+ur: Windows ٹاسک بار بحال ہو گیا۔
 
 en: Windows taskbar replacement is active.
 fr: Le remplacement de la barre des tâches Windows est actif.
 es: La sustitución de la barra de tareas de Windows está activa.
 zh: Windows 任务栏替换已生效。
 hi: Windows टास्कबार प्रतिस्थापन सक्रिय है।
+pt: A substituição da barra de tarefas do Windows está ativa.
+ru: Замена панели задач Windows активна.
+ar: استبدال شريط مهام Windows نشط.
+bn: Windows টাস্কবার প্রতিস্থাপন সক্রিয়।
+ur: Windows ٹاسک بار کا متبادل فعال ہے۔
 
 en: Windows taskbar remains available. Replacement will retry shortly.
 fr: La barre des tâches Windows reste disponible. Le remplacement va réessayer sous peu.
 es: La barra de tareas de Windows sigue disponible. La sustitución se reintentará en breve.
 zh: Windows 任务栏仍可用。替换稍后会重试。
 hi: Windows टास्कबार उपलब्ध है। प्रतिस्थापन जल्द फिर कोशिश करेगा।
+pt: A barra de tarefas do Windows continua disponível. A substituição tentará novamente em breve.
+ru: Панель задач Windows остаётся доступной. Замена вскоре повторит попытку.
+ar: يظل شريط مهام Windows متاحًا. سيعيد الاستبدال المحاولة قريبًا.
+bn: Windows টাস্কবার উপলব্ধ থাকছে। প্রতিস্থাপন শীঘ্রই আবার চেষ্টা করবে।
+ur: Windows ٹاسک بار دستیاب رہتا ہے۔ متبادل جلد دوبارہ کوشش کرے گا۔
 
 en: Windows taskbar remains available. Turn replacement off and on to retry.
 fr: La barre des tâches Windows reste disponible. Désactivez puis réactivez le remplacement pour réessayer.
 es: La barra de tareas de Windows sigue disponible. Desactiva y vuelve a activar la sustitución para reintentarlo.
 zh: Windows 任务栏仍可用。请关闭再重新开启替换以重试。
 hi: Windows टास्कबार उपलब्ध है। फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+pt: A barra de tarefas do Windows continua disponível. Desative e ative a substituição para tentar novamente.
+ru: Панель задач Windows остаётся доступной. Выключите и снова включите замену, чтобы повторить попытку.
+ar: يظل شريط مهام Windows متاحًا. أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+bn: Windows টাস্কবার উপলব্ধ থাকছে। আবার চেষ্টা করতে প্রতিস্থাপন বন্ধ করে চালু করুন।
+ur: Windows ٹاسک بار دستیاب رہتا ہے۔ دوبارہ کوشش کے لیے متبادل بند کر کے دوبارہ چالو کریں۔
 
 en: Windows taskbar restored. Replacement will reconnect shortly.
 fr: Barre des tâches Windows rétablie. Le remplacement va se reconnecter sous peu.
 es: Barra de tareas de Windows restaurada. La sustitución se reconectará en breve.
 zh: 已恢复 Windows 任务栏。替换稍后会重新连接。
 hi: Windows टास्कबार बहाल हुआ। प्रतिस्थापन जल्द फिर जुड़ेगा।
+pt: Barra de tarefas do Windows restaurada. A substituição será reconectada em breve.
+ru: Панель задач Windows восстановлена. Замена вскоре подключится снова.
+ar: تمت استعادة شريط مهام Windows. سيُعاد توصيل الاستبدال قريبًا.
+bn: Windows টাস্কবার ফিরিয়ে আনা হয়েছে। প্রতিস্থাপন শীঘ্রই আবার সংযুক্ত হবে।
+ur: Windows ٹاسک بار بحال ہو گیا۔ متبادل جلد دوبارہ منسلک ہو جائے گا۔
 
 en: Windows taskbar restored. Turn replacement off and on to retry.
 fr: Barre des tâches Windows rétablie. Désactivez puis réactivez le remplacement pour réessayer.
 es: Barra de tareas de Windows restaurada. Desactiva y vuelve a activar la sustitución para reintentarlo.
 zh: 已恢复 Windows 任务栏。请关闭再重新开启替换以重试。
 hi: Windows टास्कबार बहाल हुआ। फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+pt: Barra de tarefas do Windows restaurada. Desative e ative a substituição para tentar novamente.
+ru: Панель задач Windows восстановлена. Выключите и снова включите замену, чтобы повторить попытку.
+ar: تمت استعادة شريط مهام Windows. أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+bn: Windows টাস্কবার ফিরিয়ে আনা হয়েছে। আবার চেষ্টা করতে প্রতিস্থাপন বন্ধ করে চালু করুন।
+ur: Windows ٹاسک بار بحال ہو گیا۔ دوبارہ کوشش کے لیے متبادل بند کر کے دوبارہ چالو کریں۔
 
 en: Taskbar replacement stopped. Windows taskbar restored.
 fr: Remplacement de la barre des tâches arrêté. Barre des tâches Windows rétablie.
 es: Sustitución de la barra de tareas detenida. Barra de tareas de Windows restaurada.
 zh: 已停止替换任务栏。已恢复 Windows 任务栏。
 hi: टास्कबार प्रतिस्थापन रुका। Windows टास्कबार बहाल हुआ।
+pt: Substituição da barra de tarefas interrompida. Barra de tarefas do Windows restaurada.
+ru: Замена панели задач остановлена. Панель задач Windows восстановлена.
+ar: توقف استبدال شريط المهام. تمت استعادة شريط مهام Windows.
+bn: টাস্কবার প্রতিস্থাপন বন্ধ হয়েছে। Windows টাস্কবার ফিরিয়ে আনা হয়েছে।
+ur: ٹاسک بار کا متبادل رک گیا۔ Windows ٹاسک بار بحال ہو گیا۔
 
 en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
 fr: Remplacement de la barre des tâches arrêté. Le rétablissement de la barre des tâches Windows n'a pas pu être confirmé.
 es: Sustitución de la barra de tareas detenida. No se pudo confirmar la restauración de la barra de tareas de Windows.
 zh: 已停止替换任务栏。无法确认 Windows 任务栏是否已恢复。
 hi: टास्कबार प्रतिस्थापन रुका। Windows टास्कबार की बहाली की पुष्टि नहीं हो सकी।
+pt: Substituição da barra de tarefas interrompida. Não foi possível confirmar a restauração da barra de tarefas do Windows.
+ru: Замена панели задач остановлена. Не удалось подтвердить восстановление панели задач Windows.
+ar: توقف استبدال شريط المهام. تعذّر تأكيد استعادة شريط مهام Windows.
+bn: টাস্কবার প্রতিস্থাপন বন্ধ হয়েছে। Windows টাস্কবার ফিরিয়ে আনা নিশ্চিত করা যায়নি।
+ur: ٹاسک بار کا متبادل رک گیا۔ Windows ٹاسک بار کی بحالی کی تصدیق نہیں ہو سکی۔
 
 en: Activating taskbar replacement...
 fr: Activation du remplacement de la barre des tâches...
 es: Activando la sustitución de la barra de tareas...
 zh: 正在启用任务栏替换...
 hi: टास्कबार प्रतिस्थापन चालू हो रहा है...
+pt: Ativando a substituição da barra de tarefas...
+ru: Включается замена панели задач...
+ar: جارٍ تفعيل استبدال شريط المهام...
+bn: টাস্কবার প্রতিস্থাপন সক্রিয় করা হচ্ছে...
+ur: ٹاسک بار کا متبادل فعال کیا جا رہا ہے...
 
 en: Restoring Windows taskbar...
 fr: Rétablissement de la barre des tâches Windows...
 es: Restaurando la barra de tareas de Windows...
 zh: 正在恢复 Windows 任务栏...
 hi: Windows टास्कबार बहाल हो रहा है...
+pt: Restaurando a barra de tarefas do Windows...
+ru: Восстанавливается панель задач Windows...
+ar: جارٍ استعادة شريط مهام Windows...
+bn: Windows টাস্কবার ফিরিয়ে আনা হচ্ছে...
+ur: Windows ٹاسک بار بحال کیا جا رہا ہے...
 
 en: Reconnecting taskbar replacement...
 fr: Reconnexion du remplacement de la barre des tâches...
 es: Reconectando la sustitución de la barra de tareas...
 zh: 正在重新连接任务栏替换...
 hi: टास्कबार प्रतिस्थापन फिर जुड़ रहा है...
+pt: Reconectando a substituição da barra de tarefas...
+ru: Повторное подключение замены панели задач...
+ar: جارٍ إعادة توصيل استبدال شريط المهام...
+bn: টাস্কবার প্রতিস্থাপন আবার সংযুক্ত করা হচ্ছে...
+ur: ٹاسک بار کا متبادل دوبارہ منسلک کیا جا رہا ہے...
 
 en: Showing the Windows taskbar temporarily...
 fr: Affichage temporaire de la barre des tâches Windows...
 es: Mostrando temporalmente la barra de tareas de Windows...
 zh: 正在暂时显示 Windows 任务栏...
 hi: Windows टास्कबार अस्थायी रूप से दिखाया जा रहा है...
+pt: Exibindo a barra de tarefas do Windows temporariamente...
+ru: Временный показ панели задач Windows...
+ar: جارٍ إظهار شريط مهام Windows مؤقتًا...
+bn: Windows টাস্কবার সাময়িকভাবে দেখানো হচ্ছে...
+ur: Windows ٹاسک بار عارضی طور پر دکھایا جا رہا ہے...
 
 en: Aether Shell could not restore the Windows taskbar.
 fr: Aether Shell n'a pas pu rétablir la barre des tâches Windows.
 es: Aether Shell no pudo restaurar la barra de tareas de Windows.
 zh: Aether Shell 无法恢复 Windows 任务栏。
 hi: Aether Shell Windows टास्कबार बहाल नहीं कर सका।
+pt: O Aether Shell não conseguiu restaurar a barra de tarefas do Windows.
+ru: Aether Shell не удалось восстановить панель задач Windows.
+ar: تعذّر على Aether Shell استعادة شريط مهام Windows.
+bn: Aether Shell Windows টাস্কবার ফিরিয়ে আনতে পারেনি।
+ur: Aether Shell Windows ٹاسک بار بحال نہیں کر سکا۔
 
 en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
 fr: Redémarrez l'Explorateur Windows depuis le Gestionnaire des tâches (Ctrl+Maj+Échap), ou fermez puis rouvrez votre session.
 es: Reinicia el Explorador de Windows desde el Administrador de tareas (Ctrl+Mayús+Esc), o cierra la sesión y vuelve a iniciarla.
 zh: 请在任务管理器（Ctrl+Shift+Esc）中重新启动 Windows 资源管理器，或注销后重新登录。
 hi: टास्क मैनेजर (Ctrl+Shift+Esc) से Windows Explorer फिर शुरू करें, या साइन आउट करके फिर साइन इन करें।
+pt: Reinicie o Windows Explorer pelo Gerenciador de Tarefas (Ctrl+Shift+Esc) ou saia e entre novamente.
+ru: Перезапустите проводник Windows в диспетчере задач (Ctrl+Shift+Esc) или выйдите из системы и войдите снова.
+ar: أعد تشغيل مستكشف Windows من إدارة المهام (Ctrl+Shift+Esc)، أو سجّل الخروج ثم الدخول مرة أخرى.
+bn: টাস্ক ম্যানেজার (Ctrl+Shift+Esc) থেকে Windows এক্সপ্লোরার রিস্টার্ট করুন, অথবা সাইন আউট করে আবার সাইন ইন করুন।
+ur: ٹاسک مینیجر (Ctrl+Shift+Esc) سے Windows ایکسپلورر دوبارہ شروع کریں، یا سائن آؤٹ کر کے دوبارہ سائن ان کریں۔
 
 en: The Windows taskbar was restored to its saved state.
 fr: La barre des tâches Windows a été rétablie dans son état enregistré.
 es: La barra de tareas de Windows se restauró a su estado guardado.
 zh: Windows 任务栏已恢复到保存的状态。
 hi: Windows टास्कबार अपनी सहेजी गई स्थिति में बहाल हुआ।
+pt: A barra de tarefas do Windows foi restaurada ao estado salvo.
+ru: Панель задач Windows восстановлена в сохранённом состоянии.
+ar: تمت استعادة شريط مهام Windows إلى حالته المحفوظة.
+bn: Windows টাস্কবার তার সংরক্ষিত অবস্থায় ফিরিয়ে আনা হয়েছে।
+ur: Windows ٹاسک بار اپنی محفوظ شدہ حالت میں بحال کر دیا گیا۔
 
 en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
 fr: Aucun état enregistré de la barre des tâches n'a été trouvé. La barre des tâches Windows a été rendue visible ; son réglage de masquage automatique n'a pas été modifié.
 es: No se encontró ningún estado guardado de la barra de tareas. Se hizo visible la barra de tareas de Windows; no se cambió su ocultación automática.
 zh: 未找到已保存的任务栏状态。已显示 Windows 任务栏；其自动隐藏设置未更改。
 hi: टास्कबार की कोई सहेजी स्थिति नहीं मिली। Windows टास्कबार दिखाया गया; उसकी ऑटो-हाइड सेटिंग नहीं बदली गई।
+pt: Nenhum estado salvo da barra de tarefas foi encontrado. A barra de tarefas do Windows foi tornada visível; sua configuração de ocultar automaticamente não foi alterada.
+ru: Сохранённое состояние панели задач не найдено. Панель задач Windows сделана видимой; её параметр автоматического скрытия не изменён.
+ar: لم يتم العثور على حالة محفوظة لشريط المهام. تم إظهار شريط مهام Windows؛ ولم يتغير إعداد الإخفاء التلقائي الخاص به.
+bn: টাস্কবারের কোনো সংরক্ষিত অবস্থা পাওয়া যায়নি। Windows টাস্কবার দৃশ্যমান করা হয়েছে; এর স্বয়ংক্রিয়ভাবে লুকানোর সেটিং বদলানো হয়নি।
+ur: ٹاسک بار کی کوئی محفوظ شدہ حالت نہیں ملی۔ Windows ٹاسک بار نظر آنے والا بنا دیا گیا؛ اس کی خودکار چھپانے کی ترتیب نہیں بدلی گئی۔
 
 en: There was nothing to restore.
 fr: Il n'y avait rien à rétablir.
 es: No había nada que restaurar.
 zh: 没有需要恢复的内容。
 hi: बहाल करने के लिए कुछ नहीं था।
+pt: Não havia nada para restaurar.
+ru: Восстанавливать было нечего.
+ar: لم يكن هناك ما يمكن استعادته.
+bn: ফিরিয়ে আনার মতো কিছু ছিল না।
+ur: بحال کرنے کے لیے کچھ نہیں تھا۔
 
 en: Taskbar replacement is turned off.
 fr: Le remplacement de la barre des tâches est désactivé.
 es: La sustitución de la barra de tareas está desactivada.
 zh: 任务栏替换已关闭。
 hi: टास्कबार प्रतिस्थापन बंद है।
+pt: A substituição da barra de tarefas está desativada.
+ru: Замена панели задач выключена.
+ar: استبدال شريط المهام متوقف.
+bn: টাস্কবার প্রতিস্থাপন বন্ধ আছে।
+ur: ٹاسک بار کا متبادل بند ہے۔
 
 en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
 fr: Le remplacement de la barre des tâches n'a pas pu être désactivé automatiquement. Désactivez-le dans Paramètres d'Aether Shell > Bureau.
 es: No se pudo desactivar automáticamente la sustitución de la barra de tareas. Desactívala en Configuración de Aether Shell > Escritorio.
 zh: 无法自动关闭任务栏替换。请在 Aether Shell 设置 > 桌面 中将其关闭。
 hi: टास्कबार प्रतिस्थापन अपने-आप बंद नहीं हो सका। इसे Aether Shell सेटिंग्स > डेस्कटॉप में बंद करें।
+pt: Não foi possível desativar a substituição da barra de tarefas automaticamente. Desative-a em Configurações do Aether Shell > Área de trabalho.
+ru: Не удалось автоматически отключить замену панели задач. Отключите её в параметрах Aether Shell > Рабочий стол.
+ar: تعذّر إيقاف استبدال شريط المهام تلقائيًا. أوقفه من إعدادات Aether Shell > سطح المكتب.
+bn: টাস্কবার প্রতিস্থাপন স্বয়ংক্রিয়ভাবে বন্ধ করা যায়নি। Aether Shell সেটিংস > ডেস্কটপে এটি বন্ধ করুন।
+ur: ٹاسک بار کا متبادل خودکار طور پر بند نہیں ہو سکا۔ اسے Aether Shell کی ترتیبات > ڈیسک ٹاپ میں بند کریں۔
 
 en: Unrecognized or invalid Aether Shell command line.
 fr: Ligne de commande d'Aether Shell non reconnue ou non valide.
 es: Línea de comandos de Aether Shell no reconocida o no válida.
 zh: 无法识别或无效的 Aether Shell 命令行。
 hi: Aether Shell की कमांड लाइन पहचानी नहीं गई या अमान्य है।
+pt: Linha de comando do Aether Shell não reconhecida ou inválida.
+ru: Командная строка Aether Shell не распознана или недопустима.
+ar: سطر أوامر Aether Shell غير معروفة أو غير صالحة.
+bn: Aether Shell কমান্ড লাইন অচেনা বা অবৈধ।
+ur: Aether Shell کمانڈ لائن نامعلوم یا غلط ہے۔
 
 en: Aether Shell could not create its local data folders.
 fr: Aether Shell n'a pas pu créer ses dossiers de données locaux.
 es: Aether Shell no pudo crear sus carpetas de datos locales.
 zh: Aether Shell 无法创建其本地数据文件夹。
 hi: Aether Shell अपने स्थानीय डेटा फ़ोल्डर नहीं बना सका।
+pt: O Aether Shell não conseguiu criar suas pastas de dados locais.
+ru: Aether Shell не удалось создать свои локальные папки данных.
+ar: تعذّر على Aether Shell إنشاء مجلدات بياناته المحلية.
+bn: Aether Shell তার লোকাল ডেটা ফোল্ডার তৈরি করতে পারেনি।
+ur: Aether Shell اپنے مقامی ڈیٹا فولڈر نہیں بنا سکا۔
 
 en: Aether Shell stopped after an unexpected error.
 fr: Aether Shell s'est arrêté après une erreur inattendue.
 es: Aether Shell se detuvo tras un error inesperado.
 zh: Aether Shell 因意外错误而停止。
 hi: एक अप्रत्याशित त्रुटि के बाद Aether Shell रुक गया।
+pt: O Aether Shell parou após um erro inesperado.
+ru: Aether Shell остановлен из-за непредвиденной ошибки.
+ar: توقف Aether Shell بعد خطأ غير متوقع.
+bn: একটি অপ্রত্যাশিত ত্রুটির পর Aether Shell বন্ধ হয়ে গেছে।
+ur: غیر متوقع خرابی کے بعد Aether Shell رک گیا۔

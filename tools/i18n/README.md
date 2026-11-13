@@ -1,10 +1,15 @@
 # Interface translations (D70)
 
 Aether Shell's interface is written in English in the code and translated through one catalog into French, Spanish,
-Chinese (Simplified) and Hindi.
+Chinese (Simplified), Hindi (D70), Portuguese, Russian, Arabic, Bengali and Urdu (D74).
 
 - `catalog/*.txt` — the translations, one block per text: `en:` (the exact English text in the code), then `fr:`,
-  `es:`, `zh:`, `hi:`. `\n` is a line break. Blocks are separated by a blank line; `#` starts a comment line.
+  `es:`, `zh:`, `hi:`, `pt:`, `ru:`, `ar:`, `bn:`, `ur:`. `\n` is a line break. Blocks are separated by a blank line; `#`
+  starts a comment line. In the languages whose script has no Latin letters for an access key (`zh`, `ar`, `bn`, `ur`),
+  the key is written after the text, as Windows does: `连接(&C)`, `اتصال (&C)`.
+- Adding a language: a column in `LANGUAGES` (`make_catalog.py`), a value in `core/Localization`'s `Language`, its row in
+  `kLanguages` and `FromLocaleName`, `settings::InterfaceLanguage` and its name in `SettingsSerialization.cpp`, then the
+  translation of every block.
 - `make_catalog.py` — checks the catalog (duplicates, `{}` placeholders and `&` access keys identical to the English)
   and writes `src/core/Translations.inc`, which the build compiles. Run it after any change:
 

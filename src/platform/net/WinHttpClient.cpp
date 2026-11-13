@@ -200,6 +200,11 @@ Result<void> OpenExchange(HINTERNET session, Exchange& exchange, const ParsedUrl
         !SetDwordOption(raw, WINHTTP_OPTION_DISABLE_FEATURE, WINHTTP_DISABLE_COOKIES | WINHTTP_DISABLE_REDIRECTS)) {
         return MapWinHttpError(::GetLastError(), "configuring the request for " + origin);
     }
+    if (!request.allowCompression) {
+        // Per-request opt-out of the session's decompression: no Accept-Encoding is sent, the body arrives as is.
+        // Best effort: if the option is refused the request simply keeps the session's behaviour.
+        (void)SetDwordOption(raw, WINHTTP_OPTION_DECOMPRESSION, 0);
+    }
     if (::WinHttpSetStatusCallback(raw, &OnWinHttpStatus, WINHTTP_CALLBACK_FLAG_SECURE_FAILURE, 0) ==
         WINHTTP_INVALID_STATUS_CALLBACK) {
         // Diagnostics only: certificate failures are still detected and reported, just less precisely.
@@ -418,7 +423,9 @@ Result<HttpResponse> Execute(HINTERNET session, const WinHttpSessionInfo& info, 
         response.headers = std::move(exchange.headers);
         response.finalUrl = currentUrl;
         if (ResponseHasBody(method, response.status)) {
-            if (auto read = ReadBody(exchange, url, info, response, request.maxResponseBytes, sink, progress); !read) {
+            WinHttpSessionInfo effective = info;
+            effective.decompressionEnabled = info.decompressionEnabled && request.allowCompression;
+            if (auto read = ReadBody(exchange, url, effective, response, request.maxResponseBytes, sink, progress); !read) {
                 AETHER_LOG_DEBUG(kLog, "{} {} body failed: {}", method, url.Origin(), read.error().Describe());
                 return read.error();
             }

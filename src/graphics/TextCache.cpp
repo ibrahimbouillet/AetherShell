@@ -2,6 +2,8 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "graphics/TextCache.h"
 
+#include "core/Localization.h"
+
 #include <algorithm>
 #include <cmath>
 
@@ -32,6 +34,14 @@ std::wstring TextCache::ResolveFamily(const std::wstring& preferred) const {
 
 IDWriteTextFormat* TextCache::Format(const TextStyle& style) {
     if (!factory_) return nullptr;
+    // Arabic and Urdu read right to left: DirectWrite then shapes and orders the text accordingly, and an alignment
+    // to the start of the line means the right edge.
+    const bool rightToLeft = i18n::IsRightToLeft(i18n::CurrentLanguage());
+    if (rightToLeft != rightToLeft_) {
+        formats_.clear();
+        layouts_.clear();
+        rightToLeft_ = rightToLeft;
+    }
     const bool useSmall = style.opticalSmall && !style.display;
     const auto key = std::make_tuple(style.display, static_cast<int>(std::lround(style.size * 100.0f)),
                                      static_cast<int>(style.weight), static_cast<int>(style.alignment),
@@ -44,6 +54,7 @@ IDWriteTextFormat* TextCache::Format(const TextStyle& style) {
                                           DWRITE_FONT_STRETCH_NORMAL, style.size, L"", format.put()))) {
         return nullptr;
     }
+    if (rightToLeft) format->SetReadingDirection(DWRITE_READING_DIRECTION_RIGHT_TO_LEFT);
     format->SetTextAlignment(style.alignment);
     format->SetParagraphAlignment(style.verticalAlignment);
     if (style.ellipsis) {

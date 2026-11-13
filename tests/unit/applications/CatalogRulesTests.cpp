@@ -392,8 +392,8 @@ AETHER_TEST("catalog rules: Windows' Settings pages, named as Windows names them
     CHECK_FALSE(IsSettingsPageName(L"ms-settings-other:display"));
 }
 
-// D70: named in the interface's language, found in any of the five.
-AETHER_TEST("catalog rules: Windows' tools and Settings pages in each of the five languages") {
+// D70: named in the interface's language, found in any of the ten.
+AETHER_TEST("catalog rules: Windows' tools and Settings pages in each of the ten languages") {
     const auto spanish = SettingsPageApplications(i18n::Language::Spanish);
     const auto display = std::find_if(spanish.begin(), spanish.end(), [](const ApplicationInfo& app) { return app.parsingName == L"ms-settings:display"; });
     REQUIRE(display != spanish.end());

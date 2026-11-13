@@ -79,6 +79,25 @@ std::vector<RECT> MergeRows(std::vector<RECT> rects) {
     return merged;
 }
 
+// One region from many rectangles, in a single call. OR-ing them one at a time copies the growing region at each
+// step: measured 14 ms for the corner pieces and 12 ms for the rim, against well under one for this. The rectangles
+// never overlap; Windows takes them ordered by row, then by column.
+platform::UniqueRegion RegionFromRects(std::vector<RECT> rects) {
+    if (rects.empty()) return platform::UniqueRegion(::CreateRectRgn(0, 0, 0, 0));
+    std::sort(rects.begin(), rects.end(), [](const RECT& a, const RECT& b) { return a.top != b.top ? a.top < b.top : a.left < b.left; });
+    const auto payload = static_cast<DWORD>(rects.size() * sizeof(RECT));
+    std::vector<std::byte> storage(sizeof(RGNDATAHEADER) + payload);
+    auto* data = reinterpret_cast<RGNDATA*>(storage.data());
+    RECT box = rects.front();
+    for (const RECT& rect : rects) {
+        box.left = std::min(box.left, rect.left); box.top = std::min(box.top, rect.top);
+        box.right = std::max(box.right, rect.right); box.bottom = std::max(box.bottom, rect.bottom);
+    }
+    data->rdh = RGNDATAHEADER{sizeof(RGNDATAHEADER), RDH_RECTANGLES, static_cast<DWORD>(rects.size()), payload, box};
+    std::memcpy(data->Buffer, rects.data(), payload);
+    return platform::UniqueRegion(::ExtCreateRegion(nullptr, static_cast<DWORD>(storage.size()), data));
+}
+
 LRESULT CALLBACK OverlayProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) noexcept {
     switch (message) {
         case WM_NCHITTEST: return HTTRANSPARENT;
@@ -126,12 +145,8 @@ public:
     }
     // Gives the window the shape of `rects` (its own coordinates) at `bounds` (screen pixels).
     bool Shape(const RECT& bounds, const std::vector<RECT>& rects) {
-        platform::UniqueRegion combined(::CreateRectRgn(0, 0, 0, 0));
+        platform::UniqueRegion combined = RegionFromRects(rects);
         if (!combined) return false;
-        for (const RECT& rect : rects) {
-            platform::UniqueRegion part(::CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom));
-            if (!part || ::CombineRgn(combined.Get(), combined.Get(), part.Get(), RGN_OR) == ERROR) return false;
-        }
         if (!::SetWindowPos(window_, nullptr, bounds.left, bounds.top, bounds.right - bounds.left, bounds.bottom - bounds.top,
                             SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER)) return false;
         if (!::SetWindowRgn(window_, combined.Get(), TRUE)) return false;
@@ -268,7 +283,8 @@ struct Frame {
     int placements = 0;
     ULONGLONG burstStart = 0;
     ULONGLONG restUntil = 0;
-    void Hide() noexcept { pieces.Hide(); ring.Hide(); }
+    bool shown = false;
+    void Hide() noexcept { pieces.Hide(); ring.Hide(); shown = false; target = nullptr; }
 };
 
 struct Observer {
@@ -278,6 +294,9 @@ struct Observer {
     UINT_PTR timer = 0;
     bool pending = true;
     bool stopping = false;
+    // The display, its scale or Explorer changed: what the frames were built for (monitors, desktop picture,
+    // thumbnails) may be gone, so the next look starts them again.
+    bool forgetFrames = false;
     explicit Observer(const WindowCornerGuardOptions& value) noexcept : options(value) {}
     std::atomic<std::uint64_t>* Statistic(std::atomic<std::uint64_t> WindowCornerGuardStatistics::* field) const noexcept {
         return options.statistics ? &(options.statistics->*field) : nullptr;
@@ -330,10 +349,14 @@ struct Observer {
     struct Top { HWND window = nullptr; CornerRim rim; };
     void Consider(HWND window, std::map<HMONITOR, Top>& tops) const {
         if (!Allowed(window)) return;
+        // Only a visible, maximized window can be eligible (ClassifyCornerWindow says so as well).
+        if (!::IsWindowVisible(window) || !::IsZoomed(window)) return;
+        // Windows come front to back: the first eligible one of a monitor is its front one, so a window on a monitor
+        // that has one already is not even read.
+        const HMONITOR monitor = ::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
+        if (!monitor || tops.contains(monitor)) return;
         const auto observed = ClassifyCornerWindow(Read(window));
         if (!observed.eligible) return;
-        const HMONITOR monitor = ::MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
-        if (!monitor || tops.contains(monitor)) return;  // windows come front to back: the first is the front one
         if (const auto rim = CornerFrameFor(observed)) tops.emplace(monitor, Top{window, *rim});
     }
     // One look: the front maximized window of each monitor, and the guard's windows shaped, mapped and stacked
@@ -347,17 +370,23 @@ struct Observer {
         // A test shows only the private window it names, never the real desktop.
         if (options.onlyProcess) source = options.desktopSource;
         else if (!source || !::IsWindow(source)) source = FindDesktopSource();
+        if (forgetFrames) { forgetFrames = false; frames.clear(); }
         std::map<HMONITOR, Top> tops;
-        struct Context { Observer* self; std::map<HMONITOR, Top>* tops; } context{this, &tops};
+        struct Context { Observer* self; std::map<HMONITOR, Top>* tops; std::size_t monitors; } context{
+            this, &tops, static_cast<std::size_t>(std::max(1, ::GetSystemMetrics(SM_CMONITORS)))};
         (void)::EnumWindows([](HWND window, LPARAM value) noexcept -> BOOL {
             auto& state = *reinterpret_cast<Context*>(value);
-            try { state.self->Consider(window, *state.tops); return TRUE; }
+            try {
+                state.self->Consider(window, *state.tops);
+                // Every monitor has its front window: nothing further back can change that.
+                return state.tops->size() < state.monitors ? TRUE : FALSE;
+            }
             catch (...) { return FALSE; }
         }, reinterpret_cast<LPARAM>(&context));
-        for (auto it = frames.begin(); it != frames.end();) {
-            if (tops.contains(it->first)) ++it;
-            else it = frames.erase(it);
-        }
+        // A monitor with no eligible window keeps its frame, hidden: building one (a window, two shapes and about
+        // forty DWM thumbnails) was measured at 40 to 100 ms, and the same monitor is nearly always rounded again
+        // within seconds. Stale frames go with a display change (forgetFrames).
+        for (auto& [monitor, frame] : frames) if (!tops.contains(monitor) && frame->shown) frame->Hide();
         const COLORREF color = RimColor();
         for (const auto& [monitor, top] : tops) {
             auto& frame = frames[monitor];
@@ -367,9 +396,12 @@ struct Observer {
             // Without the desktop's picture the corners stay square: a rim alone would draw arcs over them.
             if (!source || !frame->pieces.Sync(top.rim, source) || !frame->ring.Sync(top.rim, color)) { frame->Hide(); continue; }
             Place(*frame);
+            frame->shown = true;
         }
-        if (!frames.empty() && !timer) timer = ::SetTimer(nullptr, 0, kCheckMs, nullptr);
-        else if (frames.empty() && timer) { ::KillTimer(nullptr, timer); timer = 0; }
+        // The slow look-again timer runs only while something is shown; hidden frames cost nothing.
+        const bool anyShown = std::any_of(frames.begin(), frames.end(), [](const auto& entry) { return entry.second->shown; });
+        if (anyShown && !timer) timer = ::SetTimer(nullptr, 0, kCheckMs, nullptr);
+        else if (!anyShown && timer) { ::KillTimer(nullptr, timer); timer = 0; }
         (void)::QueryPerformanceCounter(&finished);
         (void)::QueryPerformanceFrequency(&frequency);
         if (auto* longest = Statistic(&WindowCornerGuardStatistics::longestSweepMicros); longest && frequency.QuadPart > 0) {
@@ -405,12 +437,22 @@ struct Observer {
         // Windows makes a window always-on-top when it is placed right behind an always-on-top one. Above an ordinary
         // target that is the front ordinary window, the place asked for is therefore the top of the ordinary windows.
         const HWND after = !above || (!topmost && isTopmost(above)) ? HWND_TOP : above;
+        constexpr UINT kPlaceFlags = SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW;
         for (const HWND overlay : {ring, pieces}) {
             if (isTopmost(overlay) != topmost)
                 (void)::SetWindowPos(overlay, topmost ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
-            (void)::SetWindowPos(overlay, after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_SHOWWINDOW);
-            Count(Statistic(&WindowCornerGuardStatistics::placements));
         }
+        // Both windows are stacked and shown in one operation, so the desktop is recomposed once (measured 5 to 15 ms
+        // for the two separate calls). Should the batch be refused, each window is placed on its own.
+        HDWP batch = ::BeginDeferWindowPos(2);
+        for (const HWND overlay : {ring, pieces}) {
+            if (batch) batch = ::DeferWindowPos(batch, overlay, after, 0, 0, 0, 0, kPlaceFlags);
+        }
+        if (!batch || !::EndDeferWindowPos(batch)) {
+            for (const HWND overlay : {ring, pieces}) (void)::SetWindowPos(overlay, after, 0, 0, 0, 0, kPlaceFlags);
+        }
+        Count(Statistic(&WindowCornerGuardStatistics::placements));
+        Count(Statistic(&WindowCornerGuardStatistics::placements));
     }
     // Before D72 the guard clipped other applications' windows with a rounded region and marked them. A guard
     // that was killed left its clips behind, and the window stayed cut after it was restored. The guard that made
@@ -460,6 +502,9 @@ LRESULT CALLBACK BroadcastProc(HWND window, UINT message, WPARAM wParam, LPARAM 
     if ((message == WM_DISPLAYCHANGE || message == WM_SETTINGCHANGE || message == WM_DPICHANGED ||
          (message && message == ExplorerStartedMessage())) && currentObserver) {
         if (message == ExplorerStartedMessage()) currentObserver->source = nullptr;
+        // Monitors, their scale and the desktop window are what the retained frames were built for.
+        if (message == WM_DISPLAYCHANGE || message == WM_DPICHANGED || message == ExplorerStartedMessage())
+            currentObserver->forgetFrames = true;
         currentObserver->Heard();
     }
     return ::DefWindowProcW(window, message, wParam, lParam);

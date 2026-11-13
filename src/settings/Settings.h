@@ -27,8 +27,9 @@ enum class AccentSource { Windows, Aether };              // Windows accent colo
 // D63, D66: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
 // Liquid is glass in layers over what lies behind: a blur layer, the liquid's light, then the icons and text.
 enum class SurfaceStyle { Grain, Liquid };
-// D70: the interface's language. Automatic follows the Windows display language (English when it is none of the five).
-enum class InterfaceLanguage { Automatic, English, French, Spanish, Chinese, Hindi };
+// D70/D74: the interface's language. Automatic follows the Windows display languages, in the person's own order
+// (English when none of them is one of the ten). The order after Automatic is core/Localization's Language order.
+enum class InterfaceLanguage { Automatic, English, French, Spanish, Chinese, Hindi, Portuguese, Russian, Arabic, Bengali, Urdu };
 // D67: the colour of Liquid's blur layer. Automatic adds none (the glass's own adaptation only).
 enum class LiquidTint { Automatic, White, Black, Accent, Blue, Violet, Pink, Red, Orange, Yellow, Green, Teal };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster

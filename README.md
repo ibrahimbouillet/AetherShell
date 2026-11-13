@@ -68,8 +68,9 @@ Real desktops, captured on Windows 11. Wallpapers and application icons belong t
   Control Panel's items.
 - **Auto-Hide:** let the Dock and the Top Bar, each on its own, slide away while an application window
   covers them and return when the pointer reaches their screen edge, for a full-screen workspace.
-- **Five languages:** the whole interface, setup included, in English, Chinese, Hindi, Spanish and French. It follows
-  Windows' display language, or the one you choose in Settings → Language. See [Languages](#languages).
+- **Ten languages:** the whole interface, setup included, in English, Chinese, Hindi, Spanish, French, Portuguese, Russian,
+  Arabic, Bengali and Urdu. It follows your Windows display languages, or the one you choose in Settings → Language, and
+  remembers that choice from one version to the next. See [Languages](#languages).
 - **Welcome:** an optional greeting, written by hand in French, English or Spanish over your blurred wallpaper,
   after you sign in or unlock your PC. Setup can ask for the name it greets you with.
 - **Weather:** optionally use Windows location permission for a coarse position and a forecast. If
@@ -89,8 +90,9 @@ less work per frame. Read the [release notes](docs/releases/0.3.5-alpha.3.md) an
 
 ## Languages
 
-Aether Shell speaks the five most spoken languages in the world. Every menu, panel, Settings page, message and setup
-screen is translated, and so is this documentation.
+Aether Shell speaks the ten most spoken languages in the world. Every menu, panel, Settings page, message and setup
+screen is translated. The documentation is translated into the first five of the table below; for the other five it is
+still in English.
 
 | | Language | Interface | Documentation |
 |---|---|---|---|
@@ -99,11 +101,19 @@ screen is translated, and so is this documentation.
 | 🇮🇳 | हिन्दी | ✅ | [README](README.hi.md) · [उपयोग गाइड](docs/i18n/hi/USER_GUIDE.md) · [इंस्टॉलेशन](docs/i18n/hi/INSTALLATION.md) |
 | 🇪🇸 | Español | ✅ | [README](README.es.md) · [Guía de uso](docs/i18n/es/USER_GUIDE.md) · [Instalación](docs/i18n/es/INSTALLATION.md) |
 | 🇫🇷 | Français | ✅ | [README](README.fr.md) · [Guide d'utilisation](docs/i18n/fr/USER_GUIDE.md) · [Installation](docs/i18n/fr/INSTALLATION.md) |
+| 🇧🇷 | Português | ✅ | English for now |
+| 🇷🇺 | Русский | ✅ | English for now |
+| 🇸🇦 | العربية | ✅ (right to left) | English for now |
+| 🇧🇩 | বাংলা | ✅ | English for now |
+| 🇵🇰 | اردو | ✅ (right to left) | English for now |
 
-**Follow Windows** (the default) uses Windows' display language when it is one of these five, and English otherwise.
-Choose another in **Settings → Language**; the change applies at once. Names that belong to
+**Follow Windows** (the default) goes through your Windows display languages (Settings → Time & language), in the order
+you ranked them, and takes the first that is one of these ten; English if none is. Choose another in
+**Settings → Language**; the change applies at once and is kept in your settings, which every version reads: installing a
+new version, repairing or reinstalling keeps it, and setup, the updater and the launcher speak it too. Names that belong to
 you or to other programs (applications, files, Wi-Fi networks) are never translated. The handwritten welcome writes
-Latin letters, so it greets in French, English or Spanish. Translations live in
+Latin letters, so it greets in French, English or Spanish. Arabic and Urdu read right to left: text is shaped and aligned
+accordingly, while the bars and panels keep their layout. Translations live in
 [tools/i18n/catalog](tools/i18n/catalog); corrections are welcome.
 
 ## Replacing the Windows taskbar

@@ -172,6 +172,9 @@ net::HttpRequest MakeRequest(std::string url) {
     request.maxResponseBytes = kMaxResponseBytes;
     request.allowedRedirectHosts.clear();  // Open-Meteo answers directly; never follow redirects.
     request.maxRedirects = 0;
+    // Open-Meteo's compressed stream makes WinHTTP's decoder abort mid-body (E_ABORT), so the weather never
+    // loaded. The reply is under 1 KB: ask for it uncompressed.
+    request.allowCompression = false;
     return request;
 }
 

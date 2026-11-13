@@ -47,12 +47,14 @@ detail views for Wi-Fi, Bluetooth, accessibility and sound output; switches that
 itself open the matching Windows Settings page. On Windows 11, **Use Windows Quick Settings
 (Windows 11)** on the same page opens Windows' own panel instead.
 
-**Language** (Alpha 4): Aether Shell, setup included, speaks English, Chinese (simplified), Hindi, Spanish and French.
-Settings → **Language** chooses one; **Follow Windows**, the default, uses Windows' display language
-when it is one of the five, and English otherwise. The change applies at once to the bars, menus, Search and Settings.
+**Language** (Alpha 4): Aether Shell, setup included, speaks English, Chinese (simplified), Hindi, Spanish, French,
+Portuguese, Russian, Arabic, Bengali and Urdu. Settings → **Language** chooses one; **Follow Windows**, the default, goes
+through your Windows display languages in the order you ranked them and takes the first that is one of the ten, and English
+otherwise. The change applies at once to the bars, menus, Search and Settings, and your choice is kept in your settings, which
+every version reads: a new version, a repair or a reinstall finds it again, and setup, the updater and the launcher speak it.
 With a chosen language the Top Bar writes the date in it; with Follow Windows the date keeps your Windows regional
 format. Names of applications, files and networks are never translated. Search shows Windows' tools and Settings pages
-in the interface's language and finds them by their name in any of the five.
+in the interface's language and finds them by their name in any of the ten. Arabic and Urdu read right to left.
 
 Settings has Dock, Top Bar, Weather, Updates, General, About, Desktop, Appearance, Welcome and Language pages. Weather
 starts disabled. Choose automatic Windows location with consent or a manual location before enabling

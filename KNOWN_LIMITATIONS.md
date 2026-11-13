@@ -16,11 +16,16 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   fixtures, not yet on the owner's desktop. A Liquid blur below 100% lets the sharp page through and can lower the text's
   contrast over a busy page (measured 3.2:1 at 60% in light mode); Settings says so. Every Alpha 4 test build carries
   `0.4.0-alpha.4`: only the installed program's date tells them apart.
-- Alpha 4 languages (D70, S-073): Chinese and Hindi were translated without a native speaker's review; corrections are
-  welcome in `tools/i18n/catalog`. The handwritten welcome writes only Latin letters, so in Chinese and Hindi it greets in
-  English. Setup, the updater and the launcher follow Windows' display language, not the language chosen in Settings.
-  Windows' own windows (notifications, Quick Settings, Settings) keep Windows' language. Right-to-left languages are not
-  offered. The engineering documents stay in English.
+- Alpha 4 languages (D70, D74): Chinese, Hindi, Portuguese, Russian, Arabic, Bengali and Urdu were translated without a
+  native speaker's review; corrections are welcome in `tools/i18n/catalog`. The handwritten welcome writes only Latin
+  letters, so outside French, English and Spanish it greets in English. Setup, the updater and the launcher speak the
+  language chosen in Settings (read from the settings file every version shares), else the first of Windows' display
+  languages that is one of the ten; a private profile started with `--data-dir` is not read by them. Windows' own windows
+  (notifications, Quick Settings, Settings) keep Windows' language. Arabic and Urdu read right to left in the text drawn by
+  Aether Shell (shaping, alignment); the layout of the bars, the Dock and the panels is not mirrored, and the standard
+  Windows controls inside Settings and setup keep their left-to-right layout. The documentation (README, user guide,
+  installation guide) is translated into English, French, Spanish, Chinese and Hindi only; the engineering documents stay in
+  English.
 - Alpha 4 Search (D68, S-072): files come from Windows' own index, so only what Windows Search has indexed in the person's
   folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive) is found, by name, never by content; with
   Windows Search off there are no files. Settings pages are a fixed list of 44 with English and French names; others are
