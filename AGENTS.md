@@ -151,6 +151,8 @@ settings, registry Run/Uninstall keys, the work area, audio state, or launch app
 - **D74–D76 (2026-11-13): test 4.7** (weather, corners kept between windows, ten languages) is committed locally and
   packaged under D57. Not pushed (D65) and not installed. The owner's one-commit-a-day contribution (2026-11-10, `bd02322`)
   was made on `origin/main` alone, from a scratch index, without any Alpha 4 commit.
+- **D77 (2026-11-16): the owner confirmed test 4.7** (installed since 2026-11-13). Still not pushed (D65). The owner
+  declined vblank-aligned frame pacing in `FrameScheduler`; the uncommitted trial was removed. Do not reintroduce it unasked.
 - D26/D34: keep a usable current instance running except bounded tests/captures, then restore it.
   D34 authorizes the installed Alpha 2 sign-in startup with a disclosed installer choice and opt-out;
   private capture profiles must not register startup. Respect Task Manager disable and intentional Quit.

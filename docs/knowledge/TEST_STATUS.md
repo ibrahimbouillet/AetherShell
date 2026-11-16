@@ -3347,3 +3347,23 @@ the three programs, `LICENSE`, `THIRD_PARTY_NOTICES.md`), so test 4.7's package 
 
 **Not executed, so not claimed:** GitHub's rendering of the right-to-left pages (nothing is pushed, D65); a native
 speaker's reading of any of the new documents.
+
+### S-077 — Test 4.7 confirmed by the owner; the frame-pacing trial removed (Claude, 2026-11-16)
+
+**What changed (documentation only, no product file):** D77. The owner confirmed test 4.7 after using it. An uncommitted
+frame-pacing change to `src/graphics/FrameScheduler.{h,cpp}` and its untracked `tests/unit/graphics/FramePacingTests.cpp`
+were removed at the owner's word; the tree is back to the committed source. No build, test or test package was made.
+
+| Check | Result |
+| --- | --- |
+| Installed program is test 4.7 | `%LOCALAPPDATA%\Programs\AetherShell\versions\0.4.0-alpha.4\AetherShellApp.exe`, written 2026-11-13 17:08, SHA-256 `20a05ed1…` = `build/wf-claude-v4/modules/app/AetherShellApp.exe` (2026-11-13 08:17:02), the build S-075 packaged 39 s later into the 4.7 setup |
+| Test 4.7 setup in `dist/` | SHA-256 `41790ba4…e837`, matching S-075 and its checksums file |
+| Running | launcher and app from that version folder, started 2026-11-16 18:17 |
+| Owner's verdict | "Je confirme la 4.7" (2026-11-16) |
+| Working tree after removal | only the ignored-by-rule `.agents/` remains untracked; `FrameScheduler` equals `HEAD` |
+
+**Correction to S-075 and HANDOFF:** they say 4.7 was not installed; the owner installed it on 2026-11-13 at 17:08.
+
+**Not claimed:** which 4.7 items the owner exercised one by one (the weather, corners, page height, each language);
+the confirmation is the owner's overall verdict. Native-speaker review, mirrored right-to-left layout, Windows 10 and a
+second display remain unexecuted (S-075).

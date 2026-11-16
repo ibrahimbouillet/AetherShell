@@ -111,6 +111,21 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D77 — Test 4.7 confirmed by the owner; no frame pacing on the display's refresh grid
+
+Owner, 2026-11-16, after using test 4.7 (installed 2026-11-13, running since): "Je confirme la 4.7". This is the owner's
+acceptance of that test build, **not** a publication: Alpha 4 stays local and unpushed until the owner says it is complete
+(D65).
+
+Same day, the owner said they no longer want the "animation engine" begun after 4.7: an uncommitted change aligning
+`graphics::FrameScheduler`'s frames to the compositor's refresh grid (`DwmGetCompositionTimingInfo` anchor, frames stamped
+on the grid, `tests/unit/graphics/FramePacingTests.cpp`). It was never committed, built into a test or recorded; it was
+removed from the tree. The committed `FrameScheduler` (relative refresh interval, no idle frames), which drives every
+current animation, is unchanged. Do not reintroduce vblank-aligned pacing unless the owner asks for it again; D62's
+fluidity part, when the owner takes it up, starts from measurements rather than from this change.
+
+T60, T61; NFR-002. Evidence: TEST_STATUS S-077.
+
 ### D76 — Rounded corners are kept between windows instead of rebuilt (amends D72)
 
 Owner, 2026-11-10: "every time I go to a page it recalculates the rounded corners... it takes time". Measured with the

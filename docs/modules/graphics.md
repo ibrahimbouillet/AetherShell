@@ -240,7 +240,8 @@ interactive menu behavior were not requalified for this material change.
 ## Not done here
 
 - Frame pacing aligned to the DWM vblank (optional and measurement-gated in the plan) is not
-  implemented; `FrameScheduler` keeps its relative interval.
+  implemented; `FrameScheduler` keeps its relative interval. A trial of it after test 4.7 was
+  declined by the owner and removed (D77); do not reintroduce it unasked.
 - Acrylic saturation ("vibrancy") through a composition effect brush is deferred; the grain and tint
   stand in for it.
 - Windows 10 has no host blur (unchanged fallback) and is untested for 0.2.0-alpha.1.

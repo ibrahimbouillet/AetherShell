@@ -7,7 +7,23 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4, test 4.7: the weather works, corners kept between windows, ten languages (`0.4.0-alpha.4`, D74–D76, S-075, 2026-11-13)
+## Current checkpoint — test 4.7 confirmed by the owner; frame-pacing trial removed (`0.4.0-alpha.4`, D77, S-077, 2026-11-16)
+
+- **Test 4.7 is confirmed** ("Je confirme la 4.7"). It has been installed since 2026-11-13 17:08 and is the running build
+  (hash-checked against the build S-075 packaged; S-075 and the section below say "not installed", which was wrong).
+  A confirmation is not a publication: **nothing is pushed until the owner says Alpha 4 is complete (D65).**
+- **Frame pacing removed (D77):** the uncommitted change aligning `FrameScheduler` to the display's refresh grid, and its
+  untracked `FramePacingTests.cpp`, were removed at the owner's word ("le moteur d'animation, je ne le veux plus").
+  The committed `FrameScheduler` is untouched. Do not bring vblank pacing back unasked.
+- Documentation only; no build or test package. The working tree is clean apart from the untracked `.agents/`.
+
+**Next:** the owner names the next round. Alpha 4 items still open from D62/D63 and the 4.x rounds: Liquid for
+Settings, menus, Search and Quick Settings; the arrival after setup's Close; fluidity (D62 part 2, from measurements,
+not D77's pacing); the code-signed setup (D62 part 3); native-speaker review of seven languages and mirrored layout for
+Arabic/Urdu. Long-standing unknowns: the blank-window incident (AS4-01), sign-in startup, physical touch, real lock/sign-in
+for the welcome. Test builds keep `0.4.0-alpha.4` (D65).
+
+## Earlier — Alpha 4, test 4.7: the weather works, corners kept between windows, ten languages (`0.4.0-alpha.4`, D74–D76, S-075, 2026-11-13)
 
 The owner, after trying 4.6, asked for: the weather to work; the app to be more fluid (it "recalculates the rounded
 corners" at each change of page); the too-large margin that takes height from pages; more languages (ten) matched to the
