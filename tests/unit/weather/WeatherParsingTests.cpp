@@ -466,3 +466,15 @@ AETHER_TEST("weather types: location labels skip empty and repeated parts") {
     CHECK_EQ(ToString(status::WeatherState::ProviderUnavailable), std::string_view("provider-unavailable"));
     CHECK_EQ(ToString(TemperatureUnit::Fahrenheit), std::string_view("fahrenheit"));
 }
+
+AETHER_TEST("weather display: temperatures round half away from zero and never show minus zero (D78)") {
+    CHECK_EQ(RoundTemperature(12.5), 13L);
+    CHECK_EQ(RoundTemperature(12.49), 12L);
+    CHECK_EQ(RoundTemperature(-12.5), -13L);
+    CHECK_EQ(RoundTemperature(-0.4), 0L);
+    CHECK_EQ(RoundTemperature(0.4), 0L);
+    CHECK_EQ(FormatTemperature(-0.4, TemperatureUnit::Celsius), std::wstring(L"0°C"));
+    CHECK_EQ(FormatTemperature(12.5, TemperatureUnit::Celsius), std::wstring(L"13°C"));
+    CHECK_EQ(FormatTemperature(54.6, TemperatureUnit::Fahrenheit), std::wstring(L"55°F"));
+    CHECK_EQ(FormatTemperature(-3.6, TemperatureUnit::Celsius, false), std::wstring(L"-4°"));
+}

@@ -58,7 +58,7 @@ constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPost
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
               kRemovePin = 313, kMovePinUp = 314, kMovePinDown = 315, kLicense = 316, kUpdateSummary = 317,
               kDesktopStatus = 318, kImportTaskbarPins = 319, kWindowsLocation = 320, kLocationSettings = 321,
-              kUpdateProgress = 322, kUpdateHeadline = 323;
+              kUpdateProgress = 322, kUpdateHeadline = 323, kOpenWeather = 324;
 constexpr int kFirstSlider = 400;  // auxiliary sliders of Number bindings: kFirstSlider + binding index
 constexpr int kLocationField = kFirstField + 70, kReleaseNotes = kFirstField + 71, kAppChooser = kFirstField + 72;
 
@@ -1032,14 +1032,17 @@ void SettingsWindow::Impl::BuildPage() {
         Check(L"Enable weather", L"Off by default: the forecast needs network requests.",
               [](const Settings& s){return s.weather.enabled;}, [](Settings& s,bool v){s.weather.enabled=v;});
         Choice(L"Temperature", L"", {L"Celsius",L"Fahrenheit"}, [](const Settings& s){return s.weather.unit;}, [](Settings& s,int v){s.weather.unit=static_cast<TemperatureUnit>(v);});
-        NumberFormat refresh; refresh.minimum = 15; refresh.maximum = 180; refresh.step = 5; refresh.unit = L"min";
+        NumberFormat refresh; refresh.minimum = 10; refresh.maximum = 180; refresh.step = 5; refresh.unit = L"min";
         Number(L"Refresh interval", RangeText(refresh) + L".", refresh,
                [](const Settings& s){return s.weather.refreshMinutes;}, [](Settings& s,double v){s.weather.refreshMinutes=static_cast<int>(v);});
+        if (callbacks.openWeather) ButtonsRow({Button(canvas, L"&Open the weather", kOpenWeather, ButtonStyle::Secondary, Glyph::OpenExternal)});
         BeginSection(L"Location");
         Check(L"Locate automatically with Windows", L"Uses the Windows location service after you allow it.",
               [](const Settings& s){return s.weather.useWindowsLocation;}, [](Settings& s,bool v){s.weather.useWindowsLocation=v;});
-        TextRow(L"Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com; a coarse "
-                L"location key is cached locally. If location is blocked, weather is unavailable.");
+        Check(L"Precise location", L"The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.",
+              [](const Settings& s){return s.weather.preciseLocation;}, [](Settings& s,bool v){s.weather.preciseLocation=v;});
+        TextRow(L"Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the "
+                L"forecast; a location key is cached locally. If location is blocked, weather is unavailable.");
         ButtonsRow({Button(canvas, L"Use &Windows location", kWindowsLocation, ButtonStyle::Secondary, Glyph::Location),
                     Button(canvas, L"Location &settings", kLocationSettings, ButtonStyle::Subtle, Glyph::OpenExternal)});
         TextRow(callbacks.weatherLocationStatus ? callbacks.weatherLocationStatus() : L"Choose automatic location or search for a place below.",
@@ -2034,6 +2037,7 @@ void SettingsWindow::Impl::Action(int id) {
         if(livePending)Apply(false);
         callbacks.requestWindowsLocation();
     } else if (id == kLocationSettings && callbacks.openLocationSettings) callbacks.openLocationSettings();
+    else if (id == kOpenWeather && callbacks.openWeather) { if (livePending) Apply(false); callbacks.openWeather(); }
     else if (id == kGeoSearch) SearchLocation();
     else if (id == kCheckUpdate && callbacks.checkForUpdates) callbacks.checkForUpdates();
     else if (id == kInstallUpdate && callbacks.downloadAndInstall) callbacks.downloadAndInstall();

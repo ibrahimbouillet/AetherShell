@@ -11,6 +11,7 @@
 #include "core/Localization.h"
 #include "graphics/TextCache.h"
 #include "graphics/Transition.h"
+#include "graphics/WeatherArt.h"
 #include "platform/windows/MonitorUtilities.h"
 #include "platform/windows/WindowUtilities.h"
 #include "status/ClockProvider.h"
@@ -67,7 +68,8 @@ graphics::WeatherSymbol WeatherKind(weather::WeatherGlyph category) noexcept {
     }
 }
 void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
-           ID2D1SolidColorBrush* brush, const graphics::DesignTokens& tokens, bool updateAvailable) {
+           ID2D1SolidColorBrush* brush, const graphics::DesignTokens& tokens, bool updateAvailable,
+           graphics::WeatherArtMotion weatherMotion = {}) {
     const float stroke = tokens.glyph.stroke;
     const auto box = D2D1::RectF(x,y,x+18,y+18);
     if (item.kind == ItemKind::Logo) {
@@ -91,7 +93,11 @@ void Glyph(ID2D1DeviceContext* dc, const DisplayItem& item, float x, float y,
         graphics::PaintBatteryGlyph(dc,box,brush,tokens,item.level,item.lowOrCritical,
             item.charge == status::ChargeState::Charging,item.powerSource == status::PowerSource::External,stroke);
     } else if (item.kind == ItemKind::Weather) {
-        graphics::PaintWeatherGlyph(dc,box,brush,WeatherKind(item.weatherGlyph),item.isDay,item.cached,stroke);
+        // D78: the condition's own illustration, in the bar's grey; it moves only while the pointer is over it.
+        const auto ink = brush->GetColor();
+        if (item.weatherCode) graphics::PaintWeatherArt(dc,box,graphics::WeatherSubjectForCode(item.weatherCode,item.isDay),
+            graphics::WeatherArtStyle::Monochrome,graphics::Color{ink.r,ink.g,ink.b,ink.a},weatherMotion,stroke,item.cached);
+        else graphics::PaintWeatherGlyph(dc,box,brush,WeatherKind(item.weatherGlyph),item.isDay,item.cached,stroke);
     }
 }
 
@@ -143,6 +149,11 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<RECT> testBounds;
     std::optional<int> hover;
     std::optional<int> focused;
+    // D78: the weather illustration's motion: it starts while the pointer is over the weather item and settles when it
+    // leaves (a third of a second each way), never with reduced motion or high contrast. Idle: no frames.
+    double weatherClock = 0.0;
+    float weatherEnergy = 0.0f;
+    double weatherTick = -1.0;
     std::optional<float> pendingVolume;
     bool focusedWindow = false;
     bool keyboardCues = false;     // the focus ring follows keyboard navigation only
@@ -209,7 +220,7 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
                 for(const auto& component:entry.item.components){brush->SetColor(colorOf(component.unknown).ToD2D());
                     Glyph(dc,component,x,(entry.rect.top+entry.rect.bottom-18)*0.5f,brush.get(),colors,false);x+=27;}
             }else if (glyph) Glyph(dc, entry.item, entry.rect.left + 10, (entry.rect.top + entry.rect.bottom - 18) * 0.5f,
-                brush.get(), colors, updateAvailable);
+                brush.get(), colors, updateAvailable, WeatherMotion());
             brush->SetColor(color.ToD2D());
             graphics::TextStyle style; style.size = tokens.fontSizeBar * tokens.textScale;
             style.weight = ItemWeight(entry.item.kind, written);
@@ -365,6 +376,32 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
         registered = false;
         reservedBounds.reset();
         (void)::SHAppBarMessage(ABM_REMOVE, &data);
+    }
+    [[nodiscard]] static float Ease(float t) noexcept { return t * t * (3.0f - 2.0f * t); }
+    [[nodiscard]] graphics::WeatherArtMotion WeatherMotion() const noexcept { return {weatherClock, Ease(weatherEnergy)}; }
+    [[nodiscard]] bool WeatherMotionWanted() const noexcept {
+        return pointerInside && hover == static_cast<int>(ItemKind::Weather) && !motion.reduced &&
+               tokens.mode != graphics::ThemeMode::HighContrast && !fullscreen && !autoHidden && !heldBack;
+    }
+    // Advances the weather motion to `now`; true while it still moves or is about to.
+    bool StepWeather(double now) noexcept {
+        const float target = WeatherMotionWanted() ? 1.0f : 0.0f;
+        const double step = weatherTick < 0.0 ? 0.0 : std::clamp(now - weatherTick, 0.0, 0.1);
+        weatherTick = now;
+        const float change = static_cast<float>(step / 0.33);
+        weatherEnergy = target > weatherEnergy ? std::min(target, weatherEnergy + change) : std::max(target, weatherEnergy - change);
+        weatherClock += step * Ease(weatherEnergy);
+        const bool moving = weatherEnergy > 0.0f || target > 0.0f;
+        if (!moving) weatherTick = -1.0;
+        return moving;
+    }
+    // The weather illustration's own pixels (and its halo, written on the desktop): all a motion step redraws.
+    [[nodiscard]] std::optional<D2D1_RECT_F> WeatherArtArea() const noexcept {
+        const auto found = std::find_if(placed.begin(), placed.end(), [](const auto& entry) { return entry.item.kind == ItemKind::Weather; });
+        if (found == placed.end()) return std::nullopt;
+        const float margin = IsTextPresentation(settings, tokens) ? 18.0f : 2.0f;
+        const float top = (found->rect.top + found->rect.bottom - 18.0f) * 0.5f;
+        return D2D1::RectF(found->rect.left + 10.0f - margin, top - margin, found->rect.left + 28.0f + margin, top + 18.0f + margin);
     }
     std::wstring RootName() const override { return std::wstring(i18n::Tr(L"Aether Shell status bar")); }
     CONTROLTYPEID RootControlType() const override { return UIA_ToolBarControlTypeId; }
@@ -700,7 +737,7 @@ void TopBarWindow::SetAutoHidden(bool hidden) {
     graphics::TransitionShape shape;
     shape.offsetY = -(p.panel.bottom + 8.0f);
     if (hidden) {
-        p.hover.reset(); p.pointerInside = false; p.tooltip.HideTooltip();
+        p.hover.reset(); p.weatherEnergy = 0.0f; p.pointerInside = false; p.tooltip.HideTooltip();
         HideAnimated(graphics::MakeExitTransition(shape, p.tokens, p.motion));
     } else if (IsHiding()) {
         Show(false);  // reversed mid-way: back at once rather than replaying the entrance
@@ -716,7 +753,7 @@ void TopBarWindow::SetHeldBack(bool held, bool entrance) {
     p.heldBack = held;
     if (!Handle() || p.fullscreen || p.autoHidden) return;
     if (held) {
-        p.press.Cancel(); p.hover.reset(); p.pointerInside = false; p.tooltip.HideTooltip();
+        p.press.Cancel(); p.hover.reset(); p.weatherEnergy = 0.0f; p.pointerInside = false; p.tooltip.HideTooltip();
         Hide();
     } else if (!entrance) {
         Show(false);
@@ -764,7 +801,7 @@ void TopBarWindow::SetFullscreenHidden(bool hidden) {
     impl_->fullscreen = hidden;
     // State transitions only: never log foreground identities, titles, paths or repeated probes.
     AETHER_LOG_INFO("topbar", "fullscreen suppression {}", hidden);
-    if (hidden) { impl_->press.Cancel(); impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
+    if (hidden) { impl_->press.Cancel(); impl_->hover.reset(); impl_->weatherEnergy = 0.0f; impl_->pointerInside = false; impl_->tooltip.HideTooltip(); if (impl_->menus) impl_->menus->Cancel(); Hide(); }
     else if (!impl_->autoHidden && !impl_->heldBack) Show(false);
     try { FullscreenChanged.Emit(hidden); }
     catch (...) { AETHER_LOG_ERROR("topbar", "fullscreen listener threw an exception"); }
@@ -801,19 +838,32 @@ void TopBarWindow::OnRender(const ui::RenderContext& context) {
     // and the labels stay sharp.
     impl_->PaintItems(context.d2d, impl_->tokens, shown, true);
 }
-bool TopBarWindow::OnAnimate(double now) { return impl_->transition.IsAnimating(now); }
+bool TopBarWindow::OnAnimate(double now) {
+    const bool transition = impl_->transition.IsAnimating(now);
+    const bool weather = impl_->StepWeather(now);
+    // D78: the weather illustration moving on its own redraws only itself.
+    if (weather && !transition) {
+        if (const auto area = impl_->WeatherArtArea()) LimitAnimationFrameTo(*area);
+    }
+    return transition || weather;
+}
 
 void TopBarWindow::OnPointerMove(D2D1_POINT_2F point) {
     if (impl_->destroyed || !Handle() || !IsShown() || impl_->fullscreen || !::IsWindowEnabled(Handle())) return;
     impl_->pointerInside = true;
     const auto hovered = HitTest(impl_->placed, point);
     if (hovered == impl_->hover) return;
+    const bool weatherInvolved = hovered == static_cast<int>(ItemKind::Weather) || impl_->hover == static_cast<int>(ItemKind::Weather);
     impl_->hover = hovered; Invalidate();
+    if (weatherInvolved && (impl_->WeatherMotionWanted() || impl_->weatherEnergy > 0.0f)) RequestAnimationFrame();
     if (!hovered) { impl_->tooltip.HideTooltip(); return; }
     const auto found = std::find_if(impl_->placed.begin(), impl_->placed.end(), [&](const auto& item) { return item.item.id == *hovered; });
     if (found != impl_->placed.end()) impl_->tooltip.ShowFor(found->item.tooltip, impl_->ItemBounds(found->rect), ui::TooltipPlacement::Below);
 }
-void TopBarWindow::OnPointerLeave() { impl_->press.Cancel(); impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); Invalidate(); }
+void TopBarWindow::OnPointerLeave() {
+    impl_->press.Cancel(); impl_->hover.reset(); impl_->pointerInside = false; impl_->tooltip.HideTooltip(); Invalidate();
+    if (impl_->weatherEnergy > 0.0f) RequestAnimationFrame();   // D78: the illustration settles to its still pose
+}
 void TopBarWindow::OnPointerDown(ui::PointerButton button, D2D1_POINT_2F point) {
     impl_->press.Press(static_cast<int>(button), HitTest(impl_->placed, point));
 }
@@ -874,8 +924,11 @@ void TopBarWindow::Activate(int id) {
     if(id==static_cast<int>(ItemKind::QuickControls)){impl_->tooltip.HideTooltip();try{QuickControlsRequested.Emit(impl_->ItemBounds(item->rect));}catch(...){impl_->ErrorTooltip(MakeError(ErrorCode::Internal,"quick controls unavailable"),id);}return;}
     if (id == static_cast<int>(ItemKind::Keyboard)) impl_->EmitRequest(KeyboardRequested);
     else if (id == static_cast<int>(ItemKind::Network)) impl_->EmitRequest(NetworkRequested);
-    else if (id == static_cast<int>(ItemKind::Weather)) impl_->EmitRequest(WeatherRequested);
-    else if (id == static_cast<int>(ItemKind::Volume)) {
+    else if (id == static_cast<int>(ItemKind::Weather)) {
+        impl_->tooltip.HideTooltip();
+        try { WeatherPanelRequested.Emit(impl_->ItemBounds(item->rect)); }
+        catch (...) { impl_->ErrorTooltip(MakeError(ErrorCode::Internal, "weather unavailable"), id); }
+    } else if (id == static_cast<int>(ItemKind::Volume)) {
         if (impl_->context.audio) impl_->context.audio->ToggleMuteAsync(impl_->Completion(id));
         else impl_->ErrorTooltip(MakeError(ErrorCode::Unavailable, "audio unavailable"), id);
     } else if (id == static_cast<int>(ItemKind::Microphone)) {

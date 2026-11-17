@@ -80,6 +80,11 @@ struct LocationCandidate {
 // "Zurich, Canton of Zurich, Switzerland": non-empty parts, repeated parts skipped.
 [[nodiscard]] std::wstring FormatLocationLabel(const LocationCandidate& candidate);
 
+// D78: a temperature as shown: rounded half away from zero (12.5 -> 13, -0.4 -> 0, never "-0").
+[[nodiscard]] long RoundTemperature(double value) noexcept;
+// "13°C" / "55°F": the rounded temperature with its unit; `withUnit` false gives "13°".
+[[nodiscard]] std::wstring FormatTemperature(double value, status::TemperatureUnit unit, bool withUnit = true);
+
 // Stable identifiers for logs ("available", "cached", ...).
 [[nodiscard]] std::string_view ToString(status::WeatherState state) noexcept;
 [[nodiscard]] std::string_view ToString(status::TemperatureUnit unit) noexcept;

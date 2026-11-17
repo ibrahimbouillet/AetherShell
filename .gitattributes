@@ -11,3 +11,4 @@
 *.bmp   binary
 *.jpg   binary
 *.ttf   binary
+*.bin   binary

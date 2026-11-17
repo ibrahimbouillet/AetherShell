@@ -66,6 +66,17 @@ inventado. A pesquisa manual de lugar envia o nome digitado ao Open-Meteo; as pr
 escolhidas. Ele não deduz a localização a partir do nome de uma rede Wi-Fi nem de um IP bruto. As previsões em cache
 desaparecem após seis horas. Atribuição dos dados: Open-Meteo.com, CC BY 4.0.
 
+**A janela do clima** (Alpha 4): clique no clima da Top Bar (o menu do clique direito mantém **Configurações do
+clima…**) ou em Configurações → Clima → **Abrir o clima**. Ela mostra o lugar, sua hora local e o céu dessa hora, a
+temperatura e a sensação térmica, as próximas 24 horas, 7 dias, o arco do sol, a umidade, o vento, o UV e a pressão, e
+um mapa do país com suas temperaturas atuais. Pesquise outra cidade ou escolha **Minha localização**; se a localização
+ainda não estiver permitida, a janela a pede ao Windows ou abre as configurações de localização dele. **Localização
+precisa** (ativada por padrão) usa a posição do Windows com cerca de 100 m de precisão; desativada, ela é arredondada
+para cerca de 10 km. O ícone do clima da Top Bar só se mexe sob o ponteiro. O mapa vem do Natural Earth (domínio
+público) e fica armazenado no aplicativo. Com **Liquid** escolhido em Aparência, a janela do clima, as Configurações
+rápidas, a Pesquisa, os menus e as prévias do Dock são de vidro como as barras, e as Configurações ganham um aspecto
+Liquid; com **Grain**, todos são granulados.
+
 Geral contém o consentimento de inicialização, as preferências de movimento e a edição dos atalhos. A instalação
 interativa nova (desde o Alpha 2) seleciona visivelmente a inicialização ao entrar; desmarque essa opção antes da
 instalação para recusá-la. As escolhas existentes são preservadas. A instalação silenciosa exige o sinalizador explícito

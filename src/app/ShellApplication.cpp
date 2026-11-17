@@ -53,8 +53,10 @@
 #include "topbar/TopBarWindow.h"
 #include "ui/form/ConfirmDialog.h"
 #include "updates/UpdateCoordinator.h"
+#include "weather/ForecastClient.h"
 #include "weather/GeocodingClient.h"
 #include "weather/WeatherProvider.h"
+#include "weather/ui/WeatherWindow.h"
 #include "weather_location/WindowsLocation.h"
 #include "welcome/WelcomeController.h"
 #include "welcome/WelcomeWindow.h"
@@ -145,7 +147,7 @@ struct ShellApplication::Impl {
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
     std::optional<weather::WindowsLocation> automaticLocation;
-    std::optional<std::tuple<bool, bool, bool, std::optional<double>, std::optional<double>, std::wstring>> locationPolicy;
+    std::optional<std::tuple<bool, bool, bool, std::optional<double>, std::optional<double>, std::wstring, bool>> locationPolicy;
     std::uint64_t locationGeneration=0;
     bool locationPending=false,locationConsentPending=false;
     std::wstring locationStatus=L"Choose Windows location to enable automatic weather.";
@@ -167,6 +169,7 @@ struct ShellApplication::Impl {
     std::unique_ptr<status::audio::MicrophoneProvider> microphone;
     std::unique_ptr<weather::WeatherProvider> weather;
     std::unique_ptr<weather::GeocodingClient> geocoding;
+    std::unique_ptr<weather::ForecastClient> forecast;      // D78: the weather window's requests
     std::unique_ptr<updates::UpdateCoordinator> updates;
     std::unique_ptr<dock::DockWindow> dock;
     std::unique_ptr<topbar::TopBarWindow> topbar;
@@ -198,6 +201,11 @@ struct ShellApplication::Impl {
     graphics::DesignTokens shellTokens;
     graphics::MotionPolicy shellMotion;
     std::unique_ptr<controlcenter::ControlCenterWindow> controls;
+    std::unique_ptr<weather::ui::WeatherWindow> weatherWindow;  // D78
+    std::uint64_t weatherPermissionAt = 0;  // Windows' location prompt, asked from the weather window
+    bool locationDenied = false;            // Windows or the person refused the location
+    bool automaticPrecise = false;          // automaticLocation is a precise reading (D78), not the approximate fallback
+    bool preciseRequested = false;          // the pending permission request came from the weather window's Allow
     std::unique_ptr<controlcenter::MediaBrightness> mediaBrightness;
     controlcenter::ControlCenterState controlState;
     std::shared_ptr<RadioCompletionGate> radioGate = std::make_shared<RadioCompletionGate>();
@@ -230,7 +238,7 @@ struct ShellApplication::Impl {
     TouchDigitizerWatcher touchEdges;           // FR-040: a swipe from the edge reaches a hidden bar
     bool autoHideWatchesTouch = false;
     PanelDismissal panelDismissal;              // D60: panels close when anything else is used
-    PressedAway controlsPressedAway, searchPressedAway;
+    PressedAway controlsPressedAway, searchPressedAway, weatherPressedAway;
     std::uint64_t topTouchUntil = 0, dockTouchUntil = 0;
     bool topCovered = false, dockCovered = false;
     bool autoHideArmed = false;
@@ -783,14 +791,16 @@ struct ShellApplication::Impl {
     }
     // D60: open panels watch for anything else being used. Closing one comes back here through its signal.
     void UpdatePanelDismissal() {
-        const bool open = !closing && !wifiPromptOpen && ((controls && controls->IsShown()) || (searchWindow && searchWindow->IsOpen()));
+        const bool open = !closing && !wifiPromptOpen && ((controls && controls->IsShown()) || (searchWindow && searchWindow->IsOpen()) ||
+                                                          (weatherWindow && weatherWindow->IsOpen()));
         if (open != panelDismissal.Armed()) {
             if (open) {
                 panelDismissal.Arm(PanelDismissal::Callbacks{
                     [this](POINT point) { return PointOnOpenPanel(point); },
                     [this](std::uint64_t since) {
                         return (controls && controls->IsShown() && controls->LastTouchDown() >= since) ||
-                               (searchWindow && searchWindow->IsOpen() && searchWindow->LastTouchDown() >= since);
+                               (searchWindow && searchWindow->IsOpen() && searchWindow->LastTouchDown() >= since) ||
+                               (weatherWindow && weatherWindow->IsOpen() && weatherWindow->LastTouchDown() >= since);
                     },
                     [this](PanelDismissal::Reason reason) { DismissPanels(reason); }});
             } else {
@@ -807,6 +817,10 @@ struct ShellApplication::Impl {
             const RECT panel = controls->PanelBoundsPx();  // its window also holds the shadow around it
             return ::PtInRect(&panel, point) != FALSE;
         }
+        if (weatherWindow && weatherWindow->IsOpen() && root == weatherWindow->Handle()) {
+            const RECT panel = weatherWindow->PanelBoundsPx();
+            return ::PtInRect(&panel, point) != FALSE;
+        }
         return searchWindow && searchWindow->IsOpen() && root == searchWindow->Handle();
     }
     void DismissPanels(PanelDismissal::Reason reason) {
@@ -815,6 +829,12 @@ struct ShellApplication::Impl {
         if (controls && controls->IsShown()) {
             if (byHand) controlsPressedAway.Mark(now);
             controls->Close();
+        }
+        // D78: Windows' location prompt, asked from the weather window, takes the foreground for a while.
+        const bool awaitingPermission = reason == PanelDismissal::Reason::Foreground && weatherPermissionAt && now - weatherPermissionAt < 45000;
+        if (weatherWindow && weatherWindow->IsOpen() && !awaitingPermission) {
+            if (byHand) weatherPressedAway.Mark(now);
+            weatherWindow->Close();
         }
         if (searchWindow && searchWindow->IsOpen()) {
             if (byHand) searchPressedAway.Mark(now);
@@ -1150,6 +1170,75 @@ struct ShellApplication::Impl {
     void OpenSettings(settings::ui::SettingsPage page = settings::ui::SettingsPage::Dock) {
         if (!closing && !updateHandoffPending && settingsWindow) (void)settingsWindow->Show(page);
     }
+    // D78: the weather window's home: the Windows position the person allowed, or the city chosen in
+    // Settings, with what the permission banner needs. The window never reads the position itself.
+    [[nodiscard]] weather::ui::WeatherHome HomeForWeatherWindow() const {
+        using weather::ui::HomeSource;
+        using weather::ui::LocationPermission;
+        weather::ui::WeatherHome home;
+        if (!settings) return home;
+        const auto& value = settings->Current().weather;
+        home.unit = value.unit == settings::TemperatureUnit::Celsius ? status::TemperatureUnit::Celsius : status::TemperatureUnit::Fahrenheit;
+        const bool consent = value.enabled && value.useWindowsLocation && value.windowsLocationConsent;
+        home.locating = locationPending || locationConsentPending;
+        if (!nativeTaskbarAccess) home.permission = LocationPermission::Unavailable;  // an isolated instance never asks
+        else if (locationDenied) home.permission = LocationPermission::Denied;
+        else if (!consent) home.permission = LocationPermission::NotAsked;
+        else if (automaticLocation || home.locating) home.permission = LocationPermission::Granted;
+        else home.permission = LocationPermission::Unavailable;
+        if (value.useWindowsLocation) {
+            if (consent && automaticLocation) {
+                home.source = automaticPrecise ? HomeSource::PreciseLocation : HomeSource::ApproximateLocation;
+                home.latitude = automaticLocation->latitude;
+                home.longitude = automaticLocation->longitude;
+            }
+        } else if (value.latitude && value.longitude) {
+            home.source = HomeSource::ChosenCity;
+            home.latitude = *value.latitude;
+            home.longitude = *value.longitude;
+            home.name = value.locationName;
+        }
+        return home;
+    }
+    void PublishWeatherHome() {
+        if (!closing && weatherWindow) weatherWindow->SetHome(HomeForWeatherWindow());
+    }
+    // From the Top Bar's weather item (below it) or from Settings (centred on its monitor).
+    void OpenWeather(std::optional<RECT> anchor) {
+        if (closing || !weatherWindow) return;
+        if (anchor && weatherPressedAway.Take(::GetTickCount64())) return;  // that press already closed it
+        PublishWeatherHome();
+        const bool keyboard = (::GetKeyState(VK_RETURN) & 0x8000) != 0 || (::GetKeyState(VK_SPACE) & 0x8000) != 0;
+        Result<void> opened = Ok();
+        if (anchor) {
+            opened = weatherWindow->Toggle(*anchor, keyboard);
+        } else {
+            RECT at{};
+            if (!settingsWindow || !settingsWindow->Handle() || !::GetWindowRect(settingsWindow->Handle(), &at)) {
+                POINT cursor{};
+                ::GetCursorPos(&cursor);
+                at = RECT{cursor.x, cursor.y, cursor.x + 1, cursor.y + 1};
+            }
+            opened = weatherWindow->Open(at, false, keyboard);
+        }
+        if (!opened) AETHER_LOG_WARN("app", "weather window unavailable: {}", opened.error().Describe());
+        UpdatePanelDismissal();
+    }
+    // "Allow" / "Use precise location" in the weather window: the person asks for their precise position.
+    void AllowLocationFromWeather() {
+        if (closing || !settings || !nativeTaskbarAccess) return;
+        weatherPermissionAt = ::GetTickCount64();
+        const auto& value = settings->Current().weather;
+        if (value.enabled && value.useWindowsLocation && value.windowsLocationConsent) {
+            if (value.preciseLocation) RefreshWindowsWeatherLocation();
+            else (void)settings->Update([](settings::Settings& s) { s.weather.preciseLocation = true; });  // ApplyWeather reads again
+            PublishWeatherHome();
+            return;
+        }
+        if (locationConsentPending) return;
+        preciseRequested = true;  // saved with the consent once Windows grants it
+        RequestWindowsWeatherLocation();
+    }
     void CheckUpdates() { if (closing) return; OpenSettings(settings::ui::SettingsPage::Updates); if (updates) (void)updates->CheckNow(); }
     void InstallUpdate();
     void ObserveUpdateHandoff() {
@@ -1194,14 +1283,15 @@ void ShellApplication::Impl::ApplyWeather() {
     // manual place chosen while the Windows permission prompt is open. Unrelated weather units
     // and refresh intervals do not invalidate the consent request.
     const auto policy = std::tuple{value.enabled, value.useWindowsLocation, value.windowsLocationConsent,
-        value.latitude, value.longitude, value.locationName};
+        value.latitude, value.longitude, value.locationName, value.preciseLocation};
     const bool changed = locationPolicy != policy;
     if(changed){
         locationPolicy=policy;++locationGeneration;locationCancellation->Cancel();
         locationCancellation=std::make_shared<CancellationSource>();automaticLocation.reset();
         ::KillTimer(events.Handle(),kLocationRefreshTimer);
         if(consent&&nativeTaskbarAccess&&!closing){
-            if(!::SetTimer(events.Handle(),kLocationRefreshTimer,15*60*1000,nullptr))
+            // D78: a precise position follows the device (a laptop carried elsewhere) every ten minutes.
+            if(!::SetTimer(events.Handle(),kLocationRefreshTimer,(value.preciseLocation?10:15)*60*1000,nullptr))
                 locationStatus=L"Automatic location refresh is unavailable; retry in Weather settings.";
         }
     }
@@ -1216,6 +1306,7 @@ void ShellApplication::Impl::ApplyWeather() {
     }
     (void)weather->UpdateConfig(std::move(config));
     if(changed&&consent)RefreshWindowsWeatherLocation();
+    PublishWeatherHome();
 }
 
 void ShellApplication::Impl::RefreshWindowsWeatherLocation() {
@@ -1223,17 +1314,26 @@ void ShellApplication::Impl::RefreshWindowsWeatherLocation() {
     const auto& value=settings->Current().weather;
     if(!value.enabled||!value.useWindowsLocation||!value.windowsLocationConsent)return;
     if(locationPending)return;
-    locationPending=true;locationStatus=L"Reading approximate Windows location…";
+    const bool precise=value.preciseLocation;
+    locationPending=true;locationStatus=precise?L"Reading Windows location…":L"Reading approximate Windows location…";
+    PublishWeatherHome();
     const auto generation=locationGeneration;const auto cancel=locationCancellation->Token();const auto weak=std::weak_ptr<bool>(alive);
-    if(!locationWorker.Post([this,weak,generation,cancel]{
+    if(!locationWorker.Post([this,weak,generation,cancel,precise]{
         Result<weather::WindowsLocation> location=MakeError(ErrorCode::Unavailable,"Windows location unavailable");
-        try{location=weather::ReadWindowsLocation(true,cancel);}catch(...){location=MakeError(ErrorCode::Platform,"Windows location failed");}
-        dispatcher.Post([this,weak,generation,location=std::move(location)]()mutable{
+        try{location=weather::ReadWindowsLocation(true,cancel,std::chrono::seconds(precise?20:10),precise);}catch(...){location=MakeError(ErrorCode::Platform,"Windows location failed");}
+        // D78: a precise read Windows cannot answer in time (no Wi-Fi positioning) falls back to its approximate one.
+        bool exact=precise;
+        if(precise&&!location&&location.error().code!=ErrorCode::AccessDenied&&location.error().code!=ErrorCode::Cancelled){
+            exact=false;
+            try{location=weather::ReadWindowsLocation(true,cancel);}catch(...){location=MakeError(ErrorCode::Platform,"Windows location failed");}
+        }
+        dispatcher.Post([this,weak,generation,exact,location=std::move(location)]()mutable{
             const auto live=weak.lock();if(!live||!*live)return;
             locationPending=false;if(closing)return;
             if(generation!=locationGeneration){ApplyWeather();if(settings->Current().weather.windowsLocationConsent)RefreshWindowsWeatherLocation();return;}
-            if(location){automaticLocation=std::move(*location);locationStatus=L"Automatic weather follows approximate Windows location.";}
-            else{automaticLocation.reset();locationStatus=location.error().code==ErrorCode::AccessDenied?
+            if(location){automaticLocation=std::move(*location);automaticPrecise=exact;locationDenied=false;
+                locationStatus=exact?L"Automatic weather follows your Windows location.":L"Automatic weather follows approximate Windows location.";}
+            else{automaticLocation.reset();locationDenied=location.error().code==ErrorCode::AccessDenied;locationStatus=location.error().code==ErrorCode::AccessDenied?
                 L"Windows location access is blocked. Weather is unavailable.":L"Windows could not provide a current location. Weather is unavailable.";}
             ApplyWeather();
             if(settingsWindow)settingsWindow->ReportActionStatus(locationStatus);
@@ -1242,28 +1342,34 @@ void ShellApplication::Impl::RefreshWindowsWeatherLocation() {
 }
 
 void ShellApplication::Impl::RequestWindowsWeatherLocation() {
-    if(closing||!nativeTaskbarAccess||locationConsentPending||!settingsWindow||!settingsWindow->Handle())return;
+    // From Settings or the weather window (D78), right after the person's click: the app is in the foreground.
+    if(closing||!nativeTaskbarAccess||locationConsentPending)return;
     locationConsentPending=true;locationStatus=L"Waiting for Windows location permission…";
+    PublishWeatherHome();
     const auto weak=std::weak_ptr<bool>(alive);const auto generation=locationGeneration;
     {std::lock_guard lock(locationGate->mutex);locationGate->deliver=[this,weak,generation](Result<bool> granted){
         dispatcher.Post([this,weak,generation,granted=std::move(granted)]()mutable{
             const auto live=weak.lock();if(!live||!*live)return;
-            locationConsentPending=false;if(closing||generation!=locationGeneration)return;
+            locationConsentPending=false;const bool precise=std::exchange(preciseRequested,false);
+            if(closing||generation!=locationGeneration){PublishWeatherHome();return;}
             if(granted&&*granted){
-                auto saved=settings->Update([](settings::Settings& s){s.weather.enabled=true;s.weather.useWindowsLocation=true;s.weather.windowsLocationConsent=true;});
+                locationDenied=false;
+                auto saved=settings->Update([precise](settings::Settings& s){s.weather.enabled=true;s.weather.useWindowsLocation=true;s.weather.windowsLocationConsent=true;if(precise)s.weather.preciseLocation=true;});
                 if(!saved)locationStatus=L"The automatic weather choice could not be saved.";
                 else RefreshWindowsWeatherLocation();
             }else{
                 locationStatus=L"Windows location access is unavailable or was denied. Weather is unavailable.";
-                automaticLocation.reset();
+                automaticLocation.reset();locationDenied=true;
                 (void)settings->Update([](settings::Settings& s){s.weather.windowsLocationConsent=false;});
             }
             if(settingsWindow)settingsWindow->ReportActionStatus(locationStatus);
+            PublishWeatherHome();
         });
     };}
     const auto gate=locationGate;
     auto request=weather::BeginWindowsLocationAccess([gate](Result<bool> result){std::lock_guard lock(gate->mutex);if(gate->deliver)gate->deliver(std::move(result));});
-    if(!request){locationConsentPending=false;locationStatus=L"Windows location could not request permission. Review Windows location settings.";settingsWindow->ReportActionStatus(locationStatus);}
+    if(!request){locationConsentPending=false;preciseRequested=false;locationStatus=L"Windows location could not request permission. Review Windows location settings.";
+        if(settingsWindow)settingsWindow->ReportActionStatus(locationStatus);PublishWeatherHome();}
 }
 
 // This bridge is the only path from the transient panel to real system controls. Isolated test
@@ -1511,14 +1617,19 @@ void ShellApplication::Impl::ApplySettings() {
     UpdateAutoHide();
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
     if (controls) controls->SetTheme(tokens, motion);
+    if (weatherWindow) weatherWindow->SetTheme(tokens, motion);   // D78: a Top Bar panel, in the shell's mode and style
     // Settings follows the Windows app mode (AppsUseLightTheme), the shell surfaces the system mode.
     appTokens = graphics::MakeAppDesignTokens(appearance);
+    // D79: Settings follows the chosen style too: Liquid there when Liquid is chosen, Grain otherwise.
+    appTokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && appTokens.mode != graphics::ThemeMode::HighContrast;
+    appTokens.liquidGlass = LiquidGlassFrom(value, appTokens);
     appMotion = motion;
     if (settingsWindow) settingsWindow->SetTheme(appTokens, appMotion);
     if (relocalized) {
         // The bars rebuilt their texts with their theme above; these keep texts made when they were built.
         if (settingsWindow) settingsWindow->Relocalize();
         if (searchWindow) searchWindow->Relocalize();
+        if (weatherWindow) weatherWindow->Relocalize();
         if (topbar) topbar->SetSettings(value.topBar, value.weather.enabled);
         // Windows' tools and Settings pages are named in the interface's language when the catalog is read.
         if (catalogReady && catalog && !closing) {
@@ -1598,6 +1709,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     tracker = std::make_unique<apps::WindowTracker>(dispatcher);
     search = std::make_unique<search::SearchService>(dispatcher);
     geocoding = std::make_unique<weather::GeocodingClient>(*http);
+    forecast = std::make_unique<weather::ForecastClient>(*http);
     weather = std::make_unique<weather::WeatherProvider>(*http, time, paths.cacheDir / L"weather.json", weather::WeatherConfig{});
     auto createdStatus = status::CreateStatusProviders(); if (!createdStatus) return createdStatus.error();
     providers = std::make_unique<status::StatusProviders>(std::move(*createdStatus));
@@ -1621,6 +1733,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.requestWindowsLocation=[this]{RequestWindowsWeatherLocation();};
     actions.openLocationSettings=[this]{OpenWindowsSettings(L"ms-settings:privacy-location");};
     actions.weatherLocationStatus=[this]{return locationStatus;};
+    actions.openWeather=[this]{OpenWeather(std::nullopt);};
     actions.readStartup = [this](std::function<void(Result<settings::StartupState>)> completion) {
         const auto standardRoot = platform::DefaultDataRoot();
         if (closing || (command.dataDirectory && (!standardRoot || !platform::SameDataRoot(paths.dataRoot, *standardRoot)))) {
@@ -1697,6 +1810,24 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     sideInsets=std::make_unique<WorkAreaInsets>(nativeTaskbarAccess);
     windowCorners=std::make_unique<WindowCorners>(nativeTaskbarAccess, paths.executableDir / L"AetherShellApp.exe");
     connections.push_back(controls->Requested.Connect([this](controlcenter::ControlIntent intent) { HandleControl(intent); }));
+    // D78: the weather window. Optional: the shell runs without it.
+    weatherWindow = std::make_unique<weather::ui::WeatherWindow>(
+        weather::ui::WeatherWindowContext{graphics, scheduler, dispatcher, forecast.get(), geocoding.get()});
+    if (auto created = weatherWindow->Initialize(); !created) {
+        AETHER_LOG_WARN("app", "weather window unavailable: {}", created.error().Describe());
+        weatherWindow.reset();
+    } else {
+        connections.push_back(weatherWindow->LocationAccessRequested.Connect([this] { AllowLocationFromWeather(); }));
+        connections.push_back(weatherWindow->LocationSettingsRequested.Connect([this] { OpenWindowsSettings(L"ms-settings:privacy-location"); }));
+        connections.push_back(weatherWindow->WeatherSettingsRequested.Connect([this] {
+            if (weatherWindow) weatherWindow->Close();
+            OpenSettings(settings::ui::SettingsPage::Weather);
+        }));
+        connections.push_back(weatherWindow->LinkRequested.Connect([this](const std::wstring& link) {
+            if (link.rfind(L"https://", 0) == 0) OpenWindowsSettings(link);  // the browser, through the shell
+        }));
+        connections.push_back(weatherWindow->Closed.Connect([this] { UpdatePanelDismissal(); }));
+    }
     connections.push_back(controls->Closed.Connect([this]{
         UpdatePanelDismissal();
         ++*controlEpoch;controlActionCancellation->Cancel();
@@ -1763,6 +1894,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     }));
     connections.push_back(topbar->NetworkRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:network-status"); }));
     connections.push_back(topbar->WeatherRequested.Connect([this]{ OpenSettings(settings::ui::SettingsPage::Weather); }));
+    connections.push_back(topbar->WeatherPanelRequested.Connect([this](RECT anchor){ OpenWeather(anchor); }));
     connections.push_back(topbar->MicrophoneSettingsRequested.Connect([this]{ OpenWindowsSettings(L"ms-settings:privacy-microphone"); }));
     connections.push_back(topbar->VoiceTypingRequested.Connect([this]{
         if (!closing && !platform::SendKeyChord({VK_LWIN,static_cast<WORD>('H')}) && settingsWindow)
@@ -2082,6 +2214,8 @@ void ShellApplication::Impl::Stop() noexcept {
     connections.clear(); channel.Close();
     if (windowCorners) windowCorners->Stop();
     windowCorners.reset();
+    if (weatherWindow) weatherWindow->Close();
+    weatherWindow.reset();
     controls.reset(); sideInsets.reset();
     if (tracker) tracker->Stop();
     if (updates) updates->Stop();
@@ -2100,7 +2234,7 @@ void ShellApplication::Impl::Stop() noexcept {
     controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();
-    updates.reset(); geocoding.reset(); weather.reset(); audio.reset(); microphone.reset(); providers.reset(); http.reset(); settings.reset();
+    updates.reset(); forecast.reset(); geocoding.reset(); weather.reset(); audio.reset(); microphone.reset(); providers.reset(); http.reset(); settings.reset();
     events.Destroy(); scheduler.Shutdown(); graphics.Shutdown();
     (void)status::FinalizeStatusRuntime();
     dispatcher.Shutdown();

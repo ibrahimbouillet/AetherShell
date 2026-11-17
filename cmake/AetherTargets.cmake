@@ -85,6 +85,18 @@ function(aether_add_version_resource target)
     target_sources(${target} PRIVATE "${_rc}")
 endfunction()
 
+# aether_add_world_map_resource(<target>)
+# D78: embeds resources/weather/world-map.bin (public-domain Natural Earth data, converted by
+# tools/world-map/make_world_map.py) as the RCDATA resource AETHER_WORLD_MAP that
+# weather::LoadEmbeddedWorldMap() reads from the running executable.
+function(aether_add_world_map_resource target)
+    set(AETHER_WORLD_MAP_FILE "${PROJECT_SOURCE_DIR}/resources/weather/world-map.bin")
+    set(_rc "${AETHER_GENERATED_DIR}/weather/${target}-world-map.rc")
+    configure_file("${PROJECT_SOURCE_DIR}/resources/weather/WorldMap.rc.in" "${_rc}" @ONLY)
+    set_source_files_properties("${_rc}" PROPERTIES OBJECT_DEPENDS "${AETHER_WORLD_MAP_FILE}")
+    target_sources(${target} PRIVATE "${_rc}")
+endfunction()
+
 # aether_add_test_executable(<target> SOURCES ... [LINK ...] [LABELS ...] [TIMEOUT <seconds>])
 function(aether_add_test_executable target)
     cmake_parse_arguments(ARG "" "TIMEOUT" "SOURCES;LINK;LABELS" ${ARGN})

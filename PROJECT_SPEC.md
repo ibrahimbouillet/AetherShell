@@ -170,6 +170,20 @@ Its numeric tuning/performance targets remain engineering proposals on a stated 
 not new universal NFR-002 release budgets. Native input/UIA, consent, persistence and the current
 Dock's accepted response are protected; no broader scope or release authorization changes.
 
+**FR-037 owner clarification, 2026-11-16 (D79):** the chosen style applies to every Aether-owned surface: with
+Liquid, Quick Settings, Search, the menus, the Dock's previews and the weather window use the bars' glass, and Settings
+takes a Liquid look within what a top-level window allows; with Grain, all of them are grained. High contrast, disabled
+transparency and a refused compositor effect fall back to Grain; tooltips may stay opaque for legibility.
+
+**FR-010 owner amendment, 2026-11-16 (D78):** the weather is precise by default (Windows' position to about 100 m, a
+sample at most two minutes old; a Settings opt-out keeps the 10 km rounding), its Top Bar icon is an animated grey
+illustration of the condition that moves only on hover and never with reduced motion or high contrast, and the Top Bar
+item and Settings open Aether's own weather window: current conditions over a sky that follows the place's hour, 24 hours,
+7 days, the sun's arc, feels like/humidity/wind/UV/pressure, a country map with current temperatures and the person's
+position, city search, and location permission (direct or through Windows' settings). The window keeps NFR-002 (no idle
+frames, no UI-thread network), NFR-007 (UI Automation, keyboard, reduced motion, high contrast) and Open-Meteo's
+attribution; its map data is public domain and embedded.
+
 **FR-026/FR-035 owner clarification, 2026-10-26 (D44/T41):** after the native-placement investigation,
 the owner chooses a complete Aether-owned native Quick Settings recreation, faithful to the private
 reference's tile/split-button/slider/footer composition, polished recognizable icon shapes and

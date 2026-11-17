@@ -163,7 +163,8 @@ AETHER_TEST("settings validation: all numeric ranges and non-finite values are c
     CHECK_EQ(settings.dock.sideMargin, 0); CHECK_EQ(settings.dock.iconSpacing, 32);
     CHECK_EQ(settings.dock.opacity, 0.30); CHECK_EQ(settings.dock.magnification, 2.0);
     CHECK_EQ(settings.topBar.topMargin, 100); CHECK_EQ(settings.topBar.opacity, 0.80);
-    CHECK_EQ(settings.weather.refreshMinutes, 15); CHECK_EQ(settings.updates.checkIntervalHours, 168);
+    CHECK_EQ(settings.weather.refreshMinutes, 10);  // D78: the minimum is 10 minutes
+    CHECK_EQ(settings.updates.checkIntervalHours, 168);
 }
 
 AETHER_TEST("settings validation: coordinate pairs stay optional and are clamped together") {
@@ -632,4 +633,21 @@ AETHER_TEST("welcome settings: defaults, round trip and a bounded name without c
     auto named = Validate(secret); REQUIRE(named.ok());
     REQUIRE_FALSE(named->empty());
     for (const auto& warning : *named) CHECK(warning.find("QQQ") == std::string::npos);
+}
+
+AETHER_TEST("settings migration: precise location is saved and an older file's 30-minute refresh becomes 15 once (D78)") {
+    Settings settings;
+    settings.weather.preciseLocation = true;
+    settings.weather.refreshMinutes = 30;
+    auto serialized = ToJson(settings); REQUIRE(serialized.ok());
+    auto parsed = FromJson(*serialized); REQUIRE(parsed.ok());
+    CHECK(parsed->value.weather.preciseLocation);
+    CHECK_EQ(parsed->value.weather.refreshMinutes, 30);  // chosen after precise location existed: kept
+    auto olderFile = json::Parse(R"({"schemaVersion":1,"weather":{"enabled":true,"refreshMinutes":30}})"); REQUIRE(olderFile.ok());
+    auto older = FromJson(*olderFile); REQUIRE(older.ok());
+    CHECK(older->value.weather.preciseLocation);  // an absent key is precise (D78)
+    CHECK_EQ(older->value.weather.refreshMinutes, 15);
+    auto otherFile = json::Parse(R"({"schemaVersion":1,"weather":{"refreshMinutes":60}})"); REQUIRE(otherFile.ok());
+    auto otherChoice = FromJson(*otherFile); REQUIRE(otherChoice.ok());
+    CHECK_EQ(otherChoice->value.weather.refreshMinutes, 60);
 }

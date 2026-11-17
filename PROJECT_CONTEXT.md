@@ -58,6 +58,7 @@ No third-party C++ dependencies. Python stdlib scripts for releases. GitHub Acti
 | `src/graphics`, `src/ui` | composition graphics, glass, animation, `SurfaceWindow`, tooltip |
 | `src/status/StatusTypes.h`, `src/applications/ApplicationTypes.h`, `src/settings/Settings.h` | shared contracts |
 | `src/platform/net`, `src/updates`, `src/applications`, `src/status`, `src/weather` | services (see `TASKS.md` for status) |
+| `src/weather/ui`, `resources/weather`, `tools/world-map` | the weather window, its embedded Natural Earth map and the map's converter (D78) |
 | `docs/decisions/` | ADRs 0001–0009 |
 | `docs/modules/` | per-module reference docs |
 | `docs/knowledge/` | Markdown notes: module index, test status, known issues, log |

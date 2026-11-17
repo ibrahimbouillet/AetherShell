@@ -106,10 +106,10 @@ Result<std::vector<DisplayItem>> BuildDisplayItems(const TopBarSnapshots& s,
             auto item = Item(ItemKind::Weather, L"—", std::wstring(Tr(L"Weather status unavailable")), true);
             item.unknown = !usable;
             if (usable) {
-                item.text = std::format(L"{:.0f}°{}", *snapshot.temperature,
-                    snapshot.unit == status::TemperatureUnit::Fahrenheit ? L"F" : L"C");
+                item.text = weather::FormatTemperature(*snapshot.temperature, snapshot.unit);   // D78: never "-0°C"
                 item.cached = snapshot.state == status::WeatherState::Cached;
                 item.weatherGlyph = s.weather.glyph;
+                item.weatherCode = snapshot.conditionCode;
                 item.isDay = s.weather.isDay;
                 item.tooltip = snapshot.locationName + L" · " + std::wstring(Tr(snapshot.conditionText)) + L" · " + item.text;
                 if (item.cached) item.tooltip += Line(L"Cached weather");

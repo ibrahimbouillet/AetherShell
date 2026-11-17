@@ -3367,3 +3367,32 @@ were removed at the owner's word; the tree is back to the committed source. No b
 **Not claimed:** which 4.7 items the owner exercised one by one (the weather, corners, page height, each language);
 the confirmation is the owner's overall verdict. Native-speaker review, mirrored right-to-left layout, Windows 10 and a
 second display remain unexecuted (S-075).
+
+### S-078 — Alpha 4, test 4.8: the weather window, animated and precise weather, Liquid everywhere (Claude, 2026-11-17)
+
+**What changed:** D78 (precise location, rounding, refresh, animated illustrations, the weather window and its map), D79
+(Liquid on every Aether surface, Settings' Liquid look), D80 (maximized Settings without DWM's second outline, reported by
+the owner on 2026-11-16 with a screenshot). 58 new catalog texts and one rewritten (810, ten columns). Natural Earth data
+downloaded with the owner's approval; its files and hashes are in `resources/weather/README.md`.
+
+| Check | Result |
+| --- | --- |
+| Build, Release, warnings as errors (`scripts/build.ps1`, then `scripts/package.ps1`) | Pass |
+| Unit gate, this build's module set | 25/25 suites pass (`-j 4`). New: `WeatherArtTests` 5, `ForecastTests` 5, `WorldMapTests` 6, `WeatherMapViewTests` 4; added cases for precise rounding and freshness, temperature rounding, the settings migration. **Search's timing case failed once under `-j 6`** in an earlier run of this round and passes alone and at `-j 4`; not caused by this round |
+| Catalog check | 810 texts, none untranslated; placeholders and access keys match |
+| Native weather_ui (scripted Open-Meteo: forecast, places, geocoding) | 7/7: home place with forecast, country temperatures and accessible summary; search then *My location*; the permission banner asks the host and never reads the position; illustrations move, then stand still with no frame under reduced motion (NFR-002); failure text and *Try again*; Escape, close, attribution, settings, placement below the anchor; render receipts |
+| Render receipts, inspected | dark, dark Liquid, light, light Liquid, high contrast, search list, permission banner: text inside its cards, the map and pills drawn, no clipping seen |
+| Native settings_ui | whole suite passes on the final build, including `settings design` in all ten languages with the new texts and the maximized-window bands check (D80) |
+| Native topbar | passes (the weather item emits the window's anchor inside the bar's bounds) |
+| Native ui, ui_form, dock, search_ui, controlcenter | pass (first run of this round, before the catalog change) |
+| Native app | 18/19 in the first run (`window corners ... a clip left by an earlier version's dead guard is removed once`, the pre-existing intermittent case of S-075), then **19/19** on the final build |
+
+**Not executed, so not claimed:** the window against the live Open-Meteo service (all its requests ran against the
+scripted fake); precise location on a real device; the Liquid surfaces on the owner's desktop over real pages; Arabic and
+Urdu in the weather window (its layout is not mirrored); a native speaker's reading of the new texts; Windows 10; a
+second display.
+
+**Test build 4.8:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 10662912 bytes, SHA-256
+`722dc2f976bf794ee7f779539f8041ed9f6f28b1607f775c3b63e7d6b6d4df50`, built by `scripts/package.ps1 -BuildDir
+build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.7's build moved to
+`dist/test-4.7/`. Committed locally; not pushed, tagged, published or installed.

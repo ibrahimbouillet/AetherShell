@@ -9,3 +9,6 @@
 aether_add_module_library(aether_weather
     LINK aether_core aether_diagnostics aether_platform)
 aether_add_module_tests(weather LINK aether_weather)
+if(TARGET aether_weather_tests)
+    aether_add_world_map_resource(aether_weather_tests)  # D78: the tests read the real embedded map
+endif()

@@ -7,7 +7,34 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 4.7 confirmed by the owner; frame-pacing trial removed (`0.4.0-alpha.4`, D77, S-077, 2026-11-16)
+## Current checkpoint — test 4.8: the weather window, animated and precise weather, Liquid everywhere (`0.4.0-alpha.4`, D78–D80, S-078, 2026-11-17)
+
+- **The weather (D78):** precise Windows location by default (0.001°, sample at most 2 min old; Settings → Weather →
+  *Precise location* turns it off), temperatures rounded half away from zero, 15-minute default refresh (a file still at
+  the old default 30 takes 15 once). `graphics::PaintWeatherArt` animates every WMO group; the Top Bar icon stays grey and
+  moves only under the pointer, redrawing only its own rectangle (`SurfaceWindow::LimitAnimationFrameTo`).
+- **The weather window (D78):** new module `src/weather/ui` (`WeatherWindow`, `WeatherMapView`), opened by a click on the
+  Top Bar's weather item (below it; the item's menu keeps *Weather settings…*) and by Settings → Weather → *Open the
+  weather* (centred). New `weather/Forecast.h`, `ForecastClient`, `WorldMap` (Natural Earth, `resources/weather/`,
+  converter `tools/world-map/`). `ShellApplication` publishes the home place and permission (`HomeForWeatherWindow`),
+  asks Windows for location from the window (`AllowLocationFromWeather`), and dismisses it with the other panels (a
+  45-second grace after a permission prompt takes the foreground).
+- **Liquid everywhere (D79):** Quick Settings, Search, menus, Dock previews and the weather window use the host glass in
+  Liquid; Settings gets a Liquid look in `FormPaint` (it cannot get the compositor's glass). Tooltips stay opaque.
+- **Settings maximized (D80):** framed forms ask DWM for no corner and no border; the owner's double outline is gone in
+  the native test.
+- **Translations:** 58 new texts and one rewritten (`tools/i18n/catalog/weather.txt`, 810 in all, ten languages, not
+  reviewed by native speakers). User guides in the ten languages describe the window and Liquid everywhere.
+- Committed locally; **not pushed (D65)**. Test 4.7's setup moved to `dist/test-4.7/`.
+
+**Reading of the owner's words:** "agrandir le liquide" was taken as *extend Liquid to every surface*, not *make
+something bigger*; say so if the owner meant otherwise.
+
+**Next:** the owner tries test 4.8. Open from before: the arrival after setup's Close; fluidity (D62 part 2, from
+measurements); the code-signed setup (D62 part 3); native-speaker review and mirrored right-to-left layout; the
+intermittent `window corners` native case (pre-existing, S-075); the Search unit timing case under parallel load.
+
+## Earlier — test 4.7 confirmed by the owner; frame-pacing trial removed (`0.4.0-alpha.4`, D77, S-077, 2026-11-16)
 
 - **Test 4.7 is confirmed** ("Je confirme la 4.7"). It has been installed since 2026-11-13 17:08 and is the running build
   (hash-checked against the build S-075 packaged; S-075 and the section below say "not installed", which was wrong).
@@ -17,8 +44,8 @@
   The committed `FrameScheduler` is untouched. Do not bring vblank pacing back unasked.
 - Documentation only; no build or test package. The working tree is clean apart from the untracked `.agents/`.
 
-**Next:** the owner names the next round. Alpha 4 items still open from D62/D63 and the 4.x rounds: Liquid for
-Settings, menus, Search and Quick Settings; the arrival after setup's Close; fluidity (D62 part 2, from measurements,
+**Next (then):** the owner names the next round. Alpha 4 items still open from D62/D63 and the 4.x rounds: Liquid for
+Settings, menus, Search and Quick Settings (done in test 4.8, D79); the arrival after setup's Close; fluidity (D62 part 2, from measurements,
 not D77's pacing); the code-signed setup (D62 part 3); native-speaker review of seven languages and mirrored layout for
 Arabic/Urdu. Long-standing unknowns: the blank-window incident (AS4-01), sign-in startup, physical touch, real lock/sign-in
 for the welcome. Test builds keep `0.4.0-alpha.4` (D65).

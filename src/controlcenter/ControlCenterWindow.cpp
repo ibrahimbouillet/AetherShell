@@ -217,6 +217,14 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
     [[nodiscard]] float BodyTop() const { return kMargin + (MediaShown() ? kMediaHeight : 0.0f); }
     [[nodiscard]] float PanelHeight() const { return (MediaShown() ? kMediaHeight : 0.0f) + kBodyHeight; }
     [[nodiscard]] D2D1_RECT_F PanelRect() const { return D2D1::RectF(kMargin, kMargin, kMargin + kPanelWidth, kMargin + PanelHeight()); }
+    // The blurred desktop under the panel; with Liquid chosen (D79), seen through Liquid's regular glass.
+    void ApplyBackdrop(ui::SurfaceWindow& window) const {
+        const auto panel = PanelRect();
+        const bool blur = tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast;
+        const bool glass = blur && tokens.liquid;
+        window.SetBackdropPanel(D2D1::RectF(panel.left * scale, panel.top * scale, panel.right * scale, panel.bottom * scale), kRadius * scale,
+                                blur, glass ? tokens.liquidGlass.blurOpacity : tokens.glass.backdropOpacity, glass ? &tokens.liquidGlass : nullptr);
+    }
     [[nodiscard]] float FooterTop() const { return BodyTop() + kGridHeight + kSliderHeight; }
     [[nodiscard]] D2D1_RECT_F TileRect(int slot, float pageShift = 0.0f) const {
         const float x = kMargin + kTileLeft + static_cast<float>(slot % 3) * (kTileWidth + kTileGap);
@@ -1423,8 +1431,7 @@ bool ControlCenterWindow::PlaceAt(const RECT& anchor) {
                       static_cast<LONG>(std::ceil(panel.right * fit * dpiScale)), static_cast<LONG>(std::ceil(panel.bottom * fit * dpiScale))};
     SetInputRegionPx(std::span<const RECT>(&region, 1));
     SetVisualRegionPx(std::span<const RECT>(&region, 1));
-    SetBackdropPanel(D2D1::RectF(panel.left * fit, panel.top * fit, panel.right * fit, panel.bottom * fit), kRadius * fit,
-                     p.tokens.transparencyEnabled, p.tokens.glass.backdropOpacity);
+    p.ApplyBackdrop(*this);
     return true;
 }
 
@@ -1503,12 +1510,7 @@ void ControlCenterWindow::SetTheme(const graphics::DesignTokens& tokens, const g
         impl_->viewMotion.SnapTo(impl_->viewMotion.Target());
         impl_->residualFade.SnapTo(impl_->residualFade.Target());
     }
-    if (IsShown()) {
-        const float fit = impl_->scale;
-        const auto panel = impl_->PanelRect();
-        SetBackdropPanel(D2D1::RectF(panel.left * fit, panel.top * fit, panel.right * fit, panel.bottom * fit), kRadius * fit,
-                         tokens.transparencyEnabled, tokens.glass.backdropOpacity);
-    }
+    if (IsShown()) impl_->ApplyBackdrop(*this);
     Invalidate();
 }
 
@@ -1547,17 +1549,23 @@ void ControlCenterWindow::OnRender(const ui::RenderContext& context) {
     auto* dc = context.d2d;
     D2D1_MATRIX_3X2_F old{};
     dc->GetTransform(&old);
-    dc->SetTransform(D2D1::Matrix3x2F::Scale(p.scale, p.scale) * old);
-    graphics::GlassStyle glass;
-    glass.elevation = graphics::Elevation::None;
-    glass.cornerRadius = kRadius;
-    glass.opacity = 0.86f;
-    glass.backdropBlur = BackdropBlurActive();
-    glass.shadow = false;
-    glass.neutral = true;
-    glass.highlight = false;
     const auto panel = p.PanelRect();
-    graphics::PaintGlassPanel(dc, panel, p.tokens, glass);
+    // D79: Liquid's regular glass under its light when Liquid is chosen, Grain's frosted glass otherwise.
+    const float fit = p.scale;
+    const bool liquid = p.tokens.liquid && BackdropGlassActive() &&
+        PaintLiquidPanel(context, D2D1::RectF(panel.left * fit, panel.top * fit, panel.right * fit, panel.bottom * fit), kRadius * fit, 0.0f);
+    dc->SetTransform(D2D1::Matrix3x2F::Scale(p.scale, p.scale) * old);
+    if (!liquid) {
+        graphics::GlassStyle glass;
+        glass.elevation = graphics::Elevation::None;
+        glass.cornerRadius = kRadius;
+        glass.opacity = 0.86f;
+        glass.backdropBlur = BackdropBlurActive();
+        glass.shadow = false;
+        glass.neutral = true;
+        glass.highlight = false;
+        graphics::PaintGlassPanel(dc, panel, p.tokens, glass);
+    }
     Impl::Painter g{p, dc, nullptr, MakePalette(p.tokens), context.now};
     if (FAILED(dc->CreateSolidColorBrush(p.tokens.textPrimary.ToD2D(), g.brush.put()))) {
         dc->SetTransform(old);

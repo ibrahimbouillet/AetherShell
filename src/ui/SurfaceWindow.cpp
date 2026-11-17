@@ -327,6 +327,14 @@ void SurfaceWindow::InvalidateArea(const D2D1_RECT_F& areaDip) {
     scheduler_.RequestFrame(this);
 }
 
+void SurfaceWindow::LimitAnimationFrameTo(const D2D1_RECT_F& areaDip) {
+    if (!inAnimate_ || !(areaDip.right > areaDip.left) || !(areaDip.bottom > areaDip.top)) return;
+    animationArea_ = animationArea_ ? D2D1::RectF(std::min(animationArea_->left, areaDip.left), std::min(animationArea_->top, areaDip.top),
+                                                  std::max(animationArea_->right, areaDip.right),
+                                                  std::max(animationArea_->bottom, areaDip.bottom))
+                                    : areaDip;
+}
+
 void SurfaceWindow::RequestAnimationFrame() {
     if (!hwnd_) return;
     animationPending_ = true;
@@ -338,13 +346,26 @@ void SurfaceWindow::OnFrame(double now) {
     bool keepAnimating = false;
     if (animationPending_) {
         animationPending_ = false;
+        animationArea_.reset();
+        inAnimate_ = true;
         try {
             keepAnimating = OnAnimate(now);
         } catch (const std::exception&) {
             AETHER_LOG_ERROR("ui", "animation step threw an exception");
+            animationArea_.reset();
         }
+        inAnimate_ = false;
         renderPending_ = true;
-        fullDirty_ = true;   // an animation may move anything
+        if (animationArea_ && !fullDirty_) {
+            // D78: this step moved one item only (LimitAnimationFrameTo): the rest of the surface stays as drawn.
+            const auto& area = *animationArea_;
+            dirtyArea_ = dirtyArea_ ? D2D1::RectF(std::min(dirtyArea_->left, area.left), std::min(dirtyArea_->top, area.top),
+                                                  std::max(dirtyArea_->right, area.right), std::max(dirtyArea_->bottom, area.bottom))
+                                    : area;
+        } else {
+            fullDirty_ = true;   // an animation may move anything
+        }
+        animationArea_.reset();
     }
     if (renderPending_) Render(now);
     if (keepAnimating) RequestAnimationFrame();

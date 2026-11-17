@@ -135,6 +135,10 @@ protected:
     virtual void OnRender(const RenderContext& context) = 0;
     // Advance animations to `now`; return true while anything is still moving.
     virtual bool OnAnimate(double /*now*/) { return false; }
+    // D78: called from OnAnimate when this step moved only `areaDip` (window DIPs), for example one animated icon: the
+    // frame then renders that area alone, like InvalidateArea. Several calls are joined; a step without one, or any
+    // whole invalidation, still renders everything.
+    void LimitAnimationFrameTo(const D2D1_RECT_F& areaDip);
     // Default: adopt the suggested rectangle from WM_DPICHANGED.
     virtual void OnDpiChanged(UINT newDpi, const RECT& suggestedPx);
     virtual void OnPointerMove(D2D1_POINT_2F /*dip*/) {}
@@ -218,6 +222,8 @@ private:
     bool renderPending_ = false;
     bool animationPending_ = false;
     bool inRender_ = false;
+    bool inAnimate_ = false;
+    std::optional<D2D1_RECT_F> animationArea_;   // LimitAnimationFrameTo during the current OnAnimate
 };
 
 }  // namespace aether::ui

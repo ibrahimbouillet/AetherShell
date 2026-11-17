@@ -4,10 +4,16 @@ aether_add_module_library(aether_app EXCLUDE main.cpp
     LINK aether_core aether_diagnostics aether_platform aether_net aether_graphics aether_ui
          aether_status aether_status_audio aether_weather aether_weather_location aether_applications aether_search
          aether_settings aether_updates aether_install aether_dock aether_topbar aether_search_ui
-         aether_settings_ui aether_ui_form aether_controlcenter aether_welcome dbghelp comctl32 shell32 wtsapi32 hid)
+         aether_settings_ui aether_ui_form aether_weather_ui aether_controlcenter aether_welcome dbghelp comctl32 shell32 wtsapi32 hid)
 aether_add_executable(AetherShellApp WIN32 SOURCES main.cpp LINK aether_app)
 aether_add_version_resource(AetherShellApp DESCRIPTION "Aether Shell native desktop interface" INTERNAL_NAME "AetherShellApp")
+aether_add_world_map_resource(AetherShellApp)   # D78: the weather window's offline map
 aether_add_module_tests(app LINK aether_app)
+foreach(_tests IN ITEMS aether_app_tests aether_app_integration_tests)
+    if(TARGET ${_tests})
+        aether_add_world_map_resource(${_tests})
+    endif()
+endforeach()
 if(AETHER_BUILD_TESTS)
     # Own synthetic lifetime fixture only: not installed or included in release payloads.
     aether_add_executable(aether_window_corner_parent_fixture WIN32

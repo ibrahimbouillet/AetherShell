@@ -8,9 +8,21 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [0.4.0-alpha.4] — in progress, not published
 
-Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D80). Its test builds keep this number until the owner calls Alpha 4 complete.
 
 ### Added
+
+- **The weather window** (D78): a click on the Top Bar's weather opens Aether's own weather page below it (Settings →
+  Weather → *Open the weather* opens it too). The place, its local time and part of the day over a sky that follows the hour
+  (night blue in the evening, light blue in the morning), a large animated illustration in colour, the temperature and how
+  it feels; the next 24 hours; 7 days; a map of the country with the current temperatures of its main places and your
+  position; feels like, humidity, wind, the sun's arc between sunrise and sunset, UV index and pressure. Search for another
+  city, or go back to *My location*. When location is not allowed yet, a banner allows it directly or opens Windows'
+  location settings. The map's shapes come from Natural Earth (public domain) and are stored in the application; only the
+  temperatures are downloaded.
+- **Animated weather illustrations** (D78) for every kind of weather, by day and by night: rain and snow fall, the sun's
+  rays turn, clouds drift, lightning flashes. In the Top Bar the icon stays grey and moves only while the pointer is over it;
+  reduced motion and high contrast keep it still.
 
 - **The Top Bar as text on the desktop** (D71): Settings → Top Bar → Presentation → *Text on the desktop* removes the bar
   and writes its items at the very top of the screen, straight over the desktop picture, in light or dark ink chosen from
@@ -48,6 +60,13 @@ Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alph
 
 ### Changed
 
+- **Liquid everywhere** (D79): with Liquid chosen, the Quick Settings panel, Search, the menus, the Dock's window previews and
+  the weather window are glass like the bars; Settings takes a Liquid look (a lighter page with a soft sheen and rim, cards
+  as lenses). With Grain, all of them are grained. Tooltips stay opaque.
+- **A more precise weather** (D78): Settings → Weather → *Precise location* (on by default) uses Windows' position to about
+  100 m, so the forecast follows the place's own height; off, it stays rounded to about 10 km. Temperatures are rounded to
+  the nearest degree (never "-0°"). The forecast is refreshed every 15 minutes by default (10 at least); a setting left at the
+  former default, 30, becomes 15.
 - **Rounded corners for every maximized window, without touching the application** (D72, ADR 0014): Aether no longer
   gives other applications' windows a region or changes their material. Small windows of its own, directly above the
   maximized window, show the live desktop in the four corners and draw the thin rim. Browsers, File Explorer, packaged
@@ -62,6 +81,9 @@ Alpha 4 (D62–D73). Its test builds keep this number until the owner calls Alph
 
 ### Fixed
 
+- **Settings maximized had a second outline** (D80): Windows rounded and bordered the whole window, its hidden resize border
+  included, which lies on screen beside Aether's margins. Maximized, Settings now draws only its own frame, flush with the
+  screen's usable area.
 - **The weather loaded nothing** (D75): Open-Meteo's compressed answers made WinHTTP's decoder abort mid-body ("operation
   aborted"), so every request failed as a network error although the service was reachable. Requests to Open-Meteo now ask for
   the plain answer (under 1 KB), the log names the real failure, and a Network test covers both Open-Meteo requests.

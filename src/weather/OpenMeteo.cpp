@@ -89,6 +89,130 @@ std::wstring CleanDisplayText(std::string_view utf8) {
     return std::wstring(text::Trim(std::wstring_view(wide)));
 }
 
+// "YYYY-MM-DD" as a civil date.
+std::optional<std::chrono::sys_days> ParseCivilDate(std::string_view text) {
+    if (text.size() != 10) return std::nullopt;
+    const auto full = ParseCivilTime(std::string(text) + "T00:00");
+    if (!full) return std::nullopt;
+    return std::chrono::floor<std::chrono::days>(*full);
+}
+
+// is_day as true/false or 0/1.
+std::optional<bool> DayFlag(const json::Value* value) {
+    if (!value) return std::nullopt;
+    if (const auto flag = value->AsBool()) return *flag;
+    if (const auto number = value->AsInt64(); number && (*number == 0 || *number == 1)) return *number == 1;
+    return std::nullopt;
+}
+
+std::optional<double> FiniteNumber(const json::Value* value) {
+    if (!value) return std::nullopt;
+    const auto number = value->AsDouble();
+    if (!number || !std::isfinite(*number)) return std::nullopt;
+    return number;
+}
+
+std::optional<double> NumberIn(const json::Value* value, double low, double high) {
+    const auto number = FiniteNumber(value);
+    if (!number || *number < low || *number > high) return std::nullopt;
+    return number;
+}
+
+std::optional<int> RoundedIn(const json::Value* value, double low, double high) {
+    const auto number = NumberIn(value, low, high);
+    if (!number) return std::nullopt;
+    return static_cast<int>(std::lround(*number));
+}
+
+std::optional<int> WeatherCodeOf(const json::Value* value) {
+    const auto code = value ? value->AsInt64() : std::nullopt;
+    if (!code || !IsValidWeatherCode(*code)) return std::nullopt;
+    return static_cast<int>(*code);
+}
+
+std::string_view UnitLabel(status::TemperatureUnit unit) noexcept {
+    return unit == status::TemperatureUnit::Fahrenheit ? "\xC2\xB0" "F" : "\xC2\xB0" "C";
+}
+
+// The unit label is metadata; when present it must agree with the requested unit.
+Result<void> CheckUnitLabel(const json::Value& root, std::string_view group, std::string_view member,
+                            status::TemperatureUnit unit) {
+    const auto* units = root.Find(group);
+    if (!units) return Ok();
+    if (!units->IsObject()) return MakeError(ErrorCode::Parse, "'" + std::string(group) + "' is not an object");
+    if (const auto* label = units->Find(member)) {
+        const auto* labelText = label->AsString();
+        if (!labelText || *labelText != UnitLabel(unit)) {
+            return MakeError(ErrorCode::Validation, "temperature unit does not match the request");
+        }
+    }
+    return Ok();
+}
+
+// The members of a "current" object every request depends on.
+struct CurrentCore {
+    std::chrono::sys_seconds localTime{};
+    std::int64_t offset = 0;
+    double temperature = 0.0;
+    int weatherCode = 0;
+    bool isDay = true;
+};
+
+Result<CurrentCore> ParseCurrentCore(const json::Value& root, status::TemperatureUnit unit) {
+    const auto* current = root.Find("current");
+    if (!current || !current->IsObject()) return MakeError(ErrorCode::Parse, "missing 'current' object");
+
+    const auto* timeValue = current->Find("time");
+    if (!timeValue || !timeValue->AsString()) return MakeError(ErrorCode::Parse, "'current.time' is not a string");
+    const auto localTime = ParseCivilTime(*timeValue->AsString());
+    if (!localTime) return MakeError(ErrorCode::Validation, "'current.time' is not an ISO 8601 local time");
+
+    const auto* offsetValue = root.Find("utc_offset_seconds");
+    const auto offset = offsetValue ? offsetValue->AsInt64() : std::nullopt;
+    if (!offset) return MakeError(ErrorCode::Parse, "'utc_offset_seconds' is missing or not an integer");
+    if (*offset < -kMaxUtcOffsetSeconds || *offset > kMaxUtcOffsetSeconds) {
+        return MakeError(ErrorCode::Validation, "'utc_offset_seconds' is out of range");
+    }
+
+    const auto* temperatureValue = current->Find("temperature_2m");
+    const auto temperature = temperatureValue ? temperatureValue->AsDouble() : std::nullopt;
+    if (!temperature) return MakeError(ErrorCode::Parse, "'current.temperature_2m' is missing or not a number");
+    if (!IsPlausibleTemperature(*temperature, unit)) {
+        return MakeError(ErrorCode::Validation, "temperature is outside the plausible range for the unit");
+    }
+    if (auto label = CheckUnitLabel(root, "current_units", "temperature_2m", unit); !label) return label.error();
+
+    const auto* codeValue = current->Find("weather_code");
+    const auto code = codeValue ? codeValue->AsInt64() : std::nullopt;
+    if (!code) return MakeError(ErrorCode::Parse, "'current.weather_code' is missing or not an integer");
+    if (!IsValidWeatherCode(*code)) return MakeError(ErrorCode::Validation, "'current.weather_code' is not 0..99");
+
+    const auto isDay = DayFlag(current->Find("is_day"));
+    if (!isDay) return MakeError(ErrorCode::Validation, "'current.is_day' is missing or not 0/1");
+
+    CurrentCore core;
+    core.localTime = *localTime;
+    core.offset = *offset;
+    core.temperature = *temperature;
+    core.weatherCode = static_cast<int>(*code);
+    core.isDay = *isDay;
+    return core;
+}
+
+// Member `name` of a forecast block as an array; nullptr when absent or not an array.
+const json::Array* Series(const json::Value& block, std::string_view name) {
+    const auto* member = block.Find(name);
+    return member ? member->AsArray() : nullptr;
+}
+
+const json::Value* At(const json::Array* series, std::size_t index) {
+    return series && index < series->size() ? &(*series)[index] : nullptr;
+}
+
+std::string TemperatureUnitParameter(status::TemperatureUnit unit) {
+    return std::string("&temperature_unit=") + std::string(ToString(unit));
+}
+
 }  // namespace
 
 std::string FormatCoordinate(double value) {
@@ -144,8 +268,7 @@ std::string BuildForecastUrl(double latitude, double longitude, status::Temperat
     url += "&longitude=";
     url += FormatCoordinate(longitude);
     url += "&current=temperature_2m,weather_code,is_day";
-    url += "&temperature_unit=";
-    url += ToString(unit);
+    url += TemperatureUnitParameter(unit);
     url += "&timezone=auto";
     return url;
 }
@@ -199,63 +322,196 @@ Result<CurrentConditions> ParseForecast(std::string_view body, status::Temperatu
         return MakeError(ErrorCode::Http, "provider error: " + *reason);
     }
 
-    const auto* current = root.Find("current");
-    if (!current || !current->IsObject()) return MakeError(ErrorCode::Parse, "missing 'current' object");
-
-    const auto* timeValue = current->Find("time");
-    if (!timeValue || !timeValue->AsString()) return MakeError(ErrorCode::Parse, "'current.time' is not a string");
-    const auto localTime = ParseCivilTime(*timeValue->AsString());
-    if (!localTime) return MakeError(ErrorCode::Validation, "'current.time' is not an ISO 8601 local time");
-
-    const auto* offsetValue = root.Find("utc_offset_seconds");
-    const auto offset = offsetValue ? offsetValue->AsInt64() : std::nullopt;
-    if (!offset) return MakeError(ErrorCode::Parse, "'utc_offset_seconds' is missing or not an integer");
-    if (*offset < -kMaxUtcOffsetSeconds || *offset > kMaxUtcOffsetSeconds) {
-        return MakeError(ErrorCode::Validation, "'utc_offset_seconds' is out of range");
-    }
-
-    const auto* temperatureValue = current->Find("temperature_2m");
-    const auto temperature = temperatureValue ? temperatureValue->AsDouble() : std::nullopt;
-    if (!temperature) return MakeError(ErrorCode::Parse, "'current.temperature_2m' is missing or not a number");
-    if (!IsPlausibleTemperature(*temperature, unit)) {
-        return MakeError(ErrorCode::Validation, "temperature is outside the plausible range for the unit");
-    }
-
-    // The unit label is metadata; when present it must agree with the requested unit.
-    if (const auto* units = root.Find("current_units")) {
-        if (!units->IsObject()) return MakeError(ErrorCode::Parse, "'current_units' is not an object");
-        if (const auto* label = units->Find("temperature_2m")) {
-            const auto* labelText = label->AsString();
-            const std::string_view expected =
-                unit == status::TemperatureUnit::Fahrenheit ? "\xC2\xB0" "F" : "\xC2\xB0" "C";
-            if (!labelText || *labelText != expected) {
-                return MakeError(ErrorCode::Validation, "temperature unit does not match the request");
-            }
-        }
-    }
-
-    const auto* codeValue = current->Find("weather_code");
-    const auto code = codeValue ? codeValue->AsInt64() : std::nullopt;
-    if (!code) return MakeError(ErrorCode::Parse, "'current.weather_code' is missing or not an integer");
-    if (!IsValidWeatherCode(*code)) return MakeError(ErrorCode::Validation, "'current.weather_code' is not 0..99");
-
-    const auto* isDayValue = current->Find("is_day");
-    std::optional<bool> isDay;
-    if (isDayValue) {
-        if (const auto flag = isDayValue->AsBool()) {
-            isDay = *flag;
-        } else if (const auto number = isDayValue->AsInt64(); number && (*number == 0 || *number == 1)) {
-            isDay = *number == 1;
-        }
-    }
-    if (!isDay) return MakeError(ErrorCode::Validation, "'current.is_day' is missing or not 0/1");
+    auto core = ParseCurrentCore(root, unit);
+    if (!core) return core.error();
 
     CurrentConditions conditions;
-    conditions.temperature = *temperature;
-    conditions.weatherCode = static_cast<int>(*code);
-    conditions.isDay = *isDay;
-    conditions.observedAt = system_clock::time_point{*localTime - std::chrono::seconds{*offset}};
+    conditions.temperature = core->temperature;
+    conditions.weatherCode = core->weatherCode;
+    conditions.isDay = core->isDay;
+    conditions.observedAt = system_clock::time_point{core->localTime - std::chrono::seconds{core->offset}};
     return conditions;
+}
+
+std::string BuildDetailedForecastUrl(double latitude, double longitude, status::TemperatureUnit unit) {
+    std::string url(kForecastEndpoint);
+    url += "?latitude=";
+    url += FormatCoordinate(latitude);
+    url += "&longitude=";
+    url += FormatCoordinate(longitude);
+    url += "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day,cloud_cover,"
+           "pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m";
+    url += "&hourly=temperature_2m,weather_code,is_day,precipitation_probability";
+    url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max,"
+           "uv_index_max";
+    url += "&forecast_hours=" + std::to_string(kForecastHours);
+    url += "&forecast_days=" + std::to_string(kForecastDays);
+    url += TemperatureUnitParameter(unit);
+    url += unit == status::TemperatureUnit::Fahrenheit ? "&wind_speed_unit=mph" : "&wind_speed_unit=kmh";
+    url += "&timezone=auto";
+    return url;
+}
+
+Result<DetailedForecast> ParseDetailedForecast(std::string_view body, status::TemperatureUnit unit) {
+    auto parsed = ParseBody(body);
+    if (!parsed) return parsed.error();
+    const json::Value& root = parsed.value();
+    if (auto reason = ErrorReasonFromValue(root)) {
+        return MakeError(ErrorCode::Http, "provider error: " + *reason);
+    }
+    auto core = ParseCurrentCore(root, unit);
+    if (!core) return core.error();
+    if (auto label = CheckUnitLabel(root, "hourly_units", "temperature_2m", unit); !label) return label.error();
+    if (auto label = CheckUnitLabel(root, "daily_units", "temperature_2m_max", unit); !label) return label.error();
+
+    DetailedForecast forecast;
+    forecast.unit = unit;
+    forecast.utcOffsetSeconds = static_cast<std::int32_t>(core->offset);
+    forecast.latitude = NumberIn(root.Find("latitude"), -90.0, 90.0).value_or(0.0);
+    forecast.longitude = NumberIn(root.Find("longitude"), -180.0, 180.0).value_or(0.0);
+    forecast.elevation = NumberIn(root.Find("elevation"), -500.0, 9000.0);
+    if (const auto* zone = root.Find("timezone"); zone && zone->AsString()) {
+        forecast.timezone = CleanDisplayText(*zone->AsString());
+        if (forecast.timezone.size() > 64) forecast.timezone.clear();
+    }
+
+    const auto& current = *root.Find("current");
+    auto& now = forecast.current;
+    now.localTime = core->localTime;
+    now.temperature = core->temperature;
+    now.weatherCode = core->weatherCode;
+    now.isDay = core->isDay;
+    now.apparentTemperature = FiniteNumber(current.Find("apparent_temperature"));
+    if (now.apparentTemperature && !IsPlausibleTemperature(*now.apparentTemperature, unit)) now.apparentTemperature.reset();
+    now.humidity = RoundedIn(current.Find("relative_humidity_2m"), 0.0, 100.0);
+    now.cloudCover = RoundedIn(current.Find("cloud_cover"), 0.0, 100.0);
+    now.pressure = NumberIn(current.Find("pressure_msl"), 850.0, 1100.0);
+    now.windSpeed = NumberIn(current.Find("wind_speed_10m"), 0.0, 500.0);
+    now.windDirection = RoundedIn(current.Find("wind_direction_10m"), 0.0, 360.0);
+    now.windGusts = NumberIn(current.Find("wind_gusts_10m"), 0.0, 600.0);
+
+    const auto* hourly = root.Find("hourly");
+    if (!hourly || !hourly->IsObject()) return MakeError(ErrorCode::Parse, "missing 'hourly' object");
+    const auto* hourTimes = Series(*hourly, "time");
+    if (!hourTimes) return MakeError(ErrorCode::Parse, "'hourly.time' is not an array");
+    const auto* hourTemperatures = Series(*hourly, "temperature_2m");
+    const auto* hourCodes = Series(*hourly, "weather_code");
+    const auto* hourDays = Series(*hourly, "is_day");
+    const auto* hourRain = Series(*hourly, "precipitation_probability");
+    for (std::size_t i = 0; i < hourTimes->size() && forecast.hourly.size() < kForecastHours; ++i) {
+        const auto* time = (*hourTimes)[i].AsString();
+        const auto localTime = time ? ParseCivilTime(*time) : std::nullopt;
+        const auto temperature = FiniteNumber(At(hourTemperatures, i));
+        const auto code = WeatherCodeOf(At(hourCodes, i));
+        if (!localTime || !temperature || !IsPlausibleTemperature(*temperature, unit) || !code) continue;
+        HourlyPoint point;
+        point.localTime = *localTime;
+        point.temperature = *temperature;
+        point.weatherCode = *code;
+        point.isDay = DayFlag(At(hourDays, i)).value_or(true);
+        point.precipitationProbability = RoundedIn(At(hourRain, i), 0.0, 100.0);
+        forecast.hourly.push_back(point);
+    }
+
+    const auto* daily = root.Find("daily");
+    if (!daily || !daily->IsObject()) return MakeError(ErrorCode::Parse, "missing 'daily' object");
+    const auto* dayDates = Series(*daily, "time");
+    if (!dayDates) return MakeError(ErrorCode::Parse, "'daily.time' is not an array");
+    const auto* dayCodes = Series(*daily, "weather_code");
+    const auto* dayHighs = Series(*daily, "temperature_2m_max");
+    const auto* dayLows = Series(*daily, "temperature_2m_min");
+    const auto* sunrises = Series(*daily, "sunrise");
+    const auto* sunsets = Series(*daily, "sunset");
+    const auto* dayRain = Series(*daily, "precipitation_probability_max");
+    const auto* dayUv = Series(*daily, "uv_index_max");
+    const auto civilTimeAt = [](const json::Array* series, std::size_t i) -> std::optional<std::chrono::sys_seconds> {
+        const auto* value = At(series, i);
+        const auto* text = value ? value->AsString() : nullptr;
+        return text ? ParseCivilTime(*text) : std::nullopt;
+    };
+    for (std::size_t i = 0; i < dayDates->size() && forecast.daily.size() < kForecastDays; ++i) {
+        const auto* dateText = (*dayDates)[i].AsString();
+        const auto date = dateText ? ParseCivilDate(*dateText) : std::nullopt;
+        const auto code = WeatherCodeOf(At(dayCodes, i));
+        const auto high = FiniteNumber(At(dayHighs, i));
+        const auto low = FiniteNumber(At(dayLows, i));
+        if (!date || !code || !high || !low || !IsPlausibleTemperature(*high, unit) ||
+            !IsPlausibleTemperature(*low, unit) || *low > *high) {
+            continue;
+        }
+        DailyPoint day;
+        day.date = *date;
+        day.weatherCode = *code;
+        day.maxTemperature = *high;
+        day.minTemperature = *low;
+        day.sunrise = civilTimeAt(sunrises, i);
+        day.sunset = civilTimeAt(sunsets, i);
+        if (day.sunrise && day.sunset && *day.sunset <= *day.sunrise) day.sunrise.reset(), day.sunset.reset();
+        day.precipitationProbability = RoundedIn(At(dayRain, i), 0.0, 100.0);
+        day.uvIndex = NumberIn(At(dayUv, i), 0.0, 25.0);
+        forecast.daily.push_back(day);
+    }
+    if (forecast.daily.empty()) return MakeError(ErrorCode::Validation, "the forecast has no valid day");
+    return forecast;
+}
+
+std::string BuildPointsUrl(const std::vector<GeoPoint>& points, status::TemperatureUnit unit) {
+    std::string latitudes;
+    std::string longitudes;
+    const std::size_t count = points.size() < kMaxForecastPoints ? points.size() : kMaxForecastPoints;
+    for (std::size_t i = 0; i < count; ++i) {
+        if (i > 0) {
+            latitudes += ',';
+            longitudes += ',';
+        }
+        latitudes += FormatCoordinate(points[i].latitude);
+        longitudes += FormatCoordinate(points[i].longitude);
+    }
+    std::string url(kForecastEndpoint);
+    url += "?latitude=" + latitudes;
+    url += "&longitude=" + longitudes;
+    url += "&current=temperature_2m,weather_code,is_day";
+    url += TemperatureUnitParameter(unit);
+    return url;
+}
+
+Result<std::vector<PointReading>> ParsePoints(std::string_view body, status::TemperatureUnit unit,
+                                              std::size_t requested) {
+    if (body.size() > kMaxResponseBytes) {
+        return MakeError(ErrorCode::Integrity, "response exceeds " + std::to_string(kMaxResponseBytes) + " bytes");
+    }
+    auto parsed = json::Parse(body, JsonOptions());
+    if (!parsed) return MakeError(ErrorCode::Parse, "response is not valid JSON: " + parsed.error().message);
+    const json::Value& root = parsed.value();
+    std::vector<const json::Value*> places;
+    if (const auto* items = root.AsArray()) {
+        for (const auto& item : *items) places.push_back(&item);
+    } else if (root.IsObject()) {
+        if (auto reason = ErrorReasonFromValue(root)) return MakeError(ErrorCode::Http, "provider error: " + *reason);
+        places.push_back(&root);
+    } else {
+        return MakeError(ErrorCode::Parse, "response is neither an object nor an array");
+    }
+    // The answer is matched to the request by position: any other count cannot be trusted.
+    if (places.size() != requested) return MakeError(ErrorCode::Validation, "response does not match the requested places");
+
+    std::vector<PointReading> readings;
+    for (std::size_t i = 0; i < places.size(); ++i) {
+        if (!places[i]->IsObject()) continue;
+        const auto* current = places[i]->Find("current");
+        if (!current || !current->IsObject()) continue;
+        if (!CheckUnitLabel(*places[i], "current_units", "temperature_2m", unit)) continue;
+        const auto temperature = FiniteNumber(current->Find("temperature_2m"));
+        const auto code = WeatherCodeOf(current->Find("weather_code"));
+        if (!temperature || !IsPlausibleTemperature(*temperature, unit) || !code) continue;
+        PointReading reading;
+        reading.index = i;
+        reading.temperature = *temperature;
+        reading.weatherCode = *code;
+        reading.isDay = DayFlag(current->Find("is_day")).value_or(true);
+        readings.push_back(reading);
+    }
+    return readings;
 }
 
 Result<std::vector<LocationCandidate>> ParseGeocoding(std::string_view body, std::size_t maxResults) {

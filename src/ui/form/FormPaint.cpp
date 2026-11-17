@@ -66,6 +66,42 @@ void StrokeRound(ID2D1RenderTarget* target, Brush& brush, const D2D1_RECT_F& rec
     if (auto* b = brush(color)) target->DrawRoundedRectangle(D2D1::RoundedRect(inner, r, r), b, width);
 }
 
+// D79: the Liquid style chosen in Settings, outside high contrast.
+bool LiquidLook(const DesignTokens& tokens) noexcept { return tokens.liquid && tokens.mode != graphics::ThemeMode::HighContrast; }
+
+// Liquid's rim of light: brighter along the top edge where the glass gathers light, fading down its sides.
+void StrokeLiquidRim(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, float radius, bool light, float width, float strength = 1.0f) {
+    if (!Usable(rect) || !(width > 0.0f)) return;
+    const auto top = (light ? Color::FromHex(0xFFFFFF, 0.92f) : Color::FromHex(0xFFFFFF, 0.30f)).WithAlpha((light ? 0.92f : 0.30f) * strength);
+    const auto bottom = (light ? Color::FromHex(0xFFFFFF, 0.30f) : Color::FromHex(0xFFFFFF, 0.05f)).WithAlpha((light ? 0.30f : 0.05f) * strength);
+    const D2D1_GRADIENT_STOP stops[] = {{0.0f, top.ToD2D()}, {0.45f, bottom.ToD2D()}, {1.0f, bottom.WithAlpha(bottom.a * 1.6f).ToD2D()}};
+    winrt::com_ptr<ID2D1GradientStopCollection> collection;
+    winrt::com_ptr<ID2D1LinearGradientBrush> brush;
+    if (FAILED(context->CreateGradientStopCollection(stops, 3, collection.put())) ||
+        FAILED(context->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(rect.left, rect.top), D2D1::Point2F(rect.left, rect.bottom)),
+                                                  collection.get(), brush.put())))
+        return;
+    const D2D1_RECT_F inner = Deflate(rect, width / 2.0f, width / 2.0f);
+    if (!Usable(inner)) return;
+    const float r = std::clamp(radius - width / 2.0f, 0.0f, std::min(Width(inner), Height(inner)) / 2.0f);
+    context->DrawRoundedRectangle(D2D1::RoundedRect(inner, r, r), brush.get(), width);
+}
+
+// A soft sheen at the top of the glass, as light catches its upper curve.
+void FillLiquidSheen(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, float radius, bool light) {
+    if (!Usable(rect)) return;
+    const float depth = std::min(Height(rect), 160.0f);
+    const D2D1_GRADIENT_STOP stops[] = {{0.0f, Color::FromHex(0xFFFFFF, light ? 0.22f : 0.06f).ToD2D()}, {1.0f, Color::FromHex(0xFFFFFF, 0.0f).ToD2D()}};
+    winrt::com_ptr<ID2D1GradientStopCollection> collection;
+    winrt::com_ptr<ID2D1LinearGradientBrush> brush;
+    if (FAILED(context->CreateGradientStopCollection(stops, 2, collection.put())) ||
+        FAILED(context->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(rect.left, rect.top), D2D1::Point2F(rect.left, rect.top + depth)),
+                                                  collection.get(), brush.put())))
+        return;
+    const float r = std::clamp(radius, 0.0f, std::min(Width(rect), Height(rect)) / 2.0f);
+    context->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(rect.left, rect.top, rect.right, std::min(rect.bottom, rect.top + depth)), r, r), brush.get());
+}
+
 graphics::TextStyle WithVertical(graphics::TextStyle style, DWRITE_PARAGRAPH_ALIGNMENT alignment) {
     style.verticalAlignment = alignment;
     return style;
@@ -226,6 +262,9 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
     if (!context || !Usable(area) || material == FormMaterial::Native) return;
     // The glass painter supplies the shared grain; the tint is the form's own window tint.
     DesignTokens materialTokens = tokens;
+    // D79: Liquid is clear water: no grain, a lighter tint over the blurred desktop, light on its rim.
+    const bool liquid = LiquidLook(tokens);
+    const bool light = tokens.mode == graphics::ThemeMode::Light;
     graphics::GlassStyle style;
     style.cornerRadius = 0.0f;
     style.opacity = 0.8f;  // maps exactly to tintAlphaWithBlur
@@ -237,15 +276,19 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
     style.border = false;
     if (material == FormMaterial::Acrylic) {
         materialTokens.glass.tint = tokens.form.windowTint;
-        materialTokens.glass.tintAlphaWithBlur = Clamp01(tokens.form.windowTintAlpha);
-        style.noise = true;
+        materialTokens.glass.tintAlphaWithBlur = Clamp01(tokens.form.windowTintAlpha * (liquid ? 0.7f : 1.0f));
+        style.noise = !liquid;
     } else {
         materialTokens.glass.tint = tokens.form.windowSolid;
         materialTokens.glass.tintAlphaWithBlur = 1.0f;
-        style.noise = tokens.transparencyEnabled;
+        style.noise = tokens.transparencyEnabled && !liquid;
     }
     if (!frame || !Usable(*frame)) {
         graphics::PaintGlassPanel(context, area, materialTokens, style);
+        if (liquid) {
+            FillLiquidSheen(context, area, 0.0f, light);
+            StrokeLiquidRim(context, area, kWindowFrameRadius, light, PixelOf(context), 0.8f);
+        }
         return;
     }
     // The rounded body (painting is clipped to `area` by the caller), then a pixel-snapped rim of
@@ -254,6 +297,11 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
     graphics::PaintGlassPanel(context, *frame, materialTokens, style);
     const float pixel = PixelOf(context);
     const float width = std::max(1.0f, std::round(1.0f / pixel)) * pixel;
+    if (liquid) {
+        FillLiquidSheen(context, *frame, kWindowFrameRadius, light);
+        StrokeLiquidRim(context, *frame, kWindowFrameRadius, light, width);
+        return;
+    }
     Brush brush(context);
     StrokeRound(context, brush, *frame, kWindowFrameRadius, tokens.form.windowRim, width);
 }
@@ -263,6 +311,13 @@ void PaintCard(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const Desig
     if (!context || !Usable(rect)) return;
     Brush brush(context);
     const auto& f = tokens.form;
+    if (LiquidLook(tokens) && material != FormMaterial::Native) {
+        // D79: a card is a lens in the glass: a clearer fill and its own rim of light.
+        const bool light = tokens.mode == graphics::ThemeMode::Light;
+        FillRound(context, brush, rect, f.cardRadius, Color::FromHex(0xFFFFFF, light ? (emphasis ? 0.38f : 0.30f) : (emphasis ? 0.08f : 0.055f)));
+        StrokeLiquidRim(context, rect, f.cardRadius, light, pixel > 0.0f ? pixel : PixelOf(context), 0.9f);
+        return;
+    }
     Color fill = material == FormMaterial::Acrylic ? f.cardFill : f.cardFillSolid;
     if (emphasis) fill = Over(f.cardFill, fill);
     FillRound(context, brush, rect, f.cardRadius, fill);

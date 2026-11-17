@@ -17,6 +17,15 @@ the Windows SDK, linked against the Microsoft C/C++ runtime (statically).
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution is displayed with the weather.
 - **GitHub REST API** (update checks): used under the GitHub Terms of Service.
 
+## Map data
+
+- **Natural Earth** (the weather window's map, D78): country shapes and names and populated places from
+  [Natural Earth](https://www.naturalearthdata.com/), which is in the public domain
+  ([terms of use](https://www.naturalearthdata.com/about/terms-of-use/)). No permission or attribution is required;
+  it is credited in the weather window ("Map: Natural Earth"). The data is converted into `resources/weather/world-map.bin`
+  and embedded in the application; its source files and hashes are listed in `resources/weather/README.md`. Borders are
+  shown for orientation only.
+
 ## Fonts
 
 The user interface uses fonts installed with Windows (Segoe UI / Segoe UI Variable). No font files

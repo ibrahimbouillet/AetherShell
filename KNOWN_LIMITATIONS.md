@@ -9,8 +9,10 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
 - Alpha 4 tests (D64 to D66, S-068 to S-070), Liquid style: the bars are regular glass made by Windows' compositor from its
   blurred backdrop; Windows gives no sharp image of what lies behind a window, so their edges gather light but do not bend
   the page as Apple's glass does (D66). The arrival and the Settings previews show the desktop picture, placed as "Fill"
-  whatever the desktop's own setting, on the primary monitor. Only the Dock, the Top Bar, the arrival and the previews are
-  Liquid yet; Settings, menus, Search and Quick Settings stay Grain. Without transparency, on a system without the host
+  whatever the desktop's own setting, on the primary monitor. Since D79 the menus, Search, Quick Settings, the Dock's
+  previews and the weather window are the same glass; Settings, a real top-level window, has a Liquid *look* (lighter
+  page, sheen, rim, lens cards) over its own Mica/Acrylic, not the compositor's glass, which Windows gives only to
+  composition surfaces; tooltips stay opaque. Without transparency, on a system without the host
   backdrop or where the compositor refuses the effect, and on a device that cannot run the shader (Direct3D below 10), the
   bars draw Grain. The replay after a change of style or at a start, and the bars staying after an unlock, have run in
   fixtures, not yet on the owner's desktop. A Liquid blur below 100% lets the sharp page through and can lower the text's
@@ -27,6 +29,14 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   installation guide) is in all ten languages (the new five since 2026-11-13, unreviewed; their right-to-left pages rely on
   GitHub honouring `dir="rtl"`); known limitations, release notes, the changelog and the engineering documents stay in
   English.
+- Alpha 4 weather (D78, S-078), built and not yet installed: the weather window, the animated illustrations and precise
+  location ran against a scripted Open-Meteo in fixtures, not yet on the owner's desktop or against the live service in
+  the window. Precise location depends on what Windows knows (Wi-Fi or GPS); a desktop without either may get only a
+  coarse fix, which the window then calls approximate. The map's borders are Natural Earth's, simplified to about 1 km;
+  a coast the simplified shapes miss falls back to the nearest town within 40 km. Up to 24 places get a temperature per
+  view, so a small country shows few and a large one a selection. Open-Meteo's values are model data on a 15-minute grid,
+  not station readings. Units are written as km/h, mph and hPa in every language. The unit test of Search's timing
+  budget can fail under a parallel test load (`-j 6`) and passes alone; not caused by this round.
 - Alpha 4 Search (D68, S-072): files come from Windows' own index, so only what Windows Search has indexed in the person's
   folders (Desktop, Documents, Downloads, Pictures, Videos, Music, OneDrive) is found, by name, never by content; with
   Windows Search off there are no files. Settings pages are a fixed list of 44 with English and French names; others are

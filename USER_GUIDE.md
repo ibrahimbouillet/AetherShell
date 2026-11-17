@@ -64,6 +64,16 @@ sends the entered place name to Open-Meteo; forecasts send the chosen coarse coo
 not infer location from a Wi-Fi name or raw IP. Cached forecasts disappear after six hours.
 Data attribution: Open-Meteo.com, CC BY 4.0.
 
+**The weather window** (Alpha 4): click the weather in the Top Bar (its right-click menu keeps **Weather settings…**),
+or Settings → Weather → **Open the weather**. It shows the place, its local time and the sky of its hour, the
+temperature and how it feels, the next 24 hours, 7 days, the sun's arc, humidity, wind, UV and pressure, and a map of
+the country with its current temperatures. Search for another city, or choose **My location**; if location is not
+allowed yet, the window asks Windows for it or opens Windows' location settings. **Precise location** (on by default)
+uses Windows' position to about 100 m; turned off, it is rounded to about 10 km. The Top Bar's weather icon moves only
+while the pointer is over it. The map comes from Natural Earth (public domain) and is stored in the application. With
+**Liquid** chosen in Appearance, the weather window, Quick Settings, Search, the menus and the Dock's previews are
+glass like the bars, and Settings takes a Liquid look; with **Grain**, all of them are grained.
+
 General contains startup consent, motion preferences and shortcut editing. Fresh interactive setup
 (since Alpha 2) visibly selects sign-in startup; clear that option before installation to opt out. Existing
 choices are preserved. Silent setup requires the explicit startup flag. Startup is per-user and

@@ -886,6 +886,20 @@ AETHER_TEST("settings design: a maximized window keeps rounded corners, a contin
     std::array<std::array<Capture, 2>, 4> bare;
     for (std::size_t i = 0; i < crops.size(); ++i)
         for (const bool phase : {false, true}) bare[i][phase ? 1 : 0] = shoot(crops[i], phase);
+    // Where the work area stops short of the screen (Aether's side margins in replacement mode, the Top Bar), the
+    // maximized window's hidden resize border lies on screen. Owner, 2026-11-16: DWM drew a second rounded outline
+    // there. The bands just outside the work area must show exactly what is behind the window.
+    const int reach = 3 * radius;
+    std::vector<RECT> margins;
+    if (work.left - monitor.rcMonitor.left >= 2)
+        margins.push_back(RECT{std::max(monitor.rcMonitor.left, work.left - reach), work.top + side, work.left, work.bottom - side});
+    if (monitor.rcMonitor.right - work.right >= 2)
+        margins.push_back(RECT{work.right, work.top + side, std::min(monitor.rcMonitor.right, work.right + reach), work.bottom - side});
+    if (work.top - monitor.rcMonitor.top >= 2)
+        margins.push_back(RECT{work.left + side, std::max(monitor.rcMonitor.top, work.top - reach), work.right - side, work.top});
+    std::vector<std::array<Capture, 2>> bareMargins(margins.size());
+    for (std::size_t i = 0; i < margins.size(); ++i)
+        for (const bool phase : {false, true}) bareMargins[i][phase ? 1 : 0] = shoot(margins[i], phase);
     ::ShowWindow(hwnd, SW_MAXIMIZE);
     ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     PumpFor(f.dispatcher, 600ms);
@@ -896,6 +910,32 @@ AETHER_TEST("settings design: a maximized window keeps rounded corners, a contin
     ::GetClientRect(hwnd, &client);
     const RECT visible{origin.x, origin.y, origin.x + client.right, origin.y + client.bottom};
     REQUIRE(::EqualRect(&visible, &work));
+    // For inspection: the whole maximized window and the margins the work area leaves around it.
+    {
+        RECT around = work;
+        ::InflateRect(&around, reach, reach);
+        ::IntersectRect(&around, &around, &monitor.rcMonitor);
+        if (const auto whole = shoot(around, false); whole.Valid()) CHECK(SavePng(whole, InspectionPath("settings-maximized-whole")));
+    }
+    if (margins.empty()) TEST_NOTE("the work area reaches the screen's edges here: no margin to look at");
+    for (std::size_t i = 0; i < margins.size(); ++i) {
+        for (const bool phase : {false, true}) {
+            const auto& before = bareMargins[i][phase ? 1 : 0];
+            const auto after = shoot(margins[i], phase);
+            REQUIRE(before.Valid());
+            REQUIRE(after.Valid());
+            REQUIRE(before.width == after.width);
+            REQUIRE(before.height == after.height);
+            int differing = 0;
+            for (int y = 0; y < after.height; ++y)
+                for (int x = 0; x < after.width; ++x) {
+                    const auto* a = before.Pixel(x, y);
+                    const auto* b = after.Pixel(x, y);
+                    if (a[0] != b[0] || a[1] != b[1] || a[2] != b[2]) ++differing;
+                }
+            CHECK_EQ(differing, 0);
+        }
+    }
 
     // The region: the visible client, its corners rounded; nothing past the work area.
     RECT bounds{};

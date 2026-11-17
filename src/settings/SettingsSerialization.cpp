@@ -74,6 +74,7 @@ void Fields(S& s, F&& f) {
     f("weather", "refreshMinutes", s.weather.refreshMinutes);
     f("weather", "useWindowsLocation", s.weather.useWindowsLocation);
     f("weather", "windowsLocationConsent", s.weather.windowsLocationConsent);
+    f("weather", "preciseLocation", s.weather.preciseLocation);
     f("updates", "automaticChecks", s.updates.automaticChecks);
     f("updates", "checkIntervalHours", s.updates.checkIntervalHours);
     f("updates", "notifications", s.updates.notifications);
@@ -348,7 +349,7 @@ Result<std::vector<std::string>> Validate(Settings& s) {
         Clamp(s.topBar.topMargin, 0, 100, defaults.topBar.topMargin, warnings, "topMargin");
         Clamp(s.topBar.opacity, 0.30, 1.00, defaults.topBar.opacity, warnings, "topBar.opacity");
         Clamp(s.topBar.height, 24, 48, defaults.topBar.height, warnings, "topBar.height");
-        Clamp(s.weather.refreshMinutes, 15, 180, defaults.weather.refreshMinutes, warnings, "refreshMinutes");
+        Clamp(s.weather.refreshMinutes, 10, 180, defaults.weather.refreshMinutes, warnings, "refreshMinutes");
         Clamp(s.updates.checkIntervalHours, 6, 168, defaults.updates.checkIntervalHours, warnings, "checkIntervalHours");
         Clamp(s.general.animationSpeed, 0.5, 1.5, defaults.general.animationSpeed, warnings, "animationSpeed");
         Clamp(s.general.liquidBlurOpacity, 0.0, 1.0, defaults.general.liquidBlurOpacity, warnings, "liquidBlurOpacity");
@@ -479,6 +480,10 @@ Result<ParsedSettings> FromJson(const json::Value& root) {
         const auto* weather = badGroups.contains("weather") ? nullptr : root.Find("weather");
         if(weather&&!weather->Find("useWindowsLocation")&&parsed.value.weather.latitude)
             parsed.value.weather.useWindowsLocation=false;
+        // D78: a file written before precise location kept the old default refresh, 30 minutes, which shows a reading
+        // up to half an hour old. It takes the new default once; a person's other choice stays.
+        if (weather && !weather->Find("preciseLocation") && parsed.value.weather.refreshMinutes == 30)
+            parsed.value.weather.refreshMinutes = 15;
         MigrateDockMetrics(parsed.value.dock, parsed.warnings);
         for (const char* group : {"dock", "topBar", "weather", "updates", "general", "welcome"}) {
             std::set<std::string> known;

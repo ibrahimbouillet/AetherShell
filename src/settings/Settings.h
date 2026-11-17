@@ -126,9 +126,12 @@ struct WeatherSettings {
     std::optional<double> latitude;   // -90..90
     std::optional<double> longitude;  // -180..180
     TemperatureUnit unit = TemperatureUnit::Celsius;
-    int refreshMinutes = 30;       // 15..180
+    int refreshMinutes = 15;       // 10..180. D78: Open-Meteo's current conditions change every 15 minutes
     bool useWindowsLocation = true; // offered on first use, no OS access until explicit consent
     bool windowsLocationConsent = false; // app opt-in after OS grant; never overrides Windows policy
+    // D78: Windows' location read precisely (about 100 m, as Windows gives it) rather than rounded to 0.1 degree. The
+    // forecast follows the place's own height and surroundings. An absent key (every earlier file) is true.
+    bool preciseLocation = true;
 };
 
 struct UpdateSettings {

@@ -70,7 +70,18 @@ Result<WindowsLocation> CoarsenWindowsLocation(double latitude, double longitude
     if (location.longitude == 0) location.longitude = 0;
     return location; // Geoposition supplies no reliable country; never infer one from coordinates.
 }
+Result<WindowsLocation> RoundPreciseWindowsLocation(double latitude, double longitude) {
+    if (!std::isfinite(latitude) || !std::isfinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180)
+        return MakeError(ErrorCode::InvalidArgument, "Windows location coordinates are invalid");
+    WindowsLocation location;
+    location.latitude = std::round(latitude * 1000) / 1000;
+    location.longitude = std::round(longitude * 1000) / 1000;
+    if (location.latitude == 0) location.latitude = 0;
+    if (location.longitude == 0) location.longitude = 0;
+    return location;
+}
 bool IsWindowsLocationSampleFresh(std::chrono::milliseconds age) noexcept { return age >= 0ms && age <= 30min; }
+bool IsPreciseWindowsLocationSampleFresh(std::chrono::milliseconds age) noexcept { return age >= 0ms && age <= 2min; }
 
 Result<void> BeginWindowsLocationAccess(std::function<void(Result<bool>)> completion) {
     if (!completion) return MakeError(ErrorCode::InvalidArgument, "Location permission needs a completion callback");
@@ -100,7 +111,7 @@ Result<void> BeginWindowsLocationAccess(std::function<void(Result<bool>)> comple
     catch (...) { return MakeError(ErrorCode::Internal, "Windows location permission could not be requested"); }
 }
 
-Result<WindowsLocation> ReadWindowsLocation(bool appConsent, CancellationToken cancellation, std::chrono::milliseconds timeout) {
+Result<WindowsLocation> ReadWindowsLocation(bool appConsent, CancellationToken cancellation, std::chrono::milliseconds timeout, bool precise) {
     try {
         // Every safe unit case returns here, before COM initialization or location discovery.
         if (timeout <= 0ms || timeout > 30s) return MakeError(ErrorCode::InvalidArgument, "Location timeout must be between 1 and 30000 milliseconds");
@@ -118,19 +129,22 @@ Result<WindowsLocation> ReadWindowsLocation(bool appConsent, CancellationToken c
         const auto status=locator.LocationStatus();
         if(status==geo::PositionStatus::Disabled)return MakeError(ErrorCode::AccessDenied,"Windows location is disabled or denied");
         if(status==geo::PositionStatus::NotAvailable)return MakeError(ErrorCode::Unsupported,"Windows location is not available on this device");
-        locator.DesiredAccuracyInMeters(winrt::box_value(std::uint32_t{10000}).as<winrt::Windows::Foundation::IReference<std::uint32_t>>());
+        // D78: precise asks Windows for its best source (Wi-Fi positioning, a receiver) and a recent sample.
+        if (precise) locator.DesiredAccuracy(geo::PositionAccuracy::High);
+        else locator.DesiredAccuracyInMeters(winrt::box_value(std::uint32_t{10000}).as<winrt::Windows::Foundation::IReference<std::uint32_t>>());
         if (cancellation.IsCancelled()) return MakeError(ErrorCode::Cancelled, "Location request cancelled");
-        auto operation = locator.GetGeopositionAsync(30min, timeout);
+        auto operation = locator.GetGeopositionAsync(precise ? std::chrono::minutes(2) : std::chrono::minutes(30), timeout);
         auto position = Await(operation, cancellation, deadline);
         if (!position) return position.error();
         const auto coordinate = position->Coordinate();
         const auto timestamp = coordinate.Timestamp();
         const auto now = winrt::clock::now();
+        const auto age = std::chrono::ceil<std::chrono::milliseconds>(now - timestamp);
         if (timestamp <= winrt::Windows::Foundation::DateTime{} || timestamp > now ||
-            !IsWindowsLocationSampleFresh(std::chrono::ceil<std::chrono::milliseconds>(now - timestamp)))
+            !(precise ? IsPreciseWindowsLocationSampleFresh(age) : IsWindowsLocationSampleFresh(age)))
             return MakeError(ErrorCode::Unavailable, "Windows location is stale or has an invalid timestamp");
         const auto point = coordinate.Point().Position();
-        auto location=CoarsenWindowsLocation(point.Latitude, point.Longitude);
+        auto location = precise ? RoundPreciseWindowsLocation(point.Latitude, point.Longitude) : CoarsenWindowsLocation(point.Latitude, point.Longitude);
         if(!location)return MakeError(ErrorCode::Unavailable,"Windows location coordinates are unavailable");
         return location;
     } catch (const winrt::hresult_error& error) { return LocationError(error.code(), "Windows location could not be read; review location privacy settings"); }

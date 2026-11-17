@@ -585,7 +585,11 @@ void MenuLevel::Apply(POINT origin, SIZE panel) {
     const RECT visual{0, 0, platform::Width(bounds), platform::Height(bounds)};
     SetVisualRegionPx(std::span<const RECT>(&visual, 1));
     const bool highContrast = tokens.mode == graphics::ThemeMode::HighContrast;
-    SetBackdropPanel(panel_, tokens.menu.radius, tokens.transparencyEnabled && !highContrast, tokens.glass.backdropOpacity);
+    // D79: with Liquid chosen, the menu is Liquid's regular glass too.
+    const bool blur = tokens.transparencyEnabled && !highContrast;
+    const bool glass = blur && tokens.liquid;
+    SetBackdropPanel(panel_, tokens.menu.radius, blur, glass ? tokens.liquidGlass.blurOpacity : tokens.glass.backdropOpacity,
+                     glass ? &tokens.liquidGlass : nullptr);
     scroll_.SnapTo(0.0f);
     UpdateArrows(false);
     Invalidate();
@@ -985,14 +989,16 @@ void MenuLevel::OnRender(const RenderContext& context) {
     const auto& tokens = controller_.Tokens();
     const auto& menu = tokens.menu;
     dc->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
-    graphics::GlassStyle style;
-    style.cornerRadius = menu.radius;
-    style.opacity = kPanelOpacity;
-    style.neutral = true;
-    style.highlight = false;
-    style.elevation = graphics::Elevation::Popup;
-    style.backdropBlur = BackdropBlurActive();
-    graphics::PaintGlassPanel(dc, panel_, tokens, style);
+    if (!(tokens.liquid && BackdropGlassActive() && PaintLiquidPanel(context, panel_, menu.radius, 0.6f))) {
+        graphics::GlassStyle style;
+        style.cornerRadius = menu.radius;
+        style.opacity = kPanelOpacity;
+        style.neutral = true;
+        style.highlight = false;
+        style.elevation = graphics::Elevation::Popup;
+        style.backdropBlur = BackdropBlurActive();
+        graphics::PaintGlassPanel(dc, panel_, tokens, style);
+    }
 
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     if (FAILED(dc->CreateSolidColorBrush(tokens.textPrimary.ToD2D(), brush.put())) || !brush) return;

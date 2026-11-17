@@ -384,14 +384,20 @@ void SearchWindow::OnRender(const aether::ui::RenderContext& context) {
     auto* dc = context.d2d;
     const bool highContrast = tokens_.mode == graphics::ThemeMode::HighContrast;
     const auto panel = PanelDip();
-    SetBackdropPanel(panel, tokens_.radii.popup, tokens_.transparencyEnabled && !highContrast, tokens_.glass.backdropOpacity);
-    graphics::GlassStyle style;
-    style.cornerRadius = tokens_.radii.popup;
-    style.backdropBlur = BackdropBlurActive();
-    style.elevation = graphics::Elevation::Popup;
-    style.neutral = true;      // FR-037: one neutral material; no directional sheen on any side
-    style.highlight = false;
-    graphics::PaintGlassPanel(dc, panel, tokens_, style);
+    // D79: Liquid's regular glass under its light when Liquid is chosen, Grain's frosted glass otherwise.
+    const bool blur = tokens_.transparencyEnabled && !highContrast;
+    const bool wantGlass = blur && tokens_.liquid;
+    SetBackdropPanel(panel, tokens_.radii.popup, blur, wantGlass ? tokens_.liquidGlass.blurOpacity : tokens_.glass.backdropOpacity,
+                     wantGlass ? &tokens_.liquidGlass : nullptr);
+    if (!(wantGlass && BackdropGlassActive() && PaintLiquidPanel(context, panel, tokens_.radii.popup, 0.6f))) {
+        graphics::GlassStyle style;
+        style.cornerRadius = tokens_.radii.popup;
+        style.backdropBlur = BackdropBlurActive();
+        style.elevation = graphics::Elevation::Popup;
+        style.neutral = true;      // FR-037: one neutral material; no directional sheen on any side
+        style.highlight = false;
+        graphics::PaintGlassPanel(dc, panel, tokens_, style);
+    }
     winrt::com_ptr<ID2D1SolidColorBrush> brush;
     dc->CreateSolidColorBrush(tokens_.textPrimary.ToD2D(), brush.put());
     if (!brush) return;

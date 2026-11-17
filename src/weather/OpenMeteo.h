@@ -18,6 +18,7 @@
 #include "core/Http.h"
 #include "core/Result.h"
 #include "status/StatusTypes.h"
+#include "weather/Forecast.h"
 #include "weather/WeatherTypes.h"
 
 #include <chrono>
@@ -99,5 +100,24 @@ struct CurrentConditions {
 
 // "Retry-After" as delta-seconds (0..86400); the HTTP-date form is not supported.
 [[nodiscard]] std::optional<std::chrono::seconds> ParseRetryAfter(const net::HttpResponse& response);
+
+// D78: the weather window's request: current details, kForecastHours hours from the current hour
+// and kForecastDays days, in the place's time zone. Wind is in km/h, or mph with Fahrenheit.
+// Verified against the live API on 2026-11-16 (Paris): forecast_hours counts from the current hour.
+[[nodiscard]] std::string BuildDetailedForecastUrl(double latitude, double longitude, status::TemperatureUnit unit);
+
+// Strict where the window depends on a value (current temperature/code/day, each hour's and day's
+// temperature and code, the times); optional details that are null or missing stay unset. Hours or
+// days with an invalid entry are dropped rather than shown wrong. Errors as ParseForecast.
+[[nodiscard]] Result<DetailedForecast> ParseDetailedForecast(std::string_view body, status::TemperatureUnit unit);
+
+// D78: current temperature, code and day flag of up to kMaxForecastPoints places in one request
+// (comma-separated coordinate lists; the provider answers with one object per place, in order).
+[[nodiscard]] std::string BuildPointsUrl(const std::vector<GeoPoint>& points, status::TemperatureUnit unit);
+
+// An array of per-place objects, or a single object for one place. A place whose values are
+// missing or implausible is left out; the rest keep their request index.
+[[nodiscard]] Result<std::vector<PointReading>> ParsePoints(std::string_view body, status::TemperatureUnit unit,
+                                                            std::size_t requested);
 
 }  // namespace aether::weather::openmeteo

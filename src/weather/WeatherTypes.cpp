@@ -66,6 +66,18 @@ std::string_view ToString(status::WeatherState state) noexcept {
     return "unknown";
 }
 
+long RoundTemperature(double value) noexcept {
+    if (!std::isfinite(value)) return 0;
+    const long rounded = std::lround(value);
+    return rounded == 0 ? 0 : rounded;
+}
+
+std::wstring FormatTemperature(double value, status::TemperatureUnit unit, bool withUnit) {
+    std::wstring text = std::to_wstring(RoundTemperature(value)) + L"°";
+    if (withUnit) text += unit == status::TemperatureUnit::Fahrenheit ? L"F" : L"C";
+    return text;
+}
+
 std::string_view ToString(status::TemperatureUnit unit) noexcept {
     return unit == status::TemperatureUnit::Fahrenheit ? "fahrenheit" : "celsius";
 }

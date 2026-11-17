@@ -104,6 +104,9 @@ public:
     // Emitted after the Top Bar model/render update, allowing listeners to destroy the surface.
     Signal<> AudioObservedChanged;
     Signal<RECT> QuickControlsRequested;
+    // D78: the weather item opens Aether Shell's weather window below it (its screen bounds, physical
+    // pixels); its menu's "Weather settings…" stays WeatherRequested.
+    Signal<RECT> WeatherPanelRequested;
     Signal<> RevealWindowsTaskbarRequested, ResumeTaskbarReplacementRequested;
     Signal<bool> FullscreenChanged;
 

@@ -633,7 +633,10 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     auto hiddenConnection = window.HiddenIconsRequested.Connect([&](RECT anchor) {
         ++hiddenIcons; hiddenAnchor = anchor; wrongThread |= ::GetCurrentThreadId() != uiThread;
     });
-    auto weatherConnection = window.WeatherRequested.Connect([&] { ++weather; wrongThread |= ::GetCurrentThreadId() != uiThread; });
+    RECT weatherAnchor{};
+    auto weatherConnection = window.WeatherPanelRequested.Connect([&](RECT anchor) {
+        ++weather; weatherAnchor = anchor; wrongThread |= ::GetCurrentThreadId() != uiThread;
+    });
     window.Show(false); RunFor(loop, 100);
     const auto click = [&](ItemKind kind) {
         const auto found = std::find_if(window.Items().begin(), window.Items().end(), [kind](const auto& item) { return item.item.kind == kind; });
@@ -645,6 +648,10 @@ AETHER_TEST("topbar integration: pointer keyboard and MTA UIA emit only injected
     };
     click(ItemKind::Keyboard); click(ItemKind::Network); click(ItemKind::Weather);
     CHECK_EQ(keyboard, 1); CHECK_EQ(network, 1); CHECK_EQ(weather, 1);
+    // D78: the weather window drops from the item: its anchor is the item's screen rectangle.
+    const RECT bar = window.BoundsPx();
+    CHECK(weatherAnchor.left >= bar.left); CHECK(weatherAnchor.right <= bar.right); CHECK(weatherAnchor.right > weatherAnchor.left);
+    CHECK(weatherAnchor.top >= bar.top); CHECK(weatherAnchor.bottom <= bar.bottom);
     ::SendMessageW(window.Handle(), WM_KEYDOWN, VK_HOME, 0);
     // Weather, the hidden-icons chevron (D45), the input language and the network, in reading order.
     for (int index = 0; index < 4; ++index) {

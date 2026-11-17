@@ -14,7 +14,11 @@ the actual read remains subject to OS permission. No worker/startup path request
 `ReadWindowsLocation` is serial MTA worker work, uses a requested 10-km accuracy and returns only
 0.1-degree rounded coordinates. It requests a cache age of 30 minutes and independently validates
 the returned timestamp, since Windows can exceed the requested cache age depending on accuracy.
-Future/stale/invalid readings remain unavailable. Country stays unknown: no city/country, coordinates
+With `precise` (D78, Settings' *Precise location*, the default) the read asks Windows for its best accuracy, accepts a
+sample at most two minutes old (`IsPreciseWindowsLocationSampleFresh`) and rounds to 0.001 degree, about 100 m
+(`RoundPreciseWindowsLocation`, the same validation as `CoarsenWindowsLocation`). How precise the fix really is depends
+on what Windows knows (Wi-Fi, GPS or only a coarse source); the coordinates are still never logged or written to the
+settings file. Future/stale/invalid readings remain unavailable. Country stays unknown: no city/country, coordinates
 or fallback place is invented. The weather provider keeps its normal local forecast cache, whose
 location key contains the rounded coordinates; those automatic coordinates are not written to the
 settings file. There is no IP/SSID lookup, reverse geocoder or coordinate logging.
@@ -30,6 +34,6 @@ or privacy-setting changes are attempted. No successful real location has been c
 Sources: [Windows location guidance](https://learn.microsoft.com/windows/apps/develop/maps-and-location/get-location),
 [RequestAccessAsync](https://learn.microsoft.com/uwp/api/windows.devices.geolocation.geolocator.requestaccessasync),
 [GetGeopositionAsync](https://learn.microsoft.com/uwp/api/windows.devices.geolocation.geolocator.getgeopositionasync).
-Pure unit cases cover coarse rounding, invalid coordinates, freshness and admission failures;
+Pure unit cases cover coarse and precise rounding, invalid coordinates, both freshness limits and admission failures;
 valid runtime/location reads and real consent are never invoked by tests. Compilation and test results
 must be recorded separately in TEST_STATUS/HANDOFF.

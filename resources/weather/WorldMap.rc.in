@@ -1,0 +1,5 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 Ibrahim Bouillet
+//
+// D78: the weather window's offline map (public-domain Natural Earth data), configured per target by CMake.
+AETHER_WORLD_MAP RCDATA "@AETHER_WORLD_MAP_FILE@"

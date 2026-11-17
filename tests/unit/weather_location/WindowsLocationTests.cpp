@@ -38,6 +38,23 @@ AETHER_TEST("weather location: only nonfuture samples at most thirty minutes old
     CHECK(IsWindowsLocationSampleFresh(30min));CHECK_FALSE(IsWindowsLocationSampleFresh(30min+1ms));
 }
 
+AETHER_TEST("weather location: a precise position keeps about a hundred metres and the same validation (D78)"){
+    for(const auto [latitude,longitude]:{std::pair{48.85661,2.35222},std::pair{-33.86882,151.20929},std::pair{90.0,-180.0}}){
+        auto value=RoundPreciseWindowsLocation(latitude,longitude);REQUIRE(value.ok());
+        CHECK_NEAR(value->latitude,std::round(latitude*1000)/1000,0.0000001);
+        CHECK_NEAR(value->longitude,std::round(longitude*1000)/1000,0.0000001);
+        CHECK_FALSE(value->country.has_value());
+    }
+    const auto zero=RoundPreciseWindowsLocation(-0.0001,-0.0001);REQUIRE(zero.ok());
+    CHECK_FALSE(std::signbit(zero->latitude));CHECK_FALSE(std::signbit(zero->longitude));
+    const auto nan=std::numeric_limits<double>::quiet_NaN();
+    ExpectError(RoundPreciseWindowsLocation(nan,0.0),ErrorCode::InvalidArgument);
+    ExpectError(RoundPreciseWindowsLocation(0.0,180.01),ErrorCode::InvalidArgument);
+    // A precise sample describes where the device is now: two minutes at most, never from the future.
+    CHECK_FALSE(IsPreciseWindowsLocationSampleFresh(-1ms));CHECK(IsPreciseWindowsLocationSampleFresh(0ms));
+    CHECK(IsPreciseWindowsLocationSampleFresh(2min));CHECK_FALSE(IsPreciseWindowsLocationSampleFresh(2min+1ms));
+}
+
 AETHER_TEST("weather location: absent app consent fails before any runtime or device call"){
     ExpectError(ReadWindowsLocation(false),ErrorCode::AccessDenied);
     ExpectError(BeginWindowsLocationAccess({}),ErrorCode::InvalidArgument);

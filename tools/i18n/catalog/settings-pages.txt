@@ -1068,16 +1068,16 @@ ar: يستخدم خدمة الموقع في Windows بعد أن تسمح بذل�
 bn: আপনি অনুমতি দেওয়ার পর Windows লোকেশন সার্ভিস ব্যবহার করে।
 ur: آپ کی اجازت کے بعد Windows کی لوکیشن سروس استعمال کرتا ہے۔
 
-en: Windows asks for location permission. Approximate coordinates are sent to Open-Meteo.com; a coarse location key is cached locally. If location is blocked, weather is unavailable.
-fr: Windows demande l'autorisation d'accéder à la position. Des coordonnées approximatives sont envoyées à Open-Meteo.com ; une clé de position grossière est gardée en cache localement. Si la localisation est bloquée, la météo n'est pas disponible.
-es: Windows pide permiso de ubicación. Se envían coordenadas aproximadas a Open-Meteo.com; se guarda localmente una clave de ubicación aproximada. Si la ubicación está bloqueada, el tiempo no está disponible.
-zh: Windows 会请求定位权限。大致坐标会发送到 Open-Meteo.com；粗略的位置标识会缓存在本地。如果定位被阻止，则无法显示天气。
-hi: Windows स्थान की अनुमति माँगता है। अनुमानित निर्देशांक Open-Meteo.com को भेजे जाते हैं; एक मोटा स्थान-कुंजी स्थानीय रूप से कैश की जाती है। अगर स्थान अवरुद्ध है, तो मौसम उपलब्ध नहीं है।
-pt: O Windows pede permissão de localização. Coordenadas aproximadas são enviadas ao Open-Meteo.com; uma chave de localização aproximada é armazenada em cache localmente. Se a localização estiver bloqueada, o clima não estará disponível.
-ru: Windows запрашивает разрешение на доступ к расположению. Приблизительные координаты отправляются на Open-Meteo.com; грубый ключ расположения кэшируется локально. Если доступ к расположению заблокирован, погода недоступна.
-ar: يطلب Windows إذن الموقع. تُرسل إحداثيات تقريبية إلى Open-Meteo.com؛ ويُخزَّن مفتاح موقع تقريبي مؤقتًا على جهازك. إذا كان الموقع محظورًا فإن الطقس غير متاح.
-bn: Windows লোকেশনের অনুমতি চায়। আনুমানিক স্থানাঙ্ক Open-Meteo.com-এ পাঠানো হয়; একটি মোটামুটি লোকেশন কী স্থানীয়ভাবে ক্যাশ করা হয়। লোকেশন ব্লক করা থাকলে আবহাওয়া অনুপলব্ধ।
-ur: Windows لوکیشن کی اجازت مانگتا ہے۔ تقریبی نقاط Open-Meteo.com کو بھیجے جاتے ہیں؛ ایک موٹی لوکیشن کلید مقامی طور پر کیش کی جاتی ہے۔ اگر لوکیشن بلاک ہو تو موسم دستیاب نہیں۔
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+fr: Windows demande l'autorisation d'accéder à la position. Vos coordonnées sont envoyées à Open-Meteo.com uniquement pour obtenir la prévision ; une clé de position est gardée en cache localement. Si la localisation est bloquée, la météo n'est pas disponible.
+es: Windows pide permiso de ubicación. Tus coordenadas se envían a Open-Meteo.com solo para obtener el pronóstico; se guarda localmente una clave de ubicación. Si la ubicación está bloqueada, el tiempo no está disponible.
+zh: Windows 会请求定位权限。你的坐标仅为获取预报而发送到 Open-Meteo.com；位置标识会缓存在本地。如果定位被阻止，则无法显示天气。
+hi: Windows स्थान की अनुमति माँगता है। आपके निर्देशांक केवल पूर्वानुमान पाने के लिए Open-Meteo.com को भेजे जाते हैं; एक स्थान-कुंजी स्थानीय रूप से कैश की जाती है। अगर स्थान अवरुद्ध है, तो मौसम उपलब्ध नहीं है।
+pt: O Windows pede permissão de localização. Suas coordenadas são enviadas ao Open-Meteo.com apenas para obter a previsão; uma chave de localização é armazenada em cache localmente. Se a localização estiver bloqueada, o clima não estará disponível.
+ru: Windows запрашивает разрешение на доступ к расположению. Ваши координаты отправляются на Open-Meteo.com только для получения прогноза; ключ расположения кэшируется локально. Если доступ к расположению заблокирован, погода недоступна.
+ar: يطلب Windows إذن الموقع. تُرسل إحداثياتك إلى Open-Meteo.com فقط للحصول على التوقعات؛ ويُخزَّن مفتاح موقع مؤقتًا على جهازك. إذا كان الموقع محظورًا فإن الطقس غير متاح.
+bn: Windows লোকেশনের অনুমতি চায়। আপনার স্থানাঙ্ক শুধু পূর্বাভাস পাওয়ার জন্য Open-Meteo.com-এ পাঠানো হয়; একটি লোকেশন কী স্থানীয়ভাবে ক্যাশ করা হয়। লোকেশন ব্লক করা থাকলে আবহাওয়া অনুপলব্ধ।
+ur: Windows لوکیشن کی اجازت مانگتا ہے۔ آپ کے نقاط صرف پیشگوئی حاصل کرنے کے لیے Open-Meteo.com کو بھیجے جاتے ہیں؛ ایک لوکیشن کلید مقامی طور پر کیش کی جاتی ہے۔ اگر لوکیشن بلاک ہو تو موسم دستیاب نہیں۔
 
 en: Use &Windows location
 fr: Utiliser la position &Windows

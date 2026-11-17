@@ -111,6 +111,78 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D80 — A maximized Settings window: only its own frame, flush with the work area
+
+Owner, 2026-11-16, with a screenshot of the maximized Settings window: its edges were badly drawn; the page should fit the
+screen and sit against its edge. Cause: maximized, the form draws its own rounded frame over the visible client, but DWM was
+still asked to round and border the window. DWM rounds and borders the *whole* window, hidden resize border included, and
+that border lies on screen wherever the work area stops short of the monitor (Aether's side margins in replacement mode,
+the Top Bar): a second outline around the page.
+
+- **Now:** while the form is framed (maximized), DWM is asked for no corner (`DWMWCP_DONOTROUND`) and no border
+  (`DWMWA_COLOR_NONE`); a normal window keeps D45's rounded corner and neutral rim. High contrast keeps the system's.
+- **Test:** `tests/integration/settings_ui/SettingsDesignTests.cpp` maximizes the window and checks that the bands just
+  outside the work area show exactly what lies behind it, with a capture for inspection.
+
+FR-037, T47. Evidence: TEST_STATUS S-078.
+
+### D79 — Liquid everywhere: one material for every Aether surface (amends D66, D67)
+
+Owner, 2026-11-16: when Liquid is chosen, all of Settings and the weather page must be Liquid; Grain means everything is
+Grain; "agrandir le liquide". Read as: extend Liquid to every surface Aether draws, not to make any surface larger.
+
+- **The compositor's glass (D66) on every panel:** the Control Center, Search, the menus (`GlassMenu`), the Dock's window
+  previews and the weather window now ask for the same host-glass backdrop as the bars, with `LiquidGlassTokens`, and paint
+  the glass's light (`PaintLiquidPanel`, in window DIPs, before any scale) instead of the grain. Where the compositor
+  refuses the effect, without transparency or in high contrast, each falls back to Grain as before. A theme change
+  re-applies the backdrop of a panel that is open.
+- **Settings has a Liquid look, not the compositor's glass:** it is a real top-level window with its own Mica/Acrylic
+  backdrop; host glass is only available to Aether's composition surfaces. In Liquid the page's tint is lighter (×0.7 over
+  Acrylic), without noise, with a soft top sheen and a light rim; cards become lenses (a faint white fill and a rim).
+  Grain keeps D41's grained page and cards.
+- **Unchanged:** tooltips stay opaque, so their small text reads over anything. `appTokens.liquid` is false in high
+  contrast; the Top Bar and the Dock keep D66/D67's rendering.
+
+FR-037, T47, T61; NFR-002 (no idle frames), NFR-007. Evidence: TEST_STATUS S-078.
+
+### D78 — The weather, precise and animated, and its own window
+
+Owner, 2026-11-16: a more precise weather, an animated icon for every weather (rain that falls, a sun whose rays turn),
+fluid hover in the Top Bar where the icon stays grey; and "our own weather page", opened from the Top Bar and from Settings:
+rounded, a large animated colour illustration, the forecast ("Thursday, 13 degrees"), the sun's arc, a yellow sun, a sky
+that is night blue in the evening and light blue in the morning, a map of the person's position and of the country with its
+temperatures, another city or country on request, location permission (directly or through Settings), the time and part of
+the day. Natural Earth data downloaded with the owner's approval the same day.
+
+- **Precision:** with Settings › Weather › *Precise location* (on by default, an absent key is true), Windows is asked for
+  its best accuracy, the sample must be at most two minutes old and coordinates are rounded to 0.001 degree (about 100 m)
+  instead of 0.1 degree (10 km, 30 minutes). Open-Meteo then uses the place's own height. Temperatures are rounded half away
+  from zero (12.5 → 13, never "-0°"). The default refresh is 15 minutes (Open-Meteo's current values change every 15),
+  minimum 10; a settings file from before this change that kept the old default, 30, takes 15 once.
+- **The illustrations:** `graphics::PaintWeatherArt` draws every WMO code group, by day and by night (clear, partly cloudy,
+  cloudy, fog, drizzle, rain, freezing rain, snow, showers, thunder), in Monochrome (the Top Bar's grey) or Colour (a yellow
+  sun, blue rain, the window), with motion: rain and snow fall, the rays turn, clouds drift, lightning flashes. In the Top
+  Bar it moves only while the pointer is over the weather item (a third of a second to start and to settle); each step
+  redraws only the icon's rectangle (`SurfaceWindow::LimitAnimationFrameTo`). Reduced motion and high contrast keep it still.
+- **The window (`weather/ui/WeatherWindow`):** a click on the Top Bar's weather item opens it below the item (its context
+  menu keeps *Weather settings…*); Settings › Weather › *Open the weather* opens it centred. The hero shows the place, its
+  local time and part of the day over a sky that follows the hour (night blue, dawn, light blue, dusk), the large colour
+  illustration, the temperature and the feeling; then 24 hours, 7 days with range bars, a map (the country with the current
+  temperature of up to 24 of its largest places, a dot for the person's own position or a pin for a chosen city, a
+  temperature layer), and
+  tiles: feels like, humidity, wind with its direction, sunrise and sunset with the sun on its arc, UV index, pressure. A
+  city search (Open-Meteo's geocoding, 350 ms after typing) and *My location*; a banner asks for location (Windows' own
+  prompt, or Windows' location settings) and says when the position is approximate, blocked or unavailable.
+- **Rules kept:** requests and map decoding run on a two-thread worker pool, never the UI thread; the window draws no frame
+  while idle, its animations run only while it is shown and stop with reduced motion; Escape and a click elsewhere close it;
+  every text and control is in the UI Automation tree; Grain, Liquid (D79) and high contrast; ten languages.
+- **Data:** one Open-Meteo request for the details (`current`, 25 `hourly`, 7 `daily`, `timezone=auto`) and one for the
+  map's places (comma-separated coordinates). The map is Natural Earth (public domain), baked into `world-map.bin` (530 KB,
+  country names in the ten languages) by `tools/world-map/make_world_map.py`, a Windows resource of the application. No new
+  library. Coordinates go to Open-Meteo only and are never logged.
+
+FR-010, T34, T61; NFR-002, NFR-007. Evidence: TEST_STATUS S-078. Not seen by the owner yet.
+
 ### D77 — Test 4.7 confirmed by the owner; no frame pacing on the display's refresh grid
 
 Owner, 2026-11-16, after using test 4.7 (installed 2026-11-13, running since): "Je confirme la 4.7". This is the owner's

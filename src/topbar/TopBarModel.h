@@ -49,6 +49,7 @@ struct DisplayItem {
     status::PowerSource powerSource = status::PowerSource::Unknown;
     status::ChargeState charge = status::ChargeState::Unknown;
     weather::WeatherGlyph weatherGlyph = weather::WeatherGlyph::Unknown;
+    std::optional<int> weatherCode;   // D78: the WMO code, for the condition's own animated illustration
     std::optional<bool> isDay;
     std::optional<bool> lowOrCritical;
     std::vector<DisplayItem> components; // grouped real network/audio/battery status, no synthetic readings

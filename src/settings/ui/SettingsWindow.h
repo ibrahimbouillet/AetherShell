@@ -55,6 +55,7 @@ struct SettingsCallbacks {
     std::function<void()> importTaskbarPins;
     std::function<std::wstring()> taskbarStatus;
     std::function<void()> requestWindowsLocation, openLocationSettings;
+    std::function<void()> openWeather;   // D78: the weather window; null shows no button
     std::function<std::wstring()> weatherLocationStatus;
     // Optional display-refresh pacing for hover/page/indicator motion; null uses a short timer.
     graphics::FrameScheduler* scheduler = nullptr;

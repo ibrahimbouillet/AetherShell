@@ -60,8 +60,10 @@ constexpr DWORD kBackdropTransient = 3;
 constexpr DWORD kDwmCornerPreference = 33;
 constexpr DWORD kDwmBorderColor = 34;
 constexpr DWORD kCornerDefault = 0;
+constexpr DWORD kCornerNone = 1;  // DWMWCP_DONOTROUND
 constexpr DWORD kCornerRound = 2;
 constexpr DWORD kDwmColorDefault = 0xFFFFFFFFu;
+constexpr DWORD kDwmColorNone = 0xFFFFFFFEu;  // DWMWA_COLOR_NONE: no border at all
 // oleacc.h declares these GUIDs without defining them unless INITGUID is set; keep local copies.
 constexpr GUID kClsidAccPropServices = {0xb5f8350b, 0x0548, 0x48b1, {0xa6, 0xee, 0x88, 0xbd, 0x00, 0xb4, 0xa5, 0xe7}};
 constexpr GUID kPropIdAccHelp = {0xc831e11f, 0x44db, 0x4a99, {0x97, 0x68, 0xcb, 0x8f, 0x97, 0x8b, 0x72, 0x31}};
@@ -647,10 +649,15 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             const DWORD type = material == FormMaterial::Acrylic ? kBackdropTransient : kBackdropNone;
             ::DwmSetWindowAttribute(window, kDwmSystemBackdropType, &type, sizeof(type));
         }
-        // D45: a normal window is rounded by DWM with a thin neutral rim (DWM draws neither while the
-        // window is maximized; the form's own frame takes over then). High contrast keeps the system's.
-        const DWORD corner = material == FormMaterial::Native ? kCornerDefault : kCornerRound;
-        const DWORD border = material == FormMaterial::Native ? kDwmColorDefault : tokens.form.windowRim.ToColorRef();
+        // D45: a normal window is rounded by DWM with a thin neutral rim. Maximized, the form's own frame takes
+        // over (the owner's rounded region over the visible client), and DWM must draw nothing: asked to round,
+        // it rounds and borders the whole window, hidden resize border included, which lies on screen wherever the
+        // work area stops short of it (Aether's side margins): a second outline around the window. High contrast
+        // keeps the system's.
+        const DWORD corner = material == FormMaterial::Native ? kCornerDefault : Framed() ? kCornerNone : kCornerRound;
+        const DWORD border = material == FormMaterial::Native ? kDwmColorDefault
+                           : Framed()                         ? kDwmColorNone
+                                                              : tokens.form.windowRim.ToColorRef();
         (void)::DwmSetWindowAttribute(window, kDwmCornerPreference, &corner, sizeof(corner));
         (void)::DwmSetWindowAttribute(window, kDwmBorderColor, &border, sizeof(border));
         platform::ApplyImmersiveDarkMode(window, tokens.mode == graphics::ThemeMode::Dark);

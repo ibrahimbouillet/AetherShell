@@ -21,7 +21,11 @@ struct WindowsLocation {
 // Pure coordinate validation and coarse 0.1-degree rounding. Unknown coordinates are errors,
 // never a default city or zero reading. No geolocation or network API is called.
 [[nodiscard]] Result<WindowsLocation> CoarsenWindowsLocation(double latitude, double longitude);
+// D78: the same validation with 0.001-degree rounding (about 100 m), for the person's precise-location choice.
+[[nodiscard]] Result<WindowsLocation> RoundPreciseWindowsLocation(double latitude, double longitude);
 [[nodiscard]] bool IsWindowsLocationSampleFresh(std::chrono::milliseconds age) noexcept;
+// D78: a precise sample is used only while it describes where the device is now (two minutes).
+[[nodiscard]] bool IsPreciseWindowsLocationSampleFresh(std::chrono::milliseconds age) noexcept;
 
 // UI STA and foreground only, directly after a first-use/Settings click explaining that coarse
 // coordinates go to the weather service. Never blocks. The callback can run on a completion thread;
@@ -32,9 +36,11 @@ struct WindowsLocation {
 // result and may persist across launches. It is not OS permission: policy/status is checked afresh,
 // and denied/revoked access remains an error. A fresh default preference cannot count as consent.
 // This method never calls a permission-request API. Coordinates are rounded to 0.1 degree,
-// sampled at requested 10-km accuracy and rejected when older than 30 minutes. Windows policy/device
-// or unpackaged-desktop restrictions stay errors. No IP/SSID lookup, logs, storage or reverse geocoder.
+// sampled at requested 10-km accuracy and rejected when older than 30 minutes. With `precise` (D78) Windows is
+// asked for its best accuracy, the sample must be at most two minutes old and coordinates are rounded to
+// 0.001 degree. Windows policy/device or unpackaged-desktop restrictions stay errors. No IP/SSID lookup, logs,
+// storage or reverse geocoder.
 [[nodiscard]] Result<WindowsLocation> ReadWindowsLocation(bool appConsent,
-    CancellationToken cancellation = {}, std::chrono::milliseconds timeout = std::chrono::seconds(10));
+    CancellationToken cancellation = {}, std::chrono::milliseconds timeout = std::chrono::seconds(10), bool precise = false);
 
 } // namespace aether::weather

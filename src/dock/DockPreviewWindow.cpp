@@ -246,8 +246,11 @@ void DockPreviewWindow::Layout() {
     SetBoundsPx(bounds);  // may deliver WM_DPICHANGED; the guard defers that relayout to here
     laying_ = false;
     // Aether's neutral translucent material: the blurred backdrop under the whole card.
-    SetBackdropPanel(D2D1::RectF(0, 0, layout_.card.width, layout_.card.height), CornerRadius(),
-        tokens_.transparencyEnabled && tokens_.mode != graphics::ThemeMode::HighContrast, tokens_.glass.backdropOpacity);
+    // D79: with Liquid chosen, Liquid's regular glass.
+    const bool blur = tokens_.transparencyEnabled && tokens_.mode != graphics::ThemeMode::HighContrast;
+    const bool glass = blur && tokens_.liquid;
+    SetBackdropPanel(D2D1::RectF(0, 0, layout_.card.width, layout_.card.height), CornerRadius(), blur,
+        glass ? tokens_.liquidGlass.blurOpacity : tokens_.glass.backdropOpacity, glass ? &tokens_.liquidGlass : nullptr);
     if (Dpi() != layoutDpi_ && Dpi() == platform::DpiForPoint(center)) { Layout(); return; }
     UpdateThumbnails(opacity_.Value(graphics::FrameScheduler::Now()));
 }
@@ -408,15 +411,17 @@ void DockPreviewWindow::OnRender(const ui::RenderContext& context) {
     const D2D1_RECT_F card{0, 0, layout_.card.width, layout_.card.height};
     // DWM composes the live thumbnails above this window's visuals (verified with own windows, S-041),
     // so the glass is painted beneath them and nothing here may overlap a thumbnail rectangle.
-    graphics::GlassStyle glass;
-    glass.cornerRadius = CornerRadius();
-    glass.opacity = glassOpacity_;
-    glass.backdropBlur = BackdropBlurActive();
-    glass.shadow = false;  // the window is exactly the card: no margin over other applications
-    glass.elevation = graphics::Elevation::Popup;
-    glass.neutral = true;
-    glass.highlight = false;
-    graphics::PaintGlassPanel(d2d, card, tokens_, glass);
+    if (!(tokens_.liquid && BackdropGlassActive() && PaintLiquidPanel(context, card, CornerRadius(), 0.0f))) {
+        graphics::GlassStyle glass;
+        glass.cornerRadius = CornerRadius();
+        glass.opacity = glassOpacity_;
+        glass.backdropBlur = BackdropBlurActive();
+        glass.shadow = false;  // the window is exactly the card: no margin over other applications
+        glass.elevation = graphics::Elevation::Popup;
+        glass.neutral = true;
+        glass.highlight = false;
+        graphics::PaintGlassPanel(d2d, card, tokens_, glass);
+    }
 
     const bool contrast = tokens_.mode == graphics::ThemeMode::HighContrast;
     winrt::com_ptr<ID2D1SolidColorBrush> primary, secondary, disabled, onFill, closeFill, placeholder;

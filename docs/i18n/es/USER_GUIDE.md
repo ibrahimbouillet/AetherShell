@@ -67,6 +67,17 @@ ubicación ni previsión. La búsqueda manual de un lugar envía el nombre escri
 coordenadas aproximadas elegidas. La ubicación nunca se deduce del nombre de una red Wi-Fi ni de una dirección IP. Las
 previsiones en caché desaparecen a las seis horas. Atribución de los datos: Open-Meteo.com, CC BY 4.0.
 
+**La ventana del tiempo** (Alpha 4): haz clic en el tiempo de la Top Bar (su menú del clic derecho conserva
+**Configuración del tiempo…**) o en Configuración → Tiempo → **Abrir el tiempo**. Muestra el lugar, su hora local y el
+cielo de esa hora, la temperatura y la sensación térmica, las próximas 24 horas, 7 días, el arco del sol, la humedad,
+el viento, el UV y la presión, y un mapa del país con sus temperaturas actuales. Busca otra ciudad o elige **Mi
+ubicación**; si la ubicación aún no está permitida, la ventana se la pide a Windows o abre su configuración de
+ubicación. **Ubicación precisa** (activada de forma predeterminada) usa la posición de Windows con unos 100 m de
+precisión; desactivada, se redondea a unos 10 km. El icono del tiempo de la Top Bar solo se mueve bajo el puntero. El
+mapa procede de Natural Earth (dominio público) y se guarda en la aplicación. Con **Liquid** elegido en Apariencia, la
+ventana del tiempo, la Configuración rápida, la Búsqueda, los menús y las vistas previas del Dock son de cristal como
+las barras, y la Configuración adopta un aspecto Liquid; con **Grain**, todos son granulados.
+
 General reúne el consentimiento de inicio, las preferencias de movimiento y la edición de atajos. Una instalación
 interactiva nueva (desde la Alpha 2) marca de forma visible el inicio al iniciar sesión; desmarca esa opción antes de
 instalar para rechazarlo. Se conservan las elecciones existentes. La instalación silenciosa requiere la opción de inicio
