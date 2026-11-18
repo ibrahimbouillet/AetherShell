@@ -790,6 +790,111 @@ AETHER_TEST("settings design: pages render on the form material over a private b
     window.Close();
 }
 
+// D81: Liquid's light belongs to the window. Each part of Settings that is a window of its own (the title strip's label,
+// the navigation, the scrolling page, a switch row, the status line) repaints its own piece of the scene; the rim of
+// light and the sheen were placed on that piece, so every part was outlined in white with its own sheen restarting.
+// Down a column the private backdrop is one colour, so the window's material may only change smoothly there.
+namespace {
+HWND ChildOfClass(HWND parent, const wchar_t* className) {
+    struct Find { const wchar_t* name; HWND found; } find{className, nullptr};
+    ::EnumChildWindows(parent, [](HWND child, LPARAM parameter) -> BOOL {
+        auto& f = *reinterpret_cast<Find*>(parameter);
+        wchar_t name[64]{};
+        ::GetClassNameW(child, name, 64);
+        if (::IsWindowVisible(child) && ::lstrcmpiW(name, f.name) == 0) { f.found = child; return FALSE; }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&find));
+    return find.found;
+}
+// The largest step between two neighbouring rows down the 16 columns from `x`, from `top` to `bottom` (capture pixels).
+// Each row is averaged over those columns: Windows' acrylic carries a fine noise of its own (several levels from pixel to
+// pixel in dark mode), while a rim is a whole line.
+int LargestStepDown(const Capture& capture, int x, int top, int bottom) {
+    constexpr int kSpan = 16;
+    const auto row = [&](int y, int c) {
+        int sum = 0;
+        for (int i = 0; i < kSpan; ++i) sum += capture.Pixel(x + i, y)[c];
+        return static_cast<double>(sum) / kSpan;
+    };
+    double worst = 0.0;
+    for (int y = std::max(1, top); y <= std::min(capture.height - 1, bottom); ++y)
+        for (int c = 0; c < 3; ++c) worst = std::max(worst, std::abs(row(y, c) - row(y - 1, c)));
+    return static_cast<int>(std::lround(worst));
+}
+}  // namespace
+
+AETHER_TEST("settings design: Liquid draws the window's light once, never around each part of it") {
+    Fixture f("settings-design-liquid");
+    settings::ui::SettingsWindow window(f.service, f.dispatcher);
+    REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+    const RECT safe = SafeArea();
+    const UINT dpi = ::GetDpiForWindow(window.Handle());
+    const int width = std::min<int>(safe.right - safe.left - 40, ::MulDiv(900, static_cast<int>(dpi), 96));
+    const int height = std::min<int>(safe.bottom - safe.top - 20, ::MulDiv(640, static_cast<int>(dpi), 96));
+    const int left = (safe.left + safe.right - width) / 2;
+    const int top = (safe.top + safe.bottom - height) / 2;
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, left, top, width, height, SWP_NOACTIVATE);
+    RECT guard{};
+    ::GetWindowRect(window.Handle(), &guard);
+    ::InflateRect(&guard, 24, 24);
+    ::IntersectRect(&guard, &guard, &safe);
+    BackdropGuard backdrop;
+    backdrop.hwnd = CreateTestBackdrop(guard);
+    REQUIRE(backdrop.hwnd != nullptr);
+    ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    for (const auto mode : {graphics::ThemeMode::Dark, graphics::ThemeMode::Light}) {
+        auto tokens = graphics::MakeDesignTokens(mode);
+        tokens.liquid = true;
+        window.SetTheme(tokens, graphics::MotionPolicy{});
+        REQUIRE(window.Show(settings::ui::SettingsPage::Desktop).ok());
+        ::SetWindowPos(window.Handle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        PumpFor(f.dispatcher, 700ms);
+        RECT client{};
+        ::GetClientRect(window.Handle(), &client);
+        ::MapWindowPoints(window.Handle(), nullptr, reinterpret_cast<POINT*>(&client), 2);
+        SetBackdropPhase(backdrop.hwnd, false);
+        PumpFor(f.dispatcher, 250ms);
+        const auto shot = CaptureWithRetry(backdrop.hwnd, guard, client);
+        const std::string name = mode == graphics::ThemeMode::Dark ? "dark" : "light";
+        if (!shot.Valid()) {
+            TEST_NOTE("Liquid " + name + " inconclusive: a foreign window overlapped the private backdrop");
+            continue;
+        }
+        CHECK(SavePng(shot, InspectionPath("settings-liquid-" + name + "-desktop")));
+        const auto inClient = [&](HWND child) {
+            RECT r{};
+            ::GetWindowRect(child, &r);
+            ::OffsetRect(&r, -client.left, -client.top);
+            return r;
+        };
+        const auto scale = static_cast<float>(dpi) / 96.0f;
+        const int margin = std::max(3, static_cast<int>(std::lround(4.0f * scale)));
+        // The scrolling page's top edge, in the middle of the page, above its title.
+        if (HWND viewport = ChildOfClass(window.Handle(), L"AetherShell.FormScroll.Viewport")) {
+            const RECT v = inClient(viewport);
+            const int x = (v.left + v.right) / 2;
+            const int step = LargestStepDown(shot, x, v.top - margin, v.top + margin);
+            TEST_NOTE("Liquid " + name + ": largest step across the page's top edge " + std::to_string(step));
+            CHECK(step <= 4);
+        } else {
+            TEST_NOTE("no scrolling page found");
+            CHECK(false);
+        }
+        // The navigation's bottom edge, beside its last row.
+        if (HWND navigation = ChildOfClass(window.Handle(), L"ListBox")) {
+            const RECT n = inClient(navigation);
+            const int x = n.left + (n.right - n.left) * 3 / 4;
+            const int step = LargestStepDown(shot, x, n.bottom - 1, n.bottom + margin);
+            TEST_NOTE("Liquid " + name + ": largest step across the navigation's bottom edge " + std::to_string(step));
+            CHECK(step <= 4);
+        } else {
+            TEST_NOTE("no navigation found");
+            CHECK(false);
+        }
+    }
+    window.Close();
+}
+
 AETHER_TEST("settings design: the integrated title strip keeps native caption, resize, menu and maximize behaviour") {
     Fixture f("settings-design-frame");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);

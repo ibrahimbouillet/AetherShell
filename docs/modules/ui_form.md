@@ -76,8 +76,15 @@ the screen one frame apart from the form surface. Three shared changes remove it
   scene each frame through the same atomic path. `Stats()` reports the UI-thread cost and cache use.
 
 `ClientOriginPx(hwnd)` gives decorators the origin of a moving canvas inside the frame being
-rendered. `SetTheme` rebuilds only when the appearance actually changed (`SameAppearance`), so a
-repeated theme notification does not drop the retained layers.
+rendered. `SetTheme` rebuilds only when the appearance actually changed (`SameAppearance`, which
+includes the Liquid/Grain style since D81), so a repeated theme notification does not drop the
+retained layers.
+
+**Whole-window decoration (D81).** The scene is painted in parts (each child window and each dirty
+rectangle), so anything that belongs to the window rather than to the part, such as Liquid's rim and
+sheen, is drawn around the whole client (`PaintBackground`'s `body`) and only clipped to the part.
+Drawn around the part, each part had its own bright rim: the owner's "white outlines". The unit
+suite checks that the background painted in pieces equals the background painted at once.
 
 ## Motion
 

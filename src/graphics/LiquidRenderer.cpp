@@ -3,21 +3,61 @@
 #include "graphics/LiquidRenderer.h"
 
 #include <d3d11_1.h>
-#include <d3dcompiler.h>
 
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <map>
+#include <mutex>
+#include <span>
 #include <string_view>
 #include <utility>
 
+#if defined(AETHER_LIQUID_PRECOMPILED)
+#include "graphics/LiquidShaderPS.h"
+#include "graphics/LiquidShaderVS.h"
+#else
+#include <d3dcompiler.h>
+#endif
+
 namespace aether::graphics {
 namespace {
-constexpr std::string_view kShader =
-#include "graphics/LiquidShader.inc"
-    ;
 constexpr UINT kMarkSize = 512;
+
+struct ShaderBytes {
+    std::span<const std::uint8_t> vertex, pixel;
+};
+
+// D81: the shader's byte code. Built with the project by fxc, it costs nothing at run time; without fxc it is compiled
+// once per process (about half a second) and kept, so a lost device does not compile it again.
+Result<ShaderBytes> ShaderCode() {
+#if defined(AETHER_LIQUID_PRECOMPILED)
+    return ShaderBytes{{reinterpret_cast<const std::uint8_t*>(kLiquidVertexShader), sizeof(kLiquidVertexShader)},
+                       {reinterpret_cast<const std::uint8_t*>(kLiquidPixelShader), sizeof(kLiquidPixelShader)}};
+#else
+    static constexpr std::string_view kShader =
+#include "graphics/LiquidShader.inc"
+        ;
+    static std::mutex lock;
+    static winrt::com_ptr<ID3DBlob> vertex, pixel;
+    const std::lock_guard guard(lock);
+    const auto compile = [](const char* entry, const char* profile, winrt::com_ptr<ID3DBlob>& code) -> Result<void> {
+        if (code) return Ok();
+        winrt::com_ptr<ID3DBlob> errors;
+        const HRESULT compiled = ::D3DCompile(kShader.data(), kShader.size(), "LiquidShader", nullptr, nullptr, entry, profile,
+                                              D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, code.put(), errors.put());
+        if (FAILED(compiled)) {
+            code = nullptr;
+            return MakeError(ErrorCode::Internal, errors ? static_cast<const char*>(errors->GetBufferPointer()) : "material shader did not compile", compiled);
+        }
+        return Ok();
+    };
+    if (auto done = compile("VS", "vs_4_0", vertex); !done) return done.error();
+    if (auto done = compile("PS", "ps_4_0", pixel); !done) return done.error();
+    return ShaderBytes{{static_cast<const std::uint8_t*>(vertex->GetBufferPointer()), vertex->GetBufferSize()},
+                       {static_cast<const std::uint8_t*>(pixel->GetBufferPointer()), pixel->GetBufferSize()}};
+#endif
+}
 
 // The constant buffer, laid out as LiquidShader.inc's cbuffer Scene.
 struct alignas(16) Constants {
@@ -297,18 +337,10 @@ Result<void> LiquidRenderer::Initialize(ID3D11Device* device) try {
     const D3D_FEATURE_LEVEL level = m.device->GetFeatureLevel();
     HRESULT hr = m.device->CreateDeviceContextState(0, &level, 1, D3D11_SDK_VERSION, __uuidof(ID3D11Device1), nullptr, m.state.put());
     if (FAILED(hr)) return Failed("material state could not be created", hr);
-    const auto compile = [&](const char* entry, const char* profile, winrt::com_ptr<ID3DBlob>& code) -> Result<void> {
-        winrt::com_ptr<ID3DBlob> errors;
-        const HRESULT compiled = ::D3DCompile(kShader.data(), kShader.size(), "LiquidShader", nullptr, nullptr, entry, profile,
-                                              D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, code.put(), errors.put());
-        if (FAILED(compiled)) return MakeError(ErrorCode::Internal, errors ? static_cast<const char*>(errors->GetBufferPointer()) : "material shader did not compile", compiled);
-        return Ok();
-    };
-    winrt::com_ptr<ID3DBlob> vertex, pixel;
-    if (auto done = compile("VS", "vs_4_0", vertex); !done) return done;
-    if (auto done = compile("PS", "ps_4_0", pixel); !done) return done;
-    hr = m.device->CreateVertexShader(vertex->GetBufferPointer(), vertex->GetBufferSize(), nullptr, m.vertexShader.put());
-    if (SUCCEEDED(hr)) hr = m.device->CreatePixelShader(pixel->GetBufferPointer(), pixel->GetBufferSize(), nullptr, m.pixelShader.put());
+    auto code = ShaderCode();
+    if (!code) return code.error();
+    hr = m.device->CreateVertexShader(code->vertex.data(), code->vertex.size(), nullptr, m.vertexShader.put());
+    if (SUCCEEDED(hr)) hr = m.device->CreatePixelShader(code->pixel.data(), code->pixel.size(), nullptr, m.pixelShader.put());
     D3D11_BUFFER_DESC buffer{};
     buffer.ByteWidth = sizeof(Constants);
     buffer.Usage = D3D11_USAGE_DEFAULT;

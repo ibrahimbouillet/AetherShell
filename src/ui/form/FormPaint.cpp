@@ -258,8 +258,12 @@ void PaintFocusRingWithin(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, 
 }
 
 void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const DesignTokens& tokens, FormMaterial material,
-                     const D2D1_RECT_F* frame) {
+                     const D2D1_RECT_F* body, bool framed) {
     if (!context || !Usable(area) || material == FormMaterial::Native) return;
+    // D81: what belongs to the window - Liquid's sheen and rim of light, a maximized window's rounded body - is placed
+    // on the whole client, whichever part of it this call repaints. Each child window and each invalidated rectangle
+    // repaints its own part of the scene: placed on `area`, the rim outlined every one of them in white.
+    const D2D1_RECT_F whole = body && Usable(*body) ? *body : area;
     // The glass painter supplies the shared grain; the tint is the form's own window tint.
     DesignTokens materialTokens = tokens;
     // D79: Liquid is clear water: no grain, a lighter tint over the blurred desktop, light on its rim.
@@ -283,27 +287,28 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
         materialTokens.glass.tintAlphaWithBlur = 1.0f;
         style.noise = tokens.transparencyEnabled && !liquid;
     }
-    if (!frame || !Usable(*frame)) {
+    const float pixel = PixelOf(context);
+    if (!framed) {
+        // DWM rounds and borders a normal window: the material fills what is repainted, the light follows the window.
         graphics::PaintGlassPanel(context, area, materialTokens, style);
         if (liquid) {
-            FillLiquidSheen(context, area, 0.0f, light);
-            StrokeLiquidRim(context, area, kWindowFrameRadius, light, PixelOf(context), 0.8f);
+            FillLiquidSheen(context, whole, kWindowFrameRadius, light);
+            StrokeLiquidRim(context, whole, kWindowFrameRadius, light, pixel, 0.8f);
         }
         return;
     }
     // The rounded body (painting is clipped to `area` by the caller), then a pixel-snapped rim of
     // about one DIP along its edge - the same perimeter the window had before it was maximized.
     style.cornerRadius = kWindowFrameRadius;
-    graphics::PaintGlassPanel(context, *frame, materialTokens, style);
-    const float pixel = PixelOf(context);
+    graphics::PaintGlassPanel(context, whole, materialTokens, style);
     const float width = std::max(1.0f, std::round(1.0f / pixel)) * pixel;
     if (liquid) {
-        FillLiquidSheen(context, *frame, kWindowFrameRadius, light);
-        StrokeLiquidRim(context, *frame, kWindowFrameRadius, light, width);
+        FillLiquidSheen(context, whole, kWindowFrameRadius, light);
+        StrokeLiquidRim(context, whole, kWindowFrameRadius, light, width);
         return;
     }
     Brush brush(context);
-    StrokeRound(context, brush, *frame, kWindowFrameRadius, tokens.form.windowRim, width);
+    StrokeRound(context, brush, whole, kWindowFrameRadius, tokens.form.windowRim, width);
 }
 
 void PaintCard(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, const DesignTokens& tokens, FormMaterial material,

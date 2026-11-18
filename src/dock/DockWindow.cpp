@@ -1050,18 +1050,28 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
         context.d2d->GetFactory(factory.put());
         if (factory) (void)factory->CreateRoundedRectangleGeometry(D2D1::RoundedRect(impl_->layout.panel, style.cornerRadius, style.cornerRadius), glassShape.put());
     }
+    const auto forEachItem = [&](const auto& draw) {
+        for (std::size_t index = 0; index < impl_->fitted.items.size(); ++index)
+            if (impl_->layout.raisedItem != index) draw(index);
+        if (impl_->layout.raisedItem && *impl_->layout.raisedItem < impl_->fitted.items.size()) draw(*impl_->layout.raisedItem);
+    };
+    if (liquid && glassShape) {
+        // D66, layer 4 over layer 3: the icons are drawn over the glass, never in it. What passes between them shows on the
+        // glass only: the icons' soft shadows, and the red light of an application that asks for attention. D81: one
+        // masked layer for all of them (one a frame), not one per icon, and no icon's shadow over a neighbour's icon.
+        context.d2d->PushLayer(D2D1::LayerParameters1(impl_->layout.panel, glassShape.get()), nullptr);
+        forEachItem([&](std::size_t index) {
+            const auto& item = impl_->fitted.items[index];
+            const auto rect = impl_->layout.items[index].icon;
+            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens, 0.35f);
+            if (item.attentionRequested && !item.foreground) PaintWaterLight(context.d2d, rect, impl_->tokens.critical);
+        });
+        context.d2d->PopLayer();
+    }
     const auto drawItem = [&](std::size_t index) {
         const auto& item = impl_->fitted.items[index];
         const auto rect = impl_->layout.items[index].icon;
         const float size = rect.right - rect.left;
-        if (liquid && glassShape) {
-            // D66, layer 4 over layer 3: the icon is drawn over the glass, never in it. What passes between them shows
-            // on the glass only: the icon's soft shadow, and the red light of an application that asks for attention.
-            context.d2d->PushLayer(D2D1::LayerParameters1(impl_->layout.panel, glassShape.get()), nullptr);
-            graphics::PaintLiftShadow(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens, 0.35f);
-            if (item.attentionRequested && !item.foreground) PaintWaterLight(context.d2d, rect, impl_->tokens.critical);
-            context.d2d->PopLayer();
-        }
         if (const auto pulse = impl_->attentionPulses.find(item.id); pulse != impl_->attentionPulses.end() && impl_->AllowsDecoration()) {
             const float opacity = DockAttentionAt((graphics::FrameScheduler::Now() - pulse->second) / impl_->motion.EffectiveScale()).opacity;
             const D2D1_POINT_2F center{(rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2};
@@ -1108,9 +1118,7 @@ void DockWindow::OnRender(const ui::RenderContext& context) {
         }
         if (impl_->keyboard && index == impl_->focused) graphics::PaintFocusRing(context.d2d, rect, impl_->tokens.itemCornerRadius, impl_->tokens);
     };
-    for (std::size_t index = 0; index < impl_->fitted.items.size(); ++index)
-        if (impl_->layout.raisedItem != index) drawItem(index);
-    if (impl_->layout.raisedItem) drawItem(*impl_->layout.raisedItem);
+    forEachItem(drawItem);
 }
 bool DockWindow::OnAnimate(double now) {
     const double dt = impl_->lastFrame == 0 ? Scheduler().RefreshInterval() : now - impl_->lastFrame;

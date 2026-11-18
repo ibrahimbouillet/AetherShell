@@ -7,7 +7,30 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 4.8: the weather window, animated and precise weather, Liquid everywhere (`0.4.0-alpha.4`, D78–D80, S-078, 2026-11-17)
+## Current checkpoint — test 4.9: Liquid drawn once per window, the shader built with the project (`0.4.0-alpha.4`, D81, S-079, 2026-11-18)
+
+The owner sent a screenshot of Settings → Desktop in Liquid with white outlines around the parts of the page, and asked
+for every drawing flaw to be found and fixed, rendering optimized, and a better start of the computer.
+
+- **White outlines (D81):** `form::paint::PaintBackground` drew Liquid's rim and sheen around each repainted part
+  (child window or dirty rectangle) instead of around the window. It now takes the whole client (`body`) and only clips
+  to the part. Measured across the page's top edge and the navigation's bottom edge: 37 and 18 levels before, 1 and 0
+  after, dark and light (`tests/integration/settings_ui/SettingsDesignTests.cpp`, captures in `%TEMP%\AetherShellTests`).
+- **Grain ↔ Liquid with Settings open:** `SameAppearance` now compares `liquid` (the change was being ignored).
+- **Liquid shader built with the project:** `fxc` from the Windows SDK, via `cmake/AetherHlslFromInc.cmake`; no more
+  480–560 ms UI-thread stall at the first Liquid frame (desktop picture during the greeting, the arrival) or after a lost
+  device; `AetherShellApp.exe` no longer imports `D3DCOMPILER_47.dll`. Run-time compile remains only where `fxc` is missing.
+- **Dock in Liquid:** one masked layer a frame for all the icons' shadows instead of one per icon.
+- **Not changed:** `FrameScheduler` (D77); the Run-key start (D34). The log's 52–88 s after boot include sign-in; a
+  logon task to start earlier is a proposal for the owner, not implemented.
+- Committed locally; **not pushed (D65)**. Test 4.8's setup moved to `dist/test-4.8/`.
+
+**Next:** the owner tries test 4.9, at sign-in especially (the greeting's longest gap and the arrival's first frame are in
+`aethershell.log`). Open from before: the arrival after setup's Close; fluidity (D62 part 2, from measurements); the
+code-signed setup (D62 part 3); native-speaker review and mirrored right-to-left layout; the intermittent `window corners`
+native case (S-075); the Search unit timing case under parallel load.
+
+## Earlier — test 4.8: the weather window, animated and precise weather, Liquid everywhere (`0.4.0-alpha.4`, D78–D80, S-078, 2026-11-17)
 
 - **The weather (D78):** precise Windows location by default (0.001°, sample at most 2 min old; Settings → Weather →
   *Precise location* turns it off), temperatures rounded half away from zero, 15-minute default refresh (a file still at
@@ -30,7 +53,7 @@
 **Reading of the owner's words:** "agrandir le liquide" was taken as *extend Liquid to every surface*, not *make
 something bigger*; say so if the owner meant otherwise.
 
-**Next:** the owner tries test 4.8. Open from before: the arrival after setup's Close; fluidity (D62 part 2, from
+**Next (then):** the owner tries test 4.8. Open from before: the arrival after setup's Close; fluidity (D62 part 2, from
 measurements); the code-signed setup (D62 part 3); native-speaker review and mirrored right-to-left layout; the
 intermittent `window corners` native case (pre-existing, S-075); the Search unit timing case under parallel load.
 

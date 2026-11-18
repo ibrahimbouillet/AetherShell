@@ -1403,15 +1403,12 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         d2d->PushAxisAlignedClip(area, D2D1_ANTIALIAS_MODE_ALIASED);
         d2d->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
         if (layer != SceneLayer::Content) {
-            if (Framed()) {
-                // The whole client is the rounded body; each window paints its own part of it.
-                RECT client{};
-                ::GetClientRect(window, &client);
-                const D2D1_RECT_F body = D2D1::RectF(0.0f, 0.0f, static_cast<float>(client.right) / s, static_cast<float>(client.bottom) / s);
-                paint::PaintBackground(d2d, area, tokens, material, &body);
-            } else {
-                paint::PaintBackground(d2d, area, tokens, material);
-            }
+            // The whole client is one body (rounded when maximized); each window paints its own part of it, and the
+            // window's light lies on the body, never around the part (D81).
+            RECT client{};
+            ::GetClientRect(window, &client);
+            const D2D1_RECT_F body = D2D1::RectF(0.0f, 0.0f, static_cast<float>(client.right) / s, static_cast<float>(client.bottom) / s);
+            paint::PaintBackground(d2d, area, tokens, material, &body, Framed());
         }
         const float fade = layer == SceneLayer::All ? FadeOf(hwnd) : 1.0f;
         const bool layered = fade < 0.999f;
@@ -2831,8 +2828,9 @@ bool SameAppearance(const graphics::DesignTokens& a, const graphics::DesignToken
         return x.r == y.r && x.g == y.g && x.b == y.b && x.a == y.a;
     };
     // Tokens are derived deterministically from the mode, the accent palette/source, transparency and
-    // the text scale; these fields identify every input that changes form presentation.
-    return a.mode == b.mode && a.transparencyEnabled == b.transparencyEnabled && a.textScale == b.textScale &&
+    // the text scale; these fields identify every input that changes form presentation. D81: the style (Liquid or
+    // Grain) too - without it a style chosen in Settings never reached the open Settings window.
+    return a.mode == b.mode && a.liquid == b.liquid && a.transparencyEnabled == b.transparencyEnabled && a.textScale == b.textScale &&
            a.fontFamily == b.fontFamily && a.displayFontFamily == b.displayFontFamily && a.accentSource == b.accentSource &&
            a.systemAccent == b.systemAccent && same(a.accent, b.accent) && same(a.accentRoles.fill, b.accentRoles.fill) &&
            same(a.accentRoles.fillHover, b.accentRoles.fillHover) && same(a.accentRoles.fillPressed, b.accentRoles.fillPressed) &&

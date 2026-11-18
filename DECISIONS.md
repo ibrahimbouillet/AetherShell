@@ -111,6 +111,33 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D81 — Liquid's light drawn once for the whole window; the shader built with the project
+
+Owner, 2026-11-18, with a screenshot of Settings → Desktop in Liquid: the pages "have white outlines"; look at the whole
+project for every drawing flaw, then optimize; when the computer starts, Aether starts late, draws badly or slowly.
+
+- **The white outlines (cause found and measured):** `FormSurface` paints one scene in parts: each child window
+  (navigation, page, footer) and each invalidated rectangle repaints its own region. `form::paint::PaintBackground` drew
+  Liquid's window light (the bright top rim and the sheen) around *the region being painted*, so every part got a rim of
+  its own: 37 levels of brightness across the page's top edge and 18 across the navigation's bottom edge in the light
+  capture. **Now** the window's light is drawn around the whole client and only clipped to the region (1 and 0 levels,
+  dark and light). Painted in parts is painted at once, to within one level (new unit case).
+- **A style change missed open Settings:** `SameAppearance` ignored `liquid`, so switching Grain ↔ Liquid with Settings
+  open left it in the old style. It now compares `liquid`.
+- **The Liquid shader is compiled with the build:** compiled by `D3DCompile` at the first Liquid frame, it held the UI
+  thread for 480–560 ms (measured, Release) when the desktop picture arrived during the sign-in greeting or when the
+  arrival began, and again after a lost graphics device; it also loaded the shader compiler's library. The Windows SDK's
+  `fxc` now compiles it with the project (`cmake/AetherHlslFromInc.cmake` takes the HLSL from `LiquidShader.inc`, still
+  its one source); `AetherShellApp.exe` no longer imports `D3DCOMPILER_47.dll`. Where `fxc` is missing the shader is
+  compiled at run time as before, once per process.
+- **The Dock in Liquid:** the icons' shadows and attention lights are drawn in one masked layer a frame instead of one
+  layer per icon, and no icon's shadow falls on its neighbour's icon.
+- **Unchanged on purpose:** `FrameScheduler` (D77). When Windows starts Aether at sign-in is Windows' choice (D34): the
+  log's 52–88 s after boot include the time to sign in. Starting earlier (a scheduled logon task instead of the Run key)
+  would be a new owner decision, not taken here.
+
+FR-037, NFR-002, T64. Evidence: TEST_STATUS S-079.
+
 ### D80 — A maximized Settings window: only its own frame, flush with the work area
 
 Owner, 2026-11-16, with a screenshot of the maximized Settings window: its edges were badly drawn; the page should fit the

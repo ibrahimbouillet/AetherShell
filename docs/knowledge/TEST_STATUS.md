@@ -3396,3 +3396,30 @@ second display.
 `722dc2f976bf794ee7f779539f8041ed9f6f28b1607f775c3b63e7d6b6d4df50`, built by `scripts/package.ps1 -BuildDir
 build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.7's build moved to
 `dist/test-4.7/`. Committed locally; not pushed, tagged, published or installed.
+
+### S-079 — Alpha 4, test 4.9: Liquid drawn once per window, the shader built with the project (Claude, 2026-11-18)
+
+**What changed:** D81. Settings' Liquid rim and sheen drawn around the whole client instead of each repainted part (the
+owner's screenshot of white outlines, 2026-11-18); `SameAppearance` compares the style; the Liquid shader compiled with
+the build by `fxc`; the Dock's icon shadows in one masked layer a frame.
+
+| Check | Result |
+| --- | --- |
+| Before the fix (same capture, light Liquid) | largest brightness step across the page's top edge **37**, across the navigation's bottom edge **18**: the white outlines reproduced. The dark capture showed Grain, which exposed the `SameAppearance` defect |
+| Build, Release (`scripts/build.ps1`, then `scripts/package.ps1`) | Pass, no warning; `Compiling the Liquid shader` runs with the build; `AetherShellApp.exe` imports no `D3DCOMPILER_47.dll` (dumpbin) |
+| Run-time cost removed | `D3DCompile` of the pixel shader measured 480–560 ms (Release, own probe). The graphics suite's first Liquid case (`water shows the picture itself`, device creation included) takes **79 ms** with the built shader and **1357 ms** in a build configured without `fxc` (`build/wf-claude-nofxc`, `-DAETHER_FXC=OFF`), where the run-time fallback compiles and the five `liquid material` cases pass |
+| Unit gate, this build's module set | 26/26 suites pass (`-j 8`). New: `ui_form: the background painted in pieces is the background painted at once` (six clipped pieces against one pass, Liquid and Grain, framed and not, dark and light: at most one level apart) and `ui_form: Liquid and Grain are different appearances` |
+| Native settings_ui | whole suite passes; new `settings design: Liquid draws the window's light once, never around each part of it`: steps **1 and 0** in dark and in light, captures inspected (no outline around the page or the navigation) |
+| Native dock | 17/17, including both Liquid cases (icons over the glass, glyph contrast over eight scenes); hover capture inspected |
+| `aether_graphics_tests` (Liquid material and motion among them) | 111/111 |
+| Native ui, topbar, search_ui, weather_ui, welcome, app, showcase | pass |
+| Native ui_form | 29/31: **`ui_form motion: dark/light scrolling frames stay registered while moving` fail** (8–10 frames where a native field's text lags the scrolled page). The same two cases from the 0.3.5 build (`build/release-0.3.5`), which passed at its release, fail the same way on this machine now: environmental, not caused by this round. Same failure also appears in older logs of this checkout |
+| Native controlcenter | 19/20: **`keyboard opening shows focus and moves through the grid geometrically` fails** (focus on 103, not 700). The 0.3.5 build's same case fails identically now: environmental (keyboard focus on this desktop), not caused by this round |
+
+**Not executed, so not claimed:** a sign-in on the owner's PC with this build (the greeting's longest gap and the
+arrival's first frame are in `aethershell.log`); Windows 10; a second display.
+
+**Test build 4.9:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 10671616 bytes, SHA-256
+`3f054898d5681be7f6386bf40225d5b65c34cf1c6874a2ea8c9ff2299c033f89`, built by `scripts/package.ps1 -BuildDir
+build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.8's build moved to
+`dist/test-4.8/`. Committed locally; not pushed, tagged, published or installed.

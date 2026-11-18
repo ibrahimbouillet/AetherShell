@@ -12,6 +12,7 @@
 #include "ui/form/FormPaint.h"
 #include "ui/form/FormSurface.h"
 
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -319,6 +320,64 @@ AETHER_TEST("ui_form: acrylic background stays translucent, solid is opaque") {
         REQUIRE(canvas.End());
         for (UINT y = 0; y < 64; y += 7)
             for (UINT x = 0; x < 64; x += 7) CHECK_EQ(canvas.At(x, y).a, 255);
+    }
+}
+
+// D81: each child window and each invalidated rectangle repaints its own piece of the scene. The window's material, its
+// Liquid sheen and rim and a maximized frame must come out the same whichever pieces it is painted in: placed on the
+// piece, the rim outlined every part of Settings in white.
+AETHER_TEST("ui_form: the background painted in pieces is the background painted at once") {
+    constexpr UINT kWidth = 160, kHeight = 120;
+    const D2D1_RECT_F body = D2D1::RectF(0.0f, 0.0f, static_cast<float>(kWidth), static_cast<float>(kHeight));
+    // Uneven pieces, like the parts of a form: a strip, a list, a page and what lies between them.
+    const D2D1_RECT_F pieces[] = {D2D1::RectF(0.0f, 0.0f, 160.0f, 24.0f), D2D1::RectF(0.0f, 24.0f, 52.0f, 120.0f),
+                                  D2D1::RectF(52.0f, 24.0f, 160.0f, 37.0f), D2D1::RectF(52.0f, 37.0f, 131.0f, 96.0f),
+                                  D2D1::RectF(131.0f, 37.0f, 160.0f, 96.0f), D2D1::RectF(52.0f, 96.0f, 160.0f, 120.0f)};
+    for (const bool liquid : {false, true}) {
+        for (const bool framed : {false, true}) {
+            for (const auto mode : {ThemeMode::Dark, ThemeMode::Light}) {
+                auto tokens = graphics::MakeDesignTokens(mode);
+                tokens.liquid = liquid;
+                tokens.transparencyEnabled = true;
+                const auto material = framed ? FormMaterial::Solid : FormMaterial::Acrylic;
+                D2DCanvas whole, parts;
+                REQUIRE(whole.Create(kWidth, kHeight));
+                REQUIRE(parts.Create(kWidth, kHeight));
+                whole.Begin();
+                paint::PaintBackground(whole.Context(), body, tokens, material, &body, framed);
+                REQUIRE(whole.End());
+                parts.Begin();
+                for (const auto& piece : pieces) {
+                    parts.Context()->PushAxisAlignedClip(piece, D2D1_ANTIALIAS_MODE_ALIASED);
+                    paint::PaintBackground(parts.Context(), piece, tokens, material, &body, framed);
+                    parts.Context()->PopAxisAlignedClip();
+                }
+                REQUIRE(parts.End());
+                int worst = 0;
+                for (UINT y = 0; y < kHeight; ++y) {
+                    for (UINT x = 0; x < kWidth; ++x) {
+                        const auto a = whole.At(x, y), b = parts.At(x, y);
+                        worst = std::max({worst, std::abs(a.r - b.r), std::abs(a.g - b.g), std::abs(a.b - b.b), std::abs(a.a - b.a)});
+                    }
+                }
+                const std::string what = std::string(liquid ? "liquid " : "grain ") + (framed ? "framed " : "") +
+                                         (mode == ThemeMode::Dark ? "dark" : "light");
+                if (worst > 1) TEST_NOTE(what + ": largest difference " + std::to_string(worst));
+                CHECK(worst <= 1);
+            }
+        }
+    }
+}
+
+// D81: the style chosen in Settings → Appearance changes how an open form looks: it must not be skipped as "the same theme".
+AETHER_TEST("ui_form: Liquid and Grain are different appearances") {
+    for (const auto mode : {ThemeMode::Dark, ThemeMode::Light}) {
+        const auto grain = graphics::MakeDesignTokens(mode);
+        auto liquid = grain;
+        liquid.liquid = true;
+        CHECK(SameAppearance(grain, grain));
+        CHECK(!SameAppearance(grain, liquid));
+        CHECK(!SameAppearance(liquid, grain));
     }
 }
 
