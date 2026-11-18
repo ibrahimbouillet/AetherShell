@@ -111,6 +111,32 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D82 — Aether starts at sign-in through its own sign-in task (amends D34)
+
+Owner, 2026-11-18: after the measurements below, asked to look into an earlier start, then "Yes, implement it".
+
+- **Measured (Windows' own logs, eleven sign-ins on the owner's PC, 2026-11-15 to 18):** from the password to Aether
+  26–65 s, about 43 s typically. Windows takes 6–19 s to make the desktop ready, then **waits 14–32 s on purpose**
+  before its startup programs, then starts the per-user Run entries one at a time; Aether's came after other
+  applications' (4–19 s more). Once started, Aether's surfaces were up in 0.2–0.3 s.
+- **Now:** choosing sign-in startup (setup or Settings) writes the Run value as before **and** a per-user Task Scheduler
+  task, "Aether Shell at sign-in (<account SID>)": logon trigger for that account only, its interactive token, least
+  privilege (no elevation), normal priority, no time limit, one instance, visible in Task Scheduler. It starts the
+  launcher with `--autostart` at sign-in, without that wait.
+- **D34 kept where it matters:** the Run value stays the switch the person sees and controls. Task Manager's Startup
+  apps shows it but not tasks, so the launcher starts nothing from `--autostart` unless the Run value is this
+  installation's and Task Manager has not turned it off. Off in Settings, setup opt-out or uninstall remove the task;
+  each start of the application reconciles it with the Run value. No service, elevation, Winlogon change or
+  startup-delay override; a task that cannot be written leaves the Run value working as before.
+- **Two defects found on the way, fixed:** a second sign-in start that found Aether running opened Search (launcher
+  and application read it as a plain start); it now asks for nothing. The launcher never looked ready to Windows (it
+  only waits on handles), so Windows held the next Run entries 3.6–23 s behind it; one zero-length look at its input
+  queue now answers at once (13 ms against the whole timeout, in a probe).
+- **Starting before Explorer's taskbar:** the greeting can appear while Explorer is still starting; the Dock's space and
+  the taskbar replacement are retried when Explorer announces its taskbar (the existing `TaskbarCreated` path).
+
+FR-016, FR-024, NFR-003, T65. Evidence: TEST_STATUS S-080.
+
 ### D81 — Liquid's light drawn once for the whole window; the shader built with the project
 
 Owner, 2026-11-18, with a screenshot of Settings → Desktop in Liquid: the pages "have white outlines"; look at the whole

@@ -92,6 +92,13 @@ Windows schedules per-user Run entries and may delay them; registration cannot g
 ordering or hide Explorer's taskbar before Aether's guarded replacement becomes active. No service,
 Winlogon change, elevation, priority boost or startup-delay override is installed.
 
+D82 (owner-approved 2026-11-18): sign-in startup also registers the per-user sign-in task described in
+`docs/modules/settings.md`, so Aether starts at sign-in rather than after Windows' startup-program delay and the
+queue of other Run entries (26–65 s after the password over eleven measured sign-ins). Uninstall and setup opt-out
+remove this installation's task; a failed settings save that restores the previous Run value reconciles the task with
+it. The launcher answers Windows at once (it looked busy until Windows' wait timed out, holding the next Run entries)
+and a second sign-in start that finds Aether running asks it for nothing.
+
 The setup wizard clamps to the monitor work area and uses horizontal/vertical native scrollbars,
 wheel scrolling and focus visibility for smaller viewports. DPI rebuilds preserve folder and checkbox
 choices; focus notifications cannot advance pages or trigger installation. The test-mode policy is

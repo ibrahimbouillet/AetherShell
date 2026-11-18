@@ -7,7 +7,32 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 4.9: Liquid drawn once per window, the shader built with the project (`0.4.0-alpha.4`, D81, S-079, 2026-11-18)
+## Current checkpoint — test 4.10: Aether starts at sign-in through its own task (`0.4.0-alpha.4`, D82, S-080, 2026-11-18)
+
+The owner asked why Aether starts late after switching the computer on. Windows' logs of eleven sign-ins: 26–65 s from
+the password to Aether, of which 14–32 s are Windows' deliberate wait before startup programs and 4–19 s the queue of
+other Run entries. The owner approved a sign-in task ("Yes, implement it").
+
+- **Sign-in task (D82):** `settings::StartupRegistration` writes, beside the Run value, a per-user Task Scheduler task
+  "Aether Shell at sign-in (<SID>)" (`src/settings/SignInTask.cpp`; logon trigger and principal for that account,
+  least privilege, priority 5, no time limit, one instance, visible). Setup and Settings write it; opt-out, Settings off
+  and uninstall remove it; `ReconcileSignInTask` runs at each application start (creates it for installations that
+  chose sign-in startup earlier, such as the owner's). Only the standard Run key's adapter reaches Task Scheduler;
+  tests use other keys.
+- **The switch stays visible:** the launcher starts nothing from `--autostart` unless the Run value is this
+  installation's and Task Manager has not turned it off.
+- **Fixed on the way:** a second sign-in start (the task, then the Run entry) opened Search; it now asks for nothing.
+  The launcher answers Windows' input-idle wait at once (it held the next Run entries 3.6–23 s).
+- **Real check:** with `AETHER_TEST_REAL_SIGNIN_TASK=1`, the real task registered unelevated, read back and was removed;
+  the same XML registered through PowerShell reads back as the account's own logon trigger, Interactive, Limited,
+  priority 5, no limit, IgnoreNew (then removed; no Aether task left).
+- Committed locally; **not pushed (D65)**. Test 4.9's setup moved to `dist/test-4.9/`.
+
+**Next:** the owner installs test 4.10 (the application creates the task at its first start, since their sign-in
+startup is already on) and signs in again: the greeting should appear soon after the desktop instead of ~40 s later.
+Compare `startup: ... s after boot` in `aethershell.log`. Not verified: a standard account, Windows 10.
+
+## Earlier — test 4.9: Liquid drawn once per window, the shader built with the project (`0.4.0-alpha.4`, D81, S-079, 2026-11-18)
 
 The owner sent a screenshot of Settings → Desktop in Liquid with white outlines around the parts of the page, and asked
 for every drawing flaw to be found and fixed, rendering optimized, and a better start of the computer.
@@ -25,7 +50,7 @@ for every drawing flaw to be found and fixed, rendering optimized, and a better 
   logon task to start earlier is a proposal for the owner, not implemented.
 - Committed locally; **not pushed (D65)**. Test 4.8's setup moved to `dist/test-4.8/`.
 
-**Next:** the owner tries test 4.9, at sign-in especially (the greeting's longest gap and the arrival's first frame are in
+**Next (then):** the owner tries test 4.9, at sign-in especially (the greeting's longest gap and the arrival's first frame are in
 `aethershell.log`). Open from before: the arrival after setup's Close; fluidity (D62 part 2, from measurements); the
 code-signed setup (D62 part 3); native-speaker review and mirrored right-to-left layout; the intermittent `window corners`
 native case (S-075); the Search unit timing case under parallel load.

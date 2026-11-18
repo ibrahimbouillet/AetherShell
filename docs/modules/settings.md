@@ -58,6 +58,19 @@ an absolute existing `.exe`, quotes its path, appends `--autostart` and writes o
 value `AetherShell`. An injected registry adapter and key paths permit isolated tests. No constructor
 accesses the registry. Disable removes only this Run value.
 
+**Sign-in task (D82).** Beside the standard Run value, `Enable` also registers a per-user Task Scheduler task
+(`SignInTaskName`: "Aether Shell at sign-in (<the account's SID>)", in the root folder) that starts the launcher with
+`--autostart` at that user's sign-in, without Windows' startup-program delay: logon trigger and principal for that
+account only, interactive token, least privilege, priority 5 (normal), no time limit, one instance, not hidden
+(`SignInTaskXml`). `Disable` and an owned `DisableIfOwned` remove it; `ReconcileSignInTask`, run by the application at
+each start, creates it where sign-in startup was chosen before it existed and removes it when the Run value is off or
+another installation's. A task that cannot be written or removed is logged and never fails the person's choice: the
+Run value alone still starts Aether. The Run value stays the switch: the launcher starts nothing from `--autostart`
+unless it is on for this installation (Task Manager shows it; it does not show tasks). Only the adapter for the
+standard Run key has a task (`SignInTask.cpp`, Task Scheduler's COM service); adapters given other keys, as in every
+test, never reach Task Scheduler. One opt-in case (`AETHER_TEST_REAL_SIGNIN_TASK=1`) registers, reads and removes the
+real task once.
+
 The `StartupApproved` binary format is not a documented stable Windows contract: known leading
 bytes 2 (enabled) and 3 (disabled by user) are recognized, and unknown formats report
 `UnknownApproval`/`Unsupported`. The approval value is never written, and a recognized Task Manager

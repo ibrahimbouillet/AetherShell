@@ -94,6 +94,8 @@ Result<void> RemoveRegistration(const InstallLayout& layout,const InstallOptions
             auto run=registry.value()->ReadRun(); if(!run) return run.error();
             const auto expected=QuoteArgument(layout.Launcher().native())+L" --autostart";
             if(run.value() && ::_wcsicmp(run.value()->c_str(),expected.c_str())==0) { auto removed=settings::StartupRegistration(registry.value()).Disable(); if(!removed) return removed; }
+            // D82: this installation's sign-in task leaves with it, even when its Run value was already gone.
+            (void)settings::StartupRegistration(registry.value()).DisableIfOwned(layout.Launcher());
         }
         if(options.startMenuShortcut) { auto removed=Shortcut(layout,FOLDERID_Programs,true); if(!removed) return removed; }
         if(options.desktopShortcut) { auto removed=Shortcut(layout,FOLDERID_Desktop,true); if(!removed) return removed; }

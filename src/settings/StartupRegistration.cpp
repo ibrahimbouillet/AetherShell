@@ -2,7 +2,9 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "settings/StartupRegistration.h"
 
+#include "diagnostics/Logger.h"
 #include "platform/windows/Win32Error.h"
+#include "settings/SignInTask.h"
 
 #include <windows.h>
 
@@ -21,9 +23,21 @@ struct RegistryKey {
     ~RegistryKey() { if (value) ::RegCloseKey(value); }
 };
 
+bool SamePath(std::wstring_view a, std::wstring_view b) noexcept {
+    return a.size() == b.size() && ::CompareStringOrdinal(a.data(), static_cast<int>(a.size()), b.data(), static_cast<int>(b.size()), TRUE) == CSTR_EQUAL;
+}
+
 class WindowsStartupRegistry final : public IStartupRegistry {
 public:
-    explicit WindowsStartupRegistry(StartupRegistryPaths paths) : paths_(std::move(paths)) {}
+    explicit WindowsStartupRegistry(StartupRegistryPaths paths)
+        : signInTask_(SamePath(paths.run, StartupRegistryPaths{}.run)), paths_(std::move(paths)) {}
+    Result<std::optional<std::wstring>> ReadSignInTask() override {
+        return signInTask_ ? detail::ReadWindowsSignInTask() : Result<std::optional<std::wstring>>(std::optional<std::wstring>{});
+    }
+    Result<void> WriteSignInTask(const std::wstring& launcher) override {
+        return signInTask_ ? detail::WriteWindowsSignInTask(launcher) : Ok();
+    }
+    Result<void> DeleteSignInTask() override { return signInTask_ ? detail::DeleteWindowsSignInTask() : Ok(); }
     Result<std::optional<std::wstring>> ReadRun() override {
         auto raw = Read(paths_.run, REG_SZ);
         if (!raw) return raw.error();
@@ -78,8 +92,15 @@ private:
         value.resize(bytes);
         return value;
     }
+    bool signInTask_ = false;   // D82: only beside the standard per-user Run key
     StartupRegistryPaths paths_;
 };
+
+// D82: the sign-in task only speeds the start up; the Run value alone makes Aether start. A task that cannot be written
+// or removed is logged, never a failure of the choice the person made.
+void Note(const Result<void>& done, const char* what) {
+    if (!done) AETHER_LOG_WARN("settings", "sign-in task: {} ({})", what, done.error().Describe());
+}
 
 Result<std::wstring> Command(const std::filesystem::path& launcher, bool requireFile) {
     const auto native = launcher.native();
@@ -147,14 +168,18 @@ Result<void> StartupRegistration::Enable(const std::filesystem::path& launcherPa
         const auto state = ApprovalState(*approval);
         if (state == StartupState::DisabledByUser) return MakeError(ErrorCode::AccessDenied, "startup was disabled by the user in Task Manager");
         if (state == StartupState::UnknownApproval) return MakeError(ErrorCode::Unsupported, "startup approval format is unsupported");
-        return registry_->WriteRun(std::move(*command));
+        if (auto written = registry_->WriteRun(std::move(*command)); !written) return written;
+        Note(registry_->WriteSignInTask(launcherPath.native()), "not registered");
+        return Ok();
     } catch (...) { return MakeError(ErrorCode::Internal, "startup registration could not be enabled"); }
 }
 
 Result<void> StartupRegistration::Disable() {
     try {
         if (!registry_) return MakeError(ErrorCode::InvalidState, "startup registry adapter is missing");
-        return registry_->DeleteRun();
+        if (auto removed = registry_->DeleteRun(); !removed) return removed;
+        Note(registry_->DeleteSignInTask(), "not removed");
+        return Ok();
     } catch (...) { return MakeError(ErrorCode::Internal, "startup registration could not be disabled"); }
 }
 
@@ -163,9 +188,35 @@ Result<void> StartupRegistration::DisableIfOwned(const std::filesystem::path& la
         if(!registry_)return MakeError(ErrorCode::InvalidState,"startup registry adapter is missing");
         auto expected=Command(launcherPath,false);if(!expected)return expected.error();
         auto value=registry_->ReadRun();if(!value)return value.error();
-        if(*value && ::_wcsicmp((**value).c_str(),expected->c_str())==0)return registry_->DeleteRun();
+        if(*value && ::_wcsicmp((**value).c_str(),expected->c_str())==0) { auto removed=registry_->DeleteRun(); if(!removed) return removed; }
+        // D82: this launcher's sign-in task goes with it; another installation's stays.
+        if(auto task=registry_->ReadSignInTask(); task && *task && SamePath(**task,launcherPath.native())) Note(registry_->DeleteSignInTask(),"not removed");
         return Ok();
     } catch(...) { return MakeError(ErrorCode::Internal,"owned startup registration could not be disabled"); }
+}
+
+Result<void> StartupRegistration::ReconcileSignInTask(const std::filesystem::path& launcherPath) {
+    try {
+        if (!registry_) return MakeError(ErrorCode::InvalidState, "startup registry adapter is missing");
+        auto state = IsEnabled(launcherPath);
+        if (!state) return state.error();
+        auto task = registry_->ReadSignInTask();
+        if (!task) return task.error();
+        const bool ours = *task && SamePath(**task, launcherPath.native());
+        switch (*state) {
+            case StartupState::Enabled:
+                // Written once (also for an installation that chose sign-in startup before the task existed), and
+                // again only when it starts something else.
+                return ours ? Ok() : registry_->WriteSignInTask(launcherPath.native());
+            case StartupState::Disabled:
+            case StartupState::DifferentTarget:
+                return ours ? registry_->DeleteSignInTask() : Ok();
+            case StartupState::DisabledByUser:
+            case StartupState::UnknownApproval:
+                return Ok();   // Task Manager's switch decides; the launcher reads it at each sign-in
+        }
+        return Ok();
+    } catch (...) { return MakeError(ErrorCode::Internal, "the sign-in task could not be reconciled"); }
 }
 
 }  // namespace aether::settings

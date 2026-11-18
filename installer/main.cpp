@@ -344,7 +344,8 @@ Result<void> Perform(const Options& options,const CancellationToken& cancellatio
                 saved=store.value()->Save(loaded->value,false);
             }
         }
-        if(!saved && applyStartup) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;}
+        if(!saved && applyStartup) {auto restored=previousRun?startupRegistry->WriteRun(*previousRun):startupRegistry->DeleteRun();result=restored?saved:restored;
+            (void)settings::StartupRegistration(startupRegistry).ReconcileSignInTask(layout->Launcher());}   // D82: the task follows the restored value
         // The installation is complete without the name; the welcome then simply says hello.
         else if(!saved)taskbarNote+="Your name for the welcome could not be saved; add it in Settings > Welcome.\n";
     }

@@ -40,6 +40,7 @@ AETHER_TEST("app: own Dock and Top Bar, health before discovery, channel actions
     RECT before{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&before,0)!=FALSE);
     platform::EnsurePerMonitorDpiAwareness();platform::ComApartment apartment;
     std::atomic<bool> bars{false},fullscreenSuppressed{false},healthy{false},settingsOpened{false},searchOpened{false},shutdownSent{false};
+    std::atomic<bool> secondStartQuiet{false},secondStartOpenedSearch{false};
     const DWORD uiThread=::GetCurrentThreadId();
     std::jthread observer([&](std::stop_token stop){
         const auto until=[&](auto predicate){const auto deadline=std::chrono::steady_clock::now()+20s;while(!stop.stop_requested() && std::chrono::steady_clock::now()<deadline){if(predicate())return true;std::this_thread::sleep_for(10ms);}return false;};
@@ -54,6 +55,12 @@ AETHER_TEST("app: own Dock and Top Bar, health before discovery, channel actions
         });
         auto signal=health->Wait(5000ms);healthy=signal && *signal;
         if(bars){
+            // D82: a second sign-in start (the sign-in task, then Windows' Run list) finds this instance and asks it for
+            // nothing; it used to be read as a plain start and open Search.
+            {app::CommandLine again;again.autostart=true;app::ShellApplication second;
+             auto ran=second.Run(std::move(again),*paths,instance,false);secondStartQuiet=ran.ok() && *ran==0;}
+            const auto quietUntil=std::chrono::steady_clock::now()+1500ms;
+            while(!stop.stop_requested() && std::chrono::steady_clock::now()<quietUntil){if(OwnWindow(L"AetherShell.Search")){secondStartOpenedSearch=true;break;}std::this_thread::sleep_for(10ms);}
             (void)platform::InstanceChannel::Send(instance,L"settings");settingsOpened=until([]{return OwnWindow(L"AetherShell.Settings");});
             (void)platform::InstanceChannel::Send(instance,L"search");searchOpened=until([]{return OwnWindow(L"AetherShell.Search");});
         }
@@ -64,6 +71,7 @@ AETHER_TEST("app: own Dock and Top Bar, health before discovery, channel actions
     {app::ShellApplication application;auto ran=application.Run(std::move(command),*paths,instance,false);observer.request_stop();observer.join();REQUIRE(ran.ok());CHECK_EQ(*ran,0);}
     CHECK_FALSE(std::filesystem::exists(platform::TaskbarBaselineFile(paths->configDir)));
     CHECK(bars.load());CHECK(healthy.load());CHECK(settingsOpened.load());CHECK(searchOpened.load());CHECK(shutdownSent.load());
+    CHECK(secondStartQuiet.load());CHECK_FALSE(secondStartOpenedSearch.load());
     if(fullscreenSuppressed)test::Note("own bars created while the real foreground was full-screen; visibility was suppressed");
     CHECK_FALSE(OwnWindow(L"AetherShell.Dock",false));CHECK_FALSE(OwnWindow(L"AetherShell.TopBar",false));
     RECT after{};REQUIRE(::SystemParametersInfoW(SPI_GETWORKAREA,0,&after,0)!=FALSE);CHECK(::EqualRect(&before,&after)!=FALSE);

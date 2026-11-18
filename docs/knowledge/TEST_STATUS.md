@@ -3423,3 +3423,31 @@ arrival's first frame are in `aethershell.log`); Windows 10; a second display.
 `3f054898d5681be7f6386bf40225d5b65c34cf1c6874a2ea8c9ff2299c033f89`, built by `scripts/package.ps1 -BuildDir
 build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.8's build moved to
 `dist/test-4.8/`. Committed locally; not pushed, tagged, published or installed.
+
+### S-080 — Alpha 4, test 4.10: Aether starts at sign-in through its own sign-in task (Claude, 2026-11-18)
+
+**What changed:** D82. Sign-in startup also registers a per-user Task Scheduler sign-in task; the launcher starts nothing
+from `--autostart` unless the Run value is this installation's and Task Manager has not turned it off; a second sign-in
+start finds Aether running and asks it for nothing (launcher and application); the launcher answers Windows' readiness
+wait at once.
+
+| Check | Result |
+| --- | --- |
+| Sign-in timing before the change (Windows' Shell-Core and Winlogon logs, eleven sign-ins on the owner's PC, 2026-11-15 to 18) | password → Aether's launcher **26–65 s** (about 43 s typically): desktop ready 6–19 s, Windows' deliberate wait before startup programs 14–32 s, then Aether's Run entry after other applications' (4–19 s). Aether's own surfaces up 0.2–0.3 s after it started (`aethershell.log`) |
+| Launcher readiness (own probe, `scratchpad` only) | a process that only waits on handles is never input-idle: `WaitForInputIdle` on it ran to its whole timeout. With one zero-length `MsgWaitForMultipleObjects` at entry it answered after **13 ms** against a 6.5 s timeout. Windows' Run processing had held the next entries 3.6–23 s behind Aether's launcher in the logs |
+| Build, Release (`scripts/build.ps1 -BuildDir build/wf-claude-v4`) | Pass, no warning; launcher, application, setup and tests |
+| Unit gate, this build's module set | **26/26** suites pass. New settings cases: the sign-in task follows the Run value it sits beside; setup opt-out removes only its own task; each start reconciles the task with the registration (enabled, disabled, another target, turned off in Task Manager, unknown approval); the task's XML is the person's own logon, interactive token, least privilege, priority 5, no time limit, one instance, not hidden, and the isolated test registry has no task |
+| Real task, opt-in only (`AETHER_TEST_REAL_SIGNIN_TASK=1`, NFR-008) | registered unelevated, read back with the launcher path it was given, removed, read back absent. The same XML registered by PowerShell read back as: this account's logon trigger, interactive, limited, priority 5, `PT0S`, `IgnoreNew`, no battery conditions, not hidden. No "Aether Shell" task remained afterwards. The automated gate does not create one |
+| App integration: lifecycle | new check passes: a second `ShellApplication` started with `--autostart` beside a running one returns 0 at once and no Search window appears within 1.5 s |
+| Install and installer integration | pass (installer 62.98 s); setup's test mode never writes the startup values or a task |
+| App integration: window corners native | 5 pass, **1 fails on every run: `the pieces follow the front maximized window, and whatever is in front of it covers them`** (lines 554 and 557: after a small window comes in front, the test's corner pieces are found above it). **Not caused by D82:** `WindowCorners.cpp` and the test are unchanged since 78c0afd, and the 4.9 commit (95f177b), built separately from `git archive` into `build/wf-baseline-build`, now fails the same case the same way twice; it passed in that build's own CTest run earlier the same afternoon, and on 2026-11-17 (`wf-claude-v4-d79-int.log`). A z-order capture during the case showed the test's Corners and Rim windows directly above the small front window and the front window directly above the maximized one; nothing of the installed Aether lay between them. The cause is open (D72's own placement keeps the pieces directly above their target; what restacks them on this desktop was not found). The dead-guard clip case failed once in the full run and passed on rerun (known, S-075) |
+
+**Not executed, so not claimed:** an actual sign-in with this build (the owner's first sign-in after installing it
+creates the task, because sign-in startup is already on, and the second sign-in uses it); a standard (non-administrator)
+account; Windows 10; Explorer starting later than Aether on a real sign-in (the `TaskbarCreated` retry path is the
+existing one, not newly exercised).
+
+**Test build 4.10:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 10752512 bytes, SHA-256
+`1cd8fcd7336881bb0d8f2f13f52a06658633d2210c12bcc63c97bd29398938d5`, built by `scripts/package.ps1 -BuildDir
+build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.9's build moved to
+`dist/test-4.9/`. Committed locally; not pushed, tagged, published or installed.

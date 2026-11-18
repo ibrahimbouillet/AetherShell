@@ -667,6 +667,13 @@ struct ShellApplication::Impl {
             const auto state = ReadStartupRegistration();
             static constexpr const char* names[] = {"off", "on", "off in Windows", "for another copy", "unreadable"};
             AETHER_LOG_INFO("app", "sign-in startup: chosen {}, registered {}", stored ? "on" : "off", state ? names[static_cast<int>(*state)] : "could not be read");
+            // D82: the sign-in task follows the registration (created for an installation that chose sign-in startup
+            // before the task existed; removed when the choice is off).
+            if (auto registry = settings::MakeWindowsStartupRegistry()) {
+                const auto launcher = paths.executableDir.parent_path().parent_path() / L"AetherShell.exe";
+                if (auto done = settings::StartupRegistration(*registry).ReconcileSignInTask(launcher); !done)
+                    AETHER_LOG_WARN("app", "sign-in task: {}", done.error().Describe());
+            }
         });
     }
     // D56: the networks around, read in two steps: what Windows last saw at once, then a fresh look.
@@ -2248,6 +2255,9 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
     impl_->nativeTaskbarAccess = MayAccessNativeTaskbar(impl_->instanceName, nativeTaskbarAccess);
     auto instance = platform::SingleInstanceLock::Acquire(impl_->instanceName); if (!instance) return instance.error();
     if (!instance->IsPrimary()) {
+        // D82: a sign-in start that finds Aether already running (started by the sign-in task, or by hand) asks the
+        // running instance for nothing. Treated as a plain start, it opened Search.
+        if (impl_->command.autostart && impl_->command.action == StartupAction::None) return 0;
         const auto action = impl_->command.action == StartupAction::Quit ? L"shutdown" :
             impl_->command.action == StartupAction::RestoreTaskbar ? L"restore-taskbar" :
             impl_->command.action == StartupAction::OpenSettings ? L"settings" : L"search";

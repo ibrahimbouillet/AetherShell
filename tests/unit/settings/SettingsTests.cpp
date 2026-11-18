@@ -11,9 +11,12 @@
 #include "settings/SettingsStore.h"
 #include "settings/StartupRegistration.h"
 
+#include <windows.h>
+
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cwctype>
 #include <limits>
 #include <mutex>
 #include <optional>
@@ -107,6 +110,20 @@ public:
     }
     Result<void> WriteRun(std::wstring command) override { ++writes; run = std::move(command); return Ok(); }
     Result<void> DeleteRun() override { ++deletes; run.reset(); return Ok(); }
+    // D82: the sign-in task, in memory.
+    std::optional<std::wstring> task;
+    int taskWrites = 0;
+    int taskDeletes = 0;
+    bool taskFails = false;
+    Result<std::optional<std::wstring>> ReadSignInTask() override { return task; }
+    Result<void> WriteSignInTask(const std::wstring& launcher) override {
+        if (taskFails) return MakeError(ErrorCode::AccessDenied, "synthetic task refusal");
+        ++taskWrites; task = launcher; return Ok();
+    }
+    Result<void> DeleteSignInTask() override {
+        if (taskFails) return MakeError(ErrorCode::AccessDenied, "synthetic task refusal");
+        ++taskDeletes; task.reset(); return Ok();
+    }
 };
 
 }  // namespace
@@ -589,6 +606,106 @@ AETHER_TEST("settings startup: setup opt-out removes only its owned Run target a
     registry->run=L"\""+file.native()+L"\" --autostart";
     REQUIRE(startup.DisableIfOwned(file).ok());CHECK_FALSE(registry->run.has_value());
     CHECK_EQ(registry->approval[0],3);CHECK_EQ(registry->writes,0);
+}
+
+AETHER_TEST("settings startup: the sign-in task follows the Run value it sits beside (D82)") {
+    const auto file = NewFile().parent_path() / L"launcher.exe"; REQUIRE(fs::WriteFileAtomic(file, "fixture").ok());
+    auto registry = std::make_shared<MemoryRegistry>(); StartupRegistration startup(registry);
+    // Turning sign-in startup on writes the task beside the Run value; off removes both.
+    REQUIRE(startup.Enable(file).ok());
+    REQUIRE(registry->task.has_value()); CHECK_EQ(*registry->task, file.native()); CHECK_EQ(registry->taskWrites, 1);
+    REQUIRE(startup.Disable().ok()); CHECK_FALSE(registry->run.has_value()); CHECK_FALSE(registry->task.has_value());
+    // A task that cannot be written never undoes the person's choice: the Run value alone starts Aether.
+    registry->taskFails = true;
+    REQUIRE(startup.Enable(file).ok()); CHECK(registry->run.has_value()); CHECK_FALSE(registry->task.has_value());
+    REQUIRE(startup.Disable().ok()); CHECK_FALSE(registry->run.has_value());
+    registry->taskFails = false;
+    // A Task Manager disable writes neither.
+    registry->approval = {3, 0, 0, 0};
+    CHECK_EQ(startup.Enable(file).error().code, ErrorCode::AccessDenied);
+    CHECK_FALSE(registry->task.has_value()); CHECK_EQ(registry->taskWrites, 1);
+}
+
+AETHER_TEST("settings startup: setup opt-out removes only its own sign-in task (D82)") {
+    const auto file = NewFile().parent_path() / L"launcher.exe";
+    auto registry = std::make_shared<MemoryRegistry>(); StartupRegistration startup(registry);
+    registry->task = L"C:\\Other installation\\AetherShell.exe";
+    REQUIRE(startup.DisableIfOwned(file).ok()); CHECK(registry->task.has_value());
+    registry->task = file.native();
+    for (auto& c : *registry->task) c = static_cast<wchar_t>(std::towupper(c));   // paths compare without case
+    REQUIRE(startup.DisableIfOwned(file).ok()); CHECK_FALSE(registry->task.has_value());
+}
+
+AETHER_TEST("settings startup: each start reconciles the sign-in task with the registration (D82)") {
+    const auto file = NewFile().parent_path() / L"launcher.exe"; REQUIRE(fs::WriteFileAtomic(file, "fixture").ok());
+    const std::wstring command = L"\"" + file.native() + L"\" --autostart";
+    auto registry = std::make_shared<MemoryRegistry>(); StartupRegistration startup(registry);
+    // On for this launcher, chosen before the task existed: the task is written once, then left alone.
+    registry->run = command;
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); REQUIRE(registry->task.has_value()); CHECK_EQ(*registry->task, file.native());
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK_EQ(registry->taskWrites, 1);
+    // A task left starting something else is pointed back at this launcher.
+    registry->task = L"C:\\Moved\\AetherShell.exe";
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK_EQ(*registry->task, file.native()); CHECK_EQ(registry->taskWrites, 2);
+    // Task Manager's switch off: the task stays (the launcher reads the switch at each sign-in).
+    registry->approval = {3, 0, 0, 0};
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK(registry->task.has_value()); CHECK_EQ(registry->taskDeletes, 0);
+    registry->approval.clear();
+    // Off, or another installation's Run value: this launcher's task goes; another's stays.
+    registry->run = L"\"C:\\Other\\AetherShell.exe\" --autostart";
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK_FALSE(registry->task.has_value());
+    registry->task = L"C:\\Other\\AetherShell.exe";
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK(registry->task.has_value());
+    registry->run.reset(); registry->task = file.native();
+    REQUIRE(startup.ReconcileSignInTask(file).ok()); CHECK_FALSE(registry->task.has_value());
+}
+
+AETHER_TEST("settings startup: the sign-in task is the person's own, unelevated, normal and unlimited (D82)") {
+    const std::wstring sid = L"S-1-5-21-1000-2000-3000-1001";   // synthetic
+    CHECK_EQ(SignInTaskName(sid), std::wstring(L"Aether Shell at sign-in (S-1-5-21-1000-2000-3000-1001)"));
+    const auto xml = SignInTaskXml(L"C:\\Apps & Tools\\Aether <Shell>\\AetherShell.exe", sid);
+    const auto has = [&](std::wstring_view part) { return xml.find(part) != std::wstring::npos; };
+    CHECK(has(L"<LogonTrigger>\n      <Enabled>true</Enabled>\n      <UserId>S-1-5-21-1000-2000-3000-1001</UserId>"));
+    CHECK(has(L"<UserId>S-1-5-21-1000-2000-3000-1001</UserId>\n      <LogonType>InteractiveToken</LogonType>"));
+    CHECK(has(L"<RunLevel>LeastPrivilege</RunLevel>"));
+    CHECK(has(L"<ExecutionTimeLimit>PT0S</ExecutionTimeLimit>"));
+    CHECK(has(L"<Priority>5</Priority>"));
+    CHECK(has(L"<MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>"));
+    CHECK(has(L"<DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>"));
+    CHECK(has(L"<Hidden>false</Hidden>"));
+    CHECK(has(L"<Command>C:\\Apps &amp; Tools\\Aether &lt;Shell&gt;\\AetherShell.exe</Command>"));
+    CHECK(has(L"<Arguments>--autostart</Arguments>"));
+    CHECK_FALSE(has(L"HighestAvailable"));
+    // An adapter given test keys has no task and never reaches Task Scheduler.
+    auto isolated = MakeWindowsStartupRegistry({L"Software\\AetherShellTests\\Run", L"Software\\AetherShellTests\\Approval"});
+    REQUIRE(isolated.ok());
+    auto task = (*isolated)->ReadSignInTask(); REQUIRE(task.ok()); CHECK_FALSE(task->has_value());
+    CHECK((*isolated)->WriteSignInTask(L"C:\\never\\AetherShell.exe").ok());
+    CHECK((*isolated)->DeleteSignInTask().ok());
+}
+
+AETHER_TEST("settings startup: the real sign-in task registers, reads back and is removed (only when asked, D82)") {
+    // NFR-008: Task Scheduler is the person's own. This case runs only with AETHER_TEST_REAL_SIGNIN_TASK=1, never
+    // touches an existing sign-in task, points its task at a file that does not exist and removes it at once.
+    wchar_t flag[8]{};
+    if (::GetEnvironmentVariableW(L"AETHER_TEST_REAL_SIGNIN_TASK", flag, 8) == 0 || std::wstring(flag) != L"1") {
+        test::Note("not run: set AETHER_TEST_REAL_SIGNIN_TASK=1 to register, read and remove the real task once");
+        return;
+    }
+    auto registry = MakeWindowsStartupRegistry(); REQUIRE(registry.ok());
+    auto before = (*registry)->ReadSignInTask(); REQUIRE(before.ok());
+    if (before->has_value()) { test::Note("a sign-in task already exists for this account: left untouched"); return; }
+    const auto launcher = (NewFile().parent_path() / L"never-run" / L"AetherShell.exe").native();
+    REQUIRE_FALSE(std::filesystem::exists(launcher));
+    auto written = (*registry)->WriteSignInTask(launcher);
+    auto read = (*registry)->ReadSignInTask();
+    auto removed = (*registry)->DeleteSignInTask();
+    auto after = (*registry)->ReadSignInTask();
+    if (!written) test::Note("registration refused: " + written.error().Describe());
+    REQUIRE(written.ok());
+    REQUIRE(read.ok()); REQUIRE(read->has_value()); CHECK_EQ(**read, launcher);
+    REQUIRE(removed.ok()); REQUIRE(after.ok()); CHECK_FALSE(after->has_value());
+    CHECK((*registry)->DeleteSignInTask().ok());   // absent already is success
 }
 
 AETHER_TEST("weather location settings: preserve legacy manual coordinates and disabled consent") {

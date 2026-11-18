@@ -11,6 +11,7 @@
 
 #include <shellapi.h>
 #include <array>
+#include <algorithm>
 #include <charconv>
 
 namespace {
@@ -33,6 +34,15 @@ bool Transient(const std::vector<std::wstring>& arguments) {
         value==L"--version" || value==L"--help" || value==L"--post-update-check")return true;
     return false;
 }
+// D82: a sign-in start (the sign-in task, or Windows' Run list) goes ahead only while sign-in startup is on for this
+// installation. The Run value and Task Manager's switch decide; the task, which Task Manager does not show, follows
+// them. Unreadable or in an unknown format: start, as Windows' own Run list would.
+bool SignInStartAllowed(const std::filesystem::path& launcher) {
+    auto registry=aether::settings::MakeWindowsStartupRegistry();if(!registry)return true;
+    auto state=aether::settings::StartupRegistration(*registry).IsEnabled(launcher);if(!state)return true;
+    using aether::settings::StartupState;
+    return *state==StartupState::Enabled || *state==StartupState::UnknownApproval;
+}
 void AwaitControlReadiness(const aether::install::ActiveVersionProcess& child) {
     // Do not abandon a just-created child before Quit/maintenance can address it. Requesters have
     // their own bounded lease wait and fail safely if startup hangs; we never terminate the child.
@@ -45,6 +55,11 @@ void AwaitControlReadiness(const aether::install::ActiveVersionProcess& child) {
 }
 
 int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
+    // D82: tell whoever started us that we are ready for input. Windows starts its Run list one program at a time, and
+    // the next one waited 3.6 to 23 s after this launcher (measured at sign-in). A process that only ever waits on
+    // handles never becomes input-idle, so a WaitForInputIdle on it runs to its timeout; one zero-length look at the
+    // input queue makes it idle at once (13 ms in a probe, against the whole timeout without it).
+    (void)::MsgWaitForMultipleObjects(0,nullptr,FALSE,0,QS_ALLINPUT);
     try {
         std::array<wchar_t,32768> executable{};
         const DWORD length=::GetModuleFileNameW(nullptr,executable.data(),static_cast<DWORD>(executable.size()));
@@ -75,19 +90,24 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
             }
             return aether::install::LaunchActiveVersion(*layout,arguments)?0:4;
         }
+        if(std::find(arguments.begin(),arguments.end(),L"--autostart")!=arguments.end() && !SignInStartAllowed(layout->Launcher()))return 0;
         auto supervisor=aether::install::LauncherSupervisor::Acquire(*layout);
         if(!supervisor) {
             if(supervisor.error().code==aether::ErrorCode::Unavailable) {
                 // During bootstrap/backoff the existing owner must remain responsible for the
                 // next real child. Starting a direct child here would bypass its supervision.
                 std::wstring_view action=L"search";
+                bool asked=false,autostart=false;
                 for(std::size_t i=0;i<arguments.size();++i) {
-                    if(arguments[i]==L"--settings")action=L"settings";
-                    else if(arguments[i]==L"--search")action=L"search";
-                    else if(arguments[i]==L"--autostart")continue;
+                    if(arguments[i]==L"--settings"){action=L"settings";asked=true;}
+                    else if(arguments[i]==L"--search")asked=true;
+                    else if(arguments[i]==L"--autostart")autostart=true;
                     else if(arguments[i]==L"--data-dir" && i+1<arguments.size() && !arguments[i+1].empty())++i;
                     else return 2;
                 }
+                // D82: the second of the two sign-in starts (the sign-in task, then Windows' Run list) finds Aether
+                // running and asks it for nothing. Treated as a plain start, it opened Search.
+                if(autostart && !asked)return 0;
                 // IPC only: if the existing app disappears now, the owner alone may restart it.
                 return aether::platform::InstanceChannel::Send(L"AetherShell",action)?0:3;
             }
