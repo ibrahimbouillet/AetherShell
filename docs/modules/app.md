@@ -181,6 +181,10 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   (`CornerRimRects`). They are always-on-top only when their target is. Events (foreground, reorder, the target's
   or a maximized window's show, hide, move, minimize, cloak; display and work-area broadcasts; Explorer restart)
   ask for one look after the waiting messages are read; a two-second check runs only while something is shown.
+  Any other top-level window being shown asks only for `Restack`: each shown frame is put back directly under
+  whatever now lies in front of its target (two `GetWindow` calls when it is still in place; the shown window is not
+  read). Windows 11 26H2 was seen putting a new window directly above the maximized one, under the frame, with no
+  reorder event; the corners and rim then lay over it until the two-second check (test 4.11, S-081).
   Tests give the guard a private window to stand for the desktop: it never shows the real one in a test.
   Native tests verify the live desktop pixel for pixel in the corners, a continuous rim, an unchanged
   application, stacking, a hung application and the removal of an earlier version's abandoned clip.

@@ -548,9 +548,22 @@ AETHER_TEST("window corners native: the pieces follow the front maximized window
                                          nullptr, nullptr, ::GetModuleHandleW(nullptr), nullptr);
     REQUIRE(front != nullptr);
     struct Close { HWND window; ~Close() { ::DestroyWindow(window); } } close{front};
+    // Windows 11 26H2 was seen putting such a window directly above the maximized one, under the guard's two windows,
+    // and leaving it there despite HWND_TOP; no reorder event follows. Being shown is what the guard hears then, well
+    // within the 400 ms here, which the slow look (2 s) cannot answer.
+    const auto shown = std::chrono::steady_clock::now();
     ::ShowWindow(front, SW_SHOWNOACTIVATE);
     REQUIRE(::SetWindowPos(front, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE));
-    Wait(std::chrono::milliseconds(400));
+    const bool putUnder = ::GetWindow(first.window, GW_HWNDPREV) == front;   // as Windows placed it, unless the guard was quicker
+    const bool coveredInTime = PumpUntil([&] {
+        const auto now = OwnOverlays();
+        return Rounded(first.window) && now.pieces && now.rim && Above(front, now.pieces) && Above(front, now.rim);
+    }, std::chrono::milliseconds(400));
+    TEST_NOTE(std::string(putUnder ? "Windows put the new window right above the maximized one, under the pieces; " : "") +
+              "the window in front covered the pieces after " +
+              std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - shown).count()) + " ms");
+    CHECK(coveredInTime);
+    Wait(std::chrono::milliseconds(100));
     CHECK(Rounded(first.window));
     const auto overlays = OwnOverlays();
     REQUIRE(overlays.pieces != nullptr); REQUIRE(overlays.rim != nullptr);

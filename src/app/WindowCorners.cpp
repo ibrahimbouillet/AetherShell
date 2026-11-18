@@ -293,6 +293,8 @@ struct Observer {
     HWND source = nullptr;
     UINT_PTR timer = 0;
     bool pending = true;
+    // A window was shown somewhere: only the guard's own stacking is checked again (Restack), nothing is read.
+    bool restack = false;
     bool stopping = false;
     // The display, its scale or Explorer changed: what the frames were built for (monitors, desktop picture,
     // thumbnails) may be gone, so the next look starts them again.
@@ -363,6 +365,7 @@ struct Observer {
     // for it. Only the guard's own windows are ever changed.
     void Refresh() {
         pending = false;
+        restack = false;
         if (stopping) return;
         LARGE_INTEGER started{}, finished{}, frequency{};
         (void)::QueryPerformanceCounter(&started);
@@ -409,6 +412,15 @@ struct Observer {
             auto previous = longest->load(std::memory_order_relaxed);
             while (micros > previous && !longest->compare_exchange_weak(previous, micros, std::memory_order_relaxed)) {}
         }
+    }
+    // A window that Windows shows straight into its place, without restacking anything, raises no reorder event. On
+    // Windows 11 26H2 a new window can be put directly above the maximized one, under the frame's two windows, which
+    // then drew the corners and the rim over it until the next slow look (2 s). Each shown frame is put back directly
+    // under whatever now lies in front of its target; one still in place costs two GetWindow calls (Place returns).
+    void Restack() noexcept {
+        restack = false;
+        for (auto& [monitor, frame] : frames)
+            if (frame->shown && frame->target && ::IsWindow(frame->target)) Place(*frame);
     }
     // Keeps the frame's two windows directly above its target, which is itself never moved or restacked.
     // A window in front of the target is therefore in front of them too.
@@ -516,6 +528,9 @@ void CALLBACK EventHook(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LO
     if (event == EVENT_SYSTEM_FOREGROUND || (event == EVENT_OBJECT_REORDER && window == ::GetDesktopWindow())) { observer.Heard(); return; }
     if (!window || object != OBJID_WINDOW || child != CHILDID_SELF) return;
     if (observer.IsTarget(window)) { observer.Heard(); return; }
+    // Any top-level window shown may lie between a frame and its target: the guard's stacking is checked once the
+    // waiting messages are read. The window itself is not looked at.
+    if (event == EVENT_OBJECT_SHOW && !observer.IsOwn(window) && ::GetAncestor(window, GA_ROOT) == window) observer.restack = true;
     // Otherwise only a maximized top-level window matters: it may be the next front one. Ordinary moves of
     // other windows are not the guard's concern, since whatever is in front of the target covers its corners.
     if (!observer.Allowed(window) || observer.IsOwn(window)) return;
@@ -732,6 +747,7 @@ Result<int> RunWindowCornerGuard(HANDLE parent, HANDLE ready, HANDLE stop,
         }
         // However many events arrived together, the windows are looked at once.
         if (!exit && observer.pending) observer.Refresh();
+        else if (!exit && observer.restack) observer.Restack();
     }
     // Leaving is all there is to do: the guard's windows go, and no application was ever changed.
     observer.stopping = true;

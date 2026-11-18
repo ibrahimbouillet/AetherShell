@@ -3440,7 +3440,7 @@ wait at once.
 | Real task, opt-in only (`AETHER_TEST_REAL_SIGNIN_TASK=1`, NFR-008) | registered unelevated, read back with the launcher path it was given, removed, read back absent. The same XML registered by PowerShell read back as: this account's logon trigger, interactive, limited, priority 5, `PT0S`, `IgnoreNew`, no battery conditions, not hidden. No "Aether Shell" task remained afterwards. The automated gate does not create one |
 | App integration: lifecycle | new check passes: a second `ShellApplication` started with `--autostart` beside a running one returns 0 at once and no Search window appears within 1.5 s |
 | Install and installer integration | pass (installer 62.98 s); setup's test mode never writes the startup values or a task |
-| App integration: window corners native | 5 pass, **1 fails on every run: `the pieces follow the front maximized window, and whatever is in front of it covers them`** (lines 554 and 557: after a small window comes in front, the test's corner pieces are found above it). **Not caused by D82:** `WindowCorners.cpp` and the test are unchanged since 78c0afd, and the 4.9 commit (95f177b), built separately from `git archive` into `build/wf-baseline-build`, now fails the same case the same way twice; it passed in that build's own CTest run earlier the same afternoon, and on 2026-11-17 (`wf-claude-v4-d79-int.log`). A z-order capture during the case showed the test's Corners and Rim windows directly above the small front window and the front window directly above the maximized one; nothing of the installed Aether lay between them. The cause is open (D72's own placement keeps the pieces directly above their target; what restacks them on this desktop was not found). The dead-guard clip case failed once in the full run and passed on rerun (known, S-075) |
+| App integration: window corners native | 5 pass, **1 fails on every run: `the pieces follow the front maximized window, and whatever is in front of it covers them`** (lines 554 and 557: after a small window comes in front, the test's corner pieces are found above it). **Not caused by D82:** `WindowCorners.cpp` and the test are unchanged since 78c0afd, and the 4.9 commit (95f177b), built separately from `git archive` into `build/wf-baseline-build`, now fails the same case the same way twice; it passed in that build's own CTest run earlier the same afternoon, and on 2026-11-17 (`wf-claude-v4-d79-int.log`). A z-order capture during the case showed the test's Corners and Rim windows directly above the small front window and the front window directly above the maximized one; nothing of the installed Aether lay between them. The cause was open here; found and fixed in test 4.11 (S-081). The dead-guard clip case failed once in the full run and passed on rerun (known, S-075) |
 
 **Not executed, so not claimed:** an actual sign-in with this build (the owner's first sign-in after installing it
 creates the task, because sign-in startup is already on, and the second sign-in uses it); a standard (non-administrator)
@@ -3451,3 +3451,30 @@ existing one, not newly exercised).
 `1cd8fcd7336881bb0d8f2f13f52a06658633d2210c12bcc63c97bd29398938d5`, built by `scripts/package.ps1 -BuildDir
 build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes. Test 4.9's build moved to
 `dist/test-4.9/`. Committed locally; not pushed, tagged, published or installed.
+
+### S-081 — Alpha 4, test 4.11: the corners go under a window shown in front of the maximized one (Claude, 2026-11-18)
+
+**What changed:** the window-corner failure left open in S-080 had a cause in the guard. On this Windows 11 26H2 build a
+new window of the same desktop is put directly above the maximized window, under the guard's Corners and Rim, and
+`HWND_TOP` leaves it there. Nothing is restacked, so no reorder event follows; the guard heard only the next two-second
+look, and the corners and rim lay over that window until then. Any top-level window being shown now asks for `Restack`:
+each shown frame goes back directly under whatever lies in front of its target (`Place`, which returns at once when the
+frame is still in place; the shown window is not read). No other behavior changed.
+
+| Check | Result |
+| --- | --- |
+| Cause, z-order recorded at each step of the case (temporary notes, removed) | before the fix, five runs out of five: the new window directly above the maximized one, under Corners and Rim, from creation on and after `HWND_TOP`; the guard's placements did not change in the 400 ms. A standalone probe (same styles, guard windows on their own thread) put new windows on top normally, so the insertion depends on the desktop's state, not on the styles |
+| The case after the fix | **5/5 pass**; each run noted that Windows had put the window under the pieces and that the guard put them back under it after **1–4 ms** (the two-second look cannot answer within the 400 ms the case allows). "At rest nothing is restacked again" still holds |
+| Build, Release (`scripts/build.ps1 -BuildDir build/wf-claude-v4`) | Pass, no warning |
+| `aether_app_tests` | 77/77 |
+| `aether_app_integration_tests`, whole suite | **19/19**, including every window-corner case (pixels and native) and the second sign-in start |
+| Unit gate (`ctest -L unit`) | 26/26 |
+
+**Not executed, so not claimed:** the owner's desktop with a real application's popup over a maximized window (the
+case uses an own window); Windows 10.
+
+**Test build 4.11:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 10752512 bytes, SHA-256
+`9995d633981120c7098a96e379084674d550d86ac1390a96b537a649d11304d2`, built by `scripts/package.ps1 -BuildDir
+build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes; it carries test 4.10's sign-in
+task as well. Test 4.10's build moved to `dist/test-4.10/`. Committed locally; not pushed, tagged, published or
+installed.

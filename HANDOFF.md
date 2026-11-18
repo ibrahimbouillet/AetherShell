@@ -7,7 +7,25 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 4.10: Aether starts at sign-in through its own task (`0.4.0-alpha.4`, D82, S-080, 2026-11-18)
+## Current checkpoint — test 4.11: the corners go under a window shown in front of the maximized one (`0.4.0-alpha.4`, S-081, 2026-11-18)
+
+The window-corner case that failed during test 4.10 (and failed the same way with the 4.9 commit built separately) was
+a defect of the guard, now fixed. The owner asked to look into it ("Yes, look into it").
+
+- **Cause:** on this Windows 11 26H2 build a new window can be put directly above the maximized window, under the
+  guard's Corners and Rim, with no reorder event; the guard only saw it at its two-second look, so the corners and the
+  rim lay over that window meanwhile.
+- **Fix (`src/app/WindowCorners.cpp`):** any top-level window being shown sets `restack`; `Restack` puts each shown
+  frame back directly under whatever lies in front of its target (`Place` returns at once when it is still in place;
+  the shown window is not read). The native case now notes the insertion and the 1–4 ms the guard takes to answer.
+- **Evidence:** the case 5/5 (0/5 before); app integration 19/19; app unit 77/77; unit gate 26/26.
+- Committed locally; **not pushed (D65)**. Test 4.10's setup moved to `dist/test-4.10/`.
+
+**Next:** the owner installs test 4.11, which also carries test 4.10's sign-in task: sign in again and compare
+`startup: ... s after boot` in `aethershell.log`. Not verified: a real application's popup over a maximized window on
+the owner's desktop, a standard account, Windows 10.
+
+## Earlier — test 4.10: Aether starts at sign-in through its own task (`0.4.0-alpha.4`, D82, S-080, 2026-11-18)
 
 The owner asked why Aether starts late after switching the computer on. Windows' logs of eleven sign-ins: 26–65 s from
 the password to Aether, of which 14–32 s are Windows' deliberate wait before startup programs and 4–19 s the queue of
@@ -28,7 +46,7 @@ other Run entries. The owner approved a sign-in task ("Yes, implement it").
   priority 5, no limit, IgnoreNew (then removed; no Aether task left).
 - Committed locally; **not pushed (D65)**. Test 4.9's setup moved to `dist/test-4.9/`.
 
-**Next:** the owner installs test 4.10 (the application creates the task at its first start, since their sign-in
+**Next (then):** the owner installs test 4.10 (the application creates the task at its first start, since their sign-in
 startup is already on) and signs in again: the greeting should appear soon after the desktop instead of ~40 s later.
 Compare `startup: ... s after boot` in `aethershell.log`. Not verified: a standard account, Windows 10.
 
