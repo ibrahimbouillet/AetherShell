@@ -1,0 +1,2494 @@
+# Thai (th): ไทย. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: เลือกตำแหน่งที่ตั้งของ Windows เพื่อเปิดใช้งานสภาพอากาศอัตโนมัติ
+
+en: Windows taskbar visible
+tr: แถบงานของ Windows แสดงอยู่
+
+en: Connected to {}
+tr: เชื่อมต่อกับ {} แล้ว
+
+en: {} is out of range
+tr: {} อยู่นอกระยะ
+
+en: Connecting to {} took too long
+tr: การเชื่อมต่อกับ {} ใช้เวลานานเกินไป
+
+en: Use Windows to join {}
+tr: ใช้ Windows เพื่อเข้าร่วม {}
+
+en: Windows did not allow this connection
+tr: Windows ไม่อนุญาตการเชื่อมต่อนี้
+
+en: Could not connect to {}
+tr: ไม่สามารถเชื่อมต่อกับ {}
+
+en: Connect to {}
+tr: เชื่อมต่อกับ {}
+
+en: That password was not accepted. Check it and try again.
+tr: รหัสผ่านนั้นไม่ได้รับการยอมรับ ตรวจสอบแล้วลองอีกครั้ง
+
+en: Enter this network's password.
+tr: ใส่รหัสผ่านของเครือข่ายนี้
+
+en: &Connect
+tr: เชื่อมต่อ(&C)
+
+en: Windows Settings could not be opened
+tr: ไม่สามารถเปิดการตั้งค่า Windows
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: ไม่สามารถจองพื้นที่สำหรับ Dock กำลังคืนค่าแถบงานของ Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: การแทนที่ไม่พร้อมใช้งาน: ไม่สามารถเริ่มตัวเฝ้าดูการกู้คืน
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: คืนค่าแถบงานของ Windows แล้ว ไม่สามารถจองพื้นที่สำหรับ Dock ปิดแล้วเปิดการแทนที่อีกครั้งเพื่อลองใหม่
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: การเฝ้าดูการกู้คืนไม่พร้อมใช้งาน กำลังคืนค่าแถบงานของ Windows
+
+en: Windows notifications could not be opened
+tr: ไม่สามารถเปิดการแจ้งเตือนของ Windows
+
+en: The Windows calendar could not be opened
+tr: ไม่สามารถเปิดปฏิทินของ Windows
+
+en: Windows did not show its hidden icons
+tr: Windows ไม่ได้แสดงไอคอนที่ซ่อนอยู่
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: การรีเฟรชตำแหน่งที่ตั้งอัตโนมัติไม่พร้อมใช้งาน ลองอีกครั้งในการตั้งค่าสภาพอากาศ
+
+en: Windows location
+tr: ตำแหน่งที่ตั้งของ Windows
+
+en: Reading approximate Windows location…
+tr: กำลังอ่านตำแหน่งที่ตั้งโดยประมาณของ Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: สภาพอากาศอัตโนมัติจะเป็นไปตามตำแหน่งที่ตั้งโดยประมาณของ Windows
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: การเข้าถึงตำแหน่งที่ตั้งของ Windows ถูกบล็อก สภาพอากาศไม่พร้อมใช้งาน
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows ไม่สามารถระบุตำแหน่งที่ตั้งปัจจุบันได้ สภาพอากาศไม่พร้อมใช้งาน
+
+en: Location worker unavailable. Weather is unavailable.
+tr: บริการตำแหน่งที่ตั้งไม่พร้อมใช้งาน สภาพอากาศไม่พร้อมใช้งาน
+
+en: Waiting for Windows location permission…
+tr: กำลังรอสิทธิ์ตำแหน่งที่ตั้งของ Windows…
+
+en: The automatic weather choice could not be saved.
+tr: ไม่สามารถบันทึกการเลือกสภาพอากาศอัตโนมัติ
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: การเข้าถึงตำแหน่งที่ตั้งของ Windows ไม่พร้อมใช้งานหรือถูกปฏิเสธ สภาพอากาศไม่พร้อมใช้งาน
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: ตำแหน่งที่ตั้งของ Windows ไม่สามารถขอสิทธิ์ได้ ตรวจสอบการตั้งค่าตำแหน่งที่ตั้งของ Windows
+
+en: Status worker unavailable
+tr: บริการสถานะไม่พร้อมใช้งาน
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows ไม่สามารถดำเนินการนี้ให้เสร็จสมบูรณ์ ตรวจสอบการตั้งค่าที่เกี่ยวข้อง
+
+en: Reading Windows status; try the action again shortly
+tr: กำลังอ่านสถานะของ Windows ลองดำเนินการอีกครั้งในอีกสักครู่
+
+en: Could not disconnect
+tr: ไม่สามารถยกเลิกการเชื่อมต่อ
+
+en: The Windows accessibility feature could not be started
+tr: ไม่สามารถเริ่มฟีเจอร์การช่วยสำหรับการเข้าถึงของ Windows
+
+en: Windows could not change the audio output
+tr: Windows ไม่สามารถเปลี่ยนเอาต์พุตเสียง
+
+en: The Windows control could not be opened
+tr: ไม่สามารถเปิดตัวควบคุมของ Windows
+
+en: Keyboard shortcuts disabled
+tr: ปิดใช้งานแป้นพิมพ์ลัดแล้ว
+
+en: Both keyboard shortcuts registered
+tr: ลงทะเบียนแป้นพิมพ์ลัดทั้งสองแล้ว
+
+en: A keyboard shortcut is already in use by another application
+tr: มีแอปพลิเคชันอื่นใช้แป้นพิมพ์ลัดอยู่แล้ว
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: ไม่สามารถขอการตั้งค่าด่วนของ Windows ล้างตัวเลือก 'ใช้การตั้งค่าด่วนของ Windows' ในการตั้งค่าแถบด้านบนเพื่อใช้ตัวควบคุมของ Aether
+
+en: Windows Start could not be opened
+tr: ไม่สามารถเปิดเมนูเริ่มของ Windows
+
+en: Windows Task View could not be opened
+tr: ไม่สามารถเปิดมุมมองงานของ Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: การสลับเค้าโครงแป้นพิมพ์ของ Windows ไม่พร้อมใช้งาน
+
+en: Windows voice typing could not be opened
+tr: ไม่สามารถเปิดการพิมพ์ด้วยเสียงของ Windows
+
+en: Windows taskbar could not be revealed
+tr: ไม่สามารถแสดงแถบงานของ Windows
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: ไม่สามารถดำเนินการแทนที่แถบงานต่อได้ Windows ยังคงพร้อมใช้งาน
+
+en: Windows taskbar replacement is unavailable in this session
+tr: การแทนที่แถบงานของ Windows ไม่พร้อมใช้งานในเซสชันนี้
+
+en: Windows pin access is unavailable in this isolated session
+tr: การเข้าถึงรายการที่ปักหมุดของ Windows ไม่พร้อมใช้งานในเซสชันที่แยกนี้
+
+en: Windows pinned applications could not be read
+tr: ไม่สามารถอ่านแอปพลิเคชันที่ปักหมุดไว้ของ Windows
+
+en: Settings changed during pin import. Try import again.
+tr: การตั้งค่าเปลี่ยนไประหว่างการนำเข้ารายการที่ปักหมุด ลองนำเข้าอีกครั้ง
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: บันทึกแอปพลิเคชันที่ปักหมุดเพิ่มเติม {} รายการแล้ว รายการที่ปักหมุดของ Windows บางรายการอาจไม่พร้อมใช้งาน
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: รายการที่ปักหมุดเปลี่ยนแปลงในหน่วยความจำ แต่บันทึกไม่สำเร็จ เลือก นำไปใช้ ในการตั้งค่าเพื่อลองอีกครั้ง
+
+en: Pins updated in memory; saving...
+tr: อัปเดตรายการที่ปักหมุดในหน่วยความจำแล้ว กำลังบันทึก...
+
+en: Imported pins could not be applied
+tr: ไม่สามารถนำรายการที่ปักหมุดที่นำเข้ามาไปใช้
+
+en: Pin import is unavailable while closing
+tr: การนำเข้ารายการที่ปักหมุดไม่พร้อมใช้งานขณะกำลังปิด
+
+en: Settings could not be saved
+tr: ไม่สามารถบันทึกการตั้งค่า
+
+en: Quit without saving the latest changes?
+tr: ออกโดยไม่บันทึกการเปลี่ยนแปลงล่าสุดหรือไม่
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: ไฟล์การตั้งค่าก่อนหน้าของคุณยังคงอยู่ เปิด Aether Shell ไว้เพื่อลองบันทึกอีกครั้ง
+
+en: &Quit without saving
+tr: ออกโดยไม่บันทึก(&Q)
+
+en: &Keep Aether Shell open
+tr: เปิด Aether Shell ไว้(&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: ส่งออกข้อมูลการวินิจฉัยพื้นฐาน — เวอร์ชันแอปและบิลด์ของ Windows ไม่มีบันทึกหรือข้อมูลส่วนบุคคล
+
+en: Diagnostics exported.
+tr: ส่งออกข้อมูลการวินิจฉัยแล้ว
+
+en: Diagnostics could not be saved to the chosen file.
+tr: ไม่สามารถบันทึกข้อมูลการวินิจฉัยลงในไฟล์ที่เลือก
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: ไม่สามารถอ่านการตั้งค่าได้อย่างปลอดภัย ไฟล์ที่มีอยู่ได้รับการเก็บรักษาไว้
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell ไม่สามารถเริ่มส่วนประกอบบนเดสก์ท็อปได้
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: การคืนค่าแถบงานของ Windows ยังค้างอยู่ ลองอีกครั้งหรือปิด Aether Shell
+
+en: The Windows taskbar is shown temporarily.
+tr: แถบงานของ Windows แสดงชั่วคราว
+
+en: Windows taskbar restored.
+tr: คืนค่าแถบงานของ Windows แล้ว
+
+en: Windows taskbar replacement is active.
+tr: การแทนที่แถบงานของ Windows ทำงานอยู่
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: แถบงานของ Windows ยังคงพร้อมใช้งาน การแทนที่จะลองอีกครั้งในไม่ช้า
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: แถบงานของ Windows ยังคงพร้อมใช้งาน ปิดแล้วเปิดการแทนที่อีกครั้งเพื่อลองใหม่
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: คืนค่าแถบงานของ Windows แล้ว การแทนที่จะเชื่อมต่อใหม่ในไม่ช้า
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: คืนค่าแถบงานของ Windows แล้ว ปิดแล้วเปิดการแทนที่อีกครั้งเพื่อลองใหม่
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: การแทนที่แถบงานหยุดแล้ว คืนค่าแถบงานของ Windows แล้ว
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: การแทนที่แถบงานหยุดแล้ว ไม่สามารถยืนยันการคืนค่าแถบงานของ Windows
+
+en: Activating taskbar replacement...
+tr: กำลังเปิดใช้งานการแทนที่แถบงาน...
+
+en: Restoring Windows taskbar...
+tr: กำลังคืนค่าแถบงานของ Windows...
+
+en: Reconnecting taskbar replacement...
+tr: กำลังเชื่อมต่อการแทนที่แถบงานใหม่...
+
+en: Showing the Windows taskbar temporarily...
+tr: กำลังแสดงแถบงานของ Windows ชั่วคราว...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell ไม่สามารถคืนค่าแถบงานของ Windows ได้
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: เริ่ม Windows Explorer ใหม่จากตัวจัดการงาน (Ctrl+Shift+Esc) หรือออกจากระบบแล้วลงชื่อเข้าใช้อีกครั้ง
+
+en: The Windows taskbar was restored to its saved state.
+tr: คืนค่าแถบงานของ Windows เป็นสถานะที่บันทึกไว้แล้ว
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: ไม่พบสถานะแถบงานที่บันทึกไว้ แถบงานของ Windows แสดงขึ้นแล้ว การตั้งค่าซ่อนอัตโนมัติไม่ได้เปลี่ยนแปลง
+
+en: There was nothing to restore.
+tr: ไม่มีสิ่งใดต้องคืนค่า
+
+en: Taskbar replacement is turned off.
+tr: ปิดการแทนที่แถบงานอยู่
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: ไม่สามารถปิดการแทนที่แถบงานโดยอัตโนมัติ ปิดได้ในการตั้งค่า Aether Shell > เดสก์ท็อป
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: บรรทัดคำสั่งของ Aether Shell ไม่รู้จักหรือไม่ถูกต้อง
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell ไม่สามารถสร้างโฟลเดอร์ข้อมูลภายในเครื่องได้
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell หยุดทำงานหลังจากเกิดข้อผิดพลาดที่ไม่คาดคิด
+
+## search-names
+
+en: Disk Management
+tr: การจัดการดิสก์
+
+en: Local Users and Groups
+tr: ผู้ใช้และกลุ่มภายในเครื่อง
+
+en: Local Group Policy Editor
+tr: ตัวแก้ไขนโยบายกลุ่มภายในเครื่อง
+
+en: Manage User Certificates
+tr: จัดการใบรับรองผู้ใช้
+
+en: Manage Computer Certificates
+tr: จัดการใบรับรองคอมพิวเตอร์
+
+en: Shared Folders
+tr: โฟลเดอร์ที่ใช้ร่วมกัน
+
+en: TPM Management
+tr: การจัดการ TPM
+
+en: Network Connections
+tr: การเชื่อมต่อเครือข่าย
+
+en: System Properties
+tr: คุณสมบัติของระบบ
+
+en: About Windows
+tr: เกี่ยวกับ Windows
+
+en: DirectX Diagnostic Tool
+tr: เครื่องมือวินิจฉัย DirectX
+
+en: Windows Features
+tr: คุณลักษณะของ Windows
+
+en: System Restore
+tr: การคืนค่าระบบ
+
+en: Advanced System Settings
+tr: การตั้งค่าระบบขั้นสูง
+
+en: Volume Mixer
+tr: ตัวผสมระดับเสียง
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: บัญชีผู้ใช้ (ขั้นสูง)
+
+en: Display settings
+tr: การตั้งค่าจอแสดงผล
+
+en: Night light settings
+tr: การตั้งค่าแสงกลางคืน
+
+en: Graphics settings
+tr: การตั้งค่ากราฟิก
+
+en: Sound settings
+tr: การตั้งค่าเสียง
+
+en: Notification settings
+tr: การตั้งค่าการแจ้งเตือน
+
+en: Power & battery settings
+tr: การตั้งค่าพลังงานและแบตเตอรี่
+
+en: Energy saver settings
+tr: การตั้งค่าตัวประหยัดพลังงาน
+
+en: Storage settings
+tr: การตั้งค่าที่เก็บข้อมูล
+
+en: Multitasking settings
+tr: การตั้งค่าการทำงานหลายอย่างพร้อมกัน
+
+en: Clipboard settings
+tr: การตั้งค่าคลิปบอร์ด
+
+en: Remote Desktop settings
+tr: การตั้งค่าเดสก์ท็อประยะไกล
+
+en: About your PC
+tr: เกี่ยวกับพีซีของคุณ
+
+en: Bluetooth & devices settings
+tr: การตั้งค่า Bluetooth และอุปกรณ์
+
+en: Printers & scanners settings
+tr: การตั้งค่าเครื่องพิมพ์และสแกนเนอร์
+
+en: Mouse settings
+tr: การตั้งค่าเมาส์
+
+en: Touchpad settings
+tr: การตั้งค่าทัชแพด
+
+en: Network & internet settings
+tr: การตั้งค่าเครือข่ายและอินเทอร์เน็ต
+
+en: Wi-Fi settings
+tr: การตั้งค่า Wi-Fi
+
+en: VPN settings
+tr: การตั้งค่า VPN
+
+en: Proxy settings
+tr: การตั้งค่าพร็อกซี
+
+en: Airplane mode settings
+tr: การตั้งค่าโหมดเครื่องบิน
+
+en: Mobile hotspot settings
+tr: การตั้งค่าฮอตสปอตมือถือ
+
+en: Background settings
+tr: การตั้งค่าพื้นหลัง
+
+en: Color settings
+tr: การตั้งค่าสี
+
+en: Theme settings
+tr: การตั้งค่าธีม
+
+en: Lock screen settings
+tr: การตั้งค่าหน้าจอล็อก
+
+en: Taskbar settings
+tr: การตั้งค่าแถบงาน
+
+en: Font settings
+tr: การตั้งค่าแบบอักษร
+
+en: Installed apps
+tr: แอปที่ติดตั้ง
+
+en: Default apps settings
+tr: การตั้งค่าแอปเริ่มต้น
+
+en: Startup apps settings
+tr: การตั้งค่าแอปเริ่มต้นระบบ
+
+en: Account info
+tr: ข้อมูลบัญชี
+
+en: Sign-in options
+tr: ตัวเลือกการลงชื่อเข้าใช้
+
+en: Other users settings
+tr: การตั้งค่าผู้ใช้อื่นๆ
+
+en: Date & time settings
+tr: การตั้งค่าวันที่และเวลา
+
+en: Language & region settings
+tr: การตั้งค่าภาษาและภูมิภาค
+
+en: Typing settings
+tr: การตั้งค่าการพิมพ์
+
+en: Accessibility settings
+tr: การตั้งค่าการช่วยสำหรับการเข้าถึง
+
+en: Privacy & security settings
+tr: การตั้งค่าความเป็นส่วนตัวและความปลอดภัย
+
+en: Location settings
+tr: การตั้งค่าตำแหน่งที่ตั้ง
+
+en: Windows Update settings
+tr: การตั้งค่า Windows Update
+
+en: Recovery settings
+tr: การตั้งค่าการกู้คืน
+
+en: Activation settings
+tr: การตั้งค่าการเปิดใช้งาน
+
+en: For developers settings
+tr: การตั้งค่าสำหรับนักพัฒนา
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: ไม่สามารถติดต่อ GitHub ได้
+
+en: GitHub did not answer the request just now.
+tr: GitHub ไม่ได้ตอบสนองต่อคำขอในขณะนี้
+
+en: The release did not pass verification, so nothing was installed.
+tr: รุ่นนี้ไม่ผ่านการตรวจสอบ จึงไม่มีการติดตั้งสิ่งใด
+
+en: There is not enough free disk space.
+tr: พื้นที่ว่างในดิสก์ไม่เพียงพอ
+
+en: Windows refused access to the update files.
+tr: Windows ปฏิเสธการเข้าถึงไฟล์อัปเดต
+
+en: {} bytes
+tr: {} ไบต์
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: สถานะ
+
+en: Check &now
+tr: ตรวจสอบตอนนี้(&N)
+
+en: Download and install
+tr: ดาวน์โหลดและติดตั้ง
+
+en: &Later
+tr: ภายหลัง(&L)
+
+en: S&kip this version
+tr: ข้ามเวอร์ชันนี้(&K)
+
+en: &Release details
+tr: รายละเอียดรุ่น(&R)
+
+en: Disable &notifications
+tr: ปิดใช้งานการแจ้งเตือน(&N)
+
+en: Release notes
+tr: บันทึกประจำรุ่น
+
+en: the new version
+tr: เวอร์ชันใหม่
+
+en: Installed: {}.
+tr: ติดตั้งแล้ว: {}
+
+en: Automatic update checks are off
+tr: การตรวจหาอัปเดตอัตโนมัติปิดอยู่
+
+en: Check now looks for a newer release once.
+tr: ตรวจสอบตอนนี้ จะค้นหารุ่นที่ใหม่กว่าหนึ่งครั้ง
+
+en: Last checked {}
+tr: ตรวจสอบล่าสุด {}
+
+en: Not checked yet
+tr: ยังไม่ได้ตรวจสอบ
+
+en: Checking for updates...
+tr: กำลังตรวจหาอัปเดต...
+
+en: Aether Shell is up to date
+tr: Aether Shell เป็นเวอร์ชันล่าสุดแล้ว
+
+en: Latest published release: {}.
+tr: รุ่นล่าสุดที่เผยแพร่: {}
+
+en: Version {} is available
+tr: มีเวอร์ชัน {} พร้อมใช้งาน
+
+en: Download size: {}.
+tr: ขนาดการดาวน์โหลด: {}
+
+en: Downloading version {}...
+tr: กำลังดาวน์โหลดเวอร์ชัน {}...
+
+en: Received {} of {} ({}%).
+tr: ได้รับแล้ว {} จาก {} ({}%)
+
+en: Received {}; total size unknown.
+tr: ได้รับแล้ว {} ไม่ทราบขนาดทั้งหมด
+
+en: Version {} is ready to install
+tr: เวอร์ชัน {} พร้อมติดตั้งแล้ว
+
+en: Verified with the signed release manifest and SHA-256.
+tr: ตรวจสอบด้วยไฟล์ประกาศรุ่นที่ลงนามและ SHA-256 แล้ว
+
+en: The update could not be completed
+tr: ไม่สามารถอัปเดตให้เสร็จสมบูรณ์
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: ขณะนี้ต้องติดตั้งด้วยตนเอง: เปิดรายละเอียดรุ่น แล้วดาวน์โหลดและเรียกใช้โปรแกรมติดตั้ง
+
+en: Failure: {}.
+tr: ล้มเหลว: {}
+
+en: Choose Retry Download to try again.
+tr: เลือก ลองดาวน์โหลดอีกครั้ง เพื่อลองใหม่
+
+en: Use Check now to try again.
+tr: ใช้ ตรวจสอบตอนนี้ เพื่อลองใหม่
+
+en: Next automatic check: {}.
+tr: การตรวจสอบอัตโนมัติครั้งถัดไป: {}
+
+en: &Install update
+tr: ติดตั้งอัปเดต(&I)
+
+en: Retry &Download
+tr: ลองดาวน์โหลดอีกครั้ง(&D)
+
+en: &Download and install
+tr: ดาวน์โหลดและติดตั้ง(&D)
+
+en: Windows' startup state could not be read in this session.
+tr: ไม่สามารถอ่านสถานะการเริ่มต้นระบบของ Windows ในเซสชันนี้
+
+en: Windows will start it at your next sign-in.
+tr: Windows จะเริ่มโปรแกรมนี้เมื่อคุณลงชื่อเข้าใช้ครั้งถัดไป
+
+en: Right now it will not start at sign-in.
+tr: ขณะนี้โปรแกรมจะไม่เริ่มเมื่อลงชื่อเข้าใช้
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: โปรแกรมถูกปิดในตัวจัดการงานหรือการตั้งค่า Windows ซึ่งจะเป็นผู้กำหนดจนกว่าจะเปิดใช้งานที่นั่น
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows จะเริ่ม Aether Shell อีกชุดหนึ่ง
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows รายงานสถานะการเริ่มต้นระบบที่เวอร์ชันนี้อ่านไม่ได้
+
+en: The close action could not be completed.
+tr: ไม่สามารถดำเนินการปิดให้เสร็จสมบูรณ์
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: ใส่ตัวเลขที่สมบูรณ์ก่อนบันทึก ช่องที่ทำเครื่องหมายสีแดงไม่ใช่ตัวเลข
+
+en: Settings could not be validated.
+tr: ไม่สามารถตรวจสอบความถูกต้องของการตั้งค่า
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: การเริ่มต้นเมื่อลงชื่อเข้าใช้ยังคงเหมือนเดิม เนื่องจากไม่สามารถบันทึกการตั้งค่า
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: ไม่สามารถบันทึกการตั้งค่า และไม่สามารถคืนค่าการเริ่มต้นเมื่อลงชื่อเข้าใช้ของ Windows กด นำไปใช้ อีกครั้งเพื่อลองใหม่
+
+en: Settings saved.
+tr: บันทึกการตั้งค่าแล้ว
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: การตั้งค่าเปลี่ยนแปลงในหน่วยความจำ แต่บันทึกไม่สำเร็จ กด นำไปใช้ อีกครั้งเพื่อลองใหม่
+
+en: Settings could not be applied.
+tr: ไม่สามารถนำการตั้งค่าไปใช้
+
+en: Some values were corrected to their supported range.
+tr: บางค่าได้รับการแก้ไขให้อยู่ในช่วงที่รองรับ
+
+en: Startup registration is unavailable in this session.
+tr: การลงทะเบียนการเริ่มต้นระบบไม่พร้อมใช้งานในเซสชันนี้
+
+en: Changing startup registration...
+tr: กำลังเปลี่ยนการลงทะเบียนการเริ่มต้นระบบ...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows ไม่ได้เปลี่ยนการลงทะเบียนการเริ่มต้นระบบ ตรวจสอบการตั้งค่าการเริ่มต้นระบบในตัวจัดการงาน
+
+en: Startup registration could not be changed.
+tr: ไม่สามารถเปลี่ยนการลงทะเบียนการเริ่มต้นระบบ
+
+en: Defaults saved; startup is disabled.
+tr: บันทึกค่าเริ่มต้นแล้ว การเริ่มต้นระบบถูกปิดใช้งาน
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: นำค่าเริ่มต้นไปใช้แล้ว แต่บันทึกไม่สำเร็จ กด นำไปใช้ อีกครั้งเพื่อลองใหม่
+
+en: Defaults could not be applied.
+tr: ไม่สามารถนำค่าเริ่มต้นไปใช้
+
+en: Startup was not disabled; settings were kept.
+tr: ไม่ได้ปิดใช้งานการเริ่มต้นระบบ การตั้งค่ายังคงเดิม
+
+en: Location search is unavailable.
+tr: การค้นหาตำแหน่งที่ตั้งไม่พร้อมใช้งาน
+
+en: Searching Open-Meteo locations...
+tr: กำลังค้นหาตำแหน่งที่ตั้งใน Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: การค้นหาตำแหน่งที่ตั้งล้มเหลว ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง
+
+en: No place matched that search.
+tr: ไม่มีสถานที่ที่ตรงกับการค้นหานั้น
+
+en: Choose a location to save it.
+tr: เลือกตำแหน่งที่ตั้งเพื่อบันทึก
+
+en: Reset all settings?
+tr: รีเซ็ตการตั้งค่าทั้งหมดหรือไม่
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: การกำหนดลักษณะและแอปพลิเคชันที่ปักหมุดจะกลับเป็นค่าเริ่มต้น และการเริ่มต้นเมื่อลงชื่อเข้าใช้จะถูกปิด
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: ตัวเลือกแถบงานของ Windows ของคุณยังคงอยู่ และมีการเก็บสำเนาสำรองของไฟล์การตั้งค่าปัจจุบันไว้
+
+en: &Reset
+tr: รีเซ็ต(&R)
+
+en: Cancel
+tr: ยกเลิก
+
+en: Pinned applications saved.
+tr: บันทึกแอปพลิเคชันที่ปักหมุดแล้ว
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: รายการที่ปักหมุดเปลี่ยนแปลงในหน่วยความจำ แต่บันทึกไม่สำเร็จ กด นำไปใช้ อีกครั้งเพื่อลองใหม่
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: ไม่สามารถคืนค่าเริ่มต้น เนื่องจากการลงทะเบียนการเริ่มต้นระบบไม่พร้อมใช้งาน
+
+en: Pinned application could not be added.
+tr: ไม่สามารถเพิ่มแอปพลิเคชันที่ปักหมุด
+
+en: Choose an application to add first.
+tr: เลือกแอปพลิเคชันที่จะเพิ่มก่อน
+
+en: Pinned applications could not be changed.
+tr: ไม่สามารถเปลี่ยนแอปพลิเคชันที่ปักหมุด
+
+en: Choose a pinned application first.
+tr: เลือกแอปพลิเคชันที่ปักหมุดก่อน
+
+en: Desktop status is unavailable in this session.
+tr: สถานะเดสก์ท็อปไม่พร้อมใช้งานในเซสชันนี้
+
+en: Desktop status is unavailable.
+tr: สถานะเดสก์ท็อปไม่พร้อมใช้งาน
+
+en: Password
+tr: รหัสผ่าน
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: กำลังดาวน์โหลด {} จาก GitHub ({}) จะแสดงภาษาอังกฤษจนกว่าจะพร้อม
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: ไม่สามารถดาวน์โหลด {} ได้ จะแสดงภาษาอังกฤษจนกว่าจะดาวน์โหลดเสร็จ เลือก ดาวน์โหลด ด้านล่างเพื่อลองอีกครั้ง
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} ยังไม่มีในพีซีเครื่องนี้ จะแสดงภาษาอังกฤษจนกว่าจะดาวน์โหลดเสร็จ
+
+en: {} is on this PC.
+tr: {} อยู่ในพีซีเครื่องนี้แล้ว
+
+en: Every language is on this PC.
+tr: ทุกภาษาอยู่ในพีซีเครื่องนี้แล้ว
+
+en: Choose a language to download first.
+tr: เลือกภาษาที่จะดาวน์โหลดก่อน
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: แถบด้านบน
+
+en: Weather
+tr: สภาพอากาศ
+
+en: Updates
+tr: อัปเดต
+
+en: General
+tr: ทั่วไป
+
+en: About
+tr: เกี่ยวกับ
+
+en: Desktop
+tr: เดสก์ท็อป
+
+en: Appearance
+tr: ลักษณะที่ปรากฏ
+
+en: Welcome
+tr: ต้อนรับ
+
+en: Aether Shell Settings
+tr: การตั้งค่า Aether Shell
+
+en: Settings
+tr: การตั้งค่า
+
+en: Reset defaults...
+tr: รีเซ็ตเป็นค่าเริ่มต้น...
+
+en: &Apply
+tr: นำไปใช้(&A)
+
+en: Liquid
+tr: ลิควิด
+
+en: Grain
+tr: เกรน
+
+en: From {} to {}
+tr: ตั้งแต่ {} ถึง {}
+
+en: px
+tr: px
+
+en: min
+tr: นาที
+
+en: h
+tr: ชม.
+
+en: This action could not be completed.
+tr: ไม่สามารถดำเนินการนี้ให้เสร็จสมบูรณ์
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: ขนาด ระยะห่าง การเคลื่อนไหว และแอปพลิเคชันที่ปักหมุดไว้ที่ Dock
+
+en: Size and spacing
+tr: ขนาดและระยะห่าง
+
+en: Icon size
+tr: ขนาดไอคอน
+
+en: {}, scaled with the Windows display scale.
+tr: {} ปรับขนาดตามสเกลการแสดงผลของ Windows
+
+en: Bottom margin
+tr: ระยะขอบด้านล่าง
+
+en: Space between the Dock and the bottom of the screen.
+tr: ระยะห่างระหว่าง Dock กับขอบล่างของหน้าจอ
+
+en: Minimum side margin
+tr: ระยะขอบด้านข้างขั้นต่ำ
+
+en: Space kept free at the left and right screen edges.
+tr: พื้นที่ที่เว้นว่างไว้ที่ขอบซ้ายและขวาของหน้าจอ
+
+en: Icon spacing
+tr: ระยะห่างไอคอน
+
+en: Space between neighbouring icons.
+tr: ระยะห่างระหว่างไอคอนที่อยู่ติดกัน
+
+en: Glass and motion
+tr: กระจกและการเคลื่อนไหว
+
+en: Glass opacity
+tr: ความทึบของกระจก
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: ค่าที่ต่ำลงจะแสดงเดสก์ท็อปที่เบลอด้านหลัง Dock มากขึ้น
+
+en: Hover magnification
+tr: การขยายเมื่อโฮเวอร์
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: ไอคอนจะขยายใหญ่ขึ้นเท่าใดเมื่ออยู่ใต้ตัวชี้ ค่า 1 จะปิดฟีเจอร์นี้
+
+en: Behavior
+tr: ลักษณะการทำงาน
+
+en: Show running applications
+tr: แสดงแอปพลิเคชันที่กำลังทำงาน
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: แอปพลิเคชันที่เปิดอยู่ซึ่งไม่ได้ปักหมุดจะแสดงต่อจากแอปที่ปักหมุดไว้
+
+en: Reserve screen space for the Dock
+tr: จองพื้นที่หน้าจอสำหรับ Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: หน้าต่างที่ขยายใหญ่สุดจะอยู่เหนือ Dock แทนที่จะอยู่ด้านล่าง
+
+en: Automatically hide the Dock
+tr: ซ่อน Dock โดยอัตโนมัติ
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: ซ่อนเมื่อมีหน้าต่างแอปพลิเคชันบังอยู่ เลื่อนตัวชี้ไปที่ขอบล่างของหน้าจอเพื่อแสดง Dock จะยังคงอยู่บนเดสก์ท็อป และหน้าต่างจะได้รับความสูงเต็มหน้าจอ
+
+en: Pinned applications
+tr: แอปพลิเคชันที่ปักหมุด
+
+en: Move &up
+tr: ย้ายขึ้น(&U)
+
+en: Move &down
+tr: ย้ายลง(&D)
+
+en: &Remove
+tr: เอาออก(&R)
+
+en: &Add application
+tr: เพิ่มแอปพลิเคชัน(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: รายการที่ปักหมุดจะคงข้อมูลประจำตัวและการตั้งค่าการเปิดใช้ไว้ การเอารายการที่ปักหมุดออกจะป้องกันไม่ให้การซิงค์อัตโนมัติกับแถบงานของ Windows เพิ่มกลับมาอีก
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: ตำแหน่ง นาฬิกา และรายการสถานะที่แสดงในแถบสถานะด้านบน
+
+en: Presentation
+tr: การแสดงผล
+
+en: Floating bar
+tr: แถบลอย
+
+en: Text on the desktop
+tr: ข้อความบนเดสก์ท็อป
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: แถบลอย: แถบกระจกใต้ขอบบนของหน้าจอ ข้อความบนเดสก์ท็อป: ไม่มีแถบ รายการเดียวกันจะเขียนไว้ที่ด้านบนสุดของหน้าจอ บนภาพเดสก์ท็อปโดยตรง แถบนี้จะไม่มีหน้าต่างมาทับ และไม่ใช้ระยะขอบด้านบนและความทึบของกระจก เมื่อซ่อนอัตโนมัติ ข้อความจะกลับมาบนแถบกระจกเมื่อมีหน้าต่างอยู่ด้านล่าง
+
+en: Position and glass
+tr: ตำแหน่งและกระจก
+
+en: Top margin
+tr: ระยะขอบด้านบน
+
+en: Space between the Top Bar and the top of the screen.
+tr: ระยะห่างระหว่างแถบด้านบนกับขอบบนของหน้าจอ
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: ค่าที่ต่ำลงจะแสดงเดสก์ท็อปที่เบลอด้านหลังแถบมากขึ้น
+
+en: Clock
+tr: นาฬิกา
+
+en: Clock format
+tr: รูปแบบนาฬิกา
+
+en: Follow Windows
+tr: ตาม Windows
+
+en: 12-hour
+tr: 12 ชั่วโมง
+
+en: 24-hour
+tr: 24 ชั่วโมง
+
+en: Date style
+tr: รูปแบบวันที่
+
+en: Weekday, day and month
+tr: วันในสัปดาห์ วันที่ และเดือน
+
+en: Short
+tr: แบบสั้น
+
+en: Long
+tr: แบบยาว
+
+en: Show seconds
+tr: แสดงวินาที
+
+en: Show date
+tr: แสดงวันที่
+
+en: Status items
+tr: รายการสถานะ
+
+en: Show battery
+tr: แสดงแบตเตอรี่
+
+en: Hide battery when absent
+tr: ซ่อนแบตเตอรี่เมื่อไม่มี
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: พีซีตั้งโต๊ะที่ไม่มีแบตเตอรี่จะไม่แสดงอะไรเลยแทนที่จะแสดงแบตเตอรี่ที่ไม่รู้จัก
+
+en: Show input language
+tr: แสดงภาษาสำหรับป้อนข้อมูล
+
+en: Show network
+tr: แสดงเครือข่าย
+
+en: Show audio output
+tr: แสดงเอาต์พุตเสียง
+
+en: Show microphone
+tr: แสดงไมโครโฟน
+
+en: Show weather when enabled
+tr: แสดงสภาพอากาศเมื่อเปิดใช้งาน
+
+en: Weather itself is turned on in Weather settings.
+tr: สภาพอากาศจะเปิดใช้งานในการตั้งค่าสภาพอากาศ
+
+en: Show hidden icons button
+tr: แสดงปุ่มไอคอนที่ซ่อนอยู่
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: ลูกศรเล็กๆ ที่เปิดไอคอนที่ซ่อนอยู่ในพื้นที่แจ้งเตือนของ Windows
+
+en: Reserve screen space above windows
+tr: จองพื้นที่หน้าจอเหนือหน้าต่าง
+
+en: Maximized windows stay below the Top Bar.
+tr: หน้าต่างที่ขยายใหญ่สุดจะอยู่ใต้แถบด้านบน
+
+en: Automatically hide the Top Bar
+tr: ซ่อนแถบด้านบนโดยอัตโนมัติ
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: ซ่อนเมื่อมีหน้าต่างแอปพลิเคชันบังอยู่ เลื่อนตัวชี้ไปที่ขอบบนของหน้าจอเพื่อแสดง แถบจะยังคงอยู่บนเดสก์ท็อป
+
+en: Use Windows Quick Settings (Windows 11)
+tr: ใช้การตั้งค่าด่วนของ Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: ปิด: ตัวควบคุมด่วนของ Aether จะเปิดใต้แถบด้านบน เปิด: แผงของ Windows เองจะเปิดที่ด้านล่างของหน้าจอ
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: การพยากรณ์อากาศเพิ่มเติมในแถบด้านบน ให้บริการโดย Open-Meteo
+
+en: Forecast
+tr: พยากรณ์อากาศ
+
+en: Enable weather
+tr: เปิดใช้งานสภาพอากาศ
+
+en: Off by default: the forecast needs network requests.
+tr: ปิดตามค่าเริ่มต้น: การพยากรณ์อากาศต้องใช้คำขอเครือข่าย
+
+en: Temperature
+tr: อุณหภูมิ
+
+en: Celsius
+tr: เซลเซียส
+
+en: Fahrenheit
+tr: ฟาเรนไฮต์
+
+en: Refresh interval
+tr: ช่วงเวลารีเฟรช
+
+en: Location
+tr: ตำแหน่งที่ตั้ง
+
+en: Locate automatically with Windows
+tr: ระบุตำแหน่งโดยอัตโนมัติด้วย Windows
+
+en: Uses the Windows location service after you allow it.
+tr: ใช้บริการตำแหน่งที่ตั้งของ Windows หลังจากที่คุณอนุญาต
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows จะขอสิทธิ์ตำแหน่งที่ตั้ง พิกัดของคุณจะถูกส่งไปยัง Open-Meteo.com เพื่อรับการพยากรณ์อากาศเท่านั้น และคีย์ตำแหน่งที่ตั้งจะถูกแคชไว้ในเครื่อง หากตำแหน่งที่ตั้งถูกบล็อก สภาพอากาศจะไม่พร้อมใช้งาน
+
+en: Use &Windows location
+tr: ใช้ตำแหน่งที่ตั้งของ Windows(&W)
+
+en: Location &settings
+tr: การตั้งค่าตำแหน่งที่ตั้ง(&S)
+
+en: Choose automatic location or search for a place below.
+tr: เลือกตำแหน่งที่ตั้งอัตโนมัติ หรือค้นหาสถานที่ด้านล่าง
+
+en: Search for a place
+tr: ค้นหาสถานที่
+
+en: Searc&h
+tr: ค้นหา(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: ข้อมูลสภาพอากาศโดย Open-Meteo.com (CC BY 4.0) การค้นหาด้วยตนเองจะส่งเฉพาะข้อความที่คุณใส่เท่านั้น
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: รุ่นที่ลงนามจากที่เก็บ GitHub อย่างเป็นทางการ ซึ่งได้รับการตรวจสอบก่อนติดตั้ง
+
+en: Preferences
+tr: การกำหนดลักษณะ
+
+en: Check for updates automatically
+tr: ตรวจหาอัปเดตโดยอัตโนมัติ
+
+en: Check interval
+tr: ช่วงเวลาตรวจสอบ
+
+en: Release channel
+tr: ช่องทางการเผยแพร่
+
+en: Prereleases arrive earlier and change more often.
+tr: รุ่นก่อนเผยแพร่จะมาเร็วกว่าและเปลี่ยนแปลงบ่อยกว่า
+
+en: Stable
+tr: เสถียร
+
+en: Prerelease
+tr: รุ่นก่อนเผยแพร่
+
+en: Show update notifications
+tr: แสดงการแจ้งเตือนการอัปเดต
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: การเริ่มต้นระบบ การเคลื่อนไหว แป้นพิมพ์ลัด และการวินิจฉัย
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: ภาษาของแถบ เมนู การค้นหา การตั้งค่า และโปรแกรมติดตั้ง
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: ชื่อที่เป็นของคุณหรือของโปรแกรมอื่น (แอปพลิเคชัน ไฟล์ เครือข่าย Wi-Fi) จะไม่ถูกแปล เมื่อเลือกภาษาไว้ แถบด้านบนจะเขียนวันที่เป็นภาษานั้น ตาม Windows จะคงรูปแบบภูมิภาคของ Windows ของคุณไว้
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: คำต้อนรับแบบลายมือเขียนด้วยอักษรละติน: ทักทายเป็นภาษาฝรั่งเศส อังกฤษ หรือสเปน เลือกภาษาได้ในหน้าต้อนรับ
+
+en: Language
+tr: ภาษา
+
+en: Interface language
+tr: ภาษาของอินเทอร์เฟซ
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: ตาม Windows จะใช้ภาษาแรกในภาษาที่แสดงของ Windows ที่มีอยู่ในรายการนี้ หรือภาษาอังกฤษหากไม่มี
+
+en: Startup
+tr: การเริ่มต้นระบบ
+
+en: Start Aether Shell when I sign in
+tr: เริ่ม Aether Shell เมื่อฉันลงชื่อเข้าใช้
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: การเปลี่ยนค่านี้ต้องกด นำไปใช้ ตัวจัดการงานก็สามารถปิดได้เช่นกัน
+
+en: Motion
+tr: การเคลื่อนไหว
+
+en: Reduced motion removes decorative movement everywhere.
+tr: การเคลื่อนไหวแบบลดลงจะเอาการเคลื่อนไหวเพื่อการตกแต่งออกทุกที่
+
+en: Reduced
+tr: ลดลง
+
+en: Full
+tr: เต็มรูปแบบ
+
+en: Keyboard shortcuts
+tr: แป้นพิมพ์ลัด
+
+en: Enable global keyboard shortcuts
+tr: เปิดใช้งานแป้นพิมพ์ลัดส่วนกลาง
+
+en: Search shortcut key
+tr: แป้นลัดของการค้นหา
+
+en: Dock shortcut key
+tr: แป้นลัดของ Dock
+
+en: Search shortcut modifiers
+tr: แป้นตัวปรับของทางลัดการค้นหา
+
+en: Dock shortcut modifiers
+tr: แป้นตัวปรับของทางลัด Dock
+
+en: Shortcut status unavailable
+tr: สถานะแป้นพิมพ์ลัดไม่พร้อมใช้งาน
+
+en: Diagnostics
+tr: การวินิจฉัย
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: โฟลเดอร์บันทึกเก็บบันทึกของ Aether Shell ในคอมพิวเตอร์เครื่องนี้ การส่งออกข้อมูลการวินิจฉัยจะบันทึกเฉพาะเวอร์ชันแอปและบิลด์ของ Windows - ไม่มีบันทึกหรือข้อมูลส่วนบุคคล
+
+en: Open &log folder
+tr: เปิดโฟลเดอร์บันทึก(&L)
+
+en: &Export diagnostics...
+tr: ส่งออกข้อมูลการวินิจฉัย(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: คำทักทายสั้นๆ แบบลายมือบนเดสก์ท็อปของคุณหลังจากที่คุณลงชื่อเข้าใช้หรือปลดล็อกพีซี
+
+en: Greeting
+tr: คำทักทาย
+
+en: Show the welcome at sign-in and unlock
+tr: แสดงคำต้อนรับเมื่อลงชื่อเข้าใช้และปลดล็อก
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: จะปรากฏหลังจากที่ Windows ลงชื่อเข้าใช้ให้คุณแล้ว ขณะที่ Aether Shell กำลังเตรียมพร้อม แตะ คลิก หรือกด Escape เพื่อข้าม
+
+en: Greeting language
+tr: ภาษาของคำทักทาย
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut ในภาษาฝรั่งเศส Hello ในภาษาอังกฤษ Hola ในภาษาสเปน ปากกาเขียนอักษรละติน: ในภาษาอื่นทั้งหมดจะทักทายเป็นภาษาอังกฤษ
+
+en: Your name
+tr: ชื่อของคุณ
+
+en: Name to greet you with
+tr: ชื่อที่ใช้ทักทายคุณ
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: ไม่บังคับ เช่น ชื่อจริง ชื่อจะเก็บไว้ในพีซีเครื่องนี้ในการตั้งค่า Aether Shell ของคุณ และจะไม่ถูกส่งไปที่ใดหรือเขียนลงในบันทึก ล้างช่องเพื่อเอาออก
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: โหมดสี สีเน้น ความเร็วการเคลื่อนไหว และรูปลักษณ์ของ Dock และแถบด้านบน
+
+en: Style
+tr: สไตล์
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: ลิควิด: กระจกเป็นชั้นๆ ทับสิ่งที่อยู่ด้านหลัง ชั้นเบลอ แสงของของเหลว แล้วจึงเป็นไอคอนและข้อความ ซึ่งยังคงอ่านง่ายบนหน้าสว่างและหน้ามืด เกรน: กระจกฝ้า เบลอและโปร่งแสงบางส่วน พร้อมเกรนละเอียด
+
+en: Liquid blur
+tr: ความเบลอของลิควิด
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: ระดับที่ชั้นเบลอใต้กระจกลิควิดปกคลุมสิ่งที่อยู่ด้านหลัง: 100% จะเบลอทั้งหมด ค่าที่ต่ำลงจะแสดงหน้าคมชัดขึ้น และข้อความบนแถบอาจอ่านยากขึ้นบนหน้าที่มีรายละเอียดมาก
+
+en: Liquid blur color
+tr: สีเบลอของลิควิด
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: อัตโนมัติจะคงสีของกระจกเองไว้ ข้อความและไอคอนยังคงอ่านง่ายไม่ว่าจะเป็นสีใด
+
+en: Automatic
+tr: อัตโนมัติ
+
+en: White
+tr: ขาว
+
+en: Black
+tr: ดำ
+
+en: Accent
+tr: สีเน้น
+
+en: Blue
+tr: น้ำเงิน
+
+en: Violet
+tr: ม่วง
+
+en: Pink
+tr: ชมพู
+
+en: Red
+tr: แดง
+
+en: Orange
+tr: ส้ม
+
+en: Yellow
+tr: เหลือง
+
+en: Green
+tr: เขียว
+
+en: Teal
+tr: เขียวน้ำทะเล
+
+en: Liquid color strength
+tr: ความเข้มของสีลิควิด
+
+en: How much of the chosen color the blur layer takes.
+tr: ปริมาณของสีที่เลือกที่ชั้นเบลอจะได้รับ
+
+en: Theme
+tr: ธีม
+
+en: Color mode
+tr: โหมดสี
+
+en: High contrast always takes precedence.
+tr: ความคมชัดสูงจะมีลำดับความสำคัญเหนือกว่าเสมอ
+
+en: Light
+tr: สว่าง
+
+en: Dark
+tr: มืด
+
+en: Accent color
+tr: สีเน้น
+
+en: Animation duration
+tr: ระยะเวลาภาพเคลื่อนไหว
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 คือความเร็วมาตรฐาน ค่าที่สูงขึ้นจะช้าลง การเคลื่อนไหวแบบลดลงจะมีลำดับความสำคัญเหนือกว่า
+
+en: Dock icon preset
+tr: ค่าที่กำหนดไว้ล่วงหน้าของไอคอน Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: ขนาดแบบกำหนดเองจากการตั้งค่า Dock จะคงไว้จนกว่าคุณจะเลือกค่าที่กำหนดไว้ล่วงหน้า
+
+en: Small - 32 px
+tr: เล็ก - 32 px
+
+en: Medium - 40 px
+tr: กลาง - 40 px
+
+en: Large - 48 px
+tr: ใหญ่ - 48 px
+
+en: Keep custom size
+tr: คงขนาดแบบกำหนดเองไว้
+
+en: Show Windows Start in the Dock
+tr: แสดงเมนูเริ่มของ Windows ใน Dock
+
+en: Show Task View in the Dock
+tr: แสดงมุมมองงานใน Dock
+
+en: Reserve extra space for Dock animations
+tr: จองพื้นที่เพิ่มเติมสำหรับภาพเคลื่อนไหวของ Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: ป้องกันไม่ให้การขยายและการเด้งเมื่อเปิดแอปทับหน้าต่างที่ขยายใหญ่สุด
+
+en: Weather position
+tr: ตำแหน่งสภาพอากาศ
+
+en: Left
+tr: ซ้าย
+
+en: Right
+tr: ขวา
+
+en: Keyboard indicator
+tr: ตัวบ่งชี้แป้นพิมพ์
+
+en: Compact
+tr: กะทัดรัด
+
+en: Two lines
+tr: สองบรรทัด
+
+en: Windows taskbar pins
+tr: รายการที่ปักหมุดบนแถบงานของ Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: เพิ่มรายการที่ปักหมุดใหม่ที่พบบนแถบงานของ Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: ขณะที่แถบงานถูกแทนที่ รายการที่ปักหมุดใหม่ของ Windows จะถูกเพิ่มลงใน Dock
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: การแทนที่แถบงานของ Windows ด้วย Dock แบบย้อนกลับได้
+
+en: Taskbar replacement
+tr: การแทนที่แถบงาน
+
+en: Replace the Windows taskbar
+tr: แทนที่แถบงานของ Windows
+
+en: Changing this needs Apply.
+tr: การเปลี่ยนค่านี้ต้องกด นำไปใช้
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: ขณะที่ Aether Shell ทำงาน จะซ่อนแถบงานของ Windows และจองพื้นที่ใต้แอปพลิเคชันที่ขยายใหญ่สุด
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: สถานะแถบงานของ Windows จะถูกคืนค่าเมื่อปิดใช้งานโหมดนี้หรือเมื่อ Aether Shell ปิด ตัวช่วยการกู้คืนที่แยกต่างหากจะคืนค่าแถบงานเช่นกันหากแอปพลิเคชันหยุดทำงานโดยไม่คาดคิด หากการกู้คืนล้มเหลว ให้เริ่ม Windows Explorer ใหม่ในตัวจัดการงาน
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: การตั้งค่า Windows ยังคงเป็นอินเทอร์เฟซดั้งเดิมของ Windows หน้าแถบงานจะไม่ถูกแทนที่โดย Aether Shell กำหนดค่าโหมดนี้ที่นี่
+
+en: Pinned applications from Windows
+tr: แอปพลิเคชันที่ปักหมุดจาก Windows
+
+en: &Import Windows taskbar pins
+tr: นำเข้ารายการที่ปักหมุดบนแถบงานของ Windows(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: อ่านทางลัดที่ปักหมุดโดยไม่เปลี่ยนรายการที่ปักหมุดของ Windows รายการที่ปักหมุดของ Windows 11 บางรายการหรือลำดับอาจไม่พร้อมใช้งาน
+
+en: Version {}
+tr: เวอร์ชัน {}
+
+en: Created by Ibrahim Bouillet
+tr: สร้างโดย Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: อินเทอร์เฟซเดสก์ท็อปแบบเนทีฟของ Windows - Dock แบบลอยและแถบสถานะด้านบน - ที่ทำงานควบคู่กับ Explorer
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: ข้อมูลสภาพอากาศ: Open-Meteo.com (CC BY 4.0) ไม่มีการรวมไลบรารีรันไทม์ C++ ของบุคคลที่สาม
+
+en: &Official project
+tr: โปรเจกต์อย่างเป็นทางการ(&O)
+
+en: Licence
+tr: สิทธิ์การใช้งาน
+
+en: Taskbar replacement changes need Apply.
+tr: การเปลี่ยนแปลงการแทนที่แถบงานต้องกด นำไปใช้
+
+en: Changes save automatically. Startup needs Apply.
+tr: การเปลี่ยนแปลงจะบันทึกโดยอัตโนมัติ การเริ่มต้นระบบต้องกด นำไปใช้
+
+en: Changes save automatically.
+tr: การเปลี่ยนแปลงจะบันทึกโดยอัตโนมัติ
+
+en: Press Apply to confirm this change.
+tr: กด นำไปใช้ เพื่อยืนยันการเปลี่ยนแปลงนี้
+
+en: Smart transparency
+tr: ความโปร่งใสอัจฉริยะ
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: ในสไตล์ลิควิด หน้าต่างนี้จะเบลอเฉพาะส่วนที่อยู่ใต้ข้อความและตัวควบคุมของตัวเอง: เบลอเต็มที่เหนือหน้าต่างอื่นและไอคอนเดสก์ท็อป เบลอเล็กน้อยเหนือภาพเดสก์ท็อป และไม่เบลอเลยในส่วนที่ไม่ได้แสดงอะไร
+
+en: Languages on this PC
+tr: ภาษาในพีซีเครื่องนี้
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell จะดาวน์โหลดภาษาที่ Windows มี จึงเปลี่ยนภาษาตามเมื่อ Windows เปลี่ยนภาษา
+
+en: Add a language
+tr: เพิ่มภาษา
+
+en: &Download
+tr: ดาวน์โหลด(&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: ทุกภาษามาจากรุ่นบน GitHub ของเวอร์ชันนี้ และได้รับการตรวจสอบก่อนใช้งาน เมื่อภาษาอยู่ในพีซีเครื่องนี้แล้ว ให้เลือกภาษานั้นด้านบน
+
+en: built in
+tr: มีในตัว
+
+en: downloading, {}
+tr: กำลังดาวน์โหลด {}
+
+en: download failed
+tr: ดาวน์โหลดล้มเหลว
+
+## setup
+
+en: Aether Shell Setup
+tr: โปรแกรมติดตั้ง Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: โปรแกรมติดตั้งไม่สามารถสร้างอินเทอร์เฟซได้ ปิดแล้วลองอีกครั้ง หรือใช้ตัวเลือกการติดตั้งแบบเงียบตามเอกสาร
+
+en: Options
+tr: ตัวเลือก
+
+en: Install
+tr: ติดตั้ง
+
+en: Done
+tr: เสร็จสิ้น
+
+en: Remove Aether Shell
+tr: เอา Aether Shell ออก
+
+en: Repair Aether Shell
+tr: ซ่อมแซม Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Dock และแถบสถานะด้านบนแบบเนทีฟสำหรับ Windows ที่ทำงานควบคู่กับ Explorer
+
+en: Replaces the Windows taskbar while it runs
+tr: แทนที่แถบงานของ Windows ขณะทำงาน
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: ออกจาก Aether Shell ปิดตัวเลือกนี้ในการตั้งค่า > เดสก์ท็อป หรือเปิด "คืนค่าแถบงานของ Windows" ในเมนูเริ่ม เพื่อให้แถบงานของ Windows กลับมา
+
+en: Starts when you sign in - your choice
+tr: เริ่มเมื่อคุณลงชื่อเข้าใช้ - ตามที่คุณเลือก
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: การติดตั้งใหม่จะเริ่มเมื่อลงชื่อเข้าใช้ตามค่าเริ่มต้น คุณสามารถล้างตัวเลือกนั้นก่อนติดตั้ง หรือปิดในภายหลังในการตั้งค่า ตัวเลือกการเริ่มต้นระบบที่มีอยู่และการปิดใช้งานในตัวจัดการงานจะถูกเก็บรักษาไว้
+
+en: Installs for your account
+tr: ติดตั้งสำหรับบัญชีของคุณ
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: ไม่จำเป็นต้องมีสิทธิ์ผู้ดูแลระบบ การตั้งค่าและข้อมูลของคุณจะอยู่ในโปรไฟล์ผู้ใช้ของคุณ
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: การถอนการติดตั้งจะเก็บการตั้งค่าและข้อมูลของคุณไว้ เว้นแต่คุณจะเลือกเอาออก
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: การซ่อมแซมจะคืนค่าไฟล์ของแพ็กเกจนี้และเก็บการตั้งค่าของคุณไว้ หาก Aether Shell ทำให้แถบงานของ Windows ถูกซ่อนไว้ การซ่อมแซมจะคืนค่าให้
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: การติดตั้งทับเวอร์ชันที่มีอยู่จะเก็บการตั้งค่าของคุณไว้ แพ็กเกจที่เก่ากว่าจะถูกปฏิเสธ เว้นแต่คุณจะอนุญาตให้ดาวน์เกรดอย่างชัดเจน
+
+en: MIT License
+tr: สิทธิ์การใช้งาน MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: สิทธิ์การใช้งานจะถูกติดตั้งเป็นไฟล์ LICENSE ข้าง Aether Shell ด้วย
+
+en: Remove this installation
+tr: เอาการติดตั้งนี้ออก
+
+en: Install location
+tr: ตำแหน่งที่ติดตั้ง
+
+en: &Browse...
+tr: เรียกดู(&B)...
+
+en: Also remove my settings, cache and logs
+tr: เอาการตั้งค่า แคช และบันทึกของฉันออกด้วย
+
+en: This cannot be undone.
+tr: การดำเนินการนี้ไม่สามารถเลิกทำได้
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: โปรแกรมติดตั้งจะปิด Aether Shell อย่างเหมาะสม และเอาไฟล์ที่ติดตั้ง ทางลัด รายการเริ่มต้นระบบ และการลงทะเบียนในแอปที่ติดตั้งออก แอปพลิเคชันอื่นและการตั้งค่า Windows จะไม่ได้รับผลกระทบ
+
+en: Your welcome
+tr: คำต้อนรับของคุณ
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: หลังจากที่คุณลงชื่อเข้าใช้หรือปลดล็อกพีซี Aether Shell จะเขียนคำทักทายสั้นๆ ด้วยลายมือ พิมพ์ชื่อที่ต้องการให้ทักทาย หรือเว้นว่างไว้เพื่อทักทายแบบเรียบง่าย
+
+en: Your first name
+tr: ชื่อจริงของคุณ
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: ไม่บังคับ เช่น ชื่อจริง ชื่อจะเก็บไว้ในพีซีเครื่องนี้ในการตั้งค่า Aether Shell ของคุณ และจะไม่ถูกส่งไปที่ใด เปลี่ยนชื่อหรือปิดคำต้อนรับได้ในการตั้งค่า > ต้อนรับ
+
+en: Shortcuts and startup
+tr: ทางลัดและการเริ่มต้นระบบ
+
+en: Create Start menu shortcuts
+tr: สร้างทางลัดในเมนูเริ่ม
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell และคืนค่าแถบงานของ Windows
+
+en: Create a desktop shortcut
+tr: สร้างทางลัดบนเดสก์ท็อป
+
+en: Shows your current choice.
+tr: แสดงตัวเลือกปัจจุบันของคุณ
+
+en: Recommended.
+tr: แนะนำ
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: ล้างเพื่อเลือกไม่ใช้ การปิดใช้งานในตัวจัดการงานจะได้รับการเคารพ
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: การติดตั้งจะยอมรับตัวเลือกการเริ่มต้นระบบด้านบน ตัวเปิดใช้สามารถเริ่ม Aether Shell ใหม่หลังจากหยุดทำงาน โดยมีการจำกัดจำนวนครั้งที่ลองใหม่ ออก และ คืนค่าแถบงานของ Windows ยังคงพร้อมใช้งาน สภาพอากาศปิดอยู่ตามค่าเริ่มต้น ไฟล์ไบนารีที่ไม่ได้ลงนามอาจทำให้เกิดคำเตือนของ Windows SmartScreen
+
+en: Removing this installation...
+tr: กำลังเอาการติดตั้งนี้ออก...
+
+en: Repairing Aether Shell...
+tr: กำลังซ่อมแซม Aether Shell...
+
+en: Installing Aether Shell...
+tr: กำลังติดตั้ง Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: กำลังปิด Aether Shell และเอาไฟล์ออก
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: กำลังตรวจสอบแพ็กเกจที่ฝังไว้และติดตั้งไฟล์ ความคืบหน้าจะแสดงเป็นกิจกรรม: โปรแกรมติดตั้งไม่ทราบเวลาที่เหลืออยู่
+
+en: Please wait while the removal completes.
+tr: โปรดรอสักครู่ขณะที่การเอาออกเสร็จสมบูรณ์
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: สามารถยกเลิกได้จนกว่าเวอร์ชันใหม่จะเปิดใช้งาน จากนั้นโปรแกรมติดตั้งจะเสร็จสิ้นอย่างปลอดภัย
+
+en: Aether Shell was uninstalled.
+tr: ถอนการติดตั้ง Aether Shell แล้ว
+
+en: Aether Shell is ready.
+tr: Aether Shell พร้อมใช้งานแล้ว
+
+en: Setup was cancelled.
+tr: ยกเลิกการติดตั้งแล้ว
+
+en: Setup could not complete.
+tr: ไม่สามารถติดตั้งให้เสร็จสมบูรณ์
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: ข้อมูลของคุณยังคงอยู่ เว้นแต่คุณจะเลือกเอาออกอย่างชัดเจน
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: คุณสามารถซ่อมแซมหรือถอนการติดตั้งได้จากการตั้งค่า Windows > แอป > แอปที่ติดตั้ง
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: การดำเนินการถูกยกเลิกก่อนการเปิดใช้งาน กลับไปที่ตัวเลือกเพื่อลองอีกครั้ง
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: ตรวจสอบการเข้าถึงไฟล์และพื้นที่ว่างในดิสก์ แล้วลองอีกครั้ง หากมี Aether Shell อยู่แล้ว การซ่อมแซมสามารถคืนค่าไฟล์ได้ ประเภทข้อผิดพลาด: {}
+
+en: Setup log
+tr: บันทึกการติดตั้ง
+
+en: Launch Aether Shell
+tr: เปิด Aether Shell
+
+en: &Back
+tr: ย้อนกลับ(&B)
+
+en: &Next
+tr: ถัดไป(&N)
+
+en: &Continue
+tr: ดำเนินการต่อ(&C)
+
+en: &Uninstall
+tr: ถอนการติดตั้ง(&U)
+
+en: &Repair
+tr: ซ่อมแซม(&R)
+
+en: &Install
+tr: ติดตั้ง(&I)
+
+en: &Close
+tr: ปิด(&C)
+
+en: Step {} of {}: {}
+tr: ขั้นตอนที่ {} จาก {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: เลือกโฟลเดอร์การติดตั้ง Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: เลือกเส้นทางโฟลเดอร์แบบเต็ม เช่น เส้นทางที่ขึ้นต้นด้วยอักษรระบุไดรฟ์
+
+en: The install folder must be an absolute path.
+tr: โฟลเดอร์การติดตั้งต้องเป็นเส้นทางแบบสัมบูรณ์
+
+en: Setup stops at the next safe point.
+tr: โปรแกรมติดตั้งจะหยุดที่จุดปลอดภัยถัดไป
+
+en: Cancelling...
+tr: กำลังยกเลิก...
+
+en: Setup is finishing the current step safely; please wait.
+tr: โปรแกรมติดตั้งกำลังทำขั้นตอนปัจจุบันให้เสร็จอย่างปลอดภัย โปรดรอสักครู่
+
+en: Updating Aether Shell
+tr: กำลังอัปเดต Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: กำลังตรวจสอบแพ็กเกจที่ลงนามและนำการอัปเดตไปใช้
+
+en: Update completed
+tr: อัปเดตเสร็จสมบูรณ์
+
+en: The update did not complete
+tr: การอัปเดตไม่เสร็จสมบูรณ์
+
+en: Close
+tr: ปิด
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: ไม่สามารถเริ่มอินเทอร์เฟซการอัปเดต การอัปเดตยังไม่ได้นำไปใช้ ลองอีกครั้งหรือใช้การซ่อมแซม
+
+en: Aether Shell Update
+tr: การอัปเดต Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: ไม่สามารถเริ่มอินเทอร์เฟซการอัปเดต การอัปเดตยังไม่ได้นำไปใช้ ลองอีกครั้งหรือใช้การซ่อมแซมในการตั้งค่า Windows > แอป > แอปที่ติดตั้ง
+
+en: Update completed.
+tr: อัปเดตเสร็จสมบูรณ์แล้ว
+
+en: Update did not complete. See the updater log or use Repair.
+tr: การอัปเดตไม่เสร็จสมบูรณ์ ดูบันทึกของตัวอัปเดตหรือใช้การซ่อมแซม
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: ไม่สามารถเริ่ม Aether Shell เลือกซ่อมแซมในการตั้งค่า Windows > แอป > แอปที่ติดตั้ง
+
+en: Aether Shell Settings — update in progress
+tr: การตั้งค่า Aether Shell — กำลังอัปเดต
+
+## shell
+
+en: &Resume taskbar replacement
+tr: ดำเนินการแทนที่แถบงานต่อ(&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: แสดงพื้นที่แจ้งเตือนของ Windows เป็นเวลา 60 วินาที(&N)
+
+en: &Search…
+tr: ค้นหา(&S)…
+
+en: &Settings…
+tr: การตั้งค่า(&E)…
+
+en: View available &update…
+tr: ดูอัปเดตที่พร้อมใช้งาน(&U)…
+
+en: &Check for updates…
+tr: ตรวจหาอัปเดต(&C)…
+
+en: &About Aether Shell
+tr: เกี่ยวกับ Aether Shell(&A)
+
+en: &Quit Aether Shell
+tr: ออกจาก Aether Shell(&Q)
+
+en: Switch &input language\tWin+Space
+tr: สลับภาษาสำหรับป้อนข้อมูล(&I)\tWin+Space
+
+en: Open &network controls…
+tr: เปิดตัวควบคุมเครือข่าย(&N)…
+
+en: &Weather settings…
+tr: การตั้งค่าสภาพอากาศ(&W)…
+
+en: Toggle output &mute
+tr: สลับปิดเสียงเอาต์พุต(&M)
+
+en: &Sound settings…
+tr: การตั้งค่าเสียง(&S)…
+
+en: Toggle microphone &mute
+tr: สลับปิดเสียงไมโครโฟน(&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: เริ่มการพิมพ์ด้วยเสียงของ Windows(&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: การตั้งค่าความเป็นส่วนตัวของไมโครโฟน(&P)…
+
+en: &Power settings…
+tr: การตั้งค่าพลังงาน(&P)…
+
+en: Open &notifications and calendar
+tr: เปิดการแจ้งเตือนและปฏิทิน(&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: เปิดปฏิทิน(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: แสดงไอคอนที่ซ่อนอยู่(&H)
+
+en: Initializing
+tr: กำลังเริ่มต้น
+
+en: Unavailable
+tr: ไม่พร้อมใช้งาน
+
+en: Unsupported
+tr: ไม่ได้รับการสนับสนุน
+
+en: Error
+tr: ข้อผิดพลาด
+
+en: Available
+tr: พร้อมใช้งาน
+
+en: Unknown
+tr: ไม่ทราบ
+
+en: Internet access
+tr: เข้าถึงอินเทอร์เน็ตได้
+
+en: Local network only
+tr: เครือข่ายภายในเท่านั้น
+
+en: Limited Internet access
+tr: การเข้าถึงอินเทอร์เน็ตจำกัด
+
+en: No network connection
+tr: ไม่มีการเชื่อมต่อเครือข่าย
+
+en: Connectivity unknown
+tr: ไม่ทราบสถานะการเชื่อมต่อ
+
+en: Ethernet
+tr: อีเทอร์เน็ต
+
+en: Cellular
+tr: เซลลูลาร์
+
+en: Network
+tr: เครือข่าย
+
+en: Offline
+tr: ออฟไลน์
+
+en: Network status unavailable
+tr: สถานะเครือข่ายไม่พร้อมใช้งาน
+
+en: Quick controls
+tr: ตัวควบคุมด่วน
+
+en: Aether Shell menu
+tr: เมนู Aether Shell
+
+en: Weather status unavailable
+tr: สถานะสภาพอากาศไม่พร้อมใช้งาน
+
+en: Cached weather
+tr: สภาพอากาศที่แคชไว้
+
+en: Observation (UTC): {}
+tr: การสังเกตการณ์ (UTC): {}
+
+en: Weather: {}
+tr: สภาพอากาศ: {}
+
+en: Click to open weather settings
+tr: คลิกเพื่อเปิดการตั้งค่าสภาพอากาศ
+
+en: Show hidden icons
+tr: แสดงไอคอนที่ซ่อนอยู่
+
+en: Opens Windows' notification-area overflow
+tr: เปิดส่วนล้นของพื้นที่แจ้งเตือนของ Windows
+
+en: Input language: {}
+tr: ภาษาสำหรับป้อนข้อมูล: {}
+
+en: Fallback input layout
+tr: เค้าโครงการป้อนข้อมูลสำรอง
+
+en: Click to switch input language (Win+Space)
+tr: คลิกเพื่อสลับภาษาสำหรับป้อนข้อมูล (Win+Space)
+
+en: Network: {}
+tr: เครือข่าย: {}
+
+en: Signal strength unavailable
+tr: ความแรงของสัญญาณไม่พร้อมใช้งาน
+
+en: Click to open Windows network settings
+tr: คลิกเพื่อเปิดการตั้งค่าเครือข่ายของ Windows
+
+en: Audio output
+tr: เอาต์พุตเสียง
+
+en: Audio: {}
+tr: เสียง: {}
+
+en: volume unknown
+tr: ไม่ทราบระดับเสียง
+
+en: Muted
+tr: ปิดเสียงอยู่
+
+en: Sound on
+tr: เปิดเสียงอยู่
+
+en: Microphone: {}
+tr: ไมโครโฟน: {}
+
+en: Endpoint unmuted
+tr: อุปกรณ์ไม่ได้ปิดเสียง
+
+en: Recording detection unsupported
+tr: ไม่รองรับการตรวจจับการบันทึก
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: คลิกเพื่อสลับปิดเสียง คลิกขวาเพื่อใช้การพิมพ์ด้วยเสียงของ Windows และการตั้งค่าความเป็นส่วนตัวของไมโครโฟน
+
+en: Battery: {}
+tr: แบตเตอรี่: {}
+
+en: Battery {}
+tr: แบตเตอรี่ {}
+
+en: Battery status unavailable
+tr: สถานะแบตเตอรี่ไม่พร้อมใช้งาน
+
+en: Charging
+tr: กำลังชาร์จ
+
+en: External power
+tr: ใช้ไฟภายนอก
+
+en: Estimated remaining: {} h {} min
+tr: เวลาที่เหลือโดยประมาณ: {} ชม. {} นาที
+
+en: Click to open power settings
+tr: คลิกเพื่อเปิดการตั้งค่าพลังงาน
+
+en: Clock status unavailable
+tr: สถานะนาฬิกาไม่พร้อมใช้งาน
+
+en: Click to open calendar and notifications
+tr: คลิกเพื่อเปิดปฏิทินและการแจ้งเตือน
+
+en: Action failed: {}
+tr: การดำเนินการล้มเหลว: {}
+
+en: Aether Shell status bar
+tr: แถบสถานะ Aether Shell
+
+en: Update available
+tr: มีอัปเดตพร้อมใช้งาน
+
+en: Cached
+tr: แคชไว้
+
+en: Start
+tr: เริ่ม
+
+en: Search
+tr: ค้นหา
+
+en: Task View
+tr: มุมมองงาน
+
+en: Application
+tr: แอปพลิเคชัน
+
+en: Running application
+tr: แอปพลิเคชันที่กำลังทำงาน
+
+en: More applications
+tr: แอปพลิเคชันเพิ่มเติม
+
+en: Aether Shell window previews
+tr: ตัวอย่างหน้าต่างของ Aether Shell
+
+en: Minimized — preview unavailable
+tr: ย่อเล็กสุดอยู่ — ไม่มีตัวอย่าง
+
+en: Preview unavailable
+tr: ไม่มีตัวอย่าง
+
+en: {} windows
+tr: {} หน้าต่าง
+
+en: {} window
+tr: {} หน้าต่าง
+
+en: Switches to this window
+tr: สลับไปที่หน้าต่างนี้
+
+en: Minimized, preview unavailable
+tr: ย่อเล็กสุดอยู่ ไม่มีตัวอย่าง
+
+en: Minimized
+tr: ย่อเล็กสุดอยู่
+
+en: Close {}
+tr: ปิด {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: ขอให้หน้าต่างนี้ปิด แอปพลิเคชันยังคงขอให้บันทึกหรือยกเลิกได้
+
+en: Close requested
+tr: ขอให้ปิดแล้ว
+
+en: Previous applications
+tr: แอปพลิเคชันก่อนหน้า
+
+en: Open
+tr: เปิด
+
+en: New instance
+tr: อินสแตนซ์ใหม่
+
+en: Unpin from Dock
+tr: เลิกปักหมุดจาก Dock
+
+en: Pin to Dock
+tr: ปักหมุดที่ Dock
+
+en: Move left
+tr: ย้ายไปทางซ้าย
+
+en: Move right
+tr: ย้ายไปทางขวา
+
+en: Dock settings...
+tr: การตั้งค่า Dock...
+
+en: Import Windows taskbar pins
+tr: นำเข้ารายการที่ปักหมุดบนแถบงานของ Windows
+
+en: Open Windows Start
+tr: เปิดเมนูเริ่มของ Windows
+
+en: Aether Shell Dock
+tr: Dock ของ Aether Shell
+
+en: Pinned
+tr: ปักหมุดแล้ว
+
+en: Running
+tr: กำลังทำงาน
+
+en: Needs attention
+tr: ต้องการความสนใจ
+
+en: Up arrow shows window previews
+tr: ลูกศรขึ้นจะแสดงตัวอย่างหน้าต่าง
+
+en: Installed application
+tr: แอปพลิเคชันที่ติดตั้ง
+
+en: Desktop application
+tr: แอปพลิเคชันเดสก์ท็อป
+
+en: File
+tr: ไฟล์
+
+en: Folder
+tr: โฟลเดอร์
+
+en: Windows tool
+tr: เครื่องมือ Windows
+
+en: Control Panel
+tr: แผงควบคุม
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ นำทาง   ·   Enter เปิด   ·   Esc ปิด
+
+en: Search apps, settings and files
+tr: ค้นหาแอป การตั้งค่า และไฟล์
+
+en: Search could not be completed.
+tr: ไม่สามารถค้นหาให้เสร็จสมบูรณ์
+
+en: Results
+tr: ผลลัพธ์
+
+en: Indexing applications…
+tr: กำลังทำดัชนีแอปพลิเคชัน…
+
+en: Type to search apps, settings and files
+tr: พิมพ์เพื่อค้นหาแอป การตั้งค่า และไฟล์
+
+en: Nothing matches
+tr: ไม่มีรายการที่ตรงกัน
+
+en: Windows could not open this application.
+tr: Windows ไม่สามารถเปิดแอปพลิเคชันนี้
+
+en: Menu
+tr: เมนู
+
+en: Opens a submenu
+tr: เปิดเมนูย่อย
+
+en: , opens a submenu
+tr: , เปิดเมนูย่อย
+
+en: Selected
+tr: เลือกอยู่
+
+en: Checked
+tr: เลือกไว้
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: โหมดเครื่องบิน
+
+en: Accessibility
+tr: การช่วยสำหรับการเข้าถึง
+
+en: Energy saver
+tr: ตัวประหยัดพลังงาน
+
+en: Live captions
+tr: คำบรรยายสด
+
+en: Night light
+tr: แสงกลางคืน
+
+en: Mobile hotspot
+tr: ฮอตสปอตมือถือ
+
+en: Nearby sharing
+tr: การแชร์ใกล้เคียง
+
+en: Cast
+tr: แคสต์
+
+en: Project
+tr: ฉาย
+
+en: All settings
+tr: การตั้งค่าทั้งหมด
+
+en: Connected
+tr: เชื่อมต่อแล้ว
+
+en: Not connected
+tr: ไม่ได้เชื่อมต่อ
+
+en: , on
+tr: , เปิด
+
+en: , off
+tr: , ปิด
+
+en: , state unknown
+tr: , ไม่ทราบสถานะ
+
+en: , opens Windows Settings
+tr: , เปิดการตั้งค่า Windows
+
+en: , shows accessibility features
+tr: , แสดงฟีเจอร์การช่วยสำหรับการเข้าถึง
+
+en: , requires Windows 11 version 22H2
+tr: , ต้องใช้ Windows 11 เวอร์ชัน 22H2
+
+en: Now playing: {}
+tr: กำลังเล่น: {}
+
+en: Untitled media
+tr: สื่อที่ไม่มีชื่อ
+
+en: , switch source
+tr: , สลับแหล่งที่มา
+
+en: Previous media item
+tr: รายการสื่อก่อนหน้า
+
+en: Pause
+tr: หยุดชั่วคราว
+
+en: Play
+tr: เล่น
+
+en: Next media item
+tr: รายการสื่อถัดไป
+
+en: {} details
+tr: รายละเอียดของ {}
+
+en: Page {} of {}
+tr: หน้า {} จาก {}
+
+en: Next page
+tr: หน้าถัดไป
+
+en: First page
+tr: หน้าแรก
+
+en: Brightness
+tr: ความสว่าง
+
+en: Brightness, unavailable on this display
+tr: ความสว่าง ไม่พร้อมใช้งานบนจอแสดงผลนี้
+
+en: Volume
+tr: ระดับเสียง
+
+en: Volume, unavailable
+tr: ระดับเสียง ไม่พร้อมใช้งาน
+
+en: Unmute
+tr: เปิดเสียง
+
+en: Mute
+tr: ปิดเสียง
+
+en: Sound output and volume mixer
+tr: เอาต์พุตเสียงและตัวผสมระดับเสียง
+
+en: Back
+tr: ย้อนกลับ
+
+en: , secured
+tr: , ปลอดภัย
+
+en: , open
+tr: , เปิด
+
+en: , connected
+tr: , เชื่อมต่อแล้ว
+
+en: Disconnect
+tr: ยกเลิกการเชื่อมต่อ
+
+en: Show available networks
+tr: แสดงเครือข่ายที่พร้อมใช้งาน
+
+en: More Wi-Fi settings
+tr: การตั้งค่า Wi-Fi เพิ่มเติม
+
+en: Bluetooth and devices settings
+tr: การตั้งค่า Bluetooth และอุปกรณ์
+
+en: Magnifier
+tr: แว่นขยาย
+
+en: Narrator
+tr: ผู้บรรยาย
+
+en: On-screen keyboard
+tr: คีย์บอร์ดบนหน้าจอ
+
+en: Sticky keys
+tr: แป้นตรึง
+
+en: More accessibility settings
+tr: การตั้งค่าการช่วยสำหรับการเข้าถึงเพิ่มเติม
+
+en: Volume mixer
+tr: ตัวผสมระดับเสียง
+
+en: Choose output in Sound settings
+tr: เลือกเอาต์พุตในการตั้งค่าเสียง
+
+en: Power and battery settings
+tr: การตั้งค่าพลังงานและแบตเตอรี่
+
+en: Battery {} percent, {}
+tr: แบตเตอรี่ {} เปอร์เซ็นต์, {}
+
+en: All Windows settings
+tr: การตั้งค่า Windows ทั้งหมด
+
+en: The requested action could not be dispatched
+tr: ไม่สามารถส่งการดำเนินการที่ร้องขอ
+
+en: Aether Shell quick controls
+tr: ตัวควบคุมด่วนของ Aether Shell
+
+en: Media session active
+tr: มีเซสชันสื่อที่ใช้งานอยู่
+
+en: No media session
+tr: ไม่มีเซสชันสื่อ
+
+en: Current page
+tr: หน้าปัจจุบัน
+
+en:  - secured
+tr:  - ปลอดภัย
+
+en:  - open
+tr:  - เปิด
+
+en:  - opens in Windows
+tr:  - เปิดใน Windows
+
+en: Turned off by hardware or policy
+tr: ปิดโดยฮาร์ดแวร์หรือนโยบาย
+
+en: State unavailable - use Windows settings
+tr: สถานะไม่พร้อมใช้งาน - ใช้การตั้งค่า Windows
+
+en: Off
+tr: ปิด
+
+en:  - signal {} of 5
+tr:  - สัญญาณ {} จาก 5
+
+en: , no internet
+tr: , ไม่มีอินเทอร์เน็ต
+
+en: On - not connected
+tr: เปิด - ไม่ได้เชื่อมต่อ
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows ไม่อนุญาตให้แอปแสดงรายการเครือข่าย: ตรวจสอบตำแหน่งที่ตั้งในการตั้งค่าความเป็นส่วนตัว
+
+en: No Wi-Fi adapter found
+tr: ไม่พบอะแดปเตอร์ Wi-Fi
+
+en: Connecting to {}...
+tr: กำลังเชื่อมต่อกับ {}...
+
+en:  - looking for networks
+tr:  - กำลังค้นหาเครือข่าย
+
+en: On
+tr: เปิด
+
+en: A screen reader is running
+tr: โปรแกรมอ่านหน้าจอกำลังทำงาน
+
+en: Windows accessibility features
+tr: ฟีเจอร์การช่วยสำหรับการเข้าถึงของ Windows
+
+en: Sound output
+tr: เอาต์พุตเสียง
+
+en: Default output device
+tr: อุปกรณ์เอาต์พุตเริ่มต้น
+
+en: No output device available
+tr: ไม่มีอุปกรณ์เอาต์พุตที่พร้อมใช้งาน
+
+en: Battery unknown
+tr: ไม่ทราบสถานะแบตเตอรี่
+
+en: Status refresh could not be started
+tr: ไม่สามารถเริ่มการรีเฟรชสถานะ
+
+en: Status refresh unavailable
+tr: การรีเฟรชสถานะไม่พร้อมใช้งาน
+
+en: Excellent signal
+tr: สัญญาณดีเยี่ยม
+
+en: Good signal
+tr: สัญญาณดี
+
+en: Fair signal
+tr: สัญญาณปานกลาง
+
+en: Weak signal
+tr: สัญญาณอ่อน
+
+en: Clear sky
+tr: ท้องฟ้าแจ่มใส
+
+en: Mainly clear
+tr: แจ่มใสเป็นส่วนใหญ่
+
+en: Partly cloudy
+tr: มีเมฆบางส่วน
+
+en: Overcast
+tr: เมฆครึ้ม
+
+en: Fog
+tr: หมอก
+
+en: Drizzle
+tr: ฝนปรอย
+
+en: Rain
+tr: ฝน
+
+en: Snow
+tr: หิมะ
+
+en: Rain showers
+tr: ฝนตกเป็นช่วงๆ
+
+en: Snow showers
+tr: หิมะตกเป็นช่วงๆ
+
+en: Thunderstorm
+tr: พายุฝนฟ้าคะนอง
+
+## weather
+
+en: Morning
+tr: เช้า
+
+en: Afternoon
+tr: บ่าย
+
+en: Evening
+tr: เย็น
+
+en: Night
+tr: กลางคืน
+
+en: Now
+tr: ตอนนี้
+
+en: Today
+tr: วันนี้
+
+en: Low
+tr: ต่ำ
+
+en: Moderate
+tr: ปานกลาง
+
+en: High
+tr: สูง
+
+en: Very high
+tr: สูงมาก
+
+en: Extreme
+tr: สูงสุด
+
+en: No connection to the weather service.
+tr: ไม่มีการเชื่อมต่อกับบริการสภาพอากาศ
+
+en: The weather service is busy. Try again in a moment.
+tr: บริการสภาพอากาศไม่ว่าง ลองอีกครั้งในอีกสักครู่
+
+en: The weather could not be loaded.
+tr: ไม่สามารถโหลดสภาพอากาศ
+
+en: Could not update; showing the last forecast.
+tr: ไม่สามารถอัปเดตได้ กำลังแสดงการพยากรณ์ล่าสุด
+
+en: Try again
+tr: ลองอีกครั้ง
+
+en: Your location
+tr: ตำแหน่งที่ตั้งของคุณ
+
+en: My location
+tr: ตำแหน่งที่ตั้งของฉัน
+
+en: Precise location
+tr: ตำแหน่งที่ตั้งที่แม่นยำ
+
+en: Approximate location
+tr: ตำแหน่งที่ตั้งโดยประมาณ
+
+en: Chosen in Settings
+tr: เลือกไว้ในการตั้งค่า
+
+en: Allow
+tr: อนุญาต
+
+en: Use precise location
+tr: ใช้ตำแหน่งที่ตั้งที่แม่นยำ
+
+en: See the weather where you are: allow your precise location.
+tr: ดูสภาพอากาศในที่ที่คุณอยู่: อนุญาตตำแหน่งที่ตั้งที่แม่นยำของคุณ
+
+en: Your position is approximate (about 10 km).
+tr: ตำแหน่งของคุณเป็นค่าโดยประมาณ (ประมาณ 10 กม.)
+
+en: Location is turned off for this app in Windows.
+tr: ตำแหน่งที่ตั้งถูกปิดสำหรับแอปนี้ใน Windows
+
+en: This device cannot report its location. Search for a city instead.
+tr: อุปกรณ์นี้ไม่สามารถรายงานตำแหน่งที่ตั้งได้ ค้นหาเมืองแทน
+
+en: Reading Windows location…
+tr: กำลังอ่านตำแหน่งที่ตั้งของ Windows…
+
+en: Automatic weather follows your Windows location.
+tr: สภาพอากาศอัตโนมัติจะเป็นไปตามตำแหน่งที่ตั้ง Windows ของคุณ
+
+en: Search for a city
+tr: ค้นหาเมือง
+
+en: Search for a city, or allow your location, to see the weather.
+tr: ค้นหาเมือง หรืออนุญาตตำแหน่งที่ตั้งของคุณ เพื่อดูสภาพอากาศ
+
+en: Searching…
+tr: กำลังค้นหา…
+
+en: City search is unavailable.
+tr: การค้นหาเมืองไม่พร้อมใช้งาน
+
+en: No city found.
+tr: ไม่พบเมือง
+
+en: Weather settings
+tr: การตั้งค่าสภาพอากาศ
+
+en: Loading the weather…
+tr: กำลังโหลดสภาพอากาศ…
+
+en: Loading…
+tr: กำลังโหลด…
+
+en: Updated {}
+tr: อัปเดตเมื่อ {}
+
+en: Near {}
+tr: ใกล้ {}
+
+en: Temperatures now
+tr: อุณหภูมิขณะนี้
+
+en: The map is unavailable.
+tr: แผนที่ไม่พร้อมใช้งาน
+
+en: Map: Natural Earth
+tr: แผนที่: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: ข้อมูลสภาพอากาศโดย Open-Meteo.com
+
+en: Feels like
+tr: รู้สึกเหมือน
+
+en: Feels like {}
+tr: รู้สึกเหมือน {}
+
+en: Close to the real temperature
+tr: ใกล้เคียงกับอุณหภูมิจริง
+
+en: The wind makes it feel colder
+tr: ลมทำให้รู้สึกหนาวขึ้น
+
+en: Humidity makes it feel warmer
+tr: ความชื้นทำให้รู้สึกร้อนขึ้น
+
+en: Humidity
+tr: ความชื้น
+
+en: Cloud cover {}
+tr: เมฆปกคลุม {}
+
+en: Wind
+tr: ลม
+
+en: Gusts {}
+tr: ลมกระโชก {}
+
+en: Sunrise and sunset
+tr: พระอาทิตย์ขึ้นและตก
+
+en: UV index
+tr: ดัชนี UV
+
+en: Pressure
+tr: ความกดอากาศ
+
+en: At sea level
+tr: ที่ระดับน้ำทะเล
+
+en: &Open the weather
+tr: เปิดสภาพอากาศ(&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: การพยากรณ์สำหรับที่ที่คุณอยู่ แม่นยำประมาณ 100 ม. พร้อมความสูงของจุดนั้น ปิด: ปัดเป็นประมาณ 10 กม.

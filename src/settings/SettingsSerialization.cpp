@@ -2,12 +2,14 @@
 // Copyright (c) 2026 Ibrahim Bouillet
 #include "settings/SettingsSerialization.h"
 
+#include "core/Localization.h"
 #include "core/Strings.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <set>
 #include <string_view>
 #include <type_traits>
@@ -95,6 +97,7 @@ void Fields(S& s, F&& f) {
     f("general", "liquidBlurOpacity", s.general.liquidBlurOpacity);
     f("general", "liquidTint", s.general.liquidTint);
     f("general", "liquidTintStrength", s.general.liquidTintStrength);
+    f("general", "liquidSmart", s.general.liquidSmart);
     f("general", "animationSpeed", s.general.animationSpeed);
     f("general", "language", s.general.language);
 }
@@ -125,14 +128,22 @@ template <> struct EnumNames<GreetingLanguage> {
         std::pair{GreetingLanguage::French, "french"}, std::pair{GreetingLanguage::English, "english"},
         std::pair{GreetingLanguage::Spanish, "spanish"}};
 };
-template <> struct EnumNames<InterfaceLanguage> {
-    static constexpr std::array values{std::pair{InterfaceLanguage::Automatic, "automatic"},
-        std::pair{InterfaceLanguage::English, "english"}, std::pair{InterfaceLanguage::French, "french"},
-        std::pair{InterfaceLanguage::Spanish, "spanish"}, std::pair{InterfaceLanguage::Chinese, "chinese"},
-        std::pair{InterfaceLanguage::Hindi, "hindi"}, std::pair{InterfaceLanguage::Portuguese, "portuguese"},
-        std::pair{InterfaceLanguage::Russian, "russian"}, std::pair{InterfaceLanguage::Arabic, "arabic"},
-        std::pair{InterfaceLanguage::Bengali, "bengali"}, std::pair{InterfaceLanguage::Urdu, "urdu"}};
-};
+// D83: the interface's language is written with core/Localization's savedName (the names setup, the updater and the
+// launcher read back); InterfaceLanguage follows its Language order after Automatic.
+static_assert(static_cast<std::size_t>(InterfaceLanguage::Urdu) == static_cast<std::size_t>(i18n::Language::Urdu) + 1);
+static_assert(static_cast<std::size_t>(InterfaceLanguage::French) == static_cast<std::size_t>(i18n::Language::French) + 1);
+static_assert(static_cast<std::size_t>(InterfaceLanguage::English) == static_cast<std::size_t>(i18n::Language::English) + 1);
+std::string_view InterfaceLanguageName(InterfaceLanguage value) noexcept {
+    const auto index = static_cast<std::size_t>(value);
+    if (index == 0 || index > i18n::kLanguageCount) return "automatic";
+    return i18n::Info(static_cast<i18n::Language>(index - 1)).savedName;
+}
+std::optional<InterfaceLanguage> InterfaceLanguageFromName(std::string_view name) noexcept {
+    if (name == "automatic") return InterfaceLanguage::Automatic;
+    for (const auto& info : i18n::Languages())
+        if (info.savedName == name) return static_cast<InterfaceLanguage>(static_cast<std::size_t>(info.language) + 1);
+    return std::nullopt;
+}
 template <> struct EnumNames<ThemePreference> {
     static constexpr std::array values{std::pair{ThemePreference::System, "system"},
         std::pair{ThemePreference::Light, "light"}, std::pair{ThemePreference::Dark, "dark"}};
@@ -231,7 +242,12 @@ void Read(const json::Value& value, std::vector<PinnedApp>& out, Warnings& warni
 
 template <class T>
 void Read(const json::Value& value, T& out, Warnings& warnings, std::string_view name) {
-    if constexpr (std::is_enum_v<T>) {
+    if constexpr (std::is_same_v<T, InterfaceLanguage>) {
+        if (const auto* text = value.AsString()) {
+            if (const auto language = InterfaceLanguageFromName(*text)) { out = *language; return; }
+        }
+        Warn(warnings, name, "unknown enum value; used default");
+    } else if constexpr (std::is_enum_v<T>) {
         if (const auto* text = value.AsString()) {
             for (const auto& [candidate, label] : EnumNames<T>::values) {
                 if (*text == label) { out = candidate; return; }
@@ -289,7 +305,9 @@ json::Value Write(const std::vector<PinnedApp>& pins) {
     return array;
 }
 template <class T> json::Value Write(const T& value) {
-    if constexpr (std::is_enum_v<T>) {
+    if constexpr (std::is_same_v<T, InterfaceLanguage>) {
+        return std::string(InterfaceLanguageName(value));
+    } else if constexpr (std::is_enum_v<T>) {
         for (const auto& [candidate, label] : EnumNames<T>::values) if (value == candidate) return label;
         return EnumNames<T>::values.front().second;
     } else if constexpr (std::is_same_v<T, std::optional<double>>) {
@@ -373,7 +391,13 @@ Result<std::vector<std::string>> Validate(Settings& s) {
         }
         Fields(s, [&](const char*, const char* name, auto& value) {
             using T = std::remove_cvref_t<decltype(value)>;
-            if constexpr (std::is_enum_v<T>) {
+            if constexpr (std::is_same_v<T, InterfaceLanguage>) {
+                // D83: the languages are core/Localization's, named by their savedName.
+                if (static_cast<std::size_t>(value) > i18n::kLanguageCount) {
+                    value = InterfaceLanguage::Automatic;
+                    Warn(warnings, name, "unknown enum; used default");
+                }
+            } else if constexpr (std::is_enum_v<T>) {
                 bool found = false;
                 for (const auto& [candidate, label] : EnumNames<T>::values) {
                     (void)label;

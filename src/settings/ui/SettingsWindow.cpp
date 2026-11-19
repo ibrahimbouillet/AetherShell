@@ -58,9 +58,11 @@ constexpr int kFirstField = 200, kCheckUpdate = 301, kInstallUpdate = 302, kPost
               kGeoResults = 308, kOpenLogs = 309, kExport = 310, kAddPin = 311, kPinList = 312,
               kRemovePin = 313, kMovePinUp = 314, kMovePinDown = 315, kLicense = 316, kUpdateSummary = 317,
               kDesktopStatus = 318, kImportTaskbarPins = 319, kWindowsLocation = 320, kLocationSettings = 321,
-              kUpdateProgress = 322, kUpdateHeadline = 323, kOpenWeather = 324;
+              kUpdateProgress = 322, kUpdateHeadline = 323, kOpenWeather = 324,
+              kLanguageStatus = 325, kLanguagesHere = 326, kLanguageDownload = 327;
 constexpr int kFirstSlider = 400;  // auxiliary sliders of Number bindings: kFirstSlider + binding index
-constexpr int kLocationField = kFirstField + 70, kReleaseNotes = kFirstField + 71, kAppChooser = kFirstField + 72;
+constexpr int kLocationField = kFirstField + 70, kReleaseNotes = kFirstField + 71, kAppChooser = kFirstField + 72,
+              kLanguageChooser = kFirstField + 73;
 
 constexpr wchar_t kApplyHint[] = L"Press Apply to confirm this change.";
 
@@ -241,6 +243,7 @@ struct SettingsWindow::Impl {
     std::vector<HWND> pageControls;
     std::vector<weather::LocationCandidate> locations;
     std::vector<apps::ApplicationInfo> applications;
+    std::vector<i18n::Language> languageChoices;   // D83: the Add a language list, in its order
     updates::UpdateSnapshot update;
     std::wstring lastActionStatus;
     StatusTone lastActionTone = StatusTone::Neutral;
@@ -405,6 +408,30 @@ struct SettingsWindow::Impl {
                                  D2D1::RectF(left, top + tileHeight + 6.0f, left + tileWidth, top + tileHeight + 26.0f), brush.get());
             }
         }
+    }
+
+    // D84: what Settings paints itself rather than through a child window, in client pixels, so Liquid's smart
+    // transparency blurs under it too: the caption buttons, the marks and the style previews.
+    [[nodiscard]] std::vector<RECT> PaintedContentPx() const {
+        std::vector<RECT> rects;
+        if (!window) return rects;
+        RECT client{};
+        ::GetClientRect(window, &client);
+        rects.push_back(RECT{client.right - 3 * Px(kCaptionButtonWidth), 0, client.right, CaptionHeightPx()});
+        const auto px = [this](const D2D1_RECT_F& r) { return RECT{Px(r.left), Px(r.top), Px(r.right), Px(r.bottom)}; };
+        if (customFrame && captionMark.right > captionMark.left) rects.push_back(px(captionMark));
+        if (brandMark.right > brandMark.left) rects.push_back(px(brandMark));
+        if (const HWND canvas = scroll.Canvas()) {
+            const POINT origin = surface.ClientOriginPx(canvas);
+            const RECT viewport = scroll.Frame();
+            const D2D1_RECT_F* mark = page == SettingsPage::Appearance ? &stylePreview : page == SettingsPage::About ? &aboutMark : nullptr;
+            if (mark && mark->right > mark->left) {
+                RECT onPage = px(*mark), shown{};
+                ::OffsetRect(&onPage, origin.x, origin.y);
+                if (::IntersectRect(&shown, &onPage, &viewport)) rects.push_back(shown);
+            }
+        }
+        return rects;
     }
 
     // --- geometry helpers ---
@@ -887,6 +914,8 @@ struct SettingsWindow::Impl {
     void RefreshUpdates();
     void Layout();
     void LayoutCanvas();
+    void FillLanguages();
+    [[nodiscard]] LanguagePackState PackState(i18n::Language language) const;
     float LayoutRow(Row& row, float left, float top, float width, std::vector<form::FormDivider>& dividers, bool separated);
     void Apply(bool explicitConsent);
     void ScheduleLive();
@@ -1125,6 +1154,9 @@ void SettingsWindow::Impl::BuildPage() {
                [](const Settings& s){return s.general.liquidTint;}, [](Settings& s,int v){s.general.liquidTint=static_cast<LiquidTint>(v);});
         Number(L"Liquid color strength", L"How much of the chosen color the blur layer takes.", share(),
                [](const Settings& s){return s.general.liquidTintStrength;}, [](Settings& s,double v){s.general.liquidTintStrength=v;});
+        // D84: the Settings window's own glass in Liquid.
+        Check(L"Smart transparency", L"In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.",
+              [](const Settings& s){return s.general.liquidSmart;}, [](Settings& s,bool v){s.general.liquidSmart=v;});
         BeginSection(L"Theme");
         Choice(L"Color mode", L"High contrast always takes precedence.", {L"Follow Windows", L"Light", L"Dark"},
                [](const Settings& s){return s.general.themeMode;}, [](Settings& s,int v){s.general.themeMode=static_cast<ThemePreference>(v);});
@@ -1154,8 +1186,8 @@ void SettingsWindow::Impl::BuildPage() {
         Check(L"Add newly discovered Windows taskbar pins", L"While the taskbar is replaced, new Windows pins are added to the Dock.",
               [](const Settings& s){return s.general.syncTaskbarPins;}, [](Settings& s,bool v){s.general.syncTaskbarPins=v;});
     } else if (page == SettingsPage::Language) {
-        // D70/D74: the interface in ten languages, each named in its own language; the change applies at once and is
-        // kept in settings.json, which every version reads.
+        // D70/D83: each language named in its own language; the change applies at once and is kept in settings.json,
+        // which every version reads. A language that is not on this PC is downloaded from the version's GitHub release.
         header(L"Language", L"The language of the bars, menus, Search, Settings and setup.");
         BeginSection(L"Interface language");
         std::vector<std::wstring> languages{L"Follow Windows"};
@@ -1163,9 +1195,23 @@ void SettingsWindow::Impl::BuildPage() {
         Choice(L"Interface language", L"Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.",
                std::move(languages), [](const Settings& s){return s.general.language;},
                [](Settings& s,int v){s.general.language=static_cast<InterfaceLanguage>(std::clamp(v, 0, static_cast<int>(i18n::kLanguageCount)));});
+        TextRow(L"", TextRole::Status, kLanguageStatus, Severity::Info);
         TextRow(L"Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. "
                 L"With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.");
         TextRow(L"The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.");
+        BeginSection(L"Languages on this PC");
+        TextRow(L"", TextRole::Body, kLanguagesHere);
+        TextRow(L"Aether Shell downloads the languages Windows has, so it changes language when Windows does.");
+        BeginSection(L"Add a language");
+        HWND chooser = Make(canvas, L"COMBOBOX", L"", WS_TABSTOP | CBS_DROPDOWNLIST | WS_VSCROLL, kLanguageChooser);
+        { form::ControlSpec spec; spec.role = ControlRole::ComboBox; Style(chooser, spec); }
+        Row& add = AddRow(RowKind::Flex);
+        add.primary = chooser;
+        HWND download = Button(canvas, L"&Download", kLanguageDownload, ButtonStyle::Secondary, Glyph::Download);
+        ::EnableWindow(download, static_cast<bool>(callbacks.downloadLanguage));
+        add.trailing = {download};
+        TextRow(L"Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.");
+        FillLanguages();
     } else if (page == SettingsPage::Desktop) {
         header(L"Desktop", L"Reversible replacement of the Windows taskbar by the Dock.");
         BeginSection(L"Taskbar replacement");
@@ -1413,6 +1459,84 @@ void SettingsWindow::Impl::Layout() {
     const RECT viewport = PxRect(contentLeft, caption, width, footerTop);
     scroll.SetFrame(viewport);
     LayoutCanvas();
+}
+
+LanguagePackState SettingsWindow::Impl::PackState(i18n::Language language) const {
+    if (language == i18n::Language::English) return LanguagePackState::Installed;
+    return callbacks.languageState ? callbacks.languageState(language) : LanguagePackState::Missing;
+}
+
+// D83: the Language page's status, the languages on this PC and the ones that can be added, from the packs' states.
+void SettingsWindow::Impl::FillLanguages() {
+    if (page != SettingsPage::Language) return;
+    try {
+        const auto named = [](const i18n::LanguageInfo& info) {
+            std::wstring name(info.nativeName);
+            if (info.englishName != info.nativeName) name += L" (" + std::wstring(info.englishName) + L")";
+            return name;
+        };
+        if (const auto found = controls.find(kLanguageStatus); found != controls.end()) {
+            const auto chosen = service.Current().general.language;
+            const auto wanted = chosen == InterfaceLanguage::Automatic ? i18n::SystemLanguage()
+                                                                       : static_cast<i18n::Language>(static_cast<int>(chosen) - 1);
+            const auto& info = i18n::Info(wanted);
+            std::wstring line;
+            switch (PackState(wanted)) {
+                case LanguagePackState::Downloading:
+                    line = i18n::TrFormat(L"Downloading {} from GitHub ({}). English is shown until it is ready.", std::wstring(info.nativeName), FormatBytes(info.packBytes));
+                    break;
+                case LanguagePackState::Failed:
+                    line = i18n::TrFormat(L"{} could not be downloaded. English is shown until it is; choose Download below to try again.", std::wstring(info.nativeName));
+                    break;
+                case LanguagePackState::Missing:
+                    line = i18n::TrFormat(L"{} is not on this PC yet. English is shown until it is downloaded.", std::wstring(info.nativeName));
+                    break;
+                case LanguagePackState::Installed:
+                    line = i18n::TrFormat(L"{} is on this PC.", std::wstring(info.nativeName));
+                    break;
+            }
+            ::SetWindowTextW(found->second, line.c_str());
+        }
+        if (const auto found = controls.find(kLanguagesHere); found != controls.end()) {
+            std::wstring lines;
+            for (const auto& info : i18n::Languages()) {
+                std::wstring detail;
+                switch (PackState(info.language)) {
+                    case LanguagePackState::Installed:
+                        detail = info.language == i18n::Language::English ? std::wstring(i18n::Tr(L"built in")) : FormatBytes(info.packBytes);
+                        break;
+                    case LanguagePackState::Downloading: detail = i18n::TrFormat(L"downloading, {}", FormatBytes(info.packBytes)); break;
+                    case LanguagePackState::Failed: detail = std::wstring(i18n::Tr(L"download failed")); break;
+                    case LanguagePackState::Missing: continue;
+                }
+                if (!lines.empty()) lines += L"\r\n";
+                lines += named(info) + L" \u00B7 " + detail;
+            }
+            ::SetWindowTextW(found->second, lines.c_str());
+        }
+        if (const auto found = controls.find(kLanguageChooser); found != controls.end()) {
+            HWND chooser = found->second;
+            const auto selected = ::SendMessageW(chooser, CB_GETCURSEL, 0, 0);
+            const auto kept = selected != CB_ERR && static_cast<std::size_t>(selected) < languageChoices.size()
+                ? std::optional<i18n::Language>(languageChoices[static_cast<std::size_t>(selected)]) : std::nullopt;
+            ::SendMessageW(chooser, CB_RESETCONTENT, 0, 0);
+            languageChoices.clear();
+            for (const auto& info : i18n::Languages()) {
+                const auto state = PackState(info.language);
+                if (state == LanguagePackState::Installed || state == LanguagePackState::Downloading || !i18n::Available(info.language)) continue;
+                const auto item = named(info) + L" \u00B7 " + FormatBytes(info.packBytes);
+                ::SendMessageW(chooser, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(item.c_str()));
+                if (kept == info.language) ::SendMessageW(chooser, CB_SETCURSEL, languageChoices.size(), 0);
+                languageChoices.push_back(info.language);
+            }
+            ::EnableWindow(chooser, !languageChoices.empty());
+            if (controls.contains(kLanguageDownload))
+                ::EnableWindow(controls.at(kLanguageDownload), static_cast<bool>(callbacks.downloadLanguage) && !languageChoices.empty());
+        }
+    } catch (...) {
+        AETHER_LOG_WARN("settings", "language list could not be shown");
+    }
+    if (!building) LayoutCanvas();
 }
 
 void SettingsWindow::Impl::LayoutCanvas() {
@@ -2038,6 +2162,15 @@ void SettingsWindow::Impl::Action(int id) {
         callbacks.requestWindowsLocation();
     } else if (id == kLocationSettings && callbacks.openLocationSettings) callbacks.openLocationSettings();
     else if (id == kOpenWeather && callbacks.openWeather) { if (livePending) Apply(false); callbacks.openWeather(); }
+    else if (id == kLanguageDownload && callbacks.downloadLanguage && controls.contains(kLanguageChooser)) {
+        const auto selected = ::SendMessageW(controls.at(kLanguageChooser), CB_GETCURSEL, 0, 0);
+        if (selected == CB_ERR || static_cast<std::size_t>(selected) >= languageChoices.size()) {
+            Message(languageChoices.empty() ? L"Every language is on this PC." : L"Choose a language to download first.", StatusTone::Info);
+        } else {
+            callbacks.downloadLanguage(languageChoices[static_cast<std::size_t>(selected)]);
+            FillLanguages();
+        }
+    }
     else if (id == kGeoSearch) SearchLocation();
     else if (id == kCheckUpdate && callbacks.checkForUpdates) callbacks.checkForUpdates();
     else if (id == kInstallUpdate && callbacks.downloadAndInstall) callbacks.downloadAndInstall();
@@ -2263,6 +2396,8 @@ Result<void> SettingsWindow::Show(SettingsPage page) try {
         impl.status = impl.Label(window, L"", TextRole::Status, kStatus, Severity::None, true);
         impl.resetButton = impl.Button(window, L"Reset defaults...", kReset, ButtonStyle::Secondary, Glyph::Reset);
         impl.applyButton = impl.Button(window, L"&Apply", kApply, ButtonStyle::Primary, std::nullopt, BS_DEFPUSHBUTTON);
+        if (impl.callbacks.graphics)
+            impl.surface.EnableSmartGlass(impl.callbacks.graphics, [this] { return impl_->PaintedContentPx(); });   // D84
         impl.UpdateFrame();
     }
     ::SendMessageW(impl.navigation, LB_SETCURSEL, static_cast<WPARAM>(page), 0); impl.BuildPage();
@@ -2321,6 +2456,10 @@ void SettingsWindow::Relocalize() {
     } catch (...) {
         AETHER_LOG_WARN("settings", "settings language update failed");
     }
+}
+
+void SettingsWindow::RefreshLanguages() {
+    if (impl_->window && impl_->page == SettingsPage::Language) impl_->FillLanguages();
 }
 
 void SettingsWindow::SetUpdateSnapshot(updates::UpdateSnapshot snapshot) {

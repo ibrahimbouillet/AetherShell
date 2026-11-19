@@ -1,0 +1,2494 @@
+# Slovak (sk): Slovenčina. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Ak chcete zapnúť automatické počasie, vyberte polohu Windows.
+
+en: Windows taskbar visible
+tr: Panel úloh Windows je zobrazený
+
+en: Connected to {}
+tr: Pripojené k sieti {}
+
+en: {} is out of range
+tr: Sieť {} je mimo dosahu
+
+en: Connecting to {} took too long
+tr: Pripájanie k sieti {} trvalo príliš dlho
+
+en: Use Windows to join {}
+tr: Na pripojenie k sieti {} použite Windows
+
+en: Windows did not allow this connection
+tr: Windows toto pripojenie nepovolil
+
+en: Could not connect to {}
+tr: Nepodarilo sa pripojiť k sieti {}
+
+en: Connect to {}
+tr: Pripojiť k sieti {}
+
+en: That password was not accepted. Check it and try again.
+tr: Toto heslo nebolo prijaté. Skontrolujte ho a skúste to znova.
+
+en: Enter this network's password.
+tr: Zadajte heslo tejto siete.
+
+en: &Connect
+tr: &Pripojiť
+
+en: Windows Settings could not be opened
+tr: Nastavenie Windows sa nepodarilo otvoriť
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Nepodarilo sa rezervovať miesto pre Dock; obnovuje sa panel úloh Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Nahradenie nie je k dispozícii: nepodarilo sa spustiť sledovanie obnovenia
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Panel úloh Windows sa obnovil. Nepodarilo sa rezervovať miesto pre Dock; ak to chcete skúsiť znova, vypnite a znova zapnite nahradenie.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Sledovanie obnovenia nie je k dispozícii; obnovuje sa panel úloh Windows
+
+en: Windows notifications could not be opened
+tr: Oznámenia Windows sa nepodarilo otvoriť
+
+en: The Windows calendar could not be opened
+tr: Kalendár Windows sa nepodarilo otvoriť
+
+en: Windows did not show its hidden icons
+tr: Windows nezobrazil skryté ikony
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatická aktualizácia polohy nie je k dispozícii; skúste to znova v nastavení Počasia.
+
+en: Windows location
+tr: Poloha Windows
+
+en: Reading approximate Windows location…
+tr: Načítava sa približná poloha Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatické počasie sa riadi približnou polohou Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Prístup k polohe Windows je zablokovaný. Počasie nie je k dispozícii.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows nemohol zistiť aktuálnu polohu. Počasie nie je k dispozícii.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Proces zisťovania polohy nie je k dispozícii. Počasie nie je k dispozícii.
+
+en: Waiting for Windows location permission…
+tr: Čaká sa na povolenie prístupu k polohe Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Voľbu automatického počasia sa nepodarilo uložiť.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Prístup k polohe Windows nie je k dispozícii alebo bol zamietnutý. Počasie nie je k dispozícii.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Poloha Windows nemohla požiadať o povolenie. Skontrolujte nastavenie polohy vo Windows.
+
+en: Status worker unavailable
+tr: Proces zisťovania stavu nie je k dispozícii
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows nemohol dokončiť túto akciu. Skontrolujte jej nastavenie.
+
+en: Reading Windows status; try the action again shortly
+tr: Načítava sa stav Windows; skúste akciu o chvíľu znova
+
+en: Could not disconnect
+tr: Nepodarilo sa odpojiť
+
+en: The Windows accessibility feature could not be started
+tr: Funkciu prístupnosti Windows sa nepodarilo spustiť
+
+en: Windows could not change the audio output
+tr: Windows nemohol zmeniť zvukový výstup
+
+en: The Windows control could not be opened
+tr: Ovládací prvok Windows sa nepodarilo otvoriť
+
+en: Keyboard shortcuts disabled
+tr: Klávesové skratky sú vypnuté
+
+en: Both keyboard shortcuts registered
+tr: Obe klávesové skratky sú zaregistrované
+
+en: A keyboard shortcut is already in use by another application
+tr: Klávesovú skratku už používa iná aplikácia
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: O Rýchle nastavenia Windows sa nepodarilo požiadať. Ak chcete používať ovládacie prvky Aether, v nastavení horného panela zrušte začiarknutie políčka „Používať Rýchle nastavenia Windows“.
+
+en: Windows Start could not be opened
+tr: Ponuku Štart vo Windows sa nepodarilo otvoriť
+
+en: Windows Task View could not be opened
+tr: Zobrazenie úloh vo Windows sa nepodarilo otvoriť
+
+en: Windows keyboard layout switching was unavailable
+tr: Prepínanie rozloženia klávesnice vo Windows nebolo k dispozícii
+
+en: Windows voice typing could not be opened
+tr: Hlasové písanie Windows sa nepodarilo otvoriť
+
+en: Windows taskbar could not be revealed
+tr: Panel úloh Windows sa nepodarilo zobraziť
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: V nahradení panela úloh sa nepodarilo pokračovať; Windows zostáva k dispozícii
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Nahradenie panela úloh Windows nie je v tejto relácii k dispozícii
+
+en: Windows pin access is unavailable in this isolated session
+tr: Prístup k pripnutým položkám Windows nie je v tejto izolovanej relácii k dispozícii
+
+en: Windows pinned applications could not be read
+tr: Aplikácie pripnuté vo Windows sa nepodarilo načítať
+
+en: Settings changed during pin import. Try import again.
+tr: Počas importu pripnutých položiek sa zmenilo nastavenie. Skúste import znova.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Uložené ďalšie pripnuté aplikácie: {}. Niektoré pripnuté položky Windows môžu zostať nedostupné.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Pripnuté položky sa zmenili v pamäti; uloženie zlyhalo. Skúste to znova tlačidlom Použiť v Nastavení.
+
+en: Pins updated in memory; saving...
+tr: Pripnuté položky sa aktualizovali v pamäti; ukladá sa...
+
+en: Imported pins could not be applied
+tr: Importované pripnuté položky sa nepodarilo použiť
+
+en: Pin import is unavailable while closing
+tr: Import pripnutých položiek nie je počas zatvárania k dispozícii
+
+en: Settings could not be saved
+tr: Nastavenie sa nepodarilo uložiť
+
+en: Quit without saving the latest changes?
+tr: Ukončiť bez uloženia posledných zmien?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Váš predchádzajúci súbor nastavení zostáva zachovaný. Ak chcete uloženie skúsiť znova, nechajte Aether Shell otvorený.
+
+en: &Quit without saving
+tr: &Ukončiť bez uloženia
+
+en: &Keep Aether Shell open
+tr: &Nechať Aether Shell otvorený
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Exportovať základné diagnostické údaje — verziu aplikácie a zostavu Windows, bez denníkov a osobných údajov
+
+en: Diagnostics exported.
+tr: Diagnostické údaje sa exportovali.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnostické údaje sa nepodarilo uložiť do vybratého súboru.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Nastavenie sa nepodarilo bezpečne načítať. Existujúci súbor sa zachoval.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell nemohol spustiť svoje prvky pracovnej plochy.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Obnovenie panela úloh Windows čaká na dokončenie. Skúste to znova alebo Aether Shell zatvorte.
+
+en: The Windows taskbar is shown temporarily.
+tr: Panel úloh Windows je dočasne zobrazený.
+
+en: Windows taskbar restored.
+tr: Panel úloh Windows sa obnovil.
+
+en: Windows taskbar replacement is active.
+tr: Nahradenie panela úloh Windows je aktívne.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Panel úloh Windows zostáva k dispozícii. Nahradenie sa o chvíľu skúsi znova.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Panel úloh Windows zostáva k dispozícii. Ak to chcete skúsiť znova, vypnite a znova zapnite nahradenie.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Panel úloh Windows sa obnovil. Nahradenie sa o chvíľu znova pripojí.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Panel úloh Windows sa obnovil. Ak to chcete skúsiť znova, vypnite a znova zapnite nahradenie.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Nahradenie panela úloh sa zastavilo. Panel úloh Windows sa obnovil.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Nahradenie panela úloh sa zastavilo. Obnovenie panela úloh Windows sa nepodarilo potvrdiť.
+
+en: Activating taskbar replacement...
+tr: Aktivuje sa nahradenie panela úloh...
+
+en: Restoring Windows taskbar...
+tr: Obnovuje sa panel úloh Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Znova sa pripája nahradenie panela úloh...
+
+en: Showing the Windows taskbar temporarily...
+tr: Dočasne sa zobrazuje panel úloh Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell nemohol obnoviť panel úloh Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Reštartujte Prieskumníka Windows v Správcovi úloh (Ctrl+Shift+Esc) alebo sa odhláste a znova prihláste.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Panel úloh Windows sa obnovil do uloženého stavu.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Nenašiel sa žiadny uložený stav panela úloh. Panel úloh Windows sa zobrazil; jeho nastavenie automatického skrývania sa nezmenilo.
+
+en: There was nothing to restore.
+tr: Nebolo čo obnoviť.
+
+en: Taskbar replacement is turned off.
+tr: Nahradenie panela úloh je vypnuté.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Nahradenie panela úloh sa nepodarilo automaticky vypnúť. Vypnite ho v Nastavení Aether Shell > Pracovná plocha.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Nerozpoznaný alebo neplatný príkazový riadok Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell nemohol vytvoriť svoje lokálne priečinky údajov.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell sa zastavil po neočakávanej chybe.
+
+## search-names
+
+en: Disk Management
+tr: Správa diskov
+
+en: Local Users and Groups
+tr: Lokálni používatelia a skupiny
+
+en: Local Group Policy Editor
+tr: Editor lokálnej politiky skupiny
+
+en: Manage User Certificates
+tr: Spravovať používateľské certifikáty
+
+en: Manage Computer Certificates
+tr: Spravovať certifikáty počítača
+
+en: Shared Folders
+tr: Zdieľané priečinky
+
+en: TPM Management
+tr: Správa modulu TPM
+
+en: Network Connections
+tr: Sieťové pripojenia
+
+en: System Properties
+tr: Vlastnosti systému
+
+en: About Windows
+tr: Informácie o systéme Windows
+
+en: DirectX Diagnostic Tool
+tr: Diagnostický nástroj DirectX
+
+en: Windows Features
+tr: Súčasti systému Windows
+
+en: System Restore
+tr: Obnovovanie systému
+
+en: Advanced System Settings
+tr: Rozšírené nastavenie systému
+
+en: Volume Mixer
+tr: Zmiešavač hlasitosti
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Používateľské kontá (rozšírené)
+
+en: Display settings
+tr: Nastavenie obrazovky
+
+en: Night light settings
+tr: Nastavenie nočného osvetlenia
+
+en: Graphics settings
+tr: Nastavenie grafiky
+
+en: Sound settings
+tr: Nastavenie zvuku
+
+en: Notification settings
+tr: Nastavenie oznámení
+
+en: Power & battery settings
+tr: Nastavenie napájania a batérie
+
+en: Energy saver settings
+tr: Nastavenie šetriča energie
+
+en: Storage settings
+tr: Nastavenie ukladacieho priestoru
+
+en: Multitasking settings
+tr: Nastavenie multitaskingu
+
+en: Clipboard settings
+tr: Nastavenie schránky
+
+en: Remote Desktop settings
+tr: Nastavenie vzdialenej pracovnej plochy
+
+en: About your PC
+tr: Informácie o počítači
+
+en: Bluetooth & devices settings
+tr: Nastavenie Bluetooth a zariadení
+
+en: Printers & scanners settings
+tr: Nastavenie tlačiarní a skenerov
+
+en: Mouse settings
+tr: Nastavenie myši
+
+en: Touchpad settings
+tr: Nastavenie touchpadu
+
+en: Network & internet settings
+tr: Nastavenie siete a internetu
+
+en: Wi-Fi settings
+tr: Nastavenie Wi-Fi
+
+en: VPN settings
+tr: Nastavenie VPN
+
+en: Proxy settings
+tr: Nastavenie servera proxy
+
+en: Airplane mode settings
+tr: Nastavenie režimu v lietadle
+
+en: Mobile hotspot settings
+tr: Nastavenie mobilného prístupového bodu
+
+en: Background settings
+tr: Nastavenie pozadia
+
+en: Color settings
+tr: Nastavenie farieb
+
+en: Theme settings
+tr: Nastavenie motívov
+
+en: Lock screen settings
+tr: Nastavenie uzamknutej obrazovky
+
+en: Taskbar settings
+tr: Nastavenie panela úloh
+
+en: Font settings
+tr: Nastavenie písiem
+
+en: Installed apps
+tr: Nainštalované aplikácie
+
+en: Default apps settings
+tr: Nastavenie predvolených aplikácií
+
+en: Startup apps settings
+tr: Nastavenie aplikácií pri spustení
+
+en: Account info
+tr: Informácie o konte
+
+en: Sign-in options
+tr: Možnosti prihlásenia
+
+en: Other users settings
+tr: Nastavenie iných používateľov
+
+en: Date & time settings
+tr: Nastavenie dátumu a času
+
+en: Language & region settings
+tr: Nastavenie jazyka a oblasti
+
+en: Typing settings
+tr: Nastavenie písania
+
+en: Accessibility settings
+tr: Nastavenie prístupnosti
+
+en: Privacy & security settings
+tr: Nastavenie ochrany osobných údajov a zabezpečenia
+
+en: Location settings
+tr: Nastavenie polohy
+
+en: Windows Update settings
+tr: Nastavenie služby Windows Update
+
+en: Recovery settings
+tr: Nastavenie obnovenia
+
+en: Activation settings
+tr: Nastavenie aktivácie
+
+en: For developers settings
+tr: Nastavenie pre vývojárov
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Nepodarilo sa spojiť s GitHubom.
+
+en: GitHub did not answer the request just now.
+tr: GitHub na požiadavku práve neodpovedal.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Vydanie neprešlo overením, preto sa nič nenainštalovalo.
+
+en: There is not enough free disk space.
+tr: Na disku nie je dostatok voľného miesta.
+
+en: Windows refused access to the update files.
+tr: Windows odoprel prístup k súborom aktualizácie.
+
+en: {} bytes
+tr: {} B
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Stav
+
+en: Check &now
+tr: &Skontrolovať teraz
+
+en: Download and install
+tr: Stiahnuť a nainštalovať
+
+en: &Later
+tr: N&eskôr
+
+en: S&kip this version
+tr: Pres&kočiť túto verziu
+
+en: &Release details
+tr: Podrobnosti o &vydaní
+
+en: Disable &notifications
+tr: Vypnúť &oznámenia
+
+en: Release notes
+tr: Poznámky k vydaniu
+
+en: the new version
+tr: nová verzia
+
+en: Installed: {}.
+tr: Nainštalované: {}.
+
+en: Automatic update checks are off
+tr: Automatická kontrola aktualizácií je vypnutá
+
+en: Check now looks for a newer release once.
+tr: Tlačidlo Skontrolovať teraz raz vyhľadá novšie vydanie.
+
+en: Last checked {}
+tr: Posledná kontrola: {}
+
+en: Not checked yet
+tr: Zatiaľ neskontrolované
+
+en: Checking for updates...
+tr: Vyhľadávajú sa aktualizácie...
+
+en: Aether Shell is up to date
+tr: Aether Shell je aktuálny
+
+en: Latest published release: {}.
+tr: Najnovšie zverejnené vydanie: {}.
+
+en: Version {} is available
+tr: K dispozícii je verzia {}
+
+en: Download size: {}.
+tr: Veľkosť sťahovania: {}.
+
+en: Downloading version {}...
+tr: Sťahuje sa verzia {}...
+
+en: Received {} of {} ({}%).
+tr: Prijaté {} z {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Prijaté {}; celková veľkosť nie je známa.
+
+en: Version {} is ready to install
+tr: Verzia {} je pripravená na inštaláciu
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Overené podpísaným manifestom vydania a algoritmom SHA-256.
+
+en: The update could not be completed
+tr: Aktualizáciu sa nepodarilo dokončiť
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Zatiaľ sa inštaluje ručne: otvorte Podrobnosti o vydaní, potom stiahnite a spustite jeho inštalačný program.
+
+en: Failure: {}.
+tr: Chyba: {}.
+
+en: Choose Retry Download to try again.
+tr: Ak to chcete skúsiť znova, vyberte Zopakovať sťahovanie.
+
+en: Use Check now to try again.
+tr: Ak to chcete skúsiť znova, použite Skontrolovať teraz.
+
+en: Next automatic check: {}.
+tr: Ďalšia automatická kontrola: {}.
+
+en: &Install update
+tr: &Nainštalovať aktualizáciu
+
+en: Retry &Download
+tr: &Zopakovať sťahovanie
+
+en: &Download and install
+tr: S&tiahnuť a nainštalovať
+
+en: Windows' startup state could not be read in this session.
+tr: Stav spúšťania Windows sa v tejto relácii nepodarilo načítať.
+
+en: Windows will start it at your next sign-in.
+tr: Windows ho spustí pri vašom ďalšom prihlásení.
+
+en: Right now it will not start at sign-in.
+tr: Teraz sa pri prihlásení nespustí.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Je vypnutý v Správcovi úloh alebo v Nastavení Windows, ktoré rozhodujú, kým ho tam znova nezapnete.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows by spustil ďalšiu kópiu Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows hlási stav spúšťania, ktorý táto verzia nevie prečítať.
+
+en: The close action could not be completed.
+tr: Akciu zatvorenia sa nepodarilo dokončiť.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Pred uložením zadajte úplné číslo; pole označené načerveno ho neobsahuje.
+
+en: Settings could not be validated.
+tr: Nastavenie sa nepodarilo overiť.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Spúšťanie pri prihlásení zostalo bez zmeny, pretože nastavenie sa nepodarilo uložiť.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Nastavenie sa nepodarilo uložiť a spúšťanie pri prihlásení vo Windows sa nepodarilo vrátiť späť. Skúste to znova tlačidlom Použiť.
+
+en: Settings saved.
+tr: Nastavenie sa uložilo.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Nastavenie sa zmenilo v pamäti; uloženie zlyhalo. Skúste to znova tlačidlom Použiť.
+
+en: Settings could not be applied.
+tr: Nastavenie sa nepodarilo použiť.
+
+en: Some values were corrected to their supported range.
+tr: Niektoré hodnoty sa upravili na podporovaný rozsah.
+
+en: Startup registration is unavailable in this session.
+tr: Registrácia spúšťania nie je v tejto relácii k dispozícii.
+
+en: Changing startup registration...
+tr: Mení sa registrácia spúšťania...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows nezmenil registráciu spúšťania. Skontrolujte nastavenie spúšťania v Správcovi úloh.
+
+en: Startup registration could not be changed.
+tr: Registráciu spúšťania sa nepodarilo zmeniť.
+
+en: Defaults saved; startup is disabled.
+tr: Predvolené nastavenie sa uložilo; spúšťanie je vypnuté.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Predvolené nastavenie sa použilo; uloženie zlyhalo. Skúste to znova tlačidlom Použiť.
+
+en: Defaults could not be applied.
+tr: Predvolené nastavenie sa nepodarilo použiť.
+
+en: Startup was not disabled; settings were kept.
+tr: Spúšťanie sa nevyplo; nastavenie sa zachovalo.
+
+en: Location search is unavailable.
+tr: Vyhľadávanie polohy nie je k dispozícii.
+
+en: Searching Open-Meteo locations...
+tr: Hľadajú sa miesta v Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Vyhľadávanie polohy zlyhalo. Skontrolujte pripojenie a skúste to znova.
+
+en: No place matched that search.
+tr: Hľadaniu nezodpovedá žiadne miesto.
+
+en: Choose a location to save it.
+tr: Ak chcete polohu uložiť, vyberte ju.
+
+en: Reset all settings?
+tr: Obnoviť všetky nastavenia?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Predvoľby a pripnuté aplikácie sa vrátia na predvolené hodnoty a spúšťanie pri prihlásení sa vypne.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Vaša voľba panela úloh Windows zostane zachovaná. Záloha aktuálneho súboru nastavení zostane zachovaná.
+
+en: &Reset
+tr: &Obnoviť
+
+en: Cancel
+tr: Zrušiť
+
+en: Pinned applications saved.
+tr: Pripnuté aplikácie sa uložili.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Pripnuté položky sa zmenili v pamäti; uloženie zlyhalo. Skúste to znova tlačidlom Použiť.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Predvolené nastavenie sa nepodarilo obnoviť, pretože registrácia spúšťania nie je k dispozícii.
+
+en: Pinned application could not be added.
+tr: Pripnutú aplikáciu sa nepodarilo pridať.
+
+en: Choose an application to add first.
+tr: Najprv vyberte aplikáciu, ktorú chcete pridať.
+
+en: Pinned applications could not be changed.
+tr: Pripnuté aplikácie sa nepodarilo zmeniť.
+
+en: Choose a pinned application first.
+tr: Najprv vyberte pripnutú aplikáciu.
+
+en: Desktop status is unavailable in this session.
+tr: Stav pracovnej plochy nie je v tejto relácii k dispozícii.
+
+en: Desktop status is unavailable.
+tr: Stav pracovnej plochy nie je k dispozícii.
+
+en: Password
+tr: Heslo
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Sťahuje sa jazyk {} z GitHubu ({}). Kým nebude pripravený, zobrazuje sa angličtina.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Jazyk {} sa nepodarilo stiahnuť. Kým sa nestiahne, zobrazuje sa angličtina; ak to chcete skúsiť znova, vyberte nižšie Stiahnuť.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Jazyk {} zatiaľ nie je v tomto počítači. Kým sa nestiahne, zobrazuje sa angličtina.
+
+en: {} is on this PC.
+tr: Jazyk {} je v tomto počítači.
+
+en: Every language is on this PC.
+tr: Všetky jazyky sú v tomto počítači.
+
+en: Choose a language to download first.
+tr: Najprv vyberte jazyk, ktorý chcete stiahnuť.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Horný panel
+
+en: Weather
+tr: Počasie
+
+en: Updates
+tr: Aktualizácie
+
+en: General
+tr: Všeobecné
+
+en: About
+tr: Informácie
+
+en: Desktop
+tr: Pracovná plocha
+
+en: Appearance
+tr: Vzhľad
+
+en: Welcome
+tr: Privítanie
+
+en: Aether Shell Settings
+tr: Nastavenie Aether Shell
+
+en: Settings
+tr: Nastavenie
+
+en: Reset defaults...
+tr: Obnoviť predvolené...
+
+en: &Apply
+tr: &Použiť
+
+en: Liquid
+tr: Tekutý
+
+en: Grain
+tr: Zrnitý
+
+en: From {} to {}
+tr: Od {} do {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Túto akciu sa nepodarilo dokončiť.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Veľkosť, rozostupy, pohyb a aplikácie pripnuté do Docku.
+
+en: Size and spacing
+tr: Veľkosť a rozostupy
+
+en: Icon size
+tr: Veľkosť ikon
+
+en: {}, scaled with the Windows display scale.
+tr: {}, prispôsobené mierke obrazovky Windows.
+
+en: Bottom margin
+tr: Dolný okraj
+
+en: Space between the Dock and the bottom of the screen.
+tr: Medzera medzi Dockom a dolným okrajom obrazovky.
+
+en: Minimum side margin
+tr: Minimálny bočný okraj
+
+en: Space kept free at the left and right screen edges.
+tr: Miesto ponechané voľné pri ľavom a pravom okraji obrazovky.
+
+en: Icon spacing
+tr: Rozostup ikon
+
+en: Space between neighbouring icons.
+tr: Medzera medzi susednými ikonami.
+
+en: Glass and motion
+tr: Sklo a pohyb
+
+en: Glass opacity
+tr: Nepriehľadnosť skla
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Nižšie hodnoty ukazujú viac z rozmazanej pracovnej plochy za Dockom.
+
+en: Hover magnification
+tr: Zväčšenie pri ukázaní myšou
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Ako veľmi sa ikona pod ukazovateľom zväčší; hodnota 1 zväčšenie vypne.
+
+en: Behavior
+tr: Správanie
+
+en: Show running applications
+tr: Zobrazovať spustené aplikácie
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Otvorené aplikácie, ktoré nie sú pripnuté, sa zobrazia za pripnutými.
+
+en: Reserve screen space for the Dock
+tr: Rezervovať miesto na obrazovke pre Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maximalizované okná zostanú nad Dockom, nie pod ním.
+
+en: Automatically hide the Dock
+tr: Automaticky skrývať Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Skryje sa, keď ho zakryje okno aplikácie; zobrazíte ho presunutím ukazovateľa k dolnému okraju obrazovky. Na pracovnej ploche zostáva viditeľný a okná dostanú celú výšku obrazovky.
+
+en: Pinned applications
+tr: Pripnuté aplikácie
+
+en: Move &up
+tr: Posunúť &nahor
+
+en: Move &down
+tr: Posunúť na&dol
+
+en: &Remove
+tr: &Odstrániť
+
+en: &Add application
+tr: Pridať &aplikáciu
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Pripnuté položky si zachovajú svoju identitu aj nastavenie spúšťania. Odstránenie pripnutej položky tiež zabráni tomu, aby ju automatická synchronizácia s panelom úloh Windows znova pridala.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Umiestnenie, hodiny a stavové položky zobrazené v hornom stavovom paneli.
+
+en: Presentation
+tr: Prezentácia
+
+en: Floating bar
+tr: Plávajúci panel
+
+en: Text on the desktop
+tr: Text na pracovnej ploche
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Plávajúci panel: sklenený panel pod horným okrajom obrazovky. Text na pracovnej ploche: bez panela, rovnaké položky napísané úplne hore na obrazovke, priamo cez obrázok pracovnej plochy; tento pás zostáva bez okien a horný okraj ani nepriehľadnosť skla sa nepoužijú. Pri automatickom skrývaní sa text vráti na sklenenom páse, keď je pod ním okno.
+
+en: Position and glass
+tr: Umiestnenie a sklo
+
+en: Top margin
+tr: Horný okraj
+
+en: Space between the Top Bar and the top of the screen.
+tr: Medzera medzi horným panelom a horným okrajom obrazovky.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Nižšie hodnoty ukazujú viac z rozmazanej pracovnej plochy za panelom.
+
+en: Clock
+tr: Hodiny
+
+en: Clock format
+tr: Formát hodín
+
+en: Follow Windows
+tr: Podľa Windows
+
+en: 12-hour
+tr: 12-hodinový
+
+en: 24-hour
+tr: 24-hodinový
+
+en: Date style
+tr: Štýl dátumu
+
+en: Weekday, day and month
+tr: Deň v týždni, deň a mesiac
+
+en: Short
+tr: Krátky
+
+en: Long
+tr: Dlhý
+
+en: Show seconds
+tr: Zobrazovať sekundy
+
+en: Show date
+tr: Zobrazovať dátum
+
+en: Status items
+tr: Stavové položky
+
+en: Show battery
+tr: Zobrazovať batériu
+
+en: Hide battery when absent
+tr: Skryť batériu, keď chýba
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Stolové počítače bez batérie nezobrazia nič namiesto neznámej batérie.
+
+en: Show input language
+tr: Zobrazovať jazyk vstupu
+
+en: Show network
+tr: Zobrazovať sieť
+
+en: Show audio output
+tr: Zobrazovať zvukový výstup
+
+en: Show microphone
+tr: Zobrazovať mikrofón
+
+en: Show weather when enabled
+tr: Zobrazovať počasie, keď je zapnuté
+
+en: Weather itself is turned on in Weather settings.
+tr: Samotné počasie sa zapína v nastavení Počasia.
+
+en: Show hidden icons button
+tr: Zobrazovať tlačidlo skrytých ikon
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Malá šípka, ktorá otvorí skryté ikony oblasti oznámení Windows.
+
+en: Reserve screen space above windows
+tr: Rezervovať miesto na obrazovke nad oknami
+
+en: Maximized windows stay below the Top Bar.
+tr: Maximalizované okná zostanú pod horným panelom.
+
+en: Automatically hide the Top Bar
+tr: Automaticky skrývať horný panel
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Skryje sa, keď ho zakryje okno aplikácie; zobrazíte ho presunutím ukazovateľa k hornému okraju obrazovky. Na pracovnej ploche zostáva viditeľný.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Používať Rýchle nastavenia Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Vypnuté: rýchle ovládacie prvky Aether sa otvoria pod horným panelom. Zapnuté: vlastný panel Windows sa otvorí v dolnej časti obrazovky.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Voliteľná predpoveď v hornom paneli od Open-Meteo.
+
+en: Forecast
+tr: Predpoveď
+
+en: Enable weather
+tr: Zapnúť počasie
+
+en: Off by default: the forecast needs network requests.
+tr: Predvolene vypnuté: predpoveď potrebuje sieťové požiadavky.
+
+en: Temperature
+tr: Teplota
+
+en: Celsius
+tr: Celzius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Interval obnovenia
+
+en: Location
+tr: Poloha
+
+en: Locate automatically with Windows
+tr: Zisťovať polohu automaticky pomocou Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Po vašom povolení používa službu určovania polohy Windows.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows požiada o povolenie prístupu k polohe. Vaše súradnice sa odosielajú na Open-Meteo.com iba na získanie predpovede; kľúč polohy sa ukladá do lokálnej vyrovnávacej pamäte. Ak je poloha zablokovaná, počasie nie je k dispozícii.
+
+en: Use &Windows location
+tr: Použiť polohu &Windows
+
+en: Location &settings
+tr: &Nastavenie polohy
+
+en: Choose automatic location or search for a place below.
+tr: Vyberte automatickú polohu alebo nižšie vyhľadajte miesto.
+
+en: Search for a place
+tr: Vyhľadať miesto
+
+en: Searc&h
+tr: &Hľadať
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Údaje o počasí od Open-Meteo.com (CC BY 4.0). Ručné hľadanie odosiela iba zadaný text.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Podpísané vydania z oficiálneho úložiska na GitHube, overené pred inštaláciou.
+
+en: Preferences
+tr: Predvoľby
+
+en: Check for updates automatically
+tr: Automaticky vyhľadávať aktualizácie
+
+en: Check interval
+tr: Interval kontroly
+
+en: Release channel
+tr: Kanál vydaní
+
+en: Prereleases arrive earlier and change more often.
+tr: Predbežné verzie prichádzajú skôr a menia sa častejšie.
+
+en: Stable
+tr: Stabilný
+
+en: Prerelease
+tr: Predbežná verzia
+
+en: Show update notifications
+tr: Zobrazovať oznámenia o aktualizáciách
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Spúšťanie, pohyb, klávesové skratky a diagnostika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Jazyk panelov, ponúk, Hľadania, Nastavenia a inštalačného programu.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Názvy, ktoré patria vám alebo iným programom (aplikácie, súbory, siete Wi-Fi), sa nikdy neprekladajú. So zvoleným jazykom píše horný panel dátum v tomto jazyku; „Podľa Windows“ zachová váš regionálny formát Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Ručne písané privítanie píše latinkou: víta po francúzsky, anglicky alebo španielsky. Jeho jazyk vyberiete v časti Privítanie.
+
+en: Language
+tr: Jazyk
+
+en: Interface language
+tr: Jazyk rozhrania
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: „Podľa Windows“ použije prvý z vašich jazykov zobrazenia Windows, ktorý je medzi týmito, inak angličtinu.
+
+en: Startup
+tr: Spúšťanie
+
+en: Start Aether Shell when I sign in
+tr: Spustiť Aether Shell, keď sa prihlásim
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Táto zmena vyžaduje Použiť. Vypnúť ju možno aj v Správcovi úloh.
+
+en: Motion
+tr: Pohyb
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Obmedzený pohyb všade odstráni dekoratívny pohyb.
+
+en: Reduced
+tr: Obmedzený
+
+en: Full
+tr: Úplný
+
+en: Keyboard shortcuts
+tr: Klávesové skratky
+
+en: Enable global keyboard shortcuts
+tr: Zapnúť globálne klávesové skratky
+
+en: Search shortcut key
+tr: Kláves skratky Hľadania
+
+en: Dock shortcut key
+tr: Kláves skratky Docku
+
+en: Search shortcut modifiers
+tr: Modifikátory skratky Hľadania
+
+en: Dock shortcut modifiers
+tr: Modifikátory skratky Docku
+
+en: Shortcut status unavailable
+tr: Stav skratiek nie je k dispozícii
+
+en: Diagnostics
+tr: Diagnostika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Priečinok denníkov obsahuje denníky Aether Shell z tohto počítača. Export diagnostiky uloží iba verziu aplikácie a zostavu Windows - žiadne denníky ani osobné údaje.
+
+en: Open &log folder
+tr: Otvoriť priečinok &denníkov
+
+en: &Export diagnostics...
+tr: &Exportovať diagnostiku...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Krátke ručne písané privítanie na pracovnej ploche po prihlásení alebo odomknutí počítača.
+
+en: Greeting
+tr: Pozdrav
+
+en: Show the welcome at sign-in and unlock
+tr: Zobrazovať privítanie po prihlásení a odomknutí
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Zobrazí sa potom, čo vás Windows prihlási, kým sa Aether Shell pripravuje. Preskočíte ho dotykom, kliknutím alebo stlačením klávesu Esc.
+
+en: Greeting language
+tr: Jazyk pozdravu
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut po francúzsky, Hello po anglicky, Hola po španielsky. Pero píše latinkou: vo všetkých ostatných jazykoch víta po anglicky.
+
+en: Your name
+tr: Vaše meno
+
+en: Name to greet you with
+tr: Meno, ktorým vás pozdraviť
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Voliteľné, napríklad krstné meno. Zostáva v tomto počítači v nastavení Aether Shell a nikdy sa nikam neodosiela ani nezapisuje do denníka. Ak ho chcete odstrániť, vymažte pole.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Farebný režim, farba zvýraznenia, rýchlosť pohybu a vzhľad Docku a horného panela.
+
+en: Style
+tr: Štýl
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Tekutý: sklo vo vrstvách nad tým, čo je za ním, vrstva rozmazania, svetlo tekutiny a potom ikony a text, čitateľné na svetlých aj tmavých stránkach. Zrnitý: matné sklo, rozmazané a polopriehľadné, s jemným zrnom.
+
+en: Liquid blur
+tr: Rozmazanie štýlu Tekutý
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Ako veľmi vrstva rozmazania pod sklom štýlu Tekutý zakrýva to, čo je za ním: 100 % rozmaže všetko. Nižšie hodnoty ukazujú stránku ostrejšie a text na paneloch potom môže byť na rušnej stránke horšie čitateľný.
+
+en: Liquid blur color
+tr: Farba rozmazania štýlu Tekutý
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: „Automaticky“ zachová vlastné farby skla. Text a ikony zostanú čitateľné bez ohľadu na farbu.
+
+en: Automatic
+tr: Automaticky
+
+en: White
+tr: Biela
+
+en: Black
+tr: Čierna
+
+en: Accent
+tr: Zvýraznenie
+
+en: Blue
+tr: Modrá
+
+en: Violet
+tr: Fialová
+
+en: Pink
+tr: Ružová
+
+en: Red
+tr: Červená
+
+en: Orange
+tr: Oranžová
+
+en: Yellow
+tr: Žltá
+
+en: Green
+tr: Zelená
+
+en: Teal
+tr: Modrozelená
+
+en: Liquid color strength
+tr: Intenzita farby štýlu Tekutý
+
+en: How much of the chosen color the blur layer takes.
+tr: Koľko zo zvolenej farby vrstva rozmazania prevezme.
+
+en: Theme
+tr: Motív
+
+en: Color mode
+tr: Farebný režim
+
+en: High contrast always takes precedence.
+tr: Vysoký kontrast má vždy prednosť.
+
+en: Light
+tr: Svetlý
+
+en: Dark
+tr: Tmavý
+
+en: Accent color
+tr: Farba zvýraznenia
+
+en: Animation duration
+tr: Trvanie animácie
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 je štandardná rýchlosť; vyššie hodnoty sú pomalšie. Obmedzený pohyb má prednosť.
+
+en: Dock icon preset
+tr: Predvoľba ikon Docku
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Vlastná veľkosť z nastavenia Docku sa zachová, kým nevyberiete predvoľbu.
+
+en: Small - 32 px
+tr: Malé - 32 px
+
+en: Medium - 40 px
+tr: Stredné - 40 px
+
+en: Large - 48 px
+tr: Veľké - 48 px
+
+en: Keep custom size
+tr: Zachovať vlastnú veľkosť
+
+en: Show Windows Start in the Dock
+tr: Zobrazovať tlačidlo Štart Windows v Docku
+
+en: Show Task View in the Dock
+tr: Zobrazovať Zobrazenie úloh v Docku
+
+en: Reserve extra space for Dock animations
+tr: Rezervovať ďalšie miesto pre animácie Docku
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Zväčšenie a poskočenie pri spustení tak nezasahujú do maximalizovaných okien.
+
+en: Weather position
+tr: Umiestnenie počasia
+
+en: Left
+tr: Vľavo
+
+en: Right
+tr: Vpravo
+
+en: Keyboard indicator
+tr: Indikátor klávesnice
+
+en: Compact
+tr: Kompaktný
+
+en: Two lines
+tr: Dva riadky
+
+en: Windows taskbar pins
+tr: Pripnuté položky panela úloh Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Pridávať novo zistené pripnuté položky panela úloh Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Keď je panel úloh nahradený, nové pripnuté položky Windows sa pridávajú do Docku.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Vratné nahradenie panela úloh Windows Dockom.
+
+en: Taskbar replacement
+tr: Nahradenie panela úloh
+
+en: Replace the Windows taskbar
+tr: Nahradiť panel úloh Windows
+
+en: Changing this needs Apply.
+tr: Táto zmena vyžaduje Použiť.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Keď je Aether Shell spustený, skryje panel úloh Windows a rezervuje miesto pod maximalizovanými aplikáciami.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Stav panela úloh Windows sa obnoví, keď tento režim vypnete alebo sa Aether Shell ukončí. Samostatný pomocník obnovenia ho obnoví aj v prípade, že sa aplikácia neočakávane zastaví. Ak obnovenie zlyhá, reštartujte Prieskumníka Windows v Správcovi úloh.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Nastavenie Windows zostáva natívnym rozhraním Windows. Jeho stránku panela úloh Aether Shell nenahrádza; tento režim nakonfigurujte tu.
+
+en: Pinned applications from Windows
+tr: Pripnuté aplikácie z Windows
+
+en: &Import Windows taskbar pins
+tr: &Importovať pripnuté položky panela úloh Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Načíta pripnuté odkazy bez zmeny pripnutých položiek Windows. Niektoré pripnuté položky Windows 11 alebo ich poradie nemusia byť k dispozícii.
+
+en: Version {}
+tr: Verzia {}
+
+en: Created by Ibrahim Bouillet
+tr: Vytvoril Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Natívne rozhranie pracovnej plochy Windows - plávajúci Dock a horný stavový panel - fungujúce popri Prieskumníkovi.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Údaje o počasí: Open-Meteo.com (CC BY 4.0). Nie sú pribalené žiadne knižnice modulu runtime C++ tretích strán.
+
+en: &Official project
+tr: &Oficiálny projekt
+
+en: Licence
+tr: Licencia
+
+en: Taskbar replacement changes need Apply.
+tr: Zmeny nahradenia panela úloh vyžadujú Použiť.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Zmeny sa ukladajú automaticky. Spúšťanie vyžaduje Použiť.
+
+en: Changes save automatically.
+tr: Zmeny sa ukladajú automaticky.
+
+en: Press Apply to confirm this change.
+tr: Túto zmenu potvrďte stlačením tlačidla Použiť.
+
+en: Smart transparency
+tr: Inteligentná priehľadnosť
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: V štýle Tekutý toto okno rozmazáva pozadie iba pod svojím textom a ovládacími prvkami: úplne nad inými oknami a ikonami na pracovnej ploche, mierne nad obrázkom pracovnej plochy a vôbec nie tam, kde nič nezobrazuje.
+
+en: Languages on this PC
+tr: Jazyky v tomto počítači
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell sťahuje jazyky, ktoré má Windows, takže mení jazyk spolu s Windows.
+
+en: Add a language
+tr: Pridať jazyk
+
+en: &Download
+tr: &Stiahnuť
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Každý jazyk pochádza z vydania tejto verzie na GitHube a pred použitím sa skontroluje. Keď bude v tomto počítači, vyberte ho vyššie.
+
+en: built in
+tr: vstavaný
+
+en: downloading, {}
+tr: sťahuje sa, {}
+
+en: download failed
+tr: sťahovanie zlyhalo
+
+## setup
+
+en: Aether Shell Setup
+tr: Inštalačný program Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Inštalačný program nemohol vytvoriť svoje rozhranie. Zatvorte ho a skúste to znova alebo použite zdokumentované možnosti tichej inštalácie.
+
+en: Options
+tr: Možnosti
+
+en: Install
+tr: Inštalácia
+
+en: Done
+tr: Hotovo
+
+en: Remove Aether Shell
+tr: Odstrániť Aether Shell
+
+en: Repair Aether Shell
+tr: Opraviť Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Natívny Dock a horný stavový panel pre Windows, fungujúce popri Prieskumníkovi.
+
+en: Replaces the Windows taskbar while it runs
+tr: Nahrádza panel úloh Windows, kým je spustený
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Ak chcete panel úloh Windows späť, ukončite Aether Shell, vypnite túto možnosť v Nastavení > Pracovná plocha alebo v ponuke Štart otvorte „Restore Windows taskbar“.
+
+en: Starts when you sign in - your choice
+tr: Spúšťa sa pri prihlásení - podľa vašej voľby
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Nové inštalácie sa predvolene spúšťajú pri prihlásení. Túto voľbu môžete pred inštaláciou zrušiť alebo ju neskôr vypnúť v Nastavení. Existujúce voľby spúšťania a vypnutia v Správcovi úloh sa zachovajú.
+
+en: Installs for your account
+tr: Inštaluje sa pre vaše konto
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Nepotrebujete oprávnenia správcu. Vaše nastavenia a údaje zostávajú vo vašom používateľskom profile.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Odinštalovanie zachová vaše nastavenia a údaje, pokiaľ sa ich nerozhodnete odstrániť.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Oprava obnoví súbory tohto balíka a zachová vaše nastavenia. Ak Aether Shell nechal panel úloh Windows skrytý, oprava ho obnoví.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Inštalácia na existujúcu verziu zachová vaše nastavenia. Starší balík sa odmietne, pokiaľ výslovne nepovolíte prechod na staršiu verziu.
+
+en: MIT License
+tr: Licencia MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licencia sa nainštaluje aj ako súbor LICENSE vedľa Aether Shell.
+
+en: Remove this installation
+tr: Odstrániť túto inštaláciu
+
+en: Install location
+tr: Umiestnenie inštalácie
+
+en: &Browse...
+tr: Pre&hľadávať...
+
+en: Also remove my settings, cache and logs
+tr: Odstrániť aj moje nastavenia, vyrovnávaciu pamäť a denníky
+
+en: This cannot be undone.
+tr: Túto akciu nemožno vrátiť späť.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Inštalačný program riadne ukončí Aether Shell a odstráni jeho nainštalované súbory, odkazy, položku spúšťania a registráciu v Nainštalovaných aplikáciách. Ostatné aplikácie a nastavenia Windows zostanú bez zmeny.
+
+en: Your welcome
+tr: Vaše privítanie
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Po prihlásení alebo odomknutí počítača napíše Aether Shell ručne krátky pozdrav. Zadajte meno, ktorým vás má pozdraviť, alebo pole nechajte prázdne pre jednoduché ahoj.
+
+en: Your first name
+tr: Vaše krstné meno
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Voliteľné, napríklad krstné meno. Zostáva v tomto počítači v nastavení Aether Shell a nikdy sa nikam neodosiela. Zmeniť ho alebo vypnúť privítanie môžete v Nastavení > Privítanie.
+
+en: Shortcuts and startup
+tr: Odkazy a spúšťanie
+
+en: Create Start menu shortcuts
+tr: Vytvoriť odkazy v ponuke Štart
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell a Restore Windows taskbar.
+
+en: Create a desktop shortcut
+tr: Vytvoriť odkaz na pracovnej ploche
+
+en: Shows your current choice.
+tr: Zobrazuje vašu aktuálnu voľbu.
+
+en: Recommended.
+tr: Odporúča sa.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Ak nechcete, zrušte začiarknutie; vypnutia v Správcovi úloh sa rešpektujú.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Inštaláciou prijímate vyššie uvedenú voľbu spúšťania. Spúšťač môže Aether Shell po zlyhaní znova spustiť, s obmedzeným počtom pokusov. Ukončenie a Restore Windows taskbar zostávajú k dispozícii. Počasie je predvolene vypnuté. Nepodpísané binárne súbory môžu vyvolať upozornenie Windows SmartScreen.
+
+en: Removing this installation...
+tr: Odstraňuje sa táto inštalácia...
+
+en: Repairing Aether Shell...
+tr: Opravuje sa Aether Shell...
+
+en: Installing Aether Shell...
+tr: Inštaluje sa Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Ukončuje sa Aether Shell a odstraňujú sa jeho súbory.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Overuje sa vložený balík a inštalujú sa jeho súbory. Priebeh sa zobrazuje ako aktivita: inštalačný program nepozná zostávajúci čas.
+
+en: Please wait while the removal completes.
+tr: Počkajte, kým sa odstránenie dokončí.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Zrušenie je možné, kým sa neaktivuje nová verzia; potom inštalačný program bezpečne dokončí prácu.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell sa odinštaloval.
+
+en: Aether Shell is ready.
+tr: Aether Shell je pripravený.
+
+en: Setup was cancelled.
+tr: Inštalácia sa zrušila.
+
+en: Setup could not complete.
+tr: Inštaláciu sa nepodarilo dokončiť.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Vaše údaje sa zachovali, pokiaľ ste výslovne nezvolili ich odstránenie.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Opraviť alebo odinštalovať ho môžete v Nastavení Windows > Aplikácie > Nainštalované aplikácie.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Operácia sa zrušila pred aktiváciou. Ak to chcete skúsiť znova, vráťte sa do Možností.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Skontrolujte prístup k súborom a voľné miesto na disku a skúste to znova. Ak už je Aether Shell nainštalovaný, Oprava môže obnoviť jeho súbory. Kategória chyby: {}
+
+en: Setup log
+tr: Denník inštalácie
+
+en: Launch Aether Shell
+tr: Spustiť Aether Shell
+
+en: &Back
+tr: &Späť
+
+en: &Next
+tr: Ď&alej
+
+en: &Continue
+tr: &Pokračovať
+
+en: &Uninstall
+tr: &Odinštalovať
+
+en: &Repair
+tr: Op&raviť
+
+en: &Install
+tr: &Inštalovať
+
+en: &Close
+tr: &Zavrieť
+
+en: Step {} of {}: {}
+tr: Krok {} z {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Vyberte inštalačný priečinok Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Vyberte úplnú cestu k priečinku, napríklad takú, ktorá začína písmenom jednotky.
+
+en: The install folder must be an absolute path.
+tr: Inštalačný priečinok musí byť absolútna cesta.
+
+en: Setup stops at the next safe point.
+tr: Inštalačný program sa zastaví v najbližšom bezpečnom bode.
+
+en: Cancelling...
+tr: Ruší sa...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Inštalačný program bezpečne dokončuje aktuálny krok; počkajte, prosím.
+
+en: Updating Aether Shell
+tr: Aktualizuje sa Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Overuje sa podpísaný balík a použije sa aktualizácia.
+
+en: Update completed
+tr: Aktualizácia sa dokončila
+
+en: The update did not complete
+tr: Aktualizácia sa nedokončila
+
+en: Close
+tr: Zavrieť
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Rozhranie aktualizácie sa nepodarilo spustiť. Aktualizácia sa nepoužila. Skúste to znova alebo použite Opravu.
+
+en: Aether Shell Update
+tr: Aktualizácia Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Rozhranie aktualizácie sa nepodarilo spustiť. Aktualizácia sa nepoužila. Skúste to znova alebo použite Opraviť v Nastavení Windows > Aplikácie > Nainštalované aplikácie.
+
+en: Update completed.
+tr: Aktualizácia sa dokončila.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Aktualizácia sa nedokončila. Pozrite si denník aktualizačného programu alebo použite Opravu.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell sa nepodarilo spustiť. Vyberte Opraviť v Nastavení Windows > Aplikácie > Nainštalované aplikácie.
+
+en: Aether Shell Settings — update in progress
+tr: Nastavenie Aether Shell — prebieha aktualizácia
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Pokračovať v nahradení panela úloh
+
+en: Show Windows &notification area for 60 seconds
+tr: &Zobraziť oblasť oznámení Windows na 60 sekúnd
+
+en: &Search…
+tr: &Hľadať…
+
+en: &Settings…
+tr: &Nastavenie…
+
+en: View available &update…
+tr: Zobraziť dostupnú &aktualizáciu…
+
+en: &Check for updates…
+tr: &Vyhľadať aktualizácie…
+
+en: &About Aether Shell
+tr: &O aplikácii Aether Shell
+
+en: &Quit Aether Shell
+tr: &Ukončiť Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Prepnúť &jazyk vstupu\tWin+Medzerník
+
+en: Open &network controls…
+tr: Otvoriť ovládacie prvky &siete…
+
+en: &Weather settings…
+tr: Nastavenie &počasia…
+
+en: Toggle output &mute
+tr: Zapnúť/vypnúť stlmenie &výstupu
+
+en: &Sound settings…
+tr: Nastavenie &zvuku…
+
+en: Toggle microphone &mute
+tr: Zapnúť/vypnúť stlmenie &mikrofónu
+
+en: Start Windows &voice typing\tWin+H
+tr: Spustiť &hlasové písanie Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Nastavenie &ochrany osobných údajov pre mikrofón…
+
+en: &Power settings…
+tr: Nastavenie &napájania…
+
+en: Open &notifications and calendar
+tr: Otvoriť &oznámenia a kalendár
+
+en: Open &calendar\tWin+Alt+D
+tr: Otvoriť &kalendár\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Zobraziť &skryté ikony
+
+en: Initializing
+tr: Inicializácia
+
+en: Unavailable
+tr: Nie je k dispozícii
+
+en: Unsupported
+tr: Nepodporované
+
+en: Error
+tr: Chyba
+
+en: Available
+tr: K dispozícii
+
+en: Unknown
+tr: Neznáme
+
+en: Internet access
+tr: Prístup na internet
+
+en: Local network only
+tr: Iba lokálna sieť
+
+en: Limited Internet access
+tr: Obmedzený prístup na internet
+
+en: No network connection
+tr: Žiadne sieťové pripojenie
+
+en: Connectivity unknown
+tr: Pripojenie neznáme
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilná sieť
+
+en: Network
+tr: Sieť
+
+en: Offline
+tr: Offline
+
+en: Network status unavailable
+tr: Stav siete nie je k dispozícii
+
+en: Quick controls
+tr: Rýchle ovládacie prvky
+
+en: Aether Shell menu
+tr: Ponuka Aether Shell
+
+en: Weather status unavailable
+tr: Stav počasia nie je k dispozícii
+
+en: Cached weather
+tr: Počasie z vyrovnávacej pamäte
+
+en: Observation (UTC): {}
+tr: Pozorovanie (UTC): {}
+
+en: Weather: {}
+tr: Počasie: {}
+
+en: Click to open weather settings
+tr: Kliknutím otvoríte nastavenie počasia
+
+en: Show hidden icons
+tr: Zobraziť skryté ikony
+
+en: Opens Windows' notification-area overflow
+tr: Otvorí pretečenie oblasti oznámení Windows
+
+en: Input language: {}
+tr: Jazyk vstupu: {}
+
+en: Fallback input layout
+tr: Záložné rozloženie klávesnice
+
+en: Click to switch input language (Win+Space)
+tr: Kliknutím prepnete jazyk vstupu (Win+Medzerník)
+
+en: Network: {}
+tr: Sieť: {}
+
+en: Signal strength unavailable
+tr: Sila signálu nie je k dispozícii
+
+en: Click to open Windows network settings
+tr: Kliknutím otvoríte nastavenie siete Windows
+
+en: Audio output
+tr: Zvukový výstup
+
+en: Audio: {}
+tr: Zvuk: {}
+
+en: volume unknown
+tr: hlasitosť neznáma
+
+en: Muted
+tr: Stlmené
+
+en: Sound on
+tr: Zvuk zapnutý
+
+en: Microphone: {}
+tr: Mikrofón: {}
+
+en: Endpoint unmuted
+tr: Mikrofón nestlmený
+
+en: Recording detection unsupported
+tr: Zisťovanie nahrávania nie je podporované
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Kliknutím zapnete alebo vypnete stlmenie; kliknutím pravým tlačidlom otvoríte hlasové písanie Windows a nastavenie ochrany osobných údajov pre mikrofón
+
+en: Battery: {}
+tr: Batéria: {}
+
+en: Battery {}
+tr: Batéria {}
+
+en: Battery status unavailable
+tr: Stav batérie nie je k dispozícii
+
+en: Charging
+tr: Nabíja sa
+
+en: External power
+tr: Externé napájanie
+
+en: Estimated remaining: {} h {} min
+tr: Odhadovaný zostávajúci čas: {} h {} min
+
+en: Click to open power settings
+tr: Kliknutím otvoríte nastavenie napájania
+
+en: Clock status unavailable
+tr: Stav hodín nie je k dispozícii
+
+en: Click to open calendar and notifications
+tr: Kliknutím otvoríte kalendár a oznámenia
+
+en: Action failed: {}
+tr: Akcia zlyhala: {}
+
+en: Aether Shell status bar
+tr: Stavový panel Aether Shell
+
+en: Update available
+tr: K dispozícii je aktualizácia
+
+en: Cached
+tr: Z vyrovnávacej pamäte
+
+en: Start
+tr: Štart
+
+en: Search
+tr: Hľadať
+
+en: Task View
+tr: Zobrazenie úloh
+
+en: Application
+tr: Aplikácia
+
+en: Running application
+tr: Spustená aplikácia
+
+en: More applications
+tr: Ďalšie aplikácie
+
+en: Aether Shell window previews
+tr: Ukážky okien Aether Shell
+
+en: Minimized — preview unavailable
+tr: Minimalizované — ukážka nie je k dispozícii
+
+en: Preview unavailable
+tr: Ukážka nie je k dispozícii
+
+en: {} windows
+tr: Okná aplikácie {}
+
+en: {} window
+tr: Okno aplikácie {}
+
+en: Switches to this window
+tr: Prepne na toto okno
+
+en: Minimized, preview unavailable
+tr: Minimalizované, ukážka nie je k dispozícii
+
+en: Minimized
+tr: Minimalizované
+
+en: Close {}
+tr: Zavrieť {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Požiada toto okno o zatvorenie; aplikácia sa ešte môže opýtať na uloženie alebo zrušenie
+
+en: Close requested
+tr: Požiadalo sa o zatvorenie
+
+en: Previous applications
+tr: Predchádzajúce aplikácie
+
+en: Open
+tr: Otvoriť
+
+en: New instance
+tr: Nová inštancia
+
+en: Unpin from Dock
+tr: Odopnúť z Docku
+
+en: Pin to Dock
+tr: Pripnúť do Docku
+
+en: Move left
+tr: Posunúť doľava
+
+en: Move right
+tr: Posunúť doprava
+
+en: Dock settings...
+tr: Nastavenie Docku...
+
+en: Import Windows taskbar pins
+tr: Importovať pripnuté položky panela úloh Windows
+
+en: Open Windows Start
+tr: Otvoriť ponuku Štart Windows
+
+en: Aether Shell Dock
+tr: Dock Aether Shell
+
+en: Pinned
+tr: Pripnuté
+
+en: Running
+tr: Spustené
+
+en: Needs attention
+tr: Vyžaduje pozornosť
+
+en: Up arrow shows window previews
+tr: Šípka nahor zobrazí ukážky okien
+
+en: Installed application
+tr: Nainštalovaná aplikácia
+
+en: Desktop application
+tr: Počítačová aplikácia
+
+en: File
+tr: Súbor
+
+en: Folder
+tr: Priečinok
+
+en: Windows tool
+tr: Nástroj Windows
+
+en: Control Panel
+tr: Ovládací panel
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Prechádzať   ·   Enter Otvoriť   ·   Esc Zavrieť
+
+en: Search apps, settings and files
+tr: Hľadať aplikácie, nastavenia a súbory
+
+en: Search could not be completed.
+tr: Hľadanie sa nepodarilo dokončiť.
+
+en: Results
+tr: Výsledky
+
+en: Indexing applications…
+tr: Indexujú sa aplikácie…
+
+en: Type to search apps, settings and files
+tr: Začnite písať a vyhľadajte aplikácie, nastavenia a súbory
+
+en: Nothing matches
+tr: Nič sa nezhoduje
+
+en: Windows could not open this application.
+tr: Windows nemohol otvoriť túto aplikáciu.
+
+en: Menu
+tr: Ponuka
+
+en: Opens a submenu
+tr: Otvorí podponuku
+
+en: , opens a submenu
+tr: , otvorí podponuku
+
+en: Selected
+tr: Vybraté
+
+en: Checked
+tr: Začiarknuté
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Režim v lietadle
+
+en: Accessibility
+tr: Prístupnosť
+
+en: Energy saver
+tr: Šetrič energie
+
+en: Live captions
+tr: Živé titulky
+
+en: Night light
+tr: Nočné osvetlenie
+
+en: Mobile hotspot
+tr: Mobilný prístupový bod
+
+en: Nearby sharing
+tr: Zdieľanie nablízku
+
+en: Cast
+tr: Prenášať
+
+en: Project
+tr: Premietať
+
+en: All settings
+tr: Všetky nastavenia
+
+en: Connected
+tr: Pripojené
+
+en: Not connected
+tr: Nepripojené
+
+en: , on
+tr: , zapnuté
+
+en: , off
+tr: , vypnuté
+
+en: , state unknown
+tr: , stav neznámy
+
+en: , opens Windows Settings
+tr: , otvorí Nastavenie Windows
+
+en: , shows accessibility features
+tr: , zobrazí funkcie prístupnosti
+
+en: , requires Windows 11 version 22H2
+tr: , vyžaduje Windows 11 verzie 22H2
+
+en: Now playing: {}
+tr: Práve sa prehráva: {}
+
+en: Untitled media
+tr: Médium bez názvu
+
+en: , switch source
+tr: , prepnúť zdroj
+
+en: Previous media item
+tr: Predchádzajúca položka médií
+
+en: Pause
+tr: Pozastaviť
+
+en: Play
+tr: Prehrať
+
+en: Next media item
+tr: Ďalšia položka médií
+
+en: {} details
+tr: Podrobnosti: {}
+
+en: Page {} of {}
+tr: Strana {} z {}
+
+en: Next page
+tr: Ďalšia strana
+
+en: First page
+tr: Prvá strana
+
+en: Brightness
+tr: Jas
+
+en: Brightness, unavailable on this display
+tr: Jas, na tejto obrazovke nie je k dispozícii
+
+en: Volume
+tr: Hlasitosť
+
+en: Volume, unavailable
+tr: Hlasitosť, nie je k dispozícii
+
+en: Unmute
+tr: Zrušiť stlmenie
+
+en: Mute
+tr: Stlmiť
+
+en: Sound output and volume mixer
+tr: Zvukový výstup a zmiešavač hlasitosti
+
+en: Back
+tr: Späť
+
+en: , secured
+tr: , zabezpečená
+
+en: , open
+tr: , otvorená
+
+en: , connected
+tr: , pripojená
+
+en: Disconnect
+tr: Odpojiť
+
+en: Show available networks
+tr: Zobraziť dostupné siete
+
+en: More Wi-Fi settings
+tr: Ďalšie nastavenia Wi-Fi
+
+en: Bluetooth and devices settings
+tr: Nastavenie Bluetooth a zariadení
+
+en: Magnifier
+tr: Lupa
+
+en: Narrator
+tr: Moderátor
+
+en: On-screen keyboard
+tr: Klávesnica na obrazovke
+
+en: Sticky keys
+tr: Jedným prstom
+
+en: More accessibility settings
+tr: Ďalšie nastavenia prístupnosti
+
+en: Volume mixer
+tr: Zmiešavač hlasitosti
+
+en: Choose output in Sound settings
+tr: Vyberte výstup v nastavení zvuku
+
+en: Power and battery settings
+tr: Nastavenie napájania a batérie
+
+en: Battery {} percent, {}
+tr: Batéria {} percent, {}
+
+en: All Windows settings
+tr: Všetky nastavenia Windows
+
+en: The requested action could not be dispatched
+tr: Požadovanú akciu sa nepodarilo odoslať
+
+en: Aether Shell quick controls
+tr: Rýchle ovládacie prvky Aether Shell
+
+en: Media session active
+tr: Relácia médií je aktívna
+
+en: No media session
+tr: Žiadna relácia médií
+
+en: Current page
+tr: Aktuálna strana
+
+en:  - secured
+tr:  - zabezpečená
+
+en:  - open
+tr:  - otvorená
+
+en:  - opens in Windows
+tr:  - otvorí sa vo Windows
+
+en: Turned off by hardware or policy
+tr: Vypnuté hardvérom alebo politikou
+
+en: State unavailable - use Windows settings
+tr: Stav nie je k dispozícii - použite nastavenie Windows
+
+en: Off
+tr: Vypnuté
+
+en:  - signal {} of 5
+tr:  - signál {} z 5
+
+en: , no internet
+tr: , bez internetu
+
+en: On - not connected
+tr: Zapnuté - nepripojené
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows nedovoľuje aplikáciám zobraziť zoznam sietí: skontrolujte Polohu v nastavení ochrany osobných údajov
+
+en: No Wi-Fi adapter found
+tr: Nenašiel sa žiadny adaptér Wi-Fi
+
+en: Connecting to {}...
+tr: Pripája sa k sieti {}...
+
+en:  - looking for networks
+tr:  - hľadajú sa siete
+
+en: On
+tr: Zapnuté
+
+en: A screen reader is running
+tr: Je spustená čítačka obrazovky
+
+en: Windows accessibility features
+tr: Funkcie prístupnosti Windows
+
+en: Sound output
+tr: Zvukový výstup
+
+en: Default output device
+tr: Predvolené výstupné zariadenie
+
+en: No output device available
+tr: Nie je k dispozícii žiadne výstupné zariadenie
+
+en: Battery unknown
+tr: Batéria neznáma
+
+en: Status refresh could not be started
+tr: Obnovenie stavu sa nepodarilo spustiť
+
+en: Status refresh unavailable
+tr: Obnovenie stavu nie je k dispozícii
+
+en: Excellent signal
+tr: Výborný signál
+
+en: Good signal
+tr: Dobrý signál
+
+en: Fair signal
+tr: Priemerný signál
+
+en: Weak signal
+tr: Slabý signál
+
+en: Clear sky
+tr: Jasno
+
+en: Mainly clear
+tr: Prevažne jasno
+
+en: Partly cloudy
+tr: Polojasno
+
+en: Overcast
+tr: Zamračené
+
+en: Fog
+tr: Hmla
+
+en: Drizzle
+tr: Mrholenie
+
+en: Rain
+tr: Dážď
+
+en: Snow
+tr: Sneh
+
+en: Rain showers
+tr: Dažďové prehánky
+
+en: Snow showers
+tr: Snehové prehánky
+
+en: Thunderstorm
+tr: Búrka
+
+## weather
+
+en: Morning
+tr: Ráno
+
+en: Afternoon
+tr: Popoludnie
+
+en: Evening
+tr: Večer
+
+en: Night
+tr: Noc
+
+en: Now
+tr: Teraz
+
+en: Today
+tr: Dnes
+
+en: Low
+tr: Nízky
+
+en: Moderate
+tr: Stredný
+
+en: High
+tr: Vysoký
+
+en: Very high
+tr: Veľmi vysoký
+
+en: Extreme
+tr: Extrémny
+
+en: No connection to the weather service.
+tr: Žiadne pripojenie k službe počasia.
+
+en: The weather service is busy. Try again in a moment.
+tr: Služba počasia je zaneprázdnená. Skúste to znova o chvíľu.
+
+en: The weather could not be loaded.
+tr: Počasie sa nepodarilo načítať.
+
+en: Could not update; showing the last forecast.
+tr: Aktualizácia zlyhala; zobrazuje sa posledná predpoveď.
+
+en: Try again
+tr: Skúsiť znova
+
+en: Your location
+tr: Vaša poloha
+
+en: My location
+tr: Moja poloha
+
+en: Precise location
+tr: Presná poloha
+
+en: Approximate location
+tr: Približná poloha
+
+en: Chosen in Settings
+tr: Vybraté v Nastavení
+
+en: Allow
+tr: Povoliť
+
+en: Use precise location
+tr: Použiť presnú polohu
+
+en: See the weather where you are: allow your precise location.
+tr: Pozrite si počasie tam, kde ste: povoľte svoju presnú polohu.
+
+en: Your position is approximate (about 10 km).
+tr: Vaša poloha je približná (asi 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Poloha je pre túto aplikáciu vo Windows vypnutá.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Toto zariadenie nedokáže zistiť svoju polohu. Namiesto toho vyhľadajte mesto.
+
+en: Reading Windows location…
+tr: Načítava sa poloha Windows…
+
+en: Automatic weather follows your Windows location.
+tr: Automatické počasie sa riadi vašou polohou Windows.
+
+en: Search for a city
+tr: Vyhľadať mesto
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Ak chcete vidieť počasie, vyhľadajte mesto alebo povoľte svoju polohu.
+
+en: Searching…
+tr: Hľadá sa…
+
+en: City search is unavailable.
+tr: Hľadanie miest nie je k dispozícii.
+
+en: No city found.
+tr: Nenašlo sa žiadne mesto.
+
+en: Weather settings
+tr: Nastavenie počasia
+
+en: Loading the weather…
+tr: Načítava sa počasie…
+
+en: Loading…
+tr: Načítava sa…
+
+en: Updated {}
+tr: Aktualizované {}
+
+en: Near {}
+tr: Neďaleko: {}
+
+en: Temperatures now
+tr: Aktuálne teploty
+
+en: The map is unavailable.
+tr: Mapa nie je k dispozícii.
+
+en: Map: Natural Earth
+tr: Mapa: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Údaje o počasí od Open-Meteo.com
+
+en: Feels like
+tr: Pocitová teplota
+
+en: Feels like {}
+tr: Pocitovo {}
+
+en: Close to the real temperature
+tr: Blízka skutočnej teplote
+
+en: The wind makes it feel colder
+tr: Vietor spôsobuje, že sa zdá chladnejšie
+
+en: Humidity makes it feel warmer
+tr: Vlhkosť spôsobuje, že sa zdá teplejšie
+
+en: Humidity
+tr: Vlhkosť
+
+en: Cloud cover {}
+tr: Oblačnosť {}
+
+en: Wind
+tr: Vietor
+
+en: Gusts {}
+tr: Nárazy {}
+
+en: Sunrise and sunset
+tr: Východ a západ slnka
+
+en: UV index
+tr: UV index
+
+en: Pressure
+tr: Tlak
+
+en: At sea level
+tr: Na úrovni mora
+
+en: &Open the weather
+tr: &Otvoriť počasie
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Predpoveď pre miesto, kde ste, s presnosťou asi na 100 m a s jeho nadmorskou výškou. Vypnuté: zaokrúhlené asi na 10 km.

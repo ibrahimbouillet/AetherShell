@@ -29,14 +29,8 @@ A native Windows desktop interface by **Ibrahim Bouillet**. Aether Shell pairs a
 a compact Top Status Bar, using a softly blurred, translucent material. It is built in C++20 with
 Win32, Direct2D/DirectWrite and Windows.UI.Composition, and is released under the MIT License.
 
-> **Alpha software:** 0.3.5-alpha.3 (Alpha 3, version 3.5) is an early public preview. It is not a fully qualified
+> **Alpha software:** 0.4.0-alpha.4 (Alpha 4) is an early public preview. It is not a fully qualified
 > Windows shell replacement. Save your work before testing and read the [known limitations](KNOWN_LIMITATIONS.md).
-
-> **Coming soon: Alpha 4.** The next version is in development: two styles to choose from, *Liquid* (clear
-> water glass) and *Grain* (today's frosted material), a Search that also finds Windows' Settings pages, files
-> and folders, an interface in ten languages that follows your Windows display languages and remembers your
-> choice, and a lighter, smoother shell. [Watch the releases](https://github.com/ibrahimbouillet/AetherShell/releases)
-> to know when it is out.
 
 <h2 align="center">A New Desktop. A New Atmosphere.</h2>
 
@@ -70,9 +64,9 @@ Real desktops, captured on Windows 11. Wallpapers and application icons belong t
   Control Panel's items.
 - **Auto-Hide:** let the Dock and the Top Bar, each on its own, slide away while an application window
   covers them and return when the pointer reaches their screen edge, for a full-screen workspace.
-- **Ten languages:** the whole interface, setup included, in English, Chinese, Hindi, Spanish, French, Portuguese, Russian,
-  Arabic, Bengali and Urdu. It follows your Windows display languages, or the one you choose in Settings → Language, and
-  remembers that choice from one version to the next. See [Languages](#languages).
+- **41 languages:** the whole interface, setup included, in the 38 languages Windows 11 offers plus Bengali, Hindi and
+  Urdu. It follows your Windows display languages, or the one you choose in Settings → Language, and remembers that choice
+  from one version to the next. Each language is downloaded from the release when it is needed. See [Languages](#languages).
 - **Welcome:** an optional greeting, written by hand in French, English or Spanish over your blurred wallpaper,
   after you sign in or unlock your PC. Setup can ask for the name it greets you with.
 - **Weather:** optionally use Windows location permission for a coarse position and a forecast. If
@@ -83,17 +77,21 @@ Real desktops, captured on Windows 11. Wallpapers and application icons belong t
 - **Recovery:** a per-user installer, a separate recovery helper, repair/uninstall support and a
   Windows-taskbar restore command.
 
-## What's new in 3.5
+## What's new in Alpha 4
 
-Version 3.5 leaves applications' tabs and close buttons alone (the Top Bar answers only to the very top of the screen), closes
-panels as soon as you use anything else, and finds Windows' own tools in Search. The welcome now greets you by name from the first
-time, because setup asks for it; it shows your wallpaper even when the picture's file was moved or deleted, and its pen flows with
-less work per frame. Read the [release notes](docs/releases/0.3.5-alpha.3.md) and the [changelog](CHANGELOG.md).
+Two styles: *Liquid*, clear water glass over a blur layer you shape, and *Grain*, the frosted material of the earlier
+versions. In Liquid, the Settings window blurs only under its own text and controls and stays clear elsewhere. The
+interface speaks 41 languages, downloaded from the release when you need them and following your Windows display
+language. Search finds what Start finds by name. The weather is precise and animated, with a window of its own. The Top
+Bar can be plain text on your desktop, a dragged icon stretches the Dock, and Aether starts sooner after you sign in.
+Read the [release notes](docs/releases/0.4.0-alpha.4.md) and the [changelog](CHANGELOG.md).
 
 ## Languages
 
-Aether Shell speaks the ten most spoken languages in the world. Every menu, panel, Settings page, message and setup
-screen is translated, and so is this documentation.
+Aether Shell's interface speaks 41 languages: the 38 Windows 11 offers, plus Bengali, Hindi and Urdu. Every menu,
+panel, Settings page, message and setup screen is translated. Aether follows your Windows display language, or the one
+you choose in Settings > Language; each language is downloaded from the release when it is needed. This documentation
+is in the ten languages below.
 
 | | Language | Interface | Documentation |
 |---|---|---|---|
@@ -109,13 +107,13 @@ screen is translated, and so is this documentation.
 | 🇵🇰 | اردو | ✅ (right to left) | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
 **Follow Windows** (the default) goes through your Windows display languages (Settings → Time & language), in the order
-you ranked them, and takes the first that is one of these ten; English if none is. Choose another in
+you ranked them, and takes the first that Aether Shell speaks (any of the 41); English if none is. Choose another in
 **Settings → Language**; the change applies at once and is kept in your settings, which every version reads: installing a
 new version, repairing or reinstalling keeps it, and setup, the updater and the launcher speak it too. Names that belong to
 you or to other programs (applications, files, Wi-Fi networks) are never translated. The handwritten welcome writes
-Latin letters, so it greets in French, English or Spanish. Arabic and Urdu read right to left: text is shaped and aligned
-accordingly, while the bars and panels keep their layout. Translations live in
-[tools/i18n/catalog](tools/i18n/catalog); corrections are welcome.
+Latin letters, so it greets in French, English or Spanish. Arabic, Hebrew and Urdu read right to left: text is shaped and
+aligned accordingly, while the bars and panels keep their layout. Translations live in
+[tools/i18n/languages](tools/i18n/languages); corrections are welcome.
 
 ## Replacing the Windows taskbar
 

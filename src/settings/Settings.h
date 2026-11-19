@@ -27,9 +27,15 @@ enum class AccentSource { Windows, Aether };              // Windows accent colo
 // D63, D66: the material of every surface. Grain is the frosted, semi-transparent neutral glass with its grain;
 // Liquid is glass in layers over what lies behind: a blur layer, the liquid's light, then the icons and text.
 enum class SurfaceStyle { Grain, Liquid };
-// D70/D74: the interface's language. Automatic follows the Windows display languages, in the person's own order
-// (English when none of them is one of the ten). The order after Automatic is core/Localization's Language order.
-enum class InterfaceLanguage { Automatic, English, French, Spanish, Chinese, Hindi, Portuguese, Russian, Arabic, Bengali, Urdu };
+// D70/D74/D83: the interface's language. Automatic follows the Windows display languages, in the person's own order
+// (English when none of them is one of these). The order after Automatic is core/Localization's Language order, and
+// settings.json keeps each language's savedName ("english", "french", "german"...).
+enum class InterfaceLanguage : std::uint8_t {
+    Automatic, English, Arabic, Bengali, Bulgarian, Chinese, ChineseTraditional, Croatian, Czech, Danish, Dutch,
+    EnglishUnitedKingdom, Estonian, Finnish, FrenchCanada, French, German, Greek, Hebrew, Hindi, Hungarian,
+    Italian, Japanese, Korean, Latvian, Lithuanian, Norwegian, Polish, Portuguese, PortuguesePortugal, Romanian,
+    Russian, SerbianLatin, Slovak, Slovenian, Spanish, SpanishMexico, Swedish, Thai, Turkish, Ukrainian, Urdu,
+};
 // D67: the colour of Liquid's blur layer. Automatic adds none (the glass's own adaptation only).
 enum class LiquidTint { Automatic, White, Black, Accent, Blue, Violet, Pink, Red, Orange, Yellow, Green, Teal };
 enum class WeatherPlacement { Left, Right };              // next to the logo, or in the status cluster
@@ -167,6 +173,9 @@ struct GeneralSettings {
     double liquidBlurOpacity = 1.0;
     LiquidTint liquidTint = LiquidTint::Automatic;
     double liquidTintStrength = 0.3;
+    // D84: Liquid's smart transparency in the Settings window: blur only under its text and controls, full over other
+    // windows and desktop icons, light over the plain desktop picture, none where the window shows nothing.
+    bool liquidSmart = true;
     double animationSpeed = 1.0;    // MotionPolicy duration scale, 0.5 (faster)..1.5 (slower)
     bool hotkeysEnabled = true;     // Ctrl+Alt+Space (search), Ctrl+Alt+D (focus Dock)
     HotkeyChord searchHotkey{};

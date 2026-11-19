@@ -1,0 +1,2494 @@
+# Finnish (fi): Suomi. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Ota automaattinen sää käyttöön valitsemalla Windowsin sijainti.
+
+en: Windows taskbar visible
+tr: Windowsin tehtäväpalkki näkyvissä
+
+en: Connected to {}
+tr: Yhdistetty verkkoon {}
+
+en: {} is out of range
+tr: {} on kantaman ulkopuolella
+
+en: Connecting to {} took too long
+tr: Yhdistäminen verkkoon {} kesti liian kauan
+
+en: Use Windows to join {}
+tr: Muodosta yhteys verkkoon {} Windowsin avulla
+
+en: Windows did not allow this connection
+tr: Windows ei sallinut tätä yhteyttä
+
+en: Could not connect to {}
+tr: Yhteyttä verkkoon {} ei voitu muodostaa
+
+en: Connect to {}
+tr: Yhdistä verkkoon {}
+
+en: That password was not accepted. Check it and try again.
+tr: Salasanaa ei hyväksytty. Tarkista se ja yritä uudelleen.
+
+en: Enter this network's password.
+tr: Anna tämän verkon salasana.
+
+en: &Connect
+tr: &Yhdistä
+
+en: Windows Settings could not be opened
+tr: Windowsin asetuksia ei voitu avata
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Dockille ei voitu varata tilaa; palautetaan Windowsin tehtäväpalkki
+
+en: Replacement unavailable: recovery observer could not start
+tr: Korvaaminen ei käytettävissä: palautuksen valvontaa ei voitu käynnistää
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windowsin tehtäväpalkki palautettu. Dockille ei voitu varata tilaa; yritä uudelleen poistamalla korvaaminen käytöstä ja ottamalla se taas käyttöön.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Palautuksen valvonta ei ole käytettävissä; palautetaan Windowsin tehtäväpalkki
+
+en: Windows notifications could not be opened
+tr: Windowsin ilmoituksia ei voitu avata
+
+en: The Windows calendar could not be opened
+tr: Windowsin kalenteria ei voitu avata
+
+en: Windows did not show its hidden icons
+tr: Windows ei näyttänyt piilotettuja kuvakkeitaan
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Sijainnin automaattinen päivitys ei ole käytettävissä; yritä uudelleen sääasetuksissa.
+
+en: Windows location
+tr: Windowsin sijainti
+
+en: Reading approximate Windows location…
+tr: Luetaan Windowsin likimääräistä sijaintia…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automaattinen sää seuraa Windowsin likimääräistä sijaintia.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windowsin sijainnin käyttö on estetty. Sää ei ole käytettävissä.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows ei pystynyt antamaan nykyistä sijaintia. Sää ei ole käytettävissä.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Sijaintipalvelu ei ole käytettävissä. Sää ei ole käytettävissä.
+
+en: Waiting for Windows location permission…
+tr: Odotetaan Windowsin sijaintilupaa…
+
+en: The automatic weather choice could not be saved.
+tr: Automaattisen sään valintaa ei voitu tallentaa.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windowsin sijainnin käyttö ei ole käytettävissä tai se estettiin. Sää ei ole käytettävissä.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windowsin sijainti ei voinut pyytää lupaa. Tarkista Windowsin sijaintiasetukset.
+
+en: Status worker unavailable
+tr: Tilapalvelu ei ole käytettävissä
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows ei voinut suorittaa tätä toimintoa loppuun. Tarkista sen asetukset.
+
+en: Reading Windows status; try the action again shortly
+tr: Luetaan Windowsin tilaa; yritä toimintoa uudelleen hetken kuluttua
+
+en: Could not disconnect
+tr: Yhteyttä ei voitu katkaista
+
+en: The Windows accessibility feature could not be started
+tr: Windowsin helppokäyttötoimintoa ei voitu käynnistää
+
+en: Windows could not change the audio output
+tr: Windows ei voinut vaihtaa äänilähtöä
+
+en: The Windows control could not be opened
+tr: Windowsin säädintä ei voitu avata
+
+en: Keyboard shortcuts disabled
+tr: Pikanäppäimet poistettu käytöstä
+
+en: Both keyboard shortcuts registered
+tr: Molemmat pikanäppäimet rekisteröity
+
+en: A keyboard shortcut is already in use by another application
+tr: Toinen sovellus käyttää jo pikanäppäintä
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windowsin pika-asetuksia ei voitu pyytää. Poista Yläpalkin asetuksista valinta Käytä Windowsin pika-asetuksia, jotta voit käyttää Aetherin säätimiä.
+
+en: Windows Start could not be opened
+tr: Windowsin Käynnistä-valikkoa ei voitu avata
+
+en: Windows Task View could not be opened
+tr: Windowsin tehtävänäkymää ei voitu avata
+
+en: Windows keyboard layout switching was unavailable
+tr: Windowsin näppäimistöasettelun vaihtaminen ei ollut käytettävissä
+
+en: Windows voice typing could not be opened
+tr: Windowsin puhekirjoitusta ei voitu avata
+
+en: Windows taskbar could not be revealed
+tr: Windowsin tehtäväpalkkia ei voitu tuoda näkyviin
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Tehtäväpalkin korvaamista ei voitu jatkaa; Windows on edelleen käytettävissä
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Windowsin tehtäväpalkin korvaaminen ei ole käytettävissä tässä istunnossa
+
+en: Windows pin access is unavailable in this isolated session
+tr: Windowsin kiinnitysten käyttö ei ole mahdollista tässä eristetyssä istunnossa
+
+en: Windows pinned applications could not be read
+tr: Windowsin kiinnitettyjä sovelluksia ei voitu lukea
+
+en: Settings changed during pin import. Try import again.
+tr: Asetuksia muutettiin kiinnitysten tuonnin aikana. Yritä tuontia uudelleen.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Tallennettiin {} kiinnitettyä sovellusta lisää. Jotkin Windowsin kiinnitykset voivat olla edelleen poissa käytöstä.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Kiinnitykset muutettu muistissa; tallennus epäonnistui. Yritä uudelleen valitsemalla asetuksissa Käytä.
+
+en: Pins updated in memory; saving...
+tr: Kiinnitykset päivitetty muistissa; tallennetaan...
+
+en: Imported pins could not be applied
+tr: Tuotuja kiinnityksiä ei voitu ottaa käyttöön
+
+en: Pin import is unavailable while closing
+tr: Kiinnitysten tuonti ei ole käytettävissä sulkemisen aikana
+
+en: Settings could not be saved
+tr: Asetuksia ei voitu tallentaa
+
+en: Quit without saving the latest changes?
+tr: Lopetetaanko tallentamatta viimeisimpiä muutoksia?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Aiempi asetustiedostosi säilytetään. Pidä Aether Shell auki, niin voit yrittää tallentaa uudelleen.
+
+en: &Quit without saving
+tr: &Lopeta tallentamatta
+
+en: &Keep Aether Shell open
+tr: &Pidä Aether Shell auki
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Vie perusdiagnostiikka – sovelluksen versio ja Windowsin koontiversio, ei lokeja tai henkilötietoja
+
+en: Diagnostics exported.
+tr: Diagnostiikka viety.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnostiikkaa ei voitu tallentaa valittuun tiedostoon.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Asetuksia ei voitu lukea turvallisesti. Nykyinen tiedosto säilytettiin.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell ei voinut käynnistää työpöytäpintojaan.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windowsin tehtäväpalkin palautus odottaa. Yritä uudelleen tai sulje Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windowsin tehtäväpalkki näytetään tilapäisesti.
+
+en: Windows taskbar restored.
+tr: Windowsin tehtäväpalkki palautettu.
+
+en: Windows taskbar replacement is active.
+tr: Windowsin tehtäväpalkin korvaaminen on käytössä.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windowsin tehtäväpalkki on edelleen käytettävissä. Korvaamista yritetään pian uudelleen.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windowsin tehtäväpalkki on edelleen käytettävissä. Yritä uudelleen poistamalla korvaaminen käytöstä ja ottamalla se taas käyttöön.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windowsin tehtäväpalkki palautettu. Korvaaminen yhdistetään pian uudelleen.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windowsin tehtäväpalkki palautettu. Yritä uudelleen poistamalla korvaaminen käytöstä ja ottamalla se taas käyttöön.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Tehtäväpalkin korvaaminen pysäytetty. Windowsin tehtäväpalkki palautettu.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Tehtäväpalkin korvaaminen pysäytetty. Windowsin tehtäväpalkin palautusta ei voitu vahvistaa.
+
+en: Activating taskbar replacement...
+tr: Otetaan tehtäväpalkin korvaaminen käyttöön...
+
+en: Restoring Windows taskbar...
+tr: Palautetaan Windowsin tehtäväpalkkia...
+
+en: Reconnecting taskbar replacement...
+tr: Yhdistetään tehtäväpalkin korvaaminen uudelleen...
+
+en: Showing the Windows taskbar temporarily...
+tr: Näytetään Windowsin tehtäväpalkki tilapäisesti...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell ei voinut palauttaa Windowsin tehtäväpalkkia.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Käynnistä Resurssienhallinta uudelleen Tehtävienhallinnasta (Ctrl+Vaihto+Esc) tai kirjaudu ulos ja uudelleen sisään.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windowsin tehtäväpalkki palautettiin tallennettuun tilaansa.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Tallennettua tehtäväpalkin tilaa ei löytynyt. Windowsin tehtäväpalkki tuotiin näkyviin; sen automaattisen piilotuksen asetusta ei muutettu.
+
+en: There was nothing to restore.
+tr: Mitään palautettavaa ei ollut.
+
+en: Taskbar replacement is turned off.
+tr: Tehtäväpalkin korvaaminen on poistettu käytöstä.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Tehtäväpalkin korvaamista ei voitu poistaa käytöstä automaattisesti. Poista se käytöstä kohdassa Aether Shellin asetukset > Työpöytä.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Tunnistamaton tai virheellinen Aether Shellin komentorivi.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell ei voinut luoda paikallisia tietokansioitaan.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell pysähtyi odottamattoman virheen jälkeen.
+
+## search-names
+
+en: Disk Management
+tr: Levynhallinta
+
+en: Local Users and Groups
+tr: Paikalliset käyttäjät ja ryhmät
+
+en: Local Group Policy Editor
+tr: Paikallinen ryhmäkäytäntöeditori
+
+en: Manage User Certificates
+tr: Hallitse käyttäjävarmenteita
+
+en: Manage Computer Certificates
+tr: Hallitse tietokonevarmenteita
+
+en: Shared Folders
+tr: Jaetut kansiot
+
+en: TPM Management
+tr: TPM-hallinta
+
+en: Network Connections
+tr: Verkkoyhteydet
+
+en: System Properties
+tr: Järjestelmän ominaisuudet
+
+en: About Windows
+tr: Tietoja Windowsista
+
+en: DirectX Diagnostic Tool
+tr: DirectX-diagnostiikkatyökalu
+
+en: Windows Features
+tr: Windowsin ominaisuudet
+
+en: System Restore
+tr: Järjestelmän palauttaminen
+
+en: Advanced System Settings
+tr: Järjestelmän lisäasetukset
+
+en: Volume Mixer
+tr: Äänenvoimakkuuden mikseri
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Käyttäjätilit (lisäasetukset)
+
+en: Display settings
+tr: Näyttöasetukset
+
+en: Night light settings
+tr: Yövalon asetukset
+
+en: Graphics settings
+tr: Grafiikka-asetukset
+
+en: Sound settings
+tr: Ääniasetukset
+
+en: Notification settings
+tr: Ilmoitusasetukset
+
+en: Power & battery settings
+tr: Virta- ja akkuasetukset
+
+en: Energy saver settings
+tr: Virransäästön asetukset
+
+en: Storage settings
+tr: Tallennustilan asetukset
+
+en: Multitasking settings
+tr: Moniajon asetukset
+
+en: Clipboard settings
+tr: Leikepöydän asetukset
+
+en: Remote Desktop settings
+tr: Etätyöpöydän asetukset
+
+en: About your PC
+tr: Tietoja tietokoneesta
+
+en: Bluetooth & devices settings
+tr: Bluetooth- ja laiteasetukset
+
+en: Printers & scanners settings
+tr: Tulostin- ja skanneriasetukset
+
+en: Mouse settings
+tr: Hiiren asetukset
+
+en: Touchpad settings
+tr: Kosketuslevyn asetukset
+
+en: Network & internet settings
+tr: Verkko- ja Internet-asetukset
+
+en: Wi-Fi settings
+tr: Wi-Fi-asetukset
+
+en: VPN settings
+tr: VPN-asetukset
+
+en: Proxy settings
+tr: Välityspalvelimen asetukset
+
+en: Airplane mode settings
+tr: Lentokonetilan asetukset
+
+en: Mobile hotspot settings
+tr: Mobiilitukiaseman asetukset
+
+en: Background settings
+tr: Taustan asetukset
+
+en: Color settings
+tr: Väriasetukset
+
+en: Theme settings
+tr: Teema-asetukset
+
+en: Lock screen settings
+tr: Lukitusnäytön asetukset
+
+en: Taskbar settings
+tr: Tehtäväpalkin asetukset
+
+en: Font settings
+tr: Fonttiasetukset
+
+en: Installed apps
+tr: Asennetut sovellukset
+
+en: Default apps settings
+tr: Oletussovellusten asetukset
+
+en: Startup apps settings
+tr: Käynnistyssovellusten asetukset
+
+en: Account info
+tr: Omat tiedot
+
+en: Sign-in options
+tr: Kirjautumisasetukset
+
+en: Other users settings
+tr: Muiden käyttäjien asetukset
+
+en: Date & time settings
+tr: Päivämäärä- ja aika-asetukset
+
+en: Language & region settings
+tr: Kieli- ja alueasetukset
+
+en: Typing settings
+tr: Kirjoitusasetukset
+
+en: Accessibility settings
+tr: Helppokäyttöasetukset
+
+en: Privacy & security settings
+tr: Tietosuoja- ja suojausasetukset
+
+en: Location settings
+tr: Sijaintiasetukset
+
+en: Windows Update settings
+tr: Windows Update -asetukset
+
+en: Recovery settings
+tr: Palautusasetukset
+
+en: Activation settings
+tr: Aktivointiasetukset
+
+en: For developers settings
+tr: Kehittäjäasetukset
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHubiin ei saatu yhteyttä.
+
+en: GitHub did not answer the request just now.
+tr: GitHub ei vastannut pyyntöön juuri nyt.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Julkaisu ei läpäissyt tarkistusta, joten mitään ei asennettu.
+
+en: There is not enough free disk space.
+tr: Vapaata levytilaa ei ole riittävästi.
+
+en: Windows refused access to the update files.
+tr: Windows esti päivitystiedostojen käytön.
+
+en: {} bytes
+tr: {} tavua
+
+en: {} KB
+tr: {} kt
+
+en: {} MB
+tr: {} Mt
+
+en: Status
+tr: Tila
+
+en: Check &now
+tr: Tarkista &nyt
+
+en: Download and install
+tr: Lataa ja asenna
+
+en: &Later
+tr: &Myöhemmin
+
+en: S&kip this version
+tr: &Ohita tämä versio
+
+en: &Release details
+tr: &Julkaisun tiedot
+
+en: Disable &notifications
+tr: Poista &ilmoitukset käytöstä
+
+en: Release notes
+tr: Julkaisutiedot
+
+en: the new version
+tr: uusi versio
+
+en: Installed: {}.
+tr: Asennettu: {}.
+
+en: Automatic update checks are off
+tr: Automaattiset päivitystarkistukset ovat poissa käytöstä
+
+en: Check now looks for a newer release once.
+tr: Tarkista nyt etsii uudempaa julkaisua kerran.
+
+en: Last checked {}
+tr: Tarkistettu viimeksi {}
+
+en: Not checked yet
+tr: Ei vielä tarkistettu
+
+en: Checking for updates...
+tr: Etsitään päivityksiä...
+
+en: Aether Shell is up to date
+tr: Aether Shell on ajan tasalla
+
+en: Latest published release: {}.
+tr: Uusin julkaistu versio: {}.
+
+en: Version {} is available
+tr: Versio {} on saatavilla
+
+en: Download size: {}.
+tr: Latauksen koko: {}.
+
+en: Downloading version {}...
+tr: Ladataan versiota {}...
+
+en: Received {} of {} ({}%).
+tr: Vastaanotettu {}/{} ({} %).
+
+en: Received {}; total size unknown.
+tr: Vastaanotettu {}; kokonaiskoko tuntematon.
+
+en: Version {} is ready to install
+tr: Versio {} on valmis asennettavaksi
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Tarkistettu allekirjoitetulla julkaisuluettelolla ja SHA-256:lla.
+
+en: The update could not be completed
+tr: Päivitystä ei voitu suorittaa loppuun
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Se asennetaan toistaiseksi käsin: avaa Julkaisun tiedot, lataa sen asennusohjelma ja suorita se.
+
+en: Failure: {}.
+tr: Virhe: {}.
+
+en: Choose Retry Download to try again.
+tr: Yritä uudelleen valitsemalla Yritä latausta uudelleen.
+
+en: Use Check now to try again.
+tr: Yritä uudelleen valitsemalla Tarkista nyt.
+
+en: Next automatic check: {}.
+tr: Seuraava automaattinen tarkistus: {}.
+
+en: &Install update
+tr: &Asenna päivitys
+
+en: Retry &Download
+tr: Yritä &latausta uudelleen
+
+en: &Download and install
+tr: &Lataa ja asenna
+
+en: Windows' startup state could not be read in this session.
+tr: Windowsin käynnistystilaa ei voitu lukea tässä istunnossa.
+
+en: Windows will start it at your next sign-in.
+tr: Windows käynnistää sen, kun kirjaudut seuraavan kerran sisään.
+
+en: Right now it will not start at sign-in.
+tr: Tällä hetkellä se ei käynnisty sisäänkirjautumisen yhteydessä.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Se on poistettu käytöstä Tehtävienhallinnassa tai Windowsin asetuksissa, jotka päättävät asiasta, kunnes se otetaan siellä taas käyttöön.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows käynnistäisi toisen Aether Shell -kopion.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows ilmoittaa käynnistystilan, jota tämä versio ei osaa lukea.
+
+en: The close action could not be completed.
+tr: Sulkemistoimintoa ei voitu suorittaa loppuun.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Anna kokonainen luku ennen tallentamista; punaisella merkitty kenttä ei ole sellainen.
+
+en: Settings could not be validated.
+tr: Asetuksia ei voitu vahvistaa.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Käynnistys sisäänkirjautumisen yhteydessä jätettiin ennalleen, koska asetuksia ei voitu tallentaa.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Asetuksia ei voitu tallentaa, eikä Windowsin sisäänkirjautumisen käynnistysasetusta voitu palauttaa. Yritä uudelleen valitsemalla Käytä.
+
+en: Settings saved.
+tr: Asetukset tallennettu.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Asetukset muutettu muistissa; tallennus epäonnistui. Yritä uudelleen valitsemalla Käytä.
+
+en: Settings could not be applied.
+tr: Asetuksia ei voitu ottaa käyttöön.
+
+en: Some values were corrected to their supported range.
+tr: Jotkin arvot korjattiin tuetulle alueelle.
+
+en: Startup registration is unavailable in this session.
+tr: Käynnistyksen rekisteröinti ei ole käytettävissä tässä istunnossa.
+
+en: Changing startup registration...
+tr: Muutetaan käynnistyksen rekisteröintiä...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows ei muuttanut käynnistyksen rekisteröintiä. Tarkista Tehtävienhallinnan käynnistysasetus.
+
+en: Startup registration could not be changed.
+tr: Käynnistyksen rekisteröintiä ei voitu muuttaa.
+
+en: Defaults saved; startup is disabled.
+tr: Oletukset tallennettu; käynnistys on poistettu käytöstä.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Oletukset otettu käyttöön; tallennus epäonnistui. Yritä uudelleen valitsemalla Käytä.
+
+en: Defaults could not be applied.
+tr: Oletuksia ei voitu ottaa käyttöön.
+
+en: Startup was not disabled; settings were kept.
+tr: Käynnistystä ei poistettu käytöstä; asetukset säilytettiin.
+
+en: Location search is unavailable.
+tr: Sijaintihaku ei ole käytettävissä.
+
+en: Searching Open-Meteo locations...
+tr: Haetaan Open-Meteon sijainteja...
+
+en: Location search failed. Check your connection and try again.
+tr: Sijaintihaku epäonnistui. Tarkista yhteys ja yritä uudelleen.
+
+en: No place matched that search.
+tr: Mikään paikka ei vastannut hakua.
+
+en: Choose a location to save it.
+tr: Valitse sijainti, niin se tallennetaan.
+
+en: Reset all settings?
+tr: Palautetaanko kaikki asetukset?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Asetukset ja kiinnitetyt sovellukset palautetaan oletuksiin, ja käynnistys sisäänkirjautumisen yhteydessä poistetaan käytöstä.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Windowsin tehtäväpalkin valintasi säilytetään. Nykyisestä asetustiedostosta säilytetään varmuuskopio.
+
+en: &Reset
+tr: &Palauta
+
+en: Cancel
+tr: Peruuta
+
+en: Pinned applications saved.
+tr: Kiinnitetyt sovellukset tallennettu.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Kiinnitykset muutettu muistissa; tallennus epäonnistui. Yritä uudelleen valitsemalla Käytä.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Oletuksia ei voitu palauttaa, koska käynnistyksen rekisteröinti ei ole käytettävissä.
+
+en: Pinned application could not be added.
+tr: Kiinnitettyä sovellusta ei voitu lisätä.
+
+en: Choose an application to add first.
+tr: Valitse ensin lisättävä sovellus.
+
+en: Pinned applications could not be changed.
+tr: Kiinnitettyjä sovelluksia ei voitu muuttaa.
+
+en: Choose a pinned application first.
+tr: Valitse ensin kiinnitetty sovellus.
+
+en: Desktop status is unavailable in this session.
+tr: Työpöydän tila ei ole käytettävissä tässä istunnossa.
+
+en: Desktop status is unavailable.
+tr: Työpöydän tila ei ole käytettävissä.
+
+en: Password
+tr: Salasana
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Ladataan kieltä {} GitHubista ({}). Englantia käytetään, kunnes se on valmis.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Kieltä {} ei voitu ladata. Englantia käytetään siihen asti; yritä uudelleen valitsemalla alempaa Lataa.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Kieli {} ei ole vielä tässä tietokoneessa. Englantia käytetään, kunnes se on ladattu.
+
+en: {} is on this PC.
+tr: Kieli {} on tässä tietokoneessa.
+
+en: Every language is on this PC.
+tr: Kaikki kielet ovat tässä tietokoneessa.
+
+en: Choose a language to download first.
+tr: Valitse ensin ladattava kieli.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Yläpalkki
+
+en: Weather
+tr: Sää
+
+en: Updates
+tr: Päivitykset
+
+en: General
+tr: Yleiset
+
+en: About
+tr: Tietoja
+
+en: Desktop
+tr: Työpöytä
+
+en: Appearance
+tr: Ulkoasu
+
+en: Welcome
+tr: Tervetuloa
+
+en: Aether Shell Settings
+tr: Aether Shellin asetukset
+
+en: Settings
+tr: Asetukset
+
+en: Reset defaults...
+tr: Palauta oletukset...
+
+en: &Apply
+tr: &Käytä
+
+en: Liquid
+tr: Nestemäinen
+
+en: Grain
+tr: Rakeinen
+
+en: From {} to {}
+tr: Välillä {}–{}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Tätä toimintoa ei voitu suorittaa loppuun.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Koko, välit, liike ja Dockiin kiinnitetyt sovellukset.
+
+en: Size and spacing
+tr: Koko ja välit
+
+en: Icon size
+tr: Kuvakkeen koko
+
+en: {}, scaled with the Windows display scale.
+tr: {}, skaalattu Windowsin näytön skaalauksen mukaan.
+
+en: Bottom margin
+tr: Alamarginaali
+
+en: Space between the Dock and the bottom of the screen.
+tr: Dockin ja näytön alareunan välinen tila.
+
+en: Minimum side margin
+tr: Sivumarginaalin vähimmäiskoko
+
+en: Space kept free at the left and right screen edges.
+tr: Näytön vasempaan ja oikeaan reunaan vapaaksi jätettävä tila.
+
+en: Icon spacing
+tr: Kuvakkeiden väli
+
+en: Space between neighbouring icons.
+tr: Vierekkäisten kuvakkeiden välinen tila.
+
+en: Glass and motion
+tr: Lasi ja liike
+
+en: Glass opacity
+tr: Lasin peittävyys
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Pienemmät arvot näyttävät enemmän Dockin taakse jäävästä sumennetusta työpöydästä.
+
+en: Hover magnification
+tr: Suurennus osoitettaessa
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Kuinka paljon kuvake kasvaa osoittimen alla; 1 poistaa sen käytöstä.
+
+en: Behavior
+tr: Toiminta
+
+en: Show running applications
+tr: Näytä käynnissä olevat sovellukset
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Avoimet sovellukset, joita ei ole kiinnitetty, näkyvät kiinnitettyjen jälkeen.
+
+en: Reserve screen space for the Dock
+tr: Varaa näyttötilaa Dockille
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Suurennetut ikkunat pysyvät Dockin yläpuolella eivätkä mene sen alle.
+
+en: Automatically hide the Dock
+tr: Piilota Dock automaattisesti
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Piiloutuu, kun sovellusikkuna peittää sen; tuo se näkyviin siirtämällä osoitin näytön alareunaan. Se pysyy työpöydällä, ja ikkunat saavat koko näytön korkeuden.
+
+en: Pinned applications
+tr: Kiinnitetyt sovellukset
+
+en: Move &up
+tr: Siirrä &ylös
+
+en: Move &down
+tr: Siirrä &alas
+
+en: &Remove
+tr: &Poista
+
+en: &Add application
+tr: &Lisää sovellus
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Kiinnitykset säilyttävät tunnisteensa ja käynnistysasetuksensa. Kun poistat kiinnityksen, automaattinen Windowsin tehtäväpalkin synkronointi ei myöskään lisää sitä uudelleen.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Sijainti, kello ja ylätilapalkissa näytettävät tilakohteet.
+
+en: Presentation
+tr: Esitystapa
+
+en: Floating bar
+tr: Kelluva palkki
+
+en: Text on the desktop
+tr: Teksti työpöydällä
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Kelluva palkki: lasipalkki näytön yläreunan alapuolella. Teksti työpöydällä: ei palkkia, samat kohteet kirjoitettuina aivan näytön yläreunaan suoraan työpöydän kuvan päälle; tämä kaistale pysyy vapaana ikkunoista, eikä ylämarginaali tai lasin peittävyys ole käytössä. Automaattisessa piilotuksessa teksti palaa lasikaistaleelle, kun sen alla on ikkuna.
+
+en: Position and glass
+tr: Sijainti ja lasi
+
+en: Top margin
+tr: Ylämarginaali
+
+en: Space between the Top Bar and the top of the screen.
+tr: Yläpalkin ja näytön yläreunan välinen tila.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Pienemmät arvot näyttävät enemmän palkin taakse jäävästä sumennetusta työpöydästä.
+
+en: Clock
+tr: Kello
+
+en: Clock format
+tr: Kellon muoto
+
+en: Follow Windows
+tr: Seuraa Windowsia
+
+en: 12-hour
+tr: 12 tuntia
+
+en: 24-hour
+tr: 24 tuntia
+
+en: Date style
+tr: Päivämäärän tyyli
+
+en: Weekday, day and month
+tr: Viikonpäivä, päivä ja kuukausi
+
+en: Short
+tr: Lyhyt
+
+en: Long
+tr: Pitkä
+
+en: Show seconds
+tr: Näytä sekunnit
+
+en: Show date
+tr: Näytä päivämäärä
+
+en: Status items
+tr: Tilakohteet
+
+en: Show battery
+tr: Näytä akku
+
+en: Hide battery when absent
+tr: Piilota akku, jos sitä ei ole
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Pöytäkoneet, joissa ei ole akkua, eivät näytä mitään tuntemattoman akun sijaan.
+
+en: Show input language
+tr: Näytä syöttökieli
+
+en: Show network
+tr: Näytä verkko
+
+en: Show audio output
+tr: Näytä äänilähtö
+
+en: Show microphone
+tr: Näytä mikrofoni
+
+en: Show weather when enabled
+tr: Näytä sää, kun se on käytössä
+
+en: Weather itself is turned on in Weather settings.
+tr: Itse sää otetaan käyttöön sääasetuksissa.
+
+en: Show hidden icons button
+tr: Näytä piilotettujen kuvakkeiden painike
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Pieni nuoli, joka avaa Windowsin ilmaisinalueen piilotetut kuvakkeet.
+
+en: Reserve screen space above windows
+tr: Varaa näyttötilaa ikkunoiden yläpuolelta
+
+en: Maximized windows stay below the Top Bar.
+tr: Suurennetut ikkunat pysyvät Yläpalkin alapuolella.
+
+en: Automatically hide the Top Bar
+tr: Piilota Yläpalkki automaattisesti
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Piiloutuu, kun sovellusikkuna peittää sen; tuo se näkyviin siirtämällä osoitin näytön yläreunaan. Se pysyy työpöydällä.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Käytä Windowsin pika-asetuksia (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Ei käytössä: Aetherin pikasäätimet avautuvat Yläpalkin alle. Käytössä: Windowsin oma paneeli avautuu näytön alareunaan.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Valinnainen sääennuste Yläpalkissa, tarjoaa Open-Meteo.
+
+en: Forecast
+tr: Ennuste
+
+en: Enable weather
+tr: Ota sää käyttöön
+
+en: Off by default: the forecast needs network requests.
+tr: Oletuksena poissa käytöstä: ennuste edellyttää verkkopyyntöjä.
+
+en: Temperature
+tr: Lämpötila
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Päivitysväli
+
+en: Location
+tr: Sijainti
+
+en: Locate automatically with Windows
+tr: Paikanna automaattisesti Windowsin avulla
+
+en: Uses the Windows location service after you allow it.
+tr: Käyttää Windowsin sijaintipalvelua, kun olet sallinut sen.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows pyytää sijaintilupaa. Koordinaattisi lähetetään Open-Meteo.comiin vain ennusteen hakemista varten; sijaintiavain tallennetaan paikallisesti välimuistiin. Jos sijainti on estetty, sää ei ole käytettävissä.
+
+en: Use &Windows location
+tr: Käytä &Windowsin sijaintia
+
+en: Location &settings
+tr: Sijainti&asetukset
+
+en: Choose automatic location or search for a place below.
+tr: Valitse automaattinen sijainti tai hae paikkaa alta.
+
+en: Search for a place
+tr: Hae paikkaa
+
+en: Searc&h
+tr: &Hae
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Säätiedot: Open-Meteo.com (CC BY 4.0). Manuaalinen haku lähettää vain kirjoittamasi tekstin.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Allekirjoitetut julkaisut virallisesta GitHub-säilöstä, tarkistettu ennen asennusta.
+
+en: Preferences
+tr: Määritykset
+
+en: Check for updates automatically
+tr: Tarkista päivitykset automaattisesti
+
+en: Check interval
+tr: Tarkistusväli
+
+en: Release channel
+tr: Julkaisukanava
+
+en: Prereleases arrive earlier and change more often.
+tr: Esiversiot tulevat aiemmin ja muuttuvat useammin.
+
+en: Stable
+tr: Vakaa
+
+en: Prerelease
+tr: Esiversio
+
+en: Show update notifications
+tr: Näytä päivitysilmoitukset
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Käynnistys, liike, pikanäppäimet ja diagnostiikka.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Palkkien, valikoiden, haun, asetusten ja asennusohjelman kieli.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Sinulle tai muille ohjelmille kuuluvia nimiä (sovelluksia, tiedostoja, Wi-Fi-verkkoja) ei koskaan käännetä. Kun kieli on valittu, Yläpalkki kirjoittaa päivämäärän sillä kielellä; Seuraa Windowsia säilyttää Windowsin alueellisen muotosi.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Käsin kirjoitettu tervehdys käyttää latinalaisia kirjaimia: se tervehtii ranskaksi, englanniksi tai espanjaksi. Valitse sen kieli kohdassa Tervetuloa.
+
+en: Language
+tr: Kieli
+
+en: Interface language
+tr: Käyttöliittymän kieli
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Seuraa Windowsia käyttää ensimmäistä Windowsin näyttökielistäsi, joka on jokin näistä, ja muuten englantia.
+
+en: Startup
+tr: Käynnistys
+
+en: Start Aether Shell when I sign in
+tr: Käynnistä Aether Shell, kun kirjaudun sisään
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Muutos edellyttää Käytä-painiketta. Tehtävienhallinta voi myös poistaa sen käytöstä.
+
+en: Motion
+tr: Liike
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Vähennetty liike poistaa koristeellisen liikkeen kaikkialta.
+
+en: Reduced
+tr: Vähennetty
+
+en: Full
+tr: Täysi
+
+en: Keyboard shortcuts
+tr: Pikanäppäimet
+
+en: Enable global keyboard shortcuts
+tr: Ota yleiset pikanäppäimet käyttöön
+
+en: Search shortcut key
+tr: Haun pikanäppäin
+
+en: Dock shortcut key
+tr: Dockin pikanäppäin
+
+en: Search shortcut modifiers
+tr: Haun pikanäppäimen muokkausnäppäimet
+
+en: Dock shortcut modifiers
+tr: Dockin pikanäppäimen muokkausnäppäimet
+
+en: Shortcut status unavailable
+tr: Pikanäppäinten tila ei ole käytettävissä
+
+en: Diagnostics
+tr: Diagnostiikka
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Lokikansiossa ovat tämän tietokoneen Aether Shell -lokit. Vie diagnostiikka tallentaa vain sovelluksen version ja Windowsin koontiversion - ei lokeja tai henkilötietoja.
+
+en: Open &log folder
+tr: Avaa &lokikansio
+
+en: &Export diagnostics...
+tr: &Vie diagnostiikka...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Lyhyt käsin kirjoitettu tervehdys työpöydälläsi, kun kirjaudut sisään tai avaat tietokoneen lukituksen.
+
+en: Greeting
+tr: Tervehdys
+
+en: Show the welcome at sign-in and unlock
+tr: Näytä tervehdys sisäänkirjautumisen ja lukituksen avaamisen yhteydessä
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Se näkyy, kun Windows on kirjannut sinut sisään ja Aether Shell valmistautuu. Ohita se koskettamalla, napsauttamalla tai painamalla Esc-näppäintä.
+
+en: Greeting language
+tr: Tervehdyksen kieli
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut ranskaksi, Hello englanniksi, Hola espanjaksi. Kynä kirjoittaa latinalaisia kirjaimia: kaikilla muilla kielillä se tervehtii englanniksi.
+
+en: Your name
+tr: Nimesi
+
+en: Name to greet you with
+tr: Nimi, jolla sinua tervehditään
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Valinnainen, esimerkiksi etunimi. Se pysyy tässä tietokoneessa Aether Shell -asetuksissasi, eikä sitä koskaan lähetetä minnekään tai kirjoiteta lokiin. Poista se tyhjentämällä kenttä.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Väritila, korostusväri, liikkeen nopeus sekä Dockin ja Yläpalkin ulkoasu.
+
+en: Style
+tr: Tyyli
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Nestemäinen: kerroksittaista lasia taustan päällä, sumennuskerros, nesteen valo ja sitten kuvakkeet ja teksti, jotka pysyvät luettavina vaaleiden ja tummien sivujen päällä. Rakeinen: huurrettua lasia, sumennettu ja puoliksi läpinäkyvä, hienolla rakeisuudella.
+
+en: Liquid blur
+tr: Nestemäinen-tyylin sumennus
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Kuinka paljon Nestemäinen-lasin alla oleva sumennuskerros peittää taustaa: 100 % sumentaa kaiken. Pienemmät arvot näyttävät sivun terävämpänä, jolloin palkkien tekstiä voi olla vaikeampi lukea kirjavan sivun päällä.
+
+en: Liquid blur color
+tr: Nestemäinen-tyylin sumennusväri
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automaattinen säilyttää lasin omat värit. Teksti ja kuvakkeet pysyvät luettavina väristä riippumatta.
+
+en: Automatic
+tr: Automaattinen
+
+en: White
+tr: Valkoinen
+
+en: Black
+tr: Musta
+
+en: Accent
+tr: Korostusväri
+
+en: Blue
+tr: Sininen
+
+en: Violet
+tr: Violetti
+
+en: Pink
+tr: Vaaleanpunainen
+
+en: Red
+tr: Punainen
+
+en: Orange
+tr: Oranssi
+
+en: Yellow
+tr: Keltainen
+
+en: Green
+tr: Vihreä
+
+en: Teal
+tr: Sinivihreä
+
+en: Liquid color strength
+tr: Nestemäinen-tyylin värin voimakkuus
+
+en: How much of the chosen color the blur layer takes.
+tr: Kuinka paljon valitusta väristä sumennuskerros saa.
+
+en: Theme
+tr: Teema
+
+en: Color mode
+tr: Väritila
+
+en: High contrast always takes precedence.
+tr: Suuri kontrasti on aina etusijalla.
+
+en: Light
+tr: Vaalea
+
+en: Dark
+tr: Tumma
+
+en: Accent color
+tr: Korostusväri
+
+en: Animation duration
+tr: Animaation kesto
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 on vakionopeus; suuremmat arvot ovat hitaampia. Vähennetty liike on etusijalla.
+
+en: Dock icon preset
+tr: Dockin kuvakkeiden esiasetus
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Dockin asetuksista valittu mukautettu koko säilytetään, kunnes valitset esiasetuksen.
+
+en: Small - 32 px
+tr: Pieni - 32 px
+
+en: Medium - 40 px
+tr: Keskikokoinen - 40 px
+
+en: Large - 48 px
+tr: Suuri - 48 px
+
+en: Keep custom size
+tr: Säilytä mukautettu koko
+
+en: Show Windows Start in the Dock
+tr: Näytä Windowsin Käynnistä-painike Dockissa
+
+en: Show Task View in the Dock
+tr: Näytä Tehtävänäkymä Dockissa
+
+en: Reserve extra space for Dock animations
+tr: Varaa lisätilaa Dockin animaatioille
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Pitää suurennuksen ja käynnistyshypähdyksen erillään suurennetuista ikkunoista.
+
+en: Weather position
+tr: Sään sijainti
+
+en: Left
+tr: Vasen
+
+en: Right
+tr: Oikea
+
+en: Keyboard indicator
+tr: Näppäimistön ilmaisin
+
+en: Compact
+tr: Tiivis
+
+en: Two lines
+tr: Kaksi riviä
+
+en: Windows taskbar pins
+tr: Windowsin tehtäväpalkin kiinnitykset
+
+en: Add newly discovered Windows taskbar pins
+tr: Lisää uudet Windowsin tehtäväpalkin kiinnitykset
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Kun tehtäväpalkki on korvattu, uudet Windowsin kiinnitykset lisätään Dockiin.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Windowsin tehtäväpalkin peruttavissa oleva korvaaminen Dockilla.
+
+en: Taskbar replacement
+tr: Tehtäväpalkin korvaaminen
+
+en: Replace the Windows taskbar
+tr: Korvaa Windowsin tehtäväpalkki
+
+en: Changing this needs Apply.
+tr: Muutos edellyttää Käytä-painiketta.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Kun Aether Shell on käynnissä, se piilottaa Windowsin tehtäväpalkin ja varaa tilaa suurennettujen sovellusten alapuolelle.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Windowsin tehtäväpalkin tila palautetaan, kun tämä tila poistetaan käytöstä tai Aether Shell suljetaan. Erillinen palautusapuohjelma palauttaa sen myös, jos sovellus pysähtyy odottamatta. Jos palautus epäonnistuu, käynnistä Resurssienhallinta uudelleen Tehtävienhallinnassa.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windowsin asetukset pysyy Windowsin omana käyttöliittymänä. Aether Shell ei korvaa sen tehtäväpalkkisivua; määritä tämä tila täällä.
+
+en: Pinned applications from Windows
+tr: Kiinnitetyt sovellukset Windowsista
+
+en: &Import Windows taskbar pins
+tr: &Tuo Windowsin tehtäväpalkin kiinnitykset
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Lukee kiinnitetyt pikakuvakkeet muuttamatta Windowsin kiinnityksiä. Jotkin Windows 11:n kiinnitykset tai niiden järjestys eivät välttämättä ole käytettävissä.
+
+en: Version {}
+tr: Versio {}
+
+en: Created by Ibrahim Bouillet
+tr: Tekijä: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Windowsin oma työpöytäkäyttöliittymä - kelluva Dock ja ylätilapalkki - joka toimii Resurssienhallinnan rinnalla.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Säätiedot: Open-Meteo.com (CC BY 4.0). Mukana ei ole kolmannen osapuolen C++-suorituksenaikaisia kirjastoja.
+
+en: &Official project
+tr: &Virallinen projekti
+
+en: Licence
+tr: Lisenssi
+
+en: Taskbar replacement changes need Apply.
+tr: Tehtäväpalkin korvaamisen muutokset edellyttävät Käytä-painiketta.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Muutokset tallentuvat automaattisesti. Käynnistys edellyttää Käytä-painiketta.
+
+en: Changes save automatically.
+tr: Muutokset tallentuvat automaattisesti.
+
+en: Press Apply to confirm this change.
+tr: Vahvista muutos valitsemalla Käytä.
+
+en: Smart transparency
+tr: Älykäs läpinäkyvyys
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Nestemäinen-tyylissä tämä ikkuna sumentaa taustaa vain tekstinsä ja säätimiensä alla: täysin muiden ikkunoiden ja työpöydän kuvakkeiden kohdalla, kevyesti työpöydän kuvan kohdalla eikä lainkaan siellä, missä se ei näytä mitään.
+
+en: Languages on this PC
+tr: Tämän tietokoneen kielet
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell lataa Windowsissa olevat kielet, joten sen kieli vaihtuu Windowsin kielen mukana.
+
+en: Add a language
+tr: Lisää kieli
+
+en: &Download
+tr: &Lataa
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Jokainen kieli tulee tämän version GitHub-julkaisusta ja tarkistetaan ennen käyttöä. Kun kieli on tässä tietokoneessa, valitse se yläpuolelta.
+
+en: built in
+tr: sisäänrakennettu
+
+en: downloading, {}
+tr: ladataan, {}
+
+en: download failed
+tr: lataus epäonnistui
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shellin asennus
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Asennusohjelma ei voinut luoda käyttöliittymäänsä. Sulje se ja yritä uudelleen tai käytä dokumentoituja hiljaisen asennuksen asetuksia.
+
+en: Options
+tr: Valinnat
+
+en: Install
+tr: Asenna
+
+en: Done
+tr: Valmis
+
+en: Remove Aether Shell
+tr: Poista Aether Shell
+
+en: Repair Aether Shell
+tr: Korjaa Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Windowsin oma Dock ja ylätilapalkki, jotka toimivat Resurssienhallinnan rinnalla.
+
+en: Replaces the Windows taskbar while it runs
+tr: Korvaa Windowsin tehtäväpalkin ollessaan käynnissä
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Saat Windowsin tehtäväpalkin takaisin lopettamalla Aether Shellin, poistamalla tämän käytöstä kohdassa Asetukset > Työpöytä tai avaamalla Käynnistä-valikosta kohteen "Palauta Windowsin tehtäväpalkki".
+
+en: Starts when you sign in - your choice
+tr: Käynnistyy, kun kirjaudut sisään - oma valintasi
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Uudet asennukset käynnistyvät oletusarvoisesti sisäänkirjautumisen yhteydessä. Voit poistaa valinnan ennen asennusta tai poistaa sen käytöstä myöhemmin asetuksissa. Aiemmat käynnistysvalinnat ja Tehtävienhallinnassa tehdyt käytöstäpoistot säilytetään.
+
+en: Installs for your account
+tr: Asennetaan tilillesi
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Järjestelmänvalvojan oikeuksia ei tarvita. Asetuksesi ja tietosi pysyvät käyttäjäprofiilissasi.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Asennuksen poisto säilyttää asetuksesi ja tietosi, ellet valitse niiden poistamista.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Korjaus palauttaa tämän paketin tiedostot ja säilyttää asetuksesi. Jos Aether Shell jätti Windowsin tehtäväpalkin piiloon, korjaus palauttaa sen.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Asentaminen aiemman version päälle säilyttää asetuksesi. Vanhempi paketti hylätään, ellet nimenomaisesti salli version alentamista.
+
+en: MIT License
+tr: MIT-lisenssi
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Lisenssi asennetaan myös LICENSE-tiedostona Aether Shellin viereen.
+
+en: Remove this installation
+tr: Poista tämä asennus
+
+en: Install location
+tr: Asennussijainti
+
+en: &Browse...
+tr: &Selaa...
+
+en: Also remove my settings, cache and logs
+tr: Poista myös asetukseni, välimuistini ja lokini
+
+en: This cannot be undone.
+tr: Tätä ei voi kumota.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Asennusohjelma sulkee Aether Shellin hallitusti ja poistaa sen asennetut tiedostot, pikakuvakkeet, käynnistysmerkinnän ja rekisteröinnin Asennetut sovellukset -luettelossa. Muihin sovelluksiin ja Windowsin asetuksiin ei kosketa.
+
+en: Your welcome
+tr: Tervehdyksesi
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Kun kirjaudut sisään tai avaat tietokoneen lukituksen, Aether Shell kirjoittaa käsin lyhyen tervehdyksen. Kirjoita nimi, jolla se tervehtii sinua, tai jätä kenttä tyhjäksi, jolloin saat yksinkertaisen tervehdyksen.
+
+en: Your first name
+tr: Etunimesi
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Valinnainen, esimerkiksi etunimi. Se pysyy tässä tietokoneessa Aether Shell -asetuksissasi, eikä sitä koskaan lähetetä minnekään. Muuta sitä tai poista tervehdys käytöstä kohdassa Asetukset > Tervetuloa.
+
+en: Shortcuts and startup
+tr: Pikakuvakkeet ja käynnistys
+
+en: Create Start menu shortcuts
+tr: Luo Käynnistä-valikon pikakuvakkeet
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell ja Palauta Windowsin tehtäväpalkki.
+
+en: Create a desktop shortcut
+tr: Luo työpöydän pikakuvake
+
+en: Shows your current choice.
+tr: Näyttää nykyisen valintasi.
+
+en: Recommended.
+tr: Suositeltu.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Poista valinta, jos et halua tätä; Tehtävienhallinnassa tehtyjä käytöstäpoistoja noudatetaan.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Asentamalla hyväksyt yllä olevan käynnistysvalinnan. Käynnistysohjelma voi käynnistää Aether Shellin uudelleen kaatumisen jälkeen rajoitetulla määrällä yrityksiä. Lopeta ja Palauta Windowsin tehtäväpalkki ovat edelleen käytettävissä. Sää on oletuksena poissa käytöstä. Allekirjoittamattomat binaaritiedostot voivat aiheuttaa Windows SmartScreen -varoituksen.
+
+en: Removing this installation...
+tr: Poistetaan tätä asennusta...
+
+en: Repairing Aether Shell...
+tr: Korjataan Aether Shelliä...
+
+en: Installing Aether Shell...
+tr: Asennetaan Aether Shelliä...
+
+en: Closing Aether Shell and removing its files.
+tr: Suljetaan Aether Shell ja poistetaan sen tiedostot.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Tarkistetaan upotettu paketti ja asennetaan sen tiedostot. Edistyminen näytetään toimintana: asennusohjelma ei tiedä jäljellä olevaa aikaa.
+
+en: Please wait while the removal completes.
+tr: Odota, kunnes poisto on valmis.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Peruuta on käytettävissä, kunnes uusi versio on aktivoitu; sen jälkeen asennus viedään turvallisesti loppuun.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shellin asennus poistettiin.
+
+en: Aether Shell is ready.
+tr: Aether Shell on valmis.
+
+en: Setup was cancelled.
+tr: Asennus peruutettiin.
+
+en: Setup could not complete.
+tr: Asennusta ei voitu suorittaa loppuun.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Tietosi säilytettiin, ellet nimenomaisesti valinnut niiden poistamista.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Voit korjata sen tai poistaa sen asennuksen kohdassa Windowsin asetukset > Sovellukset > Asennetut sovellukset.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Toiminto peruutettiin ennen aktivointia. Yritä uudelleen palaamalla Valinnat-vaiheeseen.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Tarkista tiedostojen käyttöoikeudet ja vapaa levytila ja yritä sitten uudelleen. Jos Aether Shell on jo asennettu, Korjaa voi palauttaa sen tiedostot. Virheluokka: {}
+
+en: Setup log
+tr: Asennusloki
+
+en: Launch Aether Shell
+tr: Käynnistä Aether Shell
+
+en: &Back
+tr: &Edellinen
+
+en: &Next
+tr: &Seuraava
+
+en: &Continue
+tr: &Jatka
+
+en: &Uninstall
+tr: &Poista asennus
+
+en: &Repair
+tr: &Korjaa
+
+en: &Install
+tr: &Asenna
+
+en: &Close
+tr: &Sulje
+
+en: Step {} of {}: {}
+tr: Vaihe {}/{}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Valitse Aether Shellin asennuskansio
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Valitse täydellinen kansiopolku, esimerkiksi sellainen, joka alkaa asemakirjaimella.
+
+en: The install folder must be an absolute path.
+tr: Asennuskansion on oltava absoluuttinen polku.
+
+en: Setup stops at the next safe point.
+tr: Asennus pysähtyy seuraavassa turvallisessa kohdassa.
+
+en: Cancelling...
+tr: Peruutetaan...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Asennus viimeistelee nykyisen vaiheen turvallisesti; odota.
+
+en: Updating Aether Shell
+tr: Päivitetään Aether Shelliä
+
+en: Verifying the signed package and applying the update.
+tr: Tarkistetaan allekirjoitettu paketti ja asennetaan päivitys.
+
+en: Update completed
+tr: Päivitys valmis
+
+en: The update did not complete
+tr: Päivitystä ei suoritettu loppuun
+
+en: Close
+tr: Sulje
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Päivityksen käyttöliittymää ei voitu käynnistää. Päivitystä ei ole asennettu. Yritä uudelleen tai käytä Korjaa-toimintoa.
+
+en: Aether Shell Update
+tr: Aether Shell -päivitys
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Päivityksen käyttöliittymää ei voitu käynnistää. Päivitystä ei ole asennettu. Yritä uudelleen tai käytä Korjaa-toimintoa kohdassa Windowsin asetukset > Sovellukset > Asennetut sovellukset.
+
+en: Update completed.
+tr: Päivitys valmis.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Päivitystä ei suoritettu loppuun. Katso päivitysohjelman loki tai käytä Korjaa-toimintoa.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell ei käynnistynyt. Valitse Korjaa kohdassa Windowsin asetukset > Sovellukset > Asennetut sovellukset.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shellin asetukset — päivitys käynnissä
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Jatka tehtäväpalkin korvaamista
+
+en: Show Windows &notification area for 60 seconds
+tr: Näytä Windowsin &ilmaisinalue 60 sekunnin ajan
+
+en: &Search…
+tr: &Haku…
+
+en: &Settings…
+tr: &Asetukset…
+
+en: View available &update…
+tr: Näytä saatavilla oleva &päivitys…
+
+en: &Check for updates…
+tr: &Tarkista päivitykset…
+
+en: &About Aether Shell
+tr: &Tietoja Aether Shellistä
+
+en: &Quit Aether Shell
+tr: &Lopeta Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Vaihda &syöttökieltä\tWin+Välilyönti
+
+en: Open &network controls…
+tr: Avaa &verkkosäätimet…
+
+en: &Weather settings…
+tr: &Sääasetukset…
+
+en: Toggle output &mute
+tr: Äänilähdön &mykistys päälle/pois
+
+en: &Sound settings…
+tr: Ää&niasetukset…
+
+en: Toggle microphone &mute
+tr: Mikrofonin &mykistys päälle/pois
+
+en: Start Windows &voice typing\tWin+H
+tr: Käynnistä Windowsin &puhekirjoitus\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofonin &tietosuoja-asetukset…
+
+en: &Power settings…
+tr: &Virta-asetukset…
+
+en: Open &notifications and calendar
+tr: Avaa &ilmoitukset ja kalenteri
+
+en: Open &calendar\tWin+Alt+D
+tr: Avaa &kalenteri\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Näytä &piilotetut kuvakkeet
+
+en: Initializing
+tr: Alustetaan
+
+en: Unavailable
+tr: Ei käytettävissä
+
+en: Unsupported
+tr: Ei tuettu
+
+en: Error
+tr: Virhe
+
+en: Available
+tr: Käytettävissä
+
+en: Unknown
+tr: Tuntematon
+
+en: Internet access
+tr: Internet-yhteys
+
+en: Local network only
+tr: Vain paikallinen verkko
+
+en: Limited Internet access
+tr: Rajoitettu Internet-yhteys
+
+en: No network connection
+tr: Ei verkkoyhteyttä
+
+en: Connectivity unknown
+tr: Yhteyden tila tuntematon
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Matkapuhelinverkko
+
+en: Network
+tr: Verkko
+
+en: Offline
+tr: Offline-tila
+
+en: Network status unavailable
+tr: Verkon tila ei ole käytettävissä
+
+en: Quick controls
+tr: Pikasäätimet
+
+en: Aether Shell menu
+tr: Aether Shell -valikko
+
+en: Weather status unavailable
+tr: Sään tila ei ole käytettävissä
+
+en: Cached weather
+tr: Välimuistissa oleva sää
+
+en: Observation (UTC): {}
+tr: Havainto (UTC): {}
+
+en: Weather: {}
+tr: Sää: {}
+
+en: Click to open weather settings
+tr: Avaa sääasetukset napsauttamalla
+
+en: Show hidden icons
+tr: Näytä piilotetut kuvakkeet
+
+en: Opens Windows' notification-area overflow
+tr: Avaa Windowsin ilmaisinalueen ylivuotovalikon
+
+en: Input language: {}
+tr: Syöttökieli: {}
+
+en: Fallback input layout
+tr: Varasyöttöasettelu
+
+en: Click to switch input language (Win+Space)
+tr: Vaihda syöttökieltä napsauttamalla (Win+Välilyönti)
+
+en: Network: {}
+tr: Verkko: {}
+
+en: Signal strength unavailable
+tr: Signaalin voimakkuus ei ole käytettävissä
+
+en: Click to open Windows network settings
+tr: Avaa Windowsin verkkoasetukset napsauttamalla
+
+en: Audio output
+tr: Äänilähtö
+
+en: Audio: {}
+tr: Ääni: {}
+
+en: volume unknown
+tr: äänenvoimakkuus tuntematon
+
+en: Muted
+tr: Mykistetty
+
+en: Sound on
+tr: Ääni käytössä
+
+en: Microphone: {}
+tr: Mikrofoni: {}
+
+en: Endpoint unmuted
+tr: Laitteen mykistys poistettu
+
+en: Recording detection unsupported
+tr: Tallennuksen tunnistusta ei tueta
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Vaihda mykistystä napsauttamalla; napsauta hiiren kakkospainikkeella, niin saat Windowsin puhekirjoituksen ja mikrofonin tietosuoja-asetukset
+
+en: Battery: {}
+tr: Akku: {}
+
+en: Battery {}
+tr: Akku {}
+
+en: Battery status unavailable
+tr: Akun tila ei ole käytettävissä
+
+en: Charging
+tr: Latautuu
+
+en: External power
+tr: Ulkoinen virta
+
+en: Estimated remaining: {} h {} min
+tr: Arvioitu jäljellä: {} h {} min
+
+en: Click to open power settings
+tr: Avaa virta-asetukset napsauttamalla
+
+en: Clock status unavailable
+tr: Kellon tila ei ole käytettävissä
+
+en: Click to open calendar and notifications
+tr: Avaa kalenteri ja ilmoitukset napsauttamalla
+
+en: Action failed: {}
+tr: Toiminto epäonnistui: {}
+
+en: Aether Shell status bar
+tr: Aether Shellin tilapalkki
+
+en: Update available
+tr: Päivitys saatavilla
+
+en: Cached
+tr: Välimuistissa
+
+en: Start
+tr: Käynnistä
+
+en: Search
+tr: Haku
+
+en: Task View
+tr: Tehtävänäkymä
+
+en: Application
+tr: Sovellus
+
+en: Running application
+tr: Käynnissä oleva sovellus
+
+en: More applications
+tr: Lisää sovelluksia
+
+en: Aether Shell window previews
+tr: Aether Shellin ikkunoiden esikatselut
+
+en: Minimized — preview unavailable
+tr: Pienennetty — esikatselu ei käytettävissä
+
+en: Preview unavailable
+tr: Esikatselu ei käytettävissä
+
+en: {} windows
+tr: {} ikkunaa
+
+en: {} window
+tr: {} ikkuna
+
+en: Switches to this window
+tr: Siirtyy tähän ikkunaan
+
+en: Minimized, preview unavailable
+tr: Pienennetty, esikatselu ei käytettävissä
+
+en: Minimized
+tr: Pienennetty
+
+en: Close {}
+tr: Sulje {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Pyytää tätä ikkunaa sulkeutumaan; sovellus voi silti pyytää tallentamaan tai peruuttamaan
+
+en: Close requested
+tr: Sulkemista pyydetty
+
+en: Previous applications
+tr: Edelliset sovellukset
+
+en: Open
+tr: Avaa
+
+en: New instance
+tr: Uusi esiintymä
+
+en: Unpin from Dock
+tr: Irrota Dockista
+
+en: Pin to Dock
+tr: Kiinnitä Dockiin
+
+en: Move left
+tr: Siirrä vasemmalle
+
+en: Move right
+tr: Siirrä oikealle
+
+en: Dock settings...
+tr: Dockin asetukset...
+
+en: Import Windows taskbar pins
+tr: Tuo Windowsin tehtäväpalkin kiinnitykset
+
+en: Open Windows Start
+tr: Avaa Windowsin Käynnistä-valikko
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Kiinnitetty
+
+en: Running
+tr: Käynnissä
+
+en: Needs attention
+tr: Vaatii huomiota
+
+en: Up arrow shows window previews
+tr: Ylänuoli näyttää ikkunoiden esikatselut
+
+en: Installed application
+tr: Asennettu sovellus
+
+en: Desktop application
+tr: Työpöytäsovellus
+
+en: File
+tr: Tiedosto
+
+en: Folder
+tr: Kansio
+
+en: Windows tool
+tr: Windows-työkalu
+
+en: Control Panel
+tr: Ohjauspaneeli
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Siirry   ·   Enter Avaa   ·   Esc Sulje
+
+en: Search apps, settings and files
+tr: Hae sovelluksia, asetuksia ja tiedostoja
+
+en: Search could not be completed.
+tr: Hakua ei voitu suorittaa loppuun.
+
+en: Results
+tr: Tulokset
+
+en: Indexing applications…
+tr: Indeksoidaan sovelluksia…
+
+en: Type to search apps, settings and files
+tr: Hae sovelluksia, asetuksia ja tiedostoja kirjoittamalla
+
+en: Nothing matches
+tr: Ei vastaavia tuloksia
+
+en: Windows could not open this application.
+tr: Windows ei voinut avata tätä sovellusta.
+
+en: Menu
+tr: Valikko
+
+en: Opens a submenu
+tr: Avaa alivalikon
+
+en: , opens a submenu
+tr: , avaa alivalikon
+
+en: Selected
+tr: Valittu
+
+en: Checked
+tr: Merkitty
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Lentokonetila
+
+en: Accessibility
+tr: Helppokäyttötoiminnot
+
+en: Energy saver
+tr: Virransäästö
+
+en: Live captions
+tr: Live-tekstitys
+
+en: Night light
+tr: Yövalo
+
+en: Mobile hotspot
+tr: Mobiilitukiasema
+
+en: Nearby sharing
+tr: Lähijakaminen
+
+en: Cast
+tr: Lähetä
+
+en: Project
+tr: Heijasta
+
+en: All settings
+tr: Kaikki asetukset
+
+en: Connected
+tr: Yhdistetty
+
+en: Not connected
+tr: Ei yhdistetty
+
+en: , on
+tr: , käytössä
+
+en: , off
+tr: , ei käytössä
+
+en: , state unknown
+tr: , tila tuntematon
+
+en: , opens Windows Settings
+tr: , avaa Windowsin asetukset
+
+en: , shows accessibility features
+tr: , näyttää helppokäyttötoiminnot
+
+en: , requires Windows 11 version 22H2
+tr: , edellyttää Windows 11:n versiota 22H2
+
+en: Now playing: {}
+tr: Nyt toistetaan: {}
+
+en: Untitled media
+tr: Nimetön media
+
+en: , switch source
+tr: , vaihda lähdettä
+
+en: Previous media item
+tr: Edellinen mediakohde
+
+en: Pause
+tr: Tauko
+
+en: Play
+tr: Toista
+
+en: Next media item
+tr: Seuraava mediakohde
+
+en: {} details
+tr: {}: tiedot
+
+en: Page {} of {}
+tr: Sivu {}/{}
+
+en: Next page
+tr: Seuraava sivu
+
+en: First page
+tr: Ensimmäinen sivu
+
+en: Brightness
+tr: Kirkkaus
+
+en: Brightness, unavailable on this display
+tr: Kirkkaus, ei käytettävissä tässä näytössä
+
+en: Volume
+tr: Äänenvoimakkuus
+
+en: Volume, unavailable
+tr: Äänenvoimakkuus, ei käytettävissä
+
+en: Unmute
+tr: Poista mykistys
+
+en: Mute
+tr: Mykistä
+
+en: Sound output and volume mixer
+tr: Äänilähtö ja äänenvoimakkuuden mikseri
+
+en: Back
+tr: Takaisin
+
+en: , secured
+tr: , suojattu
+
+en: , open
+tr: , avoin
+
+en: , connected
+tr: , yhdistetty
+
+en: Disconnect
+tr: Katkaise yhteys
+
+en: Show available networks
+tr: Näytä käytettävissä olevat verkot
+
+en: More Wi-Fi settings
+tr: Lisää Wi-Fi-asetuksia
+
+en: Bluetooth and devices settings
+tr: Bluetooth- ja laiteasetukset
+
+en: Magnifier
+tr: Suurennuslasi
+
+en: Narrator
+tr: Lukija
+
+en: On-screen keyboard
+tr: Näyttönäppäimistö
+
+en: Sticky keys
+tr: Alas jäävät näppäimet
+
+en: More accessibility settings
+tr: Lisää helppokäyttöasetuksia
+
+en: Volume mixer
+tr: Äänenvoimakkuuden mikseri
+
+en: Choose output in Sound settings
+tr: Valitse äänilähtö ääniasetuksissa
+
+en: Power and battery settings
+tr: Virta- ja akkuasetukset
+
+en: Battery {} percent, {}
+tr: Akku {} prosenttia, {}
+
+en: All Windows settings
+tr: Kaikki Windowsin asetukset
+
+en: The requested action could not be dispatched
+tr: Pyydettyä toimintoa ei voitu välittää
+
+en: Aether Shell quick controls
+tr: Aether Shellin pikasäätimet
+
+en: Media session active
+tr: Mediaistunto aktiivinen
+
+en: No media session
+tr: Ei mediaistuntoa
+
+en: Current page
+tr: Nykyinen sivu
+
+en:  - secured
+tr:  - suojattu
+
+en:  - open
+tr:  - avoin
+
+en:  - opens in Windows
+tr:  - avautuu Windowsissa
+
+en: Turned off by hardware or policy
+tr: Laitteisto tai käytäntö on poistanut käytöstä
+
+en: State unavailable - use Windows settings
+tr: Tila ei käytettävissä - käytä Windowsin asetuksia
+
+en: Off
+tr: Ei käytössä
+
+en:  - signal {} of 5
+tr:  - signaali {}/5
+
+en: , no internet
+tr: , ei Internetiä
+
+en: On - not connected
+tr: Käytössä - ei yhdistetty
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows ei anna sovellusten luetella verkkoja: tarkista Sijainti tietosuoja-asetuksista
+
+en: No Wi-Fi adapter found
+tr: Wi-Fi-sovitinta ei löytynyt
+
+en: Connecting to {}...
+tr: Yhdistetään verkkoon {}...
+
+en:  - looking for networks
+tr:  - etsitään verkkoja
+
+en: On
+tr: Käytössä
+
+en: A screen reader is running
+tr: Näytönlukuohjelma on käynnissä
+
+en: Windows accessibility features
+tr: Windowsin helppokäyttötoiminnot
+
+en: Sound output
+tr: Äänilähtö
+
+en: Default output device
+tr: Oletustoistolaite
+
+en: No output device available
+tr: Toistolaitetta ei ole käytettävissä
+
+en: Battery unknown
+tr: Akku tuntematon
+
+en: Status refresh could not be started
+tr: Tilan päivitystä ei voitu käynnistää
+
+en: Status refresh unavailable
+tr: Tilan päivitys ei ole käytettävissä
+
+en: Excellent signal
+tr: Erinomainen signaali
+
+en: Good signal
+tr: Hyvä signaali
+
+en: Fair signal
+tr: Kohtalainen signaali
+
+en: Weak signal
+tr: Heikko signaali
+
+en: Clear sky
+tr: Selkeää
+
+en: Mainly clear
+tr: Enimmäkseen selkeää
+
+en: Partly cloudy
+tr: Puolipilvistä
+
+en: Overcast
+tr: Pilvistä
+
+en: Fog
+tr: Sumua
+
+en: Drizzle
+tr: Tihkusadetta
+
+en: Rain
+tr: Sadetta
+
+en: Snow
+tr: Lunta
+
+en: Rain showers
+tr: Sadekuuroja
+
+en: Snow showers
+tr: Lumikuuroja
+
+en: Thunderstorm
+tr: Ukkosta
+
+## weather
+
+en: Morning
+tr: Aamu
+
+en: Afternoon
+tr: Iltapäivä
+
+en: Evening
+tr: Ilta
+
+en: Night
+tr: Yö
+
+en: Now
+tr: Nyt
+
+en: Today
+tr: Tänään
+
+en: Low
+tr: Matala
+
+en: Moderate
+tr: Kohtalainen
+
+en: High
+tr: Korkea
+
+en: Very high
+tr: Erittäin korkea
+
+en: Extreme
+tr: Äärimmäinen
+
+en: No connection to the weather service.
+tr: Ei yhteyttä sääpalveluun.
+
+en: The weather service is busy. Try again in a moment.
+tr: Sääpalvelu on varattu. Yritä hetken kuluttua uudelleen.
+
+en: The weather could not be loaded.
+tr: Säätä ei voitu ladata.
+
+en: Could not update; showing the last forecast.
+tr: Päivitys ei onnistunut; näytetään viimeisin ennuste.
+
+en: Try again
+tr: Yritä uudelleen
+
+en: Your location
+tr: Sijaintisi
+
+en: My location
+tr: Oma sijainti
+
+en: Precise location
+tr: Tarkka sijainti
+
+en: Approximate location
+tr: Likimääräinen sijainti
+
+en: Chosen in Settings
+tr: Valittu asetuksissa
+
+en: Allow
+tr: Salli
+
+en: Use precise location
+tr: Käytä tarkkaa sijaintia
+
+en: See the weather where you are: allow your precise location.
+tr: Näe sää siellä, missä olet: salli tarkka sijaintisi.
+
+en: Your position is approximate (about 10 km).
+tr: Sijaintisi on likimääräinen (noin 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Sijainti on poistettu käytöstä tältä sovellukselta Windowsissa.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Tämä laite ei pysty ilmoittamaan sijaintiaan. Hae sen sijaan kaupunkia.
+
+en: Reading Windows location…
+tr: Luetaan Windowsin sijaintia…
+
+en: Automatic weather follows your Windows location.
+tr: Automaattinen sää seuraa Windowsin sijaintiasi.
+
+en: Search for a city
+tr: Hae kaupunkia
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Näet sään hakemalla kaupunkia tai sallimalla sijaintisi.
+
+en: Searching…
+tr: Haetaan…
+
+en: City search is unavailable.
+tr: Kaupunkihaku ei ole käytettävissä.
+
+en: No city found.
+tr: Kaupunkia ei löytynyt.
+
+en: Weather settings
+tr: Sääasetukset
+
+en: Loading the weather…
+tr: Ladataan säätä…
+
+en: Loading…
+tr: Ladataan…
+
+en: Updated {}
+tr: Päivitetty {}
+
+en: Near {}
+tr: Lähellä: {}
+
+en: Temperatures now
+tr: Lämpötilat nyt
+
+en: The map is unavailable.
+tr: Kartta ei ole käytettävissä.
+
+en: Map: Natural Earth
+tr: Kartta: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Säätiedot: Open-Meteo.com
+
+en: Feels like
+tr: Tuntuu kuin
+
+en: Feels like {}
+tr: Tuntuu kuin {}
+
+en: Close to the real temperature
+tr: Lähellä todellista lämpötilaa
+
+en: The wind makes it feel colder
+tr: Tuuli saa sen tuntumaan kylmemmältä
+
+en: Humidity makes it feel warmer
+tr: Kosteus saa sen tuntumaan lämpimämmältä
+
+en: Humidity
+tr: Ilmankosteus
+
+en: Cloud cover {}
+tr: Pilvisyys {}
+
+en: Wind
+tr: Tuuli
+
+en: Gusts {}
+tr: Puuskat {}
+
+en: Sunrise and sunset
+tr: Auringonnousu ja -lasku
+
+en: UV index
+tr: UV-indeksi
+
+en: Pressure
+tr: Ilmanpaine
+
+en: At sea level
+tr: Merenpinnan tasolla
+
+en: &Open the weather
+tr: &Avaa sää
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Ennuste sijainnillesi noin 100 metrin tarkkuudella ja omalla korkeudellaan. Ei käytössä: pyöristetty noin 10 kilometriin.

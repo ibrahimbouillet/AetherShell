@@ -11,6 +11,8 @@
 #include "platform/windows/WindowUtilities.h"
 #include "ui/form/FormInternal.h"
 #include "ui/form/FormPaint.h"
+#include "ui/form/SmartGlass.h"
+#include "graphics/GraphicsDevice.h"
 
 #include <commctrl.h>
 #include <dwmapi.h>
@@ -276,6 +278,34 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         return maximizedFrame && resolved == FormMaterial::Acrylic ? FormMaterial::Solid : resolved;
     }
     [[nodiscard]] bool Framed() const noexcept { return maximizedFrame && material != FormMaterial::Native; }
+    // D84: Liquid's smart transparency, while the material and tokens allow it.
+    graphics::GraphicsDevice* smartDevice = nullptr;
+    std::function<std::vector<RECT>()> smartExtra;
+    std::unique_ptr<SmartGlass> smart;
+    [[nodiscard]] bool SmartActive() const noexcept { return smart && smart->Started(); }
+    [[nodiscard]] bool WantsSmart() const noexcept {
+        return smartDevice && smartDevice->Capabilities().hostBackdrop && material == FormMaterial::Acrylic && !Framed() &&
+               tokens.liquid && tokens.liquidSmart && tokens.mode != graphics::ThemeMode::HighContrast;
+    }
+    void UpdateSmartGlass() noexcept {
+        try {
+            if (!WantsSmart()) {
+                if (smart) AETHER_LOG_INFO("ui_form", "smart glass off");
+                smart.reset();
+                return;
+            }
+            if (!smart) {
+                auto glass = std::make_unique<SmartGlass>(*smartDevice, window, smartExtra);
+                if (!glass->Start()) return;   // the ordinary Liquid glass stays
+                smart = std::move(glass);
+            }
+            // A blur, not a tinted pane: only a light veil of the window's tint, for the text's contrast.
+            const float veil = std::clamp(tokens.form.windowTintAlpha * 0.25f, 0.0f, 1.0f);
+            smart->SetTint(tokens.form.windowTint, veil);
+        } catch (...) {
+            smart.reset();
+        }
+    }
     UINT dpi = platform::kDefaultDpi;
     bool renderer = false;
     bool frameRequested = false;
@@ -641,14 +671,17 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     // --- material ---
     void ApplyWindowMaterial() noexcept {
         if (!window || !::IsWindow(window)) return;
+        UpdateSmartGlass();
         // A maximized frame keeps the frame extended without a system material; the owner's rounded
         // window region shapes it.
         const MARGINS margins = material == FormMaterial::Acrylic || Framed() ? MARGINS{-1, -1, -1, -1} : MARGINS{0, 0, 0, 0};
         ::DwmExtendFrameIntoClientArea(window, &margins);
         if (SystemBackdropSupported()) {
-            const DWORD type = material == FormMaterial::Acrylic ? kBackdropTransient : kBackdropNone;
+            // D84: with smart glass the client is clear and the window below carries the blur.
+            const DWORD type = material == FormMaterial::Acrylic && !SmartActive() ? kBackdropTransient : kBackdropNone;
             ::DwmSetWindowAttribute(window, kDwmSystemBackdropType, &type, sizeof(type));
         }
+        SetClearClient(SmartActive());
         // D45: a normal window is rounded by DWM with a thin neutral rim. Maximized, the form's own frame takes
         // over (the owner's rounded region over the visible client), and DWM must draw nothing: asked to round,
         // it rounds and borders the whole window, hidden resize border included, which lies on screen wherever the
@@ -663,8 +696,24 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         platform::ApplyImmersiveDarkMode(window, tokens.mode == graphics::ThemeMode::Dark);
     }
 
+    // D84: without a system backdrop DWM fills a captioned window's extended frame with its frame color. Blur-behind
+    // with an empty region makes it compose the client's own alpha instead (and blur nothing), so what the form leaves
+    // clear shows what lies behind it.
+    bool clearClient = false;
+    void SetClearClient(bool clear) noexcept {
+        if (clear == clearClient || !window) return;
+        HRGN empty = clear ? ::CreateRectRgn(0, 0, -1, -1) : nullptr;
+        DWM_BLURBEHIND behind{};
+        behind.dwFlags = DWM_BB_ENABLE | (empty ? DWM_BB_BLURREGION : 0);
+        behind.fEnable = clear ? TRUE : FALSE;
+        behind.hRgnBlur = empty;
+        if (SUCCEEDED(::DwmEnableBlurBehindWindow(window, &behind))) clearClient = clear;
+        if (empty) ::DeleteObject(empty);
+    }
+
     void RestoreWindowMaterial() noexcept {
         if (!window || !::IsWindow(window)) return;
+        SetClearClient(false);
         const MARGINS margins{0, 0, 0, 0};
         ::DwmExtendFrameIntoClientArea(window, &margins);
         if (SystemBackdropSupported()) {
@@ -1408,7 +1457,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
             RECT client{};
             ::GetClientRect(window, &client);
             const D2D1_RECT_F body = D2D1::RectF(0.0f, 0.0f, static_cast<float>(client.right) / s, static_cast<float>(client.bottom) / s);
-            paint::PaintBackground(d2d, area, tokens, material, &body, Framed());
+            paint::PaintBackground(d2d, area, tokens, material, &body, Framed(), SmartActive());
         }
         const float fade = layer == SceneLayer::All ? FadeOf(hwnd) : 1.0f;
         const bool layered = fade < 0.999f;
@@ -2750,6 +2799,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
         frameRequested = false;
         StopTimer();
         snapshotTimer = false;
+        smart.reset();
         RestoreWindowMaterial();
         if (window && ::IsWindow(window)) ::RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
         ReleaseResources();
@@ -2830,7 +2880,7 @@ bool SameAppearance(const graphics::DesignTokens& a, const graphics::DesignToken
     // Tokens are derived deterministically from the mode, the accent palette/source, transparency and
     // the text scale; these fields identify every input that changes form presentation. D81: the style (Liquid or
     // Grain) too - without it a style chosen in Settings never reached the open Settings window.
-    return a.mode == b.mode && a.liquid == b.liquid && a.transparencyEnabled == b.transparencyEnabled && a.textScale == b.textScale &&
+    return a.mode == b.mode && a.liquid == b.liquid && a.liquidSmart == b.liquidSmart && a.transparencyEnabled == b.transparencyEnabled && a.textScale == b.textScale &&
            a.fontFamily == b.fontFamily && a.displayFontFamily == b.displayFontFamily && a.accentSource == b.accentSource &&
            a.systemAccent == b.systemAccent && same(a.accent, b.accent) && same(a.accentRoles.fill, b.accentRoles.fill) &&
            same(a.accentRoles.fillHover, b.accentRoles.fillHover) && same(a.accentRoles.fillPressed, b.accentRoles.fillPressed) &&
@@ -2899,6 +2949,24 @@ const graphics::MotionPolicy& FormSurface::Motion() const noexcept { return impl
 FormMaterial FormSurface::Material() const noexcept { return impl_->material; }
 
 bool FormSurface::MaximizedFrame() const noexcept { return impl_->Framed(); }
+
+void FormSurface::EnableSmartGlass(graphics::GraphicsDevice* device, std::function<std::vector<RECT>()> extraContent) {
+    auto& impl = *impl_;
+    try {
+        impl.smart.reset();
+        impl.smartDevice = device;
+        impl.smartExtra = std::move(extraContent);
+        if (!impl.Attached()) return;
+        impl.DropVisualCaches();
+        impl.InvalidateLayers();
+        impl.ApplyWindowMaterial();
+        ::RedrawWindow(impl.window, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_FRAME);
+    } catch (...) {
+        impl.smart.reset();
+        AETHER_LOG_ERROR("ui_form", "smart glass could not be enabled");
+    }
+}
+bool FormSurface::SmartGlassActive() const noexcept { return impl_->SmartActive(); }
 
 void FormSurface::SetMaximizedFrame(bool maximized) {
     auto& impl = *impl_;
@@ -3199,6 +3267,7 @@ std::optional<LRESULT> FormSurface::HandleMessage(UINT message, WPARAM wParam, L
     auto& impl = *impl_;
     if (!impl.Attached()) return std::nullopt;
     try {
+        if (impl.smart) impl.smart->OnFormMessage(message, wParam, lParam);   // D84: the blur follows the window
         switch (message) {
             case WM_PAINT:
                 impl.Paint(impl.window);

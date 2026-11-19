@@ -1,0 +1,2494 @@
+# Russian (ru): Русский. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Выберите расположение Windows, чтобы включить автоматическую погоду.
+
+en: Windows taskbar visible
+tr: Панель задач Windows видна
+
+en: Connected to {}
+tr: Подключено к {}
+
+en: {} is out of range
+tr: {} вне зоны действия
+
+en: Connecting to {} took too long
+tr: Подключение к {} заняло слишком много времени
+
+en: Use Windows to join {}
+tr: Используйте Windows, чтобы подключиться к {}
+
+en: Windows did not allow this connection
+tr: Windows не разрешила это подключение
+
+en: Could not connect to {}
+tr: Не удалось подключиться к {}
+
+en: Connect to {}
+tr: Подключиться к {}
+
+en: That password was not accepted. Check it and try again.
+tr: Этот пароль не принят. Проверьте его и повторите попытку.
+
+en: Enter this network's password.
+tr: Введите пароль этой сети.
+
+en: &Connect
+tr: &Подключить
+
+en: Windows Settings could not be opened
+tr: Не удалось открыть параметры Windows
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Не удалось зарезервировать место для Dock; восстанавливается панель задач Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Замена недоступна: не удалось запустить наблюдатель восстановления
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Панель задач Windows восстановлена. Не удалось зарезервировать место для Dock; выключите и снова включите замену, чтобы повторить попытку.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Наблюдение за восстановлением недоступно; восстанавливается панель задач Windows
+
+en: Windows notifications could not be opened
+tr: Не удалось открыть уведомления Windows
+
+en: The Windows calendar could not be opened
+tr: Не удалось открыть календарь Windows
+
+en: Windows did not show its hidden icons
+tr: Windows не показала скрытые значки
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Автоматическое обновление местоположения недоступно; повторите попытку в параметрах погоды.
+
+en: Windows location
+tr: Расположение Windows
+
+en: Reading approximate Windows location…
+tr: Чтение приблизительного расположения Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: Автоматическая погода следует приблизительному расположению Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Доступ к расположению Windows заблокирован. Погода недоступна.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows не смогла определить текущее расположение. Погода недоступна.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Служба определения расположения недоступна. Погода недоступна.
+
+en: Waiting for Windows location permission…
+tr: Ожидание разрешения на доступ к расположению Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Не удалось сохранить выбор автоматической погоды.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Доступ к расположению Windows недоступен или отклонён. Погода недоступна.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Не удалось запросить разрешение на доступ к расположению Windows. Проверьте параметры расположения Windows.
+
+en: Status worker unavailable
+tr: Служба состояния недоступна
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows не смогла выполнить это действие. Проверьте её параметры.
+
+en: Reading Windows status; try the action again shortly
+tr: Чтение состояния Windows; повторите действие через мгновение
+
+en: Could not disconnect
+tr: Не удалось отключиться
+
+en: The Windows accessibility feature could not be started
+tr: Не удалось запустить функцию специальных возможностей Windows
+
+en: Windows could not change the audio output
+tr: Windows не смогла изменить устройство вывода звука
+
+en: The Windows control could not be opened
+tr: Не удалось открыть элемент управления Windows
+
+en: Keyboard shortcuts disabled
+tr: Сочетания клавиш отключены
+
+en: Both keyboard shortcuts registered
+tr: Оба сочетания клавиш зарегистрированы
+
+en: A keyboard shortcut is already in use by another application
+tr: Сочетание клавиш уже используется другим приложением
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Не удалось вызвать быстрые параметры Windows. Снимите флажок «Использовать быстрые параметры Windows» в параметрах верхней панели, чтобы использовать элементы управления Aether.
+
+en: Windows Start could not be opened
+tr: Не удалось открыть меню «Пуск» Windows
+
+en: Windows Task View could not be opened
+tr: Не удалось открыть представление задач Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: Переключение раскладки клавиатуры Windows было недоступно
+
+en: Windows voice typing could not be opened
+tr: Не удалось открыть голосовой ввод Windows
+
+en: Windows taskbar could not be revealed
+tr: Не удалось показать панель задач Windows
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Не удалось возобновить замену панели задач; Windows остаётся доступной
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Замена панели задач Windows недоступна в этом сеансе
+
+en: Windows pin access is unavailable in this isolated session
+tr: Доступ к закреплённым элементам Windows недоступен в этом изолированном сеансе
+
+en: Windows pinned applications could not be read
+tr: Не удалось прочитать закреплённые приложения Windows
+
+en: Settings changed during pin import. Try import again.
+tr: Параметры изменились во время импорта закреплённых элементов. Повторите импорт.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Сохранено дополнительных закреплённых приложений: {}. Некоторые закрепления Windows могут остаться недоступными.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Закрепления изменены в памяти; сохранить не удалось. Нажмите «Применить» в параметрах, чтобы повторить.
+
+en: Pins updated in memory; saving...
+tr: Закрепления обновлены в памяти; сохранение...
+
+en: Imported pins could not be applied
+tr: Не удалось применить импортированные закрепления
+
+en: Pin import is unavailable while closing
+tr: Импорт закреплений недоступен во время закрытия
+
+en: Settings could not be saved
+tr: Не удалось сохранить параметры
+
+en: Quit without saving the latest changes?
+tr: Выйти, не сохранив последние изменения?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Ваш прежний файл параметров сохранён. Оставьте Aether Shell открытым, чтобы повторить сохранение.
+
+en: &Quit without saving
+tr: &Выйти без сохранения
+
+en: &Keep Aether Shell open
+tr: &Оставить Aether Shell открытым
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Экспорт базовой диагностики — версия приложения и сборка Windows, без журналов и личных данных
+
+en: Diagnostics exported.
+tr: Диагностика экспортирована.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Не удалось сохранить диагностику в выбранный файл.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Не удалось безопасно прочитать параметры. Существующий файл сохранён.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell не удалось запустить свои элементы рабочего стола.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Восстановление панели задач Windows не завершено. Повторите попытку или закройте Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Панель задач Windows временно показана.
+
+en: Windows taskbar restored.
+tr: Панель задач Windows восстановлена.
+
+en: Windows taskbar replacement is active.
+tr: Замена панели задач Windows активна.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Панель задач Windows остаётся доступной. Замена вскоре повторит попытку.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Панель задач Windows остаётся доступной. Выключите и снова включите замену, чтобы повторить попытку.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Панель задач Windows восстановлена. Замена вскоре подключится снова.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Панель задач Windows восстановлена. Выключите и снова включите замену, чтобы повторить попытку.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Замена панели задач остановлена. Панель задач Windows восстановлена.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Замена панели задач остановлена. Не удалось подтвердить восстановление панели задач Windows.
+
+en: Activating taskbar replacement...
+tr: Включается замена панели задач...
+
+en: Restoring Windows taskbar...
+tr: Восстанавливается панель задач Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Повторное подключение замены панели задач...
+
+en: Showing the Windows taskbar temporarily...
+tr: Временный показ панели задач Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell не удалось восстановить панель задач Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Перезапустите проводник Windows в диспетчере задач (Ctrl+Shift+Esc) или выйдите из системы и войдите снова.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Панель задач Windows восстановлена в сохранённом состоянии.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Сохранённое состояние панели задач не найдено. Панель задач Windows сделана видимой; её параметр автоматического скрытия не изменён.
+
+en: There was nothing to restore.
+tr: Восстанавливать было нечего.
+
+en: Taskbar replacement is turned off.
+tr: Замена панели задач выключена.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Не удалось автоматически отключить замену панели задач. Отключите её в параметрах Aether Shell > Рабочий стол.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Командная строка Aether Shell не распознана или недопустима.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell не удалось создать свои локальные папки данных.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell остановлен из-за непредвиденной ошибки.
+
+## search-names
+
+en: Disk Management
+tr: Управление дисками
+
+en: Local Users and Groups
+tr: Локальные пользователи и группы
+
+en: Local Group Policy Editor
+tr: Редактор локальной групповой политики
+
+en: Manage User Certificates
+tr: Управление сертификатами пользователя
+
+en: Manage Computer Certificates
+tr: Управление сертификатами компьютера
+
+en: Shared Folders
+tr: Общие папки
+
+en: TPM Management
+tr: Управление TPM
+
+en: Network Connections
+tr: Сетевые подключения
+
+en: System Properties
+tr: Свойства системы
+
+en: About Windows
+tr: О программе Windows
+
+en: DirectX Diagnostic Tool
+tr: Средство диагностики DirectX
+
+en: Windows Features
+tr: Компоненты Windows
+
+en: System Restore
+tr: Восстановление системы
+
+en: Advanced System Settings
+tr: Дополнительные параметры системы
+
+en: Volume Mixer
+tr: Микшер громкости
+
+en: Microsoft Management Console
+tr: Консоль управления Microsoft
+
+en: User Accounts (Advanced)
+tr: Учётные записи пользователей (расширенные)
+
+en: Display settings
+tr: Параметры дисплея
+
+en: Night light settings
+tr: Параметры ночного света
+
+en: Graphics settings
+tr: Параметры графики
+
+en: Sound settings
+tr: Параметры звука
+
+en: Notification settings
+tr: Параметры уведомлений
+
+en: Power & battery settings
+tr: Параметры питания и батареи
+
+en: Energy saver settings
+tr: Параметры режима энергосбережения
+
+en: Storage settings
+tr: Параметры хранилища
+
+en: Multitasking settings
+tr: Параметры многозадачности
+
+en: Clipboard settings
+tr: Параметры буфера обмена
+
+en: Remote Desktop settings
+tr: Параметры удалённого рабочего стола
+
+en: About your PC
+tr: О вашем ПК
+
+en: Bluetooth & devices settings
+tr: Параметры Bluetooth и устройств
+
+en: Printers & scanners settings
+tr: Параметры принтеров и сканеров
+
+en: Mouse settings
+tr: Параметры мыши
+
+en: Touchpad settings
+tr: Параметры сенсорной панели
+
+en: Network & internet settings
+tr: Параметры сети и Интернета
+
+en: Wi-Fi settings
+tr: Параметры Wi-Fi
+
+en: VPN settings
+tr: Параметры VPN
+
+en: Proxy settings
+tr: Параметры прокси-сервера
+
+en: Airplane mode settings
+tr: Параметры режима «в самолёте»
+
+en: Mobile hotspot settings
+tr: Параметры мобильной точки доступа
+
+en: Background settings
+tr: Параметры фона
+
+en: Color settings
+tr: Параметры цвета
+
+en: Theme settings
+tr: Параметры тем
+
+en: Lock screen settings
+tr: Параметры экрана блокировки
+
+en: Taskbar settings
+tr: Параметры панели задач
+
+en: Font settings
+tr: Параметры шрифтов
+
+en: Installed apps
+tr: Установленные приложения
+
+en: Default apps settings
+tr: Параметры приложений по умолчанию
+
+en: Startup apps settings
+tr: Параметры автозагрузки приложений
+
+en: Account info
+tr: Сведения об учётной записи
+
+en: Sign-in options
+tr: Параметры входа
+
+en: Other users settings
+tr: Параметры других пользователей
+
+en: Date & time settings
+tr: Параметры даты и времени
+
+en: Language & region settings
+tr: Параметры языка и региона
+
+en: Typing settings
+tr: Параметры ввода
+
+en: Accessibility settings
+tr: Параметры специальных возможностей
+
+en: Privacy & security settings
+tr: Параметры конфиденциальности и безопасности
+
+en: Location settings
+tr: Параметры расположения
+
+en: Windows Update settings
+tr: Параметры Центра обновления Windows
+
+en: Recovery settings
+tr: Параметры восстановления
+
+en: Activation settings
+tr: Параметры активации
+
+en: For developers settings
+tr: Параметры для разработчиков
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Не удалось связаться с GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub только что не ответил на запрос.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Выпуск не прошёл проверку, поэтому ничего не установлено.
+
+en: There is not enough free disk space.
+tr: Недостаточно свободного места на диске.
+
+en: Windows refused access to the update files.
+tr: Windows отказала в доступе к файлам обновления.
+
+en: {} bytes
+tr: {} байт
+
+en: {} KB
+tr: {} КБ
+
+en: {} MB
+tr: {} МБ
+
+en: Status
+tr: Состояние
+
+en: Check &now
+tr: Проверить &сейчас
+
+en: Download and install
+tr: Скачать и установить
+
+en: &Later
+tr: &Позже
+
+en: S&kip this version
+tr: П&ропустить эту версию
+
+en: &Release details
+tr: &Сведения о выпуске
+
+en: Disable &notifications
+tr: Отключить &уведомления
+
+en: Release notes
+tr: Примечания к выпуску
+
+en: the new version
+tr: новая версия
+
+en: Installed: {}.
+tr: Установлена: {}.
+
+en: Automatic update checks are off
+tr: Автоматическая проверка обновлений отключена
+
+en: Check now looks for a newer release once.
+tr: «Проверить сейчас» один раз ищет более новый выпуск.
+
+en: Last checked {}
+tr: Последняя проверка: {}
+
+en: Not checked yet
+tr: Ещё не проверялось
+
+en: Checking for updates...
+tr: Проверка обновлений...
+
+en: Aether Shell is up to date
+tr: Aether Shell обновлён до последней версии
+
+en: Latest published release: {}.
+tr: Последний опубликованный выпуск: {}.
+
+en: Version {} is available
+tr: Доступна версия {}
+
+en: Download size: {}.
+tr: Размер загрузки: {}.
+
+en: Downloading version {}...
+tr: Загрузка версии {}...
+
+en: Received {} of {} ({}%).
+tr: Получено {} из {} ({}%).
+
+en: Received {}; total size unknown.
+tr: Получено {}; общий размер неизвестен.
+
+en: Version {} is ready to install
+tr: Версия {} готова к установке
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Проверено по подписанному манифесту выпуска и SHA-256.
+
+en: The update could not be completed
+tr: Не удалось завершить обновление
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Пока что установка выполняется вручную: откройте «Сведения о выпуске», скачайте и запустите установщик.
+
+en: Failure: {}.
+tr: Сбой: {}.
+
+en: Choose Retry Download to try again.
+tr: Выберите «Повторить загрузку», чтобы повторить попытку.
+
+en: Use Check now to try again.
+tr: Нажмите «Проверить сейчас», чтобы повторить попытку.
+
+en: Next automatic check: {}.
+tr: Следующая автоматическая проверка: {}.
+
+en: &Install update
+tr: &Установить обновление
+
+en: Retry &Download
+tr: Повторить &загрузку
+
+en: &Download and install
+tr: &Скачать и установить
+
+en: Windows' startup state could not be read in this session.
+tr: Не удалось прочитать состояние автозапуска Windows в этом сеансе.
+
+en: Windows will start it at your next sign-in.
+tr: Windows запустит его при следующем входе.
+
+en: Right now it will not start at sign-in.
+tr: Сейчас он не будет запускаться при входе.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Он отключён в диспетчере задач или в параметрах Windows, и это действует, пока его не включат там.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows запустит ещё одну копию Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows сообщает о состоянии автозапуска, которое эта версия не может прочитать.
+
+en: The close action could not be completed.
+tr: Не удалось выполнить действие закрытия.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Введите полное число перед сохранением; поле, отмеченное красным, не является числом.
+
+en: Settings could not be validated.
+tr: Не удалось проверить параметры.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Автозапуск при входе оставлен без изменений, так как параметры не удалось сохранить.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Не удалось сохранить параметры и вернуть автозапуск Windows при входе. Нажмите «Применить» ещё раз, чтобы повторить.
+
+en: Settings saved.
+tr: Параметры сохранены.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Параметры изменены в памяти; сохранить не удалось. Нажмите «Применить» ещё раз, чтобы повторить.
+
+en: Settings could not be applied.
+tr: Не удалось применить параметры.
+
+en: Some values were corrected to their supported range.
+tr: Некоторые значения исправлены до допустимого диапазона.
+
+en: Startup registration is unavailable in this session.
+tr: Регистрация автозапуска недоступна в этом сеансе.
+
+en: Changing startup registration...
+tr: Изменение регистрации автозапуска...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows не изменила регистрацию автозапуска. Проверьте параметр автозагрузки в диспетчере задач.
+
+en: Startup registration could not be changed.
+tr: Не удалось изменить регистрацию автозапуска.
+
+en: Defaults saved; startup is disabled.
+tr: Значения по умолчанию сохранены; автозапуск отключён.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Значения по умолчанию применены; сохранить не удалось. Нажмите «Применить» ещё раз, чтобы повторить.
+
+en: Defaults could not be applied.
+tr: Не удалось применить значения по умолчанию.
+
+en: Startup was not disabled; settings were kept.
+tr: Автозапуск не отключён; параметры сохранены.
+
+en: Location search is unavailable.
+tr: Поиск местоположения недоступен.
+
+en: Searching Open-Meteo locations...
+tr: Поиск местоположений в Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Поиск местоположения не удался. Проверьте подключение и повторите попытку.
+
+en: No place matched that search.
+tr: По этому запросу ничего не найдено.
+
+en: Choose a location to save it.
+tr: Выберите местоположение, чтобы сохранить его.
+
+en: Reset all settings?
+tr: Сбросить все параметры?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Предпочтения и закреплённые приложения вернутся к значениям по умолчанию, а автозапуск при входе будет отключён.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Ваш выбор по панели задач Windows сохраняется. Резервная копия текущего файла параметров сохранена.
+
+en: &Reset
+tr: &Сбросить
+
+en: Cancel
+tr: Отмена
+
+en: Pinned applications saved.
+tr: Закреплённые приложения сохранены.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Закрепления изменены в памяти; сохранить не удалось. Нажмите «Применить» ещё раз, чтобы повторить.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Не удалось восстановить значения по умолчанию: регистрация автозапуска недоступна.
+
+en: Pinned application could not be added.
+tr: Не удалось добавить закреплённое приложение.
+
+en: Choose an application to add first.
+tr: Сначала выберите приложение для добавления.
+
+en: Pinned applications could not be changed.
+tr: Не удалось изменить закреплённые приложения.
+
+en: Choose a pinned application first.
+tr: Сначала выберите закреплённое приложение.
+
+en: Desktop status is unavailable in this session.
+tr: Состояние рабочего стола недоступно в этом сеансе.
+
+en: Desktop status is unavailable.
+tr: Состояние рабочего стола недоступно.
+
+en: Password
+tr: Пароль
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Загрузка языка {} с GitHub ({}). Пока он не готов, показывается английский.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Не удалось скачать язык {}. Пока он не скачан, показывается английский; чтобы повторить попытку, выберите «Скачать» ниже.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Языка {} ещё нет на этом ПК. Пока он не скачан, показывается английский.
+
+en: {} is on this PC.
+tr: Язык {} есть на этом ПК.
+
+en: Every language is on this PC.
+tr: Все языки уже есть на этом ПК.
+
+en: Choose a language to download first.
+tr: Сначала выберите язык, который нужно скачать.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Верхняя панель
+
+en: Weather
+tr: Погода
+
+en: Updates
+tr: Обновления
+
+en: General
+tr: Общие
+
+en: About
+tr: О программе
+
+en: Desktop
+tr: Рабочий стол
+
+en: Appearance
+tr: Оформление
+
+en: Welcome
+tr: Приветствие
+
+en: Aether Shell Settings
+tr: Параметры Aether Shell
+
+en: Settings
+tr: Параметры
+
+en: Reset defaults...
+tr: Сбросить значения по умолчанию...
+
+en: &Apply
+tr: &Применить
+
+en: Liquid
+tr: Жидкое
+
+en: Grain
+tr: Зерно
+
+en: From {} to {}
+tr: От {} до {}
+
+en: px
+tr: пикс.
+
+en: min
+tr: мин
+
+en: h
+tr: ч
+
+en: This action could not be completed.
+tr: Не удалось выполнить это действие.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Размер, интервалы, анимация и приложения, закреплённые в Dock.
+
+en: Size and spacing
+tr: Размер и интервалы
+
+en: Icon size
+tr: Размер значков
+
+en: {}, scaled with the Windows display scale.
+tr: {}, масштабируется вместе с масштабом экрана Windows.
+
+en: Bottom margin
+tr: Нижний отступ
+
+en: Space between the Dock and the bottom of the screen.
+tr: Расстояние между Dock и нижним краем экрана.
+
+en: Minimum side margin
+tr: Минимальный боковой отступ
+
+en: Space kept free at the left and right screen edges.
+tr: Свободное место у левого и правого краёв экрана.
+
+en: Icon spacing
+tr: Интервал между значками
+
+en: Space between neighbouring icons.
+tr: Расстояние между соседними значками.
+
+en: Glass and motion
+tr: Стекло и анимация
+
+en: Glass opacity
+tr: Непрозрачность стекла
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Чем меньше значение, тем лучше виден размытый рабочий стол за Dock.
+
+en: Hover magnification
+tr: Увеличение при наведении
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Насколько увеличивается значок под указателем; 1 отключает увеличение.
+
+en: Behavior
+tr: Поведение
+
+en: Show running applications
+tr: Показывать запущенные приложения
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Открытые приложения, которые не закреплены, отображаются после закреплённых.
+
+en: Reserve screen space for the Dock
+tr: Резервировать место на экране для Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Развёрнутые окна остаются над Dock, а не под ним.
+
+en: Automatically hide the Dock
+tr: Автоматически скрывать Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Скрывается, пока его закрывает окно приложения; чтобы показать его, подведите указатель к нижнему краю экрана. Он остаётся на рабочем столе, а окна занимают всю высоту экрана.
+
+en: Pinned applications
+tr: Закреплённые приложения
+
+en: Move &up
+tr: Переместить &вверх
+
+en: Move &down
+tr: Переместить &вниз
+
+en: &Remove
+tr: &Удалить
+
+en: &Add application
+tr: &Добавить приложение
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Закрепления сохраняют свою идентичность и параметры запуска. Удаление закрепления также не даёт автоматической синхронизации с панелью задач Windows добавить его снова.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Положение, часы и элементы состояния, показываемые в верхней панели состояния.
+
+en: Presentation
+tr: Вид
+
+en: Floating bar
+tr: Плавающая панель
+
+en: Text on the desktop
+tr: Текст на рабочем столе
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Плавающая панель: стеклянная панель ниже верхнего края экрана. Текст на рабочем столе: без панели, те же элементы написаны у самого верха экрана прямо поверх обоев; эта полоса свободна от окон, а верхний отступ и непрозрачность стекла не применяются. При автоматическом скрытии текст возвращается на полосе стекла, пока под ним находится окно.
+
+en: Position and glass
+tr: Положение и стекло
+
+en: Top margin
+tr: Верхний отступ
+
+en: Space between the Top Bar and the top of the screen.
+tr: Расстояние между верхней панелью и верхним краем экрана.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Чем меньше значение, тем лучше виден размытый рабочий стол за панелью.
+
+en: Clock
+tr: Часы
+
+en: Clock format
+tr: Формат часов
+
+en: Follow Windows
+tr: Как в Windows
+
+en: 12-hour
+tr: 12-часовой
+
+en: 24-hour
+tr: 24-часовой
+
+en: Date style
+tr: Стиль даты
+
+en: Weekday, day and month
+tr: День недели, число и месяц
+
+en: Short
+tr: Краткий
+
+en: Long
+tr: Длинный
+
+en: Show seconds
+tr: Показывать секунды
+
+en: Show date
+tr: Показывать дату
+
+en: Status items
+tr: Элементы состояния
+
+en: Show battery
+tr: Показывать батарею
+
+en: Hide battery when absent
+tr: Скрывать батарею, если её нет
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Настольные ПК без батареи ничего не показывают вместо неизвестной батареи.
+
+en: Show input language
+tr: Показывать язык ввода
+
+en: Show network
+tr: Показывать сеть
+
+en: Show audio output
+tr: Показывать вывод звука
+
+en: Show microphone
+tr: Показывать микрофон
+
+en: Show weather when enabled
+tr: Показывать погоду, если она включена
+
+en: Weather itself is turned on in Weather settings.
+tr: Сама погода включается в параметрах погоды.
+
+en: Show hidden icons button
+tr: Показывать кнопку скрытых значков
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Небольшая стрелка, открывающая скрытые значки области уведомлений Windows.
+
+en: Reserve screen space above windows
+tr: Резервировать место на экране над окнами
+
+en: Maximized windows stay below the Top Bar.
+tr: Развёрнутые окна остаются под верхней панелью.
+
+en: Automatically hide the Top Bar
+tr: Автоматически скрывать верхнюю панель
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Скрывается, пока его закрывает окно приложения; чтобы показать его, подведите указатель к верхнему краю экрана. Он остаётся на рабочем столе.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Использовать быстрые параметры Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Выкл.: быстрые элементы управления Aether открываются под верхней панелью. Вкл.: собственная панель Windows открывается внизу экрана.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Необязательный прогноз в верхней панели от Open-Meteo.
+
+en: Forecast
+tr: Прогноз
+
+en: Enable weather
+tr: Включить погоду
+
+en: Off by default: the forecast needs network requests.
+tr: По умолчанию выключено: для прогноза нужны сетевые запросы.
+
+en: Temperature
+tr: Температура
+
+en: Celsius
+tr: Цельсий
+
+en: Fahrenheit
+tr: Фаренгейт
+
+en: Refresh interval
+tr: Интервал обновления
+
+en: Location
+tr: Местоположение
+
+en: Locate automatically with Windows
+tr: Определять автоматически средствами Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Использует службу определения расположения Windows после вашего разрешения.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows запрашивает разрешение на доступ к расположению. Ваши координаты отправляются на Open-Meteo.com только для получения прогноза; ключ расположения кэшируется локально. Если доступ к расположению заблокирован, погода недоступна.
+
+en: Use &Windows location
+tr: Использовать расположение &Windows
+
+en: Location &settings
+tr: Параметры &расположения
+
+en: Choose automatic location or search for a place below.
+tr: Выберите автоматическое определение или найдите место ниже.
+
+en: Search for a place
+tr: Поиск места
+
+en: Searc&h
+tr: &Найти
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Данные о погоде — Open-Meteo.com (CC BY 4.0). Ручной поиск отправляет только введённый вами текст.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Подписанные выпуски из официального репозитория GitHub, проверяемые перед установкой.
+
+en: Preferences
+tr: Предпочтения
+
+en: Check for updates automatically
+tr: Проверять обновления автоматически
+
+en: Check interval
+tr: Интервал проверки
+
+en: Release channel
+tr: Канал выпусков
+
+en: Prereleases arrive earlier and change more often.
+tr: Предварительные выпуски появляются раньше и меняются чаще.
+
+en: Stable
+tr: Стабильный
+
+en: Prerelease
+tr: Предварительный
+
+en: Show update notifications
+tr: Показывать уведомления об обновлениях
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Автозапуск, анимация, сочетания клавиш и диагностика.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Язык панелей, меню, поиска, параметров и программы установки.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Имена, принадлежащие вам или другим программам (приложения, файлы, сети Wi-Fi), никогда не переводятся. При выбранном языке верхняя панель пишет дату на нём; вариант «Как в Windows» сохраняет региональный формат Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Рукописное приветствие пишется латиницей: оно здоровается по-французски, по-английски или по-испански. Язык выбирается в разделе «Приветствие».
+
+en: Language
+tr: Язык
+
+en: Interface language
+tr: Язык интерфейса
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Вариант «Как в Windows» использует первый из ваших языков интерфейса Windows, который есть в этом списке, а иначе английский.
+
+en: Startup
+tr: Запуск
+
+en: Start Aether Shell when I sign in
+tr: Запускать Aether Shell при входе в систему
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Для изменения нужно нажать «Применить». Отключить его можно и в диспетчере задач.
+
+en: Motion
+tr: Анимация
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Уменьшенная анимация убирает декоративное движение везде.
+
+en: Reduced
+tr: Уменьшенная
+
+en: Full
+tr: Полная
+
+en: Keyboard shortcuts
+tr: Сочетания клавиш
+
+en: Enable global keyboard shortcuts
+tr: Включить глобальные сочетания клавиш
+
+en: Search shortcut key
+tr: Клавиша сочетания для поиска
+
+en: Dock shortcut key
+tr: Клавиша сочетания для Dock
+
+en: Search shortcut modifiers
+tr: Модификаторы сочетания для поиска
+
+en: Dock shortcut modifiers
+tr: Модификаторы сочетания для Dock
+
+en: Shortcut status unavailable
+tr: Состояние сочетания недоступно
+
+en: Diagnostics
+tr: Диагностика
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: В папке журналов хранятся журналы Aether Shell на этом компьютере. Экспорт диагностики сохраняет только версию приложения и сборку Windows — без журналов и личных данных.
+
+en: Open &log folder
+tr: Открыть папку &журналов
+
+en: &Export diagnostics...
+tr: &Экспортировать диагностику...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Короткое рукописное приветствие на рабочем столе после входа или разблокировки ПК.
+
+en: Greeting
+tr: Приветствие
+
+en: Show the welcome at sign-in and unlock
+tr: Показывать приветствие при входе и разблокировке
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Появляется после входа в Windows, пока Aether Shell готовится к работе. Коснитесь, щёлкните или нажмите Esc, чтобы пропустить.
+
+en: Greeting language
+tr: Язык приветствия
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut по-французски, Hello по-английски, Hola по-испански. Перо пишет латиницей: на всех остальных языках приветствие звучит по-английски.
+
+en: Your name
+tr: Ваше имя
+
+en: Name to greet you with
+tr: Имя для приветствия
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Необязательно, например имя. Оно хранится на этом ПК в ваших параметрах Aether Shell и никогда никуда не отправляется и не записывается в журнал. Очистите поле, чтобы удалить его.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Цветовой режим, акцент, скорость анимации и внешний вид Dock и верхней панели.
+
+en: Style
+tr: Стиль
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Жидкое: стекло слоями поверх того, что находится позади, слой размытия, свет жидкости, затем значки и текст, читаемые на светлых и тёмных страницах. Зерно: матовое стекло, размытое и полупрозрачное, с мелким зерном.
+
+en: Liquid blur
+tr: Размытие «Жидкого»
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Насколько слой размытия под жидким стеклом закрывает то, что позади: 100% размывает всё. При меньших значениях страница видна чётче, а текст на панелях может хуже читаться на пёстрой странице.
+
+en: Liquid blur color
+tr: Цвет размытия «Жидкого»
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: «Автоматически» сохраняет собственные цвета стекла. Текст и значки остаются читаемыми при любом цвете.
+
+en: Automatic
+tr: Автоматически
+
+en: White
+tr: Белый
+
+en: Black
+tr: Чёрный
+
+en: Accent
+tr: Акцентный
+
+en: Blue
+tr: Синий
+
+en: Violet
+tr: Фиолетовый
+
+en: Pink
+tr: Розовый
+
+en: Red
+tr: Красный
+
+en: Orange
+tr: Оранжевый
+
+en: Yellow
+tr: Жёлтый
+
+en: Green
+tr: Зелёный
+
+en: Teal
+tr: Бирюзовый
+
+en: Liquid color strength
+tr: Насыщенность цвета «Жидкого»
+
+en: How much of the chosen color the blur layer takes.
+tr: Какую долю выбранного цвета принимает слой размытия.
+
+en: Theme
+tr: Тема
+
+en: Color mode
+tr: Цветовой режим
+
+en: High contrast always takes precedence.
+tr: Высокая контрастность всегда имеет приоритет.
+
+en: Light
+tr: Светлый
+
+en: Dark
+tr: Тёмный
+
+en: Accent color
+tr: Акцентный цвет
+
+en: Animation duration
+tr: Длительность анимации
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 — стандартная скорость; большие значения медленнее. Уменьшенная анимация имеет приоритет.
+
+en: Dock icon preset
+tr: Предустановленный размер значков Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Свой размер из параметров Dock сохраняется, пока вы не выберете предустановку.
+
+en: Small - 32 px
+tr: Маленький — 32 пикс.
+
+en: Medium - 40 px
+tr: Средний — 40 пикс.
+
+en: Large - 48 px
+tr: Большой — 48 пикс.
+
+en: Keep custom size
+tr: Оставить свой размер
+
+en: Show Windows Start in the Dock
+tr: Показывать «Пуск» Windows в Dock
+
+en: Show Task View in the Dock
+tr: Показывать представление задач в Dock
+
+en: Reserve extra space for Dock animations
+tr: Резервировать дополнительное место для анимаций Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Не даёт увеличению и прыжку при запуске заходить на развёрнутые окна.
+
+en: Weather position
+tr: Положение погоды
+
+en: Left
+tr: Слева
+
+en: Right
+tr: Справа
+
+en: Keyboard indicator
+tr: Индикатор клавиатуры
+
+en: Compact
+tr: Компактный
+
+en: Two lines
+tr: Две строки
+
+en: Windows taskbar pins
+tr: Закрепления на панели задач Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Добавлять новые найденные закрепления панели задач Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Пока панель задач заменена, новые закрепления Windows добавляются в Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Обратимая замена панели задач Windows на Dock.
+
+en: Taskbar replacement
+tr: Замена панели задач
+
+en: Replace the Windows taskbar
+tr: Заменить панель задач Windows
+
+en: Changing this needs Apply.
+tr: Для изменения нужно нажать «Применить».
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Пока работает Aether Shell, он скрывает панель задач Windows и резервирует место под развёрнутыми приложениями.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Состояние панели задач Windows восстанавливается, когда этот режим отключён или Aether Shell закрыт. Отдельная программа восстановления тоже вернёт её, если приложение неожиданно остановится. Если восстановление не удалось, перезапустите проводник Windows в диспетчере задач.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Параметры Windows остаются родным интерфейсом Windows. Её страница панели задач не заменяется Aether Shell; настройте этот режим здесь.
+
+en: Pinned applications from Windows
+tr: Закреплённые приложения из Windows
+
+en: &Import Windows taskbar pins
+tr: &Импортировать закрепления панели задач Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Читает закреплённые ярлыки, не изменяя закрепления Windows. Некоторые закрепления Windows 11 или их порядок могут быть недоступны.
+
+en: Version {}
+tr: Версия {}
+
+en: Created by Ibrahim Bouillet
+tr: Создано Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Нативный интерфейс рабочего стола Windows — плавающий Dock и верхняя панель состояния — работающий вместе с проводником.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Данные о погоде: Open-Meteo.com (CC BY 4.0). Сторонние библиотеки времени выполнения C++ не включены.
+
+en: &Official project
+tr: &Официальный проект
+
+en: Licence
+tr: Лицензия
+
+en: Taskbar replacement changes need Apply.
+tr: Для изменения замены панели задач нужно нажать «Применить».
+
+en: Changes save automatically. Startup needs Apply.
+tr: Изменения сохраняются автоматически. Для автозапуска нужно нажать «Применить».
+
+en: Changes save automatically.
+tr: Изменения сохраняются автоматически.
+
+en: Press Apply to confirm this change.
+tr: Нажмите «Применить», чтобы подтвердить это изменение.
+
+en: Smart transparency
+tr: Умная прозрачность
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: В стиле «Жидкое» это окно размывает фон только под своим текстом и элементами управления: полностью — над другими окнами и значками рабочего стола, слегка — над обоями и совсем не размывает там, где ничего не показывает.
+
+en: Languages on this PC
+tr: Языки на этом ПК
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell скачивает языки, которые есть в Windows, поэтому меняет язык вместе с Windows.
+
+en: Add a language
+tr: Добавить язык
+
+en: &Download
+tr: &Скачать
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Каждый язык берётся из выпуска этой версии на GitHub и проверяется перед использованием. Когда он появится на этом ПК, выберите его выше.
+
+en: built in
+tr: встроенный
+
+en: downloading, {}
+tr: загрузка, {}
+
+en: download failed
+tr: ошибка загрузки
+
+## setup
+
+en: Aether Shell Setup
+tr: Установка Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Программе установки не удалось создать свой интерфейс. Закройте её и повторите попытку или воспользуйтесь описанными параметрами тихой установки.
+
+en: Options
+tr: Параметры
+
+en: Install
+tr: Установить
+
+en: Done
+tr: Готово
+
+en: Remove Aether Shell
+tr: Удалить Aether Shell
+
+en: Repair Aether Shell
+tr: Восстановить Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Нативные Dock и верхняя панель состояния для Windows, работающие вместе с проводником.
+
+en: Replaces the Windows taskbar while it runs
+tr: Заменяет панель задач Windows, пока работает
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Закройте Aether Shell, отключите это в параметрах > «Рабочий стол» или откройте «Восстановить панель задач Windows» в меню «Пуск», чтобы вернуть панель задач Windows.
+
+en: Starts when you sign in - your choice
+tr: Запускается при входе — ваш выбор
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Новые установки по умолчанию запускаются при входе. Вы можете снять этот выбор перед установкой или отключить его позже в параметрах. Существующие настройки автозапуска и отключения в диспетчере задач сохраняются.
+
+en: Installs for your account
+tr: Устанавливается для вашей учётной записи
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Права администратора не требуются. Ваши параметры и данные хранятся в вашем профиле пользователя.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: При удалении ваши параметры и данные сохраняются, если вы не выберете их удаление.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Восстановление возвращает файлы этого пакета и сохраняет ваши параметры. Если Aether Shell оставил панель задач Windows скрытой, восстановление вернёт её.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Установка поверх существующей версии сохраняет ваши параметры. Более старый пакет отклоняется, если вы явно не разрешите переход на старую версию.
+
+en: MIT License
+tr: Лицензия MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Лицензия также устанавливается как файл LICENSE рядом с Aether Shell.
+
+en: Remove this installation
+tr: Удалить эту установку
+
+en: Install location
+tr: Папка установки
+
+en: &Browse...
+tr: &Обзор...
+
+en: Also remove my settings, cache and logs
+tr: Также удалить мои параметры, кэш и журналы
+
+en: This cannot be undone.
+tr: Это действие нельзя отменить.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Программа установки штатно закроет Aether Shell и удалит его установленные файлы, ярлыки, запись автозапуска и регистрацию в разделе «Установленные приложения». Другие приложения и параметры Windows не затрагиваются.
+
+en: Your welcome
+tr: Ваше приветствие
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: После входа или разблокировки ПК Aether Shell от руки пишет короткое приветствие. Введите имя, по которому к вам обращаться, или оставьте поле пустым для простого приветствия.
+
+en: Your first name
+tr: Ваше имя
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Необязательно, например имя. Оно хранится на этом ПК в ваших параметрах Aether Shell и никуда не отправляется. Изменить его или отключить приветствие можно в разделе «Параметры» > «Приветствие».
+
+en: Shortcuts and startup
+tr: Ярлыки и автозапуск
+
+en: Create Start menu shortcuts
+tr: Создать ярлыки в меню «Пуск»
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell и «Восстановить панель задач Windows».
+
+en: Create a desktop shortcut
+tr: Создать ярлык на рабочем столе
+
+en: Shows your current choice.
+tr: Показывает ваш текущий выбор.
+
+en: Recommended.
+tr: Рекомендуется.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Снимите флажок, чтобы отказаться; отключения в диспетчере задач учитываются.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Установка принимает выбор автозапуска, сделанный выше. Загрузчик может перезапустить Aether Shell после сбоя с ограниченным числом попыток. Команды «Выйти» и «Восстановить панель задач Windows» остаются доступными. Погода по умолчанию выключена. Неподписанные файлы могут вызвать предупреждение Windows SmartScreen.
+
+en: Removing this installation...
+tr: Удаление этой установки...
+
+en: Repairing Aether Shell...
+tr: Восстановление Aether Shell...
+
+en: Installing Aether Shell...
+tr: Установка Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Закрытие Aether Shell и удаление его файлов.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Проверка встроенного пакета и установка его файлов. Ход показан как активность: программа установки не знает, сколько времени осталось.
+
+en: Please wait while the removal completes.
+tr: Подождите, пока завершится удаление.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Отмена доступна, пока новая версия не активирована; затем установка безопасно завершается.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell удалён.
+
+en: Aether Shell is ready.
+tr: Aether Shell готов к работе.
+
+en: Setup was cancelled.
+tr: Установка отменена.
+
+en: Setup could not complete.
+tr: Не удалось завершить установку.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Ваши данные сохранены, если вы явно не выбрали их удаление.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Его можно восстановить или удалить в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Операция отменена до активации. Вернитесь к параметрам, чтобы повторить попытку.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Проверьте доступ к файлам и свободное место на диске, затем повторите попытку. Если Aether Shell уже установлен, «Восстановление» может вернуть его файлы. Категория ошибки: {}
+
+en: Setup log
+tr: Журнал установки
+
+en: Launch Aether Shell
+tr: Запустить Aether Shell
+
+en: &Back
+tr: &Назад
+
+en: &Next
+tr: &Далее
+
+en: &Continue
+tr: &Продолжить
+
+en: &Uninstall
+tr: &Удалить
+
+en: &Repair
+tr: &Восстановить
+
+en: &Install
+tr: &Установить
+
+en: &Close
+tr: &Закрыть
+
+en: Step {} of {}: {}
+tr: Шаг {} из {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Выберите папку установки Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Укажите полный путь к папке, например начинающийся с буквы диска.
+
+en: The install folder must be an absolute path.
+tr: Папка установки должна быть указана абсолютным путём.
+
+en: Setup stops at the next safe point.
+tr: Установка остановится в ближайшей безопасной точке.
+
+en: Cancelling...
+tr: Отмена...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Программа установки безопасно завершает текущий шаг; подождите.
+
+en: Updating Aether Shell
+tr: Обновление Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Проверка подписанного пакета и применение обновления.
+
+en: Update completed
+tr: Обновление завершено
+
+en: The update did not complete
+tr: Обновление не завершено
+
+en: Close
+tr: Закрыть
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Не удалось запустить интерфейс обновления. Обновление не применено. Повторите попытку или воспользуйтесь восстановлением.
+
+en: Aether Shell Update
+tr: Обновление Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Не удалось запустить интерфейс обновления. Обновление не применено. Повторите попытку или воспользуйтесь восстановлением в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+
+en: Update completed.
+tr: Обновление завершено.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Обновление не завершено. Загляните в журнал программы обновления или воспользуйтесь восстановлением.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Не удалось запустить Aether Shell. Выберите «Восстановить» в разделе «Параметры Windows» > «Приложения» > «Установленные приложения».
+
+en: Aether Shell Settings — update in progress
+tr: Параметры Aether Shell — идёт обновление
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Возобновить замену панели задач
+
+en: Show Windows &notification area for 60 seconds
+tr: Показать область &уведомлений Windows на 60 секунд
+
+en: &Search…
+tr: &Поиск…
+
+en: &Settings…
+tr: &Параметры…
+
+en: View available &update…
+tr: Показать доступное &обновление…
+
+en: &Check for updates…
+tr: &Проверить обновления…
+
+en: &About Aether Shell
+tr: &О программе Aether Shell
+
+en: &Quit Aether Shell
+tr: &Выйти из Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Переключить &язык ввода\tWin+Space
+
+en: Open &network controls…
+tr: Открыть элементы управления &сетью…
+
+en: &Weather settings…
+tr: Параметры &погоды…
+
+en: Toggle output &mute
+tr: Включить или выключить &звук на выходе
+
+en: &Sound settings…
+tr: Параметры &звука…
+
+en: Toggle microphone &mute
+tr: Включить или выключить &микрофон
+
+en: Start Windows &voice typing\tWin+H
+tr: Запустить &голосовой ввод Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Параметры &конфиденциальности микрофона…
+
+en: &Power settings…
+tr: Параметры &питания…
+
+en: Open &notifications and calendar
+tr: Открыть &уведомления и календарь
+
+en: Open &calendar\tWin+Alt+D
+tr: Открыть &календарь\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Показать &скрытые значки
+
+en: Initializing
+tr: Инициализация
+
+en: Unavailable
+tr: Недоступно
+
+en: Unsupported
+tr: Не поддерживается
+
+en: Error
+tr: Ошибка
+
+en: Available
+tr: Доступно
+
+en: Unknown
+tr: Неизвестно
+
+en: Internet access
+tr: Доступ в Интернет
+
+en: Local network only
+tr: Только локальная сеть
+
+en: Limited Internet access
+tr: Ограниченный доступ в Интернет
+
+en: No network connection
+tr: Нет подключения к сети
+
+en: Connectivity unknown
+tr: Подключение неизвестно
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Сотовая сеть
+
+en: Network
+tr: Сеть
+
+en: Offline
+tr: Не в сети
+
+en: Network status unavailable
+tr: Состояние сети недоступно
+
+en: Quick controls
+tr: Быстрые элементы управления
+
+en: Aether Shell menu
+tr: Меню Aether Shell
+
+en: Weather status unavailable
+tr: Состояние погоды недоступно
+
+en: Cached weather
+tr: Погода из кэша
+
+en: Observation (UTC): {}
+tr: Наблюдение (UTC): {}
+
+en: Weather: {}
+tr: Погода: {}
+
+en: Click to open weather settings
+tr: Нажмите, чтобы открыть параметры погоды
+
+en: Show hidden icons
+tr: Показать скрытые значки
+
+en: Opens Windows' notification-area overflow
+tr: Открывает скрытые значки области уведомлений Windows
+
+en: Input language: {}
+tr: Язык ввода: {}
+
+en: Fallback input layout
+tr: Резервная раскладка ввода
+
+en: Click to switch input language (Win+Space)
+tr: Нажмите, чтобы переключить язык ввода (Win+Space)
+
+en: Network: {}
+tr: Сеть: {}
+
+en: Signal strength unavailable
+tr: Уровень сигнала недоступен
+
+en: Click to open Windows network settings
+tr: Нажмите, чтобы открыть сетевые параметры Windows
+
+en: Audio output
+tr: Вывод звука
+
+en: Audio: {}
+tr: Звук: {}
+
+en: volume unknown
+tr: громкость неизвестна
+
+en: Muted
+tr: Звук отключён
+
+en: Sound on
+tr: Звук включён
+
+en: Microphone: {}
+tr: Микрофон: {}
+
+en: Endpoint unmuted
+tr: Звук устройства включён
+
+en: Recording detection unsupported
+tr: Определение записи не поддерживается
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Нажмите, чтобы включить или выключить звук; щёлкните правой кнопкой для голосового ввода Windows и параметров конфиденциальности микрофона
+
+en: Battery: {}
+tr: Батарея: {}
+
+en: Battery {}
+tr: Батарея {}
+
+en: Battery status unavailable
+tr: Состояние батареи недоступно
+
+en: Charging
+tr: Зарядка
+
+en: External power
+tr: Внешнее питание
+
+en: Estimated remaining: {} h {} min
+tr: Осталось примерно: {} ч {} мин
+
+en: Click to open power settings
+tr: Нажмите, чтобы открыть параметры питания
+
+en: Clock status unavailable
+tr: Состояние часов недоступно
+
+en: Click to open calendar and notifications
+tr: Нажмите, чтобы открыть календарь и уведомления
+
+en: Action failed: {}
+tr: Действие не удалось: {}
+
+en: Aether Shell status bar
+tr: Панель состояния Aether Shell
+
+en: Update available
+tr: Доступно обновление
+
+en: Cached
+tr: Из кэша
+
+en: Start
+tr: Пуск
+
+en: Search
+tr: Поиск
+
+en: Task View
+tr: Представление задач
+
+en: Application
+tr: Приложение
+
+en: Running application
+tr: Запущенное приложение
+
+en: More applications
+tr: Другие приложения
+
+en: Aether Shell window previews
+tr: Миниатюры окон Aether Shell
+
+en: Minimized — preview unavailable
+tr: Свёрнуто — миниатюра недоступна
+
+en: Preview unavailable
+tr: Миниатюра недоступна
+
+en: {} windows
+tr: Окон: {}
+
+en: {} window
+tr: Окно: {}
+
+en: Switches to this window
+tr: Переключает на это окно
+
+en: Minimized, preview unavailable
+tr: Свёрнуто, миниатюра недоступна
+
+en: Minimized
+tr: Свёрнуто
+
+en: Close {}
+tr: Закрыть {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Просит это окно закрыться; приложение всё равно может предложить сохранить изменения или отменить закрытие
+
+en: Close requested
+tr: Закрытие запрошено
+
+en: Previous applications
+tr: Предыдущие приложения
+
+en: Open
+tr: Открыть
+
+en: New instance
+tr: Новый экземпляр
+
+en: Unpin from Dock
+tr: Открепить от Dock
+
+en: Pin to Dock
+tr: Закрепить в Dock
+
+en: Move left
+tr: Сдвинуть влево
+
+en: Move right
+tr: Сдвинуть вправо
+
+en: Dock settings...
+tr: Параметры Dock...
+
+en: Import Windows taskbar pins
+tr: Импортировать закрепления панели задач Windows
+
+en: Open Windows Start
+tr: Открыть меню «Пуск» Windows
+
+en: Aether Shell Dock
+tr: Dock Aether Shell
+
+en: Pinned
+tr: Закреплено
+
+en: Running
+tr: Запущено
+
+en: Needs attention
+tr: Требует внимания
+
+en: Up arrow shows window previews
+tr: Стрелка вверх показывает миниатюры окон
+
+en: Installed application
+tr: Установленное приложение
+
+en: Desktop application
+tr: Классическое приложение
+
+en: File
+tr: Файл
+
+en: Folder
+tr: Папка
+
+en: Windows tool
+tr: Средство Windows
+
+en: Control Panel
+tr: Панель управления
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Навигация   ·   Enter Открыть   ·   Esc Закрыть
+
+en: Search apps, settings and files
+tr: Поиск приложений, параметров и файлов
+
+en: Search could not be completed.
+tr: Не удалось выполнить поиск.
+
+en: Results
+tr: Результаты
+
+en: Indexing applications…
+tr: Индексация приложений…
+
+en: Type to search apps, settings and files
+tr: Введите запрос для поиска приложений, параметров и файлов
+
+en: Nothing matches
+tr: Ничего не найдено
+
+en: Windows could not open this application.
+tr: Windows не удалось открыть это приложение.
+
+en: Menu
+tr: Меню
+
+en: Opens a submenu
+tr: Открывает вложенное меню
+
+en: , opens a submenu
+tr: , открывает вложенное меню
+
+en: Selected
+tr: Выбрано
+
+en: Checked
+tr: Отмечено
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Режим «в самолёте»
+
+en: Accessibility
+tr: Специальные возможности
+
+en: Energy saver
+tr: Режим энергосбережения
+
+en: Live captions
+tr: Живые субтитры
+
+en: Night light
+tr: Ночной свет
+
+en: Mobile hotspot
+tr: Мобильная точка доступа
+
+en: Nearby sharing
+tr: Обмен с устройствами поблизости
+
+en: Cast
+tr: Трансляция
+
+en: Project
+tr: Проецировать
+
+en: All settings
+tr: Все параметры
+
+en: Connected
+tr: Подключено
+
+en: Not connected
+tr: Не подключено
+
+en: , on
+tr: , включено
+
+en: , off
+tr: , выключено
+
+en: , state unknown
+tr: , состояние неизвестно
+
+en: , opens Windows Settings
+tr: , открывает параметры Windows
+
+en: , shows accessibility features
+tr: , показывает специальные возможности
+
+en: , requires Windows 11 version 22H2
+tr: , требуется Windows 11 версии 22H2
+
+en: Now playing: {}
+tr: Сейчас играет: {}
+
+en: Untitled media
+tr: Мультимедиа без названия
+
+en: , switch source
+tr: , сменить источник
+
+en: Previous media item
+tr: Предыдущий элемент
+
+en: Pause
+tr: Пауза
+
+en: Play
+tr: Воспроизвести
+
+en: Next media item
+tr: Следующий элемент
+
+en: {} details
+tr: Сведения: {}
+
+en: Page {} of {}
+tr: Страница {} из {}
+
+en: Next page
+tr: Следующая страница
+
+en: First page
+tr: Первая страница
+
+en: Brightness
+tr: Яркость
+
+en: Brightness, unavailable on this display
+tr: Яркость, недоступна на этом экране
+
+en: Volume
+tr: Громкость
+
+en: Volume, unavailable
+tr: Громкость, недоступна
+
+en: Unmute
+tr: Включить звук
+
+en: Mute
+tr: Отключить звук
+
+en: Sound output and volume mixer
+tr: Вывод звука и микшер громкости
+
+en: Back
+tr: Назад
+
+en: , secured
+tr: , защищена
+
+en: , open
+tr: , открытая
+
+en: , connected
+tr: , подключена
+
+en: Disconnect
+tr: Отключить
+
+en: Show available networks
+tr: Показать доступные сети
+
+en: More Wi-Fi settings
+tr: Другие параметры Wi-Fi
+
+en: Bluetooth and devices settings
+tr: Параметры Bluetooth и устройств
+
+en: Magnifier
+tr: Экранная лупа
+
+en: Narrator
+tr: Экранный диктор
+
+en: On-screen keyboard
+tr: Экранная клавиатура
+
+en: Sticky keys
+tr: Залипание клавиш
+
+en: More accessibility settings
+tr: Другие параметры специальных возможностей
+
+en: Volume mixer
+tr: Микшер громкости
+
+en: Choose output in Sound settings
+tr: Выберите устройство вывода в параметрах звука
+
+en: Power and battery settings
+tr: Параметры питания и батареи
+
+en: Battery {} percent, {}
+tr: Батарея: {} процентов, {}
+
+en: All Windows settings
+tr: Все параметры Windows
+
+en: The requested action could not be dispatched
+tr: Не удалось выполнить запрошенное действие
+
+en: Aether Shell quick controls
+tr: Быстрые элементы управления Aether Shell
+
+en: Media session active
+tr: Сеанс мультимедиа активен
+
+en: No media session
+tr: Нет сеанса мультимедиа
+
+en: Current page
+tr: Текущая страница
+
+en:  - secured
+tr: — защищена
+
+en:  - open
+tr: — открытая
+
+en:  - opens in Windows
+tr: — открывается в Windows
+
+en: Turned off by hardware or policy
+tr: Отключено оборудованием или политикой
+
+en: State unavailable - use Windows settings
+tr: Состояние недоступно — используйте параметры Windows
+
+en: Off
+tr: Выкл.
+
+en:  - signal {} of 5
+tr: — сигнал {} из 5
+
+en: , no internet
+tr: , нет Интернета
+
+en: On - not connected
+tr: Вкл. — не подключено
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows не позволяет приложениям получать список сетей: проверьте раздел «Расположение» в параметрах конфиденциальности
+
+en: No Wi-Fi adapter found
+tr: Адаптер Wi-Fi не найден
+
+en: Connecting to {}...
+tr: Подключение к {}...
+
+en:  - looking for networks
+tr: — поиск сетей
+
+en: On
+tr: Вкл.
+
+en: A screen reader is running
+tr: Запущена программа чтения с экрана
+
+en: Windows accessibility features
+tr: Специальные возможности Windows
+
+en: Sound output
+tr: Вывод звука
+
+en: Default output device
+tr: Устройство вывода по умолчанию
+
+en: No output device available
+tr: Нет доступных устройств вывода
+
+en: Battery unknown
+tr: Батарея неизвестна
+
+en: Status refresh could not be started
+tr: Не удалось запустить обновление состояния
+
+en: Status refresh unavailable
+tr: Обновление состояния недоступно
+
+en: Excellent signal
+tr: Отличный сигнал
+
+en: Good signal
+tr: Хороший сигнал
+
+en: Fair signal
+tr: Средний сигнал
+
+en: Weak signal
+tr: Слабый сигнал
+
+en: Clear sky
+tr: Ясно
+
+en: Mainly clear
+tr: Преимущественно ясно
+
+en: Partly cloudy
+tr: Переменная облачность
+
+en: Overcast
+tr: Пасмурно
+
+en: Fog
+tr: Туман
+
+en: Drizzle
+tr: Морось
+
+en: Rain
+tr: Дождь
+
+en: Snow
+tr: Снег
+
+en: Rain showers
+tr: Ливень
+
+en: Snow showers
+tr: Снегопад
+
+en: Thunderstorm
+tr: Гроза
+
+## weather
+
+en: Morning
+tr: Утро
+
+en: Afternoon
+tr: День
+
+en: Evening
+tr: Вечер
+
+en: Night
+tr: Ночь
+
+en: Now
+tr: Сейчас
+
+en: Today
+tr: Сегодня
+
+en: Low
+tr: Низкий
+
+en: Moderate
+tr: Умеренный
+
+en: High
+tr: Высокий
+
+en: Very high
+tr: Очень высокий
+
+en: Extreme
+tr: Экстремальный
+
+en: No connection to the weather service.
+tr: Нет подключения к службе погоды.
+
+en: The weather service is busy. Try again in a moment.
+tr: Служба погоды занята. Повторите попытку через минуту.
+
+en: The weather could not be loaded.
+tr: Не удалось загрузить погоду.
+
+en: Could not update; showing the last forecast.
+tr: Не удалось обновить; показан последний прогноз.
+
+en: Try again
+tr: Повторить
+
+en: Your location
+tr: Ваше расположение
+
+en: My location
+tr: Моё расположение
+
+en: Precise location
+tr: Точное расположение
+
+en: Approximate location
+tr: Приблизительное расположение
+
+en: Chosen in Settings
+tr: Выбрано в параметрах
+
+en: Allow
+tr: Разрешить
+
+en: Use precise location
+tr: Использовать точное расположение
+
+en: See the weather where you are: allow your precise location.
+tr: Узнайте погоду там, где вы находитесь: разрешите точное расположение.
+
+en: Your position is approximate (about 10 km).
+tr: Ваше расположение приблизительное (около 10 км).
+
+en: Location is turned off for this app in Windows.
+tr: Доступ к расположению для этого приложения отключён в Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Это устройство не может определить своё расположение. Найдите город.
+
+en: Reading Windows location…
+tr: Чтение расположения Windows…
+
+en: Automatic weather follows your Windows location.
+tr: Автоматическая погода следует вашему расположению Windows.
+
+en: Search for a city
+tr: Найти город
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Найдите город или разрешите доступ к расположению, чтобы увидеть погоду.
+
+en: Searching…
+tr: Поиск…
+
+en: City search is unavailable.
+tr: Поиск городов недоступен.
+
+en: No city found.
+tr: Город не найден.
+
+en: Weather settings
+tr: Параметры погоды
+
+en: Loading the weather…
+tr: Загрузка погоды…
+
+en: Loading…
+tr: Загрузка…
+
+en: Updated {}
+tr: Обновлено в {}
+
+en: Near {}
+tr: Рядом: {}
+
+en: Temperatures now
+tr: Температура сейчас
+
+en: The map is unavailable.
+tr: Карта недоступна.
+
+en: Map: Natural Earth
+tr: Карта: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Данные о погоде: Open-Meteo.com
+
+en: Feels like
+tr: Ощущается как
+
+en: Feels like {}
+tr: Ощущается как {}
+
+en: Close to the real temperature
+tr: Близко к реальной температуре
+
+en: The wind makes it feel colder
+tr: Из-за ветра кажется холоднее
+
+en: Humidity makes it feel warmer
+tr: Из-за влажности кажется теплее
+
+en: Humidity
+tr: Влажность
+
+en: Cloud cover {}
+tr: Облачность {}
+
+en: Wind
+tr: Ветер
+
+en: Gusts {}
+tr: Порывы {}
+
+en: Sunrise and sunset
+tr: Восход и закат
+
+en: UV index
+tr: УФ-индекс
+
+en: Pressure
+tr: Давление
+
+en: At sea level
+tr: На уровне моря
+
+en: &Open the weather
+tr: &Открыть погоду
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Прогноз для места, где вы находитесь, с точностью около 100 м и с учётом его высоты. Выкл.: округление примерно до 10 км.

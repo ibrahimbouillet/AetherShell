@@ -1,0 +1,2494 @@
+# Lithuanian (lt): Lietuvių. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Norėdami įjungti automatinius orus, pasirinkite „Windows“ vietą.
+
+en: Windows taskbar visible
+tr: „Windows“ užduočių juosta matoma
+
+en: Connected to {}
+tr: Prisijungta prie {}
+
+en: {} is out of range
+tr: {} yra už ryšio zonos ribų
+
+en: Connecting to {} took too long
+tr: Jungimasis prie {} užtruko per ilgai
+
+en: Use Windows to join {}
+tr: Norėdami prisijungti prie {}, naudokite „Windows“
+
+en: Windows did not allow this connection
+tr: „Windows“ neleido šio ryšio
+
+en: Could not connect to {}
+tr: Nepavyko prisijungti prie {}
+
+en: Connect to {}
+tr: Prisijungti prie {}
+
+en: That password was not accepted. Check it and try again.
+tr: Šis slaptažodis nepriimtas. Patikrinkite jį ir bandykite dar kartą.
+
+en: Enter this network's password.
+tr: Įveskite šio tinklo slaptažodį.
+
+en: &Connect
+tr: &Prisijungti
+
+en: Windows Settings could not be opened
+tr: Nepavyko atidaryti „Windows“ parametrų
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Nepavyko rezervuoti vietos Dock; atkuriama „Windows“ užduočių juosta
+
+en: Replacement unavailable: recovery observer could not start
+tr: Pakeitimas nepasiekiamas: nepavyko paleisti atkūrimo stebėjimo
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: „Windows“ užduočių juosta atkurta. Nepavyko rezervuoti vietos Dock; norėdami bandyti dar kartą, išjunkite ir vėl įjunkite pakeitimą.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Atkūrimo stebėjimas nepasiekiamas; atkuriama „Windows“ užduočių juosta
+
+en: Windows notifications could not be opened
+tr: Nepavyko atidaryti „Windows“ pranešimų
+
+en: The Windows calendar could not be opened
+tr: Nepavyko atidaryti „Windows“ kalendoriaus
+
+en: Windows did not show its hidden icons
+tr: „Windows“ neparodė paslėptų piktogramų
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatinis vietos naujinimas nepasiekiamas; bandykite dar kartą orų parametruose.
+
+en: Windows location
+tr: „Windows“ vieta
+
+en: Reading approximate Windows location…
+tr: Nuskaitoma apytikslė „Windows“ vieta…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatiniai orai seka apytikslę „Windows“ vietą.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Prieiga prie „Windows“ vietos užblokuota. Orai nepasiekiami.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: „Windows“ nepavyko pateikti dabartinės vietos. Orai nepasiekiami.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Vietos procesas nepasiekiamas. Orai nepasiekiami.
+
+en: Waiting for Windows location permission…
+tr: Laukiama „Windows“ vietos leidimo…
+
+en: The automatic weather choice could not be saved.
+tr: Nepavyko įrašyti automatinių orų pasirinkimo.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Prieiga prie „Windows“ vietos nepasiekiama arba atmesta. Orai nepasiekiami.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: „Windows“ vieta negalėjo paprašyti leidimo. Peržiūrėkite „Windows“ vietos parametrus.
+
+en: Status worker unavailable
+tr: Būsenos procesas nepasiekiamas
+
+en: Windows could not complete this action. Review its settings.
+tr: „Windows“ nepavyko atlikti šio veiksmo. Peržiūrėkite jo parametrus.
+
+en: Reading Windows status; try the action again shortly
+tr: Nuskaitoma „Windows“ būsena; netrukus bandykite veiksmą dar kartą
+
+en: Could not disconnect
+tr: Nepavyko atsijungti
+
+en: The Windows accessibility feature could not be started
+tr: Nepavyko paleisti „Windows“ pritaikymo neįgaliesiems funkcijos
+
+en: Windows could not change the audio output
+tr: „Windows“ nepavyko pakeisti garso išvesties
+
+en: The Windows control could not be opened
+tr: Nepavyko atidaryti „Windows“ valdiklio
+
+en: Keyboard shortcuts disabled
+tr: Spartieji klavišai išjungti
+
+en: Both keyboard shortcuts registered
+tr: Abu spartieji klavišai užregistruoti
+
+en: A keyboard shortcut is already in use by another application
+tr: Spartųjį klavišą jau naudoja kita programėlė
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Nepavyko iškviesti „Windows“ sparčiųjų parametrų. Norėdami naudoti „Aether“ valdiklius, viršutinės juostos parametruose išvalykite „Naudoti „Windows“ sparčiuosius parametrus“.
+
+en: Windows Start could not be opened
+tr: Nepavyko atidaryti „Windows“ meniu Pradžia
+
+en: Windows Task View could not be opened
+tr: Nepavyko atidaryti „Windows“ užduočių rodinio
+
+en: Windows keyboard layout switching was unavailable
+tr: „Windows“ klaviatūros išdėstymo perjungimas nebuvo pasiekiamas
+
+en: Windows voice typing could not be opened
+tr: Nepavyko atidaryti „Windows“ rašymo balsu
+
+en: Windows taskbar could not be revealed
+tr: Nepavyko parodyti „Windows“ užduočių juostos
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Užduočių juostos pakeitimo nepavyko tęsti; „Windows“ lieka pasiekiama
+
+en: Windows taskbar replacement is unavailable in this session
+tr: „Windows“ užduočių juostos pakeitimas šiame seanse nepasiekiamas
+
+en: Windows pin access is unavailable in this isolated session
+tr: Prieiga prie „Windows“ prisegtų elementų šiame izoliuotame seanse nepasiekiama
+
+en: Windows pinned applications could not be read
+tr: Nepavyko nuskaityti „Windows“ prisegtų programėlių
+
+en: Settings changed during pin import. Try import again.
+tr: Importuojant prisegtus elementus pasikeitė parametrai. Bandykite importuoti dar kartą.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Įrašyta papildomų prisegtų programėlių: {}. Kai kurie „Windows“ prisegti elementai gali likti nepasiekiami.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Prisegti elementai pakeisti atmintyje; įrašyti nepavyko. Norėdami bandyti dar kartą, parametruose spustelėkite Taikyti.
+
+en: Pins updated in memory; saving...
+tr: Prisegti elementai atnaujinti atmintyje; įrašoma...
+
+en: Imported pins could not be applied
+tr: Nepavyko pritaikyti importuotų prisegtų elementų
+
+en: Pin import is unavailable while closing
+tr: Prisegtų elementų importavimas uždarant nepasiekiamas
+
+en: Settings could not be saved
+tr: Nepavyko įrašyti parametrų
+
+en: Quit without saving the latest changes?
+tr: Išeiti neįrašius naujausių pakeitimų?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Ankstesnis parametrų failas išsaugotas. Palikite „Aether Shell“ atidarytą, kad galėtumėte bandyti įrašyti dar kartą.
+
+en: &Quit without saving
+tr: &Išeiti neįrašius
+
+en: &Keep Aether Shell open
+tr: &Palikti „Aether Shell“ atidarytą
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Eksportuoti pagrindinę diagnostiką – programėlės versiją ir „Windows“ versijos numerį, be žurnalų ar asmeninių duomenų
+
+en: Diagnostics exported.
+tr: Diagnostika eksportuota.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Nepavyko įrašyti diagnostikos į pasirinktą failą.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Nepavyko saugiai nuskaityti parametrų. Esamas failas išsaugotas.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: „Aether Shell“ nepavyko paleisti savo darbalaukio paviršių.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Laukiama, kol bus atkurta „Windows“ užduočių juosta. Bandykite dar kartą arba uždarykite „Aether Shell“.
+
+en: The Windows taskbar is shown temporarily.
+tr: „Windows“ užduočių juosta laikinai rodoma.
+
+en: Windows taskbar restored.
+tr: „Windows“ užduočių juosta atkurta.
+
+en: Windows taskbar replacement is active.
+tr: „Windows“ užduočių juostos pakeitimas aktyvus.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: „Windows“ užduočių juosta lieka pasiekiama. Pakeitimas netrukus bus bandomas dar kartą.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: „Windows“ užduočių juosta lieka pasiekiama. Norėdami bandyti dar kartą, išjunkite ir vėl įjunkite pakeitimą.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: „Windows“ užduočių juosta atkurta. Pakeitimas netrukus vėl prisijungs.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: „Windows“ užduočių juosta atkurta. Norėdami bandyti dar kartą, išjunkite ir vėl įjunkite pakeitimą.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Užduočių juostos pakeitimas sustabdytas. „Windows“ užduočių juosta atkurta.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Užduočių juostos pakeitimas sustabdytas. Nepavyko patvirtinti „Windows“ užduočių juostos atkūrimo.
+
+en: Activating taskbar replacement...
+tr: Aktyvinamas užduočių juostos pakeitimas...
+
+en: Restoring Windows taskbar...
+tr: Atkuriama „Windows“ užduočių juosta...
+
+en: Reconnecting taskbar replacement...
+tr: Iš naujo jungiamas užduočių juostos pakeitimas...
+
+en: Showing the Windows taskbar temporarily...
+tr: Laikinai rodoma „Windows“ užduočių juosta...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: „Aether Shell“ nepavyko atkurti „Windows“ užduočių juostos.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Iš naujo paleiskite „Windows“ naršyklę užduočių tvarkytuve („Ctrl“+„Shift“+„Esc“) arba atsijunkite ir vėl prisijunkite.
+
+en: The Windows taskbar was restored to its saved state.
+tr: „Windows“ užduočių juosta atkurta į įrašytą būseną.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Įrašytos užduočių juostos būsenos nerasta. „Windows“ užduočių juosta padaryta matoma; jos automatinio slėpimo parametras nepakeistas.
+
+en: There was nothing to restore.
+tr: Nebuvo ko atkurti.
+
+en: Taskbar replacement is turned off.
+tr: Užduočių juostos pakeitimas išjungtas.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Nepavyko automatiškai išjungti užduočių juostos pakeitimo. Išjunkite jį „Aether Shell“ parametrai > Darbalaukis.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Neatpažinta arba netinkama „Aether Shell“ komandų eilutė.
+
+en: Aether Shell could not create its local data folders.
+tr: „Aether Shell“ nepavyko sukurti savo vietinių duomenų aplankų.
+
+en: Aether Shell stopped after an unexpected error.
+tr: „Aether Shell“ sustojo dėl netikėtos klaidos.
+
+## search-names
+
+en: Disk Management
+tr: Disko tvarkymas
+
+en: Local Users and Groups
+tr: Vietiniai vartotojai ir grupės
+
+en: Local Group Policy Editor
+tr: Vietinės grupės strategijos rengyklė
+
+en: Manage User Certificates
+tr: Tvarkyti vartotojo sertifikatus
+
+en: Manage Computer Certificates
+tr: Tvarkyti kompiuterio sertifikatus
+
+en: Shared Folders
+tr: Bendrai naudojami aplankai
+
+en: TPM Management
+tr: TPM valdymas
+
+en: Network Connections
+tr: Tinklo ryšiai
+
+en: System Properties
+tr: Sistemos ypatybės
+
+en: About Windows
+tr: Apie „Windows“
+
+en: DirectX Diagnostic Tool
+tr: „DirectX“ diagnostikos įrankis
+
+en: Windows Features
+tr: „Windows“ funkcijos
+
+en: System Restore
+tr: Sistemos atkūrimas
+
+en: Advanced System Settings
+tr: Išplėstiniai sistemos parametrai
+
+en: Volume Mixer
+tr: Garsumo maišytuvas
+
+en: Microsoft Management Console
+tr: „Microsoft“ valdymo pultas
+
+en: User Accounts (Advanced)
+tr: Vartotojų abonementai (išplėstiniai)
+
+en: Display settings
+tr: Ekrano parametrai
+
+en: Night light settings
+tr: Naktinės šviesos parametrai
+
+en: Graphics settings
+tr: Grafikos parametrai
+
+en: Sound settings
+tr: Garso parametrai
+
+en: Notification settings
+tr: Pranešimų parametrai
+
+en: Power & battery settings
+tr: Maitinimo ir akumuliatoriaus parametrai
+
+en: Energy saver settings
+tr: Energijos taupymo parametrai
+
+en: Storage settings
+tr: Saugyklos parametrai
+
+en: Multitasking settings
+tr: Kelių užduočių atlikimo parametrai
+
+en: Clipboard settings
+tr: Mainų srities parametrai
+
+en: Remote Desktop settings
+tr: Nuotolinio darbalaukio parametrai
+
+en: About your PC
+tr: Apie
+
+en: Bluetooth & devices settings
+tr: „Bluetooth“ ir įrenginių parametrai
+
+en: Printers & scanners settings
+tr: Spausdintuvų ir skaitytuvų parametrai
+
+en: Mouse settings
+tr: Pelės parametrai
+
+en: Touchpad settings
+tr: Jutiklinės planšetės parametrai
+
+en: Network & internet settings
+tr: Tinklo ir interneto parametrai
+
+en: Wi-Fi settings
+tr: „Wi-Fi“ parametrai
+
+en: VPN settings
+tr: VPN parametrai
+
+en: Proxy settings
+tr: Tarpinio serverio parametrai
+
+en: Airplane mode settings
+tr: Lėktuvo režimo parametrai
+
+en: Mobile hotspot settings
+tr: Mobiliojo interneto prieigos taško parametrai
+
+en: Background settings
+tr: Fono parametrai
+
+en: Color settings
+tr: Spalvų parametrai
+
+en: Theme settings
+tr: Temų parametrai
+
+en: Lock screen settings
+tr: Užrakinimo ekrano parametrai
+
+en: Taskbar settings
+tr: Užduočių juostos parametrai
+
+en: Font settings
+tr: Šriftų parametrai
+
+en: Installed apps
+tr: Įdiegtos programėlės
+
+en: Default apps settings
+tr: Numatytųjų programėlių parametrai
+
+en: Startup apps settings
+tr: Paleisties programėlių parametrai
+
+en: Account info
+tr: Jūsų informacija
+
+en: Sign-in options
+tr: Prisijungimo parinktys
+
+en: Other users settings
+tr: Kitų vartotojų parametrai
+
+en: Date & time settings
+tr: Datos ir laiko parametrai
+
+en: Language & region settings
+tr: Kalbos ir regiono parametrai
+
+en: Typing settings
+tr: Rašymo parametrai
+
+en: Accessibility settings
+tr: Pritaikymo neįgaliesiems parametrai
+
+en: Privacy & security settings
+tr: Privatumo ir saugos parametrai
+
+en: Location settings
+tr: Vietos parametrai
+
+en: Windows Update settings
+tr: „Windows Update“ parametrai
+
+en: Recovery settings
+tr: Atkūrimo parametrai
+
+en: Activation settings
+tr: Aktyvinimo parametrai
+
+en: For developers settings
+tr: Parametrai kūrėjams
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Nepavyko pasiekti „GitHub“.
+
+en: GitHub did not answer the request just now.
+tr: „GitHub“ ką tik neatsakė į užklausą.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Leidimas nepraėjo patikros, todėl niekas neįdiegta.
+
+en: There is not enough free disk space.
+tr: Diske nepakanka laisvos vietos.
+
+en: Windows refused access to the update files.
+tr: „Windows“ atsisakė suteikti prieigą prie naujinimo failų.
+
+en: {} bytes
+tr: {} B
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Būsena
+
+en: Check &now
+tr: Tikrinti &dabar
+
+en: Download and install
+tr: Atsisiųsti ir įdiegti
+
+en: &Later
+tr: &Vėliau
+
+en: S&kip this version
+tr: Pr&aleisti šią versiją
+
+en: &Release details
+tr: &Leidimo informacija
+
+en: Disable &notifications
+tr: Išjungti &pranešimus
+
+en: Release notes
+tr: Leidimo pastabos
+
+en: the new version
+tr: nauja versija
+
+en: Installed: {}.
+tr: Įdiegta: {}.
+
+en: Automatic update checks are off
+tr: Automatinis naujinimų tikrinimas išjungtas
+
+en: Check now looks for a newer release once.
+tr: „Tikrinti dabar“ vieną kartą ieško naujesnio leidimo.
+
+en: Last checked {}
+tr: Paskutinį kartą tikrinta: {}
+
+en: Not checked yet
+tr: Dar netikrinta
+
+en: Checking for updates...
+tr: Ieškoma naujinimų...
+
+en: Aether Shell is up to date
+tr: „Aether Shell“ naujausios versijos
+
+en: Latest published release: {}.
+tr: Naujausias paskelbtas leidimas: {}.
+
+en: Version {} is available
+tr: Galima versija {}
+
+en: Download size: {}.
+tr: Atsisiuntimo dydis: {}.
+
+en: Downloading version {}...
+tr: Atsisiunčiama versija {}...
+
+en: Received {} of {} ({}%).
+tr: Gauta {} iš {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Gauta {}; bendras dydis nežinomas.
+
+en: Version {} is ready to install
+tr: Versija {} paruošta įdiegti
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Patikrinta naudojant pasirašytą leidimo manifestą ir SHA-256.
+
+en: The update could not be completed
+tr: Nepavyko užbaigti naujinimo
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Kol kas diegiama rankiniu būdu: atidarykite leidimo informaciją, tada atsisiųskite ir paleiskite jo sąrankos programą.
+
+en: Failure: {}.
+tr: Klaida: {}.
+
+en: Choose Retry Download to try again.
+tr: Norėdami bandyti dar kartą, pasirinkite „Bandyti atsisiųsti dar kartą“.
+
+en: Use Check now to try again.
+tr: Norėdami bandyti dar kartą, naudokite „Tikrinti dabar“.
+
+en: Next automatic check: {}.
+tr: Kitas automatinis tikrinimas: {}.
+
+en: &Install update
+tr: Į&diegti naujinimą
+
+en: Retry &Download
+tr: Bandyti &atsisiųsti dar kartą
+
+en: &Download and install
+tr: A&tsisiųsti ir įdiegti
+
+en: Windows' startup state could not be read in this session.
+tr: Šiame seanse nepavyko nuskaityti „Windows“ paleisties būsenos.
+
+en: Windows will start it at your next sign-in.
+tr: „Windows“ paleis jį kitą kartą jums prisijungus.
+
+en: Right now it will not start at sign-in.
+tr: Šiuo metu jis nebus paleistas prisijungus.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Jis išjungtas užduočių tvarkytuve arba „Windows“ parametruose, kurie sprendžia, kol jo ten neįjungsite.
+
+en: Windows would start another copy of Aether Shell.
+tr: „Windows“ paleistų dar vieną „Aether Shell“ kopiją.
+
+en: Windows reports a startup state this version cannot read.
+tr: „Windows“ praneša apie paleisties būseną, kurios ši versija negali nuskaityti.
+
+en: The close action could not be completed.
+tr: Nepavyko atlikti uždarymo veiksmo.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Prieš įrašydami įveskite visą skaičių; raudonai pažymėtame lauke jo nėra.
+
+en: Settings could not be validated.
+tr: Nepavyko patvirtinti parametrų.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Paleistis prisijungus palikta nepakeista, nes nepavyko įrašyti parametrų.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Nepavyko įrašyti parametrų ir nepavyko grąžinti „Windows“ paleisties prisijungus. Norėdami bandyti dar kartą, vėl spustelėkite Taikyti.
+
+en: Settings saved.
+tr: Parametrai įrašyti.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Parametrai pakeisti atmintyje; įrašyti nepavyko. Norėdami bandyti dar kartą, vėl spustelėkite Taikyti.
+
+en: Settings could not be applied.
+tr: Nepavyko pritaikyti parametrų.
+
+en: Some values were corrected to their supported range.
+tr: Kai kurios reikšmės pataisytos į palaikomą intervalą.
+
+en: Startup registration is unavailable in this session.
+tr: Paleisties registracija šiame seanse nepasiekiama.
+
+en: Changing startup registration...
+tr: Keičiama paleisties registracija...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: „Windows“ nepakeitė paleisties registracijos. Patikrinkite užduočių tvarkytuvo paleisties parametrą.
+
+en: Startup registration could not be changed.
+tr: Nepavyko pakeisti paleisties registracijos.
+
+en: Defaults saved; startup is disabled.
+tr: Numatytosios reikšmės įrašytos; paleistis išjungta.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Numatytosios reikšmės pritaikytos; įrašyti nepavyko. Norėdami bandyti dar kartą, vėl spustelėkite Taikyti.
+
+en: Defaults could not be applied.
+tr: Nepavyko pritaikyti numatytųjų reikšmių.
+
+en: Startup was not disabled; settings were kept.
+tr: Paleistis neišjungta; parametrai išsaugoti.
+
+en: Location search is unavailable.
+tr: Vietų paieška nepasiekiama.
+
+en: Searching Open-Meteo locations...
+tr: Ieškoma „Open-Meteo“ vietų...
+
+en: Location search failed. Check your connection and try again.
+tr: Vietos paieška nepavyko. Patikrinkite ryšį ir bandykite dar kartą.
+
+en: No place matched that search.
+tr: Pagal šią paiešką vietų nerasta.
+
+en: Choose a location to save it.
+tr: Pasirinkite vietą, kad ją įrašytumėte.
+
+en: Reset all settings?
+tr: Nustatyti visus parametrus iš naujo?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Nuostatos ir prisegtos programėlės grąžinamos į numatytąsias reikšmes, o paleistis prisijungus išjungiama.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Jūsų „Windows“ užduočių juostos pasirinkimas išsaugotas. Išsaugota ir dabartinio parametrų failo atsarginė kopija.
+
+en: &Reset
+tr: &Nustatyti iš naujo
+
+en: Cancel
+tr: Atšaukti
+
+en: Pinned applications saved.
+tr: Prisegtos programėlės įrašytos.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Prisegti elementai pakeisti atmintyje; įrašyti nepavyko. Norėdami bandyti dar kartą, vėl spustelėkite Taikyti.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Nepavyko atkurti numatytųjų reikšmių, nes paleisties registracija nepasiekiama.
+
+en: Pinned application could not be added.
+tr: Nepavyko įtraukti prisegtos programėlės.
+
+en: Choose an application to add first.
+tr: Pirmiausia pasirinkite programėlę, kurią norite įtraukti.
+
+en: Pinned applications could not be changed.
+tr: Nepavyko pakeisti prisegtų programėlių.
+
+en: Choose a pinned application first.
+tr: Pirmiausia pasirinkite prisegtą programėlę.
+
+en: Desktop status is unavailable in this session.
+tr: Darbalaukio būsena šiame seanse nepasiekiama.
+
+en: Desktop status is unavailable.
+tr: Darbalaukio būsena nepasiekiama.
+
+en: Password
+tr: Slaptažodis
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Atsisiunčiama kalba {} iš „GitHub“ ({}). Kol ji bus paruošta, rodoma anglų kalba.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Kalbos {} atsisiųsti nepavyko. Kol ji bus atsisiųsta, rodoma anglų kalba; norėdami bandyti dar kartą, toliau pasirinkite „Atsisiųsti“.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Kalbos {} šiame kompiuteryje dar nėra. Kol ji bus atsisiųsta, rodoma anglų kalba.
+
+en: {} is on this PC.
+tr: Kalba {} yra šiame kompiuteryje.
+
+en: Every language is on this PC.
+tr: Visos kalbos yra šiame kompiuteryje.
+
+en: Choose a language to download first.
+tr: Pirmiausia pasirinkite kalbą, kurią norite atsisiųsti.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Viršutinė juosta
+
+en: Weather
+tr: Orai
+
+en: Updates
+tr: Naujinimai
+
+en: General
+tr: Bendra
+
+en: About
+tr: Apie
+
+en: Desktop
+tr: Darbalaukis
+
+en: Appearance
+tr: Išvaizda
+
+en: Welcome
+tr: Pasveikinimas
+
+en: Aether Shell Settings
+tr: „Aether Shell“ parametrai
+
+en: Settings
+tr: Parametrai
+
+en: Reset defaults...
+tr: Atkurti numatytuosius...
+
+en: &Apply
+tr: &Taikyti
+
+en: Liquid
+tr: Skystas
+
+en: Grain
+tr: Grūdėtas
+
+en: From {} to {}
+tr: Nuo {} iki {}
+
+en: px
+tr: px
+
+en: min
+tr: min.
+
+en: h
+tr: val.
+
+en: This action could not be completed.
+tr: Nepavyko atlikti šio veiksmo.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Dydis, tarpai, judesys ir prie Dock prisegtos programėlės.
+
+en: Size and spacing
+tr: Dydis ir tarpai
+
+en: Icon size
+tr: Piktogramų dydis
+
+en: {}, scaled with the Windows display scale.
+tr: {}, mastelis pagal „Windows“ ekrano mastelį.
+
+en: Bottom margin
+tr: Apatinė paraštė
+
+en: Space between the Dock and the bottom of the screen.
+tr: Tarpas tarp Dock ir ekrano apačios.
+
+en: Minimum side margin
+tr: Mažiausia šoninė paraštė
+
+en: Space kept free at the left and right screen edges.
+tr: Laisva vieta prie kairiojo ir dešiniojo ekrano kraštų.
+
+en: Icon spacing
+tr: Tarpai tarp piktogramų
+
+en: Space between neighbouring icons.
+tr: Tarpas tarp gretimų piktogramų.
+
+en: Glass and motion
+tr: Stiklas ir judesys
+
+en: Glass opacity
+tr: Stiklo neskaidrumas
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Mažesnės reikšmės parodo daugiau sulieto darbalaukio už Dock.
+
+en: Hover magnification
+tr: Padidinimas užvedus žymiklį
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Kiek piktograma padidėja po žymikliu; 1 tai išjungia.
+
+en: Behavior
+tr: Veikimas
+
+en: Show running applications
+tr: Rodyti veikiančias programėles
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Atidarytos neprisegtos programėlės rodomos po prisegtųjų.
+
+en: Reserve screen space for the Dock
+tr: Rezervuoti ekrano vietą Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Išdidinti langai lieka virš Dock, o ne po juo.
+
+en: Automatically hide the Dock
+tr: Automatiškai slėpti Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Pasislepia, kai jį uždengia programėlės langas; norėdami jį parodyti, perkelkite žymiklį į apatinį ekrano kraštą. Jis lieka darbalaukyje, o langai gauna visą ekrano aukštį.
+
+en: Pinned applications
+tr: Prisegtos programėlės
+
+en: Move &up
+tr: Perkelti &aukštyn
+
+en: Move &down
+tr: Perkelti že&myn
+
+en: &Remove
+tr: Pa&šalinti
+
+en: &Add application
+tr: Į&traukti programėlę
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Prisegti elementai išlaiko savo tapatybę ir paleisties parametrus. Pašalinus prisegtą elementą, automatinis sinchronizavimas su „Windows“ užduočių juosta jo nebeįtrauks iš naujo.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Padėtis, laikrodis ir būsenos elementai, rodomi viršutinėje būsenos juostoje.
+
+en: Presentation
+tr: Pateikimas
+
+en: Floating bar
+tr: Slankioji juosta
+
+en: Text on the desktop
+tr: Tekstas darbalaukyje
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Slankioji juosta: stiklinė juosta po ekrano viršumi. Tekstas darbalaukyje: be juostos, tie patys elementai rašomi pačiame ekrano viršuje, tiesiai ant darbalaukio paveikslėlio; ta juostelė lieka be langų, o viršutinė paraštė ir stiklo neskaidrumas netaikomi. Naudojant automatinį slėpimą, tekstas grįžta ant stiklinės juostelės, kol po juo yra langas.
+
+en: Position and glass
+tr: Padėtis ir stiklas
+
+en: Top margin
+tr: Viršutinė paraštė
+
+en: Space between the Top Bar and the top of the screen.
+tr: Tarpas tarp viršutinės juostos ir ekrano viršaus.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Mažesnės reikšmės parodo daugiau sulieto darbalaukio už juostos.
+
+en: Clock
+tr: Laikrodis
+
+en: Clock format
+tr: Laikrodžio formatas
+
+en: Follow Windows
+tr: Pagal „Windows“
+
+en: 12-hour
+tr: 12 valandų
+
+en: 24-hour
+tr: 24 valandų
+
+en: Date style
+tr: Datos stilius
+
+en: Weekday, day and month
+tr: Savaitės diena, diena ir mėnuo
+
+en: Short
+tr: Trumpas
+
+en: Long
+tr: Ilgas
+
+en: Show seconds
+tr: Rodyti sekundes
+
+en: Show date
+tr: Rodyti datą
+
+en: Status items
+tr: Būsenos elementai
+
+en: Show battery
+tr: Rodyti akumuliatorių
+
+en: Hide battery when absent
+tr: Slėpti akumuliatorių, kai jo nėra
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Staliniai kompiuteriai be akumuliatoriaus nieko nerodo vietoj nežinomo akumuliatoriaus.
+
+en: Show input language
+tr: Rodyti įvesties kalbą
+
+en: Show network
+tr: Rodyti tinklą
+
+en: Show audio output
+tr: Rodyti garso išvestį
+
+en: Show microphone
+tr: Rodyti mikrofoną
+
+en: Show weather when enabled
+tr: Rodyti orus, kai įjungta
+
+en: Weather itself is turned on in Weather settings.
+tr: Patys orai įjungiami orų parametruose.
+
+en: Show hidden icons button
+tr: Rodyti paslėptų piktogramų mygtuką
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Maža rodyklė, atidaranti paslėptas „Windows“ pranešimų srities piktogramas.
+
+en: Reserve screen space above windows
+tr: Rezervuoti ekrano vietą virš langų
+
+en: Maximized windows stay below the Top Bar.
+tr: Išdidinti langai lieka po viršutine juosta.
+
+en: Automatically hide the Top Bar
+tr: Automatiškai slėpti viršutinę juostą
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Pasislepia, kai ją uždengia programėlės langas; norėdami ją parodyti, perkelkite žymiklį į viršutinį ekrano kraštą. Ji lieka darbalaukyje.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Naudoti „Windows“ sparčiuosius parametrus („Windows 11“)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Išjungta: „Aether“ spartieji valdikliai atidaromi po viršutine juosta. Įjungta: „Windows“ skydelis atidaromas ekrano apačioje.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Pasirinktinė orų prognozė viršutinėje juostoje, kurią teikia „Open-Meteo“.
+
+en: Forecast
+tr: Prognozė
+
+en: Enable weather
+tr: Įjungti orus
+
+en: Off by default: the forecast needs network requests.
+tr: Pagal numatytuosius parametrus išjungta: prognozei reikia tinklo užklausų.
+
+en: Temperature
+tr: Temperatūra
+
+en: Celsius
+tr: Celsijus
+
+en: Fahrenheit
+tr: Farenheitas
+
+en: Refresh interval
+tr: Atnaujinimo intervalas
+
+en: Location
+tr: Vieta
+
+en: Locate automatically with Windows
+tr: Nustatyti vietą automatiškai naudojant „Windows“
+
+en: Uses the Windows location service after you allow it.
+tr: Naudoja „Windows“ vietos tarnybą, kai ją leidžiate.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: „Windows“ prašo leidimo naudoti vietą. Jūsų koordinatės siunčiamos į „Open-Meteo.com“ tik prognozei gauti; vietos raktas talpinamas vietinėje talpykloje. Jei vieta užblokuota, orai nepasiekiami.
+
+en: Use &Windows location
+tr: Naudoti „&Windows“ vietą
+
+en: Location &settings
+tr: Vietos &parametrai
+
+en: Choose automatic location or search for a place below.
+tr: Pasirinkite automatinę vietą arba ieškokite vietovės toliau.
+
+en: Search for a place
+tr: Ieškoti vietovės
+
+en: Searc&h
+tr: Ieš&koti
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Orų duomenys: „Open-Meteo.com“ (CC BY 4.0). Rankinė paieška siunčia tik jūsų įvestą tekstą.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Pasirašyti leidimai iš oficialios „GitHub“ saugyklos, patikrinti prieš diegiant.
+
+en: Preferences
+tr: Nuostatos
+
+en: Check for updates automatically
+tr: Automatiškai ieškoti naujinimų
+
+en: Check interval
+tr: Tikrinimo intervalas
+
+en: Release channel
+tr: Leidimų kanalas
+
+en: Prereleases arrive earlier and change more often.
+tr: Išankstiniai leidimai pasirodo anksčiau ir keičiasi dažniau.
+
+en: Stable
+tr: Stabilus
+
+en: Prerelease
+tr: Išankstinis leidimas
+
+en: Show update notifications
+tr: Rodyti naujinimų pranešimus
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Paleistis, judesys, spartieji klavišai ir diagnostika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Juostų, meniu, ieškos, parametrų ir sąrankos kalba.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Pavadinimai, priklausantys jums ar kitoms programoms (programėlės, failai, „Wi-Fi“ tinklai), niekada neverčiami. Pasirinkus kalbą, viršutinė juosta ja rašo datą; „Pagal „Windows““ išlaiko jūsų „Windows“ regiono formatą.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Ranka rašytas pasveikinimas rašo lotyniškomis raidėmis: jis sveikina prancūziškai, angliškai arba ispaniškai. Jo kalbą pasirinkite skiltyje Pasveikinimas.
+
+en: Language
+tr: Kalba
+
+en: Interface language
+tr: Sąsajos kalba
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: „Pagal „Windows““ naudoja pirmąją iš jūsų „Windows“ rodymo kalbų, kuri yra tarp šių, o kitu atveju – anglų kalbą.
+
+en: Startup
+tr: Paleistis
+
+en: Start Aether Shell when I sign in
+tr: Paleisti „Aether Shell“, kai prisijungiu
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Norint pakeisti, reikia spustelėti Taikyti. Užduočių tvarkytuvas taip pat gali tai išjungti.
+
+en: Motion
+tr: Judesys
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Sumažintas judesys visur pašalina dekoratyvinį judėjimą.
+
+en: Reduced
+tr: Sumažintas
+
+en: Full
+tr: Visas
+
+en: Keyboard shortcuts
+tr: Spartieji klavišai
+
+en: Enable global keyboard shortcuts
+tr: Įjungti visuotinius sparčiuosius klavišus
+
+en: Search shortcut key
+tr: Ieškos sparčiojo klavišo mygtukas
+
+en: Dock shortcut key
+tr: Dock sparčiojo klavišo mygtukas
+
+en: Search shortcut modifiers
+tr: Ieškos sparčiojo klavišo modifikatoriai
+
+en: Dock shortcut modifiers
+tr: Dock sparčiojo klavišo modifikatoriai
+
+en: Shortcut status unavailable
+tr: Sparčiųjų klavišų būsena nepasiekiama
+
+en: Diagnostics
+tr: Diagnostika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Žurnalų aplanke yra šio kompiuterio „Aether Shell“ žurnalai. Diagnostikos eksportavimas įrašo tik programėlės versiją ir „Windows“ versijos numerį – jokių žurnalų ar asmeninių duomenų.
+
+en: Open &log folder
+tr: Atidaryti žurnalų &aplanką
+
+en: &Export diagnostics...
+tr: &Eksportuoti diagnostiką...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Trumpas ranka rašytas pasveikinimas jūsų darbalaukyje, kai prisijungiate arba atrakinate kompiuterį.
+
+en: Greeting
+tr: Pasisveikinimas
+
+en: Show the welcome at sign-in and unlock
+tr: Rodyti pasveikinimą prisijungiant ir atrakinant
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Jis pasirodo, kai „Windows“ jus prijungia, kol „Aether Shell“ ruošiasi. Norėdami praleisti, palieskite, spustelėkite arba paspauskite „Esc“.
+
+en: Greeting language
+tr: Pasisveikinimo kalba
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut prancūziškai, Hello angliškai, Hola ispaniškai. Rašiklis rašo lotyniškomis raidėmis: visomis kitomis kalbomis jis sveikina angliškai.
+
+en: Your name
+tr: Jūsų vardas
+
+en: Name to greet you with
+tr: Vardas, kuriuo jus sveikinti
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Pasirinktinai, pavyzdžiui, vardas. Jis lieka šiame kompiuteryje jūsų „Aether Shell“ parametruose ir niekada niekur nesiunčiamas ir nerašomas į žurnalą. Norėdami jį pašalinti, išvalykite lauką.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Spalvų režimas, paryškinimo spalva, judesio greitis ir Dock bei viršutinės juostos išvaizda.
+
+en: Style
+tr: Stilius
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Skystas: stiklas sluoksniais virš to, kas yra už jo, suliejimo sluoksnis, skysčio šviesa, tada piktogramos ir tekstas, išliekantys įskaitomi šviesiuose ir tamsiuose puslapiuose. Grūdėtas: matinis stiklas, sulietas ir pusiau permatomas, su smulkiais grūdeliais.
+
+en: Liquid blur
+tr: Stiliaus „Skystas“ suliejimas
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Kiek suliejimo sluoksnis po stiliaus „Skystas“ stiklu uždengia tai, kas yra už jo: 100 % sulieja viską. Mažesnės reikšmės parodo puslapį ryškiau, o juostų tekstas tada margame puslapyje gali būti prasčiau įskaitomas.
+
+en: Liquid blur color
+tr: Stiliaus „Skystas“ suliejimo spalva
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatinė išlaiko paties stiklo spalvas. Tekstas ir piktogramos išlieka įskaitomi, kad ir kokia būtų spalva.
+
+en: Automatic
+tr: Automatinė
+
+en: White
+tr: Balta
+
+en: Black
+tr: Juoda
+
+en: Accent
+tr: Paryškinimo spalva
+
+en: Blue
+tr: Mėlyna
+
+en: Violet
+tr: Violetinė
+
+en: Pink
+tr: Rožinė
+
+en: Red
+tr: Raudona
+
+en: Orange
+tr: Oranžinė
+
+en: Yellow
+tr: Geltona
+
+en: Green
+tr: Žalia
+
+en: Teal
+tr: Žalsvai mėlyna
+
+en: Liquid color strength
+tr: Stiliaus „Skystas“ spalvos stiprumas
+
+en: How much of the chosen color the blur layer takes.
+tr: Kiek pasirinktos spalvos perima suliejimo sluoksnis.
+
+en: Theme
+tr: Tema
+
+en: Color mode
+tr: Spalvų režimas
+
+en: High contrast always takes precedence.
+tr: Didelis kontrastas visada turi pirmenybę.
+
+en: Light
+tr: Šviesus
+
+en: Dark
+tr: Tamsus
+
+en: Accent color
+tr: Paryškinimo spalva
+
+en: Animation duration
+tr: Animacijos trukmė
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 – standartinis greitis; didesnės reikšmės lėtesnės. Sumažintas judesys turi pirmenybę.
+
+en: Dock icon preset
+tr: Dock piktogramų dydžio šablonas
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Pasirinktinis dydis iš Dock parametrų išlaikomas, kol pasirinksite šabloną.
+
+en: Small - 32 px
+tr: Mažas – 32 px
+
+en: Medium - 40 px
+tr: Vidutinis – 40 px
+
+en: Large - 48 px
+tr: Didelis – 48 px
+
+en: Keep custom size
+tr: Palikti pasirinktinį dydį
+
+en: Show Windows Start in the Dock
+tr: Rodyti „Windows“ mygtuką Pradžia Dock juostoje
+
+en: Show Task View in the Dock
+tr: Rodyti užduočių rodinį Dock juostoje
+
+en: Reserve extra space for Dock animations
+tr: Rezervuoti papildomos vietos Dock animacijoms
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Neleidžia padidinimui ir paleidimo šuoliui užlįsti ant išdidintų langų.
+
+en: Weather position
+tr: Orų padėtis
+
+en: Left
+tr: Kairėje
+
+en: Right
+tr: Dešinėje
+
+en: Keyboard indicator
+tr: Klaviatūros indikatorius
+
+en: Compact
+tr: Kompaktiškas
+
+en: Two lines
+tr: Dvi eilutės
+
+en: Windows taskbar pins
+tr: „Windows“ užduočių juostos prisegti elementai
+
+en: Add newly discovered Windows taskbar pins
+tr: Įtraukti naujai aptiktus „Windows“ užduočių juostos prisegtus elementus
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Kol užduočių juosta pakeista, nauji „Windows“ prisegti elementai įtraukiami į Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Grįžtamasis „Windows“ užduočių juostos pakeitimas Dock juosta.
+
+en: Taskbar replacement
+tr: Užduočių juostos pakeitimas
+
+en: Replace the Windows taskbar
+tr: Pakeisti „Windows“ užduočių juostą
+
+en: Changing this needs Apply.
+tr: Norint pakeisti, reikia spustelėti Taikyti.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Kol „Aether Shell“ veikia, jis slepia „Windows“ užduočių juostą ir rezervuoja vietą po išdidintomis programėlėmis.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: „Windows“ užduočių juostos būsena atkuriama, kai šis režimas išjungiamas arba „Aether Shell“ baigia darbą. Atskira atkūrimo pagalbinė programa ją atkuria ir tada, jei programėlė netikėtai sustoja. Jei atkurti nepavyksta, iš naujo paleiskite „Windows“ naršyklę užduočių tvarkytuve.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: „Windows“ parametrai lieka savąja „Windows“ sąsaja. Jų užduočių juostos puslapio „Aether Shell“ nepakeičia; šį režimą konfigūruokite čia.
+
+en: Pinned applications from Windows
+tr: Prisegtos programėlės iš „Windows“
+
+en: &Import Windows taskbar pins
+tr: &Importuoti „Windows“ užduočių juostos prisegtus elementus
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Nuskaito prisegtas nuorodas nekeičiant „Windows“ prisegtų elementų. Kai kurie „Windows 11“ prisegti elementai arba jų tvarka gali būti nepasiekiami.
+
+en: Version {}
+tr: Versija {}
+
+en: Created by Ibrahim Bouillet
+tr: Sukūrė Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Savoji „Windows“ darbalaukio sąsaja – slankusis Dock ir viršutinė būsenos juosta, veikiantys kartu su „Windows“ naršykle.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Orų duomenys: „Open-Meteo.com“ (CC BY 4.0). Nepridedama jokių trečiųjų šalių C++ vykdymo laiko bibliotekų.
+
+en: &Official project
+tr: &Oficialus projektas
+
+en: Licence
+tr: Licencija
+
+en: Taskbar replacement changes need Apply.
+tr: Norint pakeisti užduočių juostos pakeitimą, reikia spustelėti Taikyti.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Pakeitimai įrašomi automatiškai. Paleisčiai reikia spustelėti Taikyti.
+
+en: Changes save automatically.
+tr: Pakeitimai įrašomi automatiškai.
+
+en: Press Apply to confirm this change.
+tr: Norėdami patvirtinti šį pakeitimą, spustelėkite Taikyti.
+
+en: Smart transparency
+tr: Išmanusis skaidrumas
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Naudojant stilių „Skystas“, šis langas sulieja foną tik po savo tekstu ir valdikliais: visiškai virš kitų langų ir darbalaukio piktogramų, šiek tiek virš darbalaukio paveikslėlio ir visai nesulieja ten, kur nieko nerodo.
+
+en: Languages on this PC
+tr: Kalbos šiame kompiuteryje
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: „Aether Shell“ atsisiunčia kalbas, kurias turi „Windows“, todėl pakeičia kalbą kartu su „Windows“.
+
+en: Add a language
+tr: Pridėti kalbą
+
+en: &Download
+tr: &Atsisiųsti
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Kiekviena kalba gaunama iš šios versijos „GitHub“ leidimo ir patikrinama prieš naudojant. Kai ji bus šiame kompiuteryje, pasirinkite ją aukščiau.
+
+en: built in
+tr: integruota
+
+en: downloading, {}
+tr: atsisiunčiama, {}
+
+en: download failed
+tr: atsisiųsti nepavyko
+
+## setup
+
+en: Aether Shell Setup
+tr: „Aether Shell“ sąranka
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Sąrankai nepavyko sukurti savo sąsajos. Uždarykite ją ir bandykite dar kartą arba naudokite dokumentuotas tyliosios sąrankos parinktis.
+
+en: Options
+tr: Parinktys
+
+en: Install
+tr: Įdiegti
+
+en: Done
+tr: Atlikta
+
+en: Remove Aether Shell
+tr: Šalinti „Aether Shell“
+
+en: Repair Aether Shell
+tr: Taisyti „Aether Shell“
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Savasis Dock ir viršutinė būsenos juosta, skirti „Windows“ ir veikiantys kartu su „Windows“ naršykle.
+
+en: Replaces the Windows taskbar while it runs
+tr: Kol veikia, pakeičia „Windows“ užduočių juostą
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Norėdami susigrąžinti „Windows“ užduočių juostą, išeikite iš „Aether Shell“, išjunkite tai skiltyje Parametrai > Darbalaukis arba meniu Pradžia atidarykite „Atkurti „Windows“ užduočių juostą“.
+
+en: Starts when you sign in - your choice
+tr: Paleidžiamas jums prisijungus – jūsų pasirinkimas
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Naujai įdiegtas paleidžiamas prisijungus pagal numatytuosius parametrus. Prieš diegdami galite atsisakyti šio pasirinkimo arba vėliau jį išjungti parametruose. Esami paleisties pasirinkimai ir užduočių tvarkytuve atlikti išjungimai išsaugomi.
+
+en: Installs for your account
+tr: Įdiegiama jūsų abonementui
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Administratoriaus teisių nereikia. Jūsų parametrai ir duomenys lieka jūsų vartotojo profilyje.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Pašalinant išsaugomi jūsų parametrai ir duomenys, nebent pasirinksite juos pašalinti.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Taisymas atkuria šio paketo failus ir išsaugo jūsų parametrus. Jei „Aether Shell“ paliko „Windows“ užduočių juostą paslėptą, taisymas ją atkuria.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Diegiant ant esamos versijos, jūsų parametrai išsaugomi. Senesnis paketas atmetamas, nebent aiškiai leisite grąžinti ankstesnę versiją.
+
+en: MIT License
+tr: MIT licencija
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licencija taip pat įdiegiama kaip LICENSE šalia „Aether Shell“.
+
+en: Remove this installation
+tr: Šalinti šį diegimą
+
+en: Install location
+tr: Diegimo vieta
+
+en: &Browse...
+tr: &Naršyti...
+
+en: Also remove my settings, cache and logs
+tr: Taip pat pašalinti mano parametrus, talpyklą ir žurnalus
+
+en: This cannot be undone.
+tr: Šio veiksmo anuliuoti negalima.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Sąranka tvarkingai uždarys „Aether Shell“ ir pašalins jo įdiegtus failus, nuorodas, paleisties įrašą ir registraciją sąraše Įdiegtos programėlės. Kitos programėlės ir „Windows“ parametrai neliečiami.
+
+en: Your welcome
+tr: Jūsų pasveikinimas
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Jums prisijungus arba atrakinus kompiuterį, „Aether Shell“ ranka parašo trumpą pasveikinimą. Įveskite vardą, kuriuo jis turėtų jus sveikinti, arba palikite tuščią, kad būtų tiesiog „labas“.
+
+en: Your first name
+tr: Jūsų vardas
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Pasirinktinai, pavyzdžiui, vardas. Jis lieka šiame kompiuteryje jūsų „Aether Shell“ parametruose ir niekada niekur nesiunčiamas. Pakeisti jį arba išjungti pasveikinimą galite skiltyje Parametrai > Pasveikinimas.
+
+en: Shortcuts and startup
+tr: Nuorodos ir paleistis
+
+en: Create Start menu shortcuts
+tr: Kurti meniu Pradžia nuorodas
+
+en: Aether Shell and Restore Windows taskbar.
+tr: „Aether Shell“ ir „Atkurti „Windows“ užduočių juostą“.
+
+en: Create a desktop shortcut
+tr: Kurti darbalaukio nuorodą
+
+en: Shows your current choice.
+tr: Rodo jūsų dabartinį pasirinkimą.
+
+en: Recommended.
+tr: Rekomenduojama.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Norėdami atsisakyti, išvalykite; užduočių tvarkytuve atlikti išjungimai paisomi.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Diegdami sutinkate su aukščiau esančiu paleisties pasirinkimu. Paleidimo programa gali iš naujo paleisti „Aether Shell“ po strigties, ribotą kartų skaičių. Išėjimas ir „Atkurti „Windows“ užduočių juostą“ lieka pasiekiami. Orai pagal numatytuosius parametrus išjungti. Nepasirašyti dvejetainiai failai gali sukelti „Windows SmartScreen“ įspėjimą.
+
+en: Removing this installation...
+tr: Šalinamas šis diegimas...
+
+en: Repairing Aether Shell...
+tr: Taisomas „Aether Shell“...
+
+en: Installing Aether Shell...
+tr: Diegiamas „Aether Shell“...
+
+en: Closing Aether Shell and removing its files.
+tr: Uždaromas „Aether Shell“ ir šalinami jo failai.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Tikrinamas įdėtasis paketas ir diegiami jo failai. Eiga rodoma kaip veikla: sąranka nežino likusio laiko.
+
+en: Please wait while the removal completes.
+tr: Palaukite, kol bus baigtas šalinimas.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Atšaukti galima, kol nauja versija bus aktyvinta; tada sąranka saugiai baigia darbą.
+
+en: Aether Shell was uninstalled.
+tr: „Aether Shell“ pašalintas.
+
+en: Aether Shell is ready.
+tr: „Aether Shell“ paruoštas.
+
+en: Setup was cancelled.
+tr: Sąranka atšaukta.
+
+en: Setup could not complete.
+tr: Sąrankai nepavyko baigti darbo.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Jūsų duomenys išsaugoti, nebent aiškiai pasirinkote juos pašalinti.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Jį galite pataisyti arba pašalinti skiltyje „Windows“ parametrai > Programėlės > Įdiegtos programėlės.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Operacija atšaukta prieš aktyvinimą. Norėdami bandyti dar kartą, grįžkite į parinktis.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Patikrinkite prieigą prie failų ir laisvą vietą diske, tada bandykite dar kartą. Jei „Aether Shell“ jau įdiegtas, taisymas gali atkurti jo failus. Klaidos kategorija: {}
+
+en: Setup log
+tr: Sąrankos žurnalas
+
+en: Launch Aether Shell
+tr: Paleisti „Aether Shell“
+
+en: &Back
+tr: At&gal
+
+en: &Next
+tr: &Pirmyn
+
+en: &Continue
+tr: &Tęsti
+
+en: &Uninstall
+tr: Pa&šalinti
+
+en: &Repair
+tr: &Taisyti
+
+en: &Install
+tr: Į&diegti
+
+en: &Close
+tr: &Uždaryti
+
+en: Step {} of {}: {}
+tr: Žingsnis {} iš {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Pasirinkite „Aether Shell“ diegimo aplanką
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Pasirinkite visą aplanko kelią, pavyzdžiui, prasidedantį disko raide.
+
+en: The install folder must be an absolute path.
+tr: Diegimo aplankas turi būti absoliutusis kelias.
+
+en: Setup stops at the next safe point.
+tr: Sąranka sustos kitame saugiame taške.
+
+en: Cancelling...
+tr: Atšaukiama...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Sąranka saugiai baigia dabartinį veiksmą; palaukite.
+
+en: Updating Aether Shell
+tr: Naujinamas „Aether Shell“
+
+en: Verifying the signed package and applying the update.
+tr: Tikrinamas pasirašytas paketas ir taikomas naujinimas.
+
+en: Update completed
+tr: Naujinimas baigtas
+
+en: The update did not complete
+tr: Naujinimas nebaigtas
+
+en: Close
+tr: Uždaryti
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Nepavyko paleisti naujinimo sąsajos. Naujinimas nepritaikytas. Bandykite dar kartą arba naudokite taisymą.
+
+en: Aether Shell Update
+tr: „Aether Shell“ naujinimas
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Nepavyko paleisti naujinimo sąsajos. Naujinimas nepritaikytas. Bandykite dar kartą arba naudokite taisymą skiltyje „Windows“ parametrai > Programėlės > Įdiegtos programėlės.
+
+en: Update completed.
+tr: Naujinimas baigtas.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Naujinimas nebaigtas. Peržiūrėkite naujinimo programos žurnalą arba naudokite taisymą.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Nepavyko paleisti „Aether Shell“. Skiltyje „Windows“ parametrai > Programėlės > Įdiegtos programėlės pasirinkite Taisyti.
+
+en: Aether Shell Settings — update in progress
+tr: „Aether Shell“ parametrai – vyksta naujinimas
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Tęsti užduočių juostos pakeitimą
+
+en: Show Windows &notification area for 60 seconds
+tr: Rodyti „Windows“ &pranešimų sritį 60 sekundžių
+
+en: &Search…
+tr: &Ieškoti…
+
+en: &Settings…
+tr: &Parametrai…
+
+en: View available &update…
+tr: Peržiūrėti galimą &naujinimą…
+
+en: &Check for updates…
+tr: Ieškoti &naujinimų…
+
+en: &About Aether Shell
+tr: &Apie „Aether Shell“
+
+en: &Quit Aether Shell
+tr: &Išeiti iš „Aether Shell“
+
+en: Switch &input language\tWin+Space
+tr: Perjungti į&vesties kalbą\tWin+Tarpas
+
+en: Open &network controls…
+tr: Atidaryti &tinklo valdiklius…
+
+en: &Weather settings…
+tr: &Orų parametrai…
+
+en: Toggle output &mute
+tr: Įjungti / išjungti išvesties &nutildymą
+
+en: &Sound settings…
+tr: &Garso parametrai…
+
+en: Toggle microphone &mute
+tr: Įjungti / išjungti mikrofono &nutildymą
+
+en: Start Windows &voice typing\tWin+H
+tr: Pradėti „Windows“ &rašymą balsu\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofono &privatumo parametrai…
+
+en: &Power settings…
+tr: &Maitinimo parametrai…
+
+en: Open &notifications and calendar
+tr: Atidaryti &pranešimus ir kalendorių
+
+en: Open &calendar\tWin+Alt+D
+tr: Atidaryti &kalendorių\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Rodyti paslėptas pi&ktogramas
+
+en: Initializing
+tr: Inicijuojama
+
+en: Unavailable
+tr: Nepasiekiama
+
+en: Unsupported
+tr: Nepalaikoma
+
+en: Error
+tr: Klaida
+
+en: Available
+tr: Pasiekiama
+
+en: Unknown
+tr: Nežinoma
+
+en: Internet access
+tr: Interneto prieiga
+
+en: Local network only
+tr: Tik vietinis tinklas
+
+en: Limited Internet access
+tr: Ribota interneto prieiga
+
+en: No network connection
+tr: Nėra tinklo ryšio
+
+en: Connectivity unknown
+tr: Ryšys nežinomas
+
+en: Ethernet
+tr: Eternetas
+
+en: Cellular
+tr: Korinis ryšys
+
+en: Network
+tr: Tinklas
+
+en: Offline
+tr: Neprisijungta
+
+en: Network status unavailable
+tr: Tinklo būsena nepasiekiama
+
+en: Quick controls
+tr: Spartieji valdikliai
+
+en: Aether Shell menu
+tr: „Aether Shell“ meniu
+
+en: Weather status unavailable
+tr: Orų būsena nepasiekiama
+
+en: Cached weather
+tr: Talpykloje saugomi orai
+
+en: Observation (UTC): {}
+tr: Stebėjimas (UTC): {}
+
+en: Weather: {}
+tr: Orai: {}
+
+en: Click to open weather settings
+tr: Spustelėkite, kad atidarytumėte orų parametrus
+
+en: Show hidden icons
+tr: Rodyti paslėptas piktogramas
+
+en: Opens Windows' notification-area overflow
+tr: Atidaro paslėptas „Windows“ pranešimų srities piktogramas
+
+en: Input language: {}
+tr: Įvesties kalba: {}
+
+en: Fallback input layout
+tr: Atsarginis įvesties išdėstymas
+
+en: Click to switch input language (Win+Space)
+tr: Spustelėkite, kad perjungtumėte įvesties kalbą (Win+Tarpas)
+
+en: Network: {}
+tr: Tinklas: {}
+
+en: Signal strength unavailable
+tr: Signalo stiprumas nepasiekiamas
+
+en: Click to open Windows network settings
+tr: Spustelėkite, kad atidarytumėte „Windows“ tinklo parametrus
+
+en: Audio output
+tr: Garso išvestis
+
+en: Audio: {}
+tr: Garsas: {}
+
+en: volume unknown
+tr: garsumas nežinomas
+
+en: Muted
+tr: Nutildyta
+
+en: Sound on
+tr: Garsas įjungtas
+
+en: Microphone: {}
+tr: Mikrofonas: {}
+
+en: Endpoint unmuted
+tr: Įrenginys nenutildytas
+
+en: Recording detection unsupported
+tr: Įrašymo aptikimas nepalaikomas
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Spustelėkite, kad įjungtumėte arba išjungtumėte nutildymą; spustelėkite dešiniuoju pelės mygtuku, kad pasiektumėte „Windows“ rašymą balsu ir mikrofono privatumo parametrus
+
+en: Battery: {}
+tr: Akumuliatorius: {}
+
+en: Battery {}
+tr: Akumuliatorius {}
+
+en: Battery status unavailable
+tr: Akumuliatoriaus būsena nepasiekiama
+
+en: Charging
+tr: Įkraunama
+
+en: External power
+tr: Išorinis maitinimas
+
+en: Estimated remaining: {} h {} min
+tr: Liko apytiksliai: {} val. {} min.
+
+en: Click to open power settings
+tr: Spustelėkite, kad atidarytumėte maitinimo parametrus
+
+en: Clock status unavailable
+tr: Laikrodžio būsena nepasiekiama
+
+en: Click to open calendar and notifications
+tr: Spustelėkite, kad atidarytumėte kalendorių ir pranešimus
+
+en: Action failed: {}
+tr: Veiksmas nepavyko: {}
+
+en: Aether Shell status bar
+tr: „Aether Shell“ būsenos juosta
+
+en: Update available
+tr: Galimas naujinimas
+
+en: Cached
+tr: Talpykloje
+
+en: Start
+tr: Pradžia
+
+en: Search
+tr: Ieška
+
+en: Task View
+tr: Užduočių rodinys
+
+en: Application
+tr: Programėlė
+
+en: Running application
+tr: Veikianti programėlė
+
+en: More applications
+tr: Daugiau programėlių
+
+en: Aether Shell window previews
+tr: „Aether Shell“ langų peržiūros
+
+en: Minimized — preview unavailable
+tr: Sumažinta – peržiūra nepasiekiama
+
+en: Preview unavailable
+tr: Peržiūra nepasiekiama
+
+en: {} windows
+tr: Langų: {}
+
+en: {} window
+tr: {} langas
+
+en: Switches to this window
+tr: Persijungia į šį langą
+
+en: Minimized, preview unavailable
+tr: Sumažinta, peržiūra nepasiekiama
+
+en: Minimized
+tr: Sumažinta
+
+en: Close {}
+tr: Uždaryti {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Paprašo šio lango užsidaryti; programėlė vis tiek gali pasiūlyti įrašyti arba atšaukti
+
+en: Close requested
+tr: Paprašyta uždaryti
+
+en: Previous applications
+tr: Ankstesnės programėlės
+
+en: Open
+tr: Atidaryti
+
+en: New instance
+tr: Naujas egzempliorius
+
+en: Unpin from Dock
+tr: Atsegti nuo Dock
+
+en: Pin to Dock
+tr: Prisegti prie Dock
+
+en: Move left
+tr: Perkelti kairėn
+
+en: Move right
+tr: Perkelti dešinėn
+
+en: Dock settings...
+tr: Dock parametrai...
+
+en: Import Windows taskbar pins
+tr: Importuoti „Windows“ užduočių juostos prisegtus elementus
+
+en: Open Windows Start
+tr: Atidaryti „Windows“ meniu Pradžia
+
+en: Aether Shell Dock
+tr: „Aether Shell“ Dock
+
+en: Pinned
+tr: Prisegta
+
+en: Running
+tr: Veikia
+
+en: Needs attention
+tr: Reikia dėmesio
+
+en: Up arrow shows window previews
+tr: Rodyklė aukštyn rodo langų peržiūras
+
+en: Installed application
+tr: Įdiegta programėlė
+
+en: Desktop application
+tr: Darbalaukio programėlė
+
+en: File
+tr: Failas
+
+en: Folder
+tr: Aplankas
+
+en: Windows tool
+tr: „Windows“ įrankis
+
+en: Control Panel
+tr: Valdymo skydas
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Naršyti   ·   Enter Atidaryti   ·   Esc Uždaryti
+
+en: Search apps, settings and files
+tr: Ieškokite programėlių, parametrų ir failų
+
+en: Search could not be completed.
+tr: Nepavyko atlikti ieškos.
+
+en: Results
+tr: Rezultatai
+
+en: Indexing applications…
+tr: Indeksuojamos programėlės…
+
+en: Type to search apps, settings and files
+tr: Rašykite, kad ieškotumėte programėlių, parametrų ir failų
+
+en: Nothing matches
+tr: Nieko nerasta
+
+en: Windows could not open this application.
+tr: „Windows“ nepavyko atidaryti šios programėlės.
+
+en: Menu
+tr: Meniu
+
+en: Opens a submenu
+tr: Atidaro antrinį meniu
+
+en: , opens a submenu
+tr: , atidaro antrinį meniu
+
+en: Selected
+tr: Pasirinkta
+
+en: Checked
+tr: Pažymėta
+
+en: Bluetooth
+tr: „Bluetooth“
+
+en: Airplane mode
+tr: Lėktuvo režimas
+
+en: Accessibility
+tr: Pritaikymas neįgaliesiems
+
+en: Energy saver
+tr: Energijos taupymas
+
+en: Live captions
+tr: Tiesioginiai titrai
+
+en: Night light
+tr: Naktinė šviesa
+
+en: Mobile hotspot
+tr: Mobilusis interneto prieigos taškas
+
+en: Nearby sharing
+tr: Bendrinimas netoliese
+
+en: Cast
+tr: Perduoti
+
+en: Project
+tr: Projektuoti
+
+en: All settings
+tr: Visi parametrai
+
+en: Connected
+tr: Prisijungta
+
+en: Not connected
+tr: Neprisijungta
+
+en: , on
+tr: , įjungta
+
+en: , off
+tr: , išjungta
+
+en: , state unknown
+tr: , būsena nežinoma
+
+en: , opens Windows Settings
+tr: , atidaro „Windows“ parametrus
+
+en: , shows accessibility features
+tr: , rodo pritaikymo neįgaliesiems funkcijas
+
+en: , requires Windows 11 version 22H2
+tr: , reikia „Windows 11“ 22H2 versijos
+
+en: Now playing: {}
+tr: Dabar leidžiama: {}
+
+en: Untitled media
+tr: Medija be pavadinimo
+
+en: , switch source
+tr: , perjungti šaltinį
+
+en: Previous media item
+tr: Ankstesnis medijos elementas
+
+en: Pause
+tr: Pristabdyti
+
+en: Play
+tr: Leisti
+
+en: Next media item
+tr: Kitas medijos elementas
+
+en: {} details
+tr: {}: išsami informacija
+
+en: Page {} of {}
+tr: {} puslapis iš {}
+
+en: Next page
+tr: Kitas puslapis
+
+en: First page
+tr: Pirmas puslapis
+
+en: Brightness
+tr: Ryškumas
+
+en: Brightness, unavailable on this display
+tr: Ryškumas, nepasiekiamas šiame ekrane
+
+en: Volume
+tr: Garsumas
+
+en: Volume, unavailable
+tr: Garsumas, nepasiekiamas
+
+en: Unmute
+tr: Įjungti garsą
+
+en: Mute
+tr: Nutildyti
+
+en: Sound output and volume mixer
+tr: Garso išvestis ir garsumo maišytuvas
+
+en: Back
+tr: Atgal
+
+en: , secured
+tr: , apsaugotas
+
+en: , open
+tr: , atviras
+
+en: , connected
+tr: , prisijungta
+
+en: Disconnect
+tr: Atsijungti
+
+en: Show available networks
+tr: Rodyti pasiekiamus tinklus
+
+en: More Wi-Fi settings
+tr: Daugiau „Wi-Fi“ parametrų
+
+en: Bluetooth and devices settings
+tr: „Bluetooth“ ir įrenginių parametrai
+
+en: Magnifier
+tr: Didintuvas
+
+en: Narrator
+tr: Diktorius
+
+en: On-screen keyboard
+tr: Ekraninė klaviatūra
+
+en: Sticky keys
+tr: Lipnieji klavišai
+
+en: More accessibility settings
+tr: Daugiau pritaikymo neįgaliesiems parametrų
+
+en: Volume mixer
+tr: Garsumo maišytuvas
+
+en: Choose output in Sound settings
+tr: Pasirinkite išvestį garso parametruose
+
+en: Power and battery settings
+tr: Maitinimo ir akumuliatoriaus parametrai
+
+en: Battery {} percent, {}
+tr: Akumuliatorius {} proc., {}
+
+en: All Windows settings
+tr: Visi „Windows“ parametrai
+
+en: The requested action could not be dispatched
+tr: Nepavyko išsiųsti prašomo veiksmo
+
+en: Aether Shell quick controls
+tr: „Aether Shell“ spartieji valdikliai
+
+en: Media session active
+tr: Medijos seansas aktyvus
+
+en: No media session
+tr: Nėra medijos seanso
+
+en: Current page
+tr: Dabartinis puslapis
+
+en:  - secured
+tr:  – apsaugotas
+
+en:  - open
+tr:  – atviras
+
+en:  - opens in Windows
+tr:  – atidaroma „Windows“
+
+en: Turned off by hardware or policy
+tr: Išjungta aparatūros arba strategijos
+
+en: State unavailable - use Windows settings
+tr: Būsena nepasiekiama – naudokite „Windows“ parametrus
+
+en: Off
+tr: Išjungta
+
+en:  - signal {} of 5
+tr:  – signalas {} iš 5
+
+en: , no internet
+tr: , nėra interneto
+
+en: On - not connected
+tr: Įjungta – neprisijungta
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: „Windows“ neleidžia programėlėms išvardyti tinklų: patikrinkite vietos nustatymą privatumo parametruose
+
+en: No Wi-Fi adapter found
+tr: „Wi-Fi“ adapteris nerastas
+
+en: Connecting to {}...
+tr: Jungiamasi prie {}...
+
+en:  - looking for networks
+tr:  – ieškoma tinklų
+
+en: On
+tr: Įjungta
+
+en: A screen reader is running
+tr: Veikia ekrano skaitytuvas
+
+en: Windows accessibility features
+tr: „Windows“ pritaikymo neįgaliesiems funkcijos
+
+en: Sound output
+tr: Garso išvestis
+
+en: Default output device
+tr: Numatytasis išvesties įrenginys
+
+en: No output device available
+tr: Nėra pasiekiamo išvesties įrenginio
+
+en: Battery unknown
+tr: Akumuliatoriaus būsena nežinoma
+
+en: Status refresh could not be started
+tr: Nepavyko pradėti būsenos atnaujinimo
+
+en: Status refresh unavailable
+tr: Būsenos atnaujinimas nepasiekiamas
+
+en: Excellent signal
+tr: Puikus signalas
+
+en: Good signal
+tr: Geras signalas
+
+en: Fair signal
+tr: Vidutinis signalas
+
+en: Weak signal
+tr: Silpnas signalas
+
+en: Clear sky
+tr: Giedra
+
+en: Mainly clear
+tr: Daugiausia giedra
+
+en: Partly cloudy
+tr: Mažai debesuota
+
+en: Overcast
+tr: Debesuota
+
+en: Fog
+tr: Rūkas
+
+en: Drizzle
+tr: Dulksna
+
+en: Rain
+tr: Lietus
+
+en: Snow
+tr: Sniegas
+
+en: Rain showers
+tr: Trumpas lietus
+
+en: Snow showers
+tr: Trumpas snigimas
+
+en: Thunderstorm
+tr: Perkūnija
+
+## weather
+
+en: Morning
+tr: Rytas
+
+en: Afternoon
+tr: Popietė
+
+en: Evening
+tr: Vakaras
+
+en: Night
+tr: Naktis
+
+en: Now
+tr: Dabar
+
+en: Today
+tr: Šiandien
+
+en: Low
+tr: Žemas
+
+en: Moderate
+tr: Vidutinis
+
+en: High
+tr: Aukštas
+
+en: Very high
+tr: Labai aukštas
+
+en: Extreme
+tr: Ekstremalus
+
+en: No connection to the weather service.
+tr: Nėra ryšio su orų tarnyba.
+
+en: The weather service is busy. Try again in a moment.
+tr: Orų tarnyba užimta. Bandykite dar kartą po akimirkos.
+
+en: The weather could not be loaded.
+tr: Nepavyko įkelti orų.
+
+en: Could not update; showing the last forecast.
+tr: Nepavyko atnaujinti; rodoma paskutinė prognozė.
+
+en: Try again
+tr: Bandyti dar kartą
+
+en: Your location
+tr: Jūsų vieta
+
+en: My location
+tr: Mano vieta
+
+en: Precise location
+tr: Tiksli vieta
+
+en: Approximate location
+tr: Apytikslė vieta
+
+en: Chosen in Settings
+tr: Pasirinkta parametruose
+
+en: Allow
+tr: Leisti
+
+en: Use precise location
+tr: Naudoti tikslią vietą
+
+en: See the weather where you are: allow your precise location.
+tr: Matykite orus ten, kur esate: leiskite naudoti tikslią vietą.
+
+en: Your position is approximate (about 10 km).
+tr: Jūsų padėtis apytikslė (apie 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: „Windows“ šiai programėlei vietos nustatymas išjungtas.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Šis įrenginys negali pranešti savo vietos. Vietoj to ieškokite miesto.
+
+en: Reading Windows location…
+tr: Nuskaitoma „Windows“ vieta…
+
+en: Automatic weather follows your Windows location.
+tr: Automatiniai orai seka jūsų „Windows“ vietą.
+
+en: Search for a city
+tr: Ieškoti miesto
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Norėdami matyti orus, ieškokite miesto arba leiskite naudoti savo vietą.
+
+en: Searching…
+tr: Ieškoma…
+
+en: City search is unavailable.
+tr: Miestų paieška nepasiekiama.
+
+en: No city found.
+tr: Miestas nerastas.
+
+en: Weather settings
+tr: Orų parametrai
+
+en: Loading the weather…
+tr: Įkeliami orai…
+
+en: Loading…
+tr: Įkeliama…
+
+en: Updated {}
+tr: Atnaujinta {}
+
+en: Near {}
+tr: Netoli {}
+
+en: Temperatures now
+tr: Dabartinė temperatūra
+
+en: The map is unavailable.
+tr: Žemėlapis nepasiekiamas.
+
+en: Map: Natural Earth
+tr: Žemėlapis: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Orų duomenys: „Open-Meteo.com“
+
+en: Feels like
+tr: Juntama
+
+en: Feels like {}
+tr: Juntama kaip {}
+
+en: Close to the real temperature
+tr: Artima tikrajai temperatūrai
+
+en: The wind makes it feel colder
+tr: Dėl vėjo atrodo šalčiau
+
+en: Humidity makes it feel warmer
+tr: Dėl drėgmės atrodo šilčiau
+
+en: Humidity
+tr: Drėgmė
+
+en: Cloud cover {}
+tr: Debesuotumas {}
+
+en: Wind
+tr: Vėjas
+
+en: Gusts {}
+tr: Gūsiai {}
+
+en: Sunrise and sunset
+tr: Saulėtekis ir saulėlydis
+
+en: UV index
+tr: UV indeksas
+
+en: Pressure
+tr: Slėgis
+
+en: At sea level
+tr: Jūros lygyje
+
+en: &Open the weather
+tr: &Atidaryti orus
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognozė ten, kur esate, maždaug 100 m tikslumu, su savo aukščiu. Išjungta: suapvalinta iki maždaug 10 km.

@@ -29,14 +29,9 @@ Una interfaz de escritorio nativa para Windows creada por **Ibrahim Bouillet**. 
 flotante con una barra de estado superior compacta, en un material translúcido con un desenfoque suave. Está
 escrito en C++20 con Win32, Direct2D/DirectWrite y Windows.UI.Composition, y se publica con licencia MIT.
 
-> **Software alfa:** 0.3.5-alpha.3 (Alpha 3, versión 3.5) es una versión preliminar pública. Todavía no es un
+> **Software alfa:** 0.4.0-alpha.4 (Alpha 4) es una versión preliminar pública. Todavía no es un
 > sustituto totalmente cualificado de la interfaz de Windows. Guarda tu trabajo antes de probarlo y lee las
 > [limitaciones conocidas](KNOWN_LIMITATIONS.md).
-
-> **Próximamente: Alpha 4.** La próxima versión está en desarrollo: dos estilos para elegir, *Líquido* (un cristal
-> de agua transparente) y *Grano* (el material esmerilado actual), una búsqueda que también encuentra las páginas de
-> la Configuración de Windows, archivos y carpetas, una interfaz en varios idiomas, y una interfaz más ligera y fluida.
-> [Sigue las versiones](https://github.com/ibrahimbouillet/AetherShell/releases) para saber cuándo sale.
 
 <h2 align="center">Un nuevo escritorio. Una nueva atmósfera.</h2>
 
@@ -70,9 +65,9 @@ Escritorios reales, capturados en Windows 11. Los fondos de pantalla y los icono
   dispositivos, los Servicios o los elementos del Panel de control.
 - **Ocultación automática:** el Dock y la barra superior, cada uno por su lado, se apartan cuando una ventana los
   cubre y vuelven cuando el puntero llega a su borde de la pantalla, para trabajar a pantalla completa.
-- **Diez idiomas:** toda la interfaz, instalación incluida, en inglés, chino, hindi, español, francés, portugués,
-  ruso, árabe, bengalí y urdu. Sigue tus idiomas de Windows o el que elijas en Configuración → Idioma, y recuerda esa
-  elección de una versión a otra. Consulta [Idiomas](#idiomas).
+- **41 idiomas:** toda la interfaz, instalación incluida, en los 38 idiomas que ofrece Windows 11, más el bengalí, el
+  hindi y el urdu. Sigue tus idiomas de Windows o el que elijas en Configuración → Idioma, y recuerda esa elección de
+  una versión a otra. Cada idioma se descarga de la versión publicada cuando hace falta. Consulta [Idiomas](#idiomas).
 - **Bienvenida:** un saludo opcional, escrito a mano en francés, inglés o español sobre tu fondo de pantalla
   desenfocado, al iniciar sesión o desbloquear el PC. La instalación puede pedir el nombre con el que te saluda.
 - **Tiempo:** opcionalmente, la ubicación de Windows (con tu permiso) da una posición aproximada y una previsión.
@@ -83,19 +78,22 @@ Escritorios reales, capturados en Windows 11. Los fondos de pantalla y los icono
 - **Recuperación:** una instalación por usuario, un asistente de recuperación independiente, reparación y
   desinstalación, y un comando para restaurar la barra de tareas de Windows.
 
-## Novedades de la 3.5
+## Novedades de la Alpha 4
 
-La versión 3.5 deja en paz las pestañas y los botones de cierre de las aplicaciones (la barra superior solo
-responde al borde más alto de la pantalla), cierra los paneles en cuanto usas otra cosa y encuentra las
-herramientas de Windows en la búsqueda. La bienvenida ya te saluda por tu nombre desde la primera vez, porque la
-instalación lo pide; muestra tu fondo de pantalla aunque el archivo de la imagen se haya movido o borrado, y su
-pluma fluye con menos trabajo por fotograma. Lee las [notas de la versión](docs/releases/0.3.5-alpha.3.md) y el
-[registro de cambios](CHANGELOG.md) (en inglés).
+Dos estilos: *Líquido*, un cristal de agua transparente sobre una capa de desenfoque que tú ajustas, y *Grano*, el
+material esmerilado de las versiones anteriores. En Líquido, la ventana de Configuración solo se desenfoca bajo sus
+propios textos y controles y queda transparente en el resto. La interfaz habla 41 idiomas, que se descargan de la
+versión publicada cuando los necesitas y siguen tu idioma de presentación de Windows. La búsqueda encuentra por nombre
+lo mismo que Inicio. El tiempo es preciso y animado, con una ventana propia. La barra superior puede ser simple texto
+sobre tu escritorio, un icono arrastrado estira el Dock y Aether arranca antes al iniciar sesión. Lee las
+[notas de la versión](docs/releases/0.4.0-alpha.4.md) y el [registro de cambios](CHANGELOG.md) (en inglés).
 
 ## Idiomas
 
-Aether Shell habla los diez idiomas más hablados del mundo. Cada menú, panel, página de Configuración, mensaje y
-pantalla de instalación está traducido, igual que esta documentación.
+La interfaz de Aether Shell habla 41 idiomas: los 38 que ofrece Windows 11, más el bengalí, el hindi y el urdu. Cada
+menú, panel, página de Configuración, mensaje y pantalla de instalación está traducido. Aether sigue tu idioma de
+presentación de Windows, o el que elijas en Configuración → Idioma; cada idioma se descarga de la versión publicada
+cuando hace falta. Esta documentación está disponible en los diez idiomas siguientes.
 
 | | Idioma | Interfaz | Documentación |
 |---|---|---|---|
@@ -111,13 +109,13 @@ pantalla de instalación está traducido, igual que esta documentación.
 | 🇵🇰 | اردو | ✅ (de derecha a izquierda) | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
 **Igual que Windows** (la opción predeterminada) recorre tus idiomas de Windows (Configuración → Hora e idioma) en el
-orden en que los colocaste y usa el primero que sea uno de estos diez; si no, el inglés. Elige otro en
+orden en que los colocaste y usa el primero que hable Aether Shell (cualquiera de los 41); si no, el inglés. Elige otro en
 **Configuración → Idioma**; el cambio se aplica al momento y se guarda en tu configuración, que lee cada versión:
 instalar una nueva versión, reparar o reinstalar lo conserva, y la instalación, el actualizador y el lanzador también
 lo hablan. Los nombres que son tuyos o de otros programas (aplicaciones, archivos, redes Wi-Fi) nunca se traducen. La
-bienvenida escrita a mano traza letras latinas, así que saluda en francés, inglés o español. El árabe y el urdu se leen
-de derecha a izquierda: el texto se forma y se alinea en consecuencia, mientras que las barras y los paneles conservan
-su disposición. Las traducciones están en [tools/i18n/catalog](tools/i18n/catalog); las correcciones son bienvenidas.
+bienvenida escrita a mano traza letras latinas, así que saluda en francés, inglés o español. El árabe, el hebreo y el urdu se
+leen de derecha a izquierda: el texto se forma y se alinea en consecuencia, mientras que las barras y los paneles conservan
+su disposición. Las traducciones están en [tools/i18n/languages](tools/i18n/languages); las correcciones son bienvenidas.
 
 ## Sustituir la barra de tareas de Windows
 

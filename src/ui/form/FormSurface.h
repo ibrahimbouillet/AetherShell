@@ -52,6 +52,7 @@
 
 namespace aether::graphics {
 class FrameScheduler;
+class GraphicsDevice;
 }
 
 namespace aether::ui::form {
@@ -157,6 +158,12 @@ public:
     // (high contrast) keeps the system frame.
     void SetMaximizedFrame(bool maximized);
     [[nodiscard]] bool MaximizedFrame() const noexcept;
+    // D84: Liquid's smart transparency (SmartGlass.h). With a device, a Liquid Acrylic form whose tokens ask for it
+    // (liquidSmart) draws no blur of its own: a window below it blurs only under its content. `extraContent` adds what
+    // the owner paints itself (caption buttons, marks, pictures), in client pixels. Null turns it off. It also stays
+    // off while maximized, in high contrast and where the compositor cannot blur the desktop.
+    void EnableSmartGlass(graphics::GraphicsDevice* device, std::function<std::vector<RECT>()> extraContent = {});
+    [[nodiscard]] bool SmartGlassActive() const noexcept;
     [[nodiscard]] UINT Dpi() const noexcept;
     [[nodiscard]] float ToPx(float dip) const noexcept;
     [[nodiscard]] float ToDip(float px) const noexcept;

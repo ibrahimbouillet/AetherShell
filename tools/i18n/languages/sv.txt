@@ -1,0 +1,2494 @@
+# Swedish (sv): Svenska. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Välj Windows-plats för att aktivera automatiskt väder.
+
+en: Windows taskbar visible
+tr: Windows aktivitetsfält visas
+
+en: Connected to {}
+tr: Ansluten till {}
+
+en: {} is out of range
+tr: {} är utom räckhåll
+
+en: Connecting to {} took too long
+tr: Anslutningen till {} tog för lång tid
+
+en: Use Windows to join {}
+tr: Använd Windows för att ansluta till {}
+
+en: Windows did not allow this connection
+tr: Windows tillät inte den här anslutningen
+
+en: Could not connect to {}
+tr: Det gick inte att ansluta till {}
+
+en: Connect to {}
+tr: Anslut till {}
+
+en: That password was not accepted. Check it and try again.
+tr: Lösenordet godkändes inte. Kontrollera det och försök igen.
+
+en: Enter this network's password.
+tr: Ange lösenordet för det här nätverket.
+
+en: &Connect
+tr: &Anslut
+
+en: Windows Settings could not be opened
+tr: Det gick inte att öppna Windows-inställningarna
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Det gick inte att reservera utrymme för Dock; Windows aktivitetsfält återställs
+
+en: Replacement unavailable: recovery observer could not start
+tr: Ersättning inte tillgänglig: återställningsövervakaren kunde inte starta
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows aktivitetsfält har återställts. Det gick inte att reservera utrymme för Dock; inaktivera och aktivera ersättningen för att försöka igen.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Återställningsövervakningen är inte tillgänglig; Windows aktivitetsfält återställs
+
+en: Windows notifications could not be opened
+tr: Det gick inte att öppna Windows-meddelanden
+
+en: The Windows calendar could not be opened
+tr: Det gick inte att öppna Windows-kalendern
+
+en: Windows did not show its hidden icons
+tr: Windows visade inte sina dolda ikoner
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatisk uppdatering av platsen är inte tillgänglig; försök igen i väderinställningarna.
+
+en: Windows location
+tr: Windows-plats
+
+en: Reading approximate Windows location…
+tr: Läser ungefärlig Windows-plats…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatiskt väder följer den ungefärliga Windows-platsen.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Åtkomst till Windows-platsen är blockerad. Vädret är inte tillgängligt.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows kunde inte ange någon aktuell plats. Vädret är inte tillgängligt.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Platstjänsten är inte tillgänglig. Vädret är inte tillgängligt.
+
+en: Waiting for Windows location permission…
+tr: Väntar på platsbehörighet från Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Valet av automatiskt väder kunde inte sparas.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Åtkomst till Windows-platsen är inte tillgänglig eller nekades. Vädret är inte tillgängligt.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows-platsen kunde inte begära behörighet. Granska platsinställningarna i Windows.
+
+en: Status worker unavailable
+tr: Statustjänsten är inte tillgänglig
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows kunde inte slutföra den här åtgärden. Granska inställningarna för den.
+
+en: Reading Windows status; try the action again shortly
+tr: Läser Windows-status; försök med åtgärden igen om en stund
+
+en: Could not disconnect
+tr: Det gick inte att koppla från
+
+en: The Windows accessibility feature could not be started
+tr: Det gick inte att starta hjälpmedelsfunktionen i Windows
+
+en: Windows could not change the audio output
+tr: Windows kunde inte ändra ljudutgången
+
+en: The Windows control could not be opened
+tr: Det gick inte att öppna Windows-kontrollen
+
+en: Keyboard shortcuts disabled
+tr: Kortkommandon inaktiverade
+
+en: Both keyboard shortcuts registered
+tr: Båda kortkommandona registrerade
+
+en: A keyboard shortcut is already in use by another application
+tr: Ett kortkommando används redan av ett annat program
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Det gick inte att begära Snabbinställningar i Windows. Avmarkera Använd Snabbinställningar i Windows i inställningarna för Övre fältet för att använda Aethers kontroller.
+
+en: Windows Start could not be opened
+tr: Det gick inte att öppna Start i Windows
+
+en: Windows Task View could not be opened
+tr: Det gick inte att öppna Aktivitetsvy i Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: Byte av tangentbordslayout i Windows var inte tillgängligt
+
+en: Windows voice typing could not be opened
+tr: Det gick inte att öppna röstinmatning i Windows
+
+en: Windows taskbar could not be revealed
+tr: Det gick inte att visa Windows aktivitetsfält
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Ersättningen av aktivitetsfältet kunde inte återupptas; Windows är fortfarande tillgängligt
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Ersättning av Windows aktivitetsfält är inte tillgänglig i den här sessionen
+
+en: Windows pin access is unavailable in this isolated session
+tr: Åtkomst till fästa objekt i Windows är inte tillgänglig i den här isolerade sessionen
+
+en: Windows pinned applications could not be read
+tr: Det gick inte att läsa fästa program i Windows
+
+en: Settings changed during pin import. Try import again.
+tr: Inställningarna ändrades under importen av fästa objekt. Försök importera igen.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Sparade {} ytterligare fästa program. Vissa fästa objekt i Windows kan förbli otillgängliga.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Fästa objekt ändrades i minnet; det gick inte att spara. Klicka på Verkställ i Inställningar för att försöka igen.
+
+en: Pins updated in memory; saving...
+tr: Fästa objekt uppdaterades i minnet; sparar...
+
+en: Imported pins could not be applied
+tr: Det gick inte att tillämpa de importerade fästa objekten
+
+en: Pin import is unavailable while closing
+tr: Import av fästa objekt är inte tillgänglig medan programmet stängs
+
+en: Settings could not be saved
+tr: Det gick inte att spara inställningarna
+
+en: Quit without saving the latest changes?
+tr: Avsluta utan att spara de senaste ändringarna?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Din tidigare inställningsfil behålls. Låt Aether Shell vara öppet för att försöka spara igen.
+
+en: &Quit without saving
+tr: &Avsluta utan att spara
+
+en: &Keep Aether Shell open
+tr: &Låt Aether Shell vara öppet
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Exportera grundläggande diagnostik – appversion och Windows-version, inga loggar eller personuppgifter
+
+en: Diagnostics exported.
+tr: Diagnostiken har exporterats.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Det gick inte att spara diagnostiken i den valda filen.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Det gick inte att läsa inställningarna på ett säkert sätt. Den befintliga filen har bevarats.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell kunde inte starta sina skrivbordsytor.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Återställning av Windows aktivitetsfält väntar. Försök igen eller stäng Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows aktivitetsfält visas tillfälligt.
+
+en: Windows taskbar restored.
+tr: Windows aktivitetsfält har återställts.
+
+en: Windows taskbar replacement is active.
+tr: Ersättning av Windows aktivitetsfält är aktiv.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows aktivitetsfält är fortfarande tillgängligt. Ersättningen försöker igen inom kort.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows aktivitetsfält är fortfarande tillgängligt. Inaktivera och aktivera ersättningen för att försöka igen.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows aktivitetsfält har återställts. Ersättningen återansluter inom kort.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows aktivitetsfält har återställts. Inaktivera och aktivera ersättningen för att försöka igen.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Ersättningen av aktivitetsfältet har stoppats. Windows aktivitetsfält har återställts.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Ersättningen av aktivitetsfältet har stoppats. Återställningen av Windows aktivitetsfält kunde inte bekräftas.
+
+en: Activating taskbar replacement...
+tr: Aktiverar ersättning av aktivitetsfältet...
+
+en: Restoring Windows taskbar...
+tr: Återställer Windows aktivitetsfält...
+
+en: Reconnecting taskbar replacement...
+tr: Återansluter ersättning av aktivitetsfältet...
+
+en: Showing the Windows taskbar temporarily...
+tr: Visar Windows aktivitetsfält tillfälligt...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell kunde inte återställa Windows aktivitetsfält.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Starta om Utforskaren från Aktivitetshanteraren (Ctrl+Skift+Esc), eller logga ut och logga in igen.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows aktivitetsfält har återställts till sitt sparade tillstånd.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Inget sparat tillstånd för aktivitetsfältet hittades. Windows aktivitetsfält har gjorts synligt; inställningen för att dölja automatiskt ändrades inte.
+
+en: There was nothing to restore.
+tr: Det fanns inget att återställa.
+
+en: Taskbar replacement is turned off.
+tr: Ersättning av aktivitetsfältet är inaktiverad.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Ersättning av aktivitetsfältet kunde inte inaktiveras automatiskt. Inaktivera den i Aether Shell-inställningar > Skrivbord.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Okänd eller ogiltig kommandorad för Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell kunde inte skapa sina lokala datamappar.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell stoppades efter ett oväntat fel.
+
+## search-names
+
+en: Disk Management
+tr: Diskhantering
+
+en: Local Users and Groups
+tr: Lokala användare och grupper
+
+en: Local Group Policy Editor
+tr: Redigeraren för lokala grupprinciper
+
+en: Manage User Certificates
+tr: Hantera användarcertifikat
+
+en: Manage Computer Certificates
+tr: Hantera datorcertifikat
+
+en: Shared Folders
+tr: Delade mappar
+
+en: TPM Management
+tr: TPM-hantering
+
+en: Network Connections
+tr: Nätverksanslutningar
+
+en: System Properties
+tr: Systemegenskaper
+
+en: About Windows
+tr: Om Windows
+
+en: DirectX Diagnostic Tool
+tr: DirectX-diagnostikverktyg
+
+en: Windows Features
+tr: Windows-funktioner
+
+en: System Restore
+tr: Systemåterställning
+
+en: Advanced System Settings
+tr: Avancerade systeminställningar
+
+en: Volume Mixer
+tr: Volymmixer
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Användarkonton (avancerat)
+
+en: Display settings
+tr: Skärminställningar
+
+en: Night light settings
+tr: Inställningar för nattljus
+
+en: Graphics settings
+tr: Grafikinställningar
+
+en: Sound settings
+tr: Ljudinställningar
+
+en: Notification settings
+tr: Meddelandeinställningar
+
+en: Power & battery settings
+tr: Inställningar för ström och batteri
+
+en: Energy saver settings
+tr: Inställningar för energisparläge
+
+en: Storage settings
+tr: Lagringsinställningar
+
+en: Multitasking settings
+tr: Inställningar för multikörning
+
+en: Clipboard settings
+tr: Inställningar för Urklipp
+
+en: Remote Desktop settings
+tr: Inställningar för fjärrskrivbord
+
+en: About your PC
+tr: Om din dator
+
+en: Bluetooth & devices settings
+tr: Inställningar för Bluetooth och enheter
+
+en: Printers & scanners settings
+tr: Inställningar för skrivare och skannrar
+
+en: Mouse settings
+tr: Musinställningar
+
+en: Touchpad settings
+tr: Inställningar för pekplatta
+
+en: Network & internet settings
+tr: Inställningar för nätverk och Internet
+
+en: Wi-Fi settings
+tr: Wi-Fi-inställningar
+
+en: VPN settings
+tr: VPN-inställningar
+
+en: Proxy settings
+tr: Proxyinställningar
+
+en: Airplane mode settings
+tr: Inställningar för flygplansläge
+
+en: Mobile hotspot settings
+tr: Inställningar för mobil surfzon
+
+en: Background settings
+tr: Bakgrundsinställningar
+
+en: Color settings
+tr: Färginställningar
+
+en: Theme settings
+tr: Temainställningar
+
+en: Lock screen settings
+tr: Inställningar för låsskärm
+
+en: Taskbar settings
+tr: Inställningar för aktivitetsfältet
+
+en: Font settings
+tr: Teckensnittsinställningar
+
+en: Installed apps
+tr: Installerade appar
+
+en: Default apps settings
+tr: Inställningar för standardappar
+
+en: Startup apps settings
+tr: Inställningar för startappar
+
+en: Account info
+tr: Din information
+
+en: Sign-in options
+tr: Inloggningsalternativ
+
+en: Other users settings
+tr: Inställningar för andra användare
+
+en: Date & time settings
+tr: Inställningar för datum och tid
+
+en: Language & region settings
+tr: Inställningar för språk och region
+
+en: Typing settings
+tr: Inställningar för att skriva
+
+en: Accessibility settings
+tr: Inställningar för hjälpmedel
+
+en: Privacy & security settings
+tr: Inställningar för sekretess och säkerhet
+
+en: Location settings
+tr: Platsinställningar
+
+en: Windows Update settings
+tr: Inställningar för Windows Update
+
+en: Recovery settings
+tr: Återställningsinställningar
+
+en: Activation settings
+tr: Aktiveringsinställningar
+
+en: For developers settings
+tr: Inställningar för utvecklare
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Det gick inte att nå GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub svarade inte på begäran just nu.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Versionen klarade inte verifieringen, så ingenting installerades.
+
+en: There is not enough free disk space.
+tr: Det finns inte tillräckligt med ledigt diskutrymme.
+
+en: Windows refused access to the update files.
+tr: Windows nekade åtkomst till uppdateringsfilerna.
+
+en: {} bytes
+tr: {} byte
+
+en: {} KB
+tr: {} kB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Status
+
+en: Check &now
+tr: Sök &nu
+
+en: Download and install
+tr: Ladda ned och installera
+
+en: &Later
+tr: &Senare
+
+en: S&kip this version
+tr: &Hoppa över den här versionen
+
+en: &Release details
+tr: &Versionsinformation
+
+en: Disable &notifications
+tr: Inaktivera &meddelanden
+
+en: Release notes
+tr: Versionsanteckningar
+
+en: the new version
+tr: den nya versionen
+
+en: Installed: {}.
+tr: Installerad: {}.
+
+en: Automatic update checks are off
+tr: Automatisk sökning efter uppdateringar är inaktiverad
+
+en: Check now looks for a newer release once.
+tr: Sök nu söker efter en nyare version en gång.
+
+en: Last checked {}
+tr: Senast kontrollerat {}
+
+en: Not checked yet
+tr: Inte kontrollerat ännu
+
+en: Checking for updates...
+tr: Söker efter uppdateringar...
+
+en: Aether Shell is up to date
+tr: Aether Shell är uppdaterat
+
+en: Latest published release: {}.
+tr: Senast publicerade version: {}.
+
+en: Version {} is available
+tr: Version {} är tillgänglig
+
+en: Download size: {}.
+tr: Nedladdningsstorlek: {}.
+
+en: Downloading version {}...
+tr: Laddar ned version {}...
+
+en: Received {} of {} ({}%).
+tr: Har tagit emot {} av {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Har tagit emot {}; total storlek okänd.
+
+en: Version {} is ready to install
+tr: Version {} är redo att installeras
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Verifierad med det signerade versionsmanifestet och SHA-256.
+
+en: The update could not be completed
+tr: Det gick inte att slutföra uppdateringen
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Den installeras manuellt tills vidare: öppna Versionsinformation, ladda sedan ned och kör installationsprogrammet.
+
+en: Failure: {}.
+tr: Fel: {}.
+
+en: Choose Retry Download to try again.
+tr: Välj Försök ladda ned igen för att försöka igen.
+
+en: Use Check now to try again.
+tr: Använd Sök nu för att försöka igen.
+
+en: Next automatic check: {}.
+tr: Nästa automatiska sökning: {}.
+
+en: &Install update
+tr: &Installera uppdateringen
+
+en: Retry &Download
+tr: Försök &ladda ned igen
+
+en: &Download and install
+tr: &Ladda ned och installera
+
+en: Windows' startup state could not be read in this session.
+tr: Det gick inte att läsa autostartstatus i Windows i den här sessionen.
+
+en: Windows will start it at your next sign-in.
+tr: Windows startar det vid nästa inloggning.
+
+en: Right now it will not start at sign-in.
+tr: Just nu startar det inte vid inloggning.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Det är inaktiverat i Aktivitetshanteraren eller Windows-inställningarna, som bestämmer tills det aktiveras där igen.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows skulle starta en annan kopia av Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows rapporterar en autostartstatus som den här versionen inte kan läsa.
+
+en: The close action could not be completed.
+tr: Det gick inte att slutföra stängningsåtgärden.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Ange ett fullständigt tal innan du sparar; det rödmarkerade fältet innehåller inget giltigt tal.
+
+en: Settings could not be validated.
+tr: Det gick inte att validera inställningarna.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Start vid inloggning lämnades oförändrad eftersom inställningarna inte kunde sparas.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Det gick inte att spara inställningarna, och start vid inloggning i Windows kunde inte återställas. Klicka på Verkställ igen för att försöka igen.
+
+en: Settings saved.
+tr: Inställningarna har sparats.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Inställningarna ändrades i minnet; det gick inte att spara. Klicka på Verkställ igen för att försöka igen.
+
+en: Settings could not be applied.
+tr: Det gick inte att tillämpa inställningarna.
+
+en: Some values were corrected to their supported range.
+tr: Vissa värden justerades till det intervall som stöds.
+
+en: Startup registration is unavailable in this session.
+tr: Autostartregistrering är inte tillgänglig i den här sessionen.
+
+en: Changing startup registration...
+tr: Ändrar autostartregistrering...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows ändrade inte autostartregistreringen. Kontrollera autostartinställningen i Aktivitetshanteraren.
+
+en: Startup registration could not be changed.
+tr: Det gick inte att ändra autostartregistreringen.
+
+en: Defaults saved; startup is disabled.
+tr: Standardvärdena har sparats; autostart är inaktiverat.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Standardvärdena har tillämpats; det gick inte att spara. Klicka på Verkställ igen för att försöka igen.
+
+en: Defaults could not be applied.
+tr: Det gick inte att tillämpa standardvärdena.
+
+en: Startup was not disabled; settings were kept.
+tr: Autostart inaktiverades inte; inställningarna behölls.
+
+en: Location search is unavailable.
+tr: Platssökning är inte tillgänglig.
+
+en: Searching Open-Meteo locations...
+tr: Söker efter platser hos Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Platssökningen misslyckades. Kontrollera anslutningen och försök igen.
+
+en: No place matched that search.
+tr: Ingen plats matchade sökningen.
+
+en: Choose a location to save it.
+tr: Välj en plats för att spara den.
+
+en: Reset all settings?
+tr: Vill du återställa alla inställningar?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Inställningar och fästa program återgår till standardvärdena och start vid inloggning inaktiveras.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Ditt val för Windows aktivitetsfält behålls. En säkerhetskopia av den aktuella inställningsfilen behålls.
+
+en: &Reset
+tr: &Återställ
+
+en: Cancel
+tr: Avbryt
+
+en: Pinned applications saved.
+tr: Fästa program har sparats.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Fästa objekt ändrades i minnet; det gick inte att spara. Klicka på Verkställ igen för att försöka igen.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Standardvärdena kunde inte återställas eftersom autostartregistrering inte är tillgänglig.
+
+en: Pinned application could not be added.
+tr: Det gick inte att lägga till det fästa programmet.
+
+en: Choose an application to add first.
+tr: Välj först ett program att lägga till.
+
+en: Pinned applications could not be changed.
+tr: Det gick inte att ändra de fästa programmen.
+
+en: Choose a pinned application first.
+tr: Välj först ett fäst program.
+
+en: Desktop status is unavailable in this session.
+tr: Skrivbordsstatus är inte tillgänglig i den här sessionen.
+
+en: Desktop status is unavailable.
+tr: Skrivbordsstatus är inte tillgänglig.
+
+en: Password
+tr: Lösenord
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Laddar ned {} från GitHub ({}). Engelska visas tills det är klart.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Det gick inte att ladda ned {}. Engelska visas tills det är nedladdat; välj Ladda ned nedan för att försöka igen.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} finns inte på den här datorn än. Engelska visas tills det har laddats ned.
+
+en: {} is on this PC.
+tr: {} finns på den här datorn.
+
+en: Every language is on this PC.
+tr: Alla språk finns på den här datorn.
+
+en: Choose a language to download first.
+tr: Välj först ett språk att ladda ned.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Övre fältet
+
+en: Weather
+tr: Väder
+
+en: Updates
+tr: Uppdateringar
+
+en: General
+tr: Allmänt
+
+en: About
+tr: Om
+
+en: Desktop
+tr: Skrivbord
+
+en: Appearance
+tr: Utseende
+
+en: Welcome
+tr: Välkomst
+
+en: Aether Shell Settings
+tr: Aether Shell-inställningar
+
+en: Settings
+tr: Inställningar
+
+en: Reset defaults...
+tr: Återställ standardvärden...
+
+en: &Apply
+tr: &Verkställ
+
+en: Liquid
+tr: Flytande
+
+en: Grain
+tr: Korn
+
+en: From {} to {}
+tr: Från {} till {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Det gick inte att slutföra den här åtgärden.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Storlek, avstånd, rörelse och de program som är fästa i Dock.
+
+en: Size and spacing
+tr: Storlek och avstånd
+
+en: Icon size
+tr: Ikonstorlek
+
+en: {}, scaled with the Windows display scale.
+tr: {}, skalas med skärmskalningen i Windows.
+
+en: Bottom margin
+tr: Nedre marginal
+
+en: Space between the Dock and the bottom of the screen.
+tr: Avstånd mellan Dock och skärmens nederkant.
+
+en: Minimum side margin
+tr: Minsta sidomarginal
+
+en: Space kept free at the left and right screen edges.
+tr: Utrymme som hålls fritt vid skärmens vänstra och högra kant.
+
+en: Icon spacing
+tr: Ikonavstånd
+
+en: Space between neighbouring icons.
+tr: Avstånd mellan intilliggande ikoner.
+
+en: Glass and motion
+tr: Glas och rörelse
+
+en: Glass opacity
+tr: Glasets opacitet
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Lägre värden visar mer av det suddiga skrivbordet bakom Dock.
+
+en: Hover magnification
+tr: Förstoring vid hovring
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Hur mycket en ikon växer under pekaren; 1 stänger av förstoringen.
+
+en: Behavior
+tr: Beteende
+
+en: Show running applications
+tr: Visa program som körs
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Öppna program som inte är fästa visas efter de fästa.
+
+en: Reserve screen space for the Dock
+tr: Reservera skärmutrymme för Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maximerade fönster stannar ovanför Dock i stället för under det.
+
+en: Automatically hide the Dock
+tr: Dölj Dock automatiskt
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Döljs när ett programfönster täcker det; flytta pekaren till skärmens nederkant för att visa det. Det förblir synligt på skrivbordet, och fönster får hela skärmhöjden.
+
+en: Pinned applications
+tr: Fästa program
+
+en: Move &up
+tr: Flytta &upp
+
+en: Move &down
+tr: Flytta &ned
+
+en: &Remove
+tr: &Ta bort
+
+en: &Add application
+tr: &Lägg till program
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Fästa objekt behåller sin identitet och sina startinställningar. När du tar bort ett fäst objekt lägger den automatiska synkroniseringen med Windows aktivitetsfält inte heller till det igen.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Position, klocka och statusobjekten i det övre statusfältet.
+
+en: Presentation
+tr: Presentation
+
+en: Floating bar
+tr: Flytande fält
+
+en: Text on the desktop
+tr: Text på skrivbordet
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Flytande fält: glasfältet nedanför skärmens överkant. Text på skrivbordet: inget fält, samma objekt skrivna högst upp på skärmen direkt ovanpå skrivbordsbilden; den remsan hålls fri från fönster, och övre marginal och glasets opacitet gäller inte. Med automatisk döljning visas texten på en glasremsa medan ett fönster ligger under den.
+
+en: Position and glass
+tr: Position och glas
+
+en: Top margin
+tr: Övre marginal
+
+en: Space between the Top Bar and the top of the screen.
+tr: Avstånd mellan Övre fältet och skärmens överkant.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Lägre värden visar mer av det suddiga skrivbordet bakom fältet.
+
+en: Clock
+tr: Klocka
+
+en: Clock format
+tr: Klockformat
+
+en: Follow Windows
+tr: Följ Windows
+
+en: 12-hour
+tr: 12 timmar
+
+en: 24-hour
+tr: 24 timmar
+
+en: Date style
+tr: Datumformat
+
+en: Weekday, day and month
+tr: Veckodag, dag och månad
+
+en: Short
+tr: Kort
+
+en: Long
+tr: Lång
+
+en: Show seconds
+tr: Visa sekunder
+
+en: Show date
+tr: Visa datum
+
+en: Status items
+tr: Statusobjekt
+
+en: Show battery
+tr: Visa batteri
+
+en: Hide battery when absent
+tr: Dölj batteri när det saknas
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Stationära datorer utan batteri visar ingenting i stället för ett okänt batteri.
+
+en: Show input language
+tr: Visa inmatningsspråk
+
+en: Show network
+tr: Visa nätverk
+
+en: Show audio output
+tr: Visa ljudutgång
+
+en: Show microphone
+tr: Visa mikrofon
+
+en: Show weather when enabled
+tr: Visa väder när det är aktiverat
+
+en: Weather itself is turned on in Weather settings.
+tr: Själva vädret aktiveras i väderinställningarna.
+
+en: Show hidden icons button
+tr: Visa knapp för dolda ikoner
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: En liten pil som öppnar de dolda ikonerna i Windows meddelandefält.
+
+en: Reserve screen space above windows
+tr: Reservera skärmutrymme ovanför fönster
+
+en: Maximized windows stay below the Top Bar.
+tr: Maximerade fönster stannar under Övre fältet.
+
+en: Automatically hide the Top Bar
+tr: Dölj Övre fältet automatiskt
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Döljs när ett programfönster täcker det; flytta pekaren till skärmens överkant för att visa det. Det förblir synligt på skrivbordet.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Använd Snabbinställningar i Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Av: Aethers snabbkontroller öppnas under Övre fältet. På: Windows egen panel öppnas längst ned på skärmen.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: En valfri prognos i Övre fältet, tillhandahållen av Open-Meteo.
+
+en: Forecast
+tr: Prognos
+
+en: Enable weather
+tr: Aktivera väder
+
+en: Off by default: the forecast needs network requests.
+tr: Av som standard: prognosen kräver nätverksbegäranden.
+
+en: Temperature
+tr: Temperatur
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Uppdateringsintervall
+
+en: Location
+tr: Plats
+
+en: Locate automatically with Windows
+tr: Hitta plats automatiskt med Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Använder platstjänsten i Windows när du har tillåtit den.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows ber om platsbehörighet. Dina koordinater skickas till Open-Meteo.com enbart för att hämta prognosen; en platsnyckel cachelagras lokalt. Om platsen är blockerad är vädret inte tillgängligt.
+
+en: Use &Windows location
+tr: Använd &Windows-plats
+
+en: Location &settings
+tr: Plats&inställningar
+
+en: Choose automatic location or search for a place below.
+tr: Välj automatisk plats eller sök efter en plats nedan.
+
+en: Search for a place
+tr: Sök efter en plats
+
+en: Searc&h
+tr: &Sök
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Väderdata från Open-Meteo.com (CC BY 4.0). Manuell sökning skickar bara den text du anger.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Signerade versioner från den officiella GitHub-lagringsplatsen, verifierade före installationen.
+
+en: Preferences
+tr: Preferenser
+
+en: Check for updates automatically
+tr: Sök efter uppdateringar automatiskt
+
+en: Check interval
+tr: Sökintervall
+
+en: Release channel
+tr: Versionskanal
+
+en: Prereleases arrive earlier and change more often.
+tr: Förhandsversioner kommer tidigare och ändras oftare.
+
+en: Stable
+tr: Stabil
+
+en: Prerelease
+tr: Förhandsversion
+
+en: Show update notifications
+tr: Visa uppdateringsmeddelanden
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Autostart, rörelse, kortkommandon och diagnostik.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Språket i fälten, menyerna, Sök, Inställningar och installationsprogrammet.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Namn som tillhör dig eller andra program (appar, filer, Wi-Fi-nätverk) översätts aldrig. Med ett valt språk skriver Övre fältet datumet på det språket; Följ Windows behåller ditt regionala format i Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Den handskrivna välkomsthälsningen skriver latinska bokstäver: den hälsar på franska, engelska eller spanska. Välj dess språk under Välkomst.
+
+en: Language
+tr: Språk
+
+en: Interface language
+tr: Gränssnittsspråk
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Följ Windows använder det första av dina visningsspråk i Windows som finns bland dessa, och annars engelska.
+
+en: Startup
+tr: Autostart
+
+en: Start Aether Shell when I sign in
+tr: Starta Aether Shell när jag loggar in
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Ändringen kräver Verkställ. Aktivitetshanteraren kan också inaktivera det.
+
+en: Motion
+tr: Rörelse
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Minskad rörelse tar bort dekorativa rörelser överallt.
+
+en: Reduced
+tr: Minskad
+
+en: Full
+tr: Full
+
+en: Keyboard shortcuts
+tr: Kortkommandon
+
+en: Enable global keyboard shortcuts
+tr: Aktivera globala kortkommandon
+
+en: Search shortcut key
+tr: Kortkommandotangent för Sök
+
+en: Dock shortcut key
+tr: Kortkommandotangent för Dock
+
+en: Search shortcut modifiers
+tr: Modifierartangenter för Sök
+
+en: Dock shortcut modifiers
+tr: Modifierartangenter för Dock
+
+en: Shortcut status unavailable
+tr: Kortkommandostatus inte tillgänglig
+
+en: Diagnostics
+tr: Diagnostik
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Loggmappen innehåller den här datorns Aether Shell-loggar. Exportera diagnostik sparar bara appversionen och Windows-versionen - inga loggar eller personuppgifter.
+
+en: Open &log folder
+tr: Öppna &loggmappen
+
+en: &Export diagnostics...
+tr: &Exportera diagnostik...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: En kort handskriven hälsning på skrivbordet när du loggar in eller låser upp datorn.
+
+en: Greeting
+tr: Hälsning
+
+en: Show the welcome at sign-in and unlock
+tr: Visa välkomsthälsningen vid inloggning och upplåsning
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Den visas när Windows har loggat in dig, medan Aether Shell förbereds. Tryck, klicka eller tryck på Esc för att hoppa över den.
+
+en: Greeting language
+tr: Hälsningens språk
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut på franska, Hello på engelska, Hola på spanska. Pennan skriver latinska bokstäver: på alla andra språk hälsar den på engelska.
+
+en: Your name
+tr: Ditt namn
+
+en: Name to greet you with
+tr: Namn att hälsa dig med
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Valfritt, till exempel ett förnamn. Det stannar på den här datorn i dina Aether Shell-inställningar och skickas aldrig någonstans eller skrivs till en logg. Töm fältet för att ta bort det.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Färgläge, accent, rörelsehastighet och utseendet på Dock och Övre fältet.
+
+en: Style
+tr: Stil
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Flytande: glas i lager över det som ligger bakom, ett oskärpelager, vätskans ljus och sedan ikonerna och texten, läsbara över ljusa och mörka sidor. Korn: frostat glas, suddigt och halvgenomskinligt, med fint korn.
+
+en: Liquid blur
+tr: Oskärpa för Flytande
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Hur mycket oskärpelagret under glaset i Flytande täcker det som ligger bakom: 100 % gör allt suddigt. Lägre värden visar sidan skarpare, och text i fälten kan då bli svårare att läsa över en rörig sida.
+
+en: Liquid blur color
+tr: Oskärpefärg för Flytande
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatiskt behåller glasets egna färger. Text och ikoner förblir läsbara oavsett färg.
+
+en: Automatic
+tr: Automatiskt
+
+en: White
+tr: Vit
+
+en: Black
+tr: Svart
+
+en: Accent
+tr: Accent
+
+en: Blue
+tr: Blå
+
+en: Violet
+tr: Violett
+
+en: Pink
+tr: Rosa
+
+en: Red
+tr: Röd
+
+en: Orange
+tr: Orange
+
+en: Yellow
+tr: Gul
+
+en: Green
+tr: Grön
+
+en: Teal
+tr: Blågrön
+
+en: Liquid color strength
+tr: Färgstyrka för Flytande
+
+en: How much of the chosen color the blur layer takes.
+tr: Hur mycket av den valda färgen oskärpelagret får.
+
+en: Theme
+tr: Tema
+
+en: Color mode
+tr: Färgläge
+
+en: High contrast always takes precedence.
+tr: Hög kontrast har alltid företräde.
+
+en: Light
+tr: Ljust
+
+en: Dark
+tr: Mörkt
+
+en: Accent color
+tr: Accentfärg
+
+en: Animation duration
+tr: Animeringens varaktighet
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 är standardhastigheten; högre värden är långsammare. Minskad rörelse har företräde.
+
+en: Dock icon preset
+tr: Förinställning för ikoner i Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: En anpassad storlek från Dock-inställningarna behålls tills du väljer en förinställning.
+
+en: Small - 32 px
+tr: Liten - 32 px
+
+en: Medium - 40 px
+tr: Medel - 40 px
+
+en: Large - 48 px
+tr: Stor - 48 px
+
+en: Keep custom size
+tr: Behåll anpassad storlek
+
+en: Show Windows Start in the Dock
+tr: Visa Start i Windows i Dock
+
+en: Show Task View in the Dock
+tr: Visa Aktivitetsvy i Dock
+
+en: Reserve extra space for Dock animations
+tr: Reservera extra utrymme för animeringar i Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Håller förstoring och startstuds borta från maximerade fönster.
+
+en: Weather position
+tr: Väderposition
+
+en: Left
+tr: Vänster
+
+en: Right
+tr: Höger
+
+en: Keyboard indicator
+tr: Tangentbordsindikator
+
+en: Compact
+tr: Kompakt
+
+en: Two lines
+tr: Två rader
+
+en: Windows taskbar pins
+tr: Fästa objekt i Windows aktivitetsfält
+
+en: Add newly discovered Windows taskbar pins
+tr: Lägg till nyupptäckta fästa objekt från Windows aktivitetsfält
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Medan aktivitetsfältet är ersatt läggs nya fästa objekt från Windows till i Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Reversibel ersättning av Windows aktivitetsfält med Dock.
+
+en: Taskbar replacement
+tr: Ersättning av aktivitetsfältet
+
+en: Replace the Windows taskbar
+tr: Ersätt Windows aktivitetsfält
+
+en: Changing this needs Apply.
+tr: Ändringen kräver Verkställ.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Medan Aether Shell körs döljer det Windows aktivitetsfält och reserverar utrymme under maximerade program.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Tillståndet för Windows aktivitetsfält återställs när det här läget inaktiveras eller Aether Shell avslutas. En separat återställningshjälp återställer det också om programmet stoppas oväntat. Om återställningen misslyckas startar du om Utforskaren i Aktivitetshanteraren.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows-inställningarna förblir det inbyggda Windows-gränssnittet. Dess sida för aktivitetsfältet ersätts inte av Aether Shell; konfigurera det här läget här.
+
+en: Pinned applications from Windows
+tr: Fästa program från Windows
+
+en: &Import Windows taskbar pins
+tr: &Importera fästa objekt från Windows aktivitetsfält
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Läser fästa genvägar utan att ändra fästa objekt i Windows. Vissa fästa objekt i Windows 11 eller deras ordning kanske inte är tillgängliga.
+
+en: Version {}
+tr: Version {}
+
+en: Created by Ibrahim Bouillet
+tr: Skapat av Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Ett inbyggt skrivbordsgränssnitt för Windows - en flytande Dock och ett övre statusfält - som körs bredvid Utforskaren.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Väderdata: Open-Meteo.com (CC BY 4.0). Inga C++-körningsbibliotek från tredje part medföljer.
+
+en: &Official project
+tr: &Officiellt projekt
+
+en: Licence
+tr: Licens
+
+en: Taskbar replacement changes need Apply.
+tr: Ändringar av ersättningen av aktivitetsfältet kräver Verkställ.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Ändringar sparas automatiskt. Autostart kräver Verkställ.
+
+en: Changes save automatically.
+tr: Ändringar sparas automatiskt.
+
+en: Press Apply to confirm this change.
+tr: Klicka på Verkställ för att bekräfta ändringen.
+
+en: Smart transparency
+tr: Smart genomskinlighet
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: I Flytande gör det här fönstret bakgrunden suddig bara under sin text och sina kontroller: helt över andra fönster och skrivbordsikoner, lätt över skrivbordsbilden och inte alls där det inte visar något.
+
+en: Languages on this PC
+tr: Språk på den här datorn
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell laddar ned de språk som Windows har, så att det byter språk när Windows gör det.
+
+en: Add a language
+tr: Lägg till ett språk
+
+en: &Download
+tr: &Ladda ned
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Varje språk kommer från den här versionens utgåva på GitHub och kontrolleras innan det används. Välj det ovan när det finns på den här datorn.
+
+en: built in
+tr: inbyggt
+
+en: downloading, {}
+tr: laddas ned, {}
+
+en: download failed
+tr: nedladdningen misslyckades
+
+## setup
+
+en: Aether Shell Setup
+tr: Installation av Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Installationsprogrammet kunde inte skapa sitt gränssnitt. Stäng det och försök igen, eller använd de dokumenterade alternativen för tyst installation.
+
+en: Options
+tr: Alternativ
+
+en: Install
+tr: Installera
+
+en: Done
+tr: Klart
+
+en: Remove Aether Shell
+tr: Ta bort Aether Shell
+
+en: Repair Aether Shell
+tr: Reparera Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: En inbyggd Dock och ett övre statusfält för Windows, som körs bredvid Utforskaren.
+
+en: Replaces the Windows taskbar while it runs
+tr: Ersätter Windows aktivitetsfält medan det körs
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Avsluta Aether Shell, inaktivera detta i Inställningar > Skrivbord, eller öppna "Återställ Windows aktivitetsfält" på Start-menyn för att få tillbaka Windows aktivitetsfält.
+
+en: Starts when you sign in - your choice
+tr: Startar när du loggar in - ditt val
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Nya installationer startar som standard vid inloggning. Du kan avmarkera det valet före installationen eller inaktivera det senare i Inställningar. Befintliga autostartval och inaktiveringar i Aktivitetshanteraren bevaras.
+
+en: Installs for your account
+tr: Installeras för ditt konto
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Inga administratörsbehörigheter krävs. Dina inställningar och data stannar i din användarprofil.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Avinstallationen behåller dina inställningar och data om du inte väljer att ta bort dem.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Reparationen återställer paketets filer och behåller dina inställningar. Om Aether Shell lämnade Windows aktivitetsfält dolt återställer reparationen det.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Installation över en befintlig version behåller dina inställningar. Ett äldre paket avvisas om du inte uttryckligen tillåter en nedgradering.
+
+en: MIT License
+tr: MIT-licens
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licensen installeras också som LICENSE bredvid Aether Shell.
+
+en: Remove this installation
+tr: Ta bort den här installationen
+
+en: Install location
+tr: Installationsplats
+
+en: &Browse...
+tr: &Bläddra...
+
+en: Also remove my settings, cache and logs
+tr: Ta även bort mina inställningar, cacheminne och loggar
+
+en: This cannot be undone.
+tr: Detta kan inte ångras.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Installationsprogrammet stänger Aether Shell på ett kontrollerat sätt och tar bort dess installerade filer, genvägar, autostartpost och registrering i Installerade appar. Andra program och Windows-inställningar lämnas orörda.
+
+en: Your welcome
+tr: Din välkomsthälsning
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: När du loggar in eller låser upp datorn skriver Aether Shell en kort hälsning för hand. Skriv namnet den ska hälsa dig med, eller lämna fältet tomt för ett enkelt hej.
+
+en: Your first name
+tr: Ditt förnamn
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Valfritt, till exempel ett förnamn. Det stannar på den här datorn i dina Aether Shell-inställningar och skickas aldrig någonstans. Ändra det, eller stäng av välkomsthälsningen, i Inställningar > Välkomst.
+
+en: Shortcuts and startup
+tr: Genvägar och autostart
+
+en: Create Start menu shortcuts
+tr: Skapa genvägar på Start-menyn
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell och Återställ Windows aktivitetsfält.
+
+en: Create a desktop shortcut
+tr: Skapa en genväg på skrivbordet
+
+en: Shows your current choice.
+tr: Visar ditt nuvarande val.
+
+en: Recommended.
+tr: Rekommenderas.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Avmarkera för att avstå; inaktiveringar i Aktivitetshanteraren respekteras.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Genom att installera godkänner du autostartvalet ovan. Startprogrammet kan starta om Aether Shell efter en krasch, med ett begränsat antal försök. Avsluta och Återställ Windows aktivitetsfält förblir tillgängliga. Vädret är avstängt som standard. Osignerade binärfiler kan utlösa en varning från Windows SmartScreen.
+
+en: Removing this installation...
+tr: Tar bort den här installationen...
+
+en: Repairing Aether Shell...
+tr: Reparerar Aether Shell...
+
+en: Installing Aether Shell...
+tr: Installerar Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Stänger Aether Shell och tar bort dess filer.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Verifierar det inbäddade paketet och installerar dess filer. Förloppet visas som aktivitet: installationsprogrammet vet inte hur lång tid som återstår.
+
+en: Please wait while the removal completes.
+tr: Vänta medan borttagningen slutförs.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Avbryt är tillgängligt tills den nya versionen har aktiverats; därefter slutförs installationen på ett säkert sätt.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell har avinstallerats.
+
+en: Aether Shell is ready.
+tr: Aether Shell är klart.
+
+en: Setup was cancelled.
+tr: Installationen avbröts.
+
+en: Setup could not complete.
+tr: Installationen kunde inte slutföras.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Dina data behölls om du inte uttryckligen valde att ta bort dem.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Du kan reparera eller avinstallera det från Windows-inställningar > Appar > Installerade appar.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Åtgärden avbröts före aktiveringen. Gå tillbaka till Alternativ för att försöka igen.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Kontrollera filåtkomsten och det lediga diskutrymmet och försök sedan igen. Om Aether Shell redan finns kan Reparera återställa dess filer. Felkategori: {}
+
+en: Setup log
+tr: Installationslogg
+
+en: Launch Aether Shell
+tr: Starta Aether Shell
+
+en: &Back
+tr: &Bakåt
+
+en: &Next
+tr: &Nästa
+
+en: &Continue
+tr: &Fortsätt
+
+en: &Uninstall
+tr: &Avinstallera
+
+en: &Repair
+tr: &Reparera
+
+en: &Install
+tr: &Installera
+
+en: &Close
+tr: &Stäng
+
+en: Step {} of {}: {}
+tr: Steg {} av {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Välj installationsmapp för Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Välj en fullständig mappsökväg, till exempel en som börjar med en enhetsbeteckning.
+
+en: The install folder must be an absolute path.
+tr: Installationsmappen måste vara en absolut sökväg.
+
+en: Setup stops at the next safe point.
+tr: Installationen stoppas vid nästa säkra punkt.
+
+en: Cancelling...
+tr: Avbryter...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Installationen slutför det aktuella steget på ett säkert sätt; vänta.
+
+en: Updating Aether Shell
+tr: Uppdaterar Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Verifierar det signerade paketet och tillämpar uppdateringen.
+
+en: Update completed
+tr: Uppdateringen är klar
+
+en: The update did not complete
+tr: Uppdateringen slutfördes inte
+
+en: Close
+tr: Stäng
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Uppdateringsgränssnittet kunde inte starta. Uppdateringen har inte tillämpats. Försök igen eller använd Reparera.
+
+en: Aether Shell Update
+tr: Uppdatering av Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Uppdateringsgränssnittet kunde inte starta. Uppdateringen har inte tillämpats. Försök igen eller använd Reparera i Windows-inställningar > Appar > Installerade appar.
+
+en: Update completed.
+tr: Uppdateringen är klar.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Uppdateringen slutfördes inte. Se uppdateringsloggen eller använd Reparera.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell kunde inte starta. Välj Reparera i Windows-inställningar > Appar > Installerade appar.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell-inställningar – uppdatering pågår
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Återuppta ersättning av aktivitetsfältet
+
+en: Show Windows &notification area for 60 seconds
+tr: Visa Windows &meddelandefält i 60 sekunder
+
+en: &Search…
+tr: &Sök…
+
+en: &Settings…
+tr: &Inställningar…
+
+en: View available &update…
+tr: Visa tillgänglig &uppdatering…
+
+en: &Check for updates…
+tr: Sö&k efter uppdateringar…
+
+en: &About Aether Shell
+tr: &Om Aether Shell
+
+en: &Quit Aether Shell
+tr: &Avsluta Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Byt &inmatningsspråk\tWin+Blanksteg
+
+en: Open &network controls…
+tr: Öppna &nätverkskontroller…
+
+en: &Weather settings…
+tr: &Väderinställningar…
+
+en: Toggle output &mute
+tr: Stäng av/slå på ljudet för &utgången
+
+en: &Sound settings…
+tr: &Ljudinställningar…
+
+en: Toggle microphone &mute
+tr: Stäng av/slå på &mikrofonen
+
+en: Start Windows &voice typing\tWin+H
+tr: Starta &röstinmatning i Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Sekretessinställningar för &mikrofon…
+
+en: &Power settings…
+tr: &Energiinställningar…
+
+en: Open &notifications and calendar
+tr: Öppna &meddelanden och kalender
+
+en: Open &calendar\tWin+Alt+D
+tr: Öppna &kalendern\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Visa &dolda ikoner
+
+en: Initializing
+tr: Initierar
+
+en: Unavailable
+tr: Inte tillgängligt
+
+en: Unsupported
+tr: Stöds inte
+
+en: Error
+tr: Fel
+
+en: Available
+tr: Tillgängligt
+
+en: Unknown
+tr: Okänt
+
+en: Internet access
+tr: Internetåtkomst
+
+en: Local network only
+tr: Endast lokalt nätverk
+
+en: Limited Internet access
+tr: Begränsad Internetåtkomst
+
+en: No network connection
+tr: Ingen nätverksanslutning
+
+en: Connectivity unknown
+tr: Anslutningsstatus okänd
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilnät
+
+en: Network
+tr: Nätverk
+
+en: Offline
+tr: Offline
+
+en: Network status unavailable
+tr: Nätverksstatus inte tillgänglig
+
+en: Quick controls
+tr: Snabbkontroller
+
+en: Aether Shell menu
+tr: Aether Shell-meny
+
+en: Weather status unavailable
+tr: Väderstatus inte tillgänglig
+
+en: Cached weather
+tr: Cachelagrat väder
+
+en: Observation (UTC): {}
+tr: Observation (UTC): {}
+
+en: Weather: {}
+tr: Väder: {}
+
+en: Click to open weather settings
+tr: Klicka för att öppna väderinställningarna
+
+en: Show hidden icons
+tr: Visa dolda ikoner
+
+en: Opens Windows' notification-area overflow
+tr: Öppnar överflödet i Windows meddelandefält
+
+en: Input language: {}
+tr: Inmatningsspråk: {}
+
+en: Fallback input layout
+tr: Reservlayout för inmatning
+
+en: Click to switch input language (Win+Space)
+tr: Klicka för att byta inmatningsspråk (Win+Blanksteg)
+
+en: Network: {}
+tr: Nätverk: {}
+
+en: Signal strength unavailable
+tr: Signalstyrka inte tillgänglig
+
+en: Click to open Windows network settings
+tr: Klicka för att öppna nätverksinställningarna i Windows
+
+en: Audio output
+tr: Ljudutgång
+
+en: Audio: {}
+tr: Ljud: {}
+
+en: volume unknown
+tr: volym okänd
+
+en: Muted
+tr: Ljud av
+
+en: Sound on
+tr: Ljud på
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Enheten har ljud på
+
+en: Recording detection unsupported
+tr: Inspelningsidentifiering stöds inte
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Klicka för att stänga av eller slå på mikrofonen; högerklicka för röstinmatning i Windows och sekretessinställningar för mikrofon
+
+en: Battery: {}
+tr: Batteri: {}
+
+en: Battery {}
+tr: Batteri {}
+
+en: Battery status unavailable
+tr: Batteristatus inte tillgänglig
+
+en: Charging
+tr: Laddar
+
+en: External power
+tr: Extern ström
+
+en: Estimated remaining: {} h {} min
+tr: Beräknad återstående tid: {} h {} min
+
+en: Click to open power settings
+tr: Klicka för att öppna energiinställningarna
+
+en: Clock status unavailable
+tr: Klockstatus inte tillgänglig
+
+en: Click to open calendar and notifications
+tr: Klicka för att öppna kalender och meddelanden
+
+en: Action failed: {}
+tr: Åtgärden misslyckades: {}
+
+en: Aether Shell status bar
+tr: Aether Shell-statusfält
+
+en: Update available
+tr: Uppdatering tillgänglig
+
+en: Cached
+tr: Cachelagrat
+
+en: Start
+tr: Start
+
+en: Search
+tr: Sök
+
+en: Task View
+tr: Aktivitetsvy
+
+en: Application
+tr: Program
+
+en: Running application
+tr: Program som körs
+
+en: More applications
+tr: Fler program
+
+en: Aether Shell window previews
+tr: Fönsterförhandsvisningar i Aether Shell
+
+en: Minimized — preview unavailable
+tr: Minimerat – förhandsvisning inte tillgänglig
+
+en: Preview unavailable
+tr: Förhandsvisning inte tillgänglig
+
+en: {} windows
+tr: {} fönster
+
+en: {} window
+tr: {} fönster
+
+en: Switches to this window
+tr: Växlar till det här fönstret
+
+en: Minimized, preview unavailable
+tr: Minimerat, förhandsvisning inte tillgänglig
+
+en: Minimized
+tr: Minimerat
+
+en: Close {}
+tr: Stäng {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Ber fönstret att stängas; programmet kan fortfarande be dig spara eller avbryta
+
+en: Close requested
+tr: Stängning begärd
+
+en: Previous applications
+tr: Tidigare program
+
+en: Open
+tr: Öppna
+
+en: New instance
+tr: Ny instans
+
+en: Unpin from Dock
+tr: Lossa från Dock
+
+en: Pin to Dock
+tr: Fäst i Dock
+
+en: Move left
+tr: Flytta åt vänster
+
+en: Move right
+tr: Flytta åt höger
+
+en: Dock settings...
+tr: Dock-inställningar...
+
+en: Import Windows taskbar pins
+tr: Importera fästa objekt från Windows aktivitetsfält
+
+en: Open Windows Start
+tr: Öppna Start i Windows
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Fäst
+
+en: Running
+tr: Körs
+
+en: Needs attention
+tr: Behöver uppmärksamhet
+
+en: Up arrow shows window previews
+tr: Uppåtpil visar fönsterförhandsvisningar
+
+en: Installed application
+tr: Installerat program
+
+en: Desktop application
+tr: Skrivbordsprogram
+
+en: File
+tr: Fil
+
+en: Folder
+tr: Mapp
+
+en: Windows tool
+tr: Windows-verktyg
+
+en: Control Panel
+tr: Kontrollpanelen
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Navigera   ·   Retur Öppna   ·   Esc Stäng
+
+en: Search apps, settings and files
+tr: Sök efter appar, inställningar och filer
+
+en: Search could not be completed.
+tr: Det gick inte att slutföra sökningen.
+
+en: Results
+tr: Resultat
+
+en: Indexing applications…
+tr: Indexerar program…
+
+en: Type to search apps, settings and files
+tr: Skriv för att söka efter appar, inställningar och filer
+
+en: Nothing matches
+tr: Inga träffar
+
+en: Windows could not open this application.
+tr: Windows kunde inte öppna programmet.
+
+en: Menu
+tr: Meny
+
+en: Opens a submenu
+tr: Öppnar en undermeny
+
+en: , opens a submenu
+tr: , öppnar en undermeny
+
+en: Selected
+tr: Vald
+
+en: Checked
+tr: Markerad
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Flygplansläge
+
+en: Accessibility
+tr: Hjälpmedel
+
+en: Energy saver
+tr: Energisparläge
+
+en: Live captions
+tr: Live-textning
+
+en: Night light
+tr: Nattljus
+
+en: Mobile hotspot
+tr: Mobil surfzon
+
+en: Nearby sharing
+tr: Närdelning
+
+en: Cast
+tr: Casta
+
+en: Project
+tr: Projicera
+
+en: All settings
+tr: Alla inställningar
+
+en: Connected
+tr: Ansluten
+
+en: Not connected
+tr: Inte ansluten
+
+en: , on
+tr: , på
+
+en: , off
+tr: , av
+
+en: , state unknown
+tr: , okänt tillstånd
+
+en: , opens Windows Settings
+tr: , öppnar Windows-inställningarna
+
+en: , shows accessibility features
+tr: , visar hjälpmedelsfunktioner
+
+en: , requires Windows 11 version 22H2
+tr: , kräver Windows 11 version 22H2
+
+en: Now playing: {}
+tr: Spelas upp nu: {}
+
+en: Untitled media
+tr: Media utan titel
+
+en: , switch source
+tr: , byt källa
+
+en: Previous media item
+tr: Föregående medieobjekt
+
+en: Pause
+tr: Pausa
+
+en: Play
+tr: Spela upp
+
+en: Next media item
+tr: Nästa medieobjekt
+
+en: {} details
+tr: Information om {}
+
+en: Page {} of {}
+tr: Sida {} av {}
+
+en: Next page
+tr: Nästa sida
+
+en: First page
+tr: Första sidan
+
+en: Brightness
+tr: Ljusstyrka
+
+en: Brightness, unavailable on this display
+tr: Ljusstyrka, inte tillgänglig på den här skärmen
+
+en: Volume
+tr: Volym
+
+en: Volume, unavailable
+tr: Volym, inte tillgänglig
+
+en: Unmute
+tr: Slå på ljudet
+
+en: Mute
+tr: Stäng av ljudet
+
+en: Sound output and volume mixer
+tr: Ljudutgång och volymmixer
+
+en: Back
+tr: Tillbaka
+
+en: , secured
+tr: , skyddat
+
+en: , open
+tr: , öppet
+
+en: , connected
+tr: , anslutet
+
+en: Disconnect
+tr: Koppla från
+
+en: Show available networks
+tr: Visa tillgängliga nätverk
+
+en: More Wi-Fi settings
+tr: Fler Wi-Fi-inställningar
+
+en: Bluetooth and devices settings
+tr: Inställningar för Bluetooth och enheter
+
+en: Magnifier
+tr: Förstoringsglaset
+
+en: Narrator
+tr: Skärmläsaren
+
+en: On-screen keyboard
+tr: Skärmtangentbord
+
+en: Sticky keys
+tr: Tröga tangenter
+
+en: More accessibility settings
+tr: Fler hjälpmedelsinställningar
+
+en: Volume mixer
+tr: Volymmixer
+
+en: Choose output in Sound settings
+tr: Välj utgång i Ljudinställningar
+
+en: Power and battery settings
+tr: Inställningar för ström och batteri
+
+en: Battery {} percent, {}
+tr: Batteri {} procent, {}
+
+en: All Windows settings
+tr: Alla Windows-inställningar
+
+en: The requested action could not be dispatched
+tr: Den begärda åtgärden kunde inte skickas
+
+en: Aether Shell quick controls
+tr: Snabbkontroller i Aether Shell
+
+en: Media session active
+tr: Mediesession aktiv
+
+en: No media session
+tr: Ingen mediesession
+
+en: Current page
+tr: Aktuell sida
+
+en:  - secured
+tr:  - skyddat
+
+en:  - open
+tr:  - öppet
+
+en:  - opens in Windows
+tr:  - öppnas i Windows
+
+en: Turned off by hardware or policy
+tr: Inaktiverat av maskinvara eller princip
+
+en: State unavailable - use Windows settings
+tr: Tillstånd inte tillgängligt - använd Windows-inställningarna
+
+en: Off
+tr: Av
+
+en:  - signal {} of 5
+tr:  - signal {} av 5
+
+en: , no internet
+tr: , inget Internet
+
+en: On - not connected
+tr: På - inte ansluten
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows låter inte appar visa nätverk: kontrollera Plats i sekretessinställningarna
+
+en: No Wi-Fi adapter found
+tr: Ingen Wi-Fi-adapter hittades
+
+en: Connecting to {}...
+tr: Ansluter till {}...
+
+en:  - looking for networks
+tr:  - söker efter nätverk
+
+en: On
+tr: På
+
+en: A screen reader is running
+tr: En skärmläsare körs
+
+en: Windows accessibility features
+tr: Hjälpmedelsfunktioner i Windows
+
+en: Sound output
+tr: Ljudutgång
+
+en: Default output device
+tr: Standardenhet för utgång
+
+en: No output device available
+tr: Ingen utgångsenhet tillgänglig
+
+en: Battery unknown
+tr: Batteri okänt
+
+en: Status refresh could not be started
+tr: Statusuppdateringen kunde inte startas
+
+en: Status refresh unavailable
+tr: Statusuppdatering inte tillgänglig
+
+en: Excellent signal
+tr: Utmärkt signal
+
+en: Good signal
+tr: Bra signal
+
+en: Fair signal
+tr: Godtagbar signal
+
+en: Weak signal
+tr: Svag signal
+
+en: Clear sky
+tr: Klart
+
+en: Mainly clear
+tr: Mestadels klart
+
+en: Partly cloudy
+tr: Delvis molnigt
+
+en: Overcast
+tr: Mulet
+
+en: Fog
+tr: Dimma
+
+en: Drizzle
+tr: Duggregn
+
+en: Rain
+tr: Regn
+
+en: Snow
+tr: Snö
+
+en: Rain showers
+tr: Regnskurar
+
+en: Snow showers
+tr: Snöbyar
+
+en: Thunderstorm
+tr: Åska
+
+## weather
+
+en: Morning
+tr: Morgon
+
+en: Afternoon
+tr: Eftermiddag
+
+en: Evening
+tr: Kväll
+
+en: Night
+tr: Natt
+
+en: Now
+tr: Nu
+
+en: Today
+tr: I dag
+
+en: Low
+tr: Låg
+
+en: Moderate
+tr: Måttlig
+
+en: High
+tr: Hög
+
+en: Very high
+tr: Mycket hög
+
+en: Extreme
+tr: Extrem
+
+en: No connection to the weather service.
+tr: Ingen anslutning till vädertjänsten.
+
+en: The weather service is busy. Try again in a moment.
+tr: Vädertjänsten är upptagen. Försök igen om en stund.
+
+en: The weather could not be loaded.
+tr: Det gick inte att läsa in vädret.
+
+en: Could not update; showing the last forecast.
+tr: Det gick inte att uppdatera; den senaste prognosen visas.
+
+en: Try again
+tr: Försök igen
+
+en: Your location
+tr: Din plats
+
+en: My location
+tr: Min plats
+
+en: Precise location
+tr: Exakt plats
+
+en: Approximate location
+tr: Ungefärlig plats
+
+en: Chosen in Settings
+tr: Vald i Inställningar
+
+en: Allow
+tr: Tillåt
+
+en: Use precise location
+tr: Använd exakt plats
+
+en: See the weather where you are: allow your precise location.
+tr: Se vädret där du är: tillåt din exakta plats.
+
+en: Your position is approximate (about 10 km).
+tr: Din position är ungefärlig (cirka 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Plats är inaktiverat för den här appen i Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Den här enheten kan inte rapportera sin plats. Sök efter en stad i stället.
+
+en: Reading Windows location…
+tr: Läser Windows-plats…
+
+en: Automatic weather follows your Windows location.
+tr: Automatiskt väder följer din Windows-plats.
+
+en: Search for a city
+tr: Sök efter en stad
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Sök efter en stad, eller tillåt din plats, för att se vädret.
+
+en: Searching…
+tr: Söker…
+
+en: City search is unavailable.
+tr: Stadssökning är inte tillgänglig.
+
+en: No city found.
+tr: Ingen stad hittades.
+
+en: Weather settings
+tr: Väderinställningar
+
+en: Loading the weather…
+tr: Läser in vädret…
+
+en: Loading…
+tr: Läser in…
+
+en: Updated {}
+tr: Uppdaterat {}
+
+en: Near {}
+tr: Nära {}
+
+en: Temperatures now
+tr: Temperaturer nu
+
+en: The map is unavailable.
+tr: Kartan är inte tillgänglig.
+
+en: Map: Natural Earth
+tr: Karta: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Väderdata från Open-Meteo.com
+
+en: Feels like
+tr: Känns som
+
+en: Feels like {}
+tr: Känns som {}
+
+en: Close to the real temperature
+tr: Nära den verkliga temperaturen
+
+en: The wind makes it feel colder
+tr: Vinden gör att det känns kallare
+
+en: Humidity makes it feel warmer
+tr: Luftfuktigheten gör att det känns varmare
+
+en: Humidity
+tr: Luftfuktighet
+
+en: Cloud cover {}
+tr: Molnighet {}
+
+en: Wind
+tr: Vind
+
+en: Gusts {}
+tr: Byar {}
+
+en: Sunrise and sunset
+tr: Soluppgång och solnedgång
+
+en: UV index
+tr: UV-index
+
+en: Pressure
+tr: Lufttryck
+
+en: At sea level
+tr: Vid havsnivå
+
+en: &Open the weather
+tr: &Öppna vädret
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognosen för där du är, med cirka 100 m noggrannhet och egen höjd över havet. Av: avrundat till cirka 10 km.

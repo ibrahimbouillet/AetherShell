@@ -1,0 +1,2494 @@
+# Estonian (et): Eesti. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Automaatse ilmateate lubamiseks valige Windowsi asukoht.
+
+en: Windows taskbar visible
+tr: Windowsi tegumiriba on nähtaval
+
+en: Connected to {}
+tr: Ühendatud võrguga {}
+
+en: {} is out of range
+tr: {} on levialast väljas
+
+en: Connecting to {} took too long
+tr: Võrguga {} ühendamine võttis liiga kaua aega
+
+en: Use Windows to join {}
+tr: Kasutage võrguga {} ühendamiseks Windowsi
+
+en: Windows did not allow this connection
+tr: Windows ei lubanud seda ühendust
+
+en: Could not connect to {}
+tr: Võrguga {} ei saanud ühendust luua
+
+en: Connect to {}
+tr: Ühenda võrguga {}
+
+en: That password was not accepted. Check it and try again.
+tr: Seda parooli ei aktsepteeritud. Kontrollige seda ja proovige uuesti.
+
+en: Enter this network's password.
+tr: Sisestage selle võrgu parool.
+
+en: &Connect
+tr: &Ühenda
+
+en: Windows Settings could not be opened
+tr: Windowsi sätteid ei saanud avada
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Dockile ei saanud ruumi reserveerida; Windowsi tegumiriba taastatakse
+
+en: Replacement unavailable: recovery observer could not start
+tr: Asendamine pole saadaval: taastejälgijat ei saanud käivitada
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windowsi tegumiriba on taastatud. Dockile ei saanud ruumi reserveerida; uuesti proovimiseks lülitage asendamine välja ja uuesti sisse.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Taastejälgimine pole saadaval; Windowsi tegumiriba taastatakse
+
+en: Windows notifications could not be opened
+tr: Windowsi teatisi ei saanud avada
+
+en: The Windows calendar could not be opened
+tr: Windowsi kalendrit ei saanud avada
+
+en: Windows did not show its hidden icons
+tr: Windows ei kuvanud oma peidetud ikoone
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Asukoha automaatne värskendamine pole saadaval; proovige uuesti ilmasätetes.
+
+en: Windows location
+tr: Windowsi asukoht
+
+en: Reading approximate Windows location…
+tr: Windowsi ligikaudse asukoha lugemine…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automaatne ilmateade järgib Windowsi ligikaudset asukohta.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Juurdepääs Windowsi asukohale on blokeeritud. Ilmateade pole saadaval.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows ei saanud praegust asukohta anda. Ilmateade pole saadaval.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Asukohateenus pole saadaval. Ilmateade pole saadaval.
+
+en: Waiting for Windows location permission…
+tr: Windowsi asukohaloa ootamine…
+
+en: The automatic weather choice could not be saved.
+tr: Automaatse ilmateate valikut ei saanud salvestada.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Juurdepääs Windowsi asukohale pole saadaval või see keelati. Ilmateade pole saadaval.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windowsi asukoht ei saanud luba taotleda. Vaadake üle Windowsi asukohasätted.
+
+en: Status worker unavailable
+tr: Olekuteenus pole saadaval
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows ei saanud seda toimingut lõpule viia. Vaadake üle selle sätted.
+
+en: Reading Windows status; try the action again shortly
+tr: Windowsi oleku lugemine; proovige toimingut varsti uuesti
+
+en: Could not disconnect
+tr: Ühendust ei saanud katkestada
+
+en: The Windows accessibility feature could not be started
+tr: Windowsi hõlbustusfunktsiooni ei saanud käivitada
+
+en: Windows could not change the audio output
+tr: Windows ei saanud heliväljundit muuta
+
+en: The Windows control could not be opened
+tr: Windowsi juhtelementi ei saanud avada
+
+en: Keyboard shortcuts disabled
+tr: Kiirklahvid on keelatud
+
+en: Both keyboard shortcuts registered
+tr: Mõlemad kiirklahvid on registreeritud
+
+en: A keyboard shortcut is already in use by another application
+tr: Mõnda kiirklahvi kasutab juba mõni teine rakendus
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windowsi kiirsätteid ei saanud taotleda. Aetheri juhtelementide kasutamiseks tühjendage ülariba sätetes ruut „Kasuta Windowsi kiirsätteid“.
+
+en: Windows Start could not be opened
+tr: Windowsi menüüd Start ei saanud avada
+
+en: Windows Task View could not be opened
+tr: Windowsi tegumivaadet ei saanud avada
+
+en: Windows keyboard layout switching was unavailable
+tr: Windowsi klaviatuuripaigutuse vahetamine polnud saadaval
+
+en: Windows voice typing could not be opened
+tr: Windowsi häälsisestust ei saanud avada
+
+en: Windows taskbar could not be revealed
+tr: Windowsi tegumiriba ei saanud kuvada
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Tegumiriba asendamist ei saanud jätkata; Windows jääb kättesaadavaks
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Windowsi tegumiriba asendamine pole selles seansis saadaval
+
+en: Windows pin access is unavailable in this isolated session
+tr: Juurdepääs Windowsi kinnitustele pole selles isoleeritud seansis saadaval
+
+en: Windows pinned applications could not be read
+tr: Windowsi kinnitatud rakendusi ei saanud lugeda
+
+en: Settings changed during pin import. Try import again.
+tr: Sätted muutusid kinnituste importimise ajal. Proovige uuesti importida.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Salvestati {} täiendavat kinnitatud rakendust. Mõned Windowsi kinnitused võivad jääda kättesaamatuks.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Kinnitused muudeti mälus; salvestamine nurjus. Uuesti proovimiseks klõpsake sätetes nuppu Rakenda.
+
+en: Pins updated in memory; saving...
+tr: Kinnitused värskendati mälus; salvestamine...
+
+en: Imported pins could not be applied
+tr: Imporditud kinnitusi ei saanud rakendada
+
+en: Pin import is unavailable while closing
+tr: Kinnituste importimine pole sulgemise ajal saadaval
+
+en: Settings could not be saved
+tr: Sätteid ei saanud salvestada
+
+en: Quit without saving the latest changes?
+tr: Kas väljuda viimaseid muudatusi salvestamata?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Teie eelmine sättefail säilitatakse. Uuesti salvestamise proovimiseks jätke Aether Shell avatuks.
+
+en: &Quit without saving
+tr: &Välju salvestamata
+
+en: &Keep Aether Shell open
+tr: &Jäta Aether Shell avatuks
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Ekspordi põhidiagnostika – rakenduse versioon ja Windowsi järk, ilma logide ja isikuandmeteta
+
+en: Diagnostics exported.
+tr: Diagnostika on eksporditud.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnostikat ei saanud valitud faili salvestada.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Sätteid ei saanud ohutult lugeda. Olemasolev fail säilitati.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell ei saanud oma töölauapindu käivitada.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windowsi tegumiriba taastamine on ootel. Proovige uuesti või sulgege Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windowsi tegumiriba kuvatakse ajutiselt.
+
+en: Windows taskbar restored.
+tr: Windowsi tegumiriba on taastatud.
+
+en: Windows taskbar replacement is active.
+tr: Windowsi tegumiriba asendamine on aktiivne.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windowsi tegumiriba jääb kättesaadavaks. Asendamist proovitakse varsti uuesti.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windowsi tegumiriba jääb kättesaadavaks. Uuesti proovimiseks lülitage asendamine välja ja uuesti sisse.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windowsi tegumiriba on taastatud. Asendamine ühendatakse varsti uuesti.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windowsi tegumiriba on taastatud. Uuesti proovimiseks lülitage asendamine välja ja uuesti sisse.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Tegumiriba asendamine peatati. Windowsi tegumiriba on taastatud.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Tegumiriba asendamine peatati. Windowsi tegumiriba taastamist ei saanud kinnitada.
+
+en: Activating taskbar replacement...
+tr: Tegumiriba asendamise aktiveerimine...
+
+en: Restoring Windows taskbar...
+tr: Windowsi tegumiriba taastamine...
+
+en: Reconnecting taskbar replacement...
+tr: Tegumiriba asendamise taasühendamine...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windowsi tegumiriba ajutine kuvamine...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell ei saanud Windowsi tegumiriba taastada.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Taaskäivitage Windows Explorer tegumihaldurist (Ctrl+Shift+Esc) või logige välja ja uuesti sisse.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windowsi tegumiriba taastati salvestatud olekusse.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Tegumiriba salvestatud olekut ei leitud. Windowsi tegumiriba tehti nähtavaks; selle automaatse peitmise sätet ei muudetud.
+
+en: There was nothing to restore.
+tr: Midagi polnud taastada.
+
+en: Taskbar replacement is turned off.
+tr: Tegumiriba asendamine on välja lülitatud.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Tegumiriba asendamist ei saanud automaatselt välja lülitada. Lülitage see välja jaotises Aether Shelli sätted > Töölaud.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Tundmatu või sobimatu Aether Shelli käsurida.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell ei saanud luua oma kohalikke andmekaustu.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell peatus ootamatu tõrke järel.
+
+## search-names
+
+en: Disk Management
+tr: Kettahaldus
+
+en: Local Users and Groups
+tr: Kohalikud kasutajad ja rühmad
+
+en: Local Group Policy Editor
+tr: Kohaliku rühmapoliitika redaktor
+
+en: Manage User Certificates
+tr: Kasutajasertifikaatide haldamine
+
+en: Manage Computer Certificates
+tr: Arvutisertifikaatide haldamine
+
+en: Shared Folders
+tr: Ühiskaustad
+
+en: TPM Management
+tr: TPM-i haldus
+
+en: Network Connections
+tr: Võrguühendused
+
+en: System Properties
+tr: Süsteemi atribuudid
+
+en: About Windows
+tr: Teave Windowsi kohta
+
+en: DirectX Diagnostic Tool
+tr: DirectX-i diagnostikatööriist
+
+en: Windows Features
+tr: Windowsi funktsioonid
+
+en: System Restore
+tr: Süsteemitaaste
+
+en: Advanced System Settings
+tr: Täpsemad süsteemisätted
+
+en: Volume Mixer
+tr: Helitugevuse mikser
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Kasutajakontod (täpsem)
+
+en: Display settings
+tr: Kuvasätted
+
+en: Night light settings
+tr: Öövalguse sätted
+
+en: Graphics settings
+tr: Graafikasätted
+
+en: Sound settings
+tr: Helisätted
+
+en: Notification settings
+tr: Teatiste sätted
+
+en: Power & battery settings
+tr: Toite ja aku sätted
+
+en: Energy saver settings
+tr: Energiasäästja sätted
+
+en: Storage settings
+tr: Talletusruumi sätted
+
+en: Multitasking settings
+tr: Multitegumtöö sätted
+
+en: Clipboard settings
+tr: Lõikelaua sätted
+
+en: Remote Desktop settings
+tr: Kaugtöölaua sätted
+
+en: About your PC
+tr: Teave teie arvuti kohta
+
+en: Bluetooth & devices settings
+tr: Bluetoothi ja seadmete sätted
+
+en: Printers & scanners settings
+tr: Printerite ja skannerite sätted
+
+en: Mouse settings
+tr: Hiire sätted
+
+en: Touchpad settings
+tr: Puuteplaadi sätted
+
+en: Network & internet settings
+tr: Võrgu ja Interneti sätted
+
+en: Wi-Fi settings
+tr: WiFi sätted
+
+en: VPN settings
+tr: VPN-i sätted
+
+en: Proxy settings
+tr: Puhverserveri sätted
+
+en: Airplane mode settings
+tr: Lennukirežiimi sätted
+
+en: Mobile hotspot settings
+tr: Mobiilse kuumkoha sätted
+
+en: Background settings
+tr: Tausta sätted
+
+en: Color settings
+tr: Värvisätted
+
+en: Theme settings
+tr: Kujunduste sätted
+
+en: Lock screen settings
+tr: Lukustuskuva sätted
+
+en: Taskbar settings
+tr: Tegumiriba sätted
+
+en: Font settings
+tr: Fondisätted
+
+en: Installed apps
+tr: Installitud rakendused
+
+en: Default apps settings
+tr: Vaikerakenduste sätted
+
+en: Startup apps settings
+tr: Käivitusrakenduste sätted
+
+en: Account info
+tr: Teie teave
+
+en: Sign-in options
+tr: Sisselogimissuvandid
+
+en: Other users settings
+tr: Muude kasutajate sätted
+
+en: Date & time settings
+tr: Kuupäeva ja kellaaja sätted
+
+en: Language & region settings
+tr: Keele ja piirkonna sätted
+
+en: Typing settings
+tr: Tippimissätted
+
+en: Accessibility settings
+tr: Hõlbustussätted
+
+en: Privacy & security settings
+tr: Privaatsus- ja turbesätted
+
+en: Location settings
+tr: Asukohasätted
+
+en: Windows Update settings
+tr: Windows Update'i sätted
+
+en: Recovery settings
+tr: Taastesätted
+
+en: Activation settings
+tr: Aktiveerimissätted
+
+en: For developers settings
+tr: Arendajasätted
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHubiga ei saanud ühendust.
+
+en: GitHub did not answer the request just now.
+tr: GitHub ei vastanud praegu päringule.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Väljalase ei läbinud kontrolli, seega midagi ei installitud.
+
+en: There is not enough free disk space.
+tr: Vaba kettaruumi pole piisavalt.
+
+en: Windows refused access to the update files.
+tr: Windows keelas juurdepääsu värskendusfailidele.
+
+en: {} bytes
+tr: {} baiti
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Olek
+
+en: Check &now
+tr: Kontrolli &kohe
+
+en: Download and install
+tr: Laadi alla ja installi
+
+en: &Later
+tr: &Hiljem
+
+en: S&kip this version
+tr: &Jäta see versioon vahele
+
+en: &Release details
+tr: &Väljalaske üksikasjad
+
+en: Disable &notifications
+tr: Keela &teatised
+
+en: Release notes
+tr: Väljalaskemärkmed
+
+en: the new version
+tr: uus versioon
+
+en: Installed: {}.
+tr: Installitud: {}.
+
+en: Automatic update checks are off
+tr: Automaatne värskenduste kontroll on välja lülitatud
+
+en: Check now looks for a newer release once.
+tr: Kontrolli kohe otsib ühe korra uuemat väljalaset.
+
+en: Last checked {}
+tr: Viimati kontrollitud {}
+
+en: Not checked yet
+tr: Pole veel kontrollitud
+
+en: Checking for updates...
+tr: Värskenduste otsimine...
+
+en: Aether Shell is up to date
+tr: Aether Shell on ajakohane
+
+en: Latest published release: {}.
+tr: Viimane avaldatud väljalase: {}.
+
+en: Version {} is available
+tr: Versioon {} on saadaval
+
+en: Download size: {}.
+tr: Allalaadimise maht: {}.
+
+en: Downloading version {}...
+tr: Versiooni {} allalaadimine...
+
+en: Received {} of {} ({}%).
+tr: Vastu võetud {}/{} ({} %).
+
+en: Received {}; total size unknown.
+tr: Vastu võetud {}; kogumaht teadmata.
+
+en: Version {} is ready to install
+tr: Versioon {} on installimiseks valmis
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Kontrollitud allkirjastatud väljalaskemanifesti ja SHA-256 abil.
+
+en: The update could not be completed
+tr: Värskendust ei saanud lõpule viia
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Praegu installitakse see käsitsi: avage Väljalaske üksikasjad, seejärel laadige alla ja käivitage selle installiprogramm.
+
+en: Failure: {}.
+tr: Tõrge: {}.
+
+en: Choose Retry Download to try again.
+tr: Uuesti proovimiseks valige Proovi uuesti alla laadida.
+
+en: Use Check now to try again.
+tr: Uuesti proovimiseks kasutage nuppu Kontrolli kohe.
+
+en: Next automatic check: {}.
+tr: Järgmine automaatne kontroll: {}.
+
+en: &Install update
+tr: &Installi värskendus
+
+en: Retry &Download
+tr: Proovi uuesti &alla laadida
+
+en: &Download and install
+tr: &Laadi alla ja installi
+
+en: Windows' startup state could not be read in this session.
+tr: Windowsi käivitusolekut ei saanud selles seansis lugeda.
+
+en: Windows will start it at your next sign-in.
+tr: Windows käivitab selle teie järgmisel sisselogimisel.
+
+en: Right now it will not start at sign-in.
+tr: Praegu ei käivitu see sisselogimisel.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: See on välja lülitatud tegumihalduris või Windowsi sätetes, mis otsustavad, kuni see seal uuesti sisse lülitatakse.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows käivitaks Aether Shelli teise eksemplari.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows teatab käivitusolekust, mida see versioon ei oska lugeda.
+
+en: The close action could not be completed.
+tr: Sulgemistoimingut ei saanud lõpule viia.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Enne salvestamist sisestage täielik arv; punasega märgitud väli seda ei sisalda.
+
+en: Settings could not be validated.
+tr: Sätteid ei saanud valideerida.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Sisselogimisel käivitamine jäeti muutmata, sest sätteid ei saanud salvestada.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Sätteid ei saanud salvestada ja Windowsi sisselogimisel käivitamist ei saanud taastada. Uuesti proovimiseks klõpsake uuesti nuppu Rakenda.
+
+en: Settings saved.
+tr: Sätted on salvestatud.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Sätted muudeti mälus; salvestamine nurjus. Uuesti proovimiseks klõpsake uuesti nuppu Rakenda.
+
+en: Settings could not be applied.
+tr: Sätteid ei saanud rakendada.
+
+en: Some values were corrected to their supported range.
+tr: Mõned väärtused parandati toetatud vahemikku.
+
+en: Startup registration is unavailable in this session.
+tr: Käivitusregistreerimine pole selles seansis saadaval.
+
+en: Changing startup registration...
+tr: Käivitusregistreerimise muutmine...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows ei muutnud käivitusregistreerimist. Kontrollige tegumihalduri käivitussätet.
+
+en: Startup registration could not be changed.
+tr: Käivitusregistreerimist ei saanud muuta.
+
+en: Defaults saved; startup is disabled.
+tr: Vaikesätted on salvestatud; käivitamine on keelatud.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Vaikesätted on rakendatud; salvestamine nurjus. Uuesti proovimiseks klõpsake uuesti nuppu Rakenda.
+
+en: Defaults could not be applied.
+tr: Vaikesätteid ei saanud rakendada.
+
+en: Startup was not disabled; settings were kept.
+tr: Käivitamist ei keelatud; sätted säilitati.
+
+en: Location search is unavailable.
+tr: Asukohaotsing pole saadaval.
+
+en: Searching Open-Meteo locations...
+tr: Open-Meteo asukohtade otsimine...
+
+en: Location search failed. Check your connection and try again.
+tr: Asukohaotsing nurjus. Kontrollige ühendust ja proovige uuesti.
+
+en: No place matched that search.
+tr: Otsingule ei vastanud ükski koht.
+
+en: Choose a location to save it.
+tr: Salvestamiseks valige asukoht.
+
+en: Reset all settings?
+tr: Kas lähtestada kõik sätted?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Eelistused ja kinnitatud rakendused taastatakse vaikeväärtustele ning sisselogimisel käivitamine lülitatakse välja.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Teie Windowsi tegumiriba valik säilitatakse. Praegusest sättefailist säilitatakse varukoopia.
+
+en: &Reset
+tr: &Lähtesta
+
+en: Cancel
+tr: Loobu
+
+en: Pinned applications saved.
+tr: Kinnitatud rakendused on salvestatud.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Kinnitused muudeti mälus; salvestamine nurjus. Uuesti proovimiseks klõpsake uuesti nuppu Rakenda.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Vaikesätteid ei saanud taastada, sest käivitusregistreerimine pole saadaval.
+
+en: Pinned application could not be added.
+tr: Kinnitatud rakendust ei saanud lisada.
+
+en: Choose an application to add first.
+tr: Valige esmalt lisatav rakendus.
+
+en: Pinned applications could not be changed.
+tr: Kinnitatud rakendusi ei saanud muuta.
+
+en: Choose a pinned application first.
+tr: Valige esmalt kinnitatud rakendus.
+
+en: Desktop status is unavailable in this session.
+tr: Töölaua olek pole selles seansis saadaval.
+
+en: Desktop status is unavailable.
+tr: Töölaua olek pole saadaval.
+
+en: Password
+tr: Parool
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Laaditakse GitHubist alla keelt {} ({}). Kuni see on valmis, kuvatakse inglise keelt.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Keelt {} ei saanud alla laadida. Kuni see õnnestub, kuvatakse inglise keelt; uuesti proovimiseks valige allpool Laadi alla.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Keelt {} pole veel selles arvutis. Kuni see on alla laaditud, kuvatakse inglise keelt.
+
+en: {} is on this PC.
+tr: Keel {} on selles arvutis.
+
+en: Every language is on this PC.
+tr: Kõik keeled on selles arvutis.
+
+en: Choose a language to download first.
+tr: Valige esmalt allalaaditav keel.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Ülariba
+
+en: Weather
+tr: Ilm
+
+en: Updates
+tr: Värskendused
+
+en: General
+tr: Üldist
+
+en: About
+tr: Teave
+
+en: Desktop
+tr: Töölaud
+
+en: Appearance
+tr: Välimus
+
+en: Welcome
+tr: Tervitus
+
+en: Aether Shell Settings
+tr: Aether Shelli sätted
+
+en: Settings
+tr: Sätted
+
+en: Reset defaults...
+tr: Lähtesta vaikesätted...
+
+en: &Apply
+tr: &Rakenda
+
+en: Liquid
+tr: Vedel
+
+en: Grain
+tr: Teraline
+
+en: From {} to {}
+tr: {} kuni {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Seda toimingut ei saanud lõpule viia.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Suurus, vahed, liikumine ja Dockile kinnitatud rakendused.
+
+en: Size and spacing
+tr: Suurus ja vahed
+
+en: Icon size
+tr: Ikooni suurus
+
+en: {}, scaled with the Windows display scale.
+tr: {}, skaleeritud Windowsi kuva skaleerimisega.
+
+en: Bottom margin
+tr: Alumine veeris
+
+en: Space between the Dock and the bottom of the screen.
+tr: Vahe Docki ja ekraani alaserva vahel.
+
+en: Minimum side margin
+tr: Väikseim külgveeris
+
+en: Space kept free at the left and right screen edges.
+tr: Ekraani vasakusse ja paremasse serva vabaks jäetav ruum.
+
+en: Icon spacing
+tr: Ikoonide vahe
+
+en: Space between neighbouring icons.
+tr: Vahe kõrvuti asuvate ikoonide vahel.
+
+en: Glass and motion
+tr: Klaas ja liikumine
+
+en: Glass opacity
+tr: Klaasi läbipaistmatus
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Väiksemad väärtused näitavad rohkem Docki taga olevast hägustatud töölauast.
+
+en: Hover magnification
+tr: Suurendus hõljutamisel
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Kui palju ikoon kursori all kasvab; 1 lülitab selle välja.
+
+en: Behavior
+tr: Käitumine
+
+en: Show running applications
+tr: Kuva töötavad rakendused
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Avatud rakendused, mis pole kinnitatud, kuvatakse kinnitatud rakenduste järel.
+
+en: Reserve screen space for the Dock
+tr: Reserveeri Dockile ekraaniruumi
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maksimeeritud aknad jäävad Docki kohale, mitte selle alla.
+
+en: Automatically hide the Dock
+tr: Peida Dock automaatselt
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Peitub, kui rakenduseaken selle kinni katab; selle kuvamiseks viige kursor ekraani alaserva. See jääb töölauale ja aknad saavad kogu ekraani kõrguse.
+
+en: Pinned applications
+tr: Kinnitatud rakendused
+
+en: Move &up
+tr: Teisalda &üles
+
+en: Move &down
+tr: Teisalda &alla
+
+en: &Remove
+tr: &Eemalda
+
+en: &Add application
+tr: &Lisa rakendus
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Kinnitused säilitavad oma identiteedi ja käivitussätted. Kinnituse eemaldamisel ei lisa automaatne Windowsi tegumiribaga sünkroonimine seda enam tagasi.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Asukoht, kell ja ülemisel olekuribal kuvatavad olekuüksused.
+
+en: Presentation
+tr: Esitus
+
+en: Floating bar
+tr: Hõljuv riba
+
+en: Text on the desktop
+tr: Tekst töölaual
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Hõljuv riba: klaasriba ekraani ülaserva all. Tekst töölaual: riba pole, samad üksused on kirjutatud päris ekraani ülaserva otse töölaua pildi peale; see ala jäetakse akendest vabaks ning ülemine veeris ja klaasi läbipaistmatus ei kehti. Automaatse peitmise korral ilmub tekst klaasist alale tagasi, kui selle all on aken.
+
+en: Position and glass
+tr: Asukoht ja klaas
+
+en: Top margin
+tr: Ülemine veeris
+
+en: Space between the Top Bar and the top of the screen.
+tr: Vahe ülariba ja ekraani ülaserva vahel.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Väiksemad väärtused näitavad rohkem riba taga olevast hägustatud töölauast.
+
+en: Clock
+tr: Kell
+
+en: Clock format
+tr: Kellaaja vorming
+
+en: Follow Windows
+tr: Järgi Windowsi
+
+en: 12-hour
+tr: 12-tunnine
+
+en: 24-hour
+tr: 24-tunnine
+
+en: Date style
+tr: Kuupäeva laad
+
+en: Weekday, day and month
+tr: Nädalapäev, päev ja kuu
+
+en: Short
+tr: Lühike
+
+en: Long
+tr: Pikk
+
+en: Show seconds
+tr: Kuva sekundid
+
+en: Show date
+tr: Kuva kuupäev
+
+en: Status items
+tr: Olekuüksused
+
+en: Show battery
+tr: Kuva aku
+
+en: Hide battery when absent
+tr: Peida aku, kui seda pole
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Akuta lauaarvutid ei kuva midagi, mitte tundmatut akut.
+
+en: Show input language
+tr: Kuva sisestuskeel
+
+en: Show network
+tr: Kuva võrk
+
+en: Show audio output
+tr: Kuva heliväljund
+
+en: Show microphone
+tr: Kuva mikrofon
+
+en: Show weather when enabled
+tr: Kuva ilm, kui see on lubatud
+
+en: Weather itself is turned on in Weather settings.
+tr: Ilmateade ise lülitatakse sisse ilmasätetes.
+
+en: Show hidden icons button
+tr: Kuva peidetud ikoonide nupp
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Väike nool, mis avab Windowsi teavitusala peidetud ikoonid.
+
+en: Reserve screen space above windows
+tr: Reserveeri ekraaniruumi akende kohal
+
+en: Maximized windows stay below the Top Bar.
+tr: Maksimeeritud aknad jäävad ülariba alla.
+
+en: Automatically hide the Top Bar
+tr: Peida ülariba automaatselt
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Peitub, kui rakenduseaken selle kinni katab; selle kuvamiseks viige kursor ekraani ülaserva. See jääb töölauale.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Kasuta Windowsi kiirsätteid (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Väljas: Aetheri kiirjuhtelemendid avanevad ülariba all. Sees: Windowsi enda paneel avaneb ekraani allservas.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Valikuline ilmaprognoos ülaribal, pakub Open-Meteo.
+
+en: Forecast
+tr: Prognoos
+
+en: Enable weather
+tr: Luba ilmateade
+
+en: Off by default: the forecast needs network requests.
+tr: Vaikimisi väljas: prognoos vajab võrgupäringuid.
+
+en: Temperature
+tr: Temperatuur
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Värskendusintervall
+
+en: Location
+tr: Asukoht
+
+en: Locate automatically with Windows
+tr: Määra asukoht automaatselt Windowsiga
+
+en: Uses the Windows location service after you allow it.
+tr: Kasutab Windowsi asukohateenust pärast seda, kui olete selle lubanud.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows küsib asukohaluba. Teie koordinaadid saadetakse saidile Open-Meteo.com ainult prognoosi saamiseks; asukohavõti salvestatakse kohalikku vahemällu. Kui asukoht on blokeeritud, pole ilmateade saadaval.
+
+en: Use &Windows location
+tr: Kasuta &Windowsi asukohta
+
+en: Location &settings
+tr: Asukoha&sätted
+
+en: Choose automatic location or search for a place below.
+tr: Valige automaatne asukoht või otsige allpool kohta.
+
+en: Search for a place
+tr: Otsi kohta
+
+en: Searc&h
+tr: &Otsi
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Ilmaandmed: Open-Meteo.com (CC BY 4.0). Käsitsi otsing saadab ainult teie sisestatud teksti.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Allkirjastatud väljalasked ametlikust GitHubi hoidlast, kontrollitud enne installimist.
+
+en: Preferences
+tr: Eelistused
+
+en: Check for updates automatically
+tr: Otsi värskendusi automaatselt
+
+en: Check interval
+tr: Kontrollimise intervall
+
+en: Release channel
+tr: Väljalaskekanal
+
+en: Prereleases arrive earlier and change more often.
+tr: Eelväljalasked saabuvad varem ja muutuvad sagedamini.
+
+en: Stable
+tr: Stabiilne
+
+en: Prerelease
+tr: Eelväljalase
+
+en: Show update notifications
+tr: Kuva värskendusteatised
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Käivitus, liikumine, kiirklahvid ja diagnostika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Ribade, menüüde, otsingu, sätete ja installiprogrammi keel.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Teile või teistele programmidele kuuluvaid nimesid (rakendused, failid, WiFi-võrgud) ei tõlgita kunagi. Valitud keele korral kirjutab ülariba kuupäeva selles keeles; Järgi Windowsi säilitab teie Windowsi piirkonnavormingu.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Käsitsi kirjutatud tervitus kasutab ladina tähti: see tervitab prantsuse, inglise või hispaania keeles. Valige selle keel jaotises Tervitus.
+
+en: Language
+tr: Keel
+
+en: Interface language
+tr: Liidese keel
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Järgi Windowsi kasutab teie Windowsi kuvakeeltest esimest, mis on üks neist, muidu inglise keelt.
+
+en: Startup
+tr: Käivitus
+
+en: Start Aether Shell when I sign in
+tr: Käivita Aether Shell, kui ma sisse login
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Selle muutmiseks on vaja nuppu Rakenda. Tegumihaldur saab selle ka välja lülitada.
+
+en: Motion
+tr: Liikumine
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Vähendatud liikumine eemaldab dekoratiivse liikumise kõikjalt.
+
+en: Reduced
+tr: Vähendatud
+
+en: Full
+tr: Täielik
+
+en: Keyboard shortcuts
+tr: Kiirklahvid
+
+en: Enable global keyboard shortcuts
+tr: Luba globaalsed kiirklahvid
+
+en: Search shortcut key
+tr: Otsingu kiirklahv
+
+en: Dock shortcut key
+tr: Docki kiirklahv
+
+en: Search shortcut modifiers
+tr: Otsingu kiirklahvi muuteklahvid
+
+en: Dock shortcut modifiers
+tr: Docki kiirklahvi muuteklahvid
+
+en: Shortcut status unavailable
+tr: Kiirklahvide olek pole saadaval
+
+en: Diagnostics
+tr: Diagnostika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Logikaustas on selle arvuti Aether Shelli logid. Ekspordi diagnostika salvestab ainult rakenduse versiooni ja Windowsi järgu - ilma logide ja isikuandmeteta.
+
+en: Open &log folder
+tr: Ava &logikaust
+
+en: &Export diagnostics...
+tr: &Ekspordi diagnostika...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Lühike käsitsi kirjutatud tervitus teie töölaual pärast sisselogimist või arvuti lukust avamist.
+
+en: Greeting
+tr: Tervitus
+
+en: Show the welcome at sign-in and unlock
+tr: Kuva tervitus sisselogimisel ja lukust avamisel
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: See kuvatakse pärast seda, kui Windows on teid sisse loginud, sel ajal kui Aether Shell valmistub. Vahelejätmiseks puudutage, klõpsake või vajutage paoklahvi (Esc).
+
+en: Greeting language
+tr: Tervituse keel
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut prantsuse keeles, Hello inglise keeles, Hola hispaania keeles. Pliiats kirjutab ladina tähti: kõigis teistes keeltes tervitab see inglise keeles.
+
+en: Your name
+tr: Teie nimi
+
+en: Name to greet you with
+tr: Nimi, millega teid tervitada
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Valikuline, näiteks eesnimi. See jääb sellesse arvutisse teie Aether Shelli sätetesse ning seda ei saadeta kuhugi ega kirjutata logisse. Eemaldamiseks tühjendage väli.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Värvirežiim, rõhuvärv, liikumiskiirus ning Docki ja ülariba välimus.
+
+en: Style
+tr: Laad
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Vedel: kihiline klaas tausta kohal, hägustuskiht, vedeliku valgus ning seejärel ikoonid ja tekst, mis jäävad loetavaks nii heledate kui ka tumedate lehtede peal. Teraline: härmas klaas, hägune ja poolläbipaistev, peene teralisusega.
+
+en: Liquid blur
+tr: Vedela laadi hägustus
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Kui palju katab Vedela laadi klaasi all olev hägustuskiht tausta: 100% hägustab kogu tausta. Väiksemad väärtused näitavad lehte teravamalt ning ribadel olevat teksti võib siis kirjul lehel halvemini lugeda.
+
+en: Liquid blur color
+tr: Vedela laadi hägustuse värv
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automaatne säilitab klaasi enda värvid. Tekst ja ikoonid jäävad loetavaks olenemata värvist.
+
+en: Automatic
+tr: Automaatne
+
+en: White
+tr: Valge
+
+en: Black
+tr: Must
+
+en: Accent
+tr: Rõhuvärv
+
+en: Blue
+tr: Sinine
+
+en: Violet
+tr: Violetne
+
+en: Pink
+tr: Roosa
+
+en: Red
+tr: Punane
+
+en: Orange
+tr: Oranž
+
+en: Yellow
+tr: Kollane
+
+en: Green
+tr: Roheline
+
+en: Teal
+tr: Sinakasroheline
+
+en: Liquid color strength
+tr: Vedela laadi värvitugevus
+
+en: How much of the chosen color the blur layer takes.
+tr: Kui palju valitud värvi hägustuskiht võtab.
+
+en: Theme
+tr: Kujundus
+
+en: Color mode
+tr: Värvirežiim
+
+en: High contrast always takes precedence.
+tr: Suur kontrastsus on alati ülimuslik.
+
+en: Light
+tr: Hele
+
+en: Dark
+tr: Tume
+
+en: Accent color
+tr: Rõhuvärv
+
+en: Animation duration
+tr: Animatsiooni kestus
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 on standardkiirus; suuremad väärtused on aeglasemad. Vähendatud liikumine on ülimuslik.
+
+en: Dock icon preset
+tr: Docki ikoonide eelseadistus
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Docki sätetest valitud kohandatud suurus säilitatakse, kuni valite eelseadistuse.
+
+en: Small - 32 px
+tr: Väike - 32 px
+
+en: Medium - 40 px
+tr: Keskmine - 40 px
+
+en: Large - 48 px
+tr: Suur - 48 px
+
+en: Keep custom size
+tr: Säilita kohandatud suurus
+
+en: Show Windows Start in the Dock
+tr: Kuva Dockis Windowsi menüü Start
+
+en: Show Task View in the Dock
+tr: Kuva Dockis tegumivaade
+
+en: Reserve extra space for Dock animations
+tr: Reserveeri Docki animatsioonidele lisaruumi
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Hoiab suurenduse ja käivitushüppe maksimeeritud akendest eemal.
+
+en: Weather position
+tr: Ilma asukoht
+
+en: Left
+tr: Vasakul
+
+en: Right
+tr: Paremal
+
+en: Keyboard indicator
+tr: Klaviatuuri indikaator
+
+en: Compact
+tr: Kompaktne
+
+en: Two lines
+tr: Kaks rida
+
+en: Windows taskbar pins
+tr: Windowsi tegumiriba kinnitused
+
+en: Add newly discovered Windows taskbar pins
+tr: Lisa äsja leitud Windowsi tegumiriba kinnitused
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Kui tegumiriba on asendatud, lisatakse uued Windowsi kinnitused Dockile.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Windowsi tegumiriba tagasipööratav asendamine Dockiga.
+
+en: Taskbar replacement
+tr: Tegumiriba asendamine
+
+en: Replace the Windows taskbar
+tr: Asenda Windowsi tegumiriba
+
+en: Changing this needs Apply.
+tr: Selle muutmiseks on vaja nuppu Rakenda.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Kui Aether Shell töötab, peidab see Windowsi tegumiriba ja reserveerib maksimeeritud rakenduste alla ruumi.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Windowsi tegumiriba olek taastatakse, kui see režiim keelatakse või Aether Shell sulgub. Eraldi taasteabiline taastab selle ka siis, kui rakendus ootamatult peatub. Kui taastamine nurjub, taaskäivitage tegumihalduris Windows Explorer.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windowsi sätted jääb Windowsi omaliideseks. Aether Shell ei asenda selle tegumiriba lehte; konfigureerige see režiim siin.
+
+en: Pinned applications from Windows
+tr: Kinnitatud rakendused Windowsist
+
+en: &Import Windows taskbar pins
+tr: &Impordi Windowsi tegumiriba kinnitused
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Loeb kinnitatud otseteid Windowsi kinnitusi muutmata. Mõned Windows 11 kinnitused või nende järjestus ei pruugi olla saadaval.
+
+en: Version {}
+tr: Versioon {}
+
+en: Created by Ibrahim Bouillet
+tr: Looja: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Windowsi jaoks loodud töölauaiides - hõljuv Dock ja ülemine olekuriba -, mis töötab Windows Exploreri kõrval.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Ilmaandmed: Open-Meteo.com (CC BY 4.0). Kaasas pole ühtegi kolmanda osapoole C++ käitusaja teeki.
+
+en: &Official project
+tr: &Ametlik projekt
+
+en: Licence
+tr: Litsents
+
+en: Taskbar replacement changes need Apply.
+tr: Tegumiriba asendamise muudatused vajavad nuppu Rakenda.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Muudatused salvestatakse automaatselt. Käivitus vajab nuppu Rakenda.
+
+en: Changes save automatically.
+tr: Muudatused salvestatakse automaatselt.
+
+en: Press Apply to confirm this change.
+tr: Selle muudatuse kinnitamiseks klõpsake nuppu Rakenda.
+
+en: Smart transparency
+tr: Nutikas läbipaistvus
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Vedela laadi korral hägustab see aken ainult oma teksti ja juhtelementide all: täielikult teiste akende ja töölauaikoonide kohal, kergelt töölaua pildi kohal ning üldse mitte seal, kus see midagi ei kuva.
+
+en: Languages on this PC
+tr: Selles arvutis olevad keeled
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell laadib alla Windowsis olevad keeled, nii et see vahetab keelt koos Windowsiga.
+
+en: Add a language
+tr: Lisa keel
+
+en: &Download
+tr: &Laadi alla
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Iga keel pärineb selle versiooni GitHubi väljalaskest ja seda kontrollitakse enne kasutamist. Kui see on selles arvutis, valige see ülal.
+
+en: built in
+tr: sisseehitatud
+
+en: downloading, {}
+tr: allalaadimine, {}
+
+en: download failed
+tr: allalaadimine nurjus
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shelli installiprogramm
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Installiprogramm ei saanud oma liidest luua. Sulgege see ja proovige uuesti või kasutage dokumenteeritud vaikse installi suvandeid.
+
+en: Options
+tr: Suvandid
+
+en: Install
+tr: Installi
+
+en: Done
+tr: Valmis
+
+en: Remove Aether Shell
+tr: Eemalda Aether Shell
+
+en: Repair Aether Shell
+tr: Paranda Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Windowsi jaoks loodud Dock ja ülemine olekuriba, mis töötavad Windows Exploreri kõrval.
+
+en: Replaces the Windows taskbar while it runs
+tr: Asendab töötamise ajal Windowsi tegumiriba
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Windowsi tegumiriba tagasisaamiseks väljuge Aether Shellist, lülitage see välja jaotises Sätted > Töölaud või avage menüüs Start „Taasta Windowsi tegumiriba“.
+
+en: Starts when you sign in - your choice
+tr: Käivitub sisselogimisel - teie valik
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Uued installid käivituvad vaikimisi sisselogimisel. Saate selle valiku enne installimist tühjendada või hiljem sätetes välja lülitada. Olemasolevad käivitusvalikud ja tegumihalduris tehtud keelamised säilitatakse.
+
+en: Installs for your account
+tr: Installitakse teie kontole
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Administraatoriõigusi pole vaja. Teie sätted ja andmed jäävad teie kasutajaprofiili.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Desinstallimine säilitab teie sätted ja andmed, kui te ei vali nende eemaldamist.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Parandamine taastab selle paketi failid ja säilitab teie sätted. Kui Aether Shell jättis Windowsi tegumiriba peidetuks, taastab parandamine selle.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Olemasolevale versioonile peale installimine säilitab teie sätted. Vanem pakett lükatakse tagasi, kui te ei luba selgesõnaliselt versiooni alandamist.
+
+en: MIT License
+tr: MIT-i litsents
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Litsents installitakse ka failina LICENSE Aether Shelli kõrvale.
+
+en: Remove this installation
+tr: Eemalda see install
+
+en: Install location
+tr: Installi asukoht
+
+en: &Browse...
+tr: &Sirvi...
+
+en: Also remove my settings, cache and logs
+tr: Eemalda ka minu sätted, vahemälu ja logid
+
+en: This cannot be undone.
+tr: Seda ei saa tagasi võtta.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Installiprogramm sulgeb Aether Shelli korrektselt ja eemaldab selle installitud failid, otseteed, käivituskirje ja registreeringu loendis Installitud rakendused. Teisi rakendusi ja Windowsi sätteid ei puudutata.
+
+en: Your welcome
+tr: Teie tervitus
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Pärast sisselogimist või arvuti lukust avamist kirjutab Aether Shell käsitsi lühikese tervituse. Tippige nimi, millega see teid tervitab, või jätke väli lihtsa tervituse jaoks tühjaks.
+
+en: Your first name
+tr: Teie eesnimi
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Valikuline, näiteks eesnimi. See jääb sellesse arvutisse teie Aether Shelli sätetesse ja seda ei saadeta kuhugi. Saate seda muuta või tervituse välja lülitada jaotises Sätted > Tervitus.
+
+en: Shortcuts and startup
+tr: Otseteed ja käivitus
+
+en: Create Start menu shortcuts
+tr: Loo menüü Start otseteed
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell ja Taasta Windowsi tegumiriba.
+
+en: Create a desktop shortcut
+tr: Loo töölaua otsetee
+
+en: Shows your current choice.
+tr: Näitab teie praegust valikut.
+
+en: Recommended.
+tr: Soovitatav.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Loobumiseks tühjendage ruut; tegumihalduris tehtud keelamisi arvestatakse.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Installimisega nõustute ülaltoodud käivitusvalikuga. Käivitusprogramm saab Aether Shelli pärast kokkujooksmist piiratud arvu katsetega taaskäivitada. Väljumine ja Taasta Windowsi tegumiriba jäävad saadavale. Ilmateade on vaikimisi välja lülitatud. Allkirjastamata binaarfailid võivad põhjustada Windows SmartScreeni hoiatuse.
+
+en: Removing this installation...
+tr: Selle installi eemaldamine...
+
+en: Repairing Aether Shell...
+tr: Aether Shelli parandamine...
+
+en: Installing Aether Shell...
+tr: Aether Shelli installimine...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shelli sulgemine ja selle failide eemaldamine.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Manustatud paketi kontrollimine ja selle failide installimine. Edenemist näidatakse tegevusena: installiprogramm ei tea järelejäänud aega.
+
+en: Please wait while the removal completes.
+tr: Oodake, kuni eemaldamine lõpeb.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Loobu on saadaval, kuni uus versioon on aktiveeritud; seejärel lõpetab installiprogramm ohutult.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell desinstalliti.
+
+en: Aether Shell is ready.
+tr: Aether Shell on valmis.
+
+en: Setup was cancelled.
+tr: Installimine tühistati.
+
+en: Setup could not complete.
+tr: Installimist ei saanud lõpule viia.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Teie andmed säilitati, kui te ei valinud selgesõnaliselt nende eemaldamist.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Saate selle parandada või desinstallida jaotises Windowsi sätted > Rakendused > Installitud rakendused.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Toiming tühistati enne aktiveerimist. Uuesti proovimiseks naaske jaotisse Suvandid.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Kontrollige failidele juurdepääsu ja vaba kettaruumi ning proovige seejärel uuesti. Kui Aether Shell on juba olemas, saab Paranda selle failid taastada. Tõrke kategooria: {}
+
+en: Setup log
+tr: Installilogi
+
+en: Launch Aether Shell
+tr: Käivita Aether Shell
+
+en: &Back
+tr: &Tagasi
+
+en: &Next
+tr: &Edasi
+
+en: &Continue
+tr: &Jätka
+
+en: &Uninstall
+tr: &Desinstalli
+
+en: &Repair
+tr: &Paranda
+
+en: &Install
+tr: &Installi
+
+en: &Close
+tr: &Sule
+
+en: Step {} of {}: {}
+tr: Etapp {}/{}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Valige Aether Shelli installikaust
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Valige täielik kaustatee, näiteks selline, mis algab draivitähega.
+
+en: The install folder must be an absolute path.
+tr: Installikaust peab olema absoluutne tee.
+
+en: Setup stops at the next safe point.
+tr: Installiprogramm peatub järgmises ohutus punktis.
+
+en: Cancelling...
+tr: Loobumine...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Installiprogramm lõpetab praeguse etapi ohutult; palun oodake.
+
+en: Updating Aether Shell
+tr: Aether Shelli värskendamine
+
+en: Verifying the signed package and applying the update.
+tr: Allkirjastatud paketi kontrollimine ja värskenduse rakendamine.
+
+en: Update completed
+tr: Värskendus on lõpule viidud
+
+en: The update did not complete
+tr: Värskendust ei viidud lõpule
+
+en: Close
+tr: Sule
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Värskendusliidest ei saanud käivitada. Värskendust pole rakendatud. Proovige uuesti või kasutage funktsiooni Paranda.
+
+en: Aether Shell Update
+tr: Aether Shelli värskendus
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Värskendusliidest ei saanud käivitada. Värskendust pole rakendatud. Proovige uuesti või kasutage funktsiooni Paranda jaotises Windowsi sätted > Rakendused > Installitud rakendused.
+
+en: Update completed.
+tr: Värskendus on lõpule viidud.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Värskendust ei viidud lõpule. Vaadake värskendaja logi või kasutage funktsiooni Paranda.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell ei saanud käivituda. Valige Paranda jaotises Windowsi sätted > Rakendused > Installitud rakendused.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shelli sätted — värskendamine on pooleli
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Jätka tegumiriba asendamist
+
+en: Show Windows &notification area for 60 seconds
+tr: Kuva Windowsi &teavitusala 60 sekundit
+
+en: &Search…
+tr: &Otsi…
+
+en: &Settings…
+tr: &Sätted…
+
+en: View available &update…
+tr: Kuva saadaolev &värskendus…
+
+en: &Check for updates…
+tr: &Otsi värskendusi…
+
+en: &About Aether Shell
+tr: &Teave Aether Shelli kohta
+
+en: &Quit Aether Shell
+tr: &Välju Aether Shellist
+
+en: Switch &input language\tWin+Space
+tr: Vaheta &sisestuskeelt\tWin+Tühik
+
+en: Open &network controls…
+tr: Ava &võrgu juhtelemendid…
+
+en: &Weather settings…
+tr: &Ilmasätted…
+
+en: Toggle output &mute
+tr: Lülita väljundi &vaigistus sisse/välja
+
+en: &Sound settings…
+tr: &Helisätted…
+
+en: Toggle microphone &mute
+tr: Lülita mikrofoni &vaigistus sisse/välja
+
+en: Start Windows &voice typing\tWin+H
+tr: Käivita Windowsi &häälsisestus\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofoni &privaatsussätted…
+
+en: &Power settings…
+tr: &Toitesätted…
+
+en: Open &notifications and calendar
+tr: Ava &teatised ja kalender
+
+en: Open &calendar\tWin+Alt+D
+tr: Ava &kalender\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Kuva &peidetud ikoonid
+
+en: Initializing
+tr: Lähtestamine
+
+en: Unavailable
+tr: Pole saadaval
+
+en: Unsupported
+tr: Pole toetatud
+
+en: Error
+tr: Tõrge
+
+en: Available
+tr: Saadaval
+
+en: Unknown
+tr: Teadmata
+
+en: Internet access
+tr: Interneti-juurdepääs
+
+en: Local network only
+tr: Ainult kohtvõrk
+
+en: Limited Internet access
+tr: Piiratud Interneti-juurdepääs
+
+en: No network connection
+tr: Võrguühendus puudub
+
+en: Connectivity unknown
+tr: Ühenduvus teadmata
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobiilsidevõrk
+
+en: Network
+tr: Võrk
+
+en: Offline
+tr: Võrguühenduseta
+
+en: Network status unavailable
+tr: Võrgu olek pole saadaval
+
+en: Quick controls
+tr: Kiirjuhtelemendid
+
+en: Aether Shell menu
+tr: Aether Shelli menüü
+
+en: Weather status unavailable
+tr: Ilma olek pole saadaval
+
+en: Cached weather
+tr: Vahemälus olev ilm
+
+en: Observation (UTC): {}
+tr: Vaatlus (UTC): {}
+
+en: Weather: {}
+tr: Ilm: {}
+
+en: Click to open weather settings
+tr: Klõpsake ilmasätete avamiseks
+
+en: Show hidden icons
+tr: Kuva peidetud ikoonid
+
+en: Opens Windows' notification-area overflow
+tr: Avab Windowsi teavitusala ületäite
+
+en: Input language: {}
+tr: Sisestuskeel: {}
+
+en: Fallback input layout
+tr: Varusisestuspaigutus
+
+en: Click to switch input language (Win+Space)
+tr: Klõpsake sisestuskeele vahetamiseks (Win+Tühik)
+
+en: Network: {}
+tr: Võrk: {}
+
+en: Signal strength unavailable
+tr: Signaali tugevus pole saadaval
+
+en: Click to open Windows network settings
+tr: Klõpsake Windowsi võrgusätete avamiseks
+
+en: Audio output
+tr: Heliväljund
+
+en: Audio: {}
+tr: Heli: {}
+
+en: volume unknown
+tr: helitugevus teadmata
+
+en: Muted
+tr: Vaigistatud
+
+en: Sound on
+tr: Heli sees
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Seade pole vaigistatud
+
+en: Recording detection unsupported
+tr: Salvestamise tuvastamine pole toetatud
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Klõpsake vaigistuse sisse- või väljalülitamiseks; paremklõpsake Windowsi häälsisestuse ja mikrofoni privaatsussätete jaoks
+
+en: Battery: {}
+tr: Aku: {}
+
+en: Battery {}
+tr: Aku {}
+
+en: Battery status unavailable
+tr: Aku olek pole saadaval
+
+en: Charging
+tr: Laadimine
+
+en: External power
+tr: Väline toide
+
+en: Estimated remaining: {} h {} min
+tr: Hinnanguliselt jäänud: {} h {} min
+
+en: Click to open power settings
+tr: Klõpsake toitesätete avamiseks
+
+en: Clock status unavailable
+tr: Kella olek pole saadaval
+
+en: Click to open calendar and notifications
+tr: Klõpsake kalendri ja teatiste avamiseks
+
+en: Action failed: {}
+tr: Toiming nurjus: {}
+
+en: Aether Shell status bar
+tr: Aether Shelli olekuriba
+
+en: Update available
+tr: Värskendus on saadaval
+
+en: Cached
+tr: Vahemälus
+
+en: Start
+tr: Start
+
+en: Search
+tr: Otsing
+
+en: Task View
+tr: Tegumivaade
+
+en: Application
+tr: Rakendus
+
+en: Running application
+tr: Töötav rakendus
+
+en: More applications
+tr: Veel rakendusi
+
+en: Aether Shell window previews
+tr: Aether Shelli akende eelvaated
+
+en: Minimized — preview unavailable
+tr: Minimeeritud — eelvaade pole saadaval
+
+en: Preview unavailable
+tr: Eelvaade pole saadaval
+
+en: {} windows
+tr: {} akent
+
+en: {} window
+tr: {} aken
+
+en: Switches to this window
+tr: Lülitub sellele aknale
+
+en: Minimized, preview unavailable
+tr: Minimeeritud, eelvaade pole saadaval
+
+en: Minimized
+tr: Minimeeritud
+
+en: Close {}
+tr: Sule {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Palub sellel aknal sulguda; rakendus võib siiski paluda salvestada või loobuda
+
+en: Close requested
+tr: Sulgemist taotleti
+
+en: Previous applications
+tr: Eelmised rakendused
+
+en: Open
+tr: Ava
+
+en: New instance
+tr: Uus eksemplar
+
+en: Unpin from Dock
+tr: Vabasta Dockist
+
+en: Pin to Dock
+tr: Kinnita Dockile
+
+en: Move left
+tr: Teisalda vasakule
+
+en: Move right
+tr: Teisalda paremale
+
+en: Dock settings...
+tr: Docki sätted...
+
+en: Import Windows taskbar pins
+tr: Impordi Windowsi tegumiriba kinnitused
+
+en: Open Windows Start
+tr: Ava Windowsi menüü Start
+
+en: Aether Shell Dock
+tr: Aether Shelli Dock
+
+en: Pinned
+tr: Kinnitatud
+
+en: Running
+tr: Töötab
+
+en: Needs attention
+tr: Vajab tähelepanu
+
+en: Up arrow shows window previews
+tr: Ülesnool kuvab akende eelvaated
+
+en: Installed application
+tr: Installitud rakendus
+
+en: Desktop application
+tr: Töölauarakendus
+
+en: File
+tr: Fail
+
+en: Folder
+tr: Kaust
+
+en: Windows tool
+tr: Windowsi tööriist
+
+en: Control Panel
+tr: Juhtpaneel
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Liigu   ·   Enter Ava   ·   Esc Sule
+
+en: Search apps, settings and files
+tr: Otsige rakendusi, sätteid ja faile
+
+en: Search could not be completed.
+tr: Otsingut ei saanud lõpule viia.
+
+en: Results
+tr: Tulemused
+
+en: Indexing applications…
+tr: Rakenduste indekseerimine…
+
+en: Type to search apps, settings and files
+tr: Tippige rakenduste, sätete ja failide otsimiseks
+
+en: Nothing matches
+tr: Vasteid pole
+
+en: Windows could not open this application.
+tr: Windows ei saanud seda rakendust avada.
+
+en: Menu
+tr: Menüü
+
+en: Opens a submenu
+tr: Avab alammenüü
+
+en: , opens a submenu
+tr: , avab alammenüü
+
+en: Selected
+tr: Valitud
+
+en: Checked
+tr: Märgitud
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Lennukirežiim
+
+en: Accessibility
+tr: Hõlbustus
+
+en: Energy saver
+tr: Energiasäästja
+
+en: Live captions
+tr: Reaalajas subtiitrid
+
+en: Night light
+tr: Öövalgus
+
+en: Mobile hotspot
+tr: Mobiilne kuumkoht
+
+en: Nearby sharing
+tr: Läheduses jagamine
+
+en: Cast
+tr: Ülekanne
+
+en: Project
+tr: Projekteeri
+
+en: All settings
+tr: Kõik sätted
+
+en: Connected
+tr: Ühendatud
+
+en: Not connected
+tr: Pole ühendatud
+
+en: , on
+tr: , sees
+
+en: , off
+tr: , väljas
+
+en: , state unknown
+tr: , olek teadmata
+
+en: , opens Windows Settings
+tr: , avab Windowsi sätted
+
+en: , shows accessibility features
+tr: , kuvab hõlbustusfunktsioonid
+
+en: , requires Windows 11 version 22H2
+tr: , nõuab Windows 11 versiooni 22H2
+
+en: Now playing: {}
+tr: Praegu esitatakse: {}
+
+en: Untitled media
+tr: Pealkirjata meedium
+
+en: , switch source
+tr: , vaheta allikat
+
+en: Previous media item
+tr: Eelmine meediaüksus
+
+en: Pause
+tr: Paus
+
+en: Play
+tr: Esita
+
+en: Next media item
+tr: Järgmine meediaüksus
+
+en: {} details
+tr: {} – üksikasjad
+
+en: Page {} of {}
+tr: Leht {}/{}
+
+en: Next page
+tr: Järgmine leht
+
+en: First page
+tr: Esimene leht
+
+en: Brightness
+tr: Heledus
+
+en: Brightness, unavailable on this display
+tr: Heledus, pole sellel kuval saadaval
+
+en: Volume
+tr: Helitugevus
+
+en: Volume, unavailable
+tr: Helitugevus, pole saadaval
+
+en: Unmute
+tr: Tühista vaigistus
+
+en: Mute
+tr: Vaigista
+
+en: Sound output and volume mixer
+tr: Heliväljund ja helitugevuse mikser
+
+en: Back
+tr: Tagasi
+
+en: , secured
+tr: , turvatud
+
+en: , open
+tr: , avatud
+
+en: , connected
+tr: , ühendatud
+
+en: Disconnect
+tr: Katkesta ühendus
+
+en: Show available networks
+tr: Kuva saadaolevad võrgud
+
+en: More Wi-Fi settings
+tr: Veel WiFi sätteid
+
+en: Bluetooth and devices settings
+tr: Bluetoothi ja seadmete sätted
+
+en: Magnifier
+tr: Luup
+
+en: Narrator
+tr: Jutustaja
+
+en: On-screen keyboard
+tr: Ekraaniklaviatuur
+
+en: Sticky keys
+tr: Kleepklahvid
+
+en: More accessibility settings
+tr: Veel hõlbustussätteid
+
+en: Volume mixer
+tr: Helitugevuse mikser
+
+en: Choose output in Sound settings
+tr: Valige väljund helisätetes
+
+en: Power and battery settings
+tr: Toite ja aku sätted
+
+en: Battery {} percent, {}
+tr: Aku {} protsenti, {}
+
+en: All Windows settings
+tr: Kõik Windowsi sätted
+
+en: The requested action could not be dispatched
+tr: Taotletud toimingut ei saanud edastada
+
+en: Aether Shell quick controls
+tr: Aether Shelli kiirjuhtelemendid
+
+en: Media session active
+tr: Meediaseanss on aktiivne
+
+en: No media session
+tr: Meediaseanssi pole
+
+en: Current page
+tr: Praegune leht
+
+en:  - secured
+tr:  - turvatud
+
+en:  - open
+tr:  - avatud
+
+en:  - opens in Windows
+tr:  - avaneb Windowsis
+
+en: Turned off by hardware or policy
+tr: Riistvara või poliitika on välja lülitanud
+
+en: State unavailable - use Windows settings
+tr: Olek pole saadaval - kasutage Windowsi sätteid
+
+en: Off
+tr: Väljas
+
+en:  - signal {} of 5
+tr:  - signaal {}/5
+
+en: , no internet
+tr: , Internetita
+
+en: On - not connected
+tr: Sees - pole ühendatud
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows ei luba rakendustel võrke loetleda: kontrollige privaatsussätetes asukohta
+
+en: No Wi-Fi adapter found
+tr: WiFi-adapterit ei leitud
+
+en: Connecting to {}...
+tr: Ühendamine võrguga {}...
+
+en:  - looking for networks
+tr:  - võrkude otsimine
+
+en: On
+tr: Sees
+
+en: A screen reader is running
+tr: Ekraanilugeja töötab
+
+en: Windows accessibility features
+tr: Windowsi hõlbustusfunktsioonid
+
+en: Sound output
+tr: Heliväljund
+
+en: Default output device
+tr: Vaikeväljundseade
+
+en: No output device available
+tr: Väljundseade pole saadaval
+
+en: Battery unknown
+tr: Aku teadmata
+
+en: Status refresh could not be started
+tr: Oleku värskendamist ei saanud käivitada
+
+en: Status refresh unavailable
+tr: Oleku värskendamine pole saadaval
+
+en: Excellent signal
+tr: Suurepärane signaal
+
+en: Good signal
+tr: Hea signaal
+
+en: Fair signal
+tr: Rahuldav signaal
+
+en: Weak signal
+tr: Nõrk signaal
+
+en: Clear sky
+tr: Selge taevas
+
+en: Mainly clear
+tr: Peamiselt selge
+
+en: Partly cloudy
+tr: Vahelduv pilvisus
+
+en: Overcast
+tr: Pilves
+
+en: Fog
+tr: Udu
+
+en: Drizzle
+tr: Uduvihm
+
+en: Rain
+tr: Vihm
+
+en: Snow
+tr: Lumi
+
+en: Rain showers
+tr: Vihmahood
+
+en: Snow showers
+tr: Lumehood
+
+en: Thunderstorm
+tr: Äike
+
+## weather
+
+en: Morning
+tr: Hommik
+
+en: Afternoon
+tr: Pärastlõuna
+
+en: Evening
+tr: Õhtu
+
+en: Night
+tr: Öö
+
+en: Now
+tr: Praegu
+
+en: Today
+tr: Täna
+
+en: Low
+tr: Madal
+
+en: Moderate
+tr: Mõõdukas
+
+en: High
+tr: Kõrge
+
+en: Very high
+tr: Väga kõrge
+
+en: Extreme
+tr: Äärmuslik
+
+en: No connection to the weather service.
+tr: Ilmateenusega ühendus puudub.
+
+en: The weather service is busy. Try again in a moment.
+tr: Ilmateenus on hõivatud. Proovige hetke pärast uuesti.
+
+en: The weather could not be loaded.
+tr: Ilmateadet ei saanud laadida.
+
+en: Could not update; showing the last forecast.
+tr: Värskendamine nurjus; kuvatakse viimane prognoos.
+
+en: Try again
+tr: Proovi uuesti
+
+en: Your location
+tr: Teie asukoht
+
+en: My location
+tr: Minu asukoht
+
+en: Precise location
+tr: Täpne asukoht
+
+en: Approximate location
+tr: Ligikaudne asukoht
+
+en: Chosen in Settings
+tr: Valitud sätetes
+
+en: Allow
+tr: Luba
+
+en: Use precise location
+tr: Kasuta täpset asukohta
+
+en: See the weather where you are: allow your precise location.
+tr: Vaadake ilma seal, kus olete: lubage oma täpne asukoht.
+
+en: Your position is approximate (about 10 km).
+tr: Teie asukoht on ligikaudne (umbes 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Asukoht on Windowsis selle rakenduse jaoks välja lülitatud.
+
+en: This device cannot report its location. Search for a city instead.
+tr: See seade ei saa oma asukohta edastada. Otsige selle asemel linna.
+
+en: Reading Windows location…
+tr: Windowsi asukoha lugemine…
+
+en: Automatic weather follows your Windows location.
+tr: Automaatne ilmateade järgib teie Windowsi asukohta.
+
+en: Search for a city
+tr: Otsi linna
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Ilma nägemiseks otsige linna või lubage oma asukoht.
+
+en: Searching…
+tr: Otsimine…
+
+en: City search is unavailable.
+tr: Linnaotsing pole saadaval.
+
+en: No city found.
+tr: Linna ei leitud.
+
+en: Weather settings
+tr: Ilmasätted
+
+en: Loading the weather…
+tr: Ilmateate laadimine…
+
+en: Loading…
+tr: Laadimine…
+
+en: Updated {}
+tr: Värskendatud {}
+
+en: Near {}
+tr: Koha {} lähedal
+
+en: Temperatures now
+tr: Temperatuurid praegu
+
+en: The map is unavailable.
+tr: Kaart pole saadaval.
+
+en: Map: Natural Earth
+tr: Kaart: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Ilmaandmed: Open-Meteo.com
+
+en: Feels like
+tr: Tundub nagu
+
+en: Feels like {}
+tr: Tundub nagu {}
+
+en: Close to the real temperature
+tr: Lähedal tegelikule temperatuurile
+
+en: The wind makes it feel colder
+tr: Tuul muudab selle külmemaks tunduvaks
+
+en: Humidity makes it feel warmer
+tr: Niiskus muudab selle soojemaks tunduvaks
+
+en: Humidity
+tr: Niiskus
+
+en: Cloud cover {}
+tr: Pilvisus {}
+
+en: Wind
+tr: Tuul
+
+en: Gusts {}
+tr: Iilid {}
+
+en: Sunrise and sunset
+tr: Päikesetõus ja -loojang
+
+en: UV index
+tr: UV-indeks
+
+en: Pressure
+tr: Õhurõhk
+
+en: At sea level
+tr: Merepinna kõrgusel
+
+en: &Open the weather
+tr: &Ava ilm
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognoos teie asukoha jaoks umbes 100 m täpsusega ja selle enda kõrgusega. Väljas: ümardatud umbes 10 km-ni.

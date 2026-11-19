@@ -1,0 +1,2494 @@
+# Dutch (nl): Nederlands. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Kies de Windows-locatie om automatisch weer in te schakelen.
+
+en: Windows taskbar visible
+tr: Windows-taakbalk zichtbaar
+
+en: Connected to {}
+tr: Verbonden met {}
+
+en: {} is out of range
+tr: {} is buiten bereik
+
+en: Connecting to {} took too long
+tr: Verbinding maken met {} duurde te lang
+
+en: Use Windows to join {}
+tr: Gebruik Windows om verbinding te maken met {}
+
+en: Windows did not allow this connection
+tr: Windows heeft deze verbinding niet toegestaan
+
+en: Could not connect to {}
+tr: Kan geen verbinding maken met {}
+
+en: Connect to {}
+tr: Verbinding maken met {}
+
+en: That password was not accepted. Check it and try again.
+tr: Dat wachtwoord is niet geaccepteerd. Controleer het en probeer het opnieuw.
+
+en: Enter this network's password.
+tr: Voer het wachtwoord van dit netwerk in.
+
+en: &Connect
+tr: &Verbinding maken
+
+en: Windows Settings could not be opened
+tr: Kan Windows-instellingen niet openen
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Kan geen ruimte reserveren voor het Dock; Windows-taakbalk wordt hersteld
+
+en: Replacement unavailable: recovery observer could not start
+tr: Vervanging niet beschikbaar: de herstelbewaking kan niet worden gestart
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows-taakbalk hersteld. Kan geen ruimte reserveren voor het Dock; schakel de vervanging uit en weer in om het opnieuw te proberen.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Herstelbewaking is niet beschikbaar; Windows-taakbalk wordt hersteld
+
+en: Windows notifications could not be opened
+tr: Kan Windows-meldingen niet openen
+
+en: The Windows calendar could not be opened
+tr: Kan de Windows-agenda niet openen
+
+en: Windows did not show its hidden icons
+tr: Windows heeft de verborgen pictogrammen niet weergegeven
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatisch vernieuwen van de locatie is niet beschikbaar; probeer het opnieuw in de weerinstellingen.
+
+en: Windows location
+tr: Windows-locatie
+
+en: Reading approximate Windows location…
+tr: Geschatte Windows-locatie lezen…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatisch weer volgt de geschatte Windows-locatie.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Toegang tot de Windows-locatie is geblokkeerd. Weer is niet beschikbaar.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows kan geen huidige locatie leveren. Weer is niet beschikbaar.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Locatieservice niet beschikbaar. Weer is niet beschikbaar.
+
+en: Waiting for Windows location permission…
+tr: Wachten op locatiemachtiging van Windows…
+
+en: The automatic weather choice could not be saved.
+tr: De keuze voor automatisch weer kan niet worden opgeslagen.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Toegang tot de Windows-locatie is niet beschikbaar of is geweigerd. Weer is niet beschikbaar.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows-locatie kan geen machtiging aanvragen. Controleer de locatie-instellingen van Windows.
+
+en: Status worker unavailable
+tr: Statusservice niet beschikbaar
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows kan deze actie niet voltooien. Controleer de bijbehorende instellingen.
+
+en: Reading Windows status; try the action again shortly
+tr: Windows-status wordt gelezen; probeer de actie zo dadelijk opnieuw
+
+en: Could not disconnect
+tr: Kan de verbinding niet verbreken
+
+en: The Windows accessibility feature could not be started
+tr: Kan de toegankelijkheidsfunctie van Windows niet starten
+
+en: Windows could not change the audio output
+tr: Windows kan de audio-uitvoer niet wijzigen
+
+en: The Windows control could not be opened
+tr: Kan het Windows-besturingselement niet openen
+
+en: Keyboard shortcuts disabled
+tr: Sneltoetsen uitgeschakeld
+
+en: Both keyboard shortcuts registered
+tr: Beide sneltoetsen geregistreerd
+
+en: A keyboard shortcut is already in use by another application
+tr: Een sneltoets wordt al gebruikt door een andere toepassing
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Kan Snelle instellingen van Windows niet aanvragen. Schakel 'Snelle instellingen van Windows gebruiken' uit in de instellingen van de bovenbalk om de bediening van Aether te gebruiken.
+
+en: Windows Start could not be opened
+tr: Kan Start van Windows niet openen
+
+en: Windows Task View could not be opened
+tr: Kan Taakweergave van Windows niet openen
+
+en: Windows keyboard layout switching was unavailable
+tr: Schakelen tussen toetsenbordindelingen van Windows was niet beschikbaar
+
+en: Windows voice typing could not be opened
+tr: Kan spraakgestuurd typen van Windows niet openen
+
+en: Windows taskbar could not be revealed
+tr: Kan de Windows-taakbalk niet weergeven
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Taakbalkvervanging kan niet worden hervat; Windows blijft beschikbaar
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Vervanging van de Windows-taakbalk is niet beschikbaar in deze sessie
+
+en: Windows pin access is unavailable in this isolated session
+tr: Toegang tot vastgemaakte Windows-items is niet beschikbaar in deze geïsoleerde sessie
+
+en: Windows pinned applications could not be read
+tr: Kan vastgemaakte Windows-toepassingen niet lezen
+
+en: Settings changed during pin import. Try import again.
+tr: Instellingen zijn gewijzigd tijdens het importeren van vastgemaakte items. Probeer opnieuw te importeren.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: {} extra vastgemaakte toepassingen opgeslagen. Sommige vastgemaakte Windows-items blijven mogelijk niet beschikbaar.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Vastgemaakte items in het geheugen gewijzigd; opslaan mislukt. Klik in Instellingen op Toepassen om het opnieuw te proberen.
+
+en: Pins updated in memory; saving...
+tr: Vastgemaakte items in het geheugen bijgewerkt; opslaan...
+
+en: Imported pins could not be applied
+tr: Geïmporteerde vastgemaakte items kunnen niet worden toegepast
+
+en: Pin import is unavailable while closing
+tr: Importeren van vastgemaakte items is niet beschikbaar tijdens het sluiten
+
+en: Settings could not be saved
+tr: Instellingen kunnen niet worden opgeslagen
+
+en: Quit without saving the latest changes?
+tr: Afsluiten zonder de laatste wijzigingen op te slaan?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Je vorige instellingenbestand blijft behouden. Houd Aether Shell open om opnieuw te proberen op te slaan.
+
+en: &Quit without saving
+tr: &Afsluiten zonder opslaan
+
+en: &Keep Aether Shell open
+tr: Aether Shell &openhouden
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Basisdiagnostiek exporteren — app-versie en Windows-build, geen logboeken of persoonsgegevens
+
+en: Diagnostics exported.
+tr: Diagnostiek geëxporteerd.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnostiek kan niet worden opgeslagen in het gekozen bestand.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Instellingen kunnen niet veilig worden gelezen. Het bestaande bestand is behouden.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell kan de bureaubladoppervlakken niet starten.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Herstel van de Windows-taakbalk is in behandeling. Probeer het opnieuw of sluit Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: De Windows-taakbalk wordt tijdelijk weergegeven.
+
+en: Windows taskbar restored.
+tr: Windows-taakbalk hersteld.
+
+en: Windows taskbar replacement is active.
+tr: Vervanging van de Windows-taakbalk is actief.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: De Windows-taakbalk blijft beschikbaar. De vervanging wordt binnenkort opnieuw geprobeerd.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: De Windows-taakbalk blijft beschikbaar. Schakel de vervanging uit en weer in om het opnieuw te proberen.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows-taakbalk hersteld. De vervanging maakt binnenkort opnieuw verbinding.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows-taakbalk hersteld. Schakel de vervanging uit en weer in om het opnieuw te proberen.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Taakbalkvervanging gestopt. Windows-taakbalk hersteld.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Taakbalkvervanging gestopt. Herstel van de Windows-taakbalk kan niet worden bevestigd.
+
+en: Activating taskbar replacement...
+tr: Taakbalkvervanging activeren...
+
+en: Restoring Windows taskbar...
+tr: Windows-taakbalk herstellen...
+
+en: Reconnecting taskbar replacement...
+tr: Taakbalkvervanging opnieuw verbinden...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windows-taakbalk tijdelijk weergeven...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell kan de Windows-taakbalk niet herstellen.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Start Windows Verkenner opnieuw vanuit Taakbeheer (Ctrl+Shift+Esc), of meld je af en opnieuw aan.
+
+en: The Windows taskbar was restored to its saved state.
+tr: De Windows-taakbalk is hersteld naar de opgeslagen status.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Er is geen opgeslagen taakbalkstatus gevonden. De Windows-taakbalk is zichtbaar gemaakt; de instelling voor automatisch verbergen is niet gewijzigd.
+
+en: There was nothing to restore.
+tr: Er was niets te herstellen.
+
+en: Taskbar replacement is turned off.
+tr: Taakbalkvervanging is uitgeschakeld.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Taakbalkvervanging kan niet automatisch worden uitgeschakeld. Schakel deze uit in Aether Shell-instellingen > Bureaublad.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Onbekende of ongeldige Aether Shell-opdrachtregel.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell kan de lokale gegevensmappen niet maken.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell is gestopt na een onverwachte fout.
+
+## search-names
+
+en: Disk Management
+tr: Schijfbeheer
+
+en: Local Users and Groups
+tr: Lokale gebruikers en groepen
+
+en: Local Group Policy Editor
+tr: Editor voor lokaal groepsbeleid
+
+en: Manage User Certificates
+tr: Gebruikerscertificaten beheren
+
+en: Manage Computer Certificates
+tr: Computercertificaten beheren
+
+en: Shared Folders
+tr: Gedeelde mappen
+
+en: TPM Management
+tr: TPM-beheer
+
+en: Network Connections
+tr: Netwerkverbindingen
+
+en: System Properties
+tr: Systeemeigenschappen
+
+en: About Windows
+tr: Over Windows
+
+en: DirectX Diagnostic Tool
+tr: DirectX-diagnoseprogramma
+
+en: Windows Features
+tr: Windows-onderdelen
+
+en: System Restore
+tr: Systeemherstel
+
+en: Advanced System Settings
+tr: Geavanceerde systeeminstellingen
+
+en: Volume Mixer
+tr: Volumemixer
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Gebruikersaccounts (geavanceerd)
+
+en: Display settings
+tr: Beeldscherminstellingen
+
+en: Night light settings
+tr: Instellingen voor nachtlampje
+
+en: Graphics settings
+tr: Grafische instellingen
+
+en: Sound settings
+tr: Geluidsinstellingen
+
+en: Notification settings
+tr: Meldingsinstellingen
+
+en: Power & battery settings
+tr: Instellingen voor aan/uit en batterij
+
+en: Energy saver settings
+tr: Instellingen voor energiebesparing
+
+en: Storage settings
+tr: Opslaginstellingen
+
+en: Multitasking settings
+tr: Instellingen voor multitasken
+
+en: Clipboard settings
+tr: Klembordinstellingen
+
+en: Remote Desktop settings
+tr: Instellingen voor Extern bureaublad
+
+en: About your PC
+tr: Info over je pc
+
+en: Bluetooth & devices settings
+tr: Instellingen voor Bluetooth en apparaten
+
+en: Printers & scanners settings
+tr: Instellingen voor printers en scanners
+
+en: Mouse settings
+tr: Muisinstellingen
+
+en: Touchpad settings
+tr: Touchpadinstellingen
+
+en: Network & internet settings
+tr: Instellingen voor netwerk en internet
+
+en: Wi-Fi settings
+tr: Wi-Fi-instellingen
+
+en: VPN settings
+tr: VPN-instellingen
+
+en: Proxy settings
+tr: Proxyinstellingen
+
+en: Airplane mode settings
+tr: Instellingen voor vliegtuigstand
+
+en: Mobile hotspot settings
+tr: Instellingen voor mobiele hotspot
+
+en: Background settings
+tr: Achtergrondinstellingen
+
+en: Color settings
+tr: Kleurinstellingen
+
+en: Theme settings
+tr: Thema-instellingen
+
+en: Lock screen settings
+tr: Instellingen voor vergrendelingsscherm
+
+en: Taskbar settings
+tr: Taakbalkinstellingen
+
+en: Font settings
+tr: Lettertype-instellingen
+
+en: Installed apps
+tr: Geïnstalleerde apps
+
+en: Default apps settings
+tr: Instellingen voor standaard-apps
+
+en: Startup apps settings
+tr: Instellingen voor opstart-apps
+
+en: Account info
+tr: Jouw gegevens
+
+en: Sign-in options
+tr: Aanmeldingsopties
+
+en: Other users settings
+tr: Instellingen voor andere gebruikers
+
+en: Date & time settings
+tr: Instellingen voor datum en tijd
+
+en: Language & region settings
+tr: Instellingen voor taal en regio
+
+en: Typing settings
+tr: Instellingen voor typen
+
+en: Accessibility settings
+tr: Instellingen voor toegankelijkheid
+
+en: Privacy & security settings
+tr: Instellingen voor privacy en beveiliging
+
+en: Location settings
+tr: Locatie-instellingen
+
+en: Windows Update settings
+tr: Instellingen voor Windows Update
+
+en: Recovery settings
+tr: Herstelinstellingen
+
+en: Activation settings
+tr: Activeringsinstellingen
+
+en: For developers settings
+tr: Instellingen voor ontwikkelaars
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub kan niet worden bereikt.
+
+en: GitHub did not answer the request just now.
+tr: GitHub heeft zojuist niet op de aanvraag gereageerd.
+
+en: The release did not pass verification, so nothing was installed.
+tr: De release heeft de verificatie niet doorstaan, dus er is niets geïnstalleerd.
+
+en: There is not enough free disk space.
+tr: Er is onvoldoende vrije schijfruimte.
+
+en: Windows refused access to the update files.
+tr: Windows heeft de toegang tot de updatebestanden geweigerd.
+
+en: {} bytes
+tr: {} bytes
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Status
+
+en: Check &now
+tr: Nu &controleren
+
+en: Download and install
+tr: Downloaden en installeren
+
+en: &Later
+tr: &Later
+
+en: S&kip this version
+tr: Deze versie &overslaan
+
+en: &Release details
+tr: &Releasedetails
+
+en: Disable &notifications
+tr: &Meldingen uitschakelen
+
+en: Release notes
+tr: Releaseopmerkingen
+
+en: the new version
+tr: de nieuwe versie
+
+en: Installed: {}.
+tr: Geïnstalleerd: {}.
+
+en: Automatic update checks are off
+tr: Automatisch controleren op updates is uitgeschakeld
+
+en: Check now looks for a newer release once.
+tr: Met Nu controleren wordt eenmalig naar een nieuwere release gezocht.
+
+en: Last checked {}
+tr: Laatst gecontroleerd: {}
+
+en: Not checked yet
+tr: Nog niet gecontroleerd
+
+en: Checking for updates...
+tr: Controleren op updates...
+
+en: Aether Shell is up to date
+tr: Aether Shell is up-to-date
+
+en: Latest published release: {}.
+tr: Laatst gepubliceerde release: {}.
+
+en: Version {} is available
+tr: Versie {} is beschikbaar
+
+en: Download size: {}.
+tr: Downloadgrootte: {}.
+
+en: Downloading version {}...
+tr: Versie {} downloaden...
+
+en: Received {} of {} ({}%).
+tr: {} van {} ontvangen ({}%).
+
+en: Received {}; total size unknown.
+tr: {} ontvangen; totale grootte onbekend.
+
+en: Version {} is ready to install
+tr: Versie {} is klaar om te installeren
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Geverifieerd met het ondertekende releasemanifest en SHA-256.
+
+en: The update could not be completed
+tr: De update kan niet worden voltooid
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Installeren gaat voorlopig handmatig: open Releasedetails en download en voer vervolgens de setup uit.
+
+en: Failure: {}.
+tr: Fout: {}.
+
+en: Choose Retry Download to try again.
+tr: Kies Download opnieuw proberen om het opnieuw te proberen.
+
+en: Use Check now to try again.
+tr: Gebruik Nu controleren om het opnieuw te proberen.
+
+en: Next automatic check: {}.
+tr: Volgende automatische controle: {}.
+
+en: &Install update
+tr: Update &installeren
+
+en: Retry &Download
+tr: &Download opnieuw proberen
+
+en: &Download and install
+tr: &Downloaden en installeren
+
+en: Windows' startup state could not be read in this session.
+tr: De opstartstatus van Windows kan in deze sessie niet worden gelezen.
+
+en: Windows will start it at your next sign-in.
+tr: Windows start het bij je volgende aanmelding.
+
+en: Right now it will not start at sign-in.
+tr: Op dit moment wordt het niet gestart bij aanmelding.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Het is uitgeschakeld in Taakbeheer of Windows-instellingen, die bepalend zijn totdat het daar weer wordt ingeschakeld.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows zou een andere kopie van Aether Shell starten.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows meldt een opstartstatus die deze versie niet kan lezen.
+
+en: The close action could not be completed.
+tr: De sluitactie kan niet worden voltooid.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Voer een volledig getal in voordat je opslaat; het rood gemarkeerde veld bevat er geen.
+
+en: Settings could not be validated.
+tr: Instellingen kunnen niet worden gevalideerd.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Opstarten bij aanmelding is ongewijzigd gelaten, omdat de instellingen niet kunnen worden opgeslagen.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Instellingen kunnen niet worden opgeslagen en het opstarten bij Windows-aanmelding kan niet worden teruggezet. Klik opnieuw op Toepassen om het opnieuw te proberen.
+
+en: Settings saved.
+tr: Instellingen opgeslagen.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Instellingen in het geheugen gewijzigd; opslaan mislukt. Klik opnieuw op Toepassen om het opnieuw te proberen.
+
+en: Settings could not be applied.
+tr: Instellingen kunnen niet worden toegepast.
+
+en: Some values were corrected to their supported range.
+tr: Sommige waarden zijn gecorrigeerd naar het ondersteunde bereik.
+
+en: Startup registration is unavailable in this session.
+tr: Opstartregistratie is niet beschikbaar in deze sessie.
+
+en: Changing startup registration...
+tr: Opstartregistratie wijzigen...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows heeft de opstartregistratie niet gewijzigd. Controleer de opstartinstelling in Taakbeheer.
+
+en: Startup registration could not be changed.
+tr: Opstartregistratie kan niet worden gewijzigd.
+
+en: Defaults saved; startup is disabled.
+tr: Standaardwaarden opgeslagen; opstarten is uitgeschakeld.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Standaardwaarden toegepast; opslaan mislukt. Klik opnieuw op Toepassen om het opnieuw te proberen.
+
+en: Defaults could not be applied.
+tr: Standaardwaarden kunnen niet worden toegepast.
+
+en: Startup was not disabled; settings were kept.
+tr: Opstarten is niet uitgeschakeld; instellingen zijn behouden.
+
+en: Location search is unavailable.
+tr: Locaties zoeken is niet beschikbaar.
+
+en: Searching Open-Meteo locations...
+tr: Zoeken naar Open-Meteo-locaties...
+
+en: Location search failed. Check your connection and try again.
+tr: Locaties zoeken is mislukt. Controleer je verbinding en probeer het opnieuw.
+
+en: No place matched that search.
+tr: Geen plaats komt overeen met deze zoekopdracht.
+
+en: Choose a location to save it.
+tr: Kies een locatie om deze op te slaan.
+
+en: Reset all settings?
+tr: Alle instellingen opnieuw instellen?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Voorkeuren en vastgemaakte toepassingen worden teruggezet naar de standaardwaarden en opstarten bij aanmelding wordt uitgeschakeld.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Je keuze voor de Windows-taakbalk blijft behouden. Er wordt een back-up van het huidige instellingenbestand bewaard.
+
+en: &Reset
+tr: &Opnieuw instellen
+
+en: Cancel
+tr: Annuleren
+
+en: Pinned applications saved.
+tr: Vastgemaakte toepassingen opgeslagen.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Vastgemaakte items in het geheugen gewijzigd; opslaan mislukt. Klik opnieuw op Toepassen om het opnieuw te proberen.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Standaardwaarden kunnen niet worden hersteld omdat opstartregistratie niet beschikbaar is.
+
+en: Pinned application could not be added.
+tr: Vastgemaakte toepassing kan niet worden toegevoegd.
+
+en: Choose an application to add first.
+tr: Kies eerst een toepassing om toe te voegen.
+
+en: Pinned applications could not be changed.
+tr: Vastgemaakte toepassingen kunnen niet worden gewijzigd.
+
+en: Choose a pinned application first.
+tr: Kies eerst een vastgemaakte toepassing.
+
+en: Desktop status is unavailable in this session.
+tr: Bureaubladstatus is niet beschikbaar in deze sessie.
+
+en: Desktop status is unavailable.
+tr: Bureaubladstatus is niet beschikbaar.
+
+en: Password
+tr: Wachtwoord
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: {} wordt gedownload van GitHub ({}). Engels wordt weergegeven totdat de taal klaar is.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {} kan niet worden gedownload. Engels wordt weergegeven totdat dat lukt; kies hieronder Downloaden om het opnieuw te proberen.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} staat nog niet op deze pc. Engels wordt weergegeven totdat de taal is gedownload.
+
+en: {} is on this PC.
+tr: {} staat op deze pc.
+
+en: Every language is on this PC.
+tr: Alle talen staan op deze pc.
+
+en: Choose a language to download first.
+tr: Kies eerst een taal om te downloaden.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Bovenbalk
+
+en: Weather
+tr: Weer
+
+en: Updates
+tr: Updates
+
+en: General
+tr: Algemeen
+
+en: About
+tr: Info
+
+en: Desktop
+tr: Bureaublad
+
+en: Appearance
+tr: Uiterlijk
+
+en: Welcome
+tr: Welkom
+
+en: Aether Shell Settings
+tr: Aether Shell-instellingen
+
+en: Settings
+tr: Instellingen
+
+en: Reset defaults...
+tr: Standaardwaarden herstellen...
+
+en: &Apply
+tr: &Toepassen
+
+en: Liquid
+tr: Vloeibaar
+
+en: Grain
+tr: Korrel
+
+en: From {} to {}
+tr: Van {} tot {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: u
+
+en: This action could not be completed.
+tr: Deze actie kan niet worden voltooid.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Grootte, afstand, beweging en de toepassingen die aan het Dock zijn vastgemaakt.
+
+en: Size and spacing
+tr: Grootte en afstand
+
+en: Icon size
+tr: Pictogramgrootte
+
+en: {}, scaled with the Windows display scale.
+tr: {}, geschaald met de Windows-beeldschermschaal.
+
+en: Bottom margin
+tr: Ondermarge
+
+en: Space between the Dock and the bottom of the screen.
+tr: Ruimte tussen het Dock en de onderkant van het scherm.
+
+en: Minimum side margin
+tr: Minimale zijmarge
+
+en: Space kept free at the left and right screen edges.
+tr: Vrije ruimte aan de linker- en rechterrand van het scherm.
+
+en: Icon spacing
+tr: Pictogramafstand
+
+en: Space between neighbouring icons.
+tr: Ruimte tussen aangrenzende pictogrammen.
+
+en: Glass and motion
+tr: Glas en beweging
+
+en: Glass opacity
+tr: Glasdekking
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Lagere waarden tonen meer van het vervaagde bureaublad achter het Dock.
+
+en: Hover magnification
+tr: Vergroten bij aanwijzen
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Hoeveel een pictogram groeit onder de aanwijzer; 1 schakelt dit uit.
+
+en: Behavior
+tr: Gedrag
+
+en: Show running applications
+tr: Actieve toepassingen weergeven
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Geopende toepassingen die niet zijn vastgemaakt, worden na de vastgemaakte weergegeven.
+
+en: Reserve screen space for the Dock
+tr: Schermruimte reserveren voor het Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Gemaximaliseerde vensters blijven boven het Dock in plaats van eronder.
+
+en: Automatically hide the Dock
+tr: Dock automatisch verbergen
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Wordt verborgen wanneer een toepassingsvenster het bedekt; beweeg de aanwijzer naar de onderrand van het scherm om het weer te geven. Op het bureaublad blijft het zichtbaar en vensters krijgen de volledige schermhoogte.
+
+en: Pinned applications
+tr: Vastgemaakte toepassingen
+
+en: Move &up
+tr: &Omhoog
+
+en: Move &down
+tr: Om&laag
+
+en: &Remove
+tr: &Verwijderen
+
+en: &Add application
+tr: Toepassing &toevoegen
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Vastgemaakte items behouden hun identiteit en startinstellingen. Als je een item losmaakt, wordt het ook niet opnieuw toegevoegd door de automatische synchronisatie met de Windows-taakbalk.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Positie, klok en de statusitems in de bovenste statusbalk.
+
+en: Presentation
+tr: Presentatie
+
+en: Floating bar
+tr: Zwevende balk
+
+en: Text on the desktop
+tr: Tekst op het bureaublad
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Zwevende balk: de glazen balk onder de bovenkant van het scherm. Tekst op het bureaublad: geen balk, dezelfde items helemaal bovenaan het scherm, direct over de bureaubladachtergrond geschreven; die strook blijft vrij van vensters, en de bovenmarge en glasdekking gelden niet. Bij automatisch verbergen verschijnt de tekst op een glazen strook zolang er een venster onder ligt.
+
+en: Position and glass
+tr: Positie en glas
+
+en: Top margin
+tr: Bovenmarge
+
+en: Space between the Top Bar and the top of the screen.
+tr: Ruimte tussen de bovenbalk en de bovenkant van het scherm.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Lagere waarden tonen meer van het vervaagde bureaublad achter de balk.
+
+en: Clock
+tr: Klok
+
+en: Clock format
+tr: Klokindeling
+
+en: Follow Windows
+tr: Windows volgen
+
+en: 12-hour
+tr: 12-uurs
+
+en: 24-hour
+tr: 24-uurs
+
+en: Date style
+tr: Datumstijl
+
+en: Weekday, day and month
+tr: Weekdag, dag en maand
+
+en: Short
+tr: Kort
+
+en: Long
+tr: Lang
+
+en: Show seconds
+tr: Seconden weergeven
+
+en: Show date
+tr: Datum weergeven
+
+en: Status items
+tr: Statusitems
+
+en: Show battery
+tr: Batterij weergeven
+
+en: Hide battery when absent
+tr: Batterij verbergen indien afwezig
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Desktop-pc's zonder batterij tonen niets in plaats van een onbekende batterij.
+
+en: Show input language
+tr: Invoertaal weergeven
+
+en: Show network
+tr: Netwerk weergeven
+
+en: Show audio output
+tr: Audio-uitvoer weergeven
+
+en: Show microphone
+tr: Microfoon weergeven
+
+en: Show weather when enabled
+tr: Weer weergeven indien ingeschakeld
+
+en: Weather itself is turned on in Weather settings.
+tr: Het weer zelf wordt ingeschakeld in de weerinstellingen.
+
+en: Show hidden icons button
+tr: Knop voor verborgen pictogrammen weergeven
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Een kleine punthaak die de verborgen pictogrammen in het systeemvak van Windows opent.
+
+en: Reserve screen space above windows
+tr: Schermruimte boven vensters reserveren
+
+en: Maximized windows stay below the Top Bar.
+tr: Gemaximaliseerde vensters blijven onder de bovenbalk.
+
+en: Automatically hide the Top Bar
+tr: Bovenbalk automatisch verbergen
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Wordt verborgen wanneer een toepassingsvenster de balk bedekt; beweeg de aanwijzer naar de bovenrand van het scherm om deze weer te geven. Op het bureaublad blijft de balk zichtbaar.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Snelle instellingen van Windows gebruiken (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Uit: de snelle bediening van Aether wordt onder de bovenbalk geopend. Aan: het eigen paneel van Windows wordt onderaan het scherm geopend.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Een optionele weersverwachting in de bovenbalk, geleverd door Open-Meteo.
+
+en: Forecast
+tr: Weersverwachting
+
+en: Enable weather
+tr: Weer inschakelen
+
+en: Off by default: the forecast needs network requests.
+tr: Standaard uit: de weersverwachting vereist netwerkaanvragen.
+
+en: Temperature
+tr: Temperatuur
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Vernieuwingsinterval
+
+en: Location
+tr: Locatie
+
+en: Locate automatically with Windows
+tr: Automatisch lokaliseren met Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Gebruikt de locatieservice van Windows nadat je die hebt toegestaan.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows vraagt om locatiemachtiging. Je coördinaten worden alleen naar Open-Meteo.com verzonden om de weersverwachting op te halen; een locatiesleutel wordt lokaal in de cache opgeslagen. Als locatie is geblokkeerd, is het weer niet beschikbaar.
+
+en: Use &Windows location
+tr: &Windows-locatie gebruiken
+
+en: Location &settings
+tr: Locatie-in&stellingen
+
+en: Choose automatic location or search for a place below.
+tr: Kies automatische locatie of zoek hieronder naar een plaats.
+
+en: Search for a place
+tr: Zoeken naar een plaats
+
+en: Searc&h
+tr: &Zoeken
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Weergegevens van Open-Meteo.com (CC BY 4.0). Handmatig zoeken verzendt alleen de tekst die je invoert.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Ondertekende releases uit de officiële GitHub-opslagplaats, geverifieerd vóór de installatie.
+
+en: Preferences
+tr: Voorkeuren
+
+en: Check for updates automatically
+tr: Automatisch controleren op updates
+
+en: Check interval
+tr: Controle-interval
+
+en: Release channel
+tr: Releasekanaal
+
+en: Prereleases arrive earlier and change more often.
+tr: Voorlopige releases komen eerder en veranderen vaker.
+
+en: Stable
+tr: Stabiel
+
+en: Prerelease
+tr: Voorlopige release
+
+en: Show update notifications
+tr: Updatemeldingen weergeven
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Opstarten, beweging, sneltoetsen en diagnostiek.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: De taal van de balken, menu's, Zoeken, Instellingen en de setup.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Namen die van jou of van andere programma's zijn (toepassingen, bestanden, Wi-Fi-netwerken), worden nooit vertaald. Met een gekozen taal schrijft de bovenbalk de datum in die taal; Windows volgen behoudt je regionale Windows-notatie.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Het handgeschreven welkom gebruikt Latijnse letters: het begroet in het Frans, Engels of Spaans. Kies de taal ervan in Welkom.
+
+en: Language
+tr: Taal
+
+en: Interface language
+tr: Taal van de interface
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Windows volgen gebruikt de eerste van je Windows-weergavetalen die hier beschikbaar is, en anders Engels.
+
+en: Startup
+tr: Opstarten
+
+en: Start Aether Shell when I sign in
+tr: Aether Shell starten wanneer ik me aanmeld
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Voor deze wijziging moet je op Toepassen klikken. Taakbeheer kan dit ook uitschakelen.
+
+en: Motion
+tr: Beweging
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Met beperkte beweging wordt decoratieve beweging overal verwijderd.
+
+en: Reduced
+tr: Beperkt
+
+en: Full
+tr: Volledig
+
+en: Keyboard shortcuts
+tr: Sneltoetsen
+
+en: Enable global keyboard shortcuts
+tr: Globale sneltoetsen inschakelen
+
+en: Search shortcut key
+tr: Sneltoets voor Zoeken
+
+en: Dock shortcut key
+tr: Sneltoets voor Dock
+
+en: Search shortcut modifiers
+tr: Wijzigingstoetsen voor Zoeken
+
+en: Dock shortcut modifiers
+tr: Wijzigingstoetsen voor Dock
+
+en: Shortcut status unavailable
+tr: Status van sneltoetsen niet beschikbaar
+
+en: Diagnostics
+tr: Diagnostiek
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: De logboekmap bevat de Aether Shell-logboeken van deze computer. Diagnostiek exporteren slaat alleen de app-versie en Windows-build op - geen logboeken of persoonsgegevens.
+
+en: Open &log folder
+tr: &Logboekmap openen
+
+en: &Export diagnostics...
+tr: Diagnostiek &exporteren...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Een korte handgeschreven begroeting op je bureaublad nadat je je aanmeldt of je pc ontgrendelt.
+
+en: Greeting
+tr: Begroeting
+
+en: Show the welcome at sign-in and unlock
+tr: Welkom weergeven bij aanmelden en ontgrendelen
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Het verschijnt nadat Windows je heeft aangemeld, terwijl Aether Shell wordt voorbereid. Tik, klik of druk op Esc om het over te slaan.
+
+en: Greeting language
+tr: Taal van de begroeting
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut in het Frans, Hello in het Engels, Hola in het Spaans. De pen schrijft Latijnse letters: in elke andere taal begroet hij in het Engels.
+
+en: Your name
+tr: Je naam
+
+en: Name to greet you with
+tr: Naam waarmee je wordt begroet
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Optioneel, bijvoorbeeld een voornaam. Deze blijft op deze pc in je Aether Shell-instellingen en wordt nooit ergens naartoe verzonden of in een logboek geschreven. Maak het veld leeg om de naam te verwijderen.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Kleurmodus, accent, bewegingssnelheid en het uiterlijk van het Dock en de bovenbalk.
+
+en: Style
+tr: Stijl
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Vloeibaar: glas in lagen over wat erachter ligt, een vervagingslaag, het licht van de vloeistof en dan de pictogrammen en tekst, leesbaar op lichte en donkere pagina's. Korrel: matglas, vervaagd en semitransparant, met een fijne korrel.
+
+en: Liquid blur
+tr: Vervaging van Vloeibaar
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Hoeveel de vervagingslaag onder het glas van Vloeibaar bedekt wat erachter ligt: 100% vervaagt alles. Lagere waarden tonen de pagina scherper, en tekst op de balken is dan op een drukke pagina mogelijk minder goed leesbaar.
+
+en: Liquid blur color
+tr: Vervagingskleur van Vloeibaar
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatisch behoudt de eigen kleuren van het glas. Tekst en pictogrammen blijven leesbaar, welke kleur het ook is.
+
+en: Automatic
+tr: Automatisch
+
+en: White
+tr: Wit
+
+en: Black
+tr: Zwart
+
+en: Accent
+tr: Accent
+
+en: Blue
+tr: Blauw
+
+en: Violet
+tr: Violet
+
+en: Pink
+tr: Roze
+
+en: Red
+tr: Rood
+
+en: Orange
+tr: Oranje
+
+en: Yellow
+tr: Geel
+
+en: Green
+tr: Groen
+
+en: Teal
+tr: Blauwgroen
+
+en: Liquid color strength
+tr: Kleursterkte van Vloeibaar
+
+en: How much of the chosen color the blur layer takes.
+tr: Hoeveel van de gekozen kleur de vervagingslaag aanneemt.
+
+en: Theme
+tr: Thema
+
+en: Color mode
+tr: Kleurmodus
+
+en: High contrast always takes precedence.
+tr: Hoog contrast heeft altijd voorrang.
+
+en: Light
+tr: Licht
+
+en: Dark
+tr: Donker
+
+en: Accent color
+tr: Accentkleur
+
+en: Animation duration
+tr: Animatieduur
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 is de standaardsnelheid; hogere waarden zijn langzamer. Beperkte beweging heeft voorrang.
+
+en: Dock icon preset
+tr: Voorinstelling voor Dock-pictogrammen
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Een aangepaste grootte uit de Dock-instellingen blijft behouden totdat je een voorinstelling kiest.
+
+en: Small - 32 px
+tr: Klein - 32 px
+
+en: Medium - 40 px
+tr: Gemiddeld - 40 px
+
+en: Large - 48 px
+tr: Groot - 48 px
+
+en: Keep custom size
+tr: Aangepaste grootte behouden
+
+en: Show Windows Start in the Dock
+tr: Start van Windows weergeven in het Dock
+
+en: Show Task View in the Dock
+tr: Taakweergave weergeven in het Dock
+
+en: Reserve extra space for Dock animations
+tr: Extra ruimte reserveren voor Dock-animaties
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Houdt de vergroting en de stuiterende startanimatie vrij van gemaximaliseerde vensters.
+
+en: Weather position
+tr: Positie van het weer
+
+en: Left
+tr: Links
+
+en: Right
+tr: Rechts
+
+en: Keyboard indicator
+tr: Toetsenbordindicator
+
+en: Compact
+tr: Compact
+
+en: Two lines
+tr: Twee regels
+
+en: Windows taskbar pins
+tr: Vastgemaakte items op de Windows-taakbalk
+
+en: Add newly discovered Windows taskbar pins
+tr: Nieuw gevonden vastgemaakte items op de Windows-taakbalk toevoegen
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Terwijl de taakbalk is vervangen, worden nieuwe vastgemaakte Windows-items aan het Dock toegevoegd.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Omkeerbare vervanging van de Windows-taakbalk door het Dock.
+
+en: Taskbar replacement
+tr: Taakbalkvervanging
+
+en: Replace the Windows taskbar
+tr: De Windows-taakbalk vervangen
+
+en: Changing this needs Apply.
+tr: Voor deze wijziging moet je op Toepassen klikken.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Terwijl Aether Shell wordt uitgevoerd, wordt de Windows-taakbalk verborgen en wordt ruimte gereserveerd onder gemaximaliseerde toepassingen.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: De status van de Windows-taakbalk wordt hersteld wanneer deze modus wordt uitgeschakeld of Aether Shell wordt afgesloten. Een afzonderlijk herstelhulpprogramma herstelt deze ook als de toepassing onverwacht stopt. Als het herstel mislukt, start je Windows Verkenner opnieuw in Taakbeheer.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows-instellingen blijft de systeemeigen Windows-interface. De taakbalkpagina daarvan wordt niet vervangen door Aether Shell; configureer deze modus hier.
+
+en: Pinned applications from Windows
+tr: Vastgemaakte toepassingen uit Windows
+
+en: &Import Windows taskbar pins
+tr: Vastgemaakte items van de Windows-taakbalk &importeren
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Leest vastgemaakte snelkoppelingen zonder vastgemaakte Windows-items te wijzigen. Sommige vastgemaakte items van Windows 11 of hun volgorde zijn mogelijk niet beschikbaar.
+
+en: Version {}
+tr: Versie {}
+
+en: Created by Ibrahim Bouillet
+tr: Gemaakt door Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Een systeemeigen Windows-bureaubladinterface - een zwevend Dock en een bovenste statusbalk - die naast Verkenner wordt uitgevoerd.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Weergegevens: Open-Meteo.com (CC BY 4.0). Er zijn geen C++-runtimebibliotheken van derden meegeleverd.
+
+en: &Official project
+tr: &Officieel project
+
+en: Licence
+tr: Licentie
+
+en: Taskbar replacement changes need Apply.
+tr: Wijzigingen in de taakbalkvervanging vereisen Toepassen.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Wijzigingen worden automatisch opgeslagen. Opstarten vereist Toepassen.
+
+en: Changes save automatically.
+tr: Wijzigingen worden automatisch opgeslagen.
+
+en: Press Apply to confirm this change.
+tr: Klik op Toepassen om deze wijziging te bevestigen.
+
+en: Smart transparency
+tr: Slimme transparantie
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Met Vloeibaar vervaagt dit venster de achtergrond alleen onder zijn tekst en bedieningselementen: volledig boven andere vensters en bureaubladpictogrammen, licht boven de bureaubladachtergrond en helemaal niet waar het niets weergeeft.
+
+en: Languages on this PC
+tr: Talen op deze pc
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell downloadt de talen die Windows heeft, zodat het van taal wisselt wanneer Windows dat doet.
+
+en: Add a language
+tr: Een taal toevoegen
+
+en: &Download
+tr: &Downloaden
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Elke taal komt uit de GitHub-release van deze versie en wordt gecontroleerd voordat deze wordt gebruikt. Zodra een taal op deze pc staat, kies je deze hierboven.
+
+en: built in
+tr: ingebouwd
+
+en: downloading, {}
+tr: wordt gedownload, {}
+
+en: download failed
+tr: downloaden mislukt
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell-installatie
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Het installatieprogramma kan de interface niet maken. Sluit het en probeer het opnieuw, of gebruik de gedocumenteerde opties voor een stille installatie.
+
+en: Options
+tr: Opties
+
+en: Install
+tr: Installeren
+
+en: Done
+tr: Gereed
+
+en: Remove Aether Shell
+tr: Aether Shell verwijderen
+
+en: Repair Aether Shell
+tr: Aether Shell herstellen
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Een systeemeigen Dock en bovenste statusbalk voor Windows, die naast Verkenner worden uitgevoerd.
+
+en: Replaces the Windows taskbar while it runs
+tr: Vervangt de Windows-taakbalk zolang het wordt uitgevoerd
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Sluit Aether Shell af, schakel dit uit in Instellingen > Bureaublad of open "Windows-taakbalk herstellen" in het menu Start om de Windows-taakbalk terug te krijgen.
+
+en: Starts when you sign in - your choice
+tr: Start wanneer je je aanmeldt - jouw keuze
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Nieuwe installaties starten standaard bij aanmelding. Je kunt die keuze vóór de installatie uitschakelen of later uitzetten in Instellingen. Bestaande opstartkeuzes en uitschakelingen in Taakbeheer blijven behouden.
+
+en: Installs for your account
+tr: Installeert voor je account
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Er zijn geen beheerdersrechten nodig. Je instellingen en gegevens blijven in je gebruikersprofiel.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Bij het verwijderen blijven je instellingen en gegevens behouden, tenzij je ervoor kiest ze te verwijderen.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Herstellen zet de bestanden van dit pakket terug en behoudt je instellingen. Als Aether Shell de Windows-taakbalk verborgen heeft achtergelaten, wordt deze bij het herstellen teruggezet.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Installeren over een bestaande versie behoudt je instellingen. Een ouder pakket wordt geweigerd, tenzij je expliciet een downgrade toestaat.
+
+en: MIT License
+tr: MIT-licentie
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: De licentie wordt ook geïnstalleerd als LICENSE naast Aether Shell.
+
+en: Remove this installation
+tr: Deze installatie verwijderen
+
+en: Install location
+tr: Installatielocatie
+
+en: &Browse...
+tr: &Bladeren...
+
+en: Also remove my settings, cache and logs
+tr: Ook mijn instellingen, cache en logboeken verwijderen
+
+en: This cannot be undone.
+tr: Dit kan niet ongedaan worden gemaakt.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Het installatieprogramma sluit Aether Shell netjes af en verwijdert de geïnstalleerde bestanden, snelkoppelingen, opstartvermelding en registratie in Geïnstalleerde apps. Andere toepassingen en Windows-instellingen blijven ongemoeid.
+
+en: Your welcome
+tr: Je welkom
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Nadat je je aanmeldt of je pc ontgrendelt, schrijft Aether Shell met de hand een korte begroeting. Typ de naam waarmee je wilt worden begroet, of laat het veld leeg voor een eenvoudig hallo.
+
+en: Your first name
+tr: Je voornaam
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Optioneel, bijvoorbeeld een voornaam. Deze blijft op deze pc in je Aether Shell-instellingen en wordt nooit ergens naartoe verzonden. Wijzig de naam of schakel het welkom uit in Instellingen > Welkom.
+
+en: Shortcuts and startup
+tr: Snelkoppelingen en opstarten
+
+en: Create Start menu shortcuts
+tr: Snelkoppelingen in het menu Start maken
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell en Windows-taakbalk herstellen.
+
+en: Create a desktop shortcut
+tr: Een snelkoppeling op het bureaublad maken
+
+en: Shows your current choice.
+tr: Toont je huidige keuze.
+
+en: Recommended.
+tr: Aanbevolen.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Schakel dit uit om af te zien; uitschakelingen in Taakbeheer worden gerespecteerd.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Door te installeren accepteer je de bovenstaande opstartkeuze. Het startprogramma kan Aether Shell na een crash opnieuw starten, met een beperkt aantal pogingen. Afsluiten en Windows-taakbalk herstellen blijven beschikbaar. Weer is standaard uitgeschakeld. Niet-ondertekende binaire bestanden kunnen een waarschuwing van Windows SmartScreen activeren.
+
+en: Removing this installation...
+tr: Deze installatie verwijderen...
+
+en: Repairing Aether Shell...
+tr: Aether Shell herstellen...
+
+en: Installing Aether Shell...
+tr: Aether Shell installeren...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shell wordt gesloten en de bestanden worden verwijderd.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Het ingesloten pakket wordt geverifieerd en de bestanden worden geïnstalleerd. De voortgang wordt als activiteit weergegeven: het installatieprogramma kent de resterende tijd niet.
+
+en: Please wait while the removal completes.
+tr: Een ogenblik geduld terwijl het verwijderen wordt voltooid.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Annuleren is beschikbaar totdat de nieuwe versie is geactiveerd; daarna wordt de installatie veilig voltooid.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell is verwijderd.
+
+en: Aether Shell is ready.
+tr: Aether Shell is klaar.
+
+en: Setup was cancelled.
+tr: De installatie is geannuleerd.
+
+en: Setup could not complete.
+tr: De installatie kan niet worden voltooid.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Je gegevens zijn behouden, tenzij je expliciet hebt gekozen ze te verwijderen.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Je kunt het herstellen of verwijderen via Windows-instellingen > Apps > Geïnstalleerde apps.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: De bewerking is vóór de activering geannuleerd. Ga terug naar Opties om het opnieuw te proberen.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Controleer de toegang tot bestanden en de vrije schijfruimte en probeer het opnieuw. Als Aether Shell al aanwezig is, kan Herstellen de bestanden terugzetten. Foutcategorie: {}
+
+en: Setup log
+tr: Installatielogboek
+
+en: Launch Aether Shell
+tr: Aether Shell starten
+
+en: &Back
+tr: &Vorige
+
+en: &Next
+tr: &Volgende
+
+en: &Continue
+tr: &Doorgaan
+
+en: &Uninstall
+tr: Ver&wijderen
+
+en: &Repair
+tr: &Herstellen
+
+en: &Install
+tr: &Installeren
+
+en: &Close
+tr: &Sluiten
+
+en: Step {} of {}: {}
+tr: Stap {} van {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Kies de installatiemap van Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Kies een volledig mappad, bijvoorbeeld een pad dat begint met een stationsletter.
+
+en: The install folder must be an absolute path.
+tr: De installatiemap moet een absoluut pad zijn.
+
+en: Setup stops at the next safe point.
+tr: De installatie stopt op het volgende veilige punt.
+
+en: Cancelling...
+tr: Annuleren...
+
+en: Setup is finishing the current step safely; please wait.
+tr: De installatie voltooit de huidige stap veilig; een ogenblik geduld.
+
+en: Updating Aether Shell
+tr: Aether Shell bijwerken
+
+en: Verifying the signed package and applying the update.
+tr: Het ondertekende pakket wordt geverifieerd en de update wordt toegepast.
+
+en: Update completed
+tr: Update voltooid
+
+en: The update did not complete
+tr: De update is niet voltooid
+
+en: Close
+tr: Sluiten
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: De update-interface kan niet worden gestart. De update is niet toegepast. Probeer het opnieuw of gebruik Herstellen.
+
+en: Aether Shell Update
+tr: Aether Shell-update
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: De update-interface kan niet worden gestart. De update is niet toegepast. Probeer het opnieuw of gebruik Herstellen in Windows-instellingen > Apps > Geïnstalleerde apps.
+
+en: Update completed.
+tr: Update voltooid.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: De update is niet voltooid. Bekijk het logboek van het updateprogramma of gebruik Herstellen.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell kan niet worden gestart. Kies Herstellen in Windows-instellingen > Apps > Geïnstalleerde apps.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell-instellingen — update wordt uitgevoerd
+
+## shell
+
+en: &Resume taskbar replacement
+tr: Taakbalkvervanging &hervatten
+
+en: Show Windows &notification area for 60 seconds
+tr: Windows-&systeemvak 60 seconden weergeven
+
+en: &Search…
+tr: &Zoeken…
+
+en: &Settings…
+tr: &Instellingen…
+
+en: View available &update…
+tr: Beschikbare &update weergeven…
+
+en: &Check for updates…
+tr: &Controleren op updates…
+
+en: &About Aether Shell
+tr: &Over Aether Shell
+
+en: &Quit Aether Shell
+tr: Aether Shell &afsluiten
+
+en: Switch &input language\tWin+Space
+tr: &Invoertaal wijzigen\tWin+Spatiebalk
+
+en: Open &network controls…
+tr: &Netwerkbediening openen…
+
+en: &Weather settings…
+tr: &Weerinstellingen…
+
+en: Toggle output &mute
+tr: Uitvoer &dempen in-/uitschakelen
+
+en: &Sound settings…
+tr: &Geluidsinstellingen…
+
+en: Toggle microphone &mute
+tr: &Microfoon dempen in-/uitschakelen
+
+en: Start Windows &voice typing\tWin+H
+tr: Spraakgestuurd &typen van Windows starten\tWin+H
+
+en: Microphone &privacy settings…
+tr: &Privacyinstellingen voor microfoon…
+
+en: &Power settings…
+tr: &Energie-instellingen…
+
+en: Open &notifications and calendar
+tr: &Meldingen en agenda openen
+
+en: Open &calendar\tWin+Alt+D
+tr: &Agenda openen\tWin+Alt+D
+
+en: Show &hidden icons
+tr: &Verborgen pictogrammen weergeven
+
+en: Initializing
+tr: Initialiseren
+
+en: Unavailable
+tr: Niet beschikbaar
+
+en: Unsupported
+tr: Niet ondersteund
+
+en: Error
+tr: Fout
+
+en: Available
+tr: Beschikbaar
+
+en: Unknown
+tr: Onbekend
+
+en: Internet access
+tr: Internettoegang
+
+en: Local network only
+tr: Alleen lokaal netwerk
+
+en: Limited Internet access
+tr: Beperkte internettoegang
+
+en: No network connection
+tr: Geen netwerkverbinding
+
+en: Connectivity unknown
+tr: Connectiviteit onbekend
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobiel
+
+en: Network
+tr: Netwerk
+
+en: Offline
+tr: Offline
+
+en: Network status unavailable
+tr: Netwerkstatus niet beschikbaar
+
+en: Quick controls
+tr: Snelle bediening
+
+en: Aether Shell menu
+tr: Aether Shell-menu
+
+en: Weather status unavailable
+tr: Weerstatus niet beschikbaar
+
+en: Cached weather
+tr: Weer uit cache
+
+en: Observation (UTC): {}
+tr: Waarneming (UTC): {}
+
+en: Weather: {}
+tr: Weer: {}
+
+en: Click to open weather settings
+tr: Klik om de weerinstellingen te openen
+
+en: Show hidden icons
+tr: Verborgen pictogrammen weergeven
+
+en: Opens Windows' notification-area overflow
+tr: Opent het overloopgebied van het Windows-systeemvak
+
+en: Input language: {}
+tr: Invoertaal: {}
+
+en: Fallback input layout
+tr: Reserve-invoerindeling
+
+en: Click to switch input language (Win+Space)
+tr: Klik om de invoertaal te wijzigen (Win+Spatiebalk)
+
+en: Network: {}
+tr: Netwerk: {}
+
+en: Signal strength unavailable
+tr: Signaalsterkte niet beschikbaar
+
+en: Click to open Windows network settings
+tr: Klik om de netwerkinstellingen van Windows te openen
+
+en: Audio output
+tr: Audio-uitvoer
+
+en: Audio: {}
+tr: Audio: {}
+
+en: volume unknown
+tr: volume onbekend
+
+en: Muted
+tr: Gedempt
+
+en: Sound on
+tr: Geluid aan
+
+en: Microphone: {}
+tr: Microfoon: {}
+
+en: Endpoint unmuted
+tr: Apparaat niet gedempt
+
+en: Recording detection unsupported
+tr: Opnamedetectie niet ondersteund
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Klik om dempen in of uit te schakelen; klik met de rechtermuisknop voor spraakgestuurd typen van Windows en privacyinstellingen voor de microfoon
+
+en: Battery: {}
+tr: Batterij: {}
+
+en: Battery {}
+tr: Batterij {}
+
+en: Battery status unavailable
+tr: Batterijstatus niet beschikbaar
+
+en: Charging
+tr: Opladen
+
+en: External power
+tr: Externe voeding
+
+en: Estimated remaining: {} h {} min
+tr: Geschatte resterende tijd: {} u {} min
+
+en: Click to open power settings
+tr: Klik om de energie-instellingen te openen
+
+en: Clock status unavailable
+tr: Klokstatus niet beschikbaar
+
+en: Click to open calendar and notifications
+tr: Klik om agenda en meldingen te openen
+
+en: Action failed: {}
+tr: Actie mislukt: {}
+
+en: Aether Shell status bar
+tr: Aether Shell-statusbalk
+
+en: Update available
+tr: Update beschikbaar
+
+en: Cached
+tr: In cache
+
+en: Start
+tr: Start
+
+en: Search
+tr: Zoeken
+
+en: Task View
+tr: Taakweergave
+
+en: Application
+tr: Toepassing
+
+en: Running application
+tr: Actieve toepassing
+
+en: More applications
+tr: Meer toepassingen
+
+en: Aether Shell window previews
+tr: Aether Shell-venstervoorbeelden
+
+en: Minimized — preview unavailable
+tr: Geminimaliseerd — voorbeeld niet beschikbaar
+
+en: Preview unavailable
+tr: Voorbeeld niet beschikbaar
+
+en: {} windows
+tr: {} vensters
+
+en: {} window
+tr: {} venster
+
+en: Switches to this window
+tr: Schakelt over naar dit venster
+
+en: Minimized, preview unavailable
+tr: Geminimaliseerd, voorbeeld niet beschikbaar
+
+en: Minimized
+tr: Geminimaliseerd
+
+en: Close {}
+tr: {} sluiten
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Vraagt dit venster te sluiten; de toepassing kan nog steeds vragen om op te slaan of te annuleren
+
+en: Close requested
+tr: Sluiten aangevraagd
+
+en: Previous applications
+tr: Vorige toepassingen
+
+en: Open
+tr: Openen
+
+en: New instance
+tr: Nieuw exemplaar
+
+en: Unpin from Dock
+tr: Losmaken van Dock
+
+en: Pin to Dock
+tr: Aan Dock vastmaken
+
+en: Move left
+tr: Naar links verplaatsen
+
+en: Move right
+tr: Naar rechts verplaatsen
+
+en: Dock settings...
+tr: Dock-instellingen...
+
+en: Import Windows taskbar pins
+tr: Vastgemaakte items van de Windows-taakbalk importeren
+
+en: Open Windows Start
+tr: Start van Windows openen
+
+en: Aether Shell Dock
+tr: Aether Shell-Dock
+
+en: Pinned
+tr: Vastgemaakt
+
+en: Running
+tr: Actief
+
+en: Needs attention
+tr: Vereist aandacht
+
+en: Up arrow shows window previews
+tr: Pijl-omhoog toont venstervoorbeelden
+
+en: Installed application
+tr: Geïnstalleerde toepassing
+
+en: Desktop application
+tr: Bureaubladtoepassing
+
+en: File
+tr: Bestand
+
+en: Folder
+tr: Map
+
+en: Windows tool
+tr: Windows-hulpprogramma
+
+en: Control Panel
+tr: Configuratiescherm
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Navigeren   ·   Enter Openen   ·   Esc Sluiten
+
+en: Search apps, settings and files
+tr: Zoeken in apps, instellingen en bestanden
+
+en: Search could not be completed.
+tr: Zoeken kan niet worden voltooid.
+
+en: Results
+tr: Resultaten
+
+en: Indexing applications…
+tr: Toepassingen indexeren…
+
+en: Type to search apps, settings and files
+tr: Typ om te zoeken in apps, instellingen en bestanden
+
+en: Nothing matches
+tr: Geen overeenkomsten
+
+en: Windows could not open this application.
+tr: Windows kan deze toepassing niet openen.
+
+en: Menu
+tr: Menu
+
+en: Opens a submenu
+tr: Opent een submenu
+
+en: , opens a submenu
+tr: , opent een submenu
+
+en: Selected
+tr: Geselecteerd
+
+en: Checked
+tr: Aangevinkt
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Vliegtuigstand
+
+en: Accessibility
+tr: Toegankelijkheid
+
+en: Energy saver
+tr: Energiebesparing
+
+en: Live captions
+tr: Live-ondertiteling
+
+en: Night light
+tr: Nachtlampje
+
+en: Mobile hotspot
+tr: Mobiele hotspot
+
+en: Nearby sharing
+tr: Delen in de buurt
+
+en: Cast
+tr: Casten
+
+en: Project
+tr: Projecteren
+
+en: All settings
+tr: Alle instellingen
+
+en: Connected
+tr: Verbonden
+
+en: Not connected
+tr: Niet verbonden
+
+en: , on
+tr: , aan
+
+en: , off
+tr: , uit
+
+en: , state unknown
+tr: , status onbekend
+
+en: , opens Windows Settings
+tr: , opent Windows-instellingen
+
+en: , shows accessibility features
+tr: , toont toegankelijkheidsfuncties
+
+en: , requires Windows 11 version 22H2
+tr: , vereist Windows 11 versie 22H2
+
+en: Now playing: {}
+tr: Wordt nu afgespeeld: {}
+
+en: Untitled media
+tr: Media zonder titel
+
+en: , switch source
+tr: , bron wijzigen
+
+en: Previous media item
+tr: Vorig media-item
+
+en: Pause
+tr: Onderbreken
+
+en: Play
+tr: Afspelen
+
+en: Next media item
+tr: Volgend media-item
+
+en: {} details
+tr: Details van {}
+
+en: Page {} of {}
+tr: Pagina {} van {}
+
+en: Next page
+tr: Volgende pagina
+
+en: First page
+tr: Eerste pagina
+
+en: Brightness
+tr: Helderheid
+
+en: Brightness, unavailable on this display
+tr: Helderheid, niet beschikbaar op dit beeldscherm
+
+en: Volume
+tr: Volume
+
+en: Volume, unavailable
+tr: Volume, niet beschikbaar
+
+en: Unmute
+tr: Dempen opheffen
+
+en: Mute
+tr: Dempen
+
+en: Sound output and volume mixer
+tr: Geluidsuitvoer en volumemixer
+
+en: Back
+tr: Terug
+
+en: , secured
+tr: , beveiligd
+
+en: , open
+tr: , open
+
+en: , connected
+tr: , verbonden
+
+en: Disconnect
+tr: Verbinding verbreken
+
+en: Show available networks
+tr: Beschikbare netwerken weergeven
+
+en: More Wi-Fi settings
+tr: Meer Wi-Fi-instellingen
+
+en: Bluetooth and devices settings
+tr: Instellingen voor Bluetooth en apparaten
+
+en: Magnifier
+tr: Vergrootglas
+
+en: Narrator
+tr: Verteller
+
+en: On-screen keyboard
+tr: Schermtoetsenbord
+
+en: Sticky keys
+tr: Plaktoetsen
+
+en: More accessibility settings
+tr: Meer toegankelijkheidsinstellingen
+
+en: Volume mixer
+tr: Volumemixer
+
+en: Choose output in Sound settings
+tr: Uitvoer kiezen in Geluidsinstellingen
+
+en: Power and battery settings
+tr: Instellingen voor aan/uit en batterij
+
+en: Battery {} percent, {}
+tr: Batterij {} procent, {}
+
+en: All Windows settings
+tr: Alle Windows-instellingen
+
+en: The requested action could not be dispatched
+tr: De aangevraagde actie kan niet worden verzonden
+
+en: Aether Shell quick controls
+tr: Snelle bediening van Aether Shell
+
+en: Media session active
+tr: Mediasessie actief
+
+en: No media session
+tr: Geen mediasessie
+
+en: Current page
+tr: Huidige pagina
+
+en:  - secured
+tr:  - beveiligd
+
+en:  - open
+tr:  - open
+
+en:  - opens in Windows
+tr:  - wordt geopend in Windows
+
+en: Turned off by hardware or policy
+tr: Uitgeschakeld door hardware of beleid
+
+en: State unavailable - use Windows settings
+tr: Status niet beschikbaar - gebruik Windows-instellingen
+
+en: Off
+tr: Uit
+
+en:  - signal {} of 5
+tr:  - signaal {} van 5
+
+en: , no internet
+tr: , geen internet
+
+en: On - not connected
+tr: Aan - niet verbonden
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows staat apps niet toe netwerken weer te geven: controleer Locatie in de privacyinstellingen
+
+en: No Wi-Fi adapter found
+tr: Geen Wi-Fi-adapter gevonden
+
+en: Connecting to {}...
+tr: Verbinding maken met {}...
+
+en:  - looking for networks
+tr:  - zoeken naar netwerken
+
+en: On
+tr: Aan
+
+en: A screen reader is running
+tr: Er wordt een schermlezer uitgevoerd
+
+en: Windows accessibility features
+tr: Toegankelijkheidsfuncties van Windows
+
+en: Sound output
+tr: Geluidsuitvoer
+
+en: Default output device
+tr: Standaarduitvoerapparaat
+
+en: No output device available
+tr: Geen uitvoerapparaat beschikbaar
+
+en: Battery unknown
+tr: Batterij onbekend
+
+en: Status refresh could not be started
+tr: Statusvernieuwing kan niet worden gestart
+
+en: Status refresh unavailable
+tr: Statusvernieuwing niet beschikbaar
+
+en: Excellent signal
+tr: Uitstekend signaal
+
+en: Good signal
+tr: Goed signaal
+
+en: Fair signal
+tr: Redelijk signaal
+
+en: Weak signal
+tr: Zwak signaal
+
+en: Clear sky
+tr: Onbewolkt
+
+en: Mainly clear
+tr: Overwegend helder
+
+en: Partly cloudy
+tr: Gedeeltelijk bewolkt
+
+en: Overcast
+tr: Zwaar bewolkt
+
+en: Fog
+tr: Mist
+
+en: Drizzle
+tr: Motregen
+
+en: Rain
+tr: Regen
+
+en: Snow
+tr: Sneeuw
+
+en: Rain showers
+tr: Regenbuien
+
+en: Snow showers
+tr: Sneeuwbuien
+
+en: Thunderstorm
+tr: Onweer
+
+## weather
+
+en: Morning
+tr: Ochtend
+
+en: Afternoon
+tr: Middag
+
+en: Evening
+tr: Avond
+
+en: Night
+tr: Nacht
+
+en: Now
+tr: Nu
+
+en: Today
+tr: Vandaag
+
+en: Low
+tr: Laag
+
+en: Moderate
+tr: Matig
+
+en: High
+tr: Hoog
+
+en: Very high
+tr: Zeer hoog
+
+en: Extreme
+tr: Extreem
+
+en: No connection to the weather service.
+tr: Geen verbinding met de weerdienst.
+
+en: The weather service is busy. Try again in a moment.
+tr: De weerdienst is bezet. Probeer het zo opnieuw.
+
+en: The weather could not be loaded.
+tr: Het weer kan niet worden geladen.
+
+en: Could not update; showing the last forecast.
+tr: Kan niet bijwerken; de laatste weersverwachting wordt weergegeven.
+
+en: Try again
+tr: Opnieuw proberen
+
+en: Your location
+tr: Je locatie
+
+en: My location
+tr: Mijn locatie
+
+en: Precise location
+tr: Exacte locatie
+
+en: Approximate location
+tr: Geschatte locatie
+
+en: Chosen in Settings
+tr: Gekozen in Instellingen
+
+en: Allow
+tr: Toestaan
+
+en: Use precise location
+tr: Exacte locatie gebruiken
+
+en: See the weather where you are: allow your precise location.
+tr: Bekijk het weer waar je bent: sta je exacte locatie toe.
+
+en: Your position is approximate (about 10 km).
+tr: Je positie is bij benadering (ongeveer 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Locatie is in Windows uitgeschakeld voor deze app.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Dit apparaat kan zijn locatie niet doorgeven. Zoek in plaats daarvan naar een stad.
+
+en: Reading Windows location…
+tr: Windows-locatie lezen…
+
+en: Automatic weather follows your Windows location.
+tr: Automatisch weer volgt je Windows-locatie.
+
+en: Search for a city
+tr: Zoeken naar een stad
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Zoek naar een stad of sta je locatie toe om het weer te zien.
+
+en: Searching…
+tr: Zoeken…
+
+en: City search is unavailable.
+tr: Zoeken naar steden is niet beschikbaar.
+
+en: No city found.
+tr: Geen stad gevonden.
+
+en: Weather settings
+tr: Weerinstellingen
+
+en: Loading the weather…
+tr: Het weer laden…
+
+en: Loading…
+tr: Laden…
+
+en: Updated {}
+tr: Bijgewerkt {}
+
+en: Near {}
+tr: In de buurt van {}
+
+en: Temperatures now
+tr: Temperaturen nu
+
+en: The map is unavailable.
+tr: De kaart is niet beschikbaar.
+
+en: Map: Natural Earth
+tr: Kaart: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Weergegevens van Open-Meteo.com
+
+en: Feels like
+tr: Voelt als
+
+en: Feels like {}
+tr: Voelt als {}
+
+en: Close to the real temperature
+tr: Dicht bij de werkelijke temperatuur
+
+en: The wind makes it feel colder
+tr: Door de wind voelt het kouder aan
+
+en: Humidity makes it feel warmer
+tr: Door de luchtvochtigheid voelt het warmer aan
+
+en: Humidity
+tr: Luchtvochtigheid
+
+en: Cloud cover {}
+tr: Bewolking {}
+
+en: Wind
+tr: Wind
+
+en: Gusts {}
+tr: Windstoten {}
+
+en: Sunrise and sunset
+tr: Zonsopkomst en zonsondergang
+
+en: UV index
+tr: Uv-index
+
+en: Pressure
+tr: Luchtdruk
+
+en: At sea level
+tr: Op zeeniveau
+
+en: &Open the weather
+tr: Het weer &openen
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: De weersverwachting voor waar je bent, tot op ongeveer 100 m, met de eigen hoogte. Uit: afgerond op ongeveer 10 km.

@@ -1,0 +1,162 @@
+# D70: setup (installer), the updater and the launcher. Texts already listed elsewhere (Welcome, Licence, Cancel,
+# Version {}, Name to greet you with, Start Aether Shell when I sign in) are translated once, there.
+
+en: Aether Shell Setup
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+
+en: Options
+
+en: Install
+
+en: Done
+
+en: Remove Aether Shell
+
+en: Repair Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+
+en: Replaces the Windows taskbar while it runs
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+
+en: Starts when you sign in - your choice
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+
+en: Installs for your account
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+
+en: MIT License
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+
+en: Remove this installation
+
+en: Install location
+
+en: &Browse...
+
+en: Also remove my settings, cache and logs
+
+en: This cannot be undone.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+
+en: Your welcome
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+
+en: Your first name
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+
+en: Shortcuts and startup
+
+en: Create Start menu shortcuts
+
+en: Aether Shell and Restore Windows taskbar.
+
+en: Create a desktop shortcut
+
+en: Shows your current choice.
+
+en: Recommended.
+
+en: Clear it to opt out; Task Manager disables are respected.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+
+en: Removing this installation...
+
+en: Repairing Aether Shell...
+
+en: Installing Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+
+en: Please wait while the removal completes.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+
+en: Aether Shell was uninstalled.
+
+en: Aether Shell is ready.
+
+en: Setup was cancelled.
+
+en: Setup could not complete.
+
+en: Your data was kept unless you explicitly chose to remove it.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+
+en: Setup log
+
+en: Launch Aether Shell
+
+en: &Back
+
+en: &Next
+
+en: &Continue
+
+en: &Uninstall
+
+en: &Repair
+
+en: &Install
+
+en: &Close
+
+en: Step {} of {}: {}
+
+en: Choose the Aether Shell installation folder
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+
+en: The install folder must be an absolute path.
+
+en: Setup stops at the next safe point.
+
+en: Cancelling...
+
+en: Setup is finishing the current step safely; please wait.
+
+en: Updating Aether Shell
+
+en: Verifying the signed package and applying the update.
+
+en: Update completed
+
+en: The update did not complete
+
+en: Close
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+
+en: Aether Shell Update
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+
+en: Update completed.
+
+en: Update did not complete. See the updater log or use Repair.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+
+en: Aether Shell Settings — update in progress

@@ -83,6 +83,15 @@ Rules worth knowing:
 - `CheckNow()` during a check is coalesced; conflicting requests return `InvalidState`.
 - Current version: `aether::build::kVersion` (injectable through `UpdateCoordinatorOptions`).
 
+## Language packs (D83)
+
+`updates/LanguagePacks`: `LanguagePackUrl(language)` is the pack's address in the version's release;
+`InstallLanguagePack(http, language, languagesDir, cancel)` downloads it under the release-asset rules (official
+repository, GitHub download hosts only, at most the expected size), checks its size and SHA-256 against
+`src/core/LanguageTable.inc` (`i18n::UsePack`), puts it in use and writes it atomically to `<data>\languages`.
+Blocking: the application calls it on its language worker, setup after installing. Tests:
+`tests/unit/updates/LanguagePacksTests.cpp` (URL, refused bytes, sizes, statuses and redirects, a real pack installed).
+
 ## Threading model
 
 - Public coordinator methods are non-blocking and callable from any thread (normally the UI thread).

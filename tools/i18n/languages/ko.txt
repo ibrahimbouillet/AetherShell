@@ -1,0 +1,2494 @@
+# Korean (ko): 한국어. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: 자동 날씨를 사용하려면 Windows 위치를 선택하세요.
+
+en: Windows taskbar visible
+tr: Windows 작업 표시줄 표시됨
+
+en: Connected to {}
+tr: {}에 연결됨
+
+en: {} is out of range
+tr: {}이(가) 범위를 벗어났습니다
+
+en: Connecting to {} took too long
+tr: {}에 연결하는 데 시간이 너무 오래 걸렸습니다
+
+en: Use Windows to join {}
+tr: Windows를 사용하여 {}에 연결하세요
+
+en: Windows did not allow this connection
+tr: Windows에서 이 연결을 허용하지 않았습니다
+
+en: Could not connect to {}
+tr: {}에 연결할 수 없습니다
+
+en: Connect to {}
+tr: {}에 연결
+
+en: That password was not accepted. Check it and try again.
+tr: 암호가 허용되지 않았습니다. 확인한 후 다시 시도하세요.
+
+en: Enter this network's password.
+tr: 이 네트워크의 암호를 입력하세요.
+
+en: &Connect
+tr: 연결(&C)
+
+en: Windows Settings could not be opened
+tr: Windows 설정을 열 수 없습니다
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Dock 공간을 예약할 수 없습니다. Windows 작업 표시줄을 복원하는 중
+
+en: Replacement unavailable: recovery observer could not start
+tr: 대체를 사용할 수 없음: 복구 관찰자를 시작할 수 없습니다
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows 작업 표시줄이 복원되었습니다. Dock 공간을 예약할 수 없습니다. 다시 시도하려면 대체를 껐다가 다시 켜세요.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: 복구 관찰을 사용할 수 없습니다. Windows 작업 표시줄을 복원하는 중
+
+en: Windows notifications could not be opened
+tr: Windows 알림을 열 수 없습니다
+
+en: The Windows calendar could not be opened
+tr: Windows 달력을 열 수 없습니다
+
+en: Windows did not show its hidden icons
+tr: Windows에서 숨겨진 아이콘을 표시하지 않았습니다
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: 자동 위치 새로 고침을 사용할 수 없습니다. 날씨 설정에서 다시 시도하세요.
+
+en: Windows location
+tr: Windows 위치
+
+en: Reading approximate Windows location…
+tr: Windows의 대략적인 위치를 읽는 중…
+
+en: Automatic weather follows approximate Windows location.
+tr: 자동 날씨는 Windows의 대략적인 위치를 따릅니다.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windows 위치 액세스가 차단되었습니다. 날씨를 사용할 수 없습니다.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows에서 현재 위치를 제공할 수 없습니다. 날씨를 사용할 수 없습니다.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: 위치 확인 프로세스를 사용할 수 없습니다. 날씨를 사용할 수 없습니다.
+
+en: Waiting for Windows location permission…
+tr: Windows 위치 권한을 기다리는 중…
+
+en: The automatic weather choice could not be saved.
+tr: 자동 날씨 선택을 저장할 수 없습니다.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windows 위치 액세스를 사용할 수 없거나 거부되었습니다. 날씨를 사용할 수 없습니다.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows 위치에서 권한을 요청할 수 없습니다. Windows 위치 설정을 검토하세요.
+
+en: Status worker unavailable
+tr: 상태 확인 프로세스를 사용할 수 없음
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows에서 이 작업을 완료할 수 없습니다. 해당 설정을 검토하세요.
+
+en: Reading Windows status; try the action again shortly
+tr: Windows 상태를 읽는 중입니다. 잠시 후 작업을 다시 시도하세요
+
+en: Could not disconnect
+tr: 연결을 끊을 수 없습니다
+
+en: The Windows accessibility feature could not be started
+tr: Windows 접근성 기능을 시작할 수 없습니다
+
+en: Windows could not change the audio output
+tr: Windows에서 오디오 출력을 변경할 수 없습니다
+
+en: The Windows control could not be opened
+tr: Windows 컨트롤을 열 수 없습니다
+
+en: Keyboard shortcuts disabled
+tr: 바로 가기 키 사용 안 함
+
+en: Both keyboard shortcuts registered
+tr: 두 바로 가기 키가 모두 등록됨
+
+en: A keyboard shortcut is already in use by another application
+tr: 바로 가기 키를 다른 애플리케이션에서 이미 사용하고 있습니다
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windows 빠른 설정을 요청할 수 없습니다. Aether 컨트롤을 사용하려면 상단 표시줄 설정에서 'Windows 빠른 설정 사용'을 선택 취소하세요.
+
+en: Windows Start could not be opened
+tr: Windows 시작을 열 수 없습니다
+
+en: Windows Task View could not be opened
+tr: Windows 작업 보기를 열 수 없습니다
+
+en: Windows keyboard layout switching was unavailable
+tr: Windows 키보드 레이아웃을 전환할 수 없습니다
+
+en: Windows voice typing could not be opened
+tr: Windows 음성 입력을 열 수 없습니다
+
+en: Windows taskbar could not be revealed
+tr: Windows 작업 표시줄을 표시할 수 없습니다
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: 작업 표시줄 대체를 다시 시작할 수 없습니다. Windows는 계속 사용할 수 있습니다
+
+en: Windows taskbar replacement is unavailable in this session
+tr: 이 세션에서는 Windows 작업 표시줄 대체를 사용할 수 없습니다
+
+en: Windows pin access is unavailable in this isolated session
+tr: 이 격리된 세션에서는 Windows 고정 항목에 액세스할 수 없습니다
+
+en: Windows pinned applications could not be read
+tr: Windows에 고정된 애플리케이션을 읽을 수 없습니다
+
+en: Settings changed during pin import. Try import again.
+tr: 고정 항목을 가져오는 동안 설정이 변경되었습니다. 다시 가져오세요.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: 고정된 애플리케이션 {}개를 추가로 저장했습니다. 일부 Windows 고정 항목은 계속 사용할 수 없을 수 있습니다.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: 고정 항목이 메모리에서 변경되었지만 저장하지 못했습니다. 다시 시도하려면 설정에서 적용하세요.
+
+en: Pins updated in memory; saving...
+tr: 고정 항목이 메모리에서 업데이트되었습니다. 저장하는 중...
+
+en: Imported pins could not be applied
+tr: 가져온 고정 항목을 적용할 수 없습니다
+
+en: Pin import is unavailable while closing
+tr: 닫는 동안에는 고정 항목을 가져올 수 없습니다
+
+en: Settings could not be saved
+tr: 설정을 저장할 수 없습니다
+
+en: Quit without saving the latest changes?
+tr: 최신 변경 내용을 저장하지 않고 종료하시겠습니까?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: 이전 설정 파일은 유지됩니다. 저장을 다시 시도하려면 Aether Shell을 열어 두세요.
+
+en: &Quit without saving
+tr: 저장하지 않고 종료(&Q)
+
+en: &Keep Aether Shell open
+tr: Aether Shell 열어 두기(&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: 기본 진단 정보 내보내기 — 앱 버전 및 Windows 빌드만 포함, 로그나 개인 데이터는 포함되지 않음
+
+en: Diagnostics exported.
+tr: 진단 정보를 내보냈습니다.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: 선택한 파일에 진단 정보를 저장할 수 없습니다.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: 설정을 안전하게 읽을 수 없습니다. 기존 파일은 보존되었습니다.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell에서 데스크톱 화면 요소를 시작할 수 없습니다.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windows 작업 표시줄 복원이 보류 중입니다. 다시 시도하거나 Aether Shell을 닫으세요.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows 작업 표시줄이 일시적으로 표시됩니다.
+
+en: Windows taskbar restored.
+tr: Windows 작업 표시줄이 복원되었습니다.
+
+en: Windows taskbar replacement is active.
+tr: Windows 작업 표시줄 대체가 활성화되었습니다.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows 작업 표시줄을 계속 사용할 수 있습니다. 잠시 후 대체를 다시 시도합니다.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows 작업 표시줄을 계속 사용할 수 있습니다. 다시 시도하려면 대체를 껐다가 다시 켜세요.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows 작업 표시줄이 복원되었습니다. 잠시 후 대체가 다시 연결됩니다.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows 작업 표시줄이 복원되었습니다. 다시 시도하려면 대체를 껐다가 다시 켜세요.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: 작업 표시줄 대체가 중지되었습니다. Windows 작업 표시줄이 복원되었습니다.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: 작업 표시줄 대체가 중지되었습니다. Windows 작업 표시줄 복원을 확인할 수 없습니다.
+
+en: Activating taskbar replacement...
+tr: 작업 표시줄 대체를 활성화하는 중...
+
+en: Restoring Windows taskbar...
+tr: Windows 작업 표시줄을 복원하는 중...
+
+en: Reconnecting taskbar replacement...
+tr: 작업 표시줄 대체를 다시 연결하는 중...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windows 작업 표시줄을 일시적으로 표시하는 중...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell에서 Windows 작업 표시줄을 복원할 수 없습니다.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: 작업 관리자(Ctrl+Shift+Esc)에서 Windows 탐색기를 다시 시작하거나, 로그아웃했다가 다시 로그인하세요.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows 작업 표시줄이 저장된 상태로 복원되었습니다.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: 저장된 작업 표시줄 상태를 찾을 수 없습니다. Windows 작업 표시줄을 표시했으며, 자동 숨기기 설정은 변경하지 않았습니다.
+
+en: There was nothing to restore.
+tr: 복원할 항목이 없습니다.
+
+en: Taskbar replacement is turned off.
+tr: 작업 표시줄 대체가 꺼져 있습니다.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: 작업 표시줄 대체를 자동으로 끌 수 없습니다. Aether Shell 설정 > 데스크톱에서 끄세요.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: 인식할 수 없거나 잘못된 Aether Shell 명령줄입니다.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell에서 로컬 데이터 폴더를 만들 수 없습니다.
+
+en: Aether Shell stopped after an unexpected error.
+tr: 예기치 않은 오류로 인해 Aether Shell이 중지되었습니다.
+
+## search-names
+
+en: Disk Management
+tr: 디스크 관리
+
+en: Local Users and Groups
+tr: 로컬 사용자 및 그룹
+
+en: Local Group Policy Editor
+tr: 로컬 그룹 정책 편집기
+
+en: Manage User Certificates
+tr: 사용자 인증서 관리
+
+en: Manage Computer Certificates
+tr: 컴퓨터 인증서 관리
+
+en: Shared Folders
+tr: 공유 폴더
+
+en: TPM Management
+tr: TPM 관리
+
+en: Network Connections
+tr: 네트워크 연결
+
+en: System Properties
+tr: 시스템 속성
+
+en: About Windows
+tr: Windows 정보
+
+en: DirectX Diagnostic Tool
+tr: DirectX 진단 도구
+
+en: Windows Features
+tr: Windows 기능
+
+en: System Restore
+tr: 시스템 복원
+
+en: Advanced System Settings
+tr: 고급 시스템 설정
+
+en: Volume Mixer
+tr: 볼륨 믹서
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: 사용자 계정(고급)
+
+en: Display settings
+tr: 디스플레이 설정
+
+en: Night light settings
+tr: 야간 모드 설정
+
+en: Graphics settings
+tr: 그래픽 설정
+
+en: Sound settings
+tr: 소리 설정
+
+en: Notification settings
+tr: 알림 설정
+
+en: Power & battery settings
+tr: 전원 및 배터리 설정
+
+en: Energy saver settings
+tr: 에너지 절약 설정
+
+en: Storage settings
+tr: 저장소 설정
+
+en: Multitasking settings
+tr: 멀티태스킹 설정
+
+en: Clipboard settings
+tr: 클립보드 설정
+
+en: Remote Desktop settings
+tr: 원격 데스크톱 설정
+
+en: About your PC
+tr: PC 정보
+
+en: Bluetooth & devices settings
+tr: Bluetooth 및 장치 설정
+
+en: Printers & scanners settings
+tr: 프린터 및 스캐너 설정
+
+en: Mouse settings
+tr: 마우스 설정
+
+en: Touchpad settings
+tr: 터치패드 설정
+
+en: Network & internet settings
+tr: 네트워크 및 인터넷 설정
+
+en: Wi-Fi settings
+tr: Wi-Fi 설정
+
+en: VPN settings
+tr: VPN 설정
+
+en: Proxy settings
+tr: 프록시 설정
+
+en: Airplane mode settings
+tr: 비행기 모드 설정
+
+en: Mobile hotspot settings
+tr: 모바일 핫스팟 설정
+
+en: Background settings
+tr: 배경 설정
+
+en: Color settings
+tr: 색 설정
+
+en: Theme settings
+tr: 테마 설정
+
+en: Lock screen settings
+tr: 잠금 화면 설정
+
+en: Taskbar settings
+tr: 작업 표시줄 설정
+
+en: Font settings
+tr: 글꼴 설정
+
+en: Installed apps
+tr: 설치된 앱
+
+en: Default apps settings
+tr: 기본 앱 설정
+
+en: Startup apps settings
+tr: 시작 앱 설정
+
+en: Account info
+tr: 사용자 정보
+
+en: Sign-in options
+tr: 로그인 옵션
+
+en: Other users settings
+tr: 다른 사용자 설정
+
+en: Date & time settings
+tr: 날짜 및 시간 설정
+
+en: Language & region settings
+tr: 언어 및 지역 설정
+
+en: Typing settings
+tr: 입력 설정
+
+en: Accessibility settings
+tr: 접근성 설정
+
+en: Privacy & security settings
+tr: 개인 정보 및 보안 설정
+
+en: Location settings
+tr: 위치 설정
+
+en: Windows Update settings
+tr: Windows 업데이트 설정
+
+en: Recovery settings
+tr: 복구 설정
+
+en: Activation settings
+tr: 정품 인증 설정
+
+en: For developers settings
+tr: 개발자용 설정
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub에 연결할 수 없습니다.
+
+en: GitHub did not answer the request just now.
+tr: GitHub에서 방금 요청에 응답하지 않았습니다.
+
+en: The release did not pass verification, so nothing was installed.
+tr: 릴리스가 확인을 통과하지 못해 아무것도 설치되지 않았습니다.
+
+en: There is not enough free disk space.
+tr: 사용 가능한 디스크 공간이 부족합니다.
+
+en: Windows refused access to the update files.
+tr: Windows에서 업데이트 파일에 대한 액세스를 거부했습니다.
+
+en: {} bytes
+tr: {}바이트
+
+en: {} KB
+tr: {}KB
+
+en: {} MB
+tr: {}MB
+
+en: Status
+tr: 상태
+
+en: Check &now
+tr: 지금 확인(&N)
+
+en: Download and install
+tr: 다운로드 및 설치
+
+en: &Later
+tr: 나중에(&L)
+
+en: S&kip this version
+tr: 이 버전 건너뛰기(&K)
+
+en: &Release details
+tr: 릴리스 세부 정보(&R)
+
+en: Disable &notifications
+tr: 알림 사용 안 함(&N)
+
+en: Release notes
+tr: 릴리스 정보
+
+en: the new version
+tr: 새 버전
+
+en: Installed: {}.
+tr: 설치됨: {}.
+
+en: Automatic update checks are off
+tr: 자동 업데이트 확인이 꺼져 있습니다
+
+en: Check now looks for a newer release once.
+tr: 지금 확인은 최신 릴리스를 한 번 찾습니다.
+
+en: Last checked {}
+tr: 마지막 확인: {}
+
+en: Not checked yet
+tr: 아직 확인하지 않음
+
+en: Checking for updates...
+tr: 업데이트를 확인하는 중...
+
+en: Aether Shell is up to date
+tr: Aether Shell이 최신 상태입니다
+
+en: Latest published release: {}.
+tr: 최신 게시 릴리스: {}.
+
+en: Version {} is available
+tr: 버전 {}을(를) 사용할 수 있습니다
+
+en: Download size: {}.
+tr: 다운로드 크기: {}.
+
+en: Downloading version {}...
+tr: 버전 {}을(를) 다운로드하는 중...
+
+en: Received {} of {} ({}%).
+tr: {}/{} 받음({}%).
+
+en: Received {}; total size unknown.
+tr: {} 받음, 전체 크기를 알 수 없습니다.
+
+en: Version {} is ready to install
+tr: 버전 {}을(를) 설치할 준비가 되었습니다
+
+en: Verified with the signed release manifest and SHA-256.
+tr: 서명된 릴리스 매니페스트와 SHA-256으로 확인했습니다.
+
+en: The update could not be completed
+tr: 업데이트를 완료할 수 없습니다
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: 현재는 수동으로 설치합니다. 릴리스 세부 정보를 연 다음 설치 프로그램을 다운로드하여 실행하세요.
+
+en: Failure: {}.
+tr: 실패: {}.
+
+en: Choose Retry Download to try again.
+tr: 다시 시도하려면 다운로드 다시 시도를 선택하세요.
+
+en: Use Check now to try again.
+tr: 다시 시도하려면 지금 확인을 사용하세요.
+
+en: Next automatic check: {}.
+tr: 다음 자동 확인: {}.
+
+en: &Install update
+tr: 업데이트 설치(&I)
+
+en: Retry &Download
+tr: 다운로드 다시 시도(&D)
+
+en: &Download and install
+tr: 다운로드 및 설치(&D)
+
+en: Windows' startup state could not be read in this session.
+tr: 이 세션에서 Windows의 시작 상태를 읽을 수 없습니다.
+
+en: Windows will start it at your next sign-in.
+tr: 다음에 로그인할 때 Windows에서 시작합니다.
+
+en: Right now it will not start at sign-in.
+tr: 현재는 로그인할 때 시작되지 않습니다.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: 작업 관리자 또는 Windows 설정에서 꺼져 있으며, 그곳에서 다시 켤 때까지 해당 설정이 우선합니다.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows에서 Aether Shell의 다른 복사본을 시작합니다.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows에서 이 버전이 읽을 수 없는 시작 상태를 보고했습니다.
+
+en: The close action could not be completed.
+tr: 닫기 작업을 완료할 수 없습니다.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: 저장하기 전에 완전한 숫자를 입력하세요. 빨간색으로 표시된 필드는 숫자가 아닙니다.
+
+en: Settings could not be validated.
+tr: 설정의 유효성을 검사할 수 없습니다.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: 설정을 저장할 수 없어 로그인 시 시작을 그대로 두었습니다.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: 설정을 저장할 수 없으며, Windows 로그인 시 시작을 되돌릴 수 없습니다. 다시 시도하려면 다시 적용하세요.
+
+en: Settings saved.
+tr: 설정을 저장했습니다.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: 설정이 메모리에서 변경되었지만 저장하지 못했습니다. 다시 시도하려면 다시 적용하세요.
+
+en: Settings could not be applied.
+tr: 설정을 적용할 수 없습니다.
+
+en: Some values were corrected to their supported range.
+tr: 일부 값이 지원되는 범위로 수정되었습니다.
+
+en: Startup registration is unavailable in this session.
+tr: 이 세션에서는 시작 등록을 사용할 수 없습니다.
+
+en: Changing startup registration...
+tr: 시작 등록을 변경하는 중...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows에서 시작 등록을 변경하지 않았습니다. 작업 관리자의 시작 설정을 확인하세요.
+
+en: Startup registration could not be changed.
+tr: 시작 등록을 변경할 수 없습니다.
+
+en: Defaults saved; startup is disabled.
+tr: 기본값을 저장했습니다. 시작이 사용 안 함으로 설정되었습니다.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: 기본값을 적용했지만 저장하지 못했습니다. 다시 시도하려면 다시 적용하세요.
+
+en: Defaults could not be applied.
+tr: 기본값을 적용할 수 없습니다.
+
+en: Startup was not disabled; settings were kept.
+tr: 시작이 사용 안 함으로 설정되지 않았습니다. 설정은 유지되었습니다.
+
+en: Location search is unavailable.
+tr: 위치 검색을 사용할 수 없습니다.
+
+en: Searching Open-Meteo locations...
+tr: Open-Meteo 위치를 검색하는 중...
+
+en: Location search failed. Check your connection and try again.
+tr: 위치 검색에 실패했습니다. 연결을 확인하고 다시 시도하세요.
+
+en: No place matched that search.
+tr: 검색과 일치하는 장소가 없습니다.
+
+en: Choose a location to save it.
+tr: 저장할 위치를 선택하세요.
+
+en: Reset all settings?
+tr: 모든 설정을 다시 설정하시겠습니까?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: 기본 설정과 고정된 애플리케이션이 기본값으로 돌아가며 로그인 시 시작이 꺼집니다.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Windows 작업 표시줄 선택은 유지됩니다. 현재 설정 파일의 백업도 유지됩니다.
+
+en: &Reset
+tr: 다시 설정(&R)
+
+en: Cancel
+tr: 취소
+
+en: Pinned applications saved.
+tr: 고정된 애플리케이션을 저장했습니다.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: 고정 항목이 메모리에서 변경되었지만 저장하지 못했습니다. 다시 시도하려면 다시 적용하세요.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: 시작 등록을 사용할 수 없으므로 기본값을 복원할 수 없습니다.
+
+en: Pinned application could not be added.
+tr: 고정된 애플리케이션을 추가할 수 없습니다.
+
+en: Choose an application to add first.
+tr: 먼저 추가할 애플리케이션을 선택하세요.
+
+en: Pinned applications could not be changed.
+tr: 고정된 애플리케이션을 변경할 수 없습니다.
+
+en: Choose a pinned application first.
+tr: 먼저 고정된 애플리케이션을 선택하세요.
+
+en: Desktop status is unavailable in this session.
+tr: 이 세션에서는 데스크톱 상태를 사용할 수 없습니다.
+
+en: Desktop status is unavailable.
+tr: 데스크톱 상태를 사용할 수 없습니다.
+
+en: Password
+tr: 암호
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: GitHub에서 {}을(를) 다운로드하는 중입니다({}). 준비될 때까지 영어로 표시됩니다.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {}을(를) 다운로드하지 못했습니다. 다운로드될 때까지 영어로 표시됩니다. 다시 시도하려면 아래에서 다운로드를 선택하세요.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {}이(가) 아직 이 PC에 없습니다. 다운로드될 때까지 영어로 표시됩니다.
+
+en: {} is on this PC.
+tr: {}이(가) 이 PC에 있습니다.
+
+en: Every language is on this PC.
+tr: 모든 언어가 이 PC에 있습니다.
+
+en: Choose a language to download first.
+tr: 먼저 다운로드할 언어를 선택하세요.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: 상단 표시줄
+
+en: Weather
+tr: 날씨
+
+en: Updates
+tr: 업데이트
+
+en: General
+tr: 일반
+
+en: About
+tr: 정보
+
+en: Desktop
+tr: 데스크톱
+
+en: Appearance
+tr: 모양
+
+en: Welcome
+tr: 환영
+
+en: Aether Shell Settings
+tr: Aether Shell 설정
+
+en: Settings
+tr: 설정
+
+en: Reset defaults...
+tr: 기본값으로 다시 설정...
+
+en: &Apply
+tr: 적용(&A)
+
+en: Liquid
+tr: 리퀴드
+
+en: Grain
+tr: 그레인
+
+en: From {} to {}
+tr: {}~{}
+
+en: px
+tr: px
+
+en: min
+tr: 분
+
+en: h
+tr: 시간
+
+en: This action could not be completed.
+tr: 이 작업을 완료할 수 없습니다.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: 크기, 간격, 모션 및 Dock에 고정된 애플리케이션입니다.
+
+en: Size and spacing
+tr: 크기 및 간격
+
+en: Icon size
+tr: 아이콘 크기
+
+en: {}, scaled with the Windows display scale.
+tr: {}, Windows 디스플레이 배율에 맞게 조정됩니다.
+
+en: Bottom margin
+tr: 아래쪽 여백
+
+en: Space between the Dock and the bottom of the screen.
+tr: Dock과 화면 아래쪽 사이의 공간입니다.
+
+en: Minimum side margin
+tr: 최소 측면 여백
+
+en: Space kept free at the left and right screen edges.
+tr: 화면 왼쪽과 오른쪽 가장자리에 비워 두는 공간입니다.
+
+en: Icon spacing
+tr: 아이콘 간격
+
+en: Space between neighbouring icons.
+tr: 인접한 아이콘 사이의 공간입니다.
+
+en: Glass and motion
+tr: 유리 및 모션
+
+en: Glass opacity
+tr: 유리 불투명도
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: 값이 낮을수록 Dock 뒤에 흐리게 처리된 데스크톱이 더 많이 보입니다.
+
+en: Hover magnification
+tr: 마우스오버 확대
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: 포인터 아래에서 아이콘이 커지는 정도입니다. 1이면 꺼집니다.
+
+en: Behavior
+tr: 동작
+
+en: Show running applications
+tr: 실행 중인 애플리케이션 표시
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: 고정되지 않은 열린 애플리케이션은 고정된 애플리케이션 뒤에 표시됩니다.
+
+en: Reserve screen space for the Dock
+tr: Dock을 위한 화면 공간 예약
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: 최대화된 창이 Dock 아래로 가려지지 않고 Dock 위쪽에 머무릅니다.
+
+en: Automatically hide the Dock
+tr: Dock 자동 숨기기
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: 애플리케이션 창이 가리는 동안 숨겨집니다. 표시하려면 포인터를 화면 아래쪽 가장자리로 이동하세요. 데스크톱에서는 계속 표시되며, 창은 화면 높이 전체를 사용합니다.
+
+en: Pinned applications
+tr: 고정된 애플리케이션
+
+en: Move &up
+tr: 위로 이동(&U)
+
+en: Move &down
+tr: 아래로 이동(&D)
+
+en: &Remove
+tr: 제거(&R)
+
+en: &Add application
+tr: 애플리케이션 추가(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: 고정 항목은 ID와 실행 설정을 유지합니다. 고정 항목을 제거하면 Windows 작업 표시줄 자동 동기화에서도 다시 추가되지 않습니다.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: 상단 상태 표시줄에 표시되는 위치, 시계 및 상태 항목입니다.
+
+en: Presentation
+tr: 표시 방식
+
+en: Floating bar
+tr: 떠 있는 표시줄
+
+en: Text on the desktop
+tr: 데스크톱 위 텍스트
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: 떠 있는 표시줄: 화면 위쪽 바로 아래에 있는 유리 표시줄입니다. 데스크톱 위 텍스트: 표시줄 없이 같은 항목을 화면 맨 위의 바탕 화면 그림 위에 바로 표시합니다. 이 영역에는 창이 들어오지 않으며, 위쪽 여백과 유리 불투명도는 적용되지 않습니다. 자동 숨기기를 사용하면 아래에 창이 있는 동안 텍스트가 유리 띠 위에 다시 표시됩니다.
+
+en: Position and glass
+tr: 위치 및 유리
+
+en: Top margin
+tr: 위쪽 여백
+
+en: Space between the Top Bar and the top of the screen.
+tr: 상단 표시줄과 화면 위쪽 사이의 공간입니다.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: 값이 낮을수록 표시줄 뒤에 흐리게 처리된 데스크톱이 더 많이 보입니다.
+
+en: Clock
+tr: 시계
+
+en: Clock format
+tr: 시계 형식
+
+en: Follow Windows
+tr: Windows 설정 따르기
+
+en: 12-hour
+tr: 12시간
+
+en: 24-hour
+tr: 24시간
+
+en: Date style
+tr: 날짜 스타일
+
+en: Weekday, day and month
+tr: 요일, 일 및 월
+
+en: Short
+tr: 간단히
+
+en: Long
+tr: 자세히
+
+en: Show seconds
+tr: 초 표시
+
+en: Show date
+tr: 날짜 표시
+
+en: Status items
+tr: 상태 항목
+
+en: Show battery
+tr: 배터리 표시
+
+en: Hide battery when absent
+tr: 배터리가 없으면 숨기기
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: 배터리가 없는 데스크톱 PC에서는 알 수 없는 배터리 대신 아무것도 표시하지 않습니다.
+
+en: Show input language
+tr: 입력 언어 표시
+
+en: Show network
+tr: 네트워크 표시
+
+en: Show audio output
+tr: 오디오 출력 표시
+
+en: Show microphone
+tr: 마이크 표시
+
+en: Show weather when enabled
+tr: 사용하도록 설정된 경우 날씨 표시
+
+en: Weather itself is turned on in Weather settings.
+tr: 날씨 자체는 날씨 설정에서 켭니다.
+
+en: Show hidden icons button
+tr: 숨겨진 아이콘 단추 표시
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Windows 알림 영역의 숨겨진 아이콘을 여는 작은 화살표입니다.
+
+en: Reserve screen space above windows
+tr: 창 위쪽에 화면 공간 예약
+
+en: Maximized windows stay below the Top Bar.
+tr: 최대화된 창이 상단 표시줄 아래에 머무릅니다.
+
+en: Automatically hide the Top Bar
+tr: 상단 표시줄 자동 숨기기
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: 애플리케이션 창이 가리는 동안 숨겨집니다. 표시하려면 포인터를 화면 위쪽 가장자리로 이동하세요. 데스크톱에서는 계속 표시됩니다.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Windows 빠른 설정 사용(Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: 끔: Aether 빠른 컨트롤이 상단 표시줄 아래에 열립니다. 켬: Windows 자체 패널이 화면 아래쪽에 열립니다.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Open-Meteo에서 제공하는, 상단 표시줄의 선택적 일기 예보입니다.
+
+en: Forecast
+tr: 일기 예보
+
+en: Enable weather
+tr: 날씨 사용
+
+en: Off by default: the forecast needs network requests.
+tr: 기본적으로 꺼져 있음: 일기 예보에는 네트워크 요청이 필요합니다.
+
+en: Temperature
+tr: 기온
+
+en: Celsius
+tr: 섭씨
+
+en: Fahrenheit
+tr: 화씨
+
+en: Refresh interval
+tr: 새로 고침 간격
+
+en: Location
+tr: 위치
+
+en: Locate automatically with Windows
+tr: Windows로 자동으로 위치 찾기
+
+en: Uses the Windows location service after you allow it.
+tr: 허용하면 Windows 위치 서비스를 사용합니다.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows에서 위치 권한을 요청합니다. 좌표는 일기 예보를 받기 위해서만 Open-Meteo.com으로 전송되며, 위치 키는 로컬에 캐시됩니다. 위치가 차단되면 날씨를 사용할 수 없습니다.
+
+en: Use &Windows location
+tr: Windows 위치 사용(&W)
+
+en: Location &settings
+tr: 위치 설정(&S)
+
+en: Choose automatic location or search for a place below.
+tr: 자동 위치를 선택하거나 아래에서 장소를 검색하세요.
+
+en: Search for a place
+tr: 장소 검색
+
+en: Searc&h
+tr: 검색(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: 날씨 데이터 제공: Open-Meteo.com(CC BY 4.0). 수동 검색은 입력한 텍스트만 전송합니다.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: 공식 GitHub 리포지토리의 서명된 릴리스로, 설치 전에 확인됩니다.
+
+en: Preferences
+tr: 기본 설정
+
+en: Check for updates automatically
+tr: 자동으로 업데이트 확인
+
+en: Check interval
+tr: 확인 간격
+
+en: Release channel
+tr: 릴리스 채널
+
+en: Prereleases arrive earlier and change more often.
+tr: 시험판은 더 일찍 제공되며 더 자주 변경됩니다.
+
+en: Stable
+tr: 안정 버전
+
+en: Prerelease
+tr: 시험판
+
+en: Show update notifications
+tr: 업데이트 알림 표시
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: 시작, 모션, 바로 가기 키 및 진단입니다.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: 표시줄, 메뉴, 검색, 설정 및 설치 프로그램의 언어입니다.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: 사용자나 다른 프로그램에 속한 이름(애플리케이션, 파일, Wi-Fi 네트워크)은 번역되지 않습니다. 언어를 선택하면 상단 표시줄에서 날짜를 해당 언어로 표시하며, Windows 설정 따르기를 선택하면 Windows 국가별 형식이 유지됩니다.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: 손글씨 환영 인사는 라틴 문자로 쓰이며 프랑스어, 영어 또는 스페인어로 인사합니다. 인사 언어는 환영에서 선택하세요.
+
+en: Language
+tr: 언어
+
+en: Interface language
+tr: 표시 언어
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Windows 설정 따르기는 Windows 표시 언어 중 여기에 있는 첫 번째 언어를 사용하며, 해당 언어가 없으면 영어를 사용합니다.
+
+en: Startup
+tr: 시작
+
+en: Start Aether Shell when I sign in
+tr: 로그인할 때 Aether Shell 시작
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: 이 설정을 변경하려면 적용해야 합니다. 작업 관리자에서도 끌 수 있습니다.
+
+en: Motion
+tr: 모션
+
+en: Reduced motion removes decorative movement everywhere.
+tr: 줄이기를 선택하면 모든 곳에서 장식용 움직임이 제거됩니다.
+
+en: Reduced
+tr: 줄이기
+
+en: Full
+tr: 전체
+
+en: Keyboard shortcuts
+tr: 바로 가기 키
+
+en: Enable global keyboard shortcuts
+tr: 전역 바로 가기 키 사용
+
+en: Search shortcut key
+tr: 검색 바로 가기 키
+
+en: Dock shortcut key
+tr: Dock 바로 가기 키
+
+en: Search shortcut modifiers
+tr: 검색 바로 가기 보조 키
+
+en: Dock shortcut modifiers
+tr: Dock 바로 가기 보조 키
+
+en: Shortcut status unavailable
+tr: 바로 가기 상태를 사용할 수 없음
+
+en: Diagnostics
+tr: 진단
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: 로그 폴더에는 이 컴퓨터의 Aether Shell 로그가 있습니다. 진단 정보 내보내기는 앱 버전과 Windows 빌드만 저장하며, 로그나 개인 데이터는 저장하지 않습니다.
+
+en: Open &log folder
+tr: 로그 폴더 열기(&L)
+
+en: &Export diagnostics...
+tr: 진단 정보 내보내기(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: 로그인하거나 PC 잠금을 해제한 후 데스크톱에 표시되는 짧은 손글씨 인사입니다.
+
+en: Greeting
+tr: 인사말
+
+en: Show the welcome at sign-in and unlock
+tr: 로그인 및 잠금 해제 시 환영 인사 표시
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Windows에 로그인한 후 Aether Shell이 준비되는 동안 표시됩니다. 건너뛰려면 터치하거나 클릭하거나 Esc 키를 누르세요.
+
+en: Greeting language
+tr: 인사말 언어
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: 프랑스어는 Salut, 영어는 Hello, 스페인어는 Hola입니다. 펜은 라틴 문자를 쓰므로 다른 모든 언어에서는 영어로 인사합니다.
+
+en: Your name
+tr: 이름
+
+en: Name to greet you with
+tr: 인사할 때 사용할 이름
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: 선택 사항입니다(예: 이름). 이 PC의 Aether Shell 설정에만 저장되며 어디에도 전송되거나 로그에 기록되지 않습니다. 제거하려면 필드를 지우세요.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: 색 모드, 강조 색, 모션 속도, Dock 및 상단 표시줄의 모양입니다.
+
+en: Style
+tr: 스타일
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: 리퀴드: 뒤에 있는 것 위로 겹겹이 쌓인 유리, 흐림 레이어, 리퀴드의 빛, 그리고 아이콘과 텍스트로 이루어지며 밝은 페이지와 어두운 페이지 모두에서 읽기 쉽게 유지됩니다. 그레인: 흐리고 반투명한 젖빛 유리에 고운 입자가 더해집니다.
+
+en: Liquid blur
+tr: 리퀴드 흐림
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: 리퀴드 유리 아래의 흐림 레이어가 뒤에 있는 것을 얼마나 덮는지입니다. 100%이면 모두 흐리게 처리합니다. 값이 낮을수록 페이지가 더 선명하게 보이며, 복잡한 페이지 위에서는 표시줄의 텍스트가 읽기 어려워질 수 있습니다.
+
+en: Liquid blur color
+tr: 리퀴드 흐림 색
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: 자동은 유리 본래의 색을 유지합니다. 텍스트와 아이콘은 어떤 색에서도 읽기 쉽게 유지됩니다.
+
+en: Automatic
+tr: 자동
+
+en: White
+tr: 흰색
+
+en: Black
+tr: 검은색
+
+en: Accent
+tr: 강조 색
+
+en: Blue
+tr: 파란색
+
+en: Violet
+tr: 보라색
+
+en: Pink
+tr: 분홍색
+
+en: Red
+tr: 빨간색
+
+en: Orange
+tr: 주황색
+
+en: Yellow
+tr: 노란색
+
+en: Green
+tr: 녹색
+
+en: Teal
+tr: 청록색
+
+en: Liquid color strength
+tr: 리퀴드 색 강도
+
+en: How much of the chosen color the blur layer takes.
+tr: 흐림 레이어에 선택한 색이 반영되는 정도입니다.
+
+en: Theme
+tr: 테마
+
+en: Color mode
+tr: 색 모드
+
+en: High contrast always takes precedence.
+tr: 고대비가 항상 우선합니다.
+
+en: Light
+tr: 밝게
+
+en: Dark
+tr: 어둡게
+
+en: Accent color
+tr: 강조 색
+
+en: Animation duration
+tr: 애니메이션 지속 시간
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1이 표준 속도이며 값이 클수록 느려집니다. 모션 줄이기가 우선합니다.
+
+en: Dock icon preset
+tr: Dock 아이콘 사전 설정
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Dock 설정의 사용자 지정 크기는 사전 설정을 선택할 때까지 유지됩니다.
+
+en: Small - 32 px
+tr: 작게 - 32px
+
+en: Medium - 40 px
+tr: 보통 - 40px
+
+en: Large - 48 px
+tr: 크게 - 48px
+
+en: Keep custom size
+tr: 사용자 지정 크기 유지
+
+en: Show Windows Start in the Dock
+tr: Dock에 Windows 시작 표시
+
+en: Show Task View in the Dock
+tr: Dock에 작업 보기 표시
+
+en: Reserve extra space for Dock animations
+tr: Dock 애니메이션을 위한 추가 공간 예약
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: 확대 및 실행 시 튀어 오르는 효과가 최대화된 창에 겹치지 않게 합니다.
+
+en: Weather position
+tr: 날씨 위치
+
+en: Left
+tr: 왼쪽
+
+en: Right
+tr: 오른쪽
+
+en: Keyboard indicator
+tr: 키보드 표시기
+
+en: Compact
+tr: 간결하게
+
+en: Two lines
+tr: 두 줄
+
+en: Windows taskbar pins
+tr: Windows 작업 표시줄 고정 항목
+
+en: Add newly discovered Windows taskbar pins
+tr: 새로 발견된 Windows 작업 표시줄 고정 항목 추가
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: 작업 표시줄이 대체되는 동안 새 Windows 고정 항목이 Dock에 추가됩니다.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Dock으로 Windows 작업 표시줄을 대체합니다(되돌릴 수 있음).
+
+en: Taskbar replacement
+tr: 작업 표시줄 대체
+
+en: Replace the Windows taskbar
+tr: Windows 작업 표시줄 대체
+
+en: Changing this needs Apply.
+tr: 이 설정을 변경하려면 적용해야 합니다.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Aether Shell이 실행되는 동안 Windows 작업 표시줄을 숨기고 최대화된 애플리케이션 아래에 공간을 예약합니다.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: 이 모드를 사용하지 않도록 설정하거나 Aether Shell이 종료되면 Windows 작업 표시줄 상태가 복원됩니다. 애플리케이션이 예기치 않게 중지되면 별도의 복구 도우미도 이를 복원합니다. 복구에 실패하면 작업 관리자에서 Windows 탐색기를 다시 시작하세요.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows 설정은 기본 Windows 인터페이스로 유지됩니다. 해당 작업 표시줄 페이지는 Aether Shell로 대체되지 않으므로 이 모드는 여기에서 구성하세요.
+
+en: Pinned applications from Windows
+tr: Windows의 고정된 애플리케이션
+
+en: &Import Windows taskbar pins
+tr: Windows 작업 표시줄 고정 항목 가져오기(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Windows 고정 항목을 변경하지 않고 고정된 바로 가기를 읽습니다. 일부 Windows 11 고정 항목이나 그 순서는 사용할 수 없을 수 있습니다.
+
+en: Version {}
+tr: 버전 {}
+
+en: Created by Ibrahim Bouillet
+tr: 만든 사람: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: 파일 탐색기와 함께 실행되는 기본 Windows 데스크톱 인터페이스 - 떠 있는 Dock과 상단 상태 표시줄.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: 날씨 데이터: Open-Meteo.com(CC BY 4.0). 타사 C++ 런타임 라이브러리는 포함되어 있지 않습니다.
+
+en: &Official project
+tr: 공식 프로젝트(&O)
+
+en: Licence
+tr: 라이선스
+
+en: Taskbar replacement changes need Apply.
+tr: 작업 표시줄 대체 변경 내용은 적용해야 합니다.
+
+en: Changes save automatically. Startup needs Apply.
+tr: 변경 내용은 자동으로 저장됩니다. 시작 설정은 적용해야 합니다.
+
+en: Changes save automatically.
+tr: 변경 내용은 자동으로 저장됩니다.
+
+en: Press Apply to confirm this change.
+tr: 이 변경 내용을 확인하려면 적용을 누르세요.
+
+en: Smart transparency
+tr: 스마트 투명도
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: 리퀴드에서는 이 창이 텍스트와 컨트롤 아래만 흐리게 처리합니다. 다른 창과 바탕 화면 아이콘 위에서는 완전히, 바탕 화면 그림 위에서는 약하게 흐리게 처리하고, 아무것도 표시하지 않는 곳에서는 전혀 흐리게 처리하지 않습니다.
+
+en: Languages on this PC
+tr: 이 PC의 언어
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell은 Windows에 있는 언어를 다운로드하므로 Windows의 언어가 바뀌면 함께 바뀝니다.
+
+en: Add a language
+tr: 언어 추가
+
+en: &Download
+tr: 다운로드(&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: 모든 언어는 이 버전의 GitHub 릴리스에서 가져오며 사용하기 전에 확인합니다. 이 PC에 받은 후 위에서 선택하세요.
+
+en: built in
+tr: 기본 제공
+
+en: downloading, {}
+tr: 다운로드 중, {}
+
+en: download failed
+tr: 다운로드 실패
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell 설치
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: 설치 프로그램 인터페이스를 만들 수 없습니다. 닫은 후 다시 시도하거나 문서화된 자동 설치 옵션을 사용하세요.
+
+en: Options
+tr: 옵션
+
+en: Install
+tr: 설치
+
+en: Done
+tr: 완료
+
+en: Remove Aether Shell
+tr: Aether Shell 제거
+
+en: Repair Aether Shell
+tr: Aether Shell 복구
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: 파일 탐색기와 함께 실행되는 Windows용 기본 Dock 및 상단 상태 표시줄입니다.
+
+en: Replaces the Windows taskbar while it runs
+tr: 실행되는 동안 Windows 작업 표시줄을 대체합니다
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Windows 작업 표시줄을 되돌리려면 Aether Shell을 종료하거나, 설정 > 데스크톱에서 이 기능을 끄거나, 시작 메뉴에서 "Windows 작업 표시줄 복원"을 여세요.
+
+en: Starts when you sign in - your choice
+tr: 로그인할 때 시작 - 선택 가능
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: 새로 설치하면 기본적으로 로그인할 때 시작됩니다. 설치하기 전에 이 선택을 해제하거나 나중에 설정에서 끌 수 있습니다. 기존 시작 선택 및 작업 관리자의 사용 안 함 설정은 유지됩니다.
+
+en: Installs for your account
+tr: 사용자 계정에 설치
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: 관리자 권한이 필요하지 않습니다. 설정과 데이터는 사용자 프로필에 유지됩니다.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: 제거하도록 선택하지 않는 한 제거해도 설정과 데이터가 유지됩니다.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: 복구는 이 패키지의 파일을 복원하고 설정은 유지합니다. Aether Shell로 인해 Windows 작업 표시줄이 숨겨진 상태로 남아 있으면 복구에서 이를 복원합니다.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: 기존 버전 위에 설치해도 설정은 유지됩니다. 다운그레이드를 명시적으로 허용하지 않는 한 이전 패키지는 거부됩니다.
+
+en: MIT License
+tr: MIT 라이선스
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: 라이선스는 Aether Shell과 같은 위치에 LICENSE로도 설치됩니다.
+
+en: Remove this installation
+tr: 이 설치 제거
+
+en: Install location
+tr: 설치 위치
+
+en: &Browse...
+tr: 찾아보기(&B)...
+
+en: Also remove my settings, cache and logs
+tr: 내 설정, 캐시 및 로그도 제거
+
+en: This cannot be undone.
+tr: 이 작업은 취소할 수 없습니다.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: 설치 프로그램이 Aether Shell을 정상적으로 닫고 설치된 파일, 바로 가기, 시작 항목 및 설치된 앱 등록을 제거합니다. 다른 애플리케이션과 Windows 설정은 그대로 유지됩니다.
+
+en: Your welcome
+tr: 환영 인사
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: 로그인하거나 PC 잠금을 해제한 후 Aether Shell이 짧은 인사말을 손글씨로 씁니다. 인사할 때 사용할 이름을 입력하거나, 간단한 인사를 원하면 비워 두세요.
+
+en: Your first name
+tr: 이름
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: 선택 사항입니다(예: 이름). 이 PC의 Aether Shell 설정에만 저장되며 어디에도 전송되지 않습니다. 설정 > 환영에서 변경하거나 환영 인사를 끌 수 있습니다.
+
+en: Shortcuts and startup
+tr: 바로 가기 및 시작
+
+en: Create Start menu shortcuts
+tr: 시작 메뉴 바로 가기 만들기
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell 및 Windows 작업 표시줄 복원.
+
+en: Create a desktop shortcut
+tr: 바탕 화면 바로 가기 만들기
+
+en: Shows your current choice.
+tr: 현재 선택을 표시합니다.
+
+en: Recommended.
+tr: 권장.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: 원하지 않으면 선택을 취소하세요. 작업 관리자의 사용 안 함 설정은 존중됩니다.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: 설치하면 위의 시작 선택에 동의하게 됩니다. 시작 관리자는 충돌 후 제한된 재시도 횟수 내에서 Aether Shell을 다시 시작할 수 있습니다. 종료 및 Windows 작업 표시줄 복원은 계속 사용할 수 있습니다. 날씨는 기본적으로 꺼져 있습니다. 서명되지 않은 바이너리는 Windows SmartScreen 경고를 표시할 수 있습니다.
+
+en: Removing this installation...
+tr: 이 설치를 제거하는 중...
+
+en: Repairing Aether Shell...
+tr: Aether Shell을 복구하는 중...
+
+en: Installing Aether Shell...
+tr: Aether Shell을 설치하는 중...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shell을 닫고 파일을 제거하는 중입니다.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: 포함된 패키지를 확인하고 파일을 설치하는 중입니다. 설치 프로그램은 남은 시간을 알 수 없으므로 진행률은 작업 표시로 나타납니다.
+
+en: Please wait while the removal completes.
+tr: 제거가 완료될 때까지 기다려 주세요.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: 새 버전이 활성화될 때까지 취소할 수 있으며, 이후에는 설치 프로그램이 안전하게 완료됩니다.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell을 제거했습니다.
+
+en: Aether Shell is ready.
+tr: Aether Shell이 준비되었습니다.
+
+en: Setup was cancelled.
+tr: 설치가 취소되었습니다.
+
+en: Setup could not complete.
+tr: 설치를 완료할 수 없습니다.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: 제거하도록 명시적으로 선택하지 않았다면 데이터는 유지되었습니다.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Windows 설정 > 앱 > 설치된 앱에서 복구하거나 제거할 수 있습니다.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: 활성화 전에 작업이 취소되었습니다. 다시 시도하려면 옵션으로 돌아가세요.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: 파일 액세스 권한과 사용 가능한 디스크 공간을 확인한 후 다시 시도하세요. Aether Shell이 이미 있으면 복구로 파일을 복원할 수 있습니다. 오류 범주: {}
+
+en: Setup log
+tr: 설치 로그
+
+en: Launch Aether Shell
+tr: Aether Shell 시작
+
+en: &Back
+tr: 뒤로(&B)
+
+en: &Next
+tr: 다음(&N)
+
+en: &Continue
+tr: 계속(&C)
+
+en: &Uninstall
+tr: 제거(&U)
+
+en: &Repair
+tr: 복구(&R)
+
+en: &Install
+tr: 설치(&I)
+
+en: &Close
+tr: 닫기(&C)
+
+en: Step {} of {}: {}
+tr: {}/{}단계: {}
+
+en: Choose the Aether Shell installation folder
+tr: Aether Shell 설치 폴더 선택
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: 드라이브 문자로 시작하는 경로와 같은 전체 폴더 경로를 선택하세요.
+
+en: The install folder must be an absolute path.
+tr: 설치 폴더는 절대 경로여야 합니다.
+
+en: Setup stops at the next safe point.
+tr: 설치 프로그램이 다음 안전한 지점에서 중지됩니다.
+
+en: Cancelling...
+tr: 취소하는 중...
+
+en: Setup is finishing the current step safely; please wait.
+tr: 설치 프로그램이 현재 단계를 안전하게 마무리하고 있습니다. 잠시 기다려 주세요.
+
+en: Updating Aether Shell
+tr: Aether Shell 업데이트 중
+
+en: Verifying the signed package and applying the update.
+tr: 서명된 패키지를 확인하고 업데이트를 적용하는 중입니다.
+
+en: Update completed
+tr: 업데이트 완료
+
+en: The update did not complete
+tr: 업데이트가 완료되지 않았습니다
+
+en: Close
+tr: 닫기
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: 업데이트 인터페이스를 시작할 수 없습니다. 업데이트가 적용되지 않았습니다. 다시 시도하거나 복구를 사용하세요.
+
+en: Aether Shell Update
+tr: Aether Shell 업데이트
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: 업데이트 인터페이스를 시작할 수 없습니다. 업데이트가 적용되지 않았습니다. 다시 시도하거나 Windows 설정 > 앱 > 설치된 앱에서 복구를 사용하세요.
+
+en: Update completed.
+tr: 업데이트가 완료되었습니다.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: 업데이트가 완료되지 않았습니다. 업데이트 프로그램 로그를 확인하거나 복구를 사용하세요.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell을 시작할 수 없습니다. Windows 설정 > 앱 > 설치된 앱에서 복구를 선택하세요.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell 설정 — 업데이트 진행 중
+
+## shell
+
+en: &Resume taskbar replacement
+tr: 작업 표시줄 대체 다시 시작(&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: 60초 동안 Windows 알림 영역 표시(&N)
+
+en: &Search…
+tr: 검색(&S)…
+
+en: &Settings…
+tr: 설정(&S)…
+
+en: View available &update…
+tr: 사용 가능한 업데이트 보기(&U)…
+
+en: &Check for updates…
+tr: 업데이트 확인(&C)…
+
+en: &About Aether Shell
+tr: Aether Shell 정보(&A)
+
+en: &Quit Aether Shell
+tr: Aether Shell 종료(&Q)
+
+en: Switch &input language\tWin+Space
+tr: 입력 언어 전환(&I)\tWin+Space
+
+en: Open &network controls…
+tr: 네트워크 컨트롤 열기(&N)…
+
+en: &Weather settings…
+tr: 날씨 설정(&W)…
+
+en: Toggle output &mute
+tr: 출력 음소거 전환(&M)
+
+en: &Sound settings…
+tr: 소리 설정(&S)…
+
+en: Toggle microphone &mute
+tr: 마이크 음소거 전환(&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: Windows 음성 입력 시작(&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: 마이크 개인 정보 설정(&P)…
+
+en: &Power settings…
+tr: 전원 설정(&P)…
+
+en: Open &notifications and calendar
+tr: 알림 및 달력 열기(&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: 달력 열기(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: 숨겨진 아이콘 표시(&H)
+
+en: Initializing
+tr: 초기화하는 중
+
+en: Unavailable
+tr: 사용할 수 없음
+
+en: Unsupported
+tr: 지원되지 않음
+
+en: Error
+tr: 오류
+
+en: Available
+tr: 사용 가능
+
+en: Unknown
+tr: 알 수 없음
+
+en: Internet access
+tr: 인터넷 액세스
+
+en: Local network only
+tr: 로컬 네트워크만
+
+en: Limited Internet access
+tr: 제한된 인터넷 액세스
+
+en: No network connection
+tr: 네트워크 연결 없음
+
+en: Connectivity unknown
+tr: 연결 상태 알 수 없음
+
+en: Ethernet
+tr: 이더넷
+
+en: Cellular
+tr: 셀룰러
+
+en: Network
+tr: 네트워크
+
+en: Offline
+tr: 오프라인
+
+en: Network status unavailable
+tr: 네트워크 상태를 사용할 수 없음
+
+en: Quick controls
+tr: 빠른 컨트롤
+
+en: Aether Shell menu
+tr: Aether Shell 메뉴
+
+en: Weather status unavailable
+tr: 날씨 상태를 사용할 수 없음
+
+en: Cached weather
+tr: 캐시된 날씨
+
+en: Observation (UTC): {}
+tr: 관측 시간(UTC): {}
+
+en: Weather: {}
+tr: 날씨: {}
+
+en: Click to open weather settings
+tr: 날씨 설정을 열려면 클릭하세요
+
+en: Show hidden icons
+tr: 숨겨진 아이콘 표시
+
+en: Opens Windows' notification-area overflow
+tr: Windows 알림 영역 오버플로를 엽니다
+
+en: Input language: {}
+tr: 입력 언어: {}
+
+en: Fallback input layout
+tr: 대체 입력 레이아웃
+
+en: Click to switch input language (Win+Space)
+tr: 입력 언어를 전환하려면 클릭하세요(Win+Space)
+
+en: Network: {}
+tr: 네트워크: {}
+
+en: Signal strength unavailable
+tr: 신호 강도를 사용할 수 없음
+
+en: Click to open Windows network settings
+tr: Windows 네트워크 설정을 열려면 클릭하세요
+
+en: Audio output
+tr: 오디오 출력
+
+en: Audio: {}
+tr: 오디오: {}
+
+en: volume unknown
+tr: 볼륨 알 수 없음
+
+en: Muted
+tr: 음소거됨
+
+en: Sound on
+tr: 소리 켜짐
+
+en: Microphone: {}
+tr: 마이크: {}
+
+en: Endpoint unmuted
+tr: 엔드포인트 음소거 해제됨
+
+en: Recording detection unsupported
+tr: 녹음 감지가 지원되지 않음
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: 음소거를 전환하려면 클릭하고, Windows 음성 입력 및 마이크 개인 정보 설정을 보려면 마우스 오른쪽 단추를 클릭하세요
+
+en: Battery: {}
+tr: 배터리: {}
+
+en: Battery {}
+tr: 배터리 {}
+
+en: Battery status unavailable
+tr: 배터리 상태를 사용할 수 없음
+
+en: Charging
+tr: 충전 중
+
+en: External power
+tr: 외부 전원
+
+en: Estimated remaining: {} h {} min
+tr: 예상 남은 시간: {}시간 {}분
+
+en: Click to open power settings
+tr: 전원 설정을 열려면 클릭하세요
+
+en: Clock status unavailable
+tr: 시계 상태를 사용할 수 없음
+
+en: Click to open calendar and notifications
+tr: 달력 및 알림을 열려면 클릭하세요
+
+en: Action failed: {}
+tr: 작업 실패: {}
+
+en: Aether Shell status bar
+tr: Aether Shell 상태 표시줄
+
+en: Update available
+tr: 업데이트 사용 가능
+
+en: Cached
+tr: 캐시됨
+
+en: Start
+tr: 시작
+
+en: Search
+tr: 검색
+
+en: Task View
+tr: 작업 보기
+
+en: Application
+tr: 애플리케이션
+
+en: Running application
+tr: 실행 중인 애플리케이션
+
+en: More applications
+tr: 기타 애플리케이션
+
+en: Aether Shell window previews
+tr: Aether Shell 창 미리 보기
+
+en: Minimized — preview unavailable
+tr: 최소화됨 — 미리 보기를 사용할 수 없음
+
+en: Preview unavailable
+tr: 미리 보기를 사용할 수 없음
+
+en: {} windows
+tr: 창 {}개
+
+en: {} window
+tr: 창 {}개
+
+en: Switches to this window
+tr: 이 창으로 전환합니다
+
+en: Minimized, preview unavailable
+tr: 최소화됨, 미리 보기를 사용할 수 없음
+
+en: Minimized
+tr: 최소화됨
+
+en: Close {}
+tr: {} 닫기
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: 이 창에 닫기를 요청합니다. 애플리케이션에서 저장 또는 취소를 요청할 수 있습니다
+
+en: Close requested
+tr: 닫기 요청됨
+
+en: Previous applications
+tr: 이전 애플리케이션
+
+en: Open
+tr: 열기
+
+en: New instance
+tr: 새 인스턴스
+
+en: Unpin from Dock
+tr: Dock에서 고정 해제
+
+en: Pin to Dock
+tr: Dock에 고정
+
+en: Move left
+tr: 왼쪽으로 이동
+
+en: Move right
+tr: 오른쪽으로 이동
+
+en: Dock settings...
+tr: Dock 설정...
+
+en: Import Windows taskbar pins
+tr: Windows 작업 표시줄 고정 항목 가져오기
+
+en: Open Windows Start
+tr: Windows 시작 열기
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: 고정됨
+
+en: Running
+tr: 실행 중
+
+en: Needs attention
+tr: 주의 필요
+
+en: Up arrow shows window previews
+tr: 위쪽 화살표 키를 누르면 창 미리 보기가 표시됩니다
+
+en: Installed application
+tr: 설치된 애플리케이션
+
+en: Desktop application
+tr: 데스크톱 애플리케이션
+
+en: File
+tr: 파일
+
+en: Folder
+tr: 폴더
+
+en: Windows tool
+tr: Windows 도구
+
+en: Control Panel
+tr: 제어판
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ 이동   ·   Enter 열기   ·   Esc 닫기
+
+en: Search apps, settings and files
+tr: 앱, 설정 및 파일 검색
+
+en: Search could not be completed.
+tr: 검색을 완료할 수 없습니다.
+
+en: Results
+tr: 결과
+
+en: Indexing applications…
+tr: 애플리케이션을 인덱싱하는 중…
+
+en: Type to search apps, settings and files
+tr: 앱, 설정 및 파일을 검색하려면 입력하세요
+
+en: Nothing matches
+tr: 일치하는 항목 없음
+
+en: Windows could not open this application.
+tr: Windows에서 이 애플리케이션을 열 수 없습니다.
+
+en: Menu
+tr: 메뉴
+
+en: Opens a submenu
+tr: 하위 메뉴를 엽니다
+
+en: , opens a submenu
+tr: , 하위 메뉴를 엽니다
+
+en: Selected
+tr: 선택됨
+
+en: Checked
+tr: 확인란 선택됨
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: 비행기 모드
+
+en: Accessibility
+tr: 접근성
+
+en: Energy saver
+tr: 에너지 절약
+
+en: Live captions
+tr: 실시간 자막
+
+en: Night light
+tr: 야간 모드
+
+en: Mobile hotspot
+tr: 모바일 핫스팟
+
+en: Nearby sharing
+tr: 근거리 공유
+
+en: Cast
+tr: 캐스트
+
+en: Project
+tr: 프로젝트
+
+en: All settings
+tr: 모든 설정
+
+en: Connected
+tr: 연결됨
+
+en: Not connected
+tr: 연결되지 않음
+
+en: , on
+tr: , 켜짐
+
+en: , off
+tr: , 꺼짐
+
+en: , state unknown
+tr: , 상태 알 수 없음
+
+en: , opens Windows Settings
+tr: , Windows 설정을 엽니다
+
+en: , shows accessibility features
+tr: , 접근성 기능을 표시합니다
+
+en: , requires Windows 11 version 22H2
+tr: , Windows 11 버전 22H2 필요
+
+en: Now playing: {}
+tr: 지금 재생 중: {}
+
+en: Untitled media
+tr: 제목 없는 미디어
+
+en: , switch source
+tr: , 소스 전환
+
+en: Previous media item
+tr: 이전 미디어 항목
+
+en: Pause
+tr: 일시 중지
+
+en: Play
+tr: 재생
+
+en: Next media item
+tr: 다음 미디어 항목
+
+en: {} details
+tr: {} 세부 정보
+
+en: Page {} of {}
+tr: {}/{}페이지
+
+en: Next page
+tr: 다음 페이지
+
+en: First page
+tr: 첫 페이지
+
+en: Brightness
+tr: 밝기
+
+en: Brightness, unavailable on this display
+tr: 밝기, 이 디스플레이에서 사용할 수 없음
+
+en: Volume
+tr: 볼륨
+
+en: Volume, unavailable
+tr: 볼륨, 사용할 수 없음
+
+en: Unmute
+tr: 음소거 해제
+
+en: Mute
+tr: 음소거
+
+en: Sound output and volume mixer
+tr: 소리 출력 및 볼륨 믹서
+
+en: Back
+tr: 뒤로
+
+en: , secured
+tr: , 보안됨
+
+en: , open
+tr: , 개방형
+
+en: , connected
+tr: , 연결됨
+
+en: Disconnect
+tr: 연결 끊기
+
+en: Show available networks
+tr: 사용 가능한 네트워크 표시
+
+en: More Wi-Fi settings
+tr: 추가 Wi-Fi 설정
+
+en: Bluetooth and devices settings
+tr: Bluetooth 및 장치 설정
+
+en: Magnifier
+tr: 돋보기
+
+en: Narrator
+tr: 내레이터
+
+en: On-screen keyboard
+tr: 화상 키보드
+
+en: Sticky keys
+tr: 고정 키
+
+en: More accessibility settings
+tr: 추가 접근성 설정
+
+en: Volume mixer
+tr: 볼륨 믹서
+
+en: Choose output in Sound settings
+tr: 소리 설정에서 출력 선택
+
+en: Power and battery settings
+tr: 전원 및 배터리 설정
+
+en: Battery {} percent, {}
+tr: 배터리 {}퍼센트, {}
+
+en: All Windows settings
+tr: 모든 Windows 설정
+
+en: The requested action could not be dispatched
+tr: 요청한 작업을 전달할 수 없습니다
+
+en: Aether Shell quick controls
+tr: Aether Shell 빠른 컨트롤
+
+en: Media session active
+tr: 미디어 세션 활성
+
+en: No media session
+tr: 미디어 세션 없음
+
+en: Current page
+tr: 현재 페이지
+
+en:  - secured
+tr:  - 보안됨
+
+en:  - open
+tr:  - 개방형
+
+en:  - opens in Windows
+tr:  - Windows에서 열림
+
+en: Turned off by hardware or policy
+tr: 하드웨어 또는 정책에 의해 꺼짐
+
+en: State unavailable - use Windows settings
+tr: 상태를 사용할 수 없음 - Windows 설정을 사용하세요
+
+en: Off
+tr: 끔
+
+en:  - signal {} of 5
+tr:  - 신호 {}/5
+
+en: , no internet
+tr: , 인터넷 없음
+
+en: On - not connected
+tr: 켬 - 연결되지 않음
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows에서 앱이 네트워크 목록을 표시하도록 허용하지 않습니다. 개인 정보 설정에서 위치를 확인하세요
+
+en: No Wi-Fi adapter found
+tr: Wi-Fi 어댑터를 찾을 수 없음
+
+en: Connecting to {}...
+tr: {}에 연결하는 중...
+
+en:  - looking for networks
+tr:  - 네트워크를 찾는 중
+
+en: On
+tr: 켬
+
+en: A screen reader is running
+tr: 화면 읽기 프로그램이 실행 중입니다
+
+en: Windows accessibility features
+tr: Windows 접근성 기능
+
+en: Sound output
+tr: 소리 출력
+
+en: Default output device
+tr: 기본 출력 장치
+
+en: No output device available
+tr: 사용 가능한 출력 장치 없음
+
+en: Battery unknown
+tr: 배터리 알 수 없음
+
+en: Status refresh could not be started
+tr: 상태 새로 고침을 시작할 수 없습니다
+
+en: Status refresh unavailable
+tr: 상태 새로 고침을 사용할 수 없음
+
+en: Excellent signal
+tr: 매우 강한 신호
+
+en: Good signal
+tr: 강한 신호
+
+en: Fair signal
+tr: 보통 신호
+
+en: Weak signal
+tr: 약한 신호
+
+en: Clear sky
+tr: 맑음
+
+en: Mainly clear
+tr: 대체로 맑음
+
+en: Partly cloudy
+tr: 구름 조금
+
+en: Overcast
+tr: 흐림
+
+en: Fog
+tr: 안개
+
+en: Drizzle
+tr: 이슬비
+
+en: Rain
+tr: 비
+
+en: Snow
+tr: 눈
+
+en: Rain showers
+tr: 소나기
+
+en: Snow showers
+tr: 소낙눈
+
+en: Thunderstorm
+tr: 뇌우
+
+## weather
+
+en: Morning
+tr: 아침
+
+en: Afternoon
+tr: 오후
+
+en: Evening
+tr: 저녁
+
+en: Night
+tr: 밤
+
+en: Now
+tr: 지금
+
+en: Today
+tr: 오늘
+
+en: Low
+tr: 낮음
+
+en: Moderate
+tr: 보통
+
+en: High
+tr: 높음
+
+en: Very high
+tr: 매우 높음
+
+en: Extreme
+tr: 위험
+
+en: No connection to the weather service.
+tr: 날씨 서비스에 연결되어 있지 않습니다.
+
+en: The weather service is busy. Try again in a moment.
+tr: 날씨 서비스가 사용 중입니다. 잠시 후 다시 시도하세요.
+
+en: The weather could not be loaded.
+tr: 날씨를 불러올 수 없습니다.
+
+en: Could not update; showing the last forecast.
+tr: 업데이트할 수 없습니다. 마지막 일기 예보를 표시합니다.
+
+en: Try again
+tr: 다시 시도
+
+en: Your location
+tr: 사용자 위치
+
+en: My location
+tr: 내 위치
+
+en: Precise location
+tr: 정확한 위치
+
+en: Approximate location
+tr: 대략적인 위치
+
+en: Chosen in Settings
+tr: 설정에서 선택됨
+
+en: Allow
+tr: 허용
+
+en: Use precise location
+tr: 정확한 위치 사용
+
+en: See the weather where you are: allow your precise location.
+tr: 현재 위치의 날씨를 보려면 정확한 위치를 허용하세요.
+
+en: Your position is approximate (about 10 km).
+tr: 위치가 대략적입니다(약 10km).
+
+en: Location is turned off for this app in Windows.
+tr: Windows에서 이 앱의 위치가 꺼져 있습니다.
+
+en: This device cannot report its location. Search for a city instead.
+tr: 이 장치는 위치를 보고할 수 없습니다. 대신 도시를 검색하세요.
+
+en: Reading Windows location…
+tr: Windows 위치를 읽는 중…
+
+en: Automatic weather follows your Windows location.
+tr: 자동 날씨는 Windows 위치를 따릅니다.
+
+en: Search for a city
+tr: 도시 검색
+
+en: Search for a city, or allow your location, to see the weather.
+tr: 날씨를 보려면 도시를 검색하거나 위치를 허용하세요.
+
+en: Searching…
+tr: 검색하는 중…
+
+en: City search is unavailable.
+tr: 도시 검색을 사용할 수 없습니다.
+
+en: No city found.
+tr: 도시를 찾을 수 없습니다.
+
+en: Weather settings
+tr: 날씨 설정
+
+en: Loading the weather…
+tr: 날씨를 불러오는 중…
+
+en: Loading…
+tr: 불러오는 중…
+
+en: Updated {}
+tr: 업데이트: {}
+
+en: Near {}
+tr: {} 근처
+
+en: Temperatures now
+tr: 현재 기온
+
+en: The map is unavailable.
+tr: 지도를 사용할 수 없습니다.
+
+en: Map: Natural Earth
+tr: 지도: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: 날씨 데이터 제공: Open-Meteo.com
+
+en: Feels like
+tr: 체감 온도
+
+en: Feels like {}
+tr: 체감 온도 {}
+
+en: Close to the real temperature
+tr: 실제 기온과 비슷함
+
+en: The wind makes it feel colder
+tr: 바람 때문에 더 춥게 느껴짐
+
+en: Humidity makes it feel warmer
+tr: 습도 때문에 더 덥게 느껴짐
+
+en: Humidity
+tr: 습도
+
+en: Cloud cover {}
+tr: 구름양 {}
+
+en: Wind
+tr: 바람
+
+en: Gusts {}
+tr: 돌풍 {}
+
+en: Sunrise and sunset
+tr: 일출 및 일몰
+
+en: UV index
+tr: 자외선 지수
+
+en: Pressure
+tr: 기압
+
+en: At sea level
+tr: 해수면 기준
+
+en: &Open the weather
+tr: 날씨 열기(&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: 현재 위치의 일기 예보로, 약 100m 정확도와 해당 지점의 고도를 사용합니다. 끔: 약 10km 단위로 반올림됩니다.

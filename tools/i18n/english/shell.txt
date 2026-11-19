@@ -1,0 +1,443 @@
+# D70: the Top Bar, the Dock, Search, menus and Quick Settings.
+
+en: &Resume taskbar replacement
+
+en: Show Windows &notification area for 60 seconds
+
+en: &Search…
+
+en: &Settings…
+
+en: View available &update…
+
+en: &Check for updates…
+
+en: &About Aether Shell
+
+en: &Quit Aether Shell
+
+en: Switch &input language\tWin+Space
+
+en: Open &network controls…
+
+en: &Weather settings…
+
+en: Toggle output &mute
+
+en: &Sound settings…
+
+en: Toggle microphone &mute
+
+en: Start Windows &voice typing\tWin+H
+
+en: Microphone &privacy settings…
+
+en: &Power settings…
+
+en: Open &notifications and calendar
+
+en: Open &calendar\tWin+Alt+D
+
+en: Show &hidden icons
+
+en: Initializing
+
+en: Unavailable
+
+en: Unsupported
+
+en: Error
+
+en: Available
+
+en: Unknown
+
+en: Internet access
+
+en: Local network only
+
+en: Limited Internet access
+
+en: No network connection
+
+en: Connectivity unknown
+
+en: Ethernet
+
+en: Cellular
+
+en: Network
+
+en: Offline
+
+en: Network status unavailable
+
+en: Quick controls
+
+en: Aether Shell menu
+
+en: Weather status unavailable
+
+en: Cached weather
+
+en: Observation (UTC): {}
+
+en: Weather: {}
+
+en: Click to open weather settings
+
+en: Show hidden icons
+
+en: Opens Windows' notification-area overflow
+
+en: Input language: {}
+
+en: Fallback input layout
+
+en: Click to switch input language (Win+Space)
+
+en: Network: {}
+
+en: Signal strength unavailable
+
+en: Click to open Windows network settings
+
+en: Audio output
+
+en: Audio: {}
+
+en: volume unknown
+
+en: Muted
+
+en: Sound on
+
+en: Microphone: {}
+
+en: Endpoint unmuted
+
+en: Recording detection unsupported
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+
+en: Battery: {}
+
+en: Battery {}
+
+en: Battery status unavailable
+
+en: Charging
+
+en: External power
+
+en: Estimated remaining: {} h {} min
+
+en: Click to open power settings
+
+en: Clock status unavailable
+
+en: Click to open calendar and notifications
+
+en: Action failed: {}
+
+en: Aether Shell status bar
+
+en: Update available
+
+en: Cached
+
+en: Start
+
+en: Search
+
+en: Task View
+
+en: Application
+
+en: Running application
+
+en: More applications
+
+en: Aether Shell window previews
+
+en: Minimized — preview unavailable
+
+en: Preview unavailable
+
+en: {} windows
+
+en: {} window
+
+en: Switches to this window
+
+en: Minimized, preview unavailable
+
+en: Minimized
+
+en: Close {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+
+en: Close requested
+
+en: Previous applications
+
+en: Open
+
+en: New instance
+
+en: Unpin from Dock
+
+en: Pin to Dock
+
+en: Move left
+
+en: Move right
+
+en: Dock settings...
+
+en: Import Windows taskbar pins
+
+en: Open Windows Start
+
+en: Aether Shell Dock
+
+en: Pinned
+
+en: Running
+
+en: Needs attention
+
+en: Up arrow shows window previews
+
+en: Installed application
+
+en: Desktop application
+
+en: File
+
+en: Folder
+
+en: Windows tool
+
+en: Control Panel
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+
+en: Search apps, settings and files
+
+en: Search could not be completed.
+
+en: Results
+
+en: Indexing applications…
+
+en: Type to search apps, settings and files
+
+en: Nothing matches
+
+en: Windows could not open this application.
+
+en: Menu
+
+en: Opens a submenu
+
+en: , opens a submenu
+
+en: Selected
+
+en: Checked
+
+en: Bluetooth
+
+en: Airplane mode
+
+en: Accessibility
+
+en: Energy saver
+
+en: Live captions
+
+en: Night light
+
+en: Mobile hotspot
+
+en: Nearby sharing
+
+en: Cast
+
+en: Project
+
+en: All settings
+
+en: Connected
+
+en: Not connected
+
+en: , on
+
+en: , off
+
+en: , state unknown
+
+en: , opens Windows Settings
+
+en: , shows accessibility features
+
+en: , requires Windows 11 version 22H2
+
+en: Now playing: {}
+
+en: Untitled media
+
+en: , switch source
+
+en: Previous media item
+
+en: Pause
+
+en: Play
+
+en: Next media item
+
+en: {} details
+
+en: Page {} of {}
+
+en: Next page
+
+en: First page
+
+en: Brightness
+
+en: Brightness, unavailable on this display
+
+en: Volume
+
+en: Volume, unavailable
+
+en: Unmute
+
+en: Mute
+
+en: Sound output and volume mixer
+
+en: Back
+
+en: , secured
+
+en: , open
+
+en: , connected
+
+en: Disconnect
+
+en: Show available networks
+
+en: More Wi-Fi settings
+
+en: Bluetooth and devices settings
+
+en: Magnifier
+
+en: Narrator
+
+en: On-screen keyboard
+
+en: Sticky keys
+
+en: More accessibility settings
+
+en: Volume mixer
+
+en: Choose output in Sound settings
+
+en: Power and battery settings
+
+en: Battery {} percent, {}
+
+en: All Windows settings
+
+en: The requested action could not be dispatched
+
+en: Aether Shell quick controls
+
+en: Media session active
+
+en: No media session
+
+en: Current page
+
+en:  - secured
+
+en:  - open
+
+en:  - opens in Windows
+
+en: Turned off by hardware or policy
+
+en: State unavailable - use Windows settings
+
+en: Off
+
+en:  - signal {} of 5
+
+en: , no internet
+
+en: On - not connected
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+
+en: No Wi-Fi adapter found
+
+en: Connecting to {}...
+
+en:  - looking for networks
+
+en: On
+
+en: A screen reader is running
+
+en: Windows accessibility features
+
+en: Sound output
+
+en: Default output device
+
+en: No output device available
+
+en: Battery unknown
+
+en: Status refresh could not be started
+
+en: Status refresh unavailable
+
+en: Excellent signal
+
+en: Good signal
+
+en: Fair signal
+
+en: Weak signal
+
+en: Clear sky
+
+en: Mainly clear
+
+en: Partly cloudy
+
+en: Overcast
+
+en: Fog
+
+en: Drizzle
+
+en: Rain
+
+en: Snow
+
+en: Rain showers
+
+en: Snow showers
+
+en: Thunderstorm

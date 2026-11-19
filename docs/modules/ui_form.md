@@ -5,8 +5,9 @@
 `src/ui/form`, target `aether_ui_form`, gives normal, activatable application windows with native
 child controls (Settings, the setup wizard, the updater window and confirmations) the same neutral
 frosted material, rhythm, type scale and motion as the Dock and Top Bar (FR-037 / D41 / T47). It
-depends only on core, diagnostics, platform and [graphics](graphics.md); it never uses the
-compositor or the shell surfaces, so setup can use it on a machine where Aether is not installed.
+depends only on core, diagnostics, platform and [graphics](graphics.md); it uses no shell surface,
+so setup can use it on a machine where Aether is not installed. Only Liquid's smart transparency
+(below) composes, with a `GraphicsDevice` its owner passes in.
 
 ## Material
 
@@ -22,6 +23,28 @@ compositor or the shell surfaces, so setup can use it on a machine where Aether 
 Windows draws an inactive window's Acrylic as its flat fallback; this is the documented system
 behavior and is not overridden. `SetTheme` switches materials in place (including to and from
 Native) without recreating controls, so text, selection, focus, drafts and scroll positions survive.
+
+## Smart transparency (D84, 2026-11-19)
+
+`FormSurface::EnableSmartGlass(device, extraContent)` turns on Liquid's smart transparency for a form whose tokens ask
+for it (`DesignTokens::liquidSmart`, set from Settings > Appearance), in the Acrylic material, not maximized and not in
+high contrast, when the device has `hostBackdrop`. Settings is its only user.
+
+- `ui/form/SmartGlass`: `ComputeSmartMask` (pure: own content and content behind to a grid of 8 px cells; full blur
+  where own content lies over other content, 45 % over the plain desktop picture, 0 elsewhere; three cells of gradient),
+  `OwnContentRects` (visible leaf child windows, clipped by their ancestors; empty labels count for nothing),
+  `WindowsBehind` (the windows below the form in z-order, click-through overlays excepted, by their DWM bounds; their
+  content is never read), `DesktopIconRects` (Explorer's `IFolderView`, on an MTA thread every 3 s).
+- The blur lives in a click-through, never-activated `WS_EX_NOREDIRECTIONBITMAP` window kept exactly under the form's
+  client area and directly below it in z-order: `HostBackdropBrush` through a D2D AlphaMask effect whose mask is a small
+  drawing surface (one pixel per cell, linear filtering), plus a light veil of the window tint. It follows the form's
+  moves (`WM_WINDOWPOSCHANGING`), hides with it, follows it to another virtual desktop, recomputes every 100 ms and
+  redraws only when the mask changed.
+- The form then has no system backdrop and paints no tint, only Liquid's sheen and rim; blur-behind with an empty region
+  makes DWM compose its alpha (without it a captioned window's extended frame is filled with the frame colour).
+- Tests: `tests/unit/ui_form/SmartGlassTests.cpp` (mask, own content) and
+  `tests/integration/ui_form/SmartGlassIntegrationTests.cpp` (over the private test pattern: stripes' edges intact far
+  from the content and gone under it; the blur window's place and styles; gone when turned off).
 
 ## Painting model
 

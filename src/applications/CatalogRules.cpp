@@ -509,7 +509,7 @@ namespace {
 std::pair<std::wstring, std::wstring> NamesIn(i18n::Language language, std::wstring_view english, std::wstring_view french) {
     const auto nameIn = [&](i18n::Language which) -> std::wstring_view {
         if (which == i18n::Language::English) return english;
-        if (which == i18n::Language::French) return french;
+        if (which == i18n::Language::French || which == i18n::Language::FrenchCanada) return french;
         return i18n::Tr(english, which);
     };
     std::wstring display(nameIn(language)), others;

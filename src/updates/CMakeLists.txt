@@ -9,3 +9,5 @@
 aether_add_module_library(aether_updates
     LINK aether_core aether_diagnostics aether_platform bcrypt crypt32 wintrust)
 aether_add_module_tests(updates LINK aether_updates)
+# D83: a language pack is downloaded, checked and installed as the application does it.
+aether_use_test_language_packs(aether_updates_tests)

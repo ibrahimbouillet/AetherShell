@@ -18,10 +18,12 @@
 
 #include <commctrl.h>
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
 #include <span>
 #include <string>
 #include <thread>
@@ -155,14 +157,41 @@ constexpr const char* kPageNames[] = {"dock", "topbar", "weather", "updates", "g
 
 }  // namespace
 
-// D70: the longer and the differently shaped texts of each language still fit, page by page, and every page's entry is
-// in the navigation.
-AETHER_TEST("settings design: every page lays out without overlap in each of the ten languages") {
+// D70/D83: the longer and the differently shaped texts of each language still fit, page by page, and every page's entry
+// is in the navigation. The texts are the packs a release publishes, built from tools/i18n for this test and loaded as
+// the application loads them: their size and SHA-256 must be the ones LanguageTable.inc compiled in.
+namespace {
+// Loads every language's pack once for the process, as the application loads an installed one.
+void LoadLanguagePacksOnce() {
+    static bool done = false;
+    if (done) return;
+    done = true;
+#ifdef AETHER_TEST_LANGUAGE_PACKS
+    const std::filesystem::path packs(AETHER_TEST_LANGUAGE_PACKS);
+    std::size_t loaded = 0;
+    for (const auto& language : i18n::Languages()) {
+        if (language.language == i18n::Language::English || !i18n::Available(language.language)) continue;
+        const auto used = i18n::LoadInstalledPack(language.language, packs);
+        if (!used) TEST_NOTE(std::string(language.code) + ": the pack built from tools/i18n is not LanguageTable.inc's; run languages.py build");
+        CHECK(used.ok());
+        if (used) ++loaded;
+    }
+    TEST_NOTE(std::to_string(loaded) + " language packs loaded");
+#else
+    TEST_NOTE("no Python when this was configured: the languages lay out with their English texts");
+#endif
+}
+
+// Every page, in the languages [first, last) of core/Localization's order.
+void LayOutLanguages(std::size_t first, std::size_t last) {
+    LoadLanguagePacksOnce();
     Fixture f("settings-design-languages");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Dock).ok());
     CHECK_EQ(::SendMessageW(window.Control(100), LB_GETCOUNT, 0, 0), LRESULT{10});
-    for (const auto& language : i18n::Languages()) {
+    const auto languages = i18n::Languages();
+    for (std::size_t index = first; index < std::min(last, languages.size()); ++index) {
+        const auto& language = languages[index];
         i18n::SetLanguage(language.language);
         window.Relocalize();
         for (const auto page : kPages) {
@@ -174,6 +203,16 @@ AETHER_TEST("settings design: every page lays out without overlap in each of the
     i18n::SetLanguage(i18n::Language::English);
     window.Close();
 }
+}  // namespace
+
+// D70/D83: the longer and the differently shaped texts of each language still fit, page by page, and every page's entry
+// is in the navigation. The texts are the packs a release publishes, built from tools/i18n for this test and loaded as
+// the application loads them: their size and SHA-256 must be the ones LanguageTable.inc compiled in. Four groups, so a
+// failure names its languages.
+AETHER_TEST("settings design: every page lays out without overlap in each language (English to English UK)") { LayOutLanguages(0, 11); }
+AETHER_TEST("settings design: every page lays out without overlap in each language (Estonian to Japanese)") { LayOutLanguages(11, 22); }
+AETHER_TEST("settings design: every page lays out without overlap in each language (Korean to Serbian)") { LayOutLanguages(22, 32); }
+AETHER_TEST("settings design: every page lays out without overlap in each language (Slovak to Urdu)") { LayOutLanguages(32, 41); }
 
 AETHER_TEST("settings design: every page lays out without overlap at default, small and high-DPI sizes") {
     Fixture f("settings-design-layout");
@@ -384,7 +423,7 @@ AETHER_TEST("settings design: dropdowns keep the native list and selection contr
     Fixture f("settings-design-dropdown");
     settings::ui::SettingsWindow window(f.service, f.dispatcher);
     REQUIRE(window.Show(settings::ui::SettingsPage::Appearance).ok());
-    HWND mode = window.Control(204);  // Color mode: Follow Windows / Light / Dark (200 is Style, D63; 201-203 Liquid's blur, D67)
+    HWND mode = window.Control(205);  // Color mode: Follow Windows / Light / Dark (200 is Style, D63; 201-203 Liquid's blur, D67; 204 smart transparency, D84)
     REQUIRE(mode != nullptr);
     ::SetFocus(mode);
     ::SendMessageW(mode, CB_SHOWDROPDOWN, TRUE, 0);

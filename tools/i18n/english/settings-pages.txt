@@ -1,0 +1,455 @@
+# D70: Settings pages (src/settings/ui). One block per text: en is the exact English text in the code.
+
+en: Dock
+
+en: Top Bar
+
+en: Weather
+
+en: Updates
+
+en: General
+
+en: About
+
+en: Desktop
+
+en: Appearance
+
+en: Welcome
+
+en: Aether Shell Settings
+
+en: Settings
+
+en: Reset defaults...
+
+en: &Apply
+
+en: Liquid
+
+en: Grain
+
+en: From {} to {}
+
+en: px
+
+en: min
+
+en: h
+
+en: This action could not be completed.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+
+en: Size and spacing
+
+en: Icon size
+
+en: {}, scaled with the Windows display scale.
+
+en: Bottom margin
+
+en: Space between the Dock and the bottom of the screen.
+
+en: Minimum side margin
+
+en: Space kept free at the left and right screen edges.
+
+en: Icon spacing
+
+en: Space between neighbouring icons.
+
+en: Glass and motion
+
+en: Glass opacity
+
+en: Lower values show more of the blurred desktop behind the Dock.
+
+en: Hover magnification
+
+en: How much an icon grows under the pointer; 1 turns it off.
+
+en: Behavior
+
+en: Show running applications
+
+en: Open applications that are not pinned appear after the pinned ones.
+
+en: Reserve screen space for the Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+
+en: Automatically hide the Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+
+en: Pinned applications
+
+en: Move &up
+
+en: Move &down
+
+en: &Remove
+
+en: &Add application
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+
+# D71: the Top Bar's presentation
+en: Presentation
+
+en: Floating bar
+
+en: Text on the desktop
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+
+en: Position and glass
+
+en: Top margin
+
+en: Space between the Top Bar and the top of the screen.
+
+en: Lower values show more of the blurred desktop behind the bar.
+
+en: Clock
+
+en: Clock format
+
+en: Follow Windows
+
+en: 12-hour
+
+en: 24-hour
+
+en: Date style
+
+en: Weekday, day and month
+
+en: Short
+
+en: Long
+
+en: Show seconds
+
+en: Show date
+
+en: Status items
+
+en: Show battery
+
+en: Hide battery when absent
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+
+en: Show input language
+
+en: Show network
+
+en: Show audio output
+
+en: Show microphone
+
+en: Show weather when enabled
+
+en: Weather itself is turned on in Weather settings.
+
+en: Show hidden icons button
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+
+en: Reserve screen space above windows
+
+en: Maximized windows stay below the Top Bar.
+
+en: Automatically hide the Top Bar
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+
+en: Use Windows Quick Settings (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+
+en: Forecast
+
+en: Enable weather
+
+en: Off by default: the forecast needs network requests.
+
+en: Temperature
+
+en: Celsius
+
+en: Fahrenheit
+
+en: Refresh interval
+
+en: Location
+
+en: Locate automatically with Windows
+
+en: Uses the Windows location service after you allow it.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+
+en: Use &Windows location
+
+en: Location &settings
+
+en: Choose automatic location or search for a place below.
+
+en: Search for a place
+
+en: Searc&h
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+
+en: Preferences
+
+en: Check for updates automatically
+
+en: Check interval
+
+en: Release channel
+
+en: Prereleases arrive earlier and change more often.
+
+en: Stable
+
+en: Prerelease
+
+en: Show update notifications
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+
+en: The language of the bars, menus, Search, Settings and setup.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+
+en: Language
+
+en: Interface language
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+
+en: Startup
+
+en: Start Aether Shell when I sign in
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+
+en: Motion
+
+en: Reduced motion removes decorative movement everywhere.
+
+en: Reduced
+
+en: Full
+
+en: Keyboard shortcuts
+
+en: Enable global keyboard shortcuts
+
+en: Search shortcut key
+
+en: Dock shortcut key
+
+en: Search shortcut modifiers
+
+en: Dock shortcut modifiers
+
+en: Shortcut status unavailable
+
+en: Diagnostics
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+
+en: Open &log folder
+
+en: &Export diagnostics...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+
+en: Greeting
+
+en: Show the welcome at sign-in and unlock
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+
+en: Greeting language
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+
+en: Your name
+
+en: Name to greet you with
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+
+en: Style
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+
+en: Liquid blur
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+
+en: Liquid blur color
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+
+en: Automatic
+
+en: White
+
+en: Black
+
+en: Accent
+
+en: Blue
+
+en: Violet
+
+en: Pink
+
+en: Red
+
+en: Orange
+
+en: Yellow
+
+en: Green
+
+en: Teal
+
+en: Liquid color strength
+
+en: How much of the chosen color the blur layer takes.
+
+en: Theme
+
+en: Color mode
+
+en: High contrast always takes precedence.
+
+en: Light
+
+en: Dark
+
+en: Accent color
+
+en: Animation duration
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+
+en: Dock icon preset
+
+en: A custom size from Dock settings is kept until you choose a preset.
+
+en: Small - 32 px
+
+en: Medium - 40 px
+
+en: Large - 48 px
+
+en: Keep custom size
+
+en: Show Windows Start in the Dock
+
+en: Show Task View in the Dock
+
+en: Reserve extra space for Dock animations
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+
+en: Weather position
+
+en: Left
+
+en: Right
+
+en: Keyboard indicator
+
+en: Compact
+
+en: Two lines
+
+en: Windows taskbar pins
+
+en: Add newly discovered Windows taskbar pins
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+
+en: Taskbar replacement
+
+en: Replace the Windows taskbar
+
+en: Changing this needs Apply.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+
+en: Pinned applications from Windows
+
+en: &Import Windows taskbar pins
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+
+en: Version {}
+
+en: Created by Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+
+en: &Official project
+
+en: Licence
+
+en: Taskbar replacement changes need Apply.
+
+en: Changes save automatically. Startup needs Apply.
+
+en: Changes save automatically.
+
+en: Press Apply to confirm this change.
+
+# D83: Settings > Language, the language packs; D84: Settings > Appearance, Liquid's smart transparency.
+
+en: Smart transparency
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+
+en: Languages on this PC
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+
+en: Add a language
+
+en: &Download
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+
+# A line of "Languages on this PC": a language's pack size, or one of these.
+en: built in
+
+en: downloading, {}
+
+en: download failed

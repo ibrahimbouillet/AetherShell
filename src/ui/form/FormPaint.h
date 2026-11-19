@@ -63,7 +63,7 @@ void DrawText(ID2D1DeviceContext* context, graphics::TextCache& text, std::wstri
 // `framed` (D45, a maximized window): the body is rounded - outside it stays transparent, so the scene
 // behind the window shows in the corners - with the thin windowRim along its edge.
 void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const graphics::DesignTokens& tokens,
-                     FormMaterial material, const D2D1_RECT_F* body = nullptr, bool framed = false);
+                     FormMaterial material, const D2D1_RECT_F* body = nullptr, bool framed = false, bool smart = false);
 // Corner radius of a form window's own frame (DIPs), matching Windows 11 windows.
 inline constexpr float kWindowFrameRadius = 8.0f;
 // A rounded card with a uniform hairline (`pixel` = one device pixel in DIPs).

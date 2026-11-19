@@ -111,6 +111,58 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D84 — Liquid's smart transparency in the Settings window
+
+Owner, 2026-11-18: in Liquid, the window "detects what is behind it": blur where there is text behind, a little blur
+where there is nothing, fully clear where no text can lie over text. Then, 2026-11-19: "not semi-transparent: blurred",
+with a gradient, Liquid's light kept, and no text from behind readable.
+
+- **What it looks at:** never pixels. Its own content is the rectangles of its visible child controls (labels, buttons,
+  fields, clipped by the scrolling page that holds them) and what Settings paints itself (caption buttons, marks, style
+  previews), widened by 12 px. Behind it: the rectangles of the windows below it in z-order (click-through overlays
+  excepted; their content is never read, so any window counts as possibly holding text) and the desktop's icons with
+  their names (Explorer's `IFolderView`, every 3 s on its own thread).
+- **What it shows:** in cells of 8 px, own content over a window or an icon gets the full blur, own content over the
+  plain desktop picture a light blur (45 %), anything else none. The edges fade over three cells. There is no tint
+  pane, only a light veil (a quarter of the window tint) for the text's contrast. Liquid's sheen and rim stay on the
+  window. The mask is recomputed every 100 ms and after each move, and redrawn only when it changed.
+- **How:** DWM blurs a whole window, and a window's own composition layer covers its GDI content. So the blur lives in
+  a second window: click-through, never activated, without a redirection surface, exactly under the form's client
+  area and directly below it in z-order. It shows the blurred desktop (`HostBackdropBrush`) through a D2D AlphaMask
+  effect whose mask is a small drawing surface, one pixel per cell. The form has no system backdrop. Blur-behind with an
+  empty region makes DWM compose the form's own alpha: without it, a captioned window's extended frame is filled with
+  the frame colour (probe, 2026-11-19).
+- **Where:** Settings, in Liquid, with transparency effects, not maximized, not in high contrast, when the compositor
+  can blur the desktop. Settings > Appearance > "Smart transparency" (`general.liquidSmart`, on by default) turns it
+  off; the ordinary Liquid glass then returns.
+
+FR-044, NFR-002, T68. Evidence: TEST_STATUS S-082.
+
+### D83 — Languages are downloaded from the release; every language Windows offers
+
+Owner, 2026-11-18: the languages Windows offers at download (38), published with Alpha 4 once all are in, no longer
+all shipped: downloaded when a person chooses or adds one, with its size shown, as Windows does. Then: setup and the
+application download every language Windows has, so Aether changes language when Windows does; the automatic language
+comes with setup.
+
+- **41 languages:** the 38 of Windows 11's download page, plus Bengali, Hindi and Urdu (D74). Each one but English is a
+  pack, `AetherShell-language-<code>.json` (about 70 KB), attached to the version's GitHub release. Its size and
+  SHA-256 are compiled into the programs (`src/core/LanguageTable.inc`): a pack is used only if it is exactly this
+  version's. Packs are kept in `<data>\languages`.
+- **Downloads:** only from the official repository's release, redirects only to GitHub's download hosts, the size
+  bounded by the expected one (the updater's rules, `updates::InstallLanguagePack`). English is shown until a pack is
+  ready. A pack that is damaged on disk is downloaded again.
+- **Windows' languages:** setup downloads the packs of the Windows display languages (up to four, best effort, never
+  blocking: offline, setup goes on). At each start, and when Windows' language settings change, the application
+  downloads any that are missing, so "Follow Windows" changes language with Windows.
+- **Settings > Language:** the interface language, its state ("on this PC", "downloading", "could not be downloaded"),
+  the languages on this PC with their sizes, and "Add a language" with each one's size and a Download button.
+- **Setup's own texts** are built into the setup program in every language (`src/core/SetupTexts.inc`).
+- **Translation fallback:** a translated pattern whose number of `{}` fields differs from the English is not used; the
+  English is.
+
+FR-042, NFR-004, T67. Evidence: TEST_STATUS S-082.
+
 ### D82 — Aether starts at sign-in through its own sign-in task (amends D34)
 
 Owner, 2026-11-18: after the measurements below, asked to look into an earlier start, then "Yes, implement it".

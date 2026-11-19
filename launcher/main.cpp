@@ -121,10 +121,9 @@ int WINAPI wWinMain(HINSTANCE,HINSTANCE,PWSTR,int) {
             if(busy)return 3;  // release this image promptly while setup owns the lifecycle lock
             for(const auto& value:arguments)if(value==L"--autostart")return 4;
             // Documented native fallback: the launcher has no renderer and the app did not start.
-            {   // D70/D74: the language chosen in Settings, else the Windows display language
+            {   // D70/D74/D83: the language chosen in Settings, else the Windows display language, from its pack
                 const auto root = aether::platform::DefaultDataRoot();
-                aether::i18n::SetLanguage(root ? aether::i18n::StartupLanguage(*root / L"config" / L"settings.json")
-                                               : aether::i18n::SystemLanguage());
+                if (root) (void)aether::i18n::StartIn(*root / L"config" / L"settings.json", *root / L"languages");
             }
             ::MessageBoxW(nullptr,aether::i18n::Tr(L"Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.").data(),L"Aether Shell",MB_OK|MB_ICONERROR);return 4;
         }

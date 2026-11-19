@@ -52,7 +52,7 @@ aether_declare_module(app           src/app
     applications search settings updates install dock topbar search_ui settings_ui weather_ui controlcenter welcome)
 aether_declare_module(launcher      launcher              core diagnostics platform updates install)
 aether_declare_module(updater       updater               core diagnostics platform graphics ui_form updates install)
-aether_declare_module(installer     installer             core diagnostics platform graphics ui_form updates install settings app launcher updater)
+aether_declare_module(installer     installer             core diagnostics platform graphics ui_form net updates install settings app launcher updater)
 
 function(aether_resolve_modules out_var)
     if(AETHER_MODULES STREQUAL "" OR AETHER_MODULES STREQUAL "all")

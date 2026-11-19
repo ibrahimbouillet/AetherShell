@@ -1,0 +1,2494 @@
+# Latvian (lv): Latviešu. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Lai iespējotu automātiskos laikapstākļus, izvēlieties Windows atrašanās vietu.
+
+en: Windows taskbar visible
+tr: Windows uzdevumjosla ir redzama
+
+en: Connected to {}
+tr: Izveidots savienojums ar {}
+
+en: {} is out of range
+tr: {} ir ārpus sasniedzamības zonas
+
+en: Connecting to {} took too long
+tr: Savienojuma izveide ar {} ilga pārāk ilgi
+
+en: Use Windows to join {}
+tr: Lai pievienotos {}, izmantojiet Windows
+
+en: Windows did not allow this connection
+tr: Windows neatļāva šo savienojumu
+
+en: Could not connect to {}
+tr: Nevarēja izveidot savienojumu ar {}
+
+en: Connect to {}
+tr: Izveidot savienojumu ar {}
+
+en: That password was not accepted. Check it and try again.
+tr: Šī parole netika pieņemta. Pārbaudiet to un mēģiniet vēlreiz.
+
+en: Enter this network's password.
+tr: Ievadiet šī tīkla paroli.
+
+en: &Connect
+tr: &Izveidot savienojumu
+
+en: Windows Settings could not be opened
+tr: Nevarēja atvērt Windows iestatījumus
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Nevarēja rezervēt vietu Dock; tiek atjaunota Windows uzdevumjosla
+
+en: Replacement unavailable: recovery observer could not start
+tr: Aizstāšana nav pieejama: nevarēja startēt atkopšanas novērotāju
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows uzdevumjosla ir atjaunota. Nevarēja rezervēt vietu Dock; lai mēģinātu vēlreiz, izslēdziet un atkal ieslēdziet aizstāšanu.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Atkopšanas novērošana nav pieejama; tiek atjaunota Windows uzdevumjosla
+
+en: Windows notifications could not be opened
+tr: Nevarēja atvērt Windows paziņojumus
+
+en: The Windows calendar could not be opened
+tr: Nevarēja atvērt Windows kalendāru
+
+en: Windows did not show its hidden icons
+tr: Windows nerādīja savas paslēptās ikonas
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automātiskā atrašanās vietas atsvaidzināšana nav pieejama; mēģiniet vēlreiz laikapstākļu iestatījumos.
+
+en: Windows location
+tr: Windows atrašanās vieta
+
+en: Reading approximate Windows location…
+tr: Tiek nolasīta aptuvenā Windows atrašanās vieta…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automātiskie laikapstākļi seko aptuvenajai Windows atrašanās vietai.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Piekļuve Windows atrašanās vietai ir bloķēta. Laikapstākļi nav pieejami.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows nevarēja nodrošināt pašreizējo atrašanās vietu. Laikapstākļi nav pieejami.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Atrašanās vietas process nav pieejams. Laikapstākļi nav pieejami.
+
+en: Waiting for Windows location permission…
+tr: Gaida Windows atrašanās vietas atļauju…
+
+en: The automatic weather choice could not be saved.
+tr: Automātisko laikapstākļu izvēli nevarēja saglabāt.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Piekļuve Windows atrašanās vietai nav pieejama vai tika liegta. Laikapstākļi nav pieejami.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows atrašanās vieta nevarēja pieprasīt atļauju. Pārskatiet Windows atrašanās vietas iestatījumus.
+
+en: Status worker unavailable
+tr: Statusa process nav pieejams
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows nevarēja pabeigt šo darbību. Pārskatiet tās iestatījumus.
+
+en: Reading Windows status; try the action again shortly
+tr: Tiek nolasīts Windows statuss; drīz mēģiniet darbību vēlreiz
+
+en: Could not disconnect
+tr: Nevarēja atvienot
+
+en: The Windows accessibility feature could not be started
+tr: Nevarēja startēt Windows pieejamības līdzekli
+
+en: Windows could not change the audio output
+tr: Windows nevarēja mainīt audio izvadi
+
+en: The Windows control could not be opened
+tr: Nevarēja atvērt Windows vadīklu
+
+en: Keyboard shortcuts disabled
+tr: Īsinājumtaustiņi ir atspējoti
+
+en: Both keyboard shortcuts registered
+tr: Abi īsinājumtaustiņi ir reģistrēti
+
+en: A keyboard shortcut is already in use by another application
+tr: Kāds īsinājumtaustiņš jau tiek izmantots citā programmā
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Nevarēja pieprasīt Windows ātros iestatījumus. Lai izmantotu Aether vadīklas, augšējās joslas iestatījumos notīriet atzīmi “Izmantot Windows ātros iestatījumus”.
+
+en: Windows Start could not be opened
+tr: Nevarēja atvērt Windows izvēlni Sākt
+
+en: Windows Task View could not be opened
+tr: Nevarēja atvērt Windows uzdevumu skatu
+
+en: Windows keyboard layout switching was unavailable
+tr: Windows tastatūras izkārtojuma pārslēgšana nebija pieejama
+
+en: Windows voice typing could not be opened
+tr: Nevarēja atvērt Windows balss rakstīšanu
+
+en: Windows taskbar could not be revealed
+tr: Nevarēja parādīt Windows uzdevumjoslu
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Uzdevumjoslas aizstāšanu nevarēja atsākt; Windows uzdevumjosla joprojām ir pieejama
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Windows uzdevumjoslas aizstāšana šajā sesijā nav pieejama
+
+en: Windows pin access is unavailable in this isolated session
+tr: Piekļuve Windows piespraudumiem šajā izolētajā sesijā nav pieejama
+
+en: Windows pinned applications could not be read
+tr: Nevarēja nolasīt Windows piespraustās programmas
+
+en: Settings changed during pin import. Try import again.
+tr: Piespraudumu importēšanas laikā mainījās iestatījumi. Mēģiniet importēt vēlreiz.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Saglabātas papildu piespraustās programmas: {}. Daži Windows piespraudumi var palikt nepieejami.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Piespraudumi mainīti atmiņā; saglabāšana neizdevās. Lai mēģinātu vēlreiz, iestatījumos noklikšķiniet uz Lietot.
+
+en: Pins updated in memory; saving...
+tr: Piespraudumi atjaunināti atmiņā; notiek saglabāšana...
+
+en: Imported pins could not be applied
+tr: Importētos piespraudumus nevarēja lietot
+
+en: Pin import is unavailable while closing
+tr: Piespraudumu importēšana aizvēršanas laikā nav pieejama
+
+en: Settings could not be saved
+tr: Iestatījumus nevarēja saglabāt
+
+en: Quit without saving the latest changes?
+tr: Vai iziet, nesaglabājot jaunākās izmaiņas?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Jūsu iepriekšējais iestatījumu fails ir saglabāts. Atstājiet Aether Shell atvērtu, lai mēģinātu saglabāt vēlreiz.
+
+en: &Quit without saving
+tr: &Iziet bez saglabāšanas
+
+en: &Keep Aether Shell open
+tr: &Atstāt Aether Shell atvērtu
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Eksportēt pamata diagnostiku — programmas versiju un Windows būvējumu, bez žurnāliem un personas datiem
+
+en: Diagnostics exported.
+tr: Diagnostika ir eksportēta.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnostiku nevarēja saglabāt izvēlētajā failā.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Iestatījumus nevarēja droši nolasīt. Esošais fails ir saglabāts.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell nevarēja startēt savas darbvirsmas virsmas.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Gaida Windows uzdevumjoslas atjaunošanu. Mēģiniet vēlreiz vai aizveriet Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows uzdevumjosla ir īslaicīgi parādīta.
+
+en: Windows taskbar restored.
+tr: Windows uzdevumjosla ir atjaunota.
+
+en: Windows taskbar replacement is active.
+tr: Windows uzdevumjoslas aizstāšana ir aktīva.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows uzdevumjosla joprojām ir pieejama. Aizstāšana drīz tiks mēģināta vēlreiz.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows uzdevumjosla joprojām ir pieejama. Lai mēģinātu vēlreiz, izslēdziet un atkal ieslēdziet aizstāšanu.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows uzdevumjosla ir atjaunota. Aizstāšana drīz atkal izveidos savienojumu.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows uzdevumjosla ir atjaunota. Lai mēģinātu vēlreiz, izslēdziet un atkal ieslēdziet aizstāšanu.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Uzdevumjoslas aizstāšana ir apturēta. Windows uzdevumjosla ir atjaunota.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Uzdevumjoslas aizstāšana ir apturēta. Windows uzdevumjoslas atjaunošanu nevarēja apstiprināt.
+
+en: Activating taskbar replacement...
+tr: Tiek aktivizēta uzdevumjoslas aizstāšana...
+
+en: Restoring Windows taskbar...
+tr: Tiek atjaunota Windows uzdevumjosla...
+
+en: Reconnecting taskbar replacement...
+tr: Tiek atkārtoti savienota uzdevumjoslas aizstāšana...
+
+en: Showing the Windows taskbar temporarily...
+tr: Īslaicīgi tiek rādīta Windows uzdevumjosla...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell nevarēja atjaunot Windows uzdevumjoslu.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Restartējiet Windows Explorer uzdevumu pārvaldniekā (Ctrl+Shift+Esc) vai izrakstieties un pierakstieties vēlreiz.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows uzdevumjosla ir atjaunota tās saglabātajā stāvoklī.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Saglabāts uzdevumjoslas stāvoklis netika atrasts. Windows uzdevumjosla ir padarīta redzama; tās automātiskās paslēpšanas iestatījums netika mainīts.
+
+en: There was nothing to restore.
+tr: Nebija nekā, ko atjaunot.
+
+en: Taskbar replacement is turned off.
+tr: Uzdevumjoslas aizstāšana ir izslēgta.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Uzdevumjoslas aizstāšanu nevarēja izslēgt automātiski. Izslēdziet to sadaļā Aether Shell iestatījumi > Darbvirsma.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Neatpazīta vai nederīga Aether Shell komandrinda.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell nevarēja izveidot savas lokālo datu mapes.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell apstājās neparedzētas kļūdas dēļ.
+
+## search-names
+
+en: Disk Management
+tr: Disku pārvaldība
+
+en: Local Users and Groups
+tr: Lokālie lietotāji un grupas
+
+en: Local Group Policy Editor
+tr: Vietējās grupas politikas redaktors
+
+en: Manage User Certificates
+tr: Pārvaldīt lietotāja sertifikātus
+
+en: Manage Computer Certificates
+tr: Pārvaldīt datora sertifikātus
+
+en: Shared Folders
+tr: Koplietojamās mapes
+
+en: TPM Management
+tr: TPM pārvaldība
+
+en: Network Connections
+tr: Tīkla savienojumi
+
+en: System Properties
+tr: Sistēmas rekvizīti
+
+en: About Windows
+tr: Par Windows
+
+en: DirectX Diagnostic Tool
+tr: DirectX diagnostikas rīks
+
+en: Windows Features
+tr: Windows līdzekļi
+
+en: System Restore
+tr: Sistēmas atjaunošana
+
+en: Advanced System Settings
+tr: Sistēmas papildu iestatījumi
+
+en: Volume Mixer
+tr: Skaļuma mikseris
+
+en: Microsoft Management Console
+tr: Microsoft pārvaldības konsole
+
+en: User Accounts (Advanced)
+tr: Lietotāju konti (papildu)
+
+en: Display settings
+tr: Displeja iestatījumi
+
+en: Night light settings
+tr: Nakts gaismas iestatījumi
+
+en: Graphics settings
+tr: Grafikas iestatījumi
+
+en: Sound settings
+tr: Skaņas iestatījumi
+
+en: Notification settings
+tr: Paziņojumu iestatījumi
+
+en: Power & battery settings
+tr: Barošanas un akumulatora iestatījumi
+
+en: Energy saver settings
+tr: Enerģijas taupītāja iestatījumi
+
+en: Storage settings
+tr: Krātuves iestatījumi
+
+en: Multitasking settings
+tr: Vairākuzdevumu režīma iestatījumi
+
+en: Clipboard settings
+tr: Starpliktuves iestatījumi
+
+en: Remote Desktop settings
+tr: Attālās darbvirsmas iestatījumi
+
+en: About your PC
+tr: Par
+
+en: Bluetooth & devices settings
+tr: Bluetooth un ierīču iestatījumi
+
+en: Printers & scanners settings
+tr: Printeru un skeneru iestatījumi
+
+en: Mouse settings
+tr: Peles iestatījumi
+
+en: Touchpad settings
+tr: Skārienpaliktņa iestatījumi
+
+en: Network & internet settings
+tr: Tīkla un interneta iestatījumi
+
+en: Wi-Fi settings
+tr: Wi-Fi iestatījumi
+
+en: VPN settings
+tr: VPN iestatījumi
+
+en: Proxy settings
+tr: Starpniekservera iestatījumi
+
+en: Airplane mode settings
+tr: Lidojuma režīma iestatījumi
+
+en: Mobile hotspot settings
+tr: Mobilā tīklāja iestatījumi
+
+en: Background settings
+tr: Fona iestatījumi
+
+en: Color settings
+tr: Krāsu iestatījumi
+
+en: Theme settings
+tr: Dizainu iestatījumi
+
+en: Lock screen settings
+tr: Bloķēšanas ekrāna iestatījumi
+
+en: Taskbar settings
+tr: Uzdevumjoslas iestatījumi
+
+en: Font settings
+tr: Fontu iestatījumi
+
+en: Installed apps
+tr: Instalētās programmas
+
+en: Default apps settings
+tr: Noklusējuma programmu iestatījumi
+
+en: Startup apps settings
+tr: Startēšanas programmu iestatījumi
+
+en: Account info
+tr: Jūsu informācija
+
+en: Sign-in options
+tr: Pierakstīšanās opcijas
+
+en: Other users settings
+tr: Citu lietotāju iestatījumi
+
+en: Date & time settings
+tr: Datuma un laika iestatījumi
+
+en: Language & region settings
+tr: Valodas un reģiona iestatījumi
+
+en: Typing settings
+tr: Rakstīšanas iestatījumi
+
+en: Accessibility settings
+tr: Pieejamības iestatījumi
+
+en: Privacy & security settings
+tr: Konfidencialitātes un drošības iestatījumi
+
+en: Location settings
+tr: Atrašanās vietas iestatījumi
+
+en: Windows Update settings
+tr: Windows Update iestatījumi
+
+en: Recovery settings
+tr: Atkopšanas iestatījumi
+
+en: Activation settings
+tr: Aktivizācijas iestatījumi
+
+en: For developers settings
+tr: Iestatījumi izstrādātājiem
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Nevarēja sazināties ar GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub tikko neatbildēja uz pieprasījumu.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Laidiens neizturēja verifikāciju, tāpēc nekas netika instalēts.
+
+en: There is not enough free disk space.
+tr: Diskā nepietiek brīvas vietas.
+
+en: Windows refused access to the update files.
+tr: Windows liedza piekļuvi atjauninājuma failiem.
+
+en: {} bytes
+tr: {} baiti
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Statuss
+
+en: Check &now
+tr: Pārbaudīt &tūlīt
+
+en: Download and install
+tr: Lejupielādēt un instalēt
+
+en: &Later
+tr: &Vēlāk
+
+en: S&kip this version
+tr: I&zlaist šo versiju
+
+en: &Release details
+tr: &Laidiena informācija
+
+en: Disable &notifications
+tr: Atspējot &paziņojumus
+
+en: Release notes
+tr: Laidiena piezīmes
+
+en: the new version
+tr: jaunā versija
+
+en: Installed: {}.
+tr: Instalēta: {}.
+
+en: Automatic update checks are off
+tr: Automātiskās atjauninājumu pārbaudes ir izslēgtas
+
+en: Check now looks for a newer release once.
+tr: “Pārbaudīt tūlīt” vienreiz meklē jaunāku laidienu.
+
+en: Last checked {}
+tr: Pēdējoreiz pārbaudīts: {}
+
+en: Not checked yet
+tr: Vēl nav pārbaudīts
+
+en: Checking for updates...
+tr: Notiek atjauninājumu meklēšana...
+
+en: Aether Shell is up to date
+tr: Jums ir jaunākā Aether Shell versija
+
+en: Latest published release: {}.
+tr: Jaunākais publicētais laidiens: {}.
+
+en: Version {} is available
+tr: Ir pieejama versija {}
+
+en: Download size: {}.
+tr: Lejupielādes lielums: {}.
+
+en: Downloading version {}...
+tr: Notiek versijas {} lejupielāde...
+
+en: Received {} of {} ({}%).
+tr: Saņemts {} no {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Saņemts {}; kopējais lielums nav zināms.
+
+en: Version {} is ready to install
+tr: Versija {} ir gatava instalēšanai
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Pārbaudīts ar parakstīto laidiena manifestu un SHA-256.
+
+en: The update could not be completed
+tr: Atjauninājumu nevarēja pabeigt
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Pagaidām tas tiek instalēts manuāli: atveriet laidiena informāciju, pēc tam lejupielādējiet un palaidiet tā iestatīšanas programmu.
+
+en: Failure: {}.
+tr: Kļūme: {}.
+
+en: Choose Retry Download to try again.
+tr: Lai mēģinātu vēlreiz, izvēlieties “Mēģināt lejupielādēt vēlreiz”.
+
+en: Use Check now to try again.
+tr: Lai mēģinātu vēlreiz, izmantojiet “Pārbaudīt tūlīt”.
+
+en: Next automatic check: {}.
+tr: Nākamā automātiskā pārbaude: {}.
+
+en: &Install update
+tr: &Instalēt atjauninājumu
+
+en: Retry &Download
+tr: Mēģināt &lejupielādēt vēlreiz
+
+en: &Download and install
+tr: &Lejupielādēt un instalēt
+
+en: Windows' startup state could not be read in this session.
+tr: Šajā sesijā nevarēja nolasīt Windows startēšanas stāvokli.
+
+en: Windows will start it at your next sign-in.
+tr: Windows to startēs nākamajā pierakstīšanās reizē.
+
+en: Right now it will not start at sign-in.
+tr: Pašlaik tas netiks startēts pierakstīšanās brīdī.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Tas ir izslēgts uzdevumu pārvaldniekā vai Windows iestatījumos, kas nosaka, līdz tas tur tiek ieslēgts.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows startētu vēl vienu Aether Shell kopiju.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows ziņo par startēšanas stāvokli, ko šī versija nevar nolasīt.
+
+en: The close action could not be completed.
+tr: Aizvēršanas darbību nevarēja pabeigt.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Pirms saglabāšanas ievadiet pilnu skaitli; sarkanā krāsā atzīmētajā laukā tāda nav.
+
+en: Settings could not be validated.
+tr: Iestatījumus nevarēja validēt.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Startēšana pierakstoties netika mainīta, jo iestatījumus nevarēja saglabāt.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Iestatījumus nevarēja saglabāt, un Windows startēšanu pierakstoties nevarēja atjaunot. Lai mēģinātu vēlreiz, vēlreiz noklikšķiniet uz Lietot.
+
+en: Settings saved.
+tr: Iestatījumi ir saglabāti.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Iestatījumi mainīti atmiņā; saglabāšana neizdevās. Lai mēģinātu vēlreiz, vēlreiz noklikšķiniet uz Lietot.
+
+en: Settings could not be applied.
+tr: Iestatījumus nevarēja lietot.
+
+en: Some values were corrected to their supported range.
+tr: Dažas vērtības tika labotas atbilstoši atbalstītajam diapazonam.
+
+en: Startup registration is unavailable in this session.
+tr: Startēšanas reģistrācija šajā sesijā nav pieejama.
+
+en: Changing startup registration...
+tr: Tiek mainīta startēšanas reģistrācija...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows nemainīja startēšanas reģistrāciju. Pārbaudiet uzdevumu pārvaldnieka startēšanas iestatījumu.
+
+en: Startup registration could not be changed.
+tr: Startēšanas reģistrāciju nevarēja mainīt.
+
+en: Defaults saved; startup is disabled.
+tr: Noklusējuma vērtības saglabātas; startēšana ir atspējota.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Noklusējuma vērtības lietotas; saglabāšana neizdevās. Lai mēģinātu vēlreiz, vēlreiz noklikšķiniet uz Lietot.
+
+en: Defaults could not be applied.
+tr: Noklusējuma vērtības nevarēja lietot.
+
+en: Startup was not disabled; settings were kept.
+tr: Startēšana netika atspējota; iestatījumi tika saglabāti.
+
+en: Location search is unavailable.
+tr: Atrašanās vietu meklēšana nav pieejama.
+
+en: Searching Open-Meteo locations...
+tr: Notiek Open-Meteo atrašanās vietu meklēšana...
+
+en: Location search failed. Check your connection and try again.
+tr: Atrašanās vietas meklēšana neizdevās. Pārbaudiet savienojumu un mēģiniet vēlreiz.
+
+en: No place matched that search.
+tr: Šim meklējumam neatbilda neviena vieta.
+
+en: Choose a location to save it.
+tr: Izvēlieties atrašanās vietu, lai to saglabātu.
+
+en: Reset all settings?
+tr: Vai atiestatīt visus iestatījumus?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Preferences un piespraustās programmas atgriežas pie noklusējuma vērtībām, un startēšana pierakstoties tiek izslēgta.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Jūsu Windows uzdevumjoslas izvēle tiek saglabāta. Tiek saglabāta arī pašreizējā iestatījumu faila rezerves kopija.
+
+en: &Reset
+tr: &Atiestatīt
+
+en: Cancel
+tr: Atcelt
+
+en: Pinned applications saved.
+tr: Piespraustās programmas ir saglabātas.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Piespraudumi mainīti atmiņā; saglabāšana neizdevās. Lai mēģinātu vēlreiz, vēlreiz noklikšķiniet uz Lietot.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Noklusējuma vērtības nevarēja atjaunot, jo startēšanas reģistrācija nav pieejama.
+
+en: Pinned application could not be added.
+tr: Piesprausto programmu nevarēja pievienot.
+
+en: Choose an application to add first.
+tr: Vispirms izvēlieties pievienojamo programmu.
+
+en: Pinned applications could not be changed.
+tr: Piespraustās programmas nevarēja mainīt.
+
+en: Choose a pinned application first.
+tr: Vispirms izvēlieties piesprausto programmu.
+
+en: Desktop status is unavailable in this session.
+tr: Darbvirsmas statuss šajā sesijā nav pieejams.
+
+en: Desktop status is unavailable.
+tr: Darbvirsmas statuss nav pieejams.
+
+en: Password
+tr: Parole
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Notiek valodas {} lejupielāde no GitHub ({}). Kamēr tā nav gatava, tiek rādīta angļu valoda.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Valodu {} nevarēja lejupielādēt. Kamēr tā nav lejupielādēta, tiek rādīta angļu valoda; lai mēģinātu vēlreiz, tālāk izvēlieties “Lejupielādēt”.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Valodas {} šajā datorā vēl nav. Kamēr tā nav lejupielādēta, tiek rādīta angļu valoda.
+
+en: {} is on this PC.
+tr: Valoda {} ir šajā datorā.
+
+en: Every language is on this PC.
+tr: Visas valodas ir šajā datorā.
+
+en: Choose a language to download first.
+tr: Vispirms izvēlieties valodu, ko lejupielādēt.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Augšējā josla
+
+en: Weather
+tr: Laikapstākļi
+
+en: Updates
+tr: Atjauninājumi
+
+en: General
+tr: Vispārīgi
+
+en: About
+tr: Par
+
+en: Desktop
+tr: Darbvirsma
+
+en: Appearance
+tr: Izskats
+
+en: Welcome
+tr: Sveiciens
+
+en: Aether Shell Settings
+tr: Aether Shell iestatījumi
+
+en: Settings
+tr: Iestatījumi
+
+en: Reset defaults...
+tr: Atiestatīt noklusējumus...
+
+en: &Apply
+tr: &Lietot
+
+en: Liquid
+tr: Šķidrais
+
+en: Grain
+tr: Graudainais
+
+en: From {} to {}
+tr: No {} līdz {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Šo darbību nevarēja pabeigt.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Lielums, atstarpes, kustība un Dock piespraustās programmas.
+
+en: Size and spacing
+tr: Lielums un atstarpes
+
+en: Icon size
+tr: Ikonu lielums
+
+en: {}, scaled with the Windows display scale.
+tr: {}, mērogots atbilstoši Windows displeja mērogam.
+
+en: Bottom margin
+tr: Apakšējā mala
+
+en: Space between the Dock and the bottom of the screen.
+tr: Atstarpe starp Dock un ekrāna apakšu.
+
+en: Minimum side margin
+tr: Minimālā sānu mala
+
+en: Space kept free at the left and right screen edges.
+tr: Brīvā vieta ekrāna kreisajā un labajā malā.
+
+en: Icon spacing
+tr: Ikonu atstarpes
+
+en: Space between neighbouring icons.
+tr: Atstarpe starp blakus esošām ikonām.
+
+en: Glass and motion
+tr: Stikls un kustība
+
+en: Glass opacity
+tr: Stikla necaurredzamība
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Mazākas vērtības parāda vairāk aizmiglotās darbvirsmas aiz Dock.
+
+en: Hover magnification
+tr: Palielinājums, novietojot kursoru
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Cik daudz ikona palielinās zem rādītāja; 1 to izslēdz.
+
+en: Behavior
+tr: Darbība
+
+en: Show running applications
+tr: Rādīt palaistās programmas
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Atvērtās programmas, kas nav piespraustas, tiek rādītas aiz piespraustajām.
+
+en: Reserve screen space for the Dock
+tr: Rezervēt ekrāna vietu Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maksimizētie logi paliek virs Dock, nevis zem tā.
+
+en: Automatically hide the Dock
+tr: Automātiski paslēpt Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Paslēpjas, kad to aizsedz programmas logs; lai to parādītu, pārvietojiet rādītāju uz ekrāna apakšējo malu. Tas paliek darbvirsmā, un logi iegūst visu ekrāna augstumu.
+
+en: Pinned applications
+tr: Piespraustās programmas
+
+en: Move &up
+tr: Pārvietot &augšup
+
+en: Move &down
+tr: Pārvietot &lejup
+
+en: &Remove
+tr: &Noņemt
+
+en: &Add application
+tr: &Pievienot programmu
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Piespraudumi saglabā savu identitāti un palaišanas iestatījumus. Noņemot piespraudumu, automātiskā Windows uzdevumjoslas sinhronizācija to vairs nepievienos atkārtoti.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Novietojums, pulkstenis un statusa vienumi, kas tiek rādīti augšējā statusa joslā.
+
+en: Presentation
+tr: Noformējums
+
+en: Floating bar
+tr: Peldoša josla
+
+en: Text on the desktop
+tr: Teksts uz darbvirsmas
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Peldoša josla: stikla josla zem ekrāna augšmalas. Teksts uz darbvirsmas: bez joslas, tie paši vienumi uzrakstīti pašā ekrāna augšā, tieši virs darbvirsmas attēla; šī sloksne paliek brīva no logiem, un augšējā mala un stikla necaurredzamība netiek lietotas. Ar automātisku paslēpšanu teksts atgriežas uz stikla sloksnes, kamēr zem tā atrodas logs.
+
+en: Position and glass
+tr: Novietojums un stikls
+
+en: Top margin
+tr: Augšējā mala
+
+en: Space between the Top Bar and the top of the screen.
+tr: Atstarpe starp augšējo joslu un ekrāna augšu.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Mazākas vērtības parāda vairāk aizmiglotās darbvirsmas aiz joslas.
+
+en: Clock
+tr: Pulkstenis
+
+en: Clock format
+tr: Pulksteņa formāts
+
+en: Follow Windows
+tr: Sekot Windows
+
+en: 12-hour
+tr: 12 stundu
+
+en: 24-hour
+tr: 24 stundu
+
+en: Date style
+tr: Datuma stils
+
+en: Weekday, day and month
+tr: Nedēļas diena, diena un mēnesis
+
+en: Short
+tr: Īss
+
+en: Long
+tr: Garš
+
+en: Show seconds
+tr: Rādīt sekundes
+
+en: Show date
+tr: Rādīt datumu
+
+en: Status items
+tr: Statusa vienumi
+
+en: Show battery
+tr: Rādīt akumulatoru
+
+en: Hide battery when absent
+tr: Paslēpt akumulatoru, ja tā nav
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Galddatori bez akumulatora nerāda neko, nevis nezināmu akumulatoru.
+
+en: Show input language
+tr: Rādīt ievades valodu
+
+en: Show network
+tr: Rādīt tīklu
+
+en: Show audio output
+tr: Rādīt audio izvadi
+
+en: Show microphone
+tr: Rādīt mikrofonu
+
+en: Show weather when enabled
+tr: Rādīt laikapstākļus, ja iespējoti
+
+en: Weather itself is turned on in Weather settings.
+tr: Pašus laikapstākļus ieslēdz laikapstākļu iestatījumos.
+
+en: Show hidden icons button
+tr: Rādīt paslēpto ikonu pogu
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Neliela bultiņa, kas atver Windows paslēptās paziņojumu apgabala ikonas.
+
+en: Reserve screen space above windows
+tr: Rezervēt ekrāna vietu virs logiem
+
+en: Maximized windows stay below the Top Bar.
+tr: Maksimizētie logi paliek zem augšējās joslas.
+
+en: Automatically hide the Top Bar
+tr: Automātiski paslēpt augšējo joslu
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Paslēpjas, kad to aizsedz programmas logs; lai to parādītu, pārvietojiet rādītāju uz ekrāna augšējo malu. Tā paliek darbvirsmā.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Izmantot Windows ātros iestatījumus (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Izslēgts: Aether ātrās vadīklas tiek atvērtas zem augšējās joslas. Ieslēgts: Windows panelis tiek atvērts ekrāna apakšā.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Neobligāta laika prognoze augšējā joslā, ko nodrošina Open-Meteo.
+
+en: Forecast
+tr: Prognoze
+
+en: Enable weather
+tr: Iespējot laikapstākļus
+
+en: Off by default: the forecast needs network requests.
+tr: Pēc noklusējuma izslēgts: prognozei nepieciešami tīkla pieprasījumi.
+
+en: Temperature
+tr: Temperatūra
+
+en: Celsius
+tr: Celsija grādi
+
+en: Fahrenheit
+tr: Fārenheita grādi
+
+en: Refresh interval
+tr: Atsvaidzināšanas intervāls
+
+en: Location
+tr: Atrašanās vieta
+
+en: Locate automatically with Windows
+tr: Noteikt atrašanās vietu automātiski ar Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Izmanto Windows atrašanās vietas pakalpojumu pēc tam, kad to atļaujat.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows lūdz atļauju izmantot atrašanās vietu. Jūsu koordinātas tiek nosūtītas uz Open-Meteo.com tikai prognozes iegūšanai; atrašanās vietas atslēga tiek saglabāta lokālajā kešatmiņā. Ja atrašanās vieta ir bloķēta, laikapstākļi nav pieejami.
+
+en: Use &Windows location
+tr: Izmantot &Windows atrašanās vietu
+
+en: Location &settings
+tr: Atrašanās vietas &iestatījumi
+
+en: Choose automatic location or search for a place below.
+tr: Izvēlieties automātisku atrašanās vietu vai meklējiet vietu tālāk.
+
+en: Search for a place
+tr: Meklēt vietu
+
+en: Searc&h
+tr: &Meklēt
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Laikapstākļu dati no Open-Meteo.com (CC BY 4.0). Manuālā meklēšana nosūta tikai jūsu ievadīto tekstu.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Parakstīti laidieni no oficiālās GitHub krātuves, pārbaudīti pirms instalēšanas.
+
+en: Preferences
+tr: Preferences
+
+en: Check for updates automatically
+tr: Automātiski meklēt atjauninājumus
+
+en: Check interval
+tr: Pārbaudes intervāls
+
+en: Release channel
+tr: Laidienu kanāls
+
+en: Prereleases arrive earlier and change more often.
+tr: Pirmslaidieni tiek saņemti agrāk un mainās biežāk.
+
+en: Stable
+tr: Stabils
+
+en: Prerelease
+tr: Pirmslaidiens
+
+en: Show update notifications
+tr: Rādīt atjauninājumu paziņojumus
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Startēšana, kustība, īsinājumtaustiņi un diagnostika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Joslu, izvēlņu, meklēšanas, iestatījumu un iestatīšanas programmas valoda.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Nosaukumi, kas pieder jums vai citām programmām (programmas, faili, Wi-Fi tīkli), nekad netiek tulkoti. Ja ir izvēlēta valoda, augšējā josla raksta datumu tajā; “Sekot Windows” saglabā jūsu Windows reģionālo formātu.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Ar roku rakstītais sveiciens raksta latīņu burtiem: tas sveic franču, angļu vai spāņu valodā. Tā valodu izvēlieties sadaļā Sveiciens.
+
+en: Language
+tr: Valoda
+
+en: Interface language
+tr: Saskarnes valoda
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: “Sekot Windows” izmanto pirmo no jūsu Windows displeja valodām, kas ir viena no šīm, pretējā gadījumā — angļu valodu.
+
+en: Startup
+tr: Startēšana
+
+en: Start Aether Shell when I sign in
+tr: Startēt Aether Shell, kad pierakstos
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Lai to mainītu, jānoklikšķina uz Lietot. To var izslēgt arī uzdevumu pārvaldniekā.
+
+en: Motion
+tr: Kustība
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Samazināta kustība visur noņem dekoratīvo kustību.
+
+en: Reduced
+tr: Samazināta
+
+en: Full
+tr: Pilna
+
+en: Keyboard shortcuts
+tr: Īsinājumtaustiņi
+
+en: Enable global keyboard shortcuts
+tr: Iespējot globālos īsinājumtaustiņus
+
+en: Search shortcut key
+tr: Meklēšanas īsinājumtaustiņš
+
+en: Dock shortcut key
+tr: Dock īsinājumtaustiņš
+
+en: Search shortcut modifiers
+tr: Meklēšanas īsinājumtaustiņa modifikatori
+
+en: Dock shortcut modifiers
+tr: Dock īsinājumtaustiņa modifikatori
+
+en: Shortcut status unavailable
+tr: Īsinājumtaustiņu statuss nav pieejams
+
+en: Diagnostics
+tr: Diagnostika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Žurnālu mapē ir šī datora Aether Shell žurnāli. Diagnostikas eksportēšana saglabā tikai programmas versiju un Windows būvējumu — bez žurnāliem un personas datiem.
+
+en: Open &log folder
+tr: Atvērt žurnālu &mapi
+
+en: &Export diagnostics...
+tr: &Eksportēt diagnostiku...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Īss ar roku rakstīts sveiciens jūsu darbvirsmā pēc pierakstīšanās vai datora atbloķēšanas.
+
+en: Greeting
+tr: Sveiciens
+
+en: Show the welcome at sign-in and unlock
+tr: Rādīt sveicienu pierakstoties un atbloķējot
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Tas parādās pēc tam, kad Windows jūs ir pierakstījusi, kamēr Aether Shell sagatavojas. Lai to izlaistu, pieskarieties, noklikšķiniet vai nospiediet taustiņu Esc.
+
+en: Greeting language
+tr: Sveiciena valoda
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut franču valodā, Hello angļu valodā, Hola spāņu valodā. Pildspalva raksta latīņu burtiem: visās citās valodās tā sveic angļu valodā.
+
+en: Your name
+tr: Jūsu vārds
+
+en: Name to greet you with
+tr: Vārds, ar kuru jūs sveikt
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Neobligāti, piemēram, vārds. Tas paliek šajā datorā jūsu Aether Shell iestatījumos un nekad netiek nekur nosūtīts vai ierakstīts žurnālā. Lai to noņemtu, notīriet lauku.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Krāsu režīms, izcēluma krāsa, kustības ātrums un Dock un augšējās joslas izskats.
+
+en: Style
+tr: Stils
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Šķidrais: stikls slāņos virs tā, kas atrodas aizmugurē, aizmiglojuma slānis, šķidruma gaisma, pēc tam ikonas un teksts, kas paliek salasāmi gan uz gaišām, gan tumšām lapām. Graudainais: matēts stikls, aizmiglots un daļēji caurspīdīgs, ar smalku graudainumu.
+
+en: Liquid blur
+tr: Šķidrā stila aizmiglojums
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Cik lielu daļu no aizmugurē esošā aizsedz aizmiglojuma slānis zem Šķidrā stila stikla: 100% aizmiglo visu. Mazākas vērtības parāda lapu asāk, un tad teksts joslās uz raibas lapas var būt grūtāk salasāms.
+
+en: Liquid blur color
+tr: Šķidrā stila aizmiglojuma krāsa
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Iestatījums “Automātiska” saglabā paša stikla krāsas. Teksts un ikonas paliek salasāmi neatkarīgi no krāsas.
+
+en: Automatic
+tr: Automātiska
+
+en: White
+tr: Balta
+
+en: Black
+tr: Melna
+
+en: Accent
+tr: Izcēluma krāsa
+
+en: Blue
+tr: Zila
+
+en: Violet
+tr: Violeta
+
+en: Pink
+tr: Rozā
+
+en: Red
+tr: Sarkana
+
+en: Orange
+tr: Oranža
+
+en: Yellow
+tr: Dzeltena
+
+en: Green
+tr: Zaļa
+
+en: Teal
+tr: Zilganzaļa
+
+en: Liquid color strength
+tr: Šķidrā stila krāsas intensitāte
+
+en: How much of the chosen color the blur layer takes.
+tr: Cik daudz no izvēlētās krāsas pieņem aizmiglojuma slānis.
+
+en: Theme
+tr: Dizains
+
+en: Color mode
+tr: Krāsu režīms
+
+en: High contrast always takes precedence.
+tr: Augstam kontrastam vienmēr ir prioritāte.
+
+en: Light
+tr: Gaišs
+
+en: Dark
+tr: Tumšs
+
+en: Accent color
+tr: Izcēluma krāsa
+
+en: Animation duration
+tr: Animācijas ilgums
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 ir standarta ātrums; lielākas vērtības ir lēnākas. Samazinātai kustībai ir prioritāte.
+
+en: Dock icon preset
+tr: Dock ikonu lieluma sagatave
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Pielāgotais lielums no Dock iestatījumiem tiek saglabāts, līdz izvēlaties sagatavi.
+
+en: Small - 32 px
+tr: Mazs — 32 px
+
+en: Medium - 40 px
+tr: Vidējs — 40 px
+
+en: Large - 48 px
+tr: Liels — 48 px
+
+en: Keep custom size
+tr: Saglabāt pielāgoto lielumu
+
+en: Show Windows Start in the Dock
+tr: Rādīt Windows pogu Sākt Dock
+
+en: Show Task View in the Dock
+tr: Rādīt uzdevumu skatu Dock
+
+en: Reserve extra space for Dock animations
+tr: Rezervēt papildu vietu Dock animācijām
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Neļauj palielinājumam un palaišanas lēcienam pārklāt maksimizētos logus.
+
+en: Weather position
+tr: Laikapstākļu novietojums
+
+en: Left
+tr: Pa kreisi
+
+en: Right
+tr: Pa labi
+
+en: Keyboard indicator
+tr: Tastatūras indikators
+
+en: Compact
+tr: Kompakts
+
+en: Two lines
+tr: Divas rindas
+
+en: Windows taskbar pins
+tr: Windows uzdevumjoslas piespraudumi
+
+en: Add newly discovered Windows taskbar pins
+tr: Pievienot jaunatklātos Windows uzdevumjoslas piespraudumus
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Kamēr uzdevumjosla ir aizstāta, jaunie Windows piespraudumi tiek pievienoti Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Atgriezeniska Windows uzdevumjoslas aizstāšana ar Dock.
+
+en: Taskbar replacement
+tr: Uzdevumjoslas aizstāšana
+
+en: Replace the Windows taskbar
+tr: Aizstāt Windows uzdevumjoslu
+
+en: Changing this needs Apply.
+tr: Lai to mainītu, jānoklikšķina uz Lietot.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Kamēr Aether Shell darbojas, tas paslēpj Windows uzdevumjoslu un rezervē vietu zem maksimizētajām programmām.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Windows uzdevumjoslas stāvoklis tiek atjaunots, kad šis režīms tiek atspējots vai Aether Shell tiek aizvērts. Atsevišķa atkopšanas palīgprogramma to atjauno arī tad, ja programma negaidīti apstājas. Ja atkopšana neizdodas, restartējiet Windows Explorer uzdevumu pārvaldniekā.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows iestatījumi paliek Windows vietējā saskarne. Aether Shell neaizstāj to uzdevumjoslas lapu; konfigurējiet šo režīmu šeit.
+
+en: Pinned applications from Windows
+tr: Piespraustās programmas no Windows
+
+en: &Import Windows taskbar pins
+tr: &Importēt Windows uzdevumjoslas piespraudumus
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Nolasa piespraustās saīsnes, nemainot Windows piespraudumus. Daži Windows 11 piespraudumi vai to secība var nebūt pieejami.
+
+en: Version {}
+tr: Versija {}
+
+en: Created by Ibrahim Bouillet
+tr: Izveidoja Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Vietējā Windows darbvirsmas saskarne — peldošs Dock un augšējā statusa josla —, kas darbojas līdzās Windows Explorer.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Laikapstākļu dati: Open-Meteo.com (CC BY 4.0). Netiek iekļautas trešo pušu C++ izpildlaika bibliotēkas.
+
+en: &Official project
+tr: &Oficiālais projekts
+
+en: Licence
+tr: Licence
+
+en: Taskbar replacement changes need Apply.
+tr: Uzdevumjoslas aizstāšanas izmaiņām jānoklikšķina uz Lietot.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Izmaiņas tiek saglabātas automātiski. Startēšanai jānoklikšķina uz Lietot.
+
+en: Changes save automatically.
+tr: Izmaiņas tiek saglabātas automātiski.
+
+en: Press Apply to confirm this change.
+tr: Lai apstiprinātu šīs izmaiņas, nospiediet Lietot.
+
+en: Smart transparency
+tr: Viedais caurspīdīgums
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Šķidrajā stilā šis logs aizmiglo fonu tikai zem sava teksta un vadīklām: pilnībā virs citiem logiem un darbvirsmas ikonām, nedaudz virs darbvirsmas attēla un nemaz tur, kur tas neko nerāda.
+
+en: Languages on this PC
+tr: Valodas šajā datorā
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell lejupielādē Windows pieejamās valodas, tāpēc tas maina valodu reizē ar Windows.
+
+en: Add a language
+tr: Pievienot valodu
+
+en: &Download
+tr: &Lejupielādēt
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Katra valoda tiek iegūta no šīs versijas GitHub laidiena un pirms lietošanas tiek pārbaudīta. Kad tā ir šajā datorā, izvēlieties to augstāk.
+
+en: built in
+tr: iebūvēta
+
+en: downloading, {}
+tr: notiek lejupielāde, {}
+
+en: download failed
+tr: lejupielāde neizdevās
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell iestatīšana
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Iestatīšanas programma nevarēja izveidot savu saskarni. Aizveriet to un mēģiniet vēlreiz vai izmantojiet dokumentētās klusās iestatīšanas opcijas.
+
+en: Options
+tr: Opcijas
+
+en: Install
+tr: Instalēt
+
+en: Done
+tr: Gatavs
+
+en: Remove Aether Shell
+tr: Noņemt Aether Shell
+
+en: Repair Aether Shell
+tr: Labot Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Vietējais Dock un augšējā statusa josla operētājsistēmai Windows, kas darbojas līdzās Windows Explorer.
+
+en: Replaces the Windows taskbar while it runs
+tr: Darbības laikā aizstāj Windows uzdevumjoslu
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Lai atgūtu Windows uzdevumjoslu, izejiet no Aether Shell, izslēdziet šo sadaļā Iestatījumi > Darbvirsma vai izvēlnē Sākt atveriet “Atjaunot Windows uzdevumjoslu”.
+
+en: Starts when you sign in - your choice
+tr: Startējas, kad pierakstāties — jūsu izvēle
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Jaunas instalācijas pēc noklusējuma startējas pierakstoties. Šo izvēli varat notīrīt pirms instalēšanas vai vēlāk izslēgt iestatījumos. Esošās startēšanas izvēles un uzdevumu pārvaldniekā veiktās atspējošanas tiek saglabātas.
+
+en: Installs for your account
+tr: Instalē jūsu kontam
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Administratora tiesības nav nepieciešamas. Jūsu iestatījumi un dati paliek jūsu lietotāja profilā.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Atinstalēšana saglabā jūsu iestatījumus un datus, ja vien neizvēlaties tos noņemt.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Labošana atjauno šīs pakotnes failus un saglabā jūsu iestatījumus. Ja Aether Shell atstāja Windows uzdevumjoslu paslēptu, labošana to atjauno.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Instalējot pāri esošai versijai, jūsu iestatījumi tiek saglabāti. Vecāka pakotne tiek noraidīta, ja vien jūs nepārprotami neatļaujat versijas pazemināšanu.
+
+en: MIT License
+tr: MIT licence
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licence tiek instalēta arī kā LICENSE blakus Aether Shell.
+
+en: Remove this installation
+tr: Noņemt šo instalāciju
+
+en: Install location
+tr: Instalēšanas vieta
+
+en: &Browse...
+tr: &Pārlūkot...
+
+en: Also remove my settings, cache and logs
+tr: Noņemt arī manus iestatījumus, kešatmiņu un žurnālus
+
+en: This cannot be undone.
+tr: Šo darbību nevar atsaukt.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Iestatīšanas programma pareizi aizvērs Aether Shell un noņems tā instalētos failus, saīsnes, startēšanas ierakstu un reģistrāciju sadaļā Instalētās programmas. Citas programmas un Windows iestatījumi netiek skarti.
+
+en: Your welcome
+tr: Jūsu sveiciens
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Pēc pierakstīšanās vai datora atbloķēšanas Aether Shell ar roku uzraksta īsu sveicienu. Ierakstiet vārdu, ar kuru tam jūs sveikt, vai atstājiet tukšu vienkāršam “sveiki”.
+
+en: Your first name
+tr: Jūsu vārds
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Neobligāti, piemēram, vārds. Tas paliek šajā datorā jūsu Aether Shell iestatījumos un nekad netiek nekur nosūtīts. Mainiet to vai izslēdziet sveicienu sadaļā Iestatījumi > Sveiciens.
+
+en: Shortcuts and startup
+tr: Saīsnes un startēšana
+
+en: Create Start menu shortcuts
+tr: Izveidot izvēlnes Sākt saīsnes
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell un “Atjaunot Windows uzdevumjoslu”.
+
+en: Create a desktop shortcut
+tr: Izveidot darbvirsmas saīsni
+
+en: Shows your current choice.
+tr: Parāda jūsu pašreizējo izvēli.
+
+en: Recommended.
+tr: Ieteicams.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Lai atteiktos, notīriet atzīmi; uzdevumu pārvaldniekā veiktās atspējošanas tiek ievērotas.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Instalējot tiek pieņemta iepriekš norādītā startēšanas izvēle. Palaidējs var restartēt Aether Shell pēc avārijas ar ierobežotu mēģinājumu skaitu. Iziešana un “Atjaunot Windows uzdevumjoslu” paliek pieejamas. Laikapstākļi pēc noklusējuma ir izslēgti. Neparakstīti binārie faili var izraisīt Windows SmartScreen brīdinājumu.
+
+en: Removing this installation...
+tr: Notiek šīs instalācijas noņemšana...
+
+en: Repairing Aether Shell...
+tr: Notiek Aether Shell labošana...
+
+en: Installing Aether Shell...
+tr: Notiek Aether Shell instalēšana...
+
+en: Closing Aether Shell and removing its files.
+tr: Tiek aizvērts Aether Shell un noņemti tā faili.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Tiek pārbaudīta iegultā pakotne un instalēti tās faili. Progress tiek rādīts kā aktivitāte: iestatīšanas programma nezina atlikušo laiku.
+
+en: Please wait while the removal completes.
+tr: Lūdzu, uzgaidiet, kamēr tiek pabeigta noņemšana.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Atcelšana ir pieejama, līdz tiek aktivizēta jaunā versija; pēc tam iestatīšana droši pabeidz darbu.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell ir atinstalēts.
+
+en: Aether Shell is ready.
+tr: Aether Shell ir gatavs.
+
+en: Setup was cancelled.
+tr: Iestatīšana tika atcelta.
+
+en: Setup could not complete.
+tr: Iestatīšanu nevarēja pabeigt.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Jūsu dati tika saglabāti, ja vien nepārprotami neizvēlējāties tos noņemt.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: To var labot vai atinstalēt sadaļā Windows iestatījumi > Programmas > Instalētās programmas.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Darbība tika atcelta pirms aktivizēšanas. Lai mēģinātu vēlreiz, atgriezieties pie opcijām.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Pārbaudiet piekļuvi failiem un brīvo vietu diskā, pēc tam mēģiniet vēlreiz. Ja Aether Shell jau ir instalēts, labošana var atjaunot tā failus. Kļūdas kategorija: {}
+
+en: Setup log
+tr: Iestatīšanas žurnāls
+
+en: Launch Aether Shell
+tr: Palaist Aether Shell
+
+en: &Back
+tr: &Atpakaļ
+
+en: &Next
+tr: &Tālāk
+
+en: &Continue
+tr: &Turpināt
+
+en: &Uninstall
+tr: &Atinstalēt
+
+en: &Repair
+tr: &Labot
+
+en: &Install
+tr: &Instalēt
+
+en: &Close
+tr: &Aizvērt
+
+en: Step {} of {}: {}
+tr: Darbība {} no {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Izvēlieties Aether Shell instalēšanas mapi
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Izvēlieties pilnu mapes ceļu, piemēram, tādu, kas sākas ar diska burtu.
+
+en: The install folder must be an absolute path.
+tr: Instalēšanas mapei jābūt absolūtam ceļam.
+
+en: Setup stops at the next safe point.
+tr: Iestatīšana apstāsies nākamajā drošajā punktā.
+
+en: Cancelling...
+tr: Notiek atcelšana...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Iestatīšana droši pabeidz pašreizējo darbību; lūdzu, uzgaidiet.
+
+en: Updating Aether Shell
+tr: Notiek Aether Shell atjaunināšana
+
+en: Verifying the signed package and applying the update.
+tr: Tiek pārbaudīta parakstītā pakotne un lietots atjauninājums.
+
+en: Update completed
+tr: Atjaunināšana pabeigta
+
+en: The update did not complete
+tr: Atjaunināšana netika pabeigta
+
+en: Close
+tr: Aizvērt
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Atjaunināšanas saskarni nevarēja startēt. Atjauninājums nav lietots. Mēģiniet vēlreiz vai izmantojiet labošanu.
+
+en: Aether Shell Update
+tr: Aether Shell atjaunināšana
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Atjaunināšanas saskarni nevarēja startēt. Atjauninājums nav lietots. Mēģiniet vēlreiz vai izmantojiet labošanu sadaļā Windows iestatījumi > Programmas > Instalētās programmas.
+
+en: Update completed.
+tr: Atjaunināšana pabeigta.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Atjaunināšana netika pabeigta. Skatiet atjauninātāja žurnālu vai izmantojiet labošanu.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell nevarēja startēt. Sadaļā Windows iestatījumi > Programmas > Instalētās programmas izvēlieties Labot.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell iestatījumi — notiek atjaunināšana
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Atsākt uzdevumjoslas aizstāšanu
+
+en: Show Windows &notification area for 60 seconds
+tr: Rādīt Windows &paziņojumu apgabalu 60 sekundes
+
+en: &Search…
+tr: &Meklēt…
+
+en: &Settings…
+tr: &Iestatījumi…
+
+en: View available &update…
+tr: Skatīt pieejamo &atjauninājumu…
+
+en: &Check for updates…
+tr: &Meklēt atjauninājumus…
+
+en: &About Aether Shell
+tr: &Par Aether Shell
+
+en: &Quit Aether Shell
+tr: &Iziet no Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Pārslēgt &ievades valodu\tWin+Atstarpe
+
+en: Open &network controls…
+tr: Atvērt &tīkla vadīklas…
+
+en: &Weather settings…
+tr: &Laikapstākļu iestatījumi…
+
+en: Toggle output &mute
+tr: Izslēgt/ieslēgt izvades &skaņu
+
+en: &Sound settings…
+tr: &Skaņas iestatījumi…
+
+en: Toggle microphone &mute
+tr: Izslēgt/ieslēgt &mikrofonu
+
+en: Start Windows &voice typing\tWin+H
+tr: Sākt Windows &balss rakstīšanu\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofona &konfidencialitātes iestatījumi…
+
+en: &Power settings…
+tr: &Barošanas iestatījumi…
+
+en: Open &notifications and calendar
+tr: Atvērt &paziņojumus un kalendāru
+
+en: Open &calendar\tWin+Alt+D
+tr: Atvērt &kalendāru\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Rādīt &paslēptās ikonas
+
+en: Initializing
+tr: Notiek inicializēšana
+
+en: Unavailable
+tr: Nav pieejams
+
+en: Unsupported
+tr: Netiek atbalstīts
+
+en: Error
+tr: Kļūda
+
+en: Available
+tr: Pieejams
+
+en: Unknown
+tr: Nezināms
+
+en: Internet access
+tr: Interneta piekļuve
+
+en: Local network only
+tr: Tikai lokālais tīkls
+
+en: Limited Internet access
+tr: Ierobežota interneta piekļuve
+
+en: No network connection
+tr: Nav tīkla savienojuma
+
+en: Connectivity unknown
+tr: Savienojamība nav zināma
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilie sakari
+
+en: Network
+tr: Tīkls
+
+en: Offline
+tr: Bezsaistē
+
+en: Network status unavailable
+tr: Tīkla statuss nav pieejams
+
+en: Quick controls
+tr: Ātrās vadīklas
+
+en: Aether Shell menu
+tr: Aether Shell izvēlne
+
+en: Weather status unavailable
+tr: Laikapstākļu statuss nav pieejams
+
+en: Cached weather
+tr: Kešatmiņā saglabāti laikapstākļi
+
+en: Observation (UTC): {}
+tr: Novērojums (UTC): {}
+
+en: Weather: {}
+tr: Laikapstākļi: {}
+
+en: Click to open weather settings
+tr: Noklikšķiniet, lai atvērtu laikapstākļu iestatījumus
+
+en: Show hidden icons
+tr: Rādīt paslēptās ikonas
+
+en: Opens Windows' notification-area overflow
+tr: Atver Windows paziņojumu apgabala paslēptās ikonas
+
+en: Input language: {}
+tr: Ievades valoda: {}
+
+en: Fallback input layout
+tr: Rezerves ievades izkārtojums
+
+en: Click to switch input language (Win+Space)
+tr: Noklikšķiniet, lai pārslēgtu ievades valodu (Win+Atstarpe)
+
+en: Network: {}
+tr: Tīkls: {}
+
+en: Signal strength unavailable
+tr: Signāla stiprums nav pieejams
+
+en: Click to open Windows network settings
+tr: Noklikšķiniet, lai atvērtu Windows tīkla iestatījumus
+
+en: Audio output
+tr: Audio izvade
+
+en: Audio: {}
+tr: Audio: {}
+
+en: volume unknown
+tr: skaļums nav zināms
+
+en: Muted
+tr: Skaņa izslēgta
+
+en: Sound on
+tr: Skaņa ieslēgta
+
+en: Microphone: {}
+tr: Mikrofons: {}
+
+en: Endpoint unmuted
+tr: Ierīcei skaņa nav izslēgta
+
+en: Recording detection unsupported
+tr: Ierakstīšanas noteikšana netiek atbalstīta
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Noklikšķiniet, lai izslēgtu vai ieslēgtu skaņu; noklikšķiniet ar peles labo pogu, lai piekļūtu Windows balss rakstīšanai un mikrofona konfidencialitātes iestatījumiem
+
+en: Battery: {}
+tr: Akumulators: {}
+
+en: Battery {}
+tr: Akumulators {}
+
+en: Battery status unavailable
+tr: Akumulatora statuss nav pieejams
+
+en: Charging
+tr: Notiek uzlāde
+
+en: External power
+tr: Ārējā barošana
+
+en: Estimated remaining: {} h {} min
+tr: Aptuveni atlicis: {} h {} min
+
+en: Click to open power settings
+tr: Noklikšķiniet, lai atvērtu barošanas iestatījumus
+
+en: Clock status unavailable
+tr: Pulksteņa statuss nav pieejams
+
+en: Click to open calendar and notifications
+tr: Noklikšķiniet, lai atvērtu kalendāru un paziņojumus
+
+en: Action failed: {}
+tr: Darbība neizdevās: {}
+
+en: Aether Shell status bar
+tr: Aether Shell statusa josla
+
+en: Update available
+tr: Pieejams atjauninājums
+
+en: Cached
+tr: Kešatmiņā
+
+en: Start
+tr: Sākt
+
+en: Search
+tr: Meklēt
+
+en: Task View
+tr: Uzdevumu skats
+
+en: Application
+tr: Programma
+
+en: Running application
+tr: Palaista programma
+
+en: More applications
+tr: Citas programmas
+
+en: Aether Shell window previews
+tr: Aether Shell logu priekšskatījumi
+
+en: Minimized — preview unavailable
+tr: Minimizēts — priekšskatījums nav pieejams
+
+en: Preview unavailable
+tr: Priekšskatījums nav pieejams
+
+en: {} windows
+tr: Logi: {}
+
+en: {} window
+tr: {} logs
+
+en: Switches to this window
+tr: Pārslēdzas uz šo logu
+
+en: Minimized, preview unavailable
+tr: Minimizēts, priekšskatījums nav pieejams
+
+en: Minimized
+tr: Minimizēts
+
+en: Close {}
+tr: Aizvērt {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Lūdz šo logu aizvērties; programma joprojām var piedāvāt saglabāt vai atcelt
+
+en: Close requested
+tr: Pieprasīta aizvēršana
+
+en: Previous applications
+tr: Iepriekšējās programmas
+
+en: Open
+tr: Atvērt
+
+en: New instance
+tr: Jauna instance
+
+en: Unpin from Dock
+tr: Atspraust no Dock
+
+en: Pin to Dock
+tr: Piespraust pie Dock
+
+en: Move left
+tr: Pārvietot pa kreisi
+
+en: Move right
+tr: Pārvietot pa labi
+
+en: Dock settings...
+tr: Dock iestatījumi...
+
+en: Import Windows taskbar pins
+tr: Importēt Windows uzdevumjoslas piespraudumus
+
+en: Open Windows Start
+tr: Atvērt Windows izvēlni Sākt
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Piesprausts
+
+en: Running
+tr: Darbojas
+
+en: Needs attention
+tr: Nepieciešama uzmanība
+
+en: Up arrow shows window previews
+tr: Augšupvērstā bultiņa parāda logu priekšskatījumus
+
+en: Installed application
+tr: Instalēta programma
+
+en: Desktop application
+tr: Darbvirsmas programma
+
+en: File
+tr: Fails
+
+en: Folder
+tr: Mape
+
+en: Windows tool
+tr: Windows rīks
+
+en: Control Panel
+tr: Vadības panelis
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Pārvietoties   ·   Enter Atvērt   ·   Esc Aizvērt
+
+en: Search apps, settings and files
+tr: Meklējiet programmas, iestatījumus un failus
+
+en: Search could not be completed.
+tr: Meklēšanu nevarēja pabeigt.
+
+en: Results
+tr: Rezultāti
+
+en: Indexing applications…
+tr: Notiek programmu indeksēšana…
+
+en: Type to search apps, settings and files
+tr: Rakstiet, lai meklētu programmas, iestatījumus un failus
+
+en: Nothing matches
+tr: Nekas neatbilst
+
+en: Windows could not open this application.
+tr: Windows nevarēja atvērt šo programmu.
+
+en: Menu
+tr: Izvēlne
+
+en: Opens a submenu
+tr: Atver apakšizvēlni
+
+en: , opens a submenu
+tr: , atver apakšizvēlni
+
+en: Selected
+tr: Atlasīts
+
+en: Checked
+tr: Atzīmēts
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Lidojuma režīms
+
+en: Accessibility
+tr: Pieejamība
+
+en: Energy saver
+tr: Enerģijas taupītājs
+
+en: Live captions
+tr: Tiešraides paraksti
+
+en: Night light
+tr: Nakts gaisma
+
+en: Mobile hotspot
+tr: Mobilais tīklājs
+
+en: Nearby sharing
+tr: Koplietošana tuvumā
+
+en: Cast
+tr: Apraidīt
+
+en: Project
+tr: Projicēt
+
+en: All settings
+tr: Visi iestatījumi
+
+en: Connected
+tr: Savienots
+
+en: Not connected
+tr: Nav savienots
+
+en: , on
+tr: , ieslēgts
+
+en: , off
+tr: , izslēgts
+
+en: , state unknown
+tr: , stāvoklis nav zināms
+
+en: , opens Windows Settings
+tr: , atver Windows iestatījumus
+
+en: , shows accessibility features
+tr: , rāda pieejamības līdzekļus
+
+en: , requires Windows 11 version 22H2
+tr: , nepieciešama Windows 11 versija 22H2
+
+en: Now playing: {}
+tr: Tagad atskaņo: {}
+
+en: Untitled media
+tr: Multivide bez nosaukuma
+
+en: , switch source
+tr: , pārslēgt avotu
+
+en: Previous media item
+tr: Iepriekšējais multivides vienums
+
+en: Pause
+tr: Pauze
+
+en: Play
+tr: Atskaņot
+
+en: Next media item
+tr: Nākamais multivides vienums
+
+en: {} details
+tr: {} — detalizēta informācija
+
+en: Page {} of {}
+tr: Lapa {} no {}
+
+en: Next page
+tr: Nākamā lapa
+
+en: First page
+tr: Pirmā lapa
+
+en: Brightness
+tr: Spilgtums
+
+en: Brightness, unavailable on this display
+tr: Spilgtums, nav pieejams šajā displejā
+
+en: Volume
+tr: Skaļums
+
+en: Volume, unavailable
+tr: Skaļums, nav pieejams
+
+en: Unmute
+tr: Ieslēgt skaņu
+
+en: Mute
+tr: Izslēgt skaņu
+
+en: Sound output and volume mixer
+tr: Skaņas izvade un skaļuma mikseris
+
+en: Back
+tr: Atpakaļ
+
+en: , secured
+tr: , drošs
+
+en: , open
+tr: , atvērts
+
+en: , connected
+tr: , savienots
+
+en: Disconnect
+tr: Atvienot
+
+en: Show available networks
+tr: Rādīt pieejamos tīklus
+
+en: More Wi-Fi settings
+tr: Citi Wi-Fi iestatījumi
+
+en: Bluetooth and devices settings
+tr: Bluetooth un ierīču iestatījumi
+
+en: Magnifier
+tr: Lupa
+
+en: Narrator
+tr: Diktors
+
+en: On-screen keyboard
+tr: Ekrāna tastatūra
+
+en: Sticky keys
+tr: Lipīgie taustiņi
+
+en: More accessibility settings
+tr: Citi pieejamības iestatījumi
+
+en: Volume mixer
+tr: Skaļuma mikseris
+
+en: Choose output in Sound settings
+tr: Izvēlieties izvadi skaņas iestatījumos
+
+en: Power and battery settings
+tr: Barošanas un akumulatora iestatījumi
+
+en: Battery {} percent, {}
+tr: Akumulators {} procenti, {}
+
+en: All Windows settings
+tr: Visi Windows iestatījumi
+
+en: The requested action could not be dispatched
+tr: Pieprasīto darbību nevarēja nosūtīt
+
+en: Aether Shell quick controls
+tr: Aether Shell ātrās vadīklas
+
+en: Media session active
+tr: Multivides sesija ir aktīva
+
+en: No media session
+tr: Nav multivides sesijas
+
+en: Current page
+tr: Pašreizējā lapa
+
+en:  - secured
+tr:  — drošs
+
+en:  - open
+tr:  — atvērts
+
+en:  - opens in Windows
+tr:  — tiek atvērts sistēmā Windows
+
+en: Turned off by hardware or policy
+tr: Izslēgts aparatūras vai politikas dēļ
+
+en: State unavailable - use Windows settings
+tr: Stāvoklis nav pieejams — izmantojiet Windows iestatījumus
+
+en: Off
+tr: Izslēgts
+
+en:  - signal {} of 5
+tr:  — signāls {} no 5
+
+en: , no internet
+tr: , nav interneta
+
+en: On - not connected
+tr: Ieslēgts — nav savienots
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows neļauj programmām uzskaitīt tīklus: pārbaudiet atrašanās vietu konfidencialitātes iestatījumos
+
+en: No Wi-Fi adapter found
+tr: Netika atrasts neviens Wi-Fi adapteris
+
+en: Connecting to {}...
+tr: Notiek savienojuma izveide ar {}...
+
+en:  - looking for networks
+tr:  — notiek tīklu meklēšana
+
+en: On
+tr: Ieslēgts
+
+en: A screen reader is running
+tr: Darbojas ekrāna lasītājs
+
+en: Windows accessibility features
+tr: Windows pieejamības līdzekļi
+
+en: Sound output
+tr: Skaņas izvade
+
+en: Default output device
+tr: Noklusējuma izvades ierīce
+
+en: No output device available
+tr: Nav pieejamas izvades ierīces
+
+en: Battery unknown
+tr: Akumulatora stāvoklis nav zināms
+
+en: Status refresh could not be started
+tr: Statusa atsvaidzināšanu nevarēja sākt
+
+en: Status refresh unavailable
+tr: Statusa atsvaidzināšana nav pieejama
+
+en: Excellent signal
+tr: Izcils signāls
+
+en: Good signal
+tr: Labs signāls
+
+en: Fair signal
+tr: Viduvējs signāls
+
+en: Weak signal
+tr: Vājš signāls
+
+en: Clear sky
+tr: Skaidrs
+
+en: Mainly clear
+tr: Pārsvarā skaidrs
+
+en: Partly cloudy
+tr: Daļēji mākoņains
+
+en: Overcast
+tr: Apmācies
+
+en: Fog
+tr: Migla
+
+en: Drizzle
+tr: Smidzina
+
+en: Rain
+tr: Lietus
+
+en: Snow
+tr: Sniegs
+
+en: Rain showers
+tr: Lietusgāzes
+
+en: Snow showers
+tr: Īslaicīga snigšana
+
+en: Thunderstorm
+tr: Pērkona negaiss
+
+## weather
+
+en: Morning
+tr: Rīts
+
+en: Afternoon
+tr: Pēcpusdiena
+
+en: Evening
+tr: Vakars
+
+en: Night
+tr: Nakts
+
+en: Now
+tr: Tagad
+
+en: Today
+tr: Šodien
+
+en: Low
+tr: Zems
+
+en: Moderate
+tr: Mērens
+
+en: High
+tr: Augsts
+
+en: Very high
+tr: Ļoti augsts
+
+en: Extreme
+tr: Ekstrēms
+
+en: No connection to the weather service.
+tr: Nav savienojuma ar laikapstākļu pakalpojumu.
+
+en: The weather service is busy. Try again in a moment.
+tr: Laikapstākļu pakalpojums ir aizņemts. Pēc brīža mēģiniet vēlreiz.
+
+en: The weather could not be loaded.
+tr: Laikapstākļus nevarēja ielādēt.
+
+en: Could not update; showing the last forecast.
+tr: Nevarēja atjaunināt; tiek rādīta pēdējā prognoze.
+
+en: Try again
+tr: Mēģināt vēlreiz
+
+en: Your location
+tr: Jūsu atrašanās vieta
+
+en: My location
+tr: Mana atrašanās vieta
+
+en: Precise location
+tr: Precīza atrašanās vieta
+
+en: Approximate location
+tr: Aptuvena atrašanās vieta
+
+en: Chosen in Settings
+tr: Izvēlēta iestatījumos
+
+en: Allow
+tr: Atļaut
+
+en: Use precise location
+tr: Izmantot precīzu atrašanās vietu
+
+en: See the weather where you are: allow your precise location.
+tr: Skatiet laikapstākļus tur, kur atrodaties: atļaujiet savu precīzo atrašanās vietu.
+
+en: Your position is approximate (about 10 km).
+tr: Jūsu atrašanās vieta ir aptuvena (apmēram 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Šai programmai sistēmā Windows ir izslēgta atrašanās vieta.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Šī ierīce nevar ziņot savu atrašanās vietu. Tā vietā meklējiet pilsētu.
+
+en: Reading Windows location…
+tr: Tiek nolasīta Windows atrašanās vieta…
+
+en: Automatic weather follows your Windows location.
+tr: Automātiskie laikapstākļi seko jūsu Windows atrašanās vietai.
+
+en: Search for a city
+tr: Meklēt pilsētu
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Lai skatītu laikapstākļus, meklējiet pilsētu vai atļaujiet savu atrašanās vietu.
+
+en: Searching…
+tr: Notiek meklēšana…
+
+en: City search is unavailable.
+tr: Pilsētu meklēšana nav pieejama.
+
+en: No city found.
+tr: Neviena pilsēta netika atrasta.
+
+en: Weather settings
+tr: Laikapstākļu iestatījumi
+
+en: Loading the weather…
+tr: Notiek laikapstākļu ielāde…
+
+en: Loading…
+tr: Notiek ielāde…
+
+en: Updated {}
+tr: Atjaunināts {}
+
+en: Near {}
+tr: Netālu no {}
+
+en: Temperatures now
+tr: Pašreizējā temperatūra
+
+en: The map is unavailable.
+tr: Karte nav pieejama.
+
+en: Map: Natural Earth
+tr: Karte: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Laikapstākļu dati no Open-Meteo.com
+
+en: Feels like
+tr: Sajūta kā
+
+en: Feels like {}
+tr: Sajūta kā {}
+
+en: Close to the real temperature
+tr: Tuvu reālajai temperatūrai
+
+en: The wind makes it feel colder
+tr: Vēja dēļ šķiet vēsāks
+
+en: Humidity makes it feel warmer
+tr: Mitruma dēļ šķiet siltāks
+
+en: Humidity
+tr: Mitrums
+
+en: Cloud cover {}
+tr: Mākoņainība {}
+
+en: Wind
+tr: Vējš
+
+en: Gusts {}
+tr: Brāzmas {}
+
+en: Sunrise and sunset
+tr: Saullēkts un saulriets
+
+en: UV index
+tr: UV indekss
+
+en: Pressure
+tr: Spiediens
+
+en: At sea level
+tr: Jūras līmenī
+
+en: &Open the weather
+tr: &Atvērt laikapstākļus
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognoze tur, kur atrodaties, ar precizitāti līdz aptuveni 100 m, ar savu augstumu. Izslēgts: noapaļots līdz aptuveni 10 km.

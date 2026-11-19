@@ -72,7 +72,8 @@ Result<AppPaths> AppPaths::Resolve(const std::optional<std::filesystem::path>& o
     paths.logDir = paths.dataRoot / L"logs";
     paths.cacheDir = paths.dataRoot / L"cache";
     paths.updatesDir = paths.dataRoot / L"updates";
-    for (const auto* dir : {&paths.configDir, &paths.logDir, &paths.cacheDir, &paths.updatesDir}) {
+    paths.languagesDir = paths.dataRoot / L"languages";
+    for (const auto* dir : {&paths.configDir, &paths.logDir, &paths.cacheDir, &paths.updatesDir, &paths.languagesDir}) {
         if (auto created = fs::EnsureDirectory(*dir); !created) return created.error();
     }
     paths.executablePath = CurrentExecutablePath();

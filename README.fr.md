@@ -29,14 +29,9 @@ Une interface de bureau Windows native créée par **Ibrahim Bouillet**. Aether 
 à une barre d'état compacte en haut de l'écran, dans une matière translucide au flou délicat. Il est écrit en
 C++20 avec Win32, Direct2D/DirectWrite et Windows.UI.Composition, et publié sous licence MIT.
 
-> **Logiciel alpha :** 0.3.5-alpha.3 (Alpha 3, version 3.5) est une préversion publique. Ce n'est pas encore
+> **Logiciel alpha :** 0.4.0-alpha.4 (Alpha 4) est une préversion publique. Ce n'est pas encore
 > un remplacement entièrement qualifié de l'interface de Windows. Enregistrez votre travail avant d'essayer et
 > lisez les [limites connues](KNOWN_LIMITATIONS.md).
-
-> **Bientôt : Alpha 4.** La prochaine version est en préparation : deux styles au choix, *Liquide* (un verre
-> d'eau limpide) et *Grain* (la matière dépolie actuelle), une recherche qui trouve aussi les pages des Paramètres
-> de Windows, les fichiers et les dossiers, une interface en plusieurs langues, et une interface plus légère et plus
-> fluide. [Suivez les versions](https://github.com/ibrahimbouillet/AetherShell/releases) pour savoir quand elle sort.
 
 <h2 align="center">Un nouveau bureau. Une nouvelle atmosphère.</h2>
 
@@ -70,9 +65,10 @@ Vrais bureaux, capturés sous Windows 11. Les fonds d'écran et les icônes d'ap
   périphériques, les Services ou les éléments du Panneau de configuration.
 - **Masquage automatique :** le Dock et la barre du haut, chacun de son côté, s'effacent quand une fenêtre les
   recouvre et reviennent quand le pointeur atteint leur bord de l'écran, pour un espace de travail plein écran.
-- **Dix langues :** toute l'interface, installation comprise, en anglais, chinois, hindi, espagnol, français,
-  portugais, russe, arabe, bengali et ourdou. Elle suit vos langues d'affichage de Windows, ou celle que vous
-  choisissez dans Paramètres → Langue, et se souvient de ce choix d'une version à l'autre. Voir [Langues](#langues).
+- **41 langues :** toute l'interface, installation comprise, dans les 38 langues que propose Windows 11, plus le
+  bengali, l'hindi et l'ourdou. Elle suit vos langues d'affichage de Windows, ou celle que vous choisissez dans
+  Paramètres → Langue, et se souvient de ce choix d'une version à l'autre. Chaque langue est téléchargée depuis la
+  version publiée quand on en a besoin. Voir [Langues](#langues).
 - **Accueil :** un message facultatif, écrit à la main en français, en anglais ou en espagnol sur votre fond
   d'écran flouté, après l'ouverture de session ou le déverrouillage du PC. L'installation peut demander le prénom
   avec lequel il vous salue.
@@ -84,19 +80,23 @@ Vrais bureaux, capturés sous Windows 11. Les fonds d'écran et les icônes d'ap
 - **Récupération :** une installation par utilisateur, un assistant de récupération séparé, la réparation et la
   désinstallation, et une commande pour rétablir la barre des tâches de Windows.
 
-## Nouveautés de la 3.5
+## Nouveautés de l'Alpha 4
 
-La version 3.5 laisse tranquilles les onglets et les boutons de fermeture des applications (la barre du haut ne
-répond qu'au tout premier pixel de l'écran), ferme les panneaux dès que vous utilisez autre chose, et trouve les
-outils de Windows dans la recherche. L'accueil vous salue désormais par votre prénom dès la première fois, car
-l'installation le demande ; il affiche votre fond d'écran même si le fichier de l'image a été déplacé ou supprimé,
-et sa plume coule avec moins de travail par image. Lisez les [notes de version](docs/releases/0.3.5-alpha.3.md) et
-le [journal des modifications](CHANGELOG.md) (en anglais).
+Deux styles : *Liquide*, un verre d'eau limpide posé sur une couche de flou que vous réglez à votre goût, et *Grain*,
+la matière dépolie des versions précédentes. En Liquide, la fenêtre des Paramètres ne floute que sous son propre texte
+et ses commandes, et reste limpide partout ailleurs. L'interface parle 41 langues, téléchargées depuis la version
+publiée quand vous en avez besoin, et suit votre langue d'affichage de Windows. La recherche trouve par leur nom les mêmes
+éléments que Démarrer. La météo est précise et animée, avec sa propre fenêtre. La barre du haut peut se réduire à un
+simple texte sur votre bureau, une icône que vous faites glisser étire le Dock, et Aether démarre plus tôt après
+l'ouverture de session. Lisez les [notes de version](docs/releases/0.4.0-alpha.4.md) et le
+[journal des modifications](CHANGELOG.md) (en anglais).
 
 ## Langues
 
-Aether Shell parle les dix langues les plus parlées au monde. Chaque menu, panneau, page des Paramètres,
-message et écran d'installation est traduit, tout comme cette documentation.
+L'interface d'Aether Shell parle 41 langues : les 38 que propose Windows 11, plus le bengali, l'hindi et l'ourdou.
+Chaque menu, panneau, page des Paramètres, message et écran d'installation est traduit. Aether suit votre langue
+d'affichage de Windows, ou celle que vous choisissez dans Paramètres → Langue ; chaque langue est téléchargée depuis
+la version publiée quand on en a besoin. Cette documentation existe dans les dix langues ci-dessous.
 
 | | Langue | Interface | Documentation |
 |---|---|---|---|
@@ -112,14 +112,15 @@ message et écran d'installation est traduit, tout comme cette documentation.
 | 🇵🇰 | اردو | ✅ (de droite à gauche) | [README](README.ur.md) · [صارف گائیڈ](docs/i18n/ur/USER_GUIDE.md) · [انسٹالیشن](docs/i18n/ur/INSTALLATION.md) |
 
 **Comme Windows** (le réglage par défaut) parcourt vos langues d'affichage de Windows (Paramètres → Heure et
-langue), dans l'ordre où vous les avez classées, et prend la première qui fait partie de ces dix ; l'anglais sinon.
+langue), dans l'ordre où vous les avez classées, et prend la première que parle Aether Shell (n'importe
+laquelle des 41) ; l'anglais sinon.
 Choisissez-en une autre dans **Paramètres → Langue** ; le changement s'applique aussitôt et reste dans vos
 paramètres, que chaque version lit : installer une nouvelle version, réparer ou réinstaller le conserve, et
 l'installation, la mise à jour et le lanceur parlent aussi cette langue. Les noms qui vous appartiennent ou qui
 appartiennent à d'autres programmes (applications, fichiers, réseaux Wi-Fi) ne sont jamais traduits. L'accueil écrit
-à la main trace des lettres latines : il salue donc en français, en anglais ou en espagnol. L'arabe et l'ourdou se
+à la main trace des lettres latines : il salue donc en français, en anglais ou en espagnol. L'arabe, l'hébreu et l'ourdou se
 lisent de droite à gauche : le texte est formé et aligné en conséquence, tandis que les barres et les panneaux gardent
-leur disposition. Les traductions se trouvent dans [tools/i18n/catalog](tools/i18n/catalog) ; les corrections sont
+leur disposition. Les traductions se trouvent dans [tools/i18n/languages](tools/i18n/languages) ; les corrections sont
 les bienvenues.
 
 ## Remplacer la barre des tâches de Windows

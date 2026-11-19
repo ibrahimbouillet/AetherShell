@@ -7,7 +7,38 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — test 4.11: the corners go under a window shown in front of the maximized one (`0.4.0-alpha.4`, S-081, 2026-11-18)
+## Current checkpoint — Alpha 4 published: languages from the release, Liquid's smart transparency (`0.4.0-alpha.4`, D83–D84, S-082, 2026-11-19)
+
+The owner asked for every language Windows offers, downloaded from the release when chosen (with each one's size shown,
+as Windows does), and for Liquid to blur only where text could lie over text. After looking at the Settings window they
+approved the look ("Dès qu'il y a un plan derrière, il est flouté") and authorized commit, push and the public Alpha 4
+release once the tests had run, with the languages downloaded separately and the automatic language downloaded by setup.
+
+- **Languages (D83, FR-042, T67):** 41 languages (the 38 of Windows 11, plus Bengali, Hindi and Urdu). English is
+  built in; the 40 others are `AetherShell-language-<code>.json` release assets (826 texts, about 70 KB each), checked
+  against `src/core/LanguageTable.inc` (size, SHA-256). Sources: `tools/i18n/english/`, `tools/i18n/languages/`;
+  tool `tools/i18n/languages.py` (`check`, `build`, `packs`, `verify`; see its README). Setup's own texts are built in
+  (`SetupTexts.inc`). Setup downloads the Windows display languages after installing; each start downloads what is
+  missing and follows Windows' language and the Locale setting. `scripts/package.ps1` builds and verifies the packs.
+- **Smart transparency (D84, FR-044, T68):** `src/ui/form/SmartGlass.*`, used by Settings only. A click-through blur
+  window under the form; mask of 8 px cells from the form's own controls and the windows and desktop icons behind it
+  (their bounds only, never their content): full blur over content, 45 % over the plain desktop picture, none where the
+  form shows nothing, three cells of gradient; a light veil of the tint, Liquid's sheen and rim. Settings → Appearance →
+  *Smart transparency* (`general.liquidSmart`, on by default).
+- **Startup timing (T69, for 4.1):** `aethershell.log` notes `startup: autostart …, … s after boot, process started …
+  after sign-in, surfaces up … ms after the process started` and `startup: bars ready … ms after the process started,
+  … s after sign-in`.
+- **Evidence (S-082):** unit gate 26/26; settings_ui 44/44 after the Appearance tests followed the new check's ID;
+  native smart glass passes; the ui_form motion sufficiency cases fail as on the 0.3.5 build (capture throughput,
+  0 incoherent frames).
+- **Published:** commit pushed to `main`; GitHub release `v0.4.0-alpha.4`, Latest, with the setup, the checksums and the
+  40 language packs. The unsigned manifest stayed local. Test 4.11's setup moved to `dist/test-4.11/`.
+
+**Next:** Alpha 4.1: the owner restarts the PC and reads the `startup:` lines; the numbers choose what to optimize
+(T69). Open: a native speaker's reading; mirrored right-to-left layout; a language download from the published release
+on another PC; the code-signed setup and signed manifest.
+
+## Earlier — test 4.11: the corners go under a window shown in front of the maximized one (`0.4.0-alpha.4`, S-081, 2026-11-18)
 
 The window-corner case that failed during test 4.10 (and failed the same way with the 4.9 commit built separately) was
 a defect of the guard, now fixed. The owner asked to look into it ("Yes, look into it").
@@ -1448,7 +1479,7 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**Current state: 3.5 validated and published as Latest (D61, S-067, 2026-11-05); version 4 to be named**; read the checkpoint at the top first. Older assignment
+**Current state: Alpha 4 (0.4.0-alpha.4) published as Latest (D83–D84, S-082, 2026-11-19); next, Alpha 4.1's faster start (T69)**; read the checkpoint at the top first. Older assignment
 text follows. **Assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
 the status table in `docs/specs/v4-stability-audit.md`. The source work is in the working tree,
 uncommitted. Next: owner trial of a private build, then whatever it shows; the open AS4 entries; the

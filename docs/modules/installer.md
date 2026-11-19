@@ -64,6 +64,13 @@ together with its isolation flag, so the integration suite checks creation (targ
 the foreign-file rule and removal on uninstall in a temporary folder; the user's Start menu is never
 touched by tests, and the production binary has no such switch.
 
+## Languages (D83)
+
+Setup's own texts are built in, in every language (`src/core/SetupTexts.inc`), and setup shows the language the
+settings or Windows ask for. After a successful install from the wizard it downloads the packs of the Windows display
+languages (up to four) into `<data>\languages`, best effort: offline, it stops at the first network failure and setup
+goes on. The application downloads whatever is still missing when it starts. The test setup never downloads.
+
 ## Redesigned wizard and updater window (T47 / FR-037 / D42)
 
 Codex's continuation repairs malformed licence/newline literals and gives each install attempt a

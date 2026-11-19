@@ -1,0 +1,2494 @@
+# Greek (el): Ελληνικά. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Επιλέξτε την τοποθεσία των Windows για να ενεργοποιήσετε τον αυτόματο καιρό.
+
+en: Windows taskbar visible
+tr: Η γραμμή εργασιών των Windows είναι ορατή
+
+en: Connected to {}
+tr: Συνδέθηκε στο {}
+
+en: {} is out of range
+tr: Το {} είναι εκτός εμβέλειας
+
+en: Connecting to {} took too long
+tr: Η σύνδεση στο {} διήρκεσε πάρα πολύ
+
+en: Use Windows to join {}
+tr: Χρησιμοποιήστε τα Windows για σύνδεση στο {}
+
+en: Windows did not allow this connection
+tr: Τα Windows δεν επέτρεψαν αυτήν τη σύνδεση
+
+en: Could not connect to {}
+tr: Δεν ήταν δυνατή η σύνδεση στο {}
+
+en: Connect to {}
+tr: Σύνδεση στο {}
+
+en: That password was not accepted. Check it and try again.
+tr: Αυτός ο κωδικός πρόσβασης δεν έγινε αποδεκτός. Ελέγξτε τον και δοκιμάστε ξανά.
+
+en: Enter this network's password.
+tr: Εισαγάγετε τον κωδικό πρόσβασης αυτού του δικτύου.
+
+en: &Connect
+tr: &Σύνδεση
+
+en: Windows Settings could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα των Ρυθμίσεων των Windows
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Δεν ήταν δυνατή η δέσμευση χώρου για το Dock. Γίνεται επαναφορά της γραμμής εργασιών των Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Η αντικατάσταση δεν είναι διαθέσιμη: δεν ήταν δυνατή η εκκίνηση της παρακολούθησης αποκατάστασης
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Έγινε επαναφορά της γραμμής εργασιών των Windows. Δεν ήταν δυνατή η δέσμευση χώρου για το Dock. Απενεργοποιήστε και ενεργοποιήστε ξανά την αντικατάσταση για να δοκιμάσετε ξανά.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Η παρακολούθηση αποκατάστασης δεν είναι διαθέσιμη. Γίνεται επαναφορά της γραμμής εργασιών των Windows
+
+en: Windows notifications could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα των ειδοποιήσεων των Windows
+
+en: The Windows calendar could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα του ημερολογίου των Windows
+
+en: Windows did not show its hidden icons
+tr: Τα Windows δεν εμφάνισαν τα κρυφά εικονίδιά τους
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Η αυτόματη ανανέωση τοποθεσίας δεν είναι διαθέσιμη. Δοκιμάστε ξανά από τις ρυθμίσεις Καιρού.
+
+en: Windows location
+tr: Τοποθεσία των Windows
+
+en: Reading approximate Windows location…
+tr: Ανάγνωση της κατά προσέγγιση τοποθεσίας των Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: Ο αυτόματος καιρός ακολουθεί την κατά προσέγγιση τοποθεσία των Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Η πρόσβαση στην τοποθεσία των Windows έχει αποκλειστεί. Ο καιρός δεν είναι διαθέσιμος.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Τα Windows δεν μπόρεσαν να παράσχουν την τρέχουσα τοποθεσία. Ο καιρός δεν είναι διαθέσιμος.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Η υπηρεσία τοποθεσίας δεν είναι διαθέσιμη. Ο καιρός δεν είναι διαθέσιμος.
+
+en: Waiting for Windows location permission…
+tr: Αναμονή για την άδεια τοποθεσίας των Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Δεν ήταν δυνατή η αποθήκευση της επιλογής αυτόματου καιρού.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Η πρόσβαση στην τοποθεσία των Windows δεν είναι διαθέσιμη ή απορρίφθηκε. Ο καιρός δεν είναι διαθέσιμος.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Η τοποθεσία των Windows δεν μπόρεσε να ζητήσει άδεια. Ελέγξτε τις ρυθμίσεις τοποθεσίας των Windows.
+
+en: Status worker unavailable
+tr: Η υπηρεσία κατάστασης δεν είναι διαθέσιμη
+
+en: Windows could not complete this action. Review its settings.
+tr: Τα Windows δεν μπόρεσαν να ολοκληρώσουν αυτήν την ενέργεια. Ελέγξτε τις ρυθμίσεις της.
+
+en: Reading Windows status; try the action again shortly
+tr: Γίνεται ανάγνωση της κατάστασης των Windows. Δοκιμάστε ξανά την ενέργεια σε λίγο
+
+en: Could not disconnect
+tr: Δεν ήταν δυνατή η αποσύνδεση
+
+en: The Windows accessibility feature could not be started
+tr: Δεν ήταν δυνατή η εκκίνηση της δυνατότητας προσβασιμότητας των Windows
+
+en: Windows could not change the audio output
+tr: Τα Windows δεν μπόρεσαν να αλλάξουν την έξοδο ήχου
+
+en: The Windows control could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα του στοιχείου ελέγχου των Windows
+
+en: Keyboard shortcuts disabled
+tr: Οι συντομεύσεις πληκτρολογίου απενεργοποιήθηκαν
+
+en: Both keyboard shortcuts registered
+tr: Καταχωρήθηκαν και οι δύο συντομεύσεις πληκτρολογίου
+
+en: A keyboard shortcut is already in use by another application
+tr: Μια συντόμευση πληκτρολογίου χρησιμοποιείται ήδη από άλλη εφαρμογή
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Δεν ήταν δυνατή η κλήση των Γρήγορων ρυθμίσεων των Windows. Καταργήστε την επιλογή «Χρήση των Γρήγορων ρυθμίσεων των Windows» στις ρυθμίσεις της Επάνω γραμμής για να χρησιμοποιήσετε τα στοιχεία ελέγχου του Aether.
+
+en: Windows Start could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα της Έναρξης των Windows
+
+en: Windows Task View could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα της Προβολής εργασιών των Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: Η εναλλαγή διάταξης πληκτρολογίου των Windows δεν ήταν διαθέσιμη
+
+en: Windows voice typing could not be opened
+tr: Δεν ήταν δυνατό το άνοιγμα της φωνητικής πληκτρολόγησης των Windows
+
+en: Windows taskbar could not be revealed
+tr: Δεν ήταν δυνατή η εμφάνιση της γραμμής εργασιών των Windows
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Δεν ήταν δυνατή η συνέχιση της αντικατάστασης της γραμμής εργασιών. Τα Windows παραμένουν διαθέσιμα
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Η αντικατάσταση της γραμμής εργασιών των Windows δεν είναι διαθέσιμη σε αυτήν την περίοδο λειτουργίας
+
+en: Windows pin access is unavailable in this isolated session
+tr: Η πρόσβαση στα καρφιτσώματα των Windows δεν είναι διαθέσιμη σε αυτήν την απομονωμένη περίοδο λειτουργίας
+
+en: Windows pinned applications could not be read
+tr: Δεν ήταν δυνατή η ανάγνωση των καρφιτσωμένων εφαρμογών των Windows
+
+en: Settings changed during pin import. Try import again.
+tr: Οι ρυθμίσεις άλλαξαν κατά την εισαγωγή των καρφιτσωμάτων. Δοκιμάστε ξανά την εισαγωγή.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Αποθηκεύτηκαν {} επιπλέον καρφιτσωμένες εφαρμογές. Ορισμένα καρφιτσώματα των Windows ενδέχεται να μην είναι διαθέσιμα.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Τα καρφιτσώματα άλλαξαν στη μνήμη, αλλά η αποθήκευση απέτυχε. Επιλέξτε «Εφαρμογή» στις Ρυθμίσεις για να δοκιμάσετε ξανά.
+
+en: Pins updated in memory; saving...
+tr: Τα καρφιτσώματα ενημερώθηκαν στη μνήμη. Αποθήκευση...
+
+en: Imported pins could not be applied
+tr: Δεν ήταν δυνατή η εφαρμογή των καρφιτσωμάτων που εισήχθησαν
+
+en: Pin import is unavailable while closing
+tr: Η εισαγωγή καρφιτσωμάτων δεν είναι διαθέσιμη κατά το κλείσιμο
+
+en: Settings could not be saved
+tr: Δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων
+
+en: Quit without saving the latest changes?
+tr: Έξοδος χωρίς αποθήκευση των τελευταίων αλλαγών;
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Το προηγούμενο αρχείο ρυθμίσεών σας διατηρείται. Αφήστε το Aether Shell ανοιχτό για να δοκιμάσετε ξανά την αποθήκευση.
+
+en: &Quit without saving
+tr: Έ&ξοδος χωρίς αποθήκευση
+
+en: &Keep Aether Shell open
+tr: &Να παραμείνει ανοιχτό το Aether Shell
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Εξαγωγή βασικών διαγνωστικών στοιχείων — έκδοση εφαρμογής και build των Windows, χωρίς αρχεία καταγραφής ή προσωπικά δεδομένα
+
+en: Diagnostics exported.
+tr: Τα διαγνωστικά στοιχεία εξήχθησαν.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Δεν ήταν δυνατή η αποθήκευση των διαγνωστικών στοιχείων στο επιλεγμένο αρχείο.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Δεν ήταν δυνατή η ασφαλής ανάγνωση των ρυθμίσεων. Το υπάρχον αρχείο διατηρήθηκε.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Το Aether Shell δεν μπόρεσε να εκκινήσει τα στοιχεία του στην επιφάνεια εργασίας.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Η επαναφορά της γραμμής εργασιών των Windows εκκρεμεί. Δοκιμάστε ξανά ή κλείστε το Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Η γραμμή εργασιών των Windows εμφανίζεται προσωρινά.
+
+en: Windows taskbar restored.
+tr: Έγινε επαναφορά της γραμμής εργασιών των Windows.
+
+en: Windows taskbar replacement is active.
+tr: Η αντικατάσταση της γραμμής εργασιών των Windows είναι ενεργή.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Η γραμμή εργασιών των Windows παραμένει διαθέσιμη. Η αντικατάσταση θα επιχειρηθεί ξανά σε λίγο.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Η γραμμή εργασιών των Windows παραμένει διαθέσιμη. Απενεργοποιήστε και ενεργοποιήστε ξανά την αντικατάσταση για να δοκιμάσετε ξανά.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Έγινε επαναφορά της γραμμής εργασιών των Windows. Η αντικατάσταση θα επανασυνδεθεί σε λίγο.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Έγινε επαναφορά της γραμμής εργασιών των Windows. Απενεργοποιήστε και ενεργοποιήστε ξανά την αντικατάσταση για να δοκιμάσετε ξανά.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Η αντικατάσταση της γραμμής εργασιών σταμάτησε. Έγινε επαναφορά της γραμμής εργασιών των Windows.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Η αντικατάσταση της γραμμής εργασιών σταμάτησε. Δεν ήταν δυνατή η επιβεβαίωση της επαναφοράς της γραμμής εργασιών των Windows.
+
+en: Activating taskbar replacement...
+tr: Ενεργοποίηση της αντικατάστασης της γραμμής εργασιών...
+
+en: Restoring Windows taskbar...
+tr: Επαναφορά της γραμμής εργασιών των Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Επανασύνδεση της αντικατάστασης της γραμμής εργασιών...
+
+en: Showing the Windows taskbar temporarily...
+tr: Προσωρινή εμφάνιση της γραμμής εργασιών των Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Το Aether Shell δεν μπόρεσε να επαναφέρει τη γραμμή εργασιών των Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Επανεκκινήστε την Εξερεύνηση των Windows από τη Διαχείριση εργασιών (Ctrl+Shift+Esc) ή αποσυνδεθείτε και συνδεθείτε ξανά.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Έγινε επαναφορά της γραμμής εργασιών των Windows στην αποθηκευμένη κατάστασή της.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Δεν βρέθηκε αποθηκευμένη κατάσταση της γραμμής εργασιών. Η γραμμή εργασιών των Windows έγινε ορατή. Η ρύθμιση αυτόματης απόκρυψης δεν άλλαξε.
+
+en: There was nothing to restore.
+tr: Δεν υπήρχε τίποτα για επαναφορά.
+
+en: Taskbar replacement is turned off.
+tr: Η αντικατάσταση της γραμμής εργασιών είναι απενεργοποιημένη.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Δεν ήταν δυνατή η αυτόματη απενεργοποίηση της αντικατάστασης της γραμμής εργασιών. Απενεργοποιήστε την από τις Ρυθμίσεις του Aether Shell > Επιφάνεια εργασίας.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Μη αναγνωρίσιμη ή μη έγκυρη γραμμή εντολών του Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Το Aether Shell δεν μπόρεσε να δημιουργήσει τους τοπικούς φακέλους δεδομένων του.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Το Aether Shell σταμάτησε μετά από ένα μη αναμενόμενο σφάλμα.
+
+## search-names
+
+en: Disk Management
+tr: Διαχείριση δίσκων
+
+en: Local Users and Groups
+tr: Τοπικοί χρήστες και ομάδες
+
+en: Local Group Policy Editor
+tr: Πρόγραμμα επεξεργασίας πολιτικής τοπικής ομάδας
+
+en: Manage User Certificates
+tr: Διαχείριση πιστοποιητικών χρήστη
+
+en: Manage Computer Certificates
+tr: Διαχείριση πιστοποιητικών υπολογιστή
+
+en: Shared Folders
+tr: Κοινόχρηστοι φάκελοι
+
+en: TPM Management
+tr: Διαχείριση TPM
+
+en: Network Connections
+tr: Συνδέσεις δικτύου
+
+en: System Properties
+tr: Ιδιότητες συστήματος
+
+en: About Windows
+tr: Πληροφορίες για τα Windows
+
+en: DirectX Diagnostic Tool
+tr: Διαγνωστικό εργαλείο DirectX
+
+en: Windows Features
+tr: Δυνατότητες των Windows
+
+en: System Restore
+tr: Επαναφορά Συστήματος
+
+en: Advanced System Settings
+tr: Ρυθμίσεις συστήματος για προχωρημένους
+
+en: Volume Mixer
+tr: Μείκτης έντασης ήχου
+
+en: Microsoft Management Console
+tr: Κονσόλα διαχείρισης της Microsoft
+
+en: User Accounts (Advanced)
+tr: Λογαριασμοί χρηστών (για προχωρημένους)
+
+en: Display settings
+tr: Ρυθμίσεις οθόνης
+
+en: Night light settings
+tr: Ρυθμίσεις νυχτερινού φωτισμού
+
+en: Graphics settings
+tr: Ρυθμίσεις γραφικών
+
+en: Sound settings
+tr: Ρυθμίσεις ήχου
+
+en: Notification settings
+tr: Ρυθμίσεις ειδοποιήσεων
+
+en: Power & battery settings
+tr: Ρυθμίσεις τροφοδοσίας και μπαταρίας
+
+en: Energy saver settings
+tr: Ρυθμίσεις εξοικονόμησης ενέργειας
+
+en: Storage settings
+tr: Ρυθμίσεις χώρου αποθήκευσης
+
+en: Multitasking settings
+tr: Ρυθμίσεις πολλαπλών εργασιών
+
+en: Clipboard settings
+tr: Ρυθμίσεις Προχείρου
+
+en: Remote Desktop settings
+tr: Ρυθμίσεις απομακρυσμένης επιφάνειας εργασίας
+
+en: About your PC
+tr: Πληροφορίες για τον υπολογιστή σας
+
+en: Bluetooth & devices settings
+tr: Ρυθμίσεις Bluetooth και συσκευών
+
+en: Printers & scanners settings
+tr: Ρυθμίσεις εκτυπωτών και σαρωτών
+
+en: Mouse settings
+tr: Ρυθμίσεις ποντικιού
+
+en: Touchpad settings
+tr: Ρυθμίσεις επιφάνειας αφής
+
+en: Network & internet settings
+tr: Ρυθμίσεις δικτύου και Internet
+
+en: Wi-Fi settings
+tr: Ρυθμίσεις Wi-Fi
+
+en: VPN settings
+tr: Ρυθμίσεις VPN
+
+en: Proxy settings
+tr: Ρυθμίσεις διακομιστή μεσολάβησης
+
+en: Airplane mode settings
+tr: Ρυθμίσεις λειτουργίας πτήσης
+
+en: Mobile hotspot settings
+tr: Ρυθμίσεις φορητού σημείου πρόσβασης
+
+en: Background settings
+tr: Ρυθμίσεις φόντου
+
+en: Color settings
+tr: Ρυθμίσεις χρωμάτων
+
+en: Theme settings
+tr: Ρυθμίσεις θεμάτων
+
+en: Lock screen settings
+tr: Ρυθμίσεις οθόνης κλειδώματος
+
+en: Taskbar settings
+tr: Ρυθμίσεις γραμμής εργασιών
+
+en: Font settings
+tr: Ρυθμίσεις γραμματοσειρών
+
+en: Installed apps
+tr: Εγκατεστημένες εφαρμογές
+
+en: Default apps settings
+tr: Ρυθμίσεις προεπιλεγμένων εφαρμογών
+
+en: Startup apps settings
+tr: Ρυθμίσεις εφαρμογών εκκίνησης
+
+en: Account info
+tr: Πληροφορίες λογαριασμού
+
+en: Sign-in options
+tr: Επιλογές εισόδου
+
+en: Other users settings
+tr: Ρυθμίσεις άλλων χρηστών
+
+en: Date & time settings
+tr: Ρυθμίσεις ημερομηνίας και ώρας
+
+en: Language & region settings
+tr: Ρυθμίσεις γλώσσας και περιοχής
+
+en: Typing settings
+tr: Ρυθμίσεις πληκτρολόγησης
+
+en: Accessibility settings
+tr: Ρυθμίσεις προσβασιμότητας
+
+en: Privacy & security settings
+tr: Ρυθμίσεις προστασίας προσωπικών δεδομένων και ασφάλειας
+
+en: Location settings
+tr: Ρυθμίσεις τοποθεσίας
+
+en: Windows Update settings
+tr: Ρυθμίσεις του Windows Update
+
+en: Recovery settings
+tr: Ρυθμίσεις αποκατάστασης
+
+en: Activation settings
+tr: Ρυθμίσεις ενεργοποίησης
+
+en: For developers settings
+tr: Ρυθμίσεις για προγραμματιστές
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Δεν ήταν δυνατή η πρόσβαση στο GitHub.
+
+en: GitHub did not answer the request just now.
+tr: Το GitHub δεν απάντησε στο αίτημα αυτή τη στιγμή.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Η έκδοση δεν πέρασε την επαλήθευση, επομένως δεν εγκαταστάθηκε τίποτα.
+
+en: There is not enough free disk space.
+tr: Δεν υπάρχει αρκετός ελεύθερος χώρος στον δίσκο.
+
+en: Windows refused access to the update files.
+tr: Τα Windows αρνήθηκαν την πρόσβαση στα αρχεία της ενημέρωσης.
+
+en: {} bytes
+tr: {} byte
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Κατάσταση
+
+en: Check &now
+tr: Έλεγχος &τώρα
+
+en: Download and install
+tr: Λήψη και εγκατάσταση
+
+en: &Later
+tr: Α&ργότερα
+
+en: S&kip this version
+tr: &Παράλειψη αυτής της έκδοσης
+
+en: &Release details
+tr: Λεπτομέρειες έ&κδοσης
+
+en: Disable &notifications
+tr: Απενεργοποίηση &ειδοποιήσεων
+
+en: Release notes
+tr: Σημειώσεις έκδοσης
+
+en: the new version
+tr: η νέα έκδοση
+
+en: Installed: {}.
+tr: Εγκατεστημένη: {}.
+
+en: Automatic update checks are off
+tr: Οι αυτόματοι έλεγχοι για ενημερώσεις είναι απενεργοποιημένοι
+
+en: Check now looks for a newer release once.
+tr: Το «Έλεγχος τώρα» αναζητά μία φορά μια νεότερη έκδοση.
+
+en: Last checked {}
+tr: Τελευταίος έλεγχος {}
+
+en: Not checked yet
+tr: Δεν έχει γίνει έλεγχος ακόμα
+
+en: Checking for updates...
+tr: Έλεγχος για ενημερώσεις...
+
+en: Aether Shell is up to date
+tr: Το Aether Shell είναι ενημερωμένο
+
+en: Latest published release: {}.
+tr: Τελευταία δημοσιευμένη έκδοση: {}.
+
+en: Version {} is available
+tr: Η έκδοση {} είναι διαθέσιμη
+
+en: Download size: {}.
+tr: Μέγεθος λήψης: {}.
+
+en: Downloading version {}...
+tr: Λήψη της έκδοσης {}...
+
+en: Received {} of {} ({}%).
+tr: Λήφθηκαν {} από {} ({}%).
+
+en: Received {}; total size unknown.
+tr: Λήφθηκαν {}. Το συνολικό μέγεθος είναι άγνωστο.
+
+en: Version {} is ready to install
+tr: Η έκδοση {} είναι έτοιμη για εγκατάσταση
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Επαληθεύτηκε με το υπογεγραμμένο μανιφέστο της έκδοσης και SHA-256.
+
+en: The update could not be completed
+tr: Δεν ήταν δυνατή η ολοκλήρωση της ενημέρωσης
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Προς το παρόν εγκαθίσταται χειροκίνητα: ανοίξτε τις Λεπτομέρειες έκδοσης, κατεβάστε και εκτελέστε το πρόγραμμα εγκατάστασής της.
+
+en: Failure: {}.
+tr: Αποτυχία: {}.
+
+en: Choose Retry Download to try again.
+tr: Επιλέξτε «Επανάληψη λήψης» για να δοκιμάσετε ξανά.
+
+en: Use Check now to try again.
+tr: Χρησιμοποιήστε το «Έλεγχος τώρα» για να δοκιμάσετε ξανά.
+
+en: Next automatic check: {}.
+tr: Επόμενος αυτόματος έλεγχος: {}.
+
+en: &Install update
+tr: &Εγκατάσταση ενημέρωσης
+
+en: Retry &Download
+tr: Επανάληψη &λήψης
+
+en: &Download and install
+tr: &Λήψη και εγκατάσταση
+
+en: Windows' startup state could not be read in this session.
+tr: Δεν ήταν δυνατή η ανάγνωση της κατάστασης εκκίνησης των Windows σε αυτήν την περίοδο λειτουργίας.
+
+en: Windows will start it at your next sign-in.
+tr: Τα Windows θα το εκκινήσουν στην επόμενη είσοδό σας.
+
+en: Right now it will not start at sign-in.
+tr: Αυτή τη στιγμή δεν θα ξεκινά κατά την είσοδο.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Είναι απενεργοποιημένο στη Διαχείριση εργασιών ή στις Ρυθμίσεις των Windows, που αποφασίζουν μέχρι να ενεργοποιηθεί ξανά εκεί.
+
+en: Windows would start another copy of Aether Shell.
+tr: Τα Windows θα εκκινούσαν ένα άλλο αντίγραφο του Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Τα Windows αναφέρουν μια κατάσταση εκκίνησης που αυτή η έκδοση δεν μπορεί να διαβάσει.
+
+en: The close action could not be completed.
+tr: Δεν ήταν δυνατή η ολοκλήρωση της ενέργειας κλεισίματος.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Εισαγάγετε έναν πλήρη αριθμό πριν από την αποθήκευση. Το πεδίο που επισημαίνεται με κόκκινο δεν είναι αριθμός.
+
+en: Settings could not be validated.
+tr: Δεν ήταν δυνατή η επικύρωση των ρυθμίσεων.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Η εκκίνηση κατά την είσοδο έμεινε ως είχε, επειδή δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Δεν ήταν δυνατή η αποθήκευση των ρυθμίσεων ούτε η επαναφορά της εκκίνησης κατά την είσοδο στα Windows. Επιλέξτε ξανά «Εφαρμογή» για να δοκιμάσετε ξανά.
+
+en: Settings saved.
+tr: Οι ρυθμίσεις αποθηκεύτηκαν.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Οι ρυθμίσεις άλλαξαν στη μνήμη, αλλά η αποθήκευση απέτυχε. Επιλέξτε ξανά «Εφαρμογή» για να δοκιμάσετε ξανά.
+
+en: Settings could not be applied.
+tr: Δεν ήταν δυνατή η εφαρμογή των ρυθμίσεων.
+
+en: Some values were corrected to their supported range.
+tr: Ορισμένες τιμές διορθώθηκαν ώστε να είναι εντός του υποστηριζόμενου εύρους.
+
+en: Startup registration is unavailable in this session.
+tr: Η καταχώρηση εκκίνησης δεν είναι διαθέσιμη σε αυτήν την περίοδο λειτουργίας.
+
+en: Changing startup registration...
+tr: Αλλαγή της καταχώρησης εκκίνησης...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Τα Windows δεν άλλαξαν την καταχώρηση εκκίνησης. Ελέγξτε τη ρύθμιση εκκίνησης στη Διαχείριση εργασιών.
+
+en: Startup registration could not be changed.
+tr: Δεν ήταν δυνατή η αλλαγή της καταχώρησης εκκίνησης.
+
+en: Defaults saved; startup is disabled.
+tr: Οι προεπιλογές αποθηκεύτηκαν. Η εκκίνηση είναι απενεργοποιημένη.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Οι προεπιλογές εφαρμόστηκαν, αλλά η αποθήκευση απέτυχε. Επιλέξτε ξανά «Εφαρμογή» για να δοκιμάσετε ξανά.
+
+en: Defaults could not be applied.
+tr: Δεν ήταν δυνατή η εφαρμογή των προεπιλογών.
+
+en: Startup was not disabled; settings were kept.
+tr: Η εκκίνηση δεν απενεργοποιήθηκε. Οι ρυθμίσεις διατηρήθηκαν.
+
+en: Location search is unavailable.
+tr: Η αναζήτηση τοποθεσίας δεν είναι διαθέσιμη.
+
+en: Searching Open-Meteo locations...
+tr: Αναζήτηση τοποθεσιών στο Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Η αναζήτηση τοποθεσίας απέτυχε. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.
+
+en: No place matched that search.
+tr: Κανένα μέρος δεν ταιριάζει με αυτήν την αναζήτηση.
+
+en: Choose a location to save it.
+tr: Επιλέξτε μια τοποθεσία για να την αποθηκεύσετε.
+
+en: Reset all settings?
+tr: Επαναφορά όλων των ρυθμίσεων;
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Οι προτιμήσεις και οι καρφιτσωμένες εφαρμογές επανέρχονται στις προεπιλογές τους και η εκκίνηση κατά την είσοδο απενεργοποιείται.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Η επιλογή σας για τη γραμμή εργασιών των Windows διατηρείται. Διατηρείται και ένα αντίγραφο ασφαλείας του τρέχοντος αρχείου ρυθμίσεων.
+
+en: &Reset
+tr: &Επαναφορά
+
+en: Cancel
+tr: Άκυρο
+
+en: Pinned applications saved.
+tr: Οι καρφιτσωμένες εφαρμογές αποθηκεύτηκαν.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Τα καρφιτσώματα άλλαξαν στη μνήμη, αλλά η αποθήκευση απέτυχε. Επιλέξτε ξανά «Εφαρμογή» για να δοκιμάσετε ξανά.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Δεν ήταν δυνατή η επαναφορά των προεπιλογών, επειδή η καταχώρηση εκκίνησης δεν είναι διαθέσιμη.
+
+en: Pinned application could not be added.
+tr: Δεν ήταν δυνατή η προσθήκη της καρφιτσωμένης εφαρμογής.
+
+en: Choose an application to add first.
+tr: Επιλέξτε πρώτα μια εφαρμογή για προσθήκη.
+
+en: Pinned applications could not be changed.
+tr: Δεν ήταν δυνατή η αλλαγή των καρφιτσωμένων εφαρμογών.
+
+en: Choose a pinned application first.
+tr: Επιλέξτε πρώτα μια καρφιτσωμένη εφαρμογή.
+
+en: Desktop status is unavailable in this session.
+tr: Η κατάσταση της επιφάνειας εργασίας δεν είναι διαθέσιμη σε αυτήν την περίοδο λειτουργίας.
+
+en: Desktop status is unavailable.
+tr: Η κατάσταση της επιφάνειας εργασίας δεν είναι διαθέσιμη.
+
+en: Password
+tr: Κωδικός πρόσβασης
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Λήψη της γλώσσας {} από το GitHub ({}). Μέχρι να είναι έτοιμη, εμφανίζονται τα αγγλικά.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Δεν ήταν δυνατή η λήψη της γλώσσας {}. Μέχρι να γίνει, εμφανίζονται τα αγγλικά. Επιλέξτε «Λήψη» παρακάτω για να δοκιμάσετε ξανά.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Η γλώσσα {} δεν υπάρχει ακόμη σε αυτόν τον υπολογιστή. Μέχρι να γίνει λήψη, εμφανίζονται τα αγγλικά.
+
+en: {} is on this PC.
+tr: Η γλώσσα {} υπάρχει σε αυτόν τον υπολογιστή.
+
+en: Every language is on this PC.
+tr: Όλες οι γλώσσες υπάρχουν σε αυτόν τον υπολογιστή.
+
+en: Choose a language to download first.
+tr: Επιλέξτε πρώτα μια γλώσσα για λήψη.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Επάνω γραμμή
+
+en: Weather
+tr: Καιρός
+
+en: Updates
+tr: Ενημερώσεις
+
+en: General
+tr: Γενικά
+
+en: About
+tr: Πληροφορίες
+
+en: Desktop
+tr: Επιφάνεια εργασίας
+
+en: Appearance
+tr: Εμφάνιση
+
+en: Welcome
+tr: Καλωσόρισμα
+
+en: Aether Shell Settings
+tr: Ρυθμίσεις του Aether Shell
+
+en: Settings
+tr: Ρυθμίσεις
+
+en: Reset defaults...
+tr: Επαναφορά προεπιλογών...
+
+en: &Apply
+tr: Ε&φαρμογή
+
+en: Liquid
+tr: Υγρό
+
+en: Grain
+tr: Κόκκος
+
+en: From {} to {}
+tr: Από {} έως {}
+
+en: px
+tr: px
+
+en: min
+tr: λεπ.
+
+en: h
+tr: ώ.
+
+en: This action could not be completed.
+tr: Δεν ήταν δυνατή η ολοκλήρωση αυτής της ενέργειας.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Μέγεθος, αποστάσεις, κίνηση και οι εφαρμογές που είναι καρφιτσωμένες στο Dock.
+
+en: Size and spacing
+tr: Μέγεθος και αποστάσεις
+
+en: Icon size
+tr: Μέγεθος εικονιδίων
+
+en: {}, scaled with the Windows display scale.
+tr: {}, κλιμακωμένο με την κλίμακα οθόνης των Windows.
+
+en: Bottom margin
+tr: Κάτω περιθώριο
+
+en: Space between the Dock and the bottom of the screen.
+tr: Απόσταση ανάμεσα στο Dock και το κάτω μέρος της οθόνης.
+
+en: Minimum side margin
+tr: Ελάχιστο πλευρικό περιθώριο
+
+en: Space kept free at the left and right screen edges.
+tr: Χώρος που μένει ελεύθερος στο αριστερό και το δεξί άκρο της οθόνης.
+
+en: Icon spacing
+tr: Απόσταση εικονιδίων
+
+en: Space between neighbouring icons.
+tr: Απόσταση ανάμεσα σε γειτονικά εικονίδια.
+
+en: Glass and motion
+tr: Γυαλί και κίνηση
+
+en: Glass opacity
+tr: Αδιαφάνεια γυαλιού
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Οι χαμηλότερες τιμές δείχνουν περισσότερο από τη θολωμένη επιφάνεια εργασίας πίσω από το Dock.
+
+en: Hover magnification
+tr: Μεγέθυνση κατά την τοποθέτηση του δείκτη
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Πόσο μεγαλώνει ένα εικονίδιο κάτω από τον δείκτη. Με την τιμή 1 απενεργοποιείται.
+
+en: Behavior
+tr: Συμπεριφορά
+
+en: Show running applications
+tr: Εμφάνιση εφαρμογών που εκτελούνται
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Οι ανοιχτές εφαρμογές που δεν είναι καρφιτσωμένες εμφανίζονται μετά τις καρφιτσωμένες.
+
+en: Reserve screen space for the Dock
+tr: Δέσμευση χώρου οθόνης για το Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Τα παράθυρα σε μεγιστοποίηση μένουν πάνω από το Dock αντί για κάτω από αυτό.
+
+en: Automatically hide the Dock
+tr: Αυτόματη απόκρυψη του Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Κρύβεται όταν το καλύπτει ένα παράθυρο εφαρμογής. Μετακινήστε τον δείκτη στο κάτω άκρο της οθόνης για να το εμφανίσετε. Παραμένει στην επιφάνεια εργασίας και τα παράθυρα αποκτούν όλο το ύψος της οθόνης.
+
+en: Pinned applications
+tr: Καρφιτσωμένες εφαρμογές
+
+en: Move &up
+tr: Μετακίνηση &επάνω
+
+en: Move &down
+tr: Μετακίνηση κά&τω
+
+en: &Remove
+tr: &Κατάργηση
+
+en: &Add application
+tr: &Προσθήκη εφαρμογής
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Τα καρφιτσώματα διατηρούν την ταυτότητα και τις ρυθμίσεις εκκίνησής τους. Η κατάργηση ενός καρφιτσώματος εμποδίζει επίσης τον αυτόματο συγχρονισμό με τη γραμμή εργασιών των Windows να το προσθέσει ξανά.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Θέση, ρολόι και τα στοιχεία κατάστασης που εμφανίζονται στην επάνω γραμμή κατάστασης.
+
+en: Presentation
+tr: Παρουσίαση
+
+en: Floating bar
+tr: Αιωρούμενη γραμμή
+
+en: Text on the desktop
+tr: Κείμενο στην επιφάνεια εργασίας
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Αιωρούμενη γραμμή: η γυάλινη γραμμή λίγο κάτω από το επάνω άκρο της οθόνης. Κείμενο στην επιφάνεια εργασίας: χωρίς γραμμή, τα ίδια στοιχεία γραμμένα στο πολύ επάνω μέρος της οθόνης, απευθείας πάνω στην εικόνα της επιφάνειας εργασίας. Αυτή η λωρίδα μένει ελεύθερη από παράθυρα, ενώ το επάνω περιθώριο και η αδιαφάνεια γυαλιού δεν ισχύουν. Με την αυτόματη απόκρυψη, το κείμενο επανέρχεται σε μια γυάλινη λωρίδα όσο υπάρχει παράθυρο από κάτω.
+
+en: Position and glass
+tr: Θέση και γυαλί
+
+en: Top margin
+tr: Επάνω περιθώριο
+
+en: Space between the Top Bar and the top of the screen.
+tr: Απόσταση ανάμεσα στην Επάνω γραμμή και το επάνω μέρος της οθόνης.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Οι χαμηλότερες τιμές δείχνουν περισσότερο από τη θολωμένη επιφάνεια εργασίας πίσω από τη γραμμή.
+
+en: Clock
+tr: Ρολόι
+
+en: Clock format
+tr: Μορφή ρολογιού
+
+en: Follow Windows
+tr: Όπως στα Windows
+
+en: 12-hour
+tr: 12ωρη
+
+en: 24-hour
+tr: 24ωρη
+
+en: Date style
+tr: Στυλ ημερομηνίας
+
+en: Weekday, day and month
+tr: Ημέρα εβδομάδας, ημέρα και μήνας
+
+en: Short
+tr: Σύντομη
+
+en: Long
+tr: Πλήρης
+
+en: Show seconds
+tr: Εμφάνιση δευτερολέπτων
+
+en: Show date
+tr: Εμφάνιση ημερομηνίας
+
+en: Status items
+tr: Στοιχεία κατάστασης
+
+en: Show battery
+tr: Εμφάνιση μπαταρίας
+
+en: Hide battery when absent
+tr: Απόκρυψη μπαταρίας όταν δεν υπάρχει
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Οι επιτραπέζιοι υπολογιστές χωρίς μπαταρία δεν εμφανίζουν τίποτα αντί για άγνωστη μπαταρία.
+
+en: Show input language
+tr: Εμφάνιση γλώσσας εισαγωγής
+
+en: Show network
+tr: Εμφάνιση δικτύου
+
+en: Show audio output
+tr: Εμφάνιση εξόδου ήχου
+
+en: Show microphone
+tr: Εμφάνιση μικροφώνου
+
+en: Show weather when enabled
+tr: Εμφάνιση καιρού όταν είναι ενεργοποιημένος
+
+en: Weather itself is turned on in Weather settings.
+tr: Ο ίδιος ο καιρός ενεργοποιείται στις ρυθμίσεις Καιρού.
+
+en: Show hidden icons button
+tr: Εμφάνιση κουμπιού κρυφών εικονιδίων
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Ένα μικρό βέλος που ανοίγει τα κρυφά εικονίδια της περιοχής ειδοποιήσεων των Windows.
+
+en: Reserve screen space above windows
+tr: Δέσμευση χώρου οθόνης πάνω από τα παράθυρα
+
+en: Maximized windows stay below the Top Bar.
+tr: Τα παράθυρα σε μεγιστοποίηση μένουν κάτω από την Επάνω γραμμή.
+
+en: Automatically hide the Top Bar
+tr: Αυτόματη απόκρυψη της Επάνω γραμμής
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Κρύβεται όταν την καλύπτει ένα παράθυρο εφαρμογής. Μετακινήστε τον δείκτη στο επάνω άκρο της οθόνης για να την εμφανίσετε. Παραμένει στην επιφάνεια εργασίας.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Χρήση των Γρήγορων ρυθμίσεων των Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Ανενεργό: τα γρήγορα στοιχεία ελέγχου του Aether ανοίγουν κάτω από την Επάνω γραμμή. Ενεργό: ο πίνακας των ίδιων των Windows ανοίγει στο κάτω μέρος της οθόνης.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Μια προαιρετική πρόγνωση στην Επάνω γραμμή, από το Open-Meteo.
+
+en: Forecast
+tr: Πρόγνωση
+
+en: Enable weather
+tr: Ενεργοποίηση καιρού
+
+en: Off by default: the forecast needs network requests.
+tr: Ανενεργό από προεπιλογή: η πρόγνωση απαιτεί αιτήματα δικτύου.
+
+en: Temperature
+tr: Θερμοκρασία
+
+en: Celsius
+tr: Κελσίου
+
+en: Fahrenheit
+tr: Φαρενάιτ
+
+en: Refresh interval
+tr: Διάστημα ανανέωσης
+
+en: Location
+tr: Τοποθεσία
+
+en: Locate automatically with Windows
+tr: Αυτόματος εντοπισμός με τα Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Χρησιμοποιεί την υπηρεσία τοποθεσίας των Windows αφού το επιτρέψετε.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Τα Windows ζητούν άδεια τοποθεσίας. Οι συντεταγμένες σας αποστέλλονται στο Open-Meteo.com μόνο για τη λήψη της πρόγνωσης. Ένα κλειδί τοποθεσίας αποθηκεύεται τοπικά. Αν η τοποθεσία είναι αποκλεισμένη, ο καιρός δεν είναι διαθέσιμος.
+
+en: Use &Windows location
+tr: Χρήση της τοποθεσίας των &Windows
+
+en: Location &settings
+tr: &Ρυθμίσεις τοποθεσίας
+
+en: Choose automatic location or search for a place below.
+tr: Επιλέξτε αυτόματη τοποθεσία ή αναζητήστε ένα μέρος παρακάτω.
+
+en: Search for a place
+tr: Αναζήτηση μέρους
+
+en: Searc&h
+tr: Ανα&ζήτηση
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Δεδομένα καιρού από το Open-Meteo.com (CC BY 4.0). Η χειροκίνητη αναζήτηση στέλνει μόνο το κείμενο που εισάγετε.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Υπογεγραμμένες εκδόσεις από το επίσημο αποθετήριο GitHub, που επαληθεύονται πριν από την εγκατάσταση.
+
+en: Preferences
+tr: Προτιμήσεις
+
+en: Check for updates automatically
+tr: Αυτόματος έλεγχος για ενημερώσεις
+
+en: Check interval
+tr: Διάστημα ελέγχου
+
+en: Release channel
+tr: Κανάλι εκδόσεων
+
+en: Prereleases arrive earlier and change more often.
+tr: Οι προκαταρκτικές εκδόσεις φτάνουν νωρίτερα και αλλάζουν συχνότερα.
+
+en: Stable
+tr: Σταθερή
+
+en: Prerelease
+tr: Προκαταρκτική έκδοση
+
+en: Show update notifications
+tr: Εμφάνιση ειδοποιήσεων ενημερώσεων
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Εκκίνηση, κίνηση, συντομεύσεις πληκτρολογίου και διαγνωστικά.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Η γλώσσα των γραμμών, των μενού, της Αναζήτησης, των Ρυθμίσεων και του προγράμματος εγκατάστασης.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Τα ονόματα που ανήκουν σε εσάς ή σε άλλα προγράμματα (εφαρμογές, αρχεία, δίκτυα Wi-Fi) δεν μεταφράζονται ποτέ. Με μια επιλεγμένη γλώσσα, η Επάνω γραμμή γράφει την ημερομηνία σε αυτήν. Η επιλογή «Όπως στα Windows» διατηρεί τη μορφή περιοχής των Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Το χειρόγραφο καλωσόρισμα γράφει με λατινικούς χαρακτήρες: χαιρετά στα γαλλικά, τα αγγλικά ή τα ισπανικά. Επιλέξτε τη γλώσσα του στο Καλωσόρισμα.
+
+en: Language
+tr: Γλώσσα
+
+en: Interface language
+tr: Γλώσσα περιβάλλοντος
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Η επιλογή «Όπως στα Windows» χρησιμοποιεί την πρώτη από τις γλώσσες εμφάνισης των Windows που υπάρχει σε αυτήν τη λίστα, διαφορετικά τα αγγλικά.
+
+en: Startup
+tr: Εκκίνηση
+
+en: Start Aether Shell when I sign in
+tr: Εκκίνηση του Aether Shell κατά την είσοδό μου
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Η αλλαγή αυτής της ρύθμισης απαιτεί «Εφαρμογή». Μπορείτε επίσης να την απενεργοποιήσετε από τη Διαχείριση εργασιών.
+
+en: Motion
+tr: Κίνηση
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Η μειωμένη κίνηση καταργεί παντού τη διακοσμητική κίνηση.
+
+en: Reduced
+tr: Μειωμένη
+
+en: Full
+tr: Πλήρης
+
+en: Keyboard shortcuts
+tr: Συντομεύσεις πληκτρολογίου
+
+en: Enable global keyboard shortcuts
+tr: Ενεργοποίηση καθολικών συντομεύσεων πληκτρολογίου
+
+en: Search shortcut key
+tr: Πλήκτρο συντόμευσης Αναζήτησης
+
+en: Dock shortcut key
+tr: Πλήκτρο συντόμευσης Dock
+
+en: Search shortcut modifiers
+tr: Πλήκτρα τροποποίησης συντόμευσης Αναζήτησης
+
+en: Dock shortcut modifiers
+tr: Πλήκτρα τροποποίησης συντόμευσης Dock
+
+en: Shortcut status unavailable
+tr: Η κατάσταση των συντομεύσεων δεν είναι διαθέσιμη
+
+en: Diagnostics
+tr: Διαγνωστικά
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Ο φάκελος αρχείων καταγραφής περιέχει τα αρχεία καταγραφής του Aether Shell αυτού του υπολογιστή. Η εξαγωγή διαγνωστικών αποθηκεύει μόνο την έκδοση της εφαρμογής και το build των Windows - χωρίς αρχεία καταγραφής ή προσωπικά δεδομένα.
+
+en: Open &log folder
+tr: Άνοιγμα φακέλου αρχείων &καταγραφής
+
+en: &Export diagnostics...
+tr: &Εξαγωγή διαγνωστικών...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Ένας σύντομος χειρόγραφος χαιρετισμός στην επιφάνεια εργασίας σας αφού εισέλθετε ή ξεκλειδώσετε τον υπολογιστή σας.
+
+en: Greeting
+tr: Χαιρετισμός
+
+en: Show the welcome at sign-in and unlock
+tr: Εμφάνιση του καλωσορίσματος κατά την είσοδο και το ξεκλείδωμα
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Εμφανίζεται αφού τα Windows ολοκληρώσουν την είσοδό σας, όσο το Aether Shell προετοιμάζεται. Αγγίξτε, κάντε κλικ ή πατήστε Esc για να το παραλείψετε.
+
+en: Greeting language
+tr: Γλώσσα χαιρετισμού
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut στα γαλλικά, Hello στα αγγλικά, Hola στα ισπανικά. Η πένα γράφει λατινικούς χαρακτήρες: σε κάθε άλλη γλώσσα χαιρετά στα αγγλικά.
+
+en: Your name
+tr: Το όνομά σας
+
+en: Name to greet you with
+tr: Όνομα με το οποίο θα σας χαιρετά
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Προαιρετικό, για παράδειγμα ένα μικρό όνομα. Μένει σε αυτόν τον υπολογιστή στις ρυθμίσεις του Aether Shell και δεν αποστέλλεται πουθενά ούτε γράφεται σε αρχείο καταγραφής. Αδειάστε το πεδίο για να το καταργήσετε.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Λειτουργία χρώματος, χρώμα έμφασης, ταχύτητα κίνησης και η εμφάνιση του Dock και της Επάνω γραμμής.
+
+en: Style
+tr: Στυλ
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Υγρό: γυαλί σε στρώσεις πάνω από ό,τι βρίσκεται πίσω, μια στρώση θόλωσης, το φως του υγρού και έπειτα τα εικονίδια και το κείμενο, ευανάγνωστα σε φωτεινές και σκοτεινές σελίδες. Κόκκος: αμμοβολημένο γυαλί, θολό και ημιδιαφανές, με λεπτό κόκκο.
+
+en: Liquid blur
+tr: Θόλωση Υγρού
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Πόσο καλύπτει η στρώση θόλωσης κάτω από το γυαλί Υγρού ό,τι βρίσκεται πίσω: με 100% θολώνει τα πάντα. Οι χαμηλότερες τιμές δείχνουν τη σελίδα πιο καθαρή, και το κείμενο στις γραμμές μπορεί τότε να διαβάζεται λιγότερο εύκολα πάνω σε μια φορτωμένη σελίδα.
+
+en: Liquid blur color
+tr: Χρώμα θόλωσης Υγρού
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Η επιλογή «Αυτόματο» διατηρεί τα χρώματα του ίδιου του γυαλιού. Το κείμενο και τα εικονίδια παραμένουν ευανάγνωστα όποιο κι αν είναι το χρώμα.
+
+en: Automatic
+tr: Αυτόματο
+
+en: White
+tr: Λευκό
+
+en: Black
+tr: Μαύρο
+
+en: Accent
+tr: Χρώμα έμφασης
+
+en: Blue
+tr: Μπλε
+
+en: Violet
+tr: Βιολετί
+
+en: Pink
+tr: Ροζ
+
+en: Red
+tr: Κόκκινο
+
+en: Orange
+tr: Πορτοκαλί
+
+en: Yellow
+tr: Κίτρινο
+
+en: Green
+tr: Πράσινο
+
+en: Teal
+tr: Γαλαζοπράσινο
+
+en: Liquid color strength
+tr: Ένταση χρώματος Υγρού
+
+en: How much of the chosen color the blur layer takes.
+tr: Πόσο από το επιλεγμένο χρώμα παίρνει η στρώση θόλωσης.
+
+en: Theme
+tr: Θέμα
+
+en: Color mode
+tr: Λειτουργία χρώματος
+
+en: High contrast always takes precedence.
+tr: Η υψηλή αντίθεση έχει πάντα προτεραιότητα.
+
+en: Light
+tr: Φωτεινή
+
+en: Dark
+tr: Σκοτεινή
+
+en: Accent color
+tr: Χρώμα έμφασης
+
+en: Animation duration
+tr: Διάρκεια κινούμενων εικόνων
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: Το 1 είναι η κανονική ταχύτητα. Οι υψηλότερες τιμές είναι πιο αργές. Η μειωμένη κίνηση έχει προτεραιότητα.
+
+en: Dock icon preset
+tr: Προεπιλογή εικονιδίων Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Ένα προσαρμοσμένο μέγεθος από τις ρυθμίσεις του Dock διατηρείται μέχρι να επιλέξετε μια προεπιλογή.
+
+en: Small - 32 px
+tr: Μικρό - 32 px
+
+en: Medium - 40 px
+tr: Μεσαίο - 40 px
+
+en: Large - 48 px
+tr: Μεγάλο - 48 px
+
+en: Keep custom size
+tr: Διατήρηση προσαρμοσμένου μεγέθους
+
+en: Show Windows Start in the Dock
+tr: Εμφάνιση της Έναρξης των Windows στο Dock
+
+en: Show Task View in the Dock
+tr: Εμφάνιση της Προβολής εργασιών στο Dock
+
+en: Reserve extra space for Dock animations
+tr: Δέσμευση επιπλέον χώρου για τις κινήσεις του Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Κρατά τη μεγέθυνση και την αναπήδηση εκκίνησης μακριά από τα παράθυρα σε μεγιστοποίηση.
+
+en: Weather position
+tr: Θέση καιρού
+
+en: Left
+tr: Αριστερά
+
+en: Right
+tr: Δεξιά
+
+en: Keyboard indicator
+tr: Ένδειξη πληκτρολογίου
+
+en: Compact
+tr: Συμπαγής
+
+en: Two lines
+tr: Δύο γραμμές
+
+en: Windows taskbar pins
+tr: Καρφιτσώματα της γραμμής εργασιών των Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Προσθήκη νέων καρφιτσωμάτων της γραμμής εργασιών των Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Όσο η γραμμή εργασιών είναι αντικατεστημένη, τα νέα καρφιτσώματα των Windows προστίθενται στο Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Αναστρέψιμη αντικατάσταση της γραμμής εργασιών των Windows από το Dock.
+
+en: Taskbar replacement
+tr: Αντικατάσταση γραμμής εργασιών
+
+en: Replace the Windows taskbar
+tr: Αντικατάσταση της γραμμής εργασιών των Windows
+
+en: Changing this needs Apply.
+tr: Η αλλαγή αυτής της ρύθμισης απαιτεί «Εφαρμογή».
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Όσο εκτελείται το Aether Shell, κρύβει τη γραμμή εργασιών των Windows και δεσμεύει χώρο κάτω από τις εφαρμογές σε μεγιστοποίηση.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Η κατάσταση της γραμμής εργασιών των Windows επαναφέρεται όταν απενεργοποιηθεί αυτή η λειτουργία ή όταν τερματιστεί το Aether Shell. Ένα ξεχωριστό βοηθητικό πρόγραμμα αποκατάστασης την επαναφέρει επίσης αν η εφαρμογή σταματήσει απρόσμενα. Αν η αποκατάσταση αποτύχει, επανεκκινήστε την Εξερεύνηση των Windows από τη Διαχείριση εργασιών.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Οι Ρυθμίσεις των Windows παραμένουν το εγγενές περιβάλλον των Windows. Η σελίδα της γραμμής εργασιών τους δεν αντικαθίσταται από το Aether Shell. Ρυθμίστε αυτήν τη λειτουργία εδώ.
+
+en: Pinned applications from Windows
+tr: Καρφιτσωμένες εφαρμογές από τα Windows
+
+en: &Import Windows taskbar pins
+tr: &Εισαγωγή καρφιτσωμάτων της γραμμής εργασιών των Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Διαβάζει τις καρφιτσωμένες συντομεύσεις χωρίς να αλλάζει τα καρφιτσώματα των Windows. Ορισμένα καρφιτσώματα των Windows 11 ή η σειρά τους ενδέχεται να μην είναι διαθέσιμα.
+
+en: Version {}
+tr: Έκδοση {}
+
+en: Created by Ibrahim Bouillet
+tr: Δημιουργία: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Ένα εγγενές περιβάλλον επιφάνειας εργασίας για τα Windows - ένα αιωρούμενο Dock και μια επάνω γραμμή κατάστασης - που λειτουργεί μαζί με την Εξερεύνηση.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Δεδομένα καιρού: Open-Meteo.com (CC BY 4.0). Δεν περιλαμβάνονται βιβλιοθήκες χρόνου εκτέλεσης C++ τρίτων.
+
+en: &Official project
+tr: &Επίσημο έργο
+
+en: Licence
+tr: Άδεια χρήσης
+
+en: Taskbar replacement changes need Apply.
+tr: Οι αλλαγές στην αντικατάσταση της γραμμής εργασιών απαιτούν «Εφαρμογή».
+
+en: Changes save automatically. Startup needs Apply.
+tr: Οι αλλαγές αποθηκεύονται αυτόματα. Η εκκίνηση απαιτεί «Εφαρμογή».
+
+en: Changes save automatically.
+tr: Οι αλλαγές αποθηκεύονται αυτόματα.
+
+en: Press Apply to confirm this change.
+tr: Πατήστε «Εφαρμογή» για να επιβεβαιώσετε αυτήν την αλλαγή.
+
+en: Smart transparency
+tr: Έξυπνη διαφάνεια
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Στο Υγρό, αυτό το παράθυρο θολώνει μόνο κάτω από το κείμενο και τα στοιχεία ελέγχου του: πλήρως πάνω από άλλα παράθυρα και εικονίδια της επιφάνειας εργασίας, ελαφρά πάνω από την εικόνα της επιφάνειας εργασίας και καθόλου εκεί όπου δεν εμφανίζει τίποτα.
+
+en: Languages on this PC
+tr: Γλώσσες σε αυτόν τον υπολογιστή
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Το Aether Shell κατεβάζει τις γλώσσες που διαθέτουν τα Windows, ώστε να αλλάζει γλώσσα όταν την αλλάζουν και τα Windows.
+
+en: Add a language
+tr: Προσθήκη γλώσσας
+
+en: &Download
+tr: &Λήψη
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Κάθε γλώσσα προέρχεται από την κυκλοφορία αυτής της έκδοσης στο GitHub και ελέγχεται πριν χρησιμοποιηθεί. Μόλις βρεθεί σε αυτόν τον υπολογιστή, επιλέξτε την παραπάνω.
+
+en: built in
+tr: ενσωματωμένη
+
+en: downloading, {}
+tr: λήψη, {}
+
+en: download failed
+tr: η λήψη απέτυχε
+
+## setup
+
+en: Aether Shell Setup
+tr: Εγκατάσταση του Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Το πρόγραμμα εγκατάστασης δεν μπόρεσε να δημιουργήσει το περιβάλλον του. Κλείστε το και δοκιμάστε ξανά ή χρησιμοποιήστε τις τεκμηριωμένες επιλογές αθόρυβης εγκατάστασης.
+
+en: Options
+tr: Επιλογές
+
+en: Install
+tr: Εγκατάσταση
+
+en: Done
+tr: Τέλος
+
+en: Remove Aether Shell
+tr: Κατάργηση του Aether Shell
+
+en: Repair Aether Shell
+tr: Επιδιόρθωση του Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Ένα εγγενές Dock και μια επάνω γραμμή κατάστασης για τα Windows, που λειτουργούν μαζί με την Εξερεύνηση.
+
+en: Replaces the Windows taskbar while it runs
+tr: Αντικαθιστά τη γραμμή εργασιών των Windows όσο εκτελείται
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Τερματίστε το Aether Shell, απενεργοποιήστε αυτήν τη ρύθμιση από τις Ρυθμίσεις > Επιφάνεια εργασίας ή ανοίξτε την «Επαναφορά της γραμμής εργασιών των Windows» από το μενού Έναρξη για να επαναφέρετε τη γραμμή εργασιών των Windows.
+
+en: Starts when you sign in - your choice
+tr: Ξεκινά κατά την είσοδό σας - με δική σας επιλογή
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Οι νέες εγκαταστάσεις ξεκινούν κατά την είσοδο από προεπιλογή. Μπορείτε να καταργήσετε αυτήν την επιλογή πριν από την εγκατάσταση ή να την απενεργοποιήσετε αργότερα από τις Ρυθμίσεις. Οι υπάρχουσες επιλογές εκκίνησης και οι απενεργοποιήσεις από τη Διαχείριση εργασιών διατηρούνται.
+
+en: Installs for your account
+tr: Εγκαθίσταται για τον λογαριασμό σας
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Δεν απαιτούνται δικαιώματα διαχειριστή. Οι ρυθμίσεις και τα δεδομένα σας παραμένουν στο προφίλ χρήστη σας.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Η κατάργηση εγκατάστασης διατηρεί τις ρυθμίσεις και τα δεδομένα σας, εκτός αν επιλέξετε να τα καταργήσετε.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Η επιδιόρθωση επαναφέρει τα αρχεία αυτού του πακέτου και διατηρεί τις ρυθμίσεις σας. Αν το Aether Shell άφησε τη γραμμή εργασιών των Windows κρυφή, η επιδιόρθωση την επαναφέρει.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Η εγκατάσταση πάνω από μια υπάρχουσα έκδοση διατηρεί τις ρυθμίσεις σας. Ένα παλαιότερο πακέτο απορρίπτεται, εκτός αν επιτρέψετε ρητά την υποβάθμιση.
+
+en: MIT License
+tr: Άδεια χρήσης MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Η άδεια χρήσης εγκαθίσταται επίσης ως LICENSE δίπλα στο Aether Shell.
+
+en: Remove this installation
+tr: Κατάργηση αυτής της εγκατάστασης
+
+en: Install location
+tr: Θέση εγκατάστασης
+
+en: &Browse...
+tr: Ανα&ζήτηση...
+
+en: Also remove my settings, cache and logs
+tr: Κατάργηση επίσης των ρυθμίσεων, της προσωρινής μνήμης και των αρχείων καταγραφής μου
+
+en: This cannot be undone.
+tr: Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Το πρόγραμμα εγκατάστασης θα κλείσει ομαλά το Aether Shell και θα καταργήσει τα εγκατεστημένα αρχεία, τις συντομεύσεις, την καταχώρηση εκκίνησης και την καταχώρησή του στις Εγκατεστημένες εφαρμογές. Οι άλλες εφαρμογές και οι ρυθμίσεις των Windows δεν επηρεάζονται.
+
+en: Your welcome
+tr: Το καλωσόρισμά σας
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Αφού εισέλθετε ή ξεκλειδώσετε τον υπολογιστή σας, το Aether Shell γράφει με το χέρι έναν σύντομο χαιρετισμό. Πληκτρολογήστε το όνομα με το οποίο θα σας χαιρετά ή αφήστε το κενό για ένα απλό γεια.
+
+en: Your first name
+tr: Το μικρό σας όνομα
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Προαιρετικό, για παράδειγμα ένα μικρό όνομα. Μένει σε αυτόν τον υπολογιστή στις ρυθμίσεις του Aether Shell και δεν αποστέλλεται πουθενά. Αλλάξτε το ή απενεργοποιήστε το καλωσόρισμα από τις Ρυθμίσεις > Καλωσόρισμα.
+
+en: Shortcuts and startup
+tr: Συντομεύσεις και εκκίνηση
+
+en: Create Start menu shortcuts
+tr: Δημιουργία συντομεύσεων στο μενού Έναρξη
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell και Επαναφορά της γραμμής εργασιών των Windows.
+
+en: Create a desktop shortcut
+tr: Δημιουργία συντόμευσης στην επιφάνεια εργασίας
+
+en: Shows your current choice.
+tr: Εμφανίζει την τρέχουσα επιλογή σας.
+
+en: Recommended.
+tr: Συνιστάται.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Καταργήστε την επιλογή για να εξαιρεθείτε. Οι απενεργοποιήσεις από τη Διαχείριση εργασιών γίνονται σεβαστές.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Η εγκατάσταση αποδέχεται την παραπάνω επιλογή εκκίνησης. Το πρόγραμμα εκκίνησης μπορεί να επανεκκινήσει το Aether Shell μετά από κατάρρευση, με περιορισμένο αριθμό επαναλήψεων. Οι επιλογές Έξοδος και Επαναφορά της γραμμής εργασιών των Windows παραμένουν διαθέσιμες. Ο καιρός είναι απενεργοποιημένος από προεπιλογή. Τα μη υπογεγραμμένα εκτελέσιμα αρχεία ενδέχεται να προκαλέσουν προειδοποίηση του Windows SmartScreen.
+
+en: Removing this installation...
+tr: Κατάργηση αυτής της εγκατάστασης...
+
+en: Repairing Aether Shell...
+tr: Επιδιόρθωση του Aether Shell...
+
+en: Installing Aether Shell...
+tr: Εγκατάσταση του Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Κλείσιμο του Aether Shell και κατάργηση των αρχείων του.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Επαλήθευση του ενσωματωμένου πακέτου και εγκατάσταση των αρχείων του. Η πρόοδος εμφανίζεται ως δραστηριότητα: το πρόγραμμα εγκατάστασης δεν γνωρίζει τον χρόνο που απομένει.
+
+en: Please wait while the removal completes.
+tr: Περιμένετε μέχρι να ολοκληρωθεί η κατάργηση.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Η επιλογή Άκυρο είναι διαθέσιμη μέχρι να ενεργοποιηθεί η νέα έκδοση. Έπειτα, η εγκατάσταση ολοκληρώνεται με ασφάλεια.
+
+en: Aether Shell was uninstalled.
+tr: Η εγκατάσταση του Aether Shell καταργήθηκε.
+
+en: Aether Shell is ready.
+tr: Το Aether Shell είναι έτοιμο.
+
+en: Setup was cancelled.
+tr: Η εγκατάσταση ακυρώθηκε.
+
+en: Setup could not complete.
+tr: Δεν ήταν δυνατή η ολοκλήρωση της εγκατάστασης.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Τα δεδομένα σας διατηρήθηκαν, εκτός αν επιλέξατε ρητά να τα καταργήσετε.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Μπορείτε να το επιδιορθώσετε ή να καταργήσετε την εγκατάστασή του από τις Ρυθμίσεις των Windows > Εφαρμογές > Εγκατεστημένες εφαρμογές.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Η λειτουργία ακυρώθηκε πριν από την ενεργοποίηση. Επιστρέψτε στις Επιλογές για να δοκιμάσετε ξανά.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Ελέγξτε την πρόσβαση στα αρχεία και τον ελεύθερο χώρο στον δίσκο και δοκιμάστε ξανά. Αν το Aether Shell υπάρχει ήδη, η Επιδιόρθωση μπορεί να επαναφέρει τα αρχεία του. Κατηγορία σφάλματος: {}
+
+en: Setup log
+tr: Αρχείο καταγραφής εγκατάστασης
+
+en: Launch Aether Shell
+tr: Εκκίνηση του Aether Shell
+
+en: &Back
+tr: &Πίσω
+
+en: &Next
+tr: &Επόμενο
+
+en: &Continue
+tr: &Συνέχεια
+
+en: &Uninstall
+tr: &Κατάργηση εγκατάστασης
+
+en: &Repair
+tr: Επι&διόρθωση
+
+en: &Install
+tr: Ε&γκατάσταση
+
+en: &Close
+tr: Κλεί&σιμο
+
+en: Step {} of {}: {}
+tr: Βήμα {} από {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Επιλέξτε τον φάκελο εγκατάστασης του Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Επιλέξτε μια πλήρη διαδρομή φακέλου, για παράδειγμα μία που ξεκινά με γράμμα μονάδας δίσκου.
+
+en: The install folder must be an absolute path.
+tr: Ο φάκελος εγκατάστασης πρέπει να είναι απόλυτη διαδρομή.
+
+en: Setup stops at the next safe point.
+tr: Το πρόγραμμα εγκατάστασης σταματά στο επόμενο ασφαλές σημείο.
+
+en: Cancelling...
+tr: Ακύρωση...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Το πρόγραμμα εγκατάστασης ολοκληρώνει με ασφάλεια το τρέχον βήμα. Περιμένετε.
+
+en: Updating Aether Shell
+tr: Ενημέρωση του Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Επαλήθευση του υπογεγραμμένου πακέτου και εφαρμογή της ενημέρωσης.
+
+en: Update completed
+tr: Η ενημέρωση ολοκληρώθηκε
+
+en: The update did not complete
+tr: Η ενημέρωση δεν ολοκληρώθηκε
+
+en: Close
+tr: Κλείσιμο
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Δεν ήταν δυνατή η εκκίνηση του περιβάλλοντος ενημέρωσης. Η ενημέρωση δεν εφαρμόστηκε. Δοκιμάστε ξανά ή χρησιμοποιήστε την Επιδιόρθωση.
+
+en: Aether Shell Update
+tr: Ενημέρωση του Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Δεν ήταν δυνατή η εκκίνηση του περιβάλλοντος ενημέρωσης. Η ενημέρωση δεν εφαρμόστηκε. Δοκιμάστε ξανά ή χρησιμοποιήστε την Επιδιόρθωση από τις Ρυθμίσεις των Windows > Εφαρμογές > Εγκατεστημένες εφαρμογές.
+
+en: Update completed.
+tr: Η ενημέρωση ολοκληρώθηκε.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Η ενημέρωση δεν ολοκληρώθηκε. Ανατρέξτε στο αρχείο καταγραφής ενημέρωσης ή χρησιμοποιήστε την Επιδιόρθωση.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Δεν ήταν δυνατή η εκκίνηση του Aether Shell. Επιλέξτε Επιδιόρθωση από τις Ρυθμίσεις των Windows > Εφαρμογές > Εγκατεστημένες εφαρμογές.
+
+en: Aether Shell Settings — update in progress
+tr: Ρυθμίσεις του Aether Shell — ενημέρωση σε εξέλιξη
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Συνέχιση της αντικατάστασης της γραμμής εργασιών
+
+en: Show Windows &notification area for 60 seconds
+tr: Εμφάνιση της περιοχής &ειδοποιήσεων των Windows για 60 δευτερόλεπτα
+
+en: &Search…
+tr: &Αναζήτηση…
+
+en: &Settings…
+tr: &Ρυθμίσεις…
+
+en: View available &update…
+tr: Προβολή διαθέσιμης ενη&μέρωσης…
+
+en: &Check for updates…
+tr: Έ&λεγχος για ενημερώσεις…
+
+en: &About Aether Shell
+tr: &Πληροφορίες για το Aether Shell
+
+en: &Quit Aether Shell
+tr: Έ&ξοδος από το Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Εναλλαγή γλώσσας &εισαγωγής\tWin+Διάστημα
+
+en: Open &network controls…
+tr: Άνοιγμα στοιχείων ελέγχου &δικτύου…
+
+en: &Weather settings…
+tr: Ρυθμίσεις &καιρού…
+
+en: Toggle output &mute
+tr: Εναλλαγή &σίγασης εξόδου
+
+en: &Sound settings…
+tr: Ρυθμίσεις ή&χου…
+
+en: Toggle microphone &mute
+tr: Εναλλαγή &σίγασης μικροφώνου
+
+en: Start Windows &voice typing\tWin+H
+tr: Έναρξη &φωνητικής πληκτρολόγησης των Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Ρυθμίσεις &προστασίας προσωπικών δεδομένων μικροφώνου…
+
+en: &Power settings…
+tr: Ρυθμίσεις &τροφοδοσίας…
+
+en: Open &notifications and calendar
+tr: Άνοιγμα &ειδοποιήσεων και ημερολογίου
+
+en: Open &calendar\tWin+Alt+D
+tr: Άνοιγμα &ημερολογίου\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Εμφάνιση &κρυφών εικονιδίων
+
+en: Initializing
+tr: Προετοιμασία
+
+en: Unavailable
+tr: Μη διαθέσιμο
+
+en: Unsupported
+tr: Δεν υποστηρίζεται
+
+en: Error
+tr: Σφάλμα
+
+en: Available
+tr: Διαθέσιμο
+
+en: Unknown
+tr: Άγνωστο
+
+en: Internet access
+tr: Πρόσβαση στο Internet
+
+en: Local network only
+tr: Μόνο τοπικό δίκτυο
+
+en: Limited Internet access
+tr: Περιορισμένη πρόσβαση στο Internet
+
+en: No network connection
+tr: Δεν υπάρχει σύνδεση δικτύου
+
+en: Connectivity unknown
+tr: Άγνωστη συνδεσιμότητα
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Κινητό δίκτυο
+
+en: Network
+tr: Δίκτυο
+
+en: Offline
+tr: Εκτός σύνδεσης
+
+en: Network status unavailable
+tr: Η κατάσταση δικτύου δεν είναι διαθέσιμη
+
+en: Quick controls
+tr: Γρήγορα στοιχεία ελέγχου
+
+en: Aether Shell menu
+tr: Μενού του Aether Shell
+
+en: Weather status unavailable
+tr: Η κατάσταση του καιρού δεν είναι διαθέσιμη
+
+en: Cached weather
+tr: Καιρός από την προσωρινή μνήμη
+
+en: Observation (UTC): {}
+tr: Παρατήρηση (UTC): {}
+
+en: Weather: {}
+tr: Καιρός: {}
+
+en: Click to open weather settings
+tr: Κάντε κλικ για να ανοίξετε τις ρυθμίσεις καιρού
+
+en: Show hidden icons
+tr: Εμφάνιση κρυφών εικονιδίων
+
+en: Opens Windows' notification-area overflow
+tr: Ανοίγει τα επιπλέον εικονίδια της περιοχής ειδοποιήσεων των Windows
+
+en: Input language: {}
+tr: Γλώσσα εισαγωγής: {}
+
+en: Fallback input layout
+tr: Εναλλακτική διάταξη εισαγωγής
+
+en: Click to switch input language (Win+Space)
+tr: Κάντε κλικ για εναλλαγή της γλώσσας εισαγωγής (Win+Διάστημα)
+
+en: Network: {}
+tr: Δίκτυο: {}
+
+en: Signal strength unavailable
+tr: Η ισχύς σήματος δεν είναι διαθέσιμη
+
+en: Click to open Windows network settings
+tr: Κάντε κλικ για να ανοίξετε τις ρυθμίσεις δικτύου των Windows
+
+en: Audio output
+tr: Έξοδος ήχου
+
+en: Audio: {}
+tr: Ήχος: {}
+
+en: volume unknown
+tr: άγνωστη ένταση ήχου
+
+en: Muted
+tr: Σίγαση
+
+en: Sound on
+tr: Ήχος ενεργός
+
+en: Microphone: {}
+tr: Μικρόφωνο: {}
+
+en: Endpoint unmuted
+tr: Η συσκευή δεν είναι σε σίγαση
+
+en: Recording detection unsupported
+tr: Ο εντοπισμός εγγραφής δεν υποστηρίζεται
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Κάντε κλικ για εναλλαγή σίγασης. Κάντε δεξί κλικ για τη φωνητική πληκτρολόγηση των Windows και τις ρυθμίσεις προστασίας προσωπικών δεδομένων μικροφώνου
+
+en: Battery: {}
+tr: Μπαταρία: {}
+
+en: Battery {}
+tr: Μπαταρία {}
+
+en: Battery status unavailable
+tr: Η κατάσταση της μπαταρίας δεν είναι διαθέσιμη
+
+en: Charging
+tr: Φόρτιση
+
+en: External power
+tr: Εξωτερική τροφοδοσία
+
+en: Estimated remaining: {} h {} min
+tr: Εκτιμώμενος χρόνος που απομένει: {} ώ. {} λεπ.
+
+en: Click to open power settings
+tr: Κάντε κλικ για να ανοίξετε τις ρυθμίσεις τροφοδοσίας
+
+en: Clock status unavailable
+tr: Η κατάσταση του ρολογιού δεν είναι διαθέσιμη
+
+en: Click to open calendar and notifications
+tr: Κάντε κλικ για να ανοίξετε το ημερολόγιο και τις ειδοποιήσεις
+
+en: Action failed: {}
+tr: Η ενέργεια απέτυχε: {}
+
+en: Aether Shell status bar
+tr: Γραμμή κατάστασης του Aether Shell
+
+en: Update available
+tr: Υπάρχει διαθέσιμη ενημέρωση
+
+en: Cached
+tr: Από την προσωρινή μνήμη
+
+en: Start
+tr: Έναρξη
+
+en: Search
+tr: Αναζήτηση
+
+en: Task View
+tr: Προβολή εργασιών
+
+en: Application
+tr: Εφαρμογή
+
+en: Running application
+tr: Εφαρμογή σε εκτέλεση
+
+en: More applications
+tr: Περισσότερες εφαρμογές
+
+en: Aether Shell window previews
+tr: Προεπισκοπήσεις παραθύρων του Aether Shell
+
+en: Minimized — preview unavailable
+tr: Σε ελαχιστοποίηση — η προεπισκόπηση δεν είναι διαθέσιμη
+
+en: Preview unavailable
+tr: Η προεπισκόπηση δεν είναι διαθέσιμη
+
+en: {} windows
+tr: {} παράθυρα
+
+en: {} window
+tr: {} παράθυρο
+
+en: Switches to this window
+tr: Μεταβαίνει σε αυτό το παράθυρο
+
+en: Minimized, preview unavailable
+tr: Σε ελαχιστοποίηση, η προεπισκόπηση δεν είναι διαθέσιμη
+
+en: Minimized
+tr: Σε ελαχιστοποίηση
+
+en: Close {}
+tr: Κλείσιμο {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Ζητά από αυτό το παράθυρο να κλείσει. Η εφαρμογή μπορεί ακόμα να ζητήσει αποθήκευση ή ακύρωση
+
+en: Close requested
+tr: Ζητήθηκε κλείσιμο
+
+en: Previous applications
+tr: Προηγούμενες εφαρμογές
+
+en: Open
+tr: Άνοιγμα
+
+en: New instance
+tr: Νέα παρουσία
+
+en: Unpin from Dock
+tr: Ξεκαρφίτσωμα από το Dock
+
+en: Pin to Dock
+tr: Καρφίτσωμα στο Dock
+
+en: Move left
+tr: Μετακίνηση αριστερά
+
+en: Move right
+tr: Μετακίνηση δεξιά
+
+en: Dock settings...
+tr: Ρυθμίσεις του Dock...
+
+en: Import Windows taskbar pins
+tr: Εισαγωγή καρφιτσωμάτων της γραμμής εργασιών των Windows
+
+en: Open Windows Start
+tr: Άνοιγμα της Έναρξης των Windows
+
+en: Aether Shell Dock
+tr: Dock του Aether Shell
+
+en: Pinned
+tr: Καρφιτσωμένη
+
+en: Running
+tr: Σε εκτέλεση
+
+en: Needs attention
+tr: Χρειάζεται προσοχή
+
+en: Up arrow shows window previews
+tr: Το πάνω βέλος εμφανίζει προεπισκοπήσεις παραθύρων
+
+en: Installed application
+tr: Εγκατεστημένη εφαρμογή
+
+en: Desktop application
+tr: Εφαρμογή επιφάνειας εργασίας
+
+en: File
+tr: Αρχείο
+
+en: Folder
+tr: Φάκελος
+
+en: Windows tool
+tr: Εργαλείο των Windows
+
+en: Control Panel
+tr: Πίνακας Ελέγχου
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Πλοήγηση   ·   Enter Άνοιγμα   ·   Esc Κλείσιμο
+
+en: Search apps, settings and files
+tr: Αναζήτηση εφαρμογών, ρυθμίσεων και αρχείων
+
+en: Search could not be completed.
+tr: Δεν ήταν δυνατή η ολοκλήρωση της αναζήτησης.
+
+en: Results
+tr: Αποτελέσματα
+
+en: Indexing applications…
+tr: Ευρετηρίαση εφαρμογών…
+
+en: Type to search apps, settings and files
+tr: Πληκτρολογήστε για αναζήτηση εφαρμογών, ρυθμίσεων και αρχείων
+
+en: Nothing matches
+tr: Δεν βρέθηκαν αποτελέσματα
+
+en: Windows could not open this application.
+tr: Τα Windows δεν μπόρεσαν να ανοίξουν αυτήν την εφαρμογή.
+
+en: Menu
+tr: Μενού
+
+en: Opens a submenu
+tr: Ανοίγει ένα υπομενού
+
+en: , opens a submenu
+tr: , ανοίγει ένα υπομενού
+
+en: Selected
+tr: Επιλεγμένο
+
+en: Checked
+tr: Ενεργοποιημένο
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Λειτουργία πτήσης
+
+en: Accessibility
+tr: Προσβασιμότητα
+
+en: Energy saver
+tr: Εξοικονόμηση ενέργειας
+
+en: Live captions
+tr: Ζωντανοί υπότιτλοι
+
+en: Night light
+tr: Νυχτερινός φωτισμός
+
+en: Mobile hotspot
+tr: Φορητό σημείο πρόσβασης
+
+en: Nearby sharing
+tr: Κοινή χρήση σε κοντινές συσκευές
+
+en: Cast
+tr: Μετάδοση
+
+en: Project
+tr: Προβολή
+
+en: All settings
+tr: Όλες οι ρυθμίσεις
+
+en: Connected
+tr: Συνδέθηκε
+
+en: Not connected
+tr: Δεν έχει συνδεθεί
+
+en: , on
+tr: , ενεργό
+
+en: , off
+tr: , ανενεργό
+
+en: , state unknown
+tr: , άγνωστη κατάσταση
+
+en: , opens Windows Settings
+tr: , ανοίγει τις Ρυθμίσεις των Windows
+
+en: , shows accessibility features
+tr: , εμφανίζει τις δυνατότητες προσβασιμότητας
+
+en: , requires Windows 11 version 22H2
+tr: , απαιτεί Windows 11 έκδοση 22H2
+
+en: Now playing: {}
+tr: Αναπαράγεται τώρα: {}
+
+en: Untitled media
+tr: Πολυμέσα χωρίς τίτλο
+
+en: , switch source
+tr: , αλλαγή προέλευσης
+
+en: Previous media item
+tr: Προηγούμενο στοιχείο πολυμέσων
+
+en: Pause
+tr: Παύση
+
+en: Play
+tr: Αναπαραγωγή
+
+en: Next media item
+tr: Επόμενο στοιχείο πολυμέσων
+
+en: {} details
+tr: Λεπτομέρειες για {}
+
+en: Page {} of {}
+tr: Σελίδα {} από {}
+
+en: Next page
+tr: Επόμενη σελίδα
+
+en: First page
+tr: Πρώτη σελίδα
+
+en: Brightness
+tr: Φωτεινότητα
+
+en: Brightness, unavailable on this display
+tr: Φωτεινότητα, δεν είναι διαθέσιμη σε αυτήν την οθόνη
+
+en: Volume
+tr: Ένταση ήχου
+
+en: Volume, unavailable
+tr: Ένταση ήχου, μη διαθέσιμη
+
+en: Unmute
+tr: Κατάργηση σίγασης
+
+en: Mute
+tr: Σίγαση
+
+en: Sound output and volume mixer
+tr: Έξοδος ήχου και μείκτης έντασης ήχου
+
+en: Back
+tr: Πίσω
+
+en: , secured
+tr: , ασφαλές
+
+en: , open
+tr: , ανοιχτό
+
+en: , connected
+tr: , συνδεδεμένο
+
+en: Disconnect
+tr: Αποσύνδεση
+
+en: Show available networks
+tr: Εμφάνιση διαθέσιμων δικτύων
+
+en: More Wi-Fi settings
+tr: Περισσότερες ρυθμίσεις Wi-Fi
+
+en: Bluetooth and devices settings
+tr: Ρυθμίσεις Bluetooth και συσκευών
+
+en: Magnifier
+tr: Μεγεθυντικός φακός
+
+en: Narrator
+tr: Αφηγητής
+
+en: On-screen keyboard
+tr: Πληκτρολόγιο οθόνης
+
+en: Sticky keys
+tr: Ασύγχρονα πλήκτρα
+
+en: More accessibility settings
+tr: Περισσότερες ρυθμίσεις προσβασιμότητας
+
+en: Volume mixer
+tr: Μείκτης έντασης ήχου
+
+en: Choose output in Sound settings
+tr: Επιλέξτε την έξοδο στις ρυθμίσεις ήχου
+
+en: Power and battery settings
+tr: Ρυθμίσεις τροφοδοσίας και μπαταρίας
+
+en: Battery {} percent, {}
+tr: Μπαταρία {} τοις εκατό, {}
+
+en: All Windows settings
+tr: Όλες οι ρυθμίσεις των Windows
+
+en: The requested action could not be dispatched
+tr: Δεν ήταν δυνατή η αποστολή της ζητούμενης ενέργειας
+
+en: Aether Shell quick controls
+tr: Γρήγορα στοιχεία ελέγχου του Aether Shell
+
+en: Media session active
+tr: Ενεργή περίοδος λειτουργίας πολυμέσων
+
+en: No media session
+tr: Καμία περίοδος λειτουργίας πολυμέσων
+
+en: Current page
+tr: Τρέχουσα σελίδα
+
+en:  - secured
+tr:  - ασφαλές
+
+en:  - open
+tr:  - ανοιχτό
+
+en:  - opens in Windows
+tr:  - ανοίγει στα Windows
+
+en: Turned off by hardware or policy
+tr: Απενεργοποιήθηκε από το υλικό ή από πολιτική
+
+en: State unavailable - use Windows settings
+tr: Η κατάσταση δεν είναι διαθέσιμη - χρησιμοποιήστε τις ρυθμίσεις των Windows
+
+en: Off
+tr: Ανενεργό
+
+en:  - signal {} of 5
+tr:  - σήμα {} από 5
+
+en: , no internet
+tr: , χωρίς Internet
+
+en: On - not connected
+tr: Ενεργό - χωρίς σύνδεση
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Τα Windows δεν επιτρέπουν στις εφαρμογές να εμφανίζουν λίστα δικτύων: ελέγξτε την Τοποθεσία στις ρυθμίσεις προστασίας προσωπικών δεδομένων
+
+en: No Wi-Fi adapter found
+tr: Δεν βρέθηκε προσαρμογέας Wi-Fi
+
+en: Connecting to {}...
+tr: Σύνδεση στο {}...
+
+en:  - looking for networks
+tr:  - αναζήτηση δικτύων
+
+en: On
+tr: Ενεργό
+
+en: A screen reader is running
+tr: Εκτελείται ένα πρόγραμμα ανάγνωσης οθόνης
+
+en: Windows accessibility features
+tr: Δυνατότητες προσβασιμότητας των Windows
+
+en: Sound output
+tr: Έξοδος ήχου
+
+en: Default output device
+tr: Προεπιλεγμένη συσκευή εξόδου
+
+en: No output device available
+tr: Δεν υπάρχει διαθέσιμη συσκευή εξόδου
+
+en: Battery unknown
+tr: Άγνωστη κατάσταση μπαταρίας
+
+en: Status refresh could not be started
+tr: Δεν ήταν δυνατή η έναρξη της ανανέωσης κατάστασης
+
+en: Status refresh unavailable
+tr: Η ανανέωση κατάστασης δεν είναι διαθέσιμη
+
+en: Excellent signal
+tr: Εξαιρετικό σήμα
+
+en: Good signal
+tr: Καλό σήμα
+
+en: Fair signal
+tr: Μέτριο σήμα
+
+en: Weak signal
+tr: Ασθενές σήμα
+
+en: Clear sky
+tr: Αίθριος
+
+en: Mainly clear
+tr: Κυρίως αίθριος
+
+en: Partly cloudy
+tr: Μερική συννεφιά
+
+en: Overcast
+tr: Συννεφιά
+
+en: Fog
+tr: Ομίχλη
+
+en: Drizzle
+tr: Ψιχάλα
+
+en: Rain
+tr: Βροχή
+
+en: Snow
+tr: Χιόνι
+
+en: Rain showers
+tr: Μπόρες βροχής
+
+en: Snow showers
+tr: Χιονοπτώσεις
+
+en: Thunderstorm
+tr: Καταιγίδα
+
+## weather
+
+en: Morning
+tr: Πρωί
+
+en: Afternoon
+tr: Απόγευμα
+
+en: Evening
+tr: Βράδυ
+
+en: Night
+tr: Νύχτα
+
+en: Now
+tr: Τώρα
+
+en: Today
+tr: Σήμερα
+
+en: Low
+tr: Χαμηλός
+
+en: Moderate
+tr: Μέτριος
+
+en: High
+tr: Υψηλός
+
+en: Very high
+tr: Πολύ υψηλός
+
+en: Extreme
+tr: Ακραίος
+
+en: No connection to the weather service.
+tr: Δεν υπάρχει σύνδεση με την υπηρεσία καιρού.
+
+en: The weather service is busy. Try again in a moment.
+tr: Η υπηρεσία καιρού είναι απασχολημένη. Δοκιμάστε ξανά σε λίγο.
+
+en: The weather could not be loaded.
+tr: Δεν ήταν δυνατή η φόρτωση του καιρού.
+
+en: Could not update; showing the last forecast.
+tr: Δεν ήταν δυνατή η ενημέρωση. Εμφανίζεται η τελευταία πρόγνωση.
+
+en: Try again
+tr: Δοκιμάστε ξανά
+
+en: Your location
+tr: Η τοποθεσία σας
+
+en: My location
+tr: Η τοποθεσία μου
+
+en: Precise location
+tr: Ακριβής τοποθεσία
+
+en: Approximate location
+tr: Κατά προσέγγιση τοποθεσία
+
+en: Chosen in Settings
+tr: Επιλέχθηκε στις Ρυθμίσεις
+
+en: Allow
+tr: Να επιτρέπεται
+
+en: Use precise location
+tr: Χρήση ακριβούς τοποθεσίας
+
+en: See the weather where you are: allow your precise location.
+tr: Δείτε τον καιρό εκεί που βρίσκεστε: επιτρέψτε την ακριβή τοποθεσία σας.
+
+en: Your position is approximate (about 10 km).
+tr: Η θέση σας είναι κατά προσέγγιση (περίπου 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Η τοποθεσία είναι απενεργοποιημένη για αυτήν την εφαρμογή στα Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Αυτή η συσκευή δεν μπορεί να αναφέρει την τοποθεσία της. Αναζητήστε μια πόλη.
+
+en: Reading Windows location…
+tr: Ανάγνωση της τοποθεσίας των Windows…
+
+en: Automatic weather follows your Windows location.
+tr: Ο αυτόματος καιρός ακολουθεί την τοποθεσία σας στα Windows.
+
+en: Search for a city
+tr: Αναζήτηση πόλης
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Αναζητήστε μια πόλη ή επιτρέψτε την τοποθεσία σας για να δείτε τον καιρό.
+
+en: Searching…
+tr: Αναζήτηση…
+
+en: City search is unavailable.
+tr: Η αναζήτηση πόλης δεν είναι διαθέσιμη.
+
+en: No city found.
+tr: Δεν βρέθηκε πόλη.
+
+en: Weather settings
+tr: Ρυθμίσεις καιρού
+
+en: Loading the weather…
+tr: Φόρτωση του καιρού…
+
+en: Loading…
+tr: Φόρτωση…
+
+en: Updated {}
+tr: Ενημερώθηκε {}
+
+en: Near {}
+tr: Κοντά σε {}
+
+en: Temperatures now
+tr: Θερμοκρασίες τώρα
+
+en: The map is unavailable.
+tr: Ο χάρτης δεν είναι διαθέσιμος.
+
+en: Map: Natural Earth
+tr: Χάρτης: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Δεδομένα καιρού από το Open-Meteo.com
+
+en: Feels like
+tr: Αισθητή θερμοκρασία
+
+en: Feels like {}
+tr: Αισθητή θερμοκρασία {}
+
+en: Close to the real temperature
+tr: Κοντά στην πραγματική θερμοκρασία
+
+en: The wind makes it feel colder
+tr: Ο άνεμος την κάνει να μοιάζει πιο κρύα
+
+en: Humidity makes it feel warmer
+tr: Η υγρασία την κάνει να μοιάζει πιο ζεστή
+
+en: Humidity
+tr: Υγρασία
+
+en: Cloud cover {}
+tr: Νεφοκάλυψη {}
+
+en: Wind
+tr: Άνεμος
+
+en: Gusts {}
+tr: Ριπές {}
+
+en: Sunrise and sunset
+tr: Ανατολή και δύση ηλίου
+
+en: UV index
+tr: Δείκτης UV
+
+en: Pressure
+tr: Πίεση
+
+en: At sea level
+tr: Στο επίπεδο της θάλασσας
+
+en: &Open the weather
+tr: Ά&νοιγμα του καιρού
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Η πρόγνωση για το σημείο όπου βρίσκεστε, με ακρίβεια περίπου 100 m, με το δικό του υψόμετρο. Ανενεργό: στρογγυλοποίηση σε περίπου 10 km.

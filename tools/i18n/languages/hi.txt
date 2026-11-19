@@ -1,0 +1,2494 @@
+# Hindi (hi): हिन्दी. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: स्वचालित मौसम चालू करने के लिए Windows स्थान चुनें।
+
+en: Windows taskbar visible
+tr: Windows टास्कबार दिख रहा है
+
+en: Connected to {}
+tr: {} से कनेक्ट है
+
+en: {} is out of range
+tr: {} सीमा से बाहर है
+
+en: Connecting to {} took too long
+tr: {} से कनेक्ट होने में बहुत समय लगा
+
+en: Use Windows to join {}
+tr: {} से जुड़ने के लिए Windows का उपयोग करें
+
+en: Windows did not allow this connection
+tr: Windows ने यह कनेक्शन अनुमति नहीं दी
+
+en: Could not connect to {}
+tr: {} से कनेक्ट नहीं हो सका
+
+en: Connect to {}
+tr: {} से कनेक्ट करें
+
+en: That password was not accepted. Check it and try again.
+tr: वह पासवर्ड स्वीकार नहीं हुआ। जाँचें और फिर कोशिश करें।
+
+en: Enter this network's password.
+tr: इस नेटवर्क का पासवर्ड डालें।
+
+en: &Connect
+tr: कनेक्ट करें(&C)
+
+en: Windows Settings could not be opened
+tr: Windows सेटिंग्स नहीं खुल सकीं
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: डॉक के लिए जगह आरक्षित नहीं हो सकी; Windows टास्कबार बहाल किया जा रहा है
+
+en: Replacement unavailable: recovery observer could not start
+tr: प्रतिस्थापन उपलब्ध नहीं: रिकवरी निगरानी शुरू नहीं हो सकी
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows टास्कबार बहाल हुआ। डॉक के लिए जगह आरक्षित नहीं हो सकी; फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: रिकवरी निगरानी उपलब्ध नहीं; Windows टास्कबार बहाल किया जा रहा है
+
+en: Windows notifications could not be opened
+tr: Windows सूचनाएँ नहीं खुल सकीं
+
+en: The Windows calendar could not be opened
+tr: Windows कैलेंडर नहीं खुल सका
+
+en: Windows did not show its hidden icons
+tr: Windows ने अपने छिपे हुए आइकन नहीं दिखाए
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: स्वचालित स्थान रीफ़्रेश उपलब्ध नहीं; मौसम सेटिंग्स में फिर कोशिश करें।
+
+en: Windows location
+tr: Windows स्थान
+
+en: Reading approximate Windows location…
+tr: Windows का अनुमानित स्थान पढ़ा जा रहा है…
+
+en: Automatic weather follows approximate Windows location.
+tr: स्वचालित मौसम Windows के अनुमानित स्थान के अनुसार चलता है।
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windows स्थान की पहुँच अवरुद्ध है। मौसम उपलब्ध नहीं।
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows मौजूदा स्थान नहीं दे सका। मौसम उपलब्ध नहीं।
+
+en: Location worker unavailable. Weather is unavailable.
+tr: स्थान सेवा उपलब्ध नहीं। मौसम उपलब्ध नहीं।
+
+en: Waiting for Windows location permission…
+tr: Windows स्थान अनुमति की प्रतीक्षा है…
+
+en: The automatic weather choice could not be saved.
+tr: स्वचालित मौसम का चुनाव सहेजा नहीं जा सका।
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windows स्थान की पहुँच उपलब्ध नहीं या मना कर दी गई। मौसम उपलब्ध नहीं।
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows स्थान अनुमति नहीं माँग सका। Windows स्थान सेटिंग्स जाँचें।
+
+en: Status worker unavailable
+tr: स्थिति सेवा उपलब्ध नहीं
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows यह कार्य पूरा नहीं कर सका। इसकी सेटिंग्स जाँचें।
+
+en: Reading Windows status; try the action again shortly
+tr: Windows की स्थिति पढ़ी जा रही है; थोड़ी देर में फिर कोशिश करें
+
+en: Could not disconnect
+tr: डिस्कनेक्ट नहीं हो सका
+
+en: The Windows accessibility feature could not be started
+tr: Windows सुगम्यता सुविधा शुरू नहीं हो सकी
+
+en: Windows could not change the audio output
+tr: Windows ऑडियो आउटपुट नहीं बदल सका
+
+en: The Windows control could not be opened
+tr: Windows नियंत्रण नहीं खुल सका
+
+en: Keyboard shortcuts disabled
+tr: कीबोर्ड शॉर्टकट बंद हैं
+
+en: Both keyboard shortcuts registered
+tr: दोनों कीबोर्ड शॉर्टकट पंजीकृत हैं
+
+en: A keyboard shortcut is already in use by another application
+tr: एक कीबोर्ड शॉर्टकट पहले से किसी दूसरे ऐप्लिकेशन द्वारा उपयोग में है
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windows क्विक सेटिंग्स नहीं खुल सकीं। Aether कंट्रोल उपयोग करने के लिए शीर्ष बार सेटिंग्स में 'Windows क्विक सेटिंग्स का उपयोग करें' हटाएँ।
+
+en: Windows Start could not be opened
+tr: Windows स्टार्ट नहीं खुल सका
+
+en: Windows Task View could not be opened
+tr: Windows टास्क व्यू नहीं खुल सका
+
+en: Windows keyboard layout switching was unavailable
+tr: Windows कीबोर्ड लेआउट बदलना उपलब्ध नहीं था
+
+en: Windows voice typing could not be opened
+tr: Windows वॉइस टाइपिंग नहीं खुल सकी
+
+en: Windows taskbar could not be revealed
+tr: Windows टास्कबार दिखाया नहीं जा सका
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: टास्कबार प्रतिस्थापन फिर शुरू नहीं हो सका; Windows उपलब्ध है
+
+en: Windows taskbar replacement is unavailable in this session
+tr: इस सत्र में Windows टास्कबार प्रतिस्थापन उपलब्ध नहीं है
+
+en: Windows pin access is unavailable in this isolated session
+tr: इस अलग सत्र में Windows पिन की पहुँच उपलब्ध नहीं है
+
+en: Windows pinned applications could not be read
+tr: Windows के पिन किए गए ऐप्लिकेशन पढ़े नहीं जा सके
+
+en: Settings changed during pin import. Try import again.
+tr: पिन आयात के दौरान सेटिंग्स बदल गईं। फिर से आयात करें।
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: {} और पिन किए गए ऐप्लिकेशन सहेजे गए। कुछ Windows पिन अब भी उपलब्ध न हों।
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: पिन मेमोरी में बदले; सहेजना विफल रहा। फिर कोशिश करने के लिए सेटिंग्स में लागू करें।
+
+en: Pins updated in memory; saving...
+tr: पिन मेमोरी में अपडेट हुए; सहेजे जा रहे हैं...
+
+en: Imported pins could not be applied
+tr: आयात किए गए पिन लागू नहीं हो सके
+
+en: Pin import is unavailable while closing
+tr: बंद होते समय पिन आयात उपलब्ध नहीं है
+
+en: Settings could not be saved
+tr: सेटिंग्स सहेजी नहीं जा सकीं
+
+en: Quit without saving the latest changes?
+tr: नवीनतम बदलाव सहेजे बिना बाहर निकलें?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: आपकी पिछली सेटिंग्स फ़ाइल रखी गई है। फिर से सहेजने की कोशिश के लिए Aether Shell खुला रखें।
+
+en: &Quit without saving
+tr: सहेजे बिना बाहर निकलें(&Q)
+
+en: &Keep Aether Shell open
+tr: Aether Shell खुला रखें(&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: बुनियादी डायग्नोस्टिक्स निर्यात करें — ऐप संस्करण और Windows बिल्ड, कोई लॉग या निजी डेटा नहीं
+
+en: Diagnostics exported.
+tr: डायग्नोस्टिक्स निर्यात हुआ।
+
+en: Diagnostics could not be saved to the chosen file.
+tr: डायग्नोस्टिक्स चुनी गई फ़ाइल में सहेजा नहीं जा सका।
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: सेटिंग्स सुरक्षित रूप से पढ़ी नहीं जा सकीं। मौजूदा फ़ाइल सुरक्षित रखी गई।
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell अपने डेस्कटॉप तत्व शुरू नहीं कर सका।
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windows टास्कबार की बहाली बाकी है। फिर कोशिश करें या Aether Shell बंद करें।
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows टास्कबार अस्थायी रूप से दिख रहा है।
+
+en: Windows taskbar restored.
+tr: Windows टास्कबार बहाल हुआ।
+
+en: Windows taskbar replacement is active.
+tr: Windows टास्कबार प्रतिस्थापन सक्रिय है।
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows टास्कबार उपलब्ध है। प्रतिस्थापन जल्द फिर कोशिश करेगा।
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows टास्कबार उपलब्ध है। फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows टास्कबार बहाल हुआ। प्रतिस्थापन जल्द फिर जुड़ेगा।
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows टास्कबार बहाल हुआ। फिर कोशिश करने के लिए प्रतिस्थापन बंद करके फिर चालू करें।
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: टास्कबार प्रतिस्थापन रुका। Windows टास्कबार बहाल हुआ।
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: टास्कबार प्रतिस्थापन रुका। Windows टास्कबार की बहाली की पुष्टि नहीं हो सकी।
+
+en: Activating taskbar replacement...
+tr: टास्कबार प्रतिस्थापन चालू हो रहा है...
+
+en: Restoring Windows taskbar...
+tr: Windows टास्कबार बहाल हो रहा है...
+
+en: Reconnecting taskbar replacement...
+tr: टास्कबार प्रतिस्थापन फिर जुड़ रहा है...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windows टास्कबार अस्थायी रूप से दिखाया जा रहा है...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell Windows टास्कबार बहाल नहीं कर सका।
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: टास्क मैनेजर (Ctrl+Shift+Esc) से Windows Explorer फिर शुरू करें, या साइन आउट करके फिर साइन इन करें।
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows टास्कबार अपनी सहेजी गई स्थिति में बहाल हुआ।
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: टास्कबार की कोई सहेजी स्थिति नहीं मिली। Windows टास्कबार दिखाया गया; उसकी ऑटो-हाइड सेटिंग नहीं बदली गई।
+
+en: There was nothing to restore.
+tr: बहाल करने के लिए कुछ नहीं था।
+
+en: Taskbar replacement is turned off.
+tr: टास्कबार प्रतिस्थापन बंद है।
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: टास्कबार प्रतिस्थापन अपने-आप बंद नहीं हो सका। इसे Aether Shell सेटिंग्स > डेस्कटॉप में बंद करें।
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Aether Shell की कमांड लाइन पहचानी नहीं गई या अमान्य है।
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell अपने स्थानीय डेटा फ़ोल्डर नहीं बना सका।
+
+en: Aether Shell stopped after an unexpected error.
+tr: एक अप्रत्याशित त्रुटि के बाद Aether Shell रुक गया।
+
+## search-names
+
+en: Disk Management
+tr: डिस्क प्रबंधन
+
+en: Local Users and Groups
+tr: स्थानीय उपयोगकर्ता और समूह
+
+en: Local Group Policy Editor
+tr: स्थानीय समूह नीति संपादक
+
+en: Manage User Certificates
+tr: उपयोगकर्ता प्रमाणपत्र प्रबंधित करें
+
+en: Manage Computer Certificates
+tr: कंप्यूटर प्रमाणपत्र प्रबंधित करें
+
+en: Shared Folders
+tr: साझा फ़ोल्डर
+
+en: TPM Management
+tr: TPM प्रबंधन
+
+en: Network Connections
+tr: नेटवर्क कनेक्शन
+
+en: System Properties
+tr: सिस्टम गुण
+
+en: About Windows
+tr: Windows के बारे में
+
+en: DirectX Diagnostic Tool
+tr: DirectX डायग्नोस्टिक टूल
+
+en: Windows Features
+tr: Windows सुविधाएँ
+
+en: System Restore
+tr: सिस्टम पुनर्स्थापना
+
+en: Advanced System Settings
+tr: उन्नत सिस्टम सेटिंग्स
+
+en: Volume Mixer
+tr: वॉल्यूम मिक्सर
+
+en: Microsoft Management Console
+tr: Microsoft प्रबंधन कंसोल
+
+en: User Accounts (Advanced)
+tr: उपयोगकर्ता खाते (उन्नत)
+
+en: Display settings
+tr: डिस्प्ले सेटिंग्स
+
+en: Night light settings
+tr: रात्रि प्रकाश सेटिंग्स
+
+en: Graphics settings
+tr: ग्राफ़िक्स सेटिंग्स
+
+en: Sound settings
+tr: ध्वनि सेटिंग्स
+
+en: Notification settings
+tr: सूचना सेटिंग्स
+
+en: Power & battery settings
+tr: पावर और बैटरी सेटिंग्स
+
+en: Energy saver settings
+tr: ऊर्जा बचत सेटिंग्स
+
+en: Storage settings
+tr: स्टोरेज सेटिंग्स
+
+en: Multitasking settings
+tr: मल्टीटास्किंग सेटिंग्स
+
+en: Clipboard settings
+tr: क्लिपबोर्ड सेटिंग्स
+
+en: Remote Desktop settings
+tr: रिमोट डेस्कटॉप सेटिंग्स
+
+en: About your PC
+tr: आपके PC के बारे में
+
+en: Bluetooth & devices settings
+tr: ब्लूटूथ और डिवाइस सेटिंग्स
+
+en: Printers & scanners settings
+tr: प्रिंटर और स्कैनर सेटिंग्स
+
+en: Mouse settings
+tr: माउस सेटिंग्स
+
+en: Touchpad settings
+tr: टचपैड सेटिंग्स
+
+en: Network & internet settings
+tr: नेटवर्क और इंटरनेट सेटिंग्स
+
+en: Wi-Fi settings
+tr: Wi-Fi सेटिंग्स
+
+en: VPN settings
+tr: VPN सेटिंग्स
+
+en: Proxy settings
+tr: प्रॉक्सी सेटिंग्स
+
+en: Airplane mode settings
+tr: हवाई जहाज़ मोड सेटिंग्स
+
+en: Mobile hotspot settings
+tr: मोबाइल हॉटस्पॉट सेटिंग्स
+
+en: Background settings
+tr: पृष्ठभूमि सेटिंग्स
+
+en: Color settings
+tr: रंग सेटिंग्स
+
+en: Theme settings
+tr: थीम सेटिंग्स
+
+en: Lock screen settings
+tr: लॉक स्क्रीन सेटिंग्स
+
+en: Taskbar settings
+tr: टास्कबार सेटिंग्स
+
+en: Font settings
+tr: फ़ॉन्ट सेटिंग्स
+
+en: Installed apps
+tr: इंस्टॉल किए गए ऐप्स
+
+en: Default apps settings
+tr: डिफ़ॉल्ट ऐप्स सेटिंग्स
+
+en: Startup apps settings
+tr: स्टार्टअप ऐप्स सेटिंग्स
+
+en: Account info
+tr: खाते की जानकारी
+
+en: Sign-in options
+tr: साइन-इन विकल्प
+
+en: Other users settings
+tr: अन्य उपयोगकर्ता सेटिंग्स
+
+en: Date & time settings
+tr: दिनांक और समय सेटिंग्स
+
+en: Language & region settings
+tr: भाषा और क्षेत्र सेटिंग्स
+
+en: Typing settings
+tr: टाइपिंग सेटिंग्स
+
+en: Accessibility settings
+tr: सुगम्यता सेटिंग्स
+
+en: Privacy & security settings
+tr: गोपनीयता और सुरक्षा सेटिंग्स
+
+en: Location settings
+tr: स्थान सेटिंग्स
+
+en: Windows Update settings
+tr: Windows Update सेटिंग्स
+
+en: Recovery settings
+tr: रिकवरी सेटिंग्स
+
+en: Activation settings
+tr: सक्रियण सेटिंग्स
+
+en: For developers settings
+tr: डेवलपर सेटिंग्स
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub तक नहीं पहुँचा जा सका।
+
+en: GitHub did not answer the request just now.
+tr: GitHub ने अभी अनुरोध का जवाब नहीं दिया।
+
+en: The release did not pass verification, so nothing was installed.
+tr: रिलीज़ सत्यापन में पास नहीं हुई, इसलिए कुछ भी इंस्टॉल नहीं हुआ।
+
+en: There is not enough free disk space.
+tr: डिस्क पर पर्याप्त खाली जगह नहीं है।
+
+en: Windows refused access to the update files.
+tr: Windows ने अपडेट फ़ाइलों तक पहुँच से मना कर दिया।
+
+en: {} bytes
+tr: {} बाइट
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: स्थिति
+
+en: Check &now
+tr: अभी जाँचें(&N)
+
+en: Download and install
+tr: डाउनलोड और इंस्टॉल करें
+
+en: &Later
+tr: बाद में(&L)
+
+en: S&kip this version
+tr: यह संस्करण छोड़ें(&K)
+
+en: &Release details
+tr: रिलीज़ विवरण(&R)
+
+en: Disable &notifications
+tr: सूचनाएँ बंद करें(&N)
+
+en: Release notes
+tr: रिलीज़ नोट्स
+
+en: the new version
+tr: नया संस्करण
+
+en: Installed: {}.
+tr: इंस्टॉल है: {}।
+
+en: Automatic update checks are off
+tr: स्वचालित अपडेट जाँच बंद है
+
+en: Check now looks for a newer release once.
+tr: “अभी जाँचें” एक बार नई रिलीज़ खोजता है।
+
+en: Last checked {}
+tr: पिछली जाँच: {}
+
+en: Not checked yet
+tr: अभी तक जाँच नहीं हुई
+
+en: Checking for updates...
+tr: अपडेट जाँचे जा रहे हैं...
+
+en: Aether Shell is up to date
+tr: Aether Shell अप टू डेट है
+
+en: Latest published release: {}.
+tr: नवीनतम प्रकाशित रिलीज़: {}।
+
+en: Version {} is available
+tr: संस्करण {} उपलब्ध है
+
+en: Download size: {}.
+tr: डाउनलोड का आकार: {}।
+
+en: Downloading version {}...
+tr: संस्करण {} डाउनलोड हो रहा है...
+
+en: Received {} of {} ({}%).
+tr: {} में से {} प्राप्त ({}%)।
+
+en: Received {}; total size unknown.
+tr: {} प्राप्त; कुल आकार अज्ञात।
+
+en: Version {} is ready to install
+tr: संस्करण {} इंस्टॉल के लिए तैयार है
+
+en: Verified with the signed release manifest and SHA-256.
+tr: हस्ताक्षरित रिलीज़ मैनिफ़ेस्ट और SHA-256 से सत्यापित।
+
+en: The update could not be completed
+tr: अपडेट पूरा नहीं हो सका
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: फ़िलहाल यह हाथ से इंस्टॉल होता है: रिलीज़ विवरण खोलें, फिर इसका सेटअप डाउनलोड करके चलाएँ।
+
+en: Failure: {}.
+tr: विफलता: {}।
+
+en: Choose Retry Download to try again.
+tr: फिर से कोशिश करने के लिए “डाउनलोड दोबारा करें” चुनें।
+
+en: Use Check now to try again.
+tr: फिर से कोशिश करने के लिए “अभी जाँचें” का उपयोग करें।
+
+en: Next automatic check: {}.
+tr: अगली स्वचालित जाँच: {}।
+
+en: &Install update
+tr: अपडेट इंस्टॉल करें(&I)
+
+en: Retry &Download
+tr: डाउनलोड दोबारा करें(&D)
+
+en: &Download and install
+tr: डाउनलोड और इंस्टॉल करें(&D)
+
+en: Windows' startup state could not be read in this session.
+tr: इस सत्र में Windows की स्टार्टअप स्थिति नहीं पढ़ी जा सकी।
+
+en: Windows will start it at your next sign-in.
+tr: Windows इसे आपके अगले साइन इन पर शुरू करेगा।
+
+en: Right now it will not start at sign-in.
+tr: अभी यह साइन इन पर शुरू नहीं होगा।
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: यह टास्क मैनेजर या Windows सेटिंग्स में बंद है, और जब तक वहाँ चालू न हो, वही तय करते हैं।
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows Aether Shell की कोई दूसरी प्रति शुरू करेगा।
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows ऐसी स्टार्टअप स्थिति बताता है जिसे यह संस्करण नहीं पढ़ सकता।
+
+en: The close action could not be completed.
+tr: बंद करने का कार्य पूरा नहीं हो सका।
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: सहेजने से पहले पूरी संख्या लिखें; लाल चिह्नित फ़ील्ड संख्या नहीं है।
+
+en: Settings could not be validated.
+tr: सेटिंग्स का सत्यापन नहीं हो सका।
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: साइन-इन स्टार्टअप पहले जैसा छोड़ा गया, क्योंकि सेटिंग्स सहेजी नहीं जा सकीं।
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: सेटिंग्स सहेजी नहीं जा सकीं, और Windows का साइन-इन स्टार्टअप वापस नहीं लाया जा सका। फिर से कोशिश करने के लिए दोबारा लागू करें।
+
+en: Settings saved.
+tr: सेटिंग्स सहेजी गईं।
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: सेटिंग्स मेमोरी में बदलीं; सहेजना विफल रहा। फिर से कोशिश करने के लिए दोबारा लागू करें।
+
+en: Settings could not be applied.
+tr: सेटिंग्स लागू नहीं की जा सकीं।
+
+en: Some values were corrected to their supported range.
+tr: कुछ मान उनकी समर्थित सीमा में ठीक किए गए।
+
+en: Startup registration is unavailable in this session.
+tr: इस सत्र में स्टार्टअप पंजीकरण उपलब्ध नहीं है।
+
+en: Changing startup registration...
+tr: स्टार्टअप पंजीकरण बदला जा रहा है...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows ने स्टार्टअप पंजीकरण नहीं बदला। टास्क मैनेजर की स्टार्टअप सेटिंग जाँचें।
+
+en: Startup registration could not be changed.
+tr: स्टार्टअप पंजीकरण बदला नहीं जा सका।
+
+en: Defaults saved; startup is disabled.
+tr: डिफ़ॉल्ट सहेजे गए; स्टार्टअप बंद है।
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: डिफ़ॉल्ट लागू हुए; सहेजना विफल रहा। फिर से कोशिश करने के लिए दोबारा लागू करें।
+
+en: Defaults could not be applied.
+tr: डिफ़ॉल्ट लागू नहीं किए जा सके।
+
+en: Startup was not disabled; settings were kept.
+tr: स्टार्टअप बंद नहीं हुआ; सेटिंग्स बनी रहीं।
+
+en: Location search is unavailable.
+tr: स्थान खोज उपलब्ध नहीं है।
+
+en: Searching Open-Meteo locations...
+tr: Open-Meteo स्थान खोजे जा रहे हैं...
+
+en: Location search failed. Check your connection and try again.
+tr: स्थान खोज विफल रही। अपना कनेक्शन जाँचें और फिर कोशिश करें।
+
+en: No place matched that search.
+tr: उस खोज से कोई जगह मेल नहीं खाई।
+
+en: Choose a location to save it.
+tr: सहेजने के लिए कोई स्थान चुनें।
+
+en: Reset all settings?
+tr: सभी सेटिंग्स रीसेट करें?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: प्राथमिकताएँ और पिन किए गए ऐप्लिकेशन डिफ़ॉल्ट पर लौट आते हैं और साइन इन पर स्टार्टअप बंद हो जाता है।
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Windows टास्कबार को लेकर आपकी पसंद बनी रहती है। मौजूदा सेटिंग्स फ़ाइल का बैकअप रखा जाता है।
+
+en: &Reset
+tr: रीसेट करें(&R)
+
+en: Cancel
+tr: रद्द करें
+
+en: Pinned applications saved.
+tr: पिन किए गए ऐप्लिकेशन सहेजे गए।
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: पिन मेमोरी में बदले; सहेजना विफल रहा। फिर से कोशिश करने के लिए दोबारा लागू करें।
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: डिफ़ॉल्ट बहाल नहीं हो सके क्योंकि स्टार्टअप पंजीकरण उपलब्ध नहीं है।
+
+en: Pinned application could not be added.
+tr: पिन किया गया ऐप्लिकेशन जोड़ा नहीं जा सका।
+
+en: Choose an application to add first.
+tr: पहले जोड़ने के लिए कोई ऐप्लिकेशन चुनें।
+
+en: Pinned applications could not be changed.
+tr: पिन किए गए ऐप्लिकेशन बदले नहीं जा सके।
+
+en: Choose a pinned application first.
+tr: पहले कोई पिन किया गया ऐप्लिकेशन चुनें।
+
+en: Desktop status is unavailable in this session.
+tr: इस सत्र में डेस्कटॉप की स्थिति उपलब्ध नहीं है।
+
+en: Desktop status is unavailable.
+tr: डेस्कटॉप की स्थिति उपलब्ध नहीं है।
+
+en: Password
+tr: पासवर्ड
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: {} भाषा GitHub से डाउनलोड हो रही है ({})। तैयार होने तक अंग्रेज़ी दिखाई जाएगी।
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {} भाषा डाउनलोड नहीं हो सकी। तब तक अंग्रेज़ी दिखाई जाएगी; फिर से कोशिश करने के लिए नीचे “डाउनलोड करें” चुनें।
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} भाषा अभी इस PC पर नहीं है। डाउनलोड होने तक अंग्रेज़ी दिखाई जाएगी।
+
+en: {} is on this PC.
+tr: {} भाषा इस PC पर है।
+
+en: Every language is on this PC.
+tr: सभी भाषाएँ इस PC पर हैं।
+
+en: Choose a language to download first.
+tr: पहले डाउनलोड करने के लिए कोई भाषा चुनें।
+
+## settings-pages
+
+en: Dock
+tr: डॉक
+
+en: Top Bar
+tr: शीर्ष बार
+
+en: Weather
+tr: मौसम
+
+en: Updates
+tr: अपडेट
+
+en: General
+tr: सामान्य
+
+en: About
+tr: परिचय
+
+en: Desktop
+tr: डेस्कटॉप
+
+en: Appearance
+tr: रूप-रंग
+
+en: Welcome
+tr: स्वागत
+
+en: Aether Shell Settings
+tr: Aether Shell सेटिंग्स
+
+en: Settings
+tr: सेटिंग्स
+
+en: Reset defaults...
+tr: डिफ़ॉल्ट पर रीसेट करें...
+
+en: &Apply
+tr: लागू करें(&A)
+
+en: Liquid
+tr: लिक्विड
+
+en: Grain
+tr: ग्रेन
+
+en: From {} to {}
+tr: {} से {} तक
+
+en: px
+tr: px
+
+en: min
+tr: मिनट
+
+en: h
+tr: घंटे
+
+en: This action could not be completed.
+tr: यह कार्य पूरा नहीं हो सका।
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: आकार, दूरी, गति और डॉक पर पिन किए गए ऐप्लिकेशन।
+
+en: Size and spacing
+tr: आकार और दूरी
+
+en: Icon size
+tr: आइकन का आकार
+
+en: {}, scaled with the Windows display scale.
+tr: {}, Windows डिस्प्ले स्केल के अनुसार।
+
+en: Bottom margin
+tr: नीचे का मार्जिन
+
+en: Space between the Dock and the bottom of the screen.
+tr: डॉक और स्क्रीन के निचले किनारे के बीच की जगह।
+
+en: Minimum side margin
+tr: न्यूनतम साइड मार्जिन
+
+en: Space kept free at the left and right screen edges.
+tr: स्क्रीन के बाएँ और दाएँ किनारों पर खाली छोड़ी गई जगह।
+
+en: Icon spacing
+tr: आइकनों के बीच दूरी
+
+en: Space between neighbouring icons.
+tr: पास-पास के आइकनों के बीच की जगह।
+
+en: Glass and motion
+tr: ग्लास और गति
+
+en: Glass opacity
+tr: ग्लास अपारदर्शिता
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: कम मान डॉक के पीछे धुंधले डेस्कटॉप को ज़्यादा दिखाते हैं।
+
+en: Hover magnification
+tr: होवर पर बड़ा करना
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: पॉइंटर के नीचे आइकन कितना बड़ा हो; 1 इसे बंद करता है।
+
+en: Behavior
+tr: व्यवहार
+
+en: Show running applications
+tr: चल रहे ऐप्लिकेशन दिखाएँ
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: खुले ऐप्लिकेशन जो पिन नहीं हैं, पिन किए गए ऐप्लिकेशनों के बाद दिखते हैं।
+
+en: Reserve screen space for the Dock
+tr: डॉक के लिए स्क्रीन पर जगह आरक्षित करें
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: बड़ी की गई विंडो डॉक के नीचे जाने के बजाय उसके ऊपर रहती हैं।
+
+en: Automatically hide the Dock
+tr: डॉक को अपने-आप छिपाएँ
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: जब कोई ऐप्लिकेशन विंडो इसे ढकती है तो यह छिप जाता है; दिखाने के लिए पॉइंटर को स्क्रीन के निचले किनारे पर ले जाएँ। डेस्कटॉप पर यह दिखता रहता है, और विंडो को पूरी स्क्रीन ऊँचाई मिलती है।
+
+en: Pinned applications
+tr: पिन किए गए ऐप्लिकेशन
+
+en: Move &up
+tr: ऊपर ले जाएँ(&U)
+
+en: Move &down
+tr: नीचे ले जाएँ(&D)
+
+en: &Remove
+tr: हटाएँ(&R)
+
+en: &Add application
+tr: ऐप्लिकेशन जोड़ें(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: पिन अपनी पहचान और लॉन्च सेटिंग्स बनाए रखते हैं। किसी पिन को हटाने से Windows टास्कबार का स्वचालित सिंक उसे दोबारा नहीं जोड़ता।
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: शीर्ष स्टेटस बार की स्थिति, घड़ी और उसमें दिखने वाले स्टेटस आइटम।
+
+en: Presentation
+tr: प्रस्तुति
+
+en: Floating bar
+tr: तैरती बार
+
+en: Text on the desktop
+tr: डेस्कटॉप पर टेक्स्ट
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: तैरती बार: स्क्रीन के ऊपरी किनारे के नीचे की ग्लास बार। डेस्कटॉप पर टेक्स्ट: कोई बार नहीं, वही आइटम स्क्रीन के सबसे ऊपर सीधे डेस्कटॉप वॉलपेपर पर लिखे जाते हैं; यह पट्टी विंडो से खाली रहती है, और ऊपर का मार्जिन तथा ग्लास की अपारदर्शिता लागू नहीं होते। अपने-आप छिपाने के साथ, जब तक नीचे कोई विंडो हो, टेक्स्ट ग्लास की एक पट्टी पर लौटता है।
+
+en: Position and glass
+tr: स्थिति और ग्लास
+
+en: Top margin
+tr: ऊपर का मार्जिन
+
+en: Space between the Top Bar and the top of the screen.
+tr: शीर्ष बार और स्क्रीन के ऊपरी किनारे के बीच की जगह।
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: कम मान बार के पीछे धुंधले डेस्कटॉप को ज़्यादा दिखाते हैं।
+
+en: Clock
+tr: घड़ी
+
+en: Clock format
+tr: घड़ी का फ़ॉर्मैट
+
+en: Follow Windows
+tr: Windows के अनुसार
+
+en: 12-hour
+tr: 12 घंटे
+
+en: 24-hour
+tr: 24 घंटे
+
+en: Date style
+tr: तारीख की शैली
+
+en: Weekday, day and month
+tr: सप्ताह का दिन, दिन और महीना
+
+en: Short
+tr: छोटा
+
+en: Long
+tr: लंबा
+
+en: Show seconds
+tr: सेकंड दिखाएँ
+
+en: Show date
+tr: तारीख दिखाएँ
+
+en: Status items
+tr: स्टेटस आइटम
+
+en: Show battery
+tr: बैटरी दिखाएँ
+
+en: Hide battery when absent
+tr: बैटरी न होने पर छिपाएँ
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: बिना बैटरी वाले डेस्कटॉप PC अज्ञात बैटरी के बजाय कुछ नहीं दिखाते।
+
+en: Show input language
+tr: इनपुट भाषा दिखाएँ
+
+en: Show network
+tr: नेटवर्क दिखाएँ
+
+en: Show audio output
+tr: ऑडियो आउटपुट दिखाएँ
+
+en: Show microphone
+tr: माइक्रोफ़ोन दिखाएँ
+
+en: Show weather when enabled
+tr: चालू होने पर मौसम दिखाएँ
+
+en: Weather itself is turned on in Weather settings.
+tr: मौसम खुद मौसम सेटिंग्स में चालू किया जाता है।
+
+en: Show hidden icons button
+tr: छिपे हुए आइकन का बटन दिखाएँ
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: एक छोटा शेवरॉन जो Windows के सूचना क्षेत्र के छिपे हुए आइकन खोलता है।
+
+en: Reserve screen space above windows
+tr: विंडो के ऊपर स्क्रीन पर जगह आरक्षित करें
+
+en: Maximized windows stay below the Top Bar.
+tr: बड़ी की गई विंडो शीर्ष बार के नीचे रहती हैं।
+
+en: Automatically hide the Top Bar
+tr: शीर्ष बार को अपने-आप छिपाएँ
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: जब कोई ऐप्लिकेशन विंडो इसे ढकती है तो यह छिप जाती है; दिखाने के लिए पॉइंटर को स्क्रीन के ऊपरी किनारे पर ले जाएँ। डेस्कटॉप पर यह दिखती रहती है।
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Windows क्विक सेटिंग्स का उपयोग करें (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: बंद: Aether के क्विक कंट्रोल शीर्ष बार के नीचे खुलते हैं। चालू: Windows का अपना पैनल स्क्रीन के नीचे खुलता है।
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: शीर्ष बार में एक वैकल्पिक मौसम पूर्वानुमान, Open-Meteo द्वारा।
+
+en: Forecast
+tr: पूर्वानुमान
+
+en: Enable weather
+tr: मौसम चालू करें
+
+en: Off by default: the forecast needs network requests.
+tr: डिफ़ॉल्ट रूप से बंद: पूर्वानुमान के लिए नेटवर्क अनुरोध ज़रूरी हैं।
+
+en: Temperature
+tr: तापमान
+
+en: Celsius
+tr: सेल्सियस
+
+en: Fahrenheit
+tr: फ़ारेनहाइट
+
+en: Refresh interval
+tr: रीफ़्रेश अंतराल
+
+en: Location
+tr: स्थान
+
+en: Locate automatically with Windows
+tr: Windows के साथ अपने-आप स्थान पता करें
+
+en: Uses the Windows location service after you allow it.
+tr: आपकी अनुमति के बाद Windows स्थान सेवा का उपयोग करता है।
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows स्थान की अनुमति माँगता है। आपके निर्देशांक केवल पूर्वानुमान पाने के लिए Open-Meteo.com को भेजे जाते हैं; एक स्थान-कुंजी स्थानीय रूप से कैश की जाती है। अगर स्थान अवरुद्ध है, तो मौसम उपलब्ध नहीं है।
+
+en: Use &Windows location
+tr: Windows स्थान का उपयोग करें(&W)
+
+en: Location &settings
+tr: स्थान सेटिंग्स(&S)
+
+en: Choose automatic location or search for a place below.
+tr: स्वचालित स्थान चुनें या नीचे कोई जगह खोजें।
+
+en: Search for a place
+tr: कोई जगह खोजें
+
+en: Searc&h
+tr: खोजें(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: मौसम डेटा Open-Meteo.com से (CC BY 4.0)। मैन्युअल खोज केवल आपका लिखा हुआ टेक्स्ट भेजती है।
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: आधिकारिक GitHub रिपॉज़िटरी से हस्ताक्षरित रिलीज़, इंस्टॉल से पहले सत्यापित।
+
+en: Preferences
+tr: प्राथमिकताएँ
+
+en: Check for updates automatically
+tr: अपडेट अपने-आप जाँचें
+
+en: Check interval
+tr: जाँच का अंतराल
+
+en: Release channel
+tr: रिलीज़ चैनल
+
+en: Prereleases arrive earlier and change more often.
+tr: प्री-रिलीज़ पहले आती हैं और अक्सर बदलती रहती हैं।
+
+en: Stable
+tr: स्थिर
+
+en: Prerelease
+tr: प्री-रिलीज़
+
+en: Show update notifications
+tr: अपडेट सूचनाएँ दिखाएँ
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: स्टार्टअप, गति, कीबोर्ड शॉर्टकट और डायग्नोस्टिक्स।
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: बार, मेनू, खोज, सेटिंग्स और सेटअप की भाषा।
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: आपके या दूसरे प्रोग्रामों के नाम (ऐप्लिकेशन, फ़ाइलें, Wi-Fi नेटवर्क) कभी अनुवादित नहीं होते। कोई भाषा चुनने पर शीर्ष बार तारीख उसी भाषा में लिखता है; "Windows के अनुसार" आपका Windows क्षेत्रीय फ़ॉर्मैट रखता है।
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: हाथ से लिखा स्वागत लैटिन अक्षर लिखता है: यह फ़्रेंच, अंग्रेज़ी या स्पैनिश में अभिवादन करता है। इसकी भाषा स्वागत में चुनें।
+
+en: Language
+tr: भाषा
+
+en: Interface language
+tr: इंटरफ़ेस की भाषा
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: “Windows के अनुसार” आपकी Windows डिस्प्ले भाषाओं में से पहली भाषा का उपयोग करता है जो इनमें से एक है, वरना अंग्रेज़ी।
+
+en: Startup
+tr: स्टार्टअप
+
+en: Start Aether Shell when I sign in
+tr: साइन इन करने पर Aether Shell शुरू करें
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: इसे बदलने के लिए लागू करें दबाएँ। टास्क मैनेजर भी इसे बंद कर सकता है।
+
+en: Motion
+tr: गति
+
+en: Reduced motion removes decorative movement everywhere.
+tr: कम गति हर जगह सजावटी हलचल हटा देती है।
+
+en: Reduced
+tr: कम
+
+en: Full
+tr: पूरा
+
+en: Keyboard shortcuts
+tr: कीबोर्ड शॉर्टकट
+
+en: Enable global keyboard shortcuts
+tr: वैश्विक कीबोर्ड शॉर्टकट चालू करें
+
+en: Search shortcut key
+tr: खोज शॉर्टकट कुंजी
+
+en: Dock shortcut key
+tr: डॉक शॉर्टकट कुंजी
+
+en: Search shortcut modifiers
+tr: खोज शॉर्टकट के मॉडिफ़ायर
+
+en: Dock shortcut modifiers
+tr: डॉक शॉर्टकट के मॉडिफ़ायर
+
+en: Shortcut status unavailable
+tr: शॉर्टकट की स्थिति उपलब्ध नहीं
+
+en: Diagnostics
+tr: डायग्नोस्टिक्स
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: लॉग फ़ोल्डर में इस कंप्यूटर के Aether Shell लॉग रहते हैं। डायग्नोस्टिक्स निर्यात केवल ऐप का संस्करण और Windows बिल्ड सहेजता है - कोई लॉग या निजी डेटा नहीं।
+
+en: Open &log folder
+tr: लॉग फ़ोल्डर खोलें(&L)
+
+en: &Export diagnostics...
+tr: डायग्नोस्टिक्स निर्यात करें(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: साइन इन करने या PC अनलॉक करने के बाद आपके डेस्कटॉप पर हाथ से लिखा एक छोटा अभिवादन।
+
+en: Greeting
+tr: अभिवादन
+
+en: Show the welcome at sign-in and unlock
+tr: साइन इन और अनलॉक पर स्वागत दिखाएँ
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: यह Windows के साइन इन करने के बाद दिखता है, जब Aether Shell तैयार हो रहा होता है। छोड़ने के लिए छुएँ, क्लिक करें या Escape दबाएँ।
+
+en: Greeting language
+tr: अभिवादन की भाषा
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: फ़्रेंच में Salut, अंग्रेज़ी में Hello, स्पैनिश में Hola। कलम लैटिन अक्षर लिखती है: अन्य सभी भाषाओं में यह अंग्रेज़ी में अभिवादन करती है।
+
+en: Your name
+tr: आपका नाम
+
+en: Name to greet you with
+tr: अभिवादन के लिए नाम
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: वैकल्पिक, जैसे कोई पहला नाम। यह इसी PC पर आपकी Aether Shell सेटिंग्स में रहता है और कभी कहीं भेजा या लॉग में लिखा नहीं जाता। हटाने के लिए फ़ील्ड खाली करें।
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: रंग मोड, एक्सेंट, गति की रफ़्तार और डॉक तथा शीर्ष बार का रूप।
+
+en: Style
+tr: शैली
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: लिक्विड: पीछे की चीज़ों के ऊपर परतों में ग्लास, एक ब्लर परत, तरल की रोशनी, फिर आइकन और टेक्स्ट, जो हल्के और गहरे पेजों पर पढ़ने योग्य रहते हैं। ग्रेन: फ्रॉस्टेड ग्लास, धुंधला और अर्ध-पारदर्शी, बारीक दानों के साथ।
+
+en: Liquid blur
+tr: लिक्विड ब्लर
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: लिक्विड ग्लास के नीचे की ब्लर परत पीछे की चीज़ों को कितना ढकती है: 100% सब धुंधला कर देता है। कम मान पेज को ज़्यादा साफ़ दिखाते हैं, और तब भरे-भरे पेज पर बार का टेक्स्ट कम साफ़ पढ़ा जा सकता है।
+
+en: Liquid blur color
+tr: लिक्विड ब्लर का रंग
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: स्वचालित ग्लास के अपने रंग रखता है। रंग चाहे जो हो, टेक्स्ट और आइकन पढ़ने योग्य रहते हैं।
+
+en: Automatic
+tr: स्वचालित
+
+en: White
+tr: सफ़ेद
+
+en: Black
+tr: काला
+
+en: Accent
+tr: एक्सेंट
+
+en: Blue
+tr: नीला
+
+en: Violet
+tr: बैंगनी
+
+en: Pink
+tr: गुलाबी
+
+en: Red
+tr: लाल
+
+en: Orange
+tr: नारंगी
+
+en: Yellow
+tr: पीला
+
+en: Green
+tr: हरा
+
+en: Teal
+tr: हरा-नीला
+
+en: Liquid color strength
+tr: लिक्विड रंग की तीव्रता
+
+en: How much of the chosen color the blur layer takes.
+tr: ब्लर परत चुने गए रंग को कितना लेती है।
+
+en: Theme
+tr: थीम
+
+en: Color mode
+tr: रंग मोड
+
+en: High contrast always takes precedence.
+tr: हाई कंट्रास्ट को हमेशा प्राथमिकता मिलती है।
+
+en: Light
+tr: हल्का
+
+en: Dark
+tr: गहरा
+
+en: Accent color
+tr: एक्सेंट रंग
+
+en: Animation duration
+tr: एनिमेशन की अवधि
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 मानक गति है; बड़े मान धीमे होते हैं। कम गति को प्राथमिकता मिलती है।
+
+en: Dock icon preset
+tr: डॉक आइकन प्रीसेट
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: डॉक सेटिंग्स का कस्टम आकार तब तक बना रहता है जब तक आप कोई प्रीसेट न चुनें।
+
+en: Small - 32 px
+tr: छोटा - 32 px
+
+en: Medium - 40 px
+tr: मध्यम - 40 px
+
+en: Large - 48 px
+tr: बड़ा - 48 px
+
+en: Keep custom size
+tr: कस्टम आकार रखें
+
+en: Show Windows Start in the Dock
+tr: डॉक में Windows स्टार्ट दिखाएँ
+
+en: Show Task View in the Dock
+tr: डॉक में टास्क व्यू दिखाएँ
+
+en: Reserve extra space for Dock animations
+tr: डॉक एनिमेशन के लिए अतिरिक्त जगह आरक्षित करें
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: बड़ा होना और लॉन्च पर उछलना बड़ी की गई विंडो से अलग रखता है।
+
+en: Weather position
+tr: मौसम की स्थिति
+
+en: Left
+tr: बाएँ
+
+en: Right
+tr: दाएँ
+
+en: Keyboard indicator
+tr: कीबोर्ड संकेतक
+
+en: Compact
+tr: छोटा
+
+en: Two lines
+tr: दो पंक्तियाँ
+
+en: Windows taskbar pins
+tr: Windows टास्कबार पिन
+
+en: Add newly discovered Windows taskbar pins
+tr: नए मिले Windows टास्कबार पिन जोड़ें
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: जब तक टास्कबार बदला हुआ है, नए Windows पिन डॉक में जोड़े जाते हैं।
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: डॉक द्वारा Windows टास्कबार का उलटा जा सकने वाला प्रतिस्थापन।
+
+en: Taskbar replacement
+tr: टास्कबार प्रतिस्थापन
+
+en: Replace the Windows taskbar
+tr: Windows टास्कबार बदलें
+
+en: Changing this needs Apply.
+tr: इसे बदलने के लिए लागू करें दबाएँ।
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Aether Shell चलते समय Windows टास्कबार छिपाता है और बड़े किए गए ऐप्लिकेशनों के नीचे जगह आरक्षित करता है।
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: यह मोड बंद करने या Aether Shell से बाहर निकलने पर Windows टास्कबार की स्थिति बहाल हो जाती है। अगर ऐप्लिकेशन अचानक रुक जाए तो एक अलग रिकवरी सहायक भी इसे बहाल करता है। अगर रिकवरी विफल हो, तो टास्क मैनेजर में Windows Explorer फिर से शुरू करें।
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows सेटिंग्स मूल Windows इंटरफ़ेस ही रहती हैं। Aether Shell उसका टास्कबार पेज नहीं बदलता; यह मोड यहीं सेट करें।
+
+en: Pinned applications from Windows
+tr: Windows से पिन किए गए ऐप्लिकेशन
+
+en: &Import Windows taskbar pins
+tr: Windows टास्कबार पिन आयात करें(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Windows पिन बदले बिना पिन किए गए शॉर्टकट पढ़ता है। कुछ Windows 11 पिन या उनका क्रम उपलब्ध न हो सकता है।
+
+en: Version {}
+tr: संस्करण {}
+
+en: Created by Ibrahim Bouillet
+tr: Ibrahim Bouillet द्वारा बनाया गया
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: एक मूल Windows डेस्कटॉप इंटरफ़ेस - एक तैरता डॉक और शीर्ष स्टेटस बार - जो Explorer के साथ चलता है।
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: मौसम डेटा: Open-Meteo.com (CC BY 4.0)। कोई तृतीय-पक्ष C++ रनटाइम लाइब्रेरी शामिल नहीं है।
+
+en: &Official project
+tr: आधिकारिक प्रोजेक्ट(&O)
+
+en: Licence
+tr: लाइसेंस
+
+en: Taskbar replacement changes need Apply.
+tr: टास्कबार प्रतिस्थापन के बदलावों के लिए लागू करें दबाएँ।
+
+en: Changes save automatically. Startup needs Apply.
+tr: बदलाव अपने-आप सहेजे जाते हैं। स्टार्टअप के लिए लागू करें दबाएँ।
+
+en: Changes save automatically.
+tr: बदलाव अपने-आप सहेजे जाते हैं।
+
+en: Press Apply to confirm this change.
+tr: इस बदलाव की पुष्टि के लिए लागू करें दबाएँ।
+
+en: Smart transparency
+tr: स्मार्ट पारदर्शिता
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: लिक्विड में यह विंडो सिर्फ़ अपने टेक्स्ट और कंट्रोल के नीचे ब्लर करती है: दूसरी विंडो और डेस्कटॉप आइकन के ऊपर पूरी तरह, डेस्कटॉप वॉलपेपर के ऊपर हल्का, और जहाँ यह कुछ नहीं दिखाती वहाँ बिल्कुल नहीं।
+
+en: Languages on this PC
+tr: इस PC पर भाषाएँ
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell वे भाषाएँ डाउनलोड करता है जो Windows में हैं, ताकि Windows की भाषा बदलने पर इसकी भाषा भी बदल जाए।
+
+en: Add a language
+tr: भाषा जोड़ें
+
+en: &Download
+tr: डाउनलोड करें(&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: हर भाषा इस संस्करण की GitHub रिलीज़ से आती है और इस्तेमाल से पहले जाँची जाती है। इस PC पर आ जाने के बाद उसे ऊपर चुनें।
+
+en: built in
+tr: बिल्ट-इन
+
+en: downloading, {}
+tr: डाउनलोड हो रही है, {}
+
+en: download failed
+tr: डाउनलोड विफल
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell सेटअप
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: सेटअप अपना इंटरफ़ेस नहीं बना सका। इसे बंद करके फिर कोशिश करें, या दस्तावेज़ में दिए साइलेंट सेटअप विकल्प उपयोग करें।
+
+en: Options
+tr: विकल्प
+
+en: Install
+tr: इंस्टॉल
+
+en: Done
+tr: पूरा
+
+en: Remove Aether Shell
+tr: Aether Shell हटाएँ
+
+en: Repair Aether Shell
+tr: Aether Shell सुधारें
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Windows के लिए एक मूल डॉक और शीर्ष स्टेटस बार, जो Explorer के साथ चलता है।
+
+en: Replaces the Windows taskbar while it runs
+tr: चलते समय Windows टास्कबार की जगह लेता है
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Windows टास्कबार वापस पाने के लिए Aether Shell बंद करें, सेटिंग्स > डेस्कटॉप में इसे बंद करें, या स्टार्ट मेनू में "Restore Windows taskbar" खोलें।
+
+en: Starts when you sign in - your choice
+tr: साइन इन पर शुरू होता है - आपकी पसंद
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: नए इंस्टॉलेशन डिफ़ॉल्ट रूप से साइन इन पर शुरू होते हैं। आप इंस्टॉल से पहले यह विकल्प हटा सकते हैं, या बाद में सेटिंग्स में बंद कर सकते हैं। मौजूदा स्टार्टअप विकल्प और टास्क मैनेजर में किए गए बंद बने रहते हैं।
+
+en: Installs for your account
+tr: आपके खाते के लिए इंस्टॉल होता है
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: व्यवस्थापक अधिकारों की ज़रूरत नहीं। आपकी सेटिंग्स और डेटा आपकी उपयोगकर्ता प्रोफ़ाइल में रहते हैं।
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: अनइंस्टॉल आपकी सेटिंग्स और डेटा रखता है, जब तक आप उन्हें हटाना न चुनें।
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: सुधार इस पैकेज की फ़ाइलें बहाल करता है और आपकी सेटिंग्स रखता है। अगर Aether Shell ने Windows टास्कबार छिपा छोड़ा हो, तो सुधार उसे बहाल करता है।
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: किसी मौजूदा संस्करण के ऊपर इंस्टॉल करने से आपकी सेटिंग्स बनी रहती हैं। पुराना पैकेज अस्वीकार किया जाता है, जब तक आप स्पष्ट रूप से डाउनग्रेड की अनुमति न दें।
+
+en: MIT License
+tr: MIT लाइसेंस
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: लाइसेंस Aether Shell के पास LICENSE नाम से भी इंस्टॉल होता है।
+
+en: Remove this installation
+tr: यह इंस्टॉलेशन हटाएँ
+
+en: Install location
+tr: इंस्टॉल का स्थान
+
+en: &Browse...
+tr: ब्राउज़ करें(&B)...
+
+en: Also remove my settings, cache and logs
+tr: मेरी सेटिंग्स, कैश और लॉग भी हटाएँ
+
+en: This cannot be undone.
+tr: इसे पूर्ववत नहीं किया जा सकता।
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: सेटअप Aether Shell को ठीक से बंद करेगा और उसकी इंस्टॉल की गई फ़ाइलें, शॉर्टकट, स्टार्टअप प्रविष्टि और इंस्टॉल किए गए ऐप्स का पंजीकरण हटाएगा। दूसरे ऐप्लिकेशन और Windows सेटिंग्स नहीं छुए जाते।
+
+en: Your welcome
+tr: आपका स्वागत
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: साइन इन करने या PC अनलॉक करने के बाद Aether Shell हाथ से एक छोटा अभिवादन लिखता है। वह नाम लिखें जिससे वह आपको अभिवादन करे, या सिर्फ़ नमस्ते के लिए खाली छोड़ें।
+
+en: Your first name
+tr: आपका पहला नाम
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: वैकल्पिक, जैसे कोई पहला नाम। यह इसी PC पर आपकी Aether Shell सेटिंग्स में रहता है और कभी कहीं नहीं भेजा जाता। इसे बदलें या स्वागत बंद करें: सेटिंग्स > स्वागत।
+
+en: Shortcuts and startup
+tr: शॉर्टकट और स्टार्टअप
+
+en: Create Start menu shortcuts
+tr: स्टार्ट मेनू शॉर्टकट बनाएँ
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell और Restore Windows taskbar।
+
+en: Create a desktop shortcut
+tr: डेस्कटॉप शॉर्टकट बनाएँ
+
+en: Shows your current choice.
+tr: आपकी मौजूदा पसंद दिखाता है।
+
+en: Recommended.
+tr: अनुशंसित।
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: न चाहें तो इसे हटाएँ; टास्क मैनेजर में किए गए बंद का सम्मान होता है।
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: इंस्टॉल करना ऊपर दिए स्टार्टअप विकल्प को स्वीकार करता है। क्रैश के बाद लॉन्चर Aether Shell को सीमित प्रयासों के साथ फिर शुरू कर सकता है। बंद करना और Restore Windows taskbar उपलब्ध रहते हैं। मौसम डिफ़ॉल्ट रूप से बंद है। बिना हस्ताक्षर वाली फ़ाइलें Windows SmartScreen चेतावनी दिखा सकती हैं।
+
+en: Removing this installation...
+tr: यह इंस्टॉलेशन हटाया जा रहा है...
+
+en: Repairing Aether Shell...
+tr: Aether Shell सुधारा जा रहा है...
+
+en: Installing Aether Shell...
+tr: Aether Shell इंस्टॉल हो रहा है...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shell बंद करके उसकी फ़ाइलें हटाई जा रही हैं।
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: अंतर्निहित पैकेज सत्यापित करके उसकी फ़ाइलें इंस्टॉल की जा रही हैं। प्रगति गतिविधि के रूप में दिखती है: सेटअप को बचा हुआ समय नहीं पता।
+
+en: Please wait while the removal completes.
+tr: हटाना पूरा होने तक कृपया प्रतीक्षा करें।
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: नया संस्करण सक्रिय होने तक रद्द किया जा सकता है; फिर सेटअप सुरक्षित रूप से पूरा होता है।
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell अनइंस्टॉल हो गया।
+
+en: Aether Shell is ready.
+tr: Aether Shell तैयार है।
+
+en: Setup was cancelled.
+tr: सेटअप रद्द किया गया।
+
+en: Setup could not complete.
+tr: सेटअप पूरा नहीं हो सका।
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: आपका डेटा रखा गया, जब तक आपने उसे हटाना स्पष्ट रूप से न चुना हो।
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: आप इसे Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स से सुधार या अनइंस्टॉल कर सकते हैं।
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: सक्रिय होने से पहले कार्य रद्द किया गया। फिर कोशिश करने के लिए विकल्पों पर वापस जाएँ।
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: फ़ाइल पहुँच और खाली डिस्क जगह जाँचें, फिर कोशिश करें। अगर Aether Shell पहले से है, तो सुधार उसकी फ़ाइलें बहाल कर सकता है। त्रुटि श्रेणी: {}
+
+en: Setup log
+tr: सेटअप लॉग
+
+en: Launch Aether Shell
+tr: Aether Shell शुरू करें
+
+en: &Back
+tr: पीछे(&B)
+
+en: &Next
+tr: आगे(&N)
+
+en: &Continue
+tr: जारी रखें(&C)
+
+en: &Uninstall
+tr: अनइंस्टॉल करें(&U)
+
+en: &Repair
+tr: सुधारें(&R)
+
+en: &Install
+tr: इंस्टॉल करें(&I)
+
+en: &Close
+tr: बंद करें(&C)
+
+en: Step {} of {}: {}
+tr: चरण {} / {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Aether Shell का इंस्टॉल फ़ोल्डर चुनें
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: पूरा फ़ोल्डर पथ चुनें, जैसे कोई ड्राइव अक्षर से शुरू होने वाला।
+
+en: The install folder must be an absolute path.
+tr: इंस्टॉल फ़ोल्डर एक पूर्ण पथ होना चाहिए।
+
+en: Setup stops at the next safe point.
+tr: सेटअप अगले सुरक्षित बिंदु पर रुकता है।
+
+en: Cancelling...
+tr: रद्द हो रहा है...
+
+en: Setup is finishing the current step safely; please wait.
+tr: सेटअप मौजूदा चरण सुरक्षित रूप से पूरा कर रहा है; कृपया प्रतीक्षा करें।
+
+en: Updating Aether Shell
+tr: Aether Shell अपडेट हो रहा है
+
+en: Verifying the signed package and applying the update.
+tr: हस्ताक्षरित पैकेज सत्यापित करके अपडेट लागू किया जा रहा है।
+
+en: Update completed
+tr: अपडेट पूरा हुआ
+
+en: The update did not complete
+tr: अपडेट पूरा नहीं हुआ
+
+en: Close
+tr: बंद करें
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: अपडेट इंटरफ़ेस शुरू नहीं हो सका। अपडेट लागू नहीं हुआ। फिर कोशिश करें या सुधार का उपयोग करें।
+
+en: Aether Shell Update
+tr: Aether Shell अपडेट
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: अपडेट इंटरफ़ेस शुरू नहीं हो सका। अपडेट लागू नहीं हुआ। फिर कोशिश करें या Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स में सुधार का उपयोग करें।
+
+en: Update completed.
+tr: अपडेट पूरा हुआ।
+
+en: Update did not complete. See the updater log or use Repair.
+tr: अपडेट पूरा नहीं हुआ। अपडेटर लॉग देखें या सुधार का उपयोग करें।
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell शुरू नहीं हो सका। Windows सेटिंग्स > ऐप्स > इंस्टॉल किए गए ऐप्स में सुधार चुनें।
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell सेटिंग्स — अपडेट चल रहा है
+
+## shell
+
+en: &Resume taskbar replacement
+tr: टास्कबार प्रतिस्थापन फिर शुरू करें(&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: Windows सूचना क्षेत्र 60 सेकंड के लिए दिखाएँ(&N)
+
+en: &Search…
+tr: खोजें(&S)…
+
+en: &Settings…
+tr: सेटिंग्स(&S)…
+
+en: View available &update…
+tr: उपलब्ध अपडेट देखें(&U)…
+
+en: &Check for updates…
+tr: अपडेट जाँचें(&C)…
+
+en: &About Aether Shell
+tr: Aether Shell के बारे में(&A)
+
+en: &Quit Aether Shell
+tr: Aether Shell बंद करें(&Q)
+
+en: Switch &input language\tWin+Space
+tr: इनपुट भाषा बदलें(&I)\tWin+Space
+
+en: Open &network controls…
+tr: नेटवर्क नियंत्रण खोलें(&N)…
+
+en: &Weather settings…
+tr: मौसम सेटिंग्स(&W)…
+
+en: Toggle output &mute
+tr: आउटपुट म्यूट चालू/बंद करें(&M)
+
+en: &Sound settings…
+tr: ध्वनि सेटिंग्स(&S)…
+
+en: Toggle microphone &mute
+tr: माइक्रोफ़ोन म्यूट चालू/बंद करें(&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: Windows वॉइस टाइपिंग शुरू करें(&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: माइक्रोफ़ोन गोपनीयता सेटिंग्स(&P)…
+
+en: &Power settings…
+tr: पावर सेटिंग्स(&P)…
+
+en: Open &notifications and calendar
+tr: सूचनाएँ और कैलेंडर खोलें(&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: कैलेंडर खोलें(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: छिपे हुए आइकन दिखाएँ(&H)
+
+en: Initializing
+tr: शुरू हो रहा है
+
+en: Unavailable
+tr: उपलब्ध नहीं
+
+en: Unsupported
+tr: समर्थित नहीं
+
+en: Error
+tr: त्रुटि
+
+en: Available
+tr: उपलब्ध
+
+en: Unknown
+tr: अज्ञात
+
+en: Internet access
+tr: इंटरनेट उपलब्ध
+
+en: Local network only
+tr: केवल स्थानीय नेटवर्क
+
+en: Limited Internet access
+tr: सीमित इंटरनेट
+
+en: No network connection
+tr: कोई नेटवर्क कनेक्शन नहीं
+
+en: Connectivity unknown
+tr: कनेक्टिविटी अज्ञात
+
+en: Ethernet
+tr: ईथरनेट
+
+en: Cellular
+tr: सेल्युलर
+
+en: Network
+tr: नेटवर्क
+
+en: Offline
+tr: ऑफ़लाइन
+
+en: Network status unavailable
+tr: नेटवर्क की स्थिति उपलब्ध नहीं
+
+en: Quick controls
+tr: क्विक कंट्रोल
+
+en: Aether Shell menu
+tr: Aether Shell मेनू
+
+en: Weather status unavailable
+tr: मौसम की स्थिति उपलब्ध नहीं
+
+en: Cached weather
+tr: कैश किया गया मौसम
+
+en: Observation (UTC): {}
+tr: अवलोकन (UTC): {}
+
+en: Weather: {}
+tr: मौसम: {}
+
+en: Click to open weather settings
+tr: मौसम सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Show hidden icons
+tr: छिपे हुए आइकन दिखाएँ
+
+en: Opens Windows' notification-area overflow
+tr: Windows सूचना क्षेत्र का ओवरफ़्लो खोलता है
+
+en: Input language: {}
+tr: इनपुट भाषा: {}
+
+en: Fallback input layout
+tr: वैकल्पिक इनपुट लेआउट
+
+en: Click to switch input language (Win+Space)
+tr: इनपुट भाषा बदलने के लिए क्लिक करें (Win+Space)
+
+en: Network: {}
+tr: नेटवर्क: {}
+
+en: Signal strength unavailable
+tr: सिग्नल की ताकत उपलब्ध नहीं
+
+en: Click to open Windows network settings
+tr: Windows नेटवर्क सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Audio output
+tr: ऑडियो आउटपुट
+
+en: Audio: {}
+tr: ऑडियो: {}
+
+en: volume unknown
+tr: वॉल्यूम अज्ञात
+
+en: Muted
+tr: म्यूट
+
+en: Sound on
+tr: ध्वनि चालू
+
+en: Microphone: {}
+tr: माइक्रोफ़ोन: {}
+
+en: Endpoint unmuted
+tr: माइक्रोफ़ोन चालू
+
+en: Recording detection unsupported
+tr: रिकॉर्डिंग पहचान समर्थित नहीं
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: म्यूट चालू/बंद करने के लिए क्लिक करें; Windows वॉइस टाइपिंग और माइक्रोफ़ोन गोपनीयता सेटिंग्स के लिए राइट-क्लिक करें
+
+en: Battery: {}
+tr: बैटरी: {}
+
+en: Battery {}
+tr: बैटरी {}
+
+en: Battery status unavailable
+tr: बैटरी की स्थिति उपलब्ध नहीं
+
+en: Charging
+tr: चार्ज हो रही है
+
+en: External power
+tr: बाहरी बिजली
+
+en: Estimated remaining: {} h {} min
+tr: अनुमानित शेष: {} घंटे {} मिनट
+
+en: Click to open power settings
+tr: पावर सेटिंग्स खोलने के लिए क्लिक करें
+
+en: Clock status unavailable
+tr: घड़ी की स्थिति उपलब्ध नहीं
+
+en: Click to open calendar and notifications
+tr: कैलेंडर और सूचनाएँ खोलने के लिए क्लिक करें
+
+en: Action failed: {}
+tr: कार्य विफल: {}
+
+en: Aether Shell status bar
+tr: Aether Shell स्टेटस बार
+
+en: Update available
+tr: अपडेट उपलब्ध
+
+en: Cached
+tr: कैश किया गया
+
+en: Start
+tr: स्टार्ट
+
+en: Search
+tr: खोजें
+
+en: Task View
+tr: टास्क व्यू
+
+en: Application
+tr: ऐप्लिकेशन
+
+en: Running application
+tr: चल रहा ऐप्लिकेशन
+
+en: More applications
+tr: और ऐप्लिकेशन
+
+en: Aether Shell window previews
+tr: Aether Shell विंडो पूर्वावलोकन
+
+en: Minimized — preview unavailable
+tr: छोटा किया गया — पूर्वावलोकन उपलब्ध नहीं
+
+en: Preview unavailable
+tr: पूर्वावलोकन उपलब्ध नहीं
+
+en: {} windows
+tr: {} की विंडो
+
+en: {} window
+tr: {} विंडो
+
+en: Switches to this window
+tr: इस विंडो पर जाता है
+
+en: Minimized, preview unavailable
+tr: छोटा किया गया, पूर्वावलोकन उपलब्ध नहीं
+
+en: Minimized
+tr: छोटा किया गया
+
+en: Close {}
+tr: {} बंद करें
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: इस विंडो को बंद होने के लिए कहता है; ऐप्लिकेशन अब भी सहेजने या रद्द करने को कह सकता है
+
+en: Close requested
+tr: बंद करने का अनुरोध किया गया
+
+en: Previous applications
+tr: पिछले ऐप्लिकेशन
+
+en: Open
+tr: खोलें
+
+en: New instance
+tr: नया इंस्टेंस
+
+en: Unpin from Dock
+tr: डॉक से अनपिन करें
+
+en: Pin to Dock
+tr: डॉक पर पिन करें
+
+en: Move left
+tr: बाएँ ले जाएँ
+
+en: Move right
+tr: दाएँ ले जाएँ
+
+en: Dock settings...
+tr: डॉक सेटिंग्स...
+
+en: Import Windows taskbar pins
+tr: Windows टास्कबार पिन आयात करें
+
+en: Open Windows Start
+tr: Windows स्टार्ट खोलें
+
+en: Aether Shell Dock
+tr: Aether Shell डॉक
+
+en: Pinned
+tr: पिन किया गया
+
+en: Running
+tr: चल रहा है
+
+en: Needs attention
+tr: ध्यान चाहिए
+
+en: Up arrow shows window previews
+tr: ऊपर तीर विंडो पूर्वावलोकन दिखाता है
+
+en: Installed application
+tr: इंस्टॉल किया गया ऐप्लिकेशन
+
+en: Desktop application
+tr: डेस्कटॉप ऐप्लिकेशन
+
+en: File
+tr: फ़ाइल
+
+en: Folder
+tr: फ़ोल्डर
+
+en: Windows tool
+tr: Windows टूल
+
+en: Control Panel
+tr: कंट्रोल पैनल
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ नेविगेट   ·   Enter खोलें   ·   Esc बंद करें
+
+en: Search apps, settings and files
+tr: ऐप, सेटिंग्स और फ़ाइलें खोजें
+
+en: Search could not be completed.
+tr: खोज पूरी नहीं हो सकी।
+
+en: Results
+tr: परिणाम
+
+en: Indexing applications…
+tr: ऐप्लिकेशन इंडेक्स हो रहे हैं…
+
+en: Type to search apps, settings and files
+tr: ऐप, सेटिंग्स और फ़ाइलें खोजने के लिए लिखें
+
+en: Nothing matches
+tr: कुछ नहीं मिला
+
+en: Windows could not open this application.
+tr: Windows यह ऐप्लिकेशन नहीं खोल सका।
+
+en: Menu
+tr: मेनू
+
+en: Opens a submenu
+tr: उप-मेनू खोलता है
+
+en: , opens a submenu
+tr: , उप-मेनू खोलता है
+
+en: Selected
+tr: चयनित
+
+en: Checked
+tr: चुना गया
+
+en: Bluetooth
+tr: ब्लूटूथ
+
+en: Airplane mode
+tr: हवाई जहाज़ मोड
+
+en: Accessibility
+tr: सुगम्यता
+
+en: Energy saver
+tr: ऊर्जा बचत
+
+en: Live captions
+tr: लाइव कैप्शन
+
+en: Night light
+tr: रात्रि प्रकाश
+
+en: Mobile hotspot
+tr: मोबाइल हॉटस्पॉट
+
+en: Nearby sharing
+tr: आस-पास साझाकरण
+
+en: Cast
+tr: कास्ट
+
+en: Project
+tr: प्रोजेक्ट
+
+en: All settings
+tr: सभी सेटिंग्स
+
+en: Connected
+tr: कनेक्ट है
+
+en: Not connected
+tr: कनेक्ट नहीं है
+
+en: , on
+tr: , चालू
+
+en: , off
+tr: , बंद
+
+en: , state unknown
+tr: , स्थिति अज्ञात
+
+en: , opens Windows Settings
+tr: , Windows सेटिंग्स खोलता है
+
+en: , shows accessibility features
+tr: , सुगम्यता सुविधाएँ दिखाता है
+
+en: , requires Windows 11 version 22H2
+tr: , Windows 11 संस्करण 22H2 चाहिए
+
+en: Now playing: {}
+tr: अभी चल रहा है: {}
+
+en: Untitled media
+tr: बिना शीर्षक का मीडिया
+
+en: , switch source
+tr: , स्रोत बदलें
+
+en: Previous media item
+tr: पिछला मीडिया आइटम
+
+en: Pause
+tr: रोकें
+
+en: Play
+tr: चलाएँ
+
+en: Next media item
+tr: अगला मीडिया आइटम
+
+en: {} details
+tr: {} का विवरण
+
+en: Page {} of {}
+tr: पेज {} / {}
+
+en: Next page
+tr: अगला पेज
+
+en: First page
+tr: पहला पेज
+
+en: Brightness
+tr: चमक
+
+en: Brightness, unavailable on this display
+tr: चमक, इस डिस्प्ले पर उपलब्ध नहीं
+
+en: Volume
+tr: वॉल्यूम
+
+en: Volume, unavailable
+tr: वॉल्यूम, उपलब्ध नहीं
+
+en: Unmute
+tr: म्यूट हटाएँ
+
+en: Mute
+tr: म्यूट करें
+
+en: Sound output and volume mixer
+tr: ध्वनि आउटपुट और वॉल्यूम मिक्सर
+
+en: Back
+tr: वापस
+
+en: , secured
+tr: , सुरक्षित
+
+en: , open
+tr: , खुला
+
+en: , connected
+tr: , कनेक्ट है
+
+en: Disconnect
+tr: डिस्कनेक्ट करें
+
+en: Show available networks
+tr: उपलब्ध नेटवर्क दिखाएँ
+
+en: More Wi-Fi settings
+tr: और Wi-Fi सेटिंग्स
+
+en: Bluetooth and devices settings
+tr: ब्लूटूथ और डिवाइस सेटिंग्स
+
+en: Magnifier
+tr: मैग्निफ़ायर
+
+en: Narrator
+tr: नैरेटर
+
+en: On-screen keyboard
+tr: ऑन-स्क्रीन कीबोर्ड
+
+en: Sticky keys
+tr: स्टिकी कुंजियाँ
+
+en: More accessibility settings
+tr: और सुगम्यता सेटिंग्स
+
+en: Volume mixer
+tr: वॉल्यूम मिक्सर
+
+en: Choose output in Sound settings
+tr: ध्वनि सेटिंग्स में आउटपुट चुनें
+
+en: Power and battery settings
+tr: पावर और बैटरी सेटिंग्स
+
+en: Battery {} percent, {}
+tr: बैटरी {} प्रतिशत, {}
+
+en: All Windows settings
+tr: सभी Windows सेटिंग्स
+
+en: The requested action could not be dispatched
+tr: अनुरोधित कार्य भेजा नहीं जा सका
+
+en: Aether Shell quick controls
+tr: Aether Shell क्विक कंट्रोल
+
+en: Media session active
+tr: मीडिया सत्र सक्रिय
+
+en: No media session
+tr: कोई मीडिया सत्र नहीं
+
+en: Current page
+tr: वर्तमान पेज
+
+en:  - secured
+tr:  - सुरक्षित
+
+en:  - open
+tr:  - खुला
+
+en:  - opens in Windows
+tr:  - Windows में खुलता है
+
+en: Turned off by hardware or policy
+tr: हार्डवेयर या नीति द्वारा बंद
+
+en: State unavailable - use Windows settings
+tr: स्थिति उपलब्ध नहीं - Windows सेटिंग्स का उपयोग करें
+
+en: Off
+tr: बंद
+
+en:  - signal {} of 5
+tr:  - सिग्नल 5 में से {}
+
+en: , no internet
+tr: , इंटरनेट नहीं
+
+en: On - not connected
+tr: चालू - कनेक्ट नहीं है
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows ऐप्स को नेटवर्क सूचीबद्ध करने नहीं दे रहा: गोपनीयता सेटिंग्स में स्थान जाँचें
+
+en: No Wi-Fi adapter found
+tr: कोई Wi-Fi अडैप्टर नहीं मिला
+
+en: Connecting to {}...
+tr: {} से कनेक्ट हो रहा है...
+
+en:  - looking for networks
+tr:  - नेटवर्क खोजे जा रहे हैं
+
+en: On
+tr: चालू
+
+en: A screen reader is running
+tr: एक स्क्रीन रीडर चल रहा है
+
+en: Windows accessibility features
+tr: Windows सुगम्यता सुविधाएँ
+
+en: Sound output
+tr: ध्वनि आउटपुट
+
+en: Default output device
+tr: डिफ़ॉल्ट आउटपुट डिवाइस
+
+en: No output device available
+tr: कोई आउटपुट डिवाइस उपलब्ध नहीं
+
+en: Battery unknown
+tr: बैटरी अज्ञात
+
+en: Status refresh could not be started
+tr: स्थिति रीफ़्रेश शुरू नहीं हो सका
+
+en: Status refresh unavailable
+tr: स्थिति रीफ़्रेश उपलब्ध नहीं
+
+en: Excellent signal
+tr: बहुत अच्छा सिग्नल
+
+en: Good signal
+tr: अच्छा सिग्नल
+
+en: Fair signal
+tr: ठीक-ठाक सिग्नल
+
+en: Weak signal
+tr: कमज़ोर सिग्नल
+
+en: Clear sky
+tr: साफ़ आसमान
+
+en: Mainly clear
+tr: ज़्यादातर साफ़
+
+en: Partly cloudy
+tr: आंशिक रूप से बादल
+
+en: Overcast
+tr: घने बादल
+
+en: Fog
+tr: कोहरा
+
+en: Drizzle
+tr: बूँदाबाँदी
+
+en: Rain
+tr: बारिश
+
+en: Snow
+tr: बर्फ़
+
+en: Rain showers
+tr: बौछारें
+
+en: Snow showers
+tr: बर्फ़ की बौछारें
+
+en: Thunderstorm
+tr: आँधी-तूफ़ान
+
+## weather
+
+en: Morning
+tr: सुबह
+
+en: Afternoon
+tr: दोपहर
+
+en: Evening
+tr: शाम
+
+en: Night
+tr: रात
+
+en: Now
+tr: अभी
+
+en: Today
+tr: आज
+
+en: Low
+tr: कम
+
+en: Moderate
+tr: मध्यम
+
+en: High
+tr: अधिक
+
+en: Very high
+tr: बहुत अधिक
+
+en: Extreme
+tr: अत्यधिक
+
+en: No connection to the weather service.
+tr: मौसम सेवा से कोई कनेक्शन नहीं है।
+
+en: The weather service is busy. Try again in a moment.
+tr: मौसम सेवा व्यस्त है। थोड़ी देर में फिर से कोशिश करें।
+
+en: The weather could not be loaded.
+tr: मौसम लोड नहीं हो सका।
+
+en: Could not update; showing the last forecast.
+tr: अपडेट नहीं हो सका; पिछला पूर्वानुमान दिखाया जा रहा है।
+
+en: Try again
+tr: फिर से कोशिश करें
+
+en: Your location
+tr: आपका स्थान
+
+en: My location
+tr: मेरा स्थान
+
+en: Precise location
+tr: सटीक स्थान
+
+en: Approximate location
+tr: अनुमानित स्थान
+
+en: Chosen in Settings
+tr: सेटिंग्स में चुना गया
+
+en: Allow
+tr: अनुमति दें
+
+en: Use precise location
+tr: सटीक स्थान का उपयोग करें
+
+en: See the weather where you are: allow your precise location.
+tr: जहाँ आप हैं वहाँ का मौसम देखें: अपने सटीक स्थान की अनुमति दें।
+
+en: Your position is approximate (about 10 km).
+tr: आपका स्थान अनुमानित है (लगभग 10 किमी)।
+
+en: Location is turned off for this app in Windows.
+tr: Windows में इस ऐप के लिए स्थान बंद है।
+
+en: This device cannot report its location. Search for a city instead.
+tr: यह डिवाइस अपना स्थान नहीं बता सकता। इसके बजाय कोई शहर खोजें।
+
+en: Reading Windows location…
+tr: Windows का स्थान पढ़ा जा रहा है…
+
+en: Automatic weather follows your Windows location.
+tr: स्वचालित मौसम आपके Windows स्थान के अनुसार चलता है।
+
+en: Search for a city
+tr: कोई शहर खोजें
+
+en: Search for a city, or allow your location, to see the weather.
+tr: मौसम देखने के लिए कोई शहर खोजें या अपने स्थान की अनुमति दें।
+
+en: Searching…
+tr: खोज रहा है…
+
+en: City search is unavailable.
+tr: शहर खोज उपलब्ध नहीं है।
+
+en: No city found.
+tr: कोई शहर नहीं मिला।
+
+en: Weather settings
+tr: मौसम सेटिंग्स
+
+en: Loading the weather…
+tr: मौसम लोड हो रहा है…
+
+en: Loading…
+tr: लोड हो रहा है…
+
+en: Updated {}
+tr: {} बजे अपडेट किया गया
+
+en: Near {}
+tr: {} के पास
+
+en: Temperatures now
+tr: अभी का तापमान
+
+en: The map is unavailable.
+tr: नक्शा उपलब्ध नहीं है।
+
+en: Map: Natural Earth
+tr: नक्शा: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: मौसम डेटा: Open-Meteo.com
+
+en: Feels like
+tr: महसूस होता है
+
+en: Feels like {}
+tr: {} जैसा महसूस होता है
+
+en: Close to the real temperature
+tr: असली तापमान के करीब
+
+en: The wind makes it feel colder
+tr: हवा के कारण ज़्यादा ठंड महसूस होती है
+
+en: Humidity makes it feel warmer
+tr: नमी के कारण ज़्यादा गर्मी महसूस होती है
+
+en: Humidity
+tr: नमी
+
+en: Cloud cover {}
+tr: बादल {}
+
+en: Wind
+tr: हवा
+
+en: Gusts {}
+tr: झोंके {}
+
+en: Sunrise and sunset
+tr: सूर्योदय और सूर्यास्त
+
+en: UV index
+tr: UV सूचकांक
+
+en: Pressure
+tr: दबाव
+
+en: At sea level
+tr: समुद्र तल पर
+
+en: &Open the weather
+tr: मौसम खोलें(&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: आप जहाँ हैं वहाँ का पूर्वानुमान, लगभग 100 मीटर तक सटीक, उसकी अपनी ऊँचाई के साथ। बंद: लगभग 10 किमी तक पूर्णांकित।

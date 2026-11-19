@@ -5,14 +5,15 @@
 🇸🇦 [العربية](../ar/INSTALLATION.md) · 🇧🇩 [বাংলা](../bn/INSTALLATION.md) · 🇵🇰 [اردو](../ur/INSTALLATION.md)
 
 N'utilisez que l'exécutable d'installation de la [page des versions du dépôt officiel](https://github.com/ibrahimbouillet/AetherShell/releases).
-La version actuelle, 3.5 [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3), est
+La version actuelle, l'Alpha 4 [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4), est
 une préversion à installer manuellement ; la qualification plus large de la version 1 reste ouverte. La version précédente
 [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) reste disponible.
 
 Lancez l'installation avec votre compte Windows habituel. Depuis l'Alpha 4, l'installation parle la langue que
-vous avez choisie dans les Paramètres d'Aether Shell ou, à défaut, la première de vos langues d'affichage de Windows
-qui fait partie des dix langues de l'interface, et l'anglais sinon. L'assistant
-présente le produit, affiche la licence MIT et vous laisse choisir un dossier (par défaut
+vous avez choisie dans les Paramètres d'Aether Shell ou, à défaut, votre langue d'affichage de Windows (n'importe
+laquelle des 41 langues de l'interface), et l'anglais sinon. Une fois l'installation terminée, elle télécharge depuis
+la version publiée les langues de l'interface que compte votre Windows (quelques dizaines de Ko chacune) ; hors ligne,
+Aether Shell les télécharge à son démarrage. L'assistant présente le produit, affiche la licence MIT et vous laisse choisir un dossier (par défaut
 `%LOCALAPPDATA%\Programs\AetherShell`), les raccourcis et le démarrage facultatif. Il installe un lanceur stable, un
 programme de maintenance et des fichiers de programme versionnés. Il peut créer un raccourci dans le menu Démarrer et une
 entrée propre à l'utilisateur dans les applications installées de Windows. Aucun droit d'administrateur n'est utilisé et
@@ -33,7 +34,7 @@ Des fichiers d'application ou d'installation non signés peuvent déclencher Sma
 certificat d'éditeur Authenticode. Vérifiez la source exacte de la version et son SHA-256 avant de décider de la lancer :
 
 ```powershell
-Get-FileHash .\AetherShell-0.3.5-alpha.3-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\AetherShell-0.4.0-alpha.4-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Comparez avec le fichier de sommes de contrôle correspondant. Une somme de contrôle seule n'authentifie pas un éditeur.

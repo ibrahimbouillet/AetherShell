@@ -1,0 +1,2494 @@
+# Croatian (hr): Hrvatski. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Da biste omogućili automatsku vremensku prognozu, odaberite lokaciju sustava Windows.
+
+en: Windows taskbar visible
+tr: Programska traka sustava Windows je vidljiva
+
+en: Connected to {}
+tr: Povezano s mrežom {}
+
+en: {} is out of range
+tr: Mreža {} je izvan dometa
+
+en: Connecting to {} took too long
+tr: Povezivanje s mrežom {} trajalo je predugo
+
+en: Use Windows to join {}
+tr: Za pridruživanje mreži {} upotrijebite Windows
+
+en: Windows did not allow this connection
+tr: Windows nije dopustio ovu vezu
+
+en: Could not connect to {}
+tr: Povezivanje s mrežom {} nije uspjelo
+
+en: Connect to {}
+tr: Povezivanje s mrežom {}
+
+en: That password was not accepted. Check it and try again.
+tr: Lozinka nije prihvaćena. Provjerite je i pokušajte ponovno.
+
+en: Enter this network's password.
+tr: Unesite lozinku ove mreže.
+
+en: &Connect
+tr: &Poveži
+
+en: Windows Settings could not be opened
+tr: Postavke sustava Windows nije moguće otvoriti
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Prostor za Dock nije moguće rezervirati; vraćanje programske trake sustava Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Zamjena nije dostupna: nadzor oporavka nije moguće pokrenuti
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Programska traka sustava Windows je vraćena. Prostor za Dock nije moguće rezervirati; za ponovni pokušaj isključite pa ponovno uključite zamjenu.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Nadzor oporavka nije dostupan; vraćanje programske trake sustava Windows
+
+en: Windows notifications could not be opened
+tr: Obavijesti sustava Windows nije moguće otvoriti
+
+en: The Windows calendar could not be opened
+tr: Kalendar sustava Windows nije moguće otvoriti
+
+en: Windows did not show its hidden icons
+tr: Windows nije prikazao svoje skrivene ikone
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatsko osvježavanje lokacije nije dostupno; pokušajte ponovno u postavkama vremenske prognoze.
+
+en: Windows location
+tr: Lokacija sustava Windows
+
+en: Reading approximate Windows location…
+tr: Čitanje približne lokacije sustava Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatska vremenska prognoza prati približnu lokaciju sustava Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Pristup lokaciji sustava Windows je blokiran. Vremenska prognoza nije dostupna.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows nije mogao pružiti trenutnu lokaciju. Vremenska prognoza nije dostupna.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Proces za lokaciju nije dostupan. Vremenska prognoza nije dostupna.
+
+en: Waiting for Windows location permission…
+tr: Čekanje na dopuštenje za lokaciju sustava Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Odabir automatske vremenske prognoze nije moguće spremiti.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Pristup lokaciji sustava Windows nije dostupan ili je odbijen. Vremenska prognoza nije dostupna.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Lokacija sustava Windows nije mogla zatražiti dopuštenje. Provjerite postavke lokacije sustava Windows.
+
+en: Status worker unavailable
+tr: Proces za stanje nije dostupan
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows nije mogao dovršiti ovu radnju. Provjerite njezine postavke.
+
+en: Reading Windows status; try the action again shortly
+tr: Čitanje stanja sustava Windows; uskoro ponovno pokušajte izvršiti radnju
+
+en: Could not disconnect
+tr: Prekid veze nije uspio
+
+en: The Windows accessibility feature could not be started
+tr: Značajku pristupačnosti sustava Windows nije moguće pokrenuti
+
+en: Windows could not change the audio output
+tr: Windows nije mogao promijeniti audioizlaz
+
+en: The Windows control could not be opened
+tr: Kontrolu sustava Windows nije moguće otvoriti
+
+en: Keyboard shortcuts disabled
+tr: Tipkovni prečaci su onemogućeni
+
+en: Both keyboard shortcuts registered
+tr: Oba tipkovna prečaca su registrirana
+
+en: A keyboard shortcut is already in use by another application
+tr: Tipkovni prečac već koristi druga aplikacija
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Brze postavke sustava Windows nije moguće zatražiti. Da biste koristili kontrole sustava Aether, u postavkama gornje trake poništite odabir mogućnosti „Koristi brze postavke sustava Windows“.
+
+en: Windows Start could not be opened
+tr: Izbornik Start sustava Windows nije moguće otvoriti
+
+en: Windows Task View could not be opened
+tr: Prikaz zadataka sustava Windows nije moguće otvoriti
+
+en: Windows keyboard layout switching was unavailable
+tr: Promjena rasporeda tipkovnice sustava Windows nije bila dostupna
+
+en: Windows voice typing could not be opened
+tr: Glasovno tipkanje sustava Windows nije moguće otvoriti
+
+en: Windows taskbar could not be revealed
+tr: Programsku traku sustava Windows nije moguće prikazati
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Zamjenu programske trake nije moguće nastaviti; Windows ostaje dostupan
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Zamjena programske trake sustava Windows nije dostupna u ovoj sesiji
+
+en: Windows pin access is unavailable in this isolated session
+tr: Pristup prikvačenim stavkama sustava Windows nije dostupan u ovoj izoliranoj sesiji
+
+en: Windows pinned applications could not be read
+tr: Prikvačene aplikacije sustava Windows nije moguće pročitati
+
+en: Settings changed during pin import. Try import again.
+tr: Postavke su se promijenile tijekom uvoza prikvačenih stavki. Ponovno pokušajte uvoz.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Spremljene dodatne prikvačene aplikacije: {}. Neke prikvačene stavke sustava Windows mogu ostati nedostupne.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Prikvačene stavke promijenjene su u memoriji; spremanje nije uspjelo. Za ponovni pokušaj kliknite Primijeni u postavkama.
+
+en: Pins updated in memory; saving...
+tr: Prikvačene stavke ažurirane su u memoriji; spremanje...
+
+en: Imported pins could not be applied
+tr: Uvezene prikvačene stavke nije moguće primijeniti
+
+en: Pin import is unavailable while closing
+tr: Uvoz prikvačenih stavki nije dostupan tijekom zatvaranja
+
+en: Settings could not be saved
+tr: Postavke nije moguće spremiti
+
+en: Quit without saving the latest changes?
+tr: Želite li izaći bez spremanja najnovijih promjena?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Vaša prethodna datoteka postavki je zadržana. Ostavite Aether Shell otvoren da biste ponovno pokušali spremanje.
+
+en: &Quit without saving
+tr: &Izađi bez spremanja
+
+en: &Keep Aether Shell open
+tr: &Ostavi Aether Shell otvoren
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Izvezi osnovnu dijagnostiku – verzija aplikacije i međuverzija sustava Windows, bez zapisnika i osobnih podataka
+
+en: Diagnostics exported.
+tr: Dijagnostika je izvezena.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Dijagnostiku nije moguće spremiti u odabranu datoteku.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Postavke nije moguće sigurno pročitati. Postojeća datoteka je sačuvana.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell nije mogao pokrenuti svoje površine radne površine.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Vraćanje programske trake sustava Windows je na čekanju. Pokušajte ponovno ili zatvorite Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Programska traka sustava Windows privremeno je prikazana.
+
+en: Windows taskbar restored.
+tr: Programska traka sustava Windows je vraćena.
+
+en: Windows taskbar replacement is active.
+tr: Zamjena programske trake sustava Windows je aktivna.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Programska traka sustava Windows ostaje dostupna. Zamjena će uskoro pokušati ponovno.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Programska traka sustava Windows ostaje dostupna. Za ponovni pokušaj isključite pa ponovno uključite zamjenu.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Programska traka sustava Windows je vraćena. Zamjena će se uskoro ponovno povezati.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Programska traka sustava Windows je vraćena. Za ponovni pokušaj isključite pa ponovno uključite zamjenu.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Zamjena programske trake je zaustavljena. Programska traka sustava Windows je vraćena.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Zamjena programske trake je zaustavljena. Vraćanje programske trake sustava Windows nije moguće potvrditi.
+
+en: Activating taskbar replacement...
+tr: Aktiviranje zamjene programske trake...
+
+en: Restoring Windows taskbar...
+tr: Vraćanje programske trake sustava Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Ponovno povezivanje zamjene programske trake...
+
+en: Showing the Windows taskbar temporarily...
+tr: Privremeno prikazivanje programske trake sustava Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell nije mogao vratiti programsku traku sustava Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Ponovno pokrenite Eksplorer za Windows u Upravitelju zadataka (Ctrl+Shift+Esc) ili se odjavite i ponovno prijavite.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Programska traka sustava Windows vraćena je u spremljeno stanje.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Spremljeno stanje programske trake nije pronađeno. Programska traka sustava Windows učinjena je vidljivom; njezina postavka automatskog skrivanja nije promijenjena.
+
+en: There was nothing to restore.
+tr: Nije bilo ničega za vraćanje.
+
+en: Taskbar replacement is turned off.
+tr: Zamjena programske trake je isključena.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Zamjenu programske trake nije moguće automatski isključiti. Isključite je u Postavkama za Aether Shell > Radna površina.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Neprepoznat ili nevažeći naredbeni redak za Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell nije mogao stvoriti svoje lokalne mape s podacima.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell se zaustavio zbog neočekivane pogreške.
+
+## search-names
+
+en: Disk Management
+tr: Upravljanje diskovima
+
+en: Local Users and Groups
+tr: Lokalni korisnici i grupe
+
+en: Local Group Policy Editor
+tr: Uređivač pravila lokalne grupe
+
+en: Manage User Certificates
+tr: Upravljanje korisničkim certifikatima
+
+en: Manage Computer Certificates
+tr: Upravljanje certifikatima računala
+
+en: Shared Folders
+tr: Zajedničke mape
+
+en: TPM Management
+tr: Upravljanje TPM-om
+
+en: Network Connections
+tr: Mrežne veze
+
+en: System Properties
+tr: Svojstva sustava
+
+en: About Windows
+tr: O sustavu Windows
+
+en: DirectX Diagnostic Tool
+tr: Dijagnostički alat za DirectX
+
+en: Windows Features
+tr: Značajke sustava Windows
+
+en: System Restore
+tr: Vraćanje sustava
+
+en: Advanced System Settings
+tr: Dodatne postavke sustava
+
+en: Volume Mixer
+tr: Mješač glasnoće
+
+en: Microsoft Management Console
+tr: Microsoftova konzola za upravljanje
+
+en: User Accounts (Advanced)
+tr: Korisnički računi (napredno)
+
+en: Display settings
+tr: Postavke zaslona
+
+en: Night light settings
+tr: Postavke noćnog svjetla
+
+en: Graphics settings
+tr: Postavke grafike
+
+en: Sound settings
+tr: Postavke zvuka
+
+en: Notification settings
+tr: Postavke obavijesti
+
+en: Power & battery settings
+tr: Postavke napajanja i baterije
+
+en: Energy saver settings
+tr: Postavke uštede energije
+
+en: Storage settings
+tr: Postavke pohrane
+
+en: Multitasking settings
+tr: Postavke obavljanja više zadataka
+
+en: Clipboard settings
+tr: Postavke međuspremnika
+
+en: Remote Desktop settings
+tr: Postavke udaljene radne površine
+
+en: About your PC
+tr: O sustavu
+
+en: Bluetooth & devices settings
+tr: Postavke za Bluetooth i uređaje
+
+en: Printers & scanners settings
+tr: Postavke pisača i skenera
+
+en: Mouse settings
+tr: Postavke miša
+
+en: Touchpad settings
+tr: Postavke dodirne pločice
+
+en: Network & internet settings
+tr: Postavke mreže i interneta
+
+en: Wi-Fi settings
+tr: Postavke Wi-Fi mreže
+
+en: VPN settings
+tr: Postavke VPN-a
+
+en: Proxy settings
+tr: Postavke proxyja
+
+en: Airplane mode settings
+tr: Postavke načina rada u zrakoplovu
+
+en: Mobile hotspot settings
+tr: Postavke mobilne pristupne točke
+
+en: Background settings
+tr: Postavke pozadine
+
+en: Color settings
+tr: Postavke boja
+
+en: Theme settings
+tr: Postavke teme
+
+en: Lock screen settings
+tr: Postavke zaključanog zaslona
+
+en: Taskbar settings
+tr: Postavke programske trake
+
+en: Font settings
+tr: Postavke fontova
+
+en: Installed apps
+tr: Instalirane aplikacije
+
+en: Default apps settings
+tr: Postavke zadanih aplikacija
+
+en: Startup apps settings
+tr: Postavke aplikacija za pokretanje
+
+en: Account info
+tr: Vaši podaci
+
+en: Sign-in options
+tr: Mogućnosti prijave
+
+en: Other users settings
+tr: Postavke ostalih korisnika
+
+en: Date & time settings
+tr: Postavke datuma i vremena
+
+en: Language & region settings
+tr: Postavke jezika i regije
+
+en: Typing settings
+tr: Postavke tipkanja
+
+en: Accessibility settings
+tr: Postavke pristupačnosti
+
+en: Privacy & security settings
+tr: Postavke privatnosti i sigurnosti
+
+en: Location settings
+tr: Postavke lokacije
+
+en: Windows Update settings
+tr: Postavke servisa Windows Update
+
+en: Recovery settings
+tr: Postavke oporavka
+
+en: Activation settings
+tr: Postavke aktivacije
+
+en: For developers settings
+tr: Postavke za razvojne inženjere
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Nije moguće pristupiti servisu GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub trenutno nije odgovorio na zahtjev.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Izdanje nije prošlo provjeru, pa ništa nije instalirano.
+
+en: There is not enough free disk space.
+tr: Nema dovoljno slobodnog prostora na disku.
+
+en: Windows refused access to the update files.
+tr: Windows je odbio pristup datotekama ažuriranja.
+
+en: {} bytes
+tr: {} bajtova
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Stanje
+
+en: Check &now
+tr: Provjeri &sada
+
+en: Download and install
+tr: Preuzmi i instaliraj
+
+en: &Later
+tr: &Kasnije
+
+en: S&kip this version
+tr: Pr&eskoči ovu verziju
+
+en: &Release details
+tr: Pojedinosti o &izdanju
+
+en: Disable &notifications
+tr: Onemogući &obavijesti
+
+en: Release notes
+tr: Napomene o izdanju
+
+en: the new version
+tr: nova verzija
+
+en: Installed: {}.
+tr: Instalirano: {}.
+
+en: Automatic update checks are off
+tr: Automatske provjere ažuriranja su isključene
+
+en: Check now looks for a newer release once.
+tr: Provjeri sada jednom traži novije izdanje.
+
+en: Last checked {}
+tr: Posljednja provjera: {}
+
+en: Not checked yet
+tr: Još nije provjereno
+
+en: Checking for updates...
+tr: Traženje ažuriranja...
+
+en: Aether Shell is up to date
+tr: Aether Shell je ažuran
+
+en: Latest published release: {}.
+tr: Najnovije objavljeno izdanje: {}.
+
+en: Version {} is available
+tr: Dostupna je verzija {}
+
+en: Download size: {}.
+tr: Veličina preuzimanja: {}.
+
+en: Downloading version {}...
+tr: Preuzimanje verzije {}...
+
+en: Received {} of {} ({}%).
+tr: Primljeno {} od {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Primljeno {}; ukupna veličina nije poznata.
+
+en: Version {} is ready to install
+tr: Verzija {} spremna je za instalaciju
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Provjereno pomoću potpisanog manifesta izdanja i SHA-256.
+
+en: The update could not be completed
+tr: Ažuriranje nije moguće dovršiti
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Zasad se instalira ručno: otvorite pojedinosti o izdanju, zatim preuzmite i pokrenite njegov instalacijski program.
+
+en: Failure: {}.
+tr: Pogreška: {}.
+
+en: Choose Retry Download to try again.
+tr: Za ponovni pokušaj odaberite Ponovi preuzimanje.
+
+en: Use Check now to try again.
+tr: Za ponovni pokušaj upotrijebite Provjeri sada.
+
+en: Next automatic check: {}.
+tr: Sljedeća automatska provjera: {}.
+
+en: &Install update
+tr: &Instaliraj ažuriranje
+
+en: Retry &Download
+tr: Ponovi &preuzimanje
+
+en: &Download and install
+tr: &Preuzmi i instaliraj
+
+en: Windows' startup state could not be read in this session.
+tr: Stanje pokretanja sustava Windows nije moguće pročitati u ovoj sesiji.
+
+en: Windows will start it at your next sign-in.
+tr: Windows će ga pokrenuti pri vašoj sljedećoj prijavi.
+
+en: Right now it will not start at sign-in.
+tr: Trenutno se neće pokrenuti pri prijavi.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Isključen je u Upravitelju zadataka ili postavkama sustava Windows, koji o tome odlučuju dok ga ondje ne uključite.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows bi pokrenuo još jednu kopiju programa Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows javlja stanje pokretanja koje ova verzija ne može pročitati.
+
+en: The close action could not be completed.
+tr: Radnju zatvaranja nije moguće dovršiti.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Prije spremanja unesite potpun broj; polje označeno crvenom bojom ne sadrži ga.
+
+en: Settings could not be validated.
+tr: Postavke nije moguće provjeriti.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Pokretanje pri prijavi ostavljeno je nepromijenjeno jer postavke nije moguće spremiti.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Postavke nije moguće spremiti, a pokretanje pri prijavi u sustav Windows nije moguće vratiti. Za ponovni pokušaj ponovno kliknite Primijeni.
+
+en: Settings saved.
+tr: Postavke su spremljene.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Postavke su promijenjene u memoriji; spremanje nije uspjelo. Za ponovni pokušaj ponovno kliknite Primijeni.
+
+en: Settings could not be applied.
+tr: Postavke nije moguće primijeniti.
+
+en: Some values were corrected to their supported range.
+tr: Neke su vrijednosti ispravljene na podržani raspon.
+
+en: Startup registration is unavailable in this session.
+tr: Registracija pokretanja nije dostupna u ovoj sesiji.
+
+en: Changing startup registration...
+tr: Promjena registracije pokretanja...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows nije promijenio registraciju pokretanja. Provjerite postavku pokretanja u Upravitelju zadataka.
+
+en: Startup registration could not be changed.
+tr: Registraciju pokretanja nije moguće promijeniti.
+
+en: Defaults saved; startup is disabled.
+tr: Zadane vrijednosti su spremljene; pokretanje je onemogućeno.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Zadane vrijednosti su primijenjene; spremanje nije uspjelo. Za ponovni pokušaj ponovno kliknite Primijeni.
+
+en: Defaults could not be applied.
+tr: Zadane vrijednosti nije moguće primijeniti.
+
+en: Startup was not disabled; settings were kept.
+tr: Pokretanje nije onemogućeno; postavke su zadržane.
+
+en: Location search is unavailable.
+tr: Pretraživanje lokacija nije dostupno.
+
+en: Searching Open-Meteo locations...
+tr: Pretraživanje lokacija servisa Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Pretraživanje lokacije nije uspjelo. Provjerite vezu i pokušajte ponovno.
+
+en: No place matched that search.
+tr: Nijedno mjesto ne odgovara tom pretraživanju.
+
+en: Choose a location to save it.
+tr: Odaberite lokaciju da biste je spremili.
+
+en: Reset all settings?
+tr: Želite li vratiti sve postavke na zadano?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Preference i prikvačene aplikacije vraćaju se na zadane vrijednosti, a pokretanje pri prijavi se isključuje.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Vaš odabir za programsku traku sustava Windows je zadržan. Zadržana je i sigurnosna kopija trenutne datoteke postavki.
+
+en: &Reset
+tr: &Vrati na zadano
+
+en: Cancel
+tr: Odustani
+
+en: Pinned applications saved.
+tr: Prikvačene aplikacije su spremljene.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Prikvačene stavke promijenjene su u memoriji; spremanje nije uspjelo. Za ponovni pokušaj ponovno kliknite Primijeni.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Zadane vrijednosti nije moguće vratiti jer registracija pokretanja nije dostupna.
+
+en: Pinned application could not be added.
+tr: Prikvačenu aplikaciju nije moguće dodati.
+
+en: Choose an application to add first.
+tr: Najprije odaberite aplikaciju koju želite dodati.
+
+en: Pinned applications could not be changed.
+tr: Prikvačene aplikacije nije moguće promijeniti.
+
+en: Choose a pinned application first.
+tr: Najprije odaberite prikvačenu aplikaciju.
+
+en: Desktop status is unavailable in this session.
+tr: Stanje radne površine nije dostupno u ovoj sesiji.
+
+en: Desktop status is unavailable.
+tr: Stanje radne površine nije dostupno.
+
+en: Password
+tr: Lozinka
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Preuzimanje jezika {} s GitHuba ({}). Dok ne bude spreman, prikazuje se engleski.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Jezik {} nije bilo moguće preuzeti. Dok se ne preuzme, prikazuje se engleski; za ponovni pokušaj odaberite Preuzmi u nastavku.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Jezik {} još nije na ovom računalu. Dok se ne preuzme, prikazuje se engleski.
+
+en: {} is on this PC.
+tr: Jezik {} nalazi se na ovom računalu.
+
+en: Every language is on this PC.
+tr: Svi su jezici na ovom računalu.
+
+en: Choose a language to download first.
+tr: Najprije odaberite jezik koji želite preuzeti.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Gornja traka
+
+en: Weather
+tr: Vremenska prognoza
+
+en: Updates
+tr: Ažuriranja
+
+en: General
+tr: Općenito
+
+en: About
+tr: O programu
+
+en: Desktop
+tr: Radna površina
+
+en: Appearance
+tr: Izgled
+
+en: Welcome
+tr: Dobrodošlica
+
+en: Aether Shell Settings
+tr: Postavke za Aether Shell
+
+en: Settings
+tr: Postavke
+
+en: Reset defaults...
+tr: Vrati zadano...
+
+en: &Apply
+tr: &Primijeni
+
+en: Liquid
+tr: Tekuće
+
+en: Grain
+tr: Zrnato
+
+en: From {} to {}
+tr: Od {} do {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Ovu radnju nije moguće dovršiti.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Veličina, razmak, kretanje i aplikacije prikvačene na Dock.
+
+en: Size and spacing
+tr: Veličina i razmak
+
+en: Icon size
+tr: Veličina ikona
+
+en: {}, scaled with the Windows display scale.
+tr: {}, skalirano prema skaliranju zaslona sustava Windows.
+
+en: Bottom margin
+tr: Donja margina
+
+en: Space between the Dock and the bottom of the screen.
+tr: Razmak između Docka i dna zaslona.
+
+en: Minimum side margin
+tr: Najmanja bočna margina
+
+en: Space kept free at the left and right screen edges.
+tr: Prostor koji ostaje slobodan uz lijevi i desni rub zaslona.
+
+en: Icon spacing
+tr: Razmak između ikona
+
+en: Space between neighbouring icons.
+tr: Razmak između susjednih ikona.
+
+en: Glass and motion
+tr: Staklo i kretanje
+
+en: Glass opacity
+tr: Neprozirnost stakla
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Niže vrijednosti prikazuju više zamućene radne površine iza Docka.
+
+en: Hover magnification
+tr: Povećanje pri pokazivanju
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Koliko se ikona povećava ispod pokazivača; 1 to isključuje.
+
+en: Behavior
+tr: Ponašanje
+
+en: Show running applications
+tr: Prikaži pokrenute aplikacije
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Otvorene aplikacije koje nisu prikvačene prikazuju se iza prikvačenih.
+
+en: Reserve screen space for the Dock
+tr: Rezerviraj prostor na zaslonu za Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maksimizirani prozori ostaju iznad Docka umjesto ispod njega.
+
+en: Automatically hide the Dock
+tr: Automatski sakrij Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Skriva se kad ga prekrije prozor aplikacije; da biste ga prikazali, pomaknite pokazivač na donji rub zaslona. Ostaje na radnoj površini, a prozori dobivaju punu visinu zaslona.
+
+en: Pinned applications
+tr: Prikvačene aplikacije
+
+en: Move &up
+tr: Pomakni &gore
+
+en: Move &down
+tr: Pomakni &dolje
+
+en: &Remove
+tr: &Ukloni
+
+en: &Add application
+tr: Dod&aj aplikaciju
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Prikvačene stavke zadržavaju svoj identitet i postavke pokretanja. Uklanjanje prikvačene stavke također sprječava da je automatska sinkronizacija s programskom trakom sustava Windows ponovno doda.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Položaj, sat i stavke stanja prikazane na gornjoj traci stanja.
+
+en: Presentation
+tr: Prikaz
+
+en: Floating bar
+tr: Plutajuća traka
+
+en: Text on the desktop
+tr: Tekst na radnoj površini
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Plutajuća traka: staklena traka ispod vrha zaslona. Tekst na radnoj površini: bez trake, iste stavke ispisane na samom vrhu zaslona, izravno preko slike radne površine; taj pojas ostaje bez prozora, a gornja margina i neprozirnost stakla ne primjenjuju se. S automatskim skrivanjem tekst se vraća na staklenom pojasu dok je ispod njega prozor.
+
+en: Position and glass
+tr: Položaj i staklo
+
+en: Top margin
+tr: Gornja margina
+
+en: Space between the Top Bar and the top of the screen.
+tr: Razmak između gornje trake i vrha zaslona.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Niže vrijednosti prikazuju više zamućene radne površine iza trake.
+
+en: Clock
+tr: Sat
+
+en: Clock format
+tr: Format sata
+
+en: Follow Windows
+tr: Prati Windows
+
+en: 12-hour
+tr: 12-satni
+
+en: 24-hour
+tr: 24-satni
+
+en: Date style
+tr: Stil datuma
+
+en: Weekday, day and month
+tr: Dan u tjednu, dan i mjesec
+
+en: Short
+tr: Kratko
+
+en: Long
+tr: Dugo
+
+en: Show seconds
+tr: Prikaži sekunde
+
+en: Show date
+tr: Prikaži datum
+
+en: Status items
+tr: Stavke stanja
+
+en: Show battery
+tr: Prikaži bateriju
+
+en: Hide battery when absent
+tr: Sakrij bateriju ako je nema
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Stolna računala bez baterije ne prikazuju ništa umjesto nepoznate baterije.
+
+en: Show input language
+tr: Prikaži jezik unosa
+
+en: Show network
+tr: Prikaži mrežu
+
+en: Show audio output
+tr: Prikaži audioizlaz
+
+en: Show microphone
+tr: Prikaži mikrofon
+
+en: Show weather when enabled
+tr: Prikaži vremensku prognozu kad je omogućena
+
+en: Weather itself is turned on in Weather settings.
+tr: Sama vremenska prognoza uključuje se u postavkama vremenske prognoze.
+
+en: Show hidden icons button
+tr: Prikaži gumb skrivenih ikona
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Mala strelica koja otvara skrivene ikone područja obavijesti sustava Windows.
+
+en: Reserve screen space above windows
+tr: Rezerviraj prostor na zaslonu iznad prozora
+
+en: Maximized windows stay below the Top Bar.
+tr: Maksimizirani prozori ostaju ispod gornje trake.
+
+en: Automatically hide the Top Bar
+tr: Automatski sakrij gornju traku
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Skriva se kad je prekrije prozor aplikacije; da biste je prikazali, pomaknite pokazivač na gornji rub zaslona. Ostaje na radnoj površini.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Koristi brze postavke sustava Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Isključeno: brze kontrole sustava Aether otvaraju se ispod gornje trake. Uključeno: vlastita ploča sustava Windows otvara se pri dnu zaslona.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Neobavezna vremenska prognoza na gornjoj traci koju pruža Open-Meteo.
+
+en: Forecast
+tr: Prognoza
+
+en: Enable weather
+tr: Omogući vremensku prognozu
+
+en: Off by default: the forecast needs network requests.
+tr: Zadano isključeno: prognoza zahtijeva mrežne zahtjeve.
+
+en: Temperature
+tr: Temperatura
+
+en: Celsius
+tr: Celzij
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Interval osvježavanja
+
+en: Location
+tr: Lokacija
+
+en: Locate automatically with Windows
+tr: Automatski odredi lokaciju pomoću sustava Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Koristi servis lokacije sustava Windows nakon što ga dopustite.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows traži dopuštenje za lokaciju. Vaše se koordinate šalju servisu Open-Meteo.com samo radi dohvaćanja prognoze; ključ lokacije sprema se u lokalnu predmemoriju. Ako je lokacija blokirana, vremenska prognoza nije dostupna.
+
+en: Use &Windows location
+tr: Koristi lokaciju sustava &Windows
+
+en: Location &settings
+tr: Postavke &lokacije
+
+en: Choose automatic location or search for a place below.
+tr: Odaberite automatsku lokaciju ili u nastavku potražite mjesto.
+
+en: Search for a place
+tr: Potražite mjesto
+
+en: Searc&h
+tr: Pret&raži
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Vremenski podaci: Open-Meteo.com (CC BY 4.0). Ručno pretraživanje šalje samo tekst koji unesete.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Potpisana izdanja iz službenog repozitorija na GitHubu, provjerena prije instalacije.
+
+en: Preferences
+tr: Preference
+
+en: Check for updates automatically
+tr: Automatski provjeravaj ažuriranja
+
+en: Check interval
+tr: Interval provjere
+
+en: Release channel
+tr: Kanal izdanja
+
+en: Prereleases arrive earlier and change more often.
+tr: Predizdanja stižu ranije i češće se mijenjaju.
+
+en: Stable
+tr: Stabilno
+
+en: Prerelease
+tr: Predizdanje
+
+en: Show update notifications
+tr: Prikaži obavijesti o ažuriranjima
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Pokretanje, kretanje, tipkovni prečaci i dijagnostika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Jezik traka, izbornika, pretraživanja, postavki i instalacije.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Nazivi koji pripadaju vama ili drugim programima (aplikacije, datoteke, Wi-Fi mreže) nikad se ne prevode. S odabranim jezikom gornja traka na njemu ispisuje datum; Prati Windows zadržava vaš regionalni format sustava Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Rukom pisana dobrodošlica piše latinična slova: pozdravlja na francuskom, engleskom ili španjolskom. Njezin jezik odaberite u odjeljku Dobrodošlica.
+
+en: Language
+tr: Jezik
+
+en: Interface language
+tr: Jezik sučelja
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Prati Windows koristi prvi od vaših jezika prikaza sustava Windows koji je među ovima, a inače engleski.
+
+en: Startup
+tr: Pokretanje
+
+en: Start Aether Shell when I sign in
+tr: Pokreni Aether Shell kad se prijavim
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Za ovu promjenu potrebno je kliknuti Primijeni. Isključiti ga može i Upravitelj zadataka.
+
+en: Motion
+tr: Kretanje
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Smanjeno kretanje svugdje uklanja ukrasne pokrete.
+
+en: Reduced
+tr: Smanjeno
+
+en: Full
+tr: Potpuno
+
+en: Keyboard shortcuts
+tr: Tipkovni prečaci
+
+en: Enable global keyboard shortcuts
+tr: Omogući globalne tipkovne prečace
+
+en: Search shortcut key
+tr: Tipka prečaca za pretraživanje
+
+en: Dock shortcut key
+tr: Tipka prečaca za Dock
+
+en: Search shortcut modifiers
+tr: Modifikatori prečaca za pretraživanje
+
+en: Dock shortcut modifiers
+tr: Modifikatori prečaca za Dock
+
+en: Shortcut status unavailable
+tr: Stanje prečaca nije dostupno
+
+en: Diagnostics
+tr: Dijagnostika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Mapa zapisnika sadrži zapisnike programa Aether Shell na ovom računalu. Izvoz dijagnostike sprema samo verziju aplikacije i međuverziju sustava Windows – bez zapisnika i osobnih podataka.
+
+en: Open &log folder
+tr: Otvori mapu &zapisnika
+
+en: &Export diagnostics...
+tr: &Izvezi dijagnostiku...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Kratki rukom pisani pozdrav na radnoj površini nakon što se prijavite ili otključate računalo.
+
+en: Greeting
+tr: Pozdrav
+
+en: Show the welcome at sign-in and unlock
+tr: Prikaži dobrodošlicu pri prijavi i otključavanju
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Pojavljuje se nakon što vas Windows prijavi, dok se Aether Shell priprema. Dodirnite, kliknite ili pritisnite Esc da biste je preskočili.
+
+en: Greeting language
+tr: Jezik pozdrava
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut na francuskom, Hello na engleskom, Hola na španjolskom. Olovka piše latinična slova: na svim ostalim jezicima pozdravlja na engleskom.
+
+en: Your name
+tr: Vaše ime
+
+en: Name to greet you with
+tr: Ime kojim vas pozdravlja
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Neobavezno, na primjer ime. Ostaje na ovom računalu u vašim postavkama za Aether Shell i nikad se nikamo ne šalje niti zapisuje u zapisnik. Da biste ga uklonili, ispraznite polje.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Način boja, boja isticanja, brzina kretanja i izgled Docka i gornje trake.
+
+en: Style
+tr: Stil
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Tekuće: staklo u slojevima preko onoga što je iza, sloj zamućenja, svjetlost tekućine, a zatim ikone i tekst, čitljivi na svijetlim i tamnim stranicama. Zrnato: mutno staklo, zamućeno i poluprozirno, s finim zrnom.
+
+en: Liquid blur
+tr: Zamućenje stila Tekuće
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Koliko sloj zamućenja ispod stakla stila Tekuće prekriva ono što je iza: 100 % zamućuje sve. Niže vrijednosti prikazuju stranicu oštrije, a tekst na trakama tada može biti slabije čitljiv preko pretrpane stranice.
+
+en: Liquid blur color
+tr: Boja zamućenja stila Tekuće
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatski zadržava vlastite boje stakla. Tekst i ikone ostaju čitljivi bez obzira na boju.
+
+en: Automatic
+tr: Automatski
+
+en: White
+tr: Bijela
+
+en: Black
+tr: Crna
+
+en: Accent
+tr: Boja isticanja
+
+en: Blue
+tr: Plava
+
+en: Violet
+tr: Ljubičasta
+
+en: Pink
+tr: Ružičasta
+
+en: Red
+tr: Crvena
+
+en: Orange
+tr: Narančasta
+
+en: Yellow
+tr: Žuta
+
+en: Green
+tr: Zelena
+
+en: Teal
+tr: Tirkizna
+
+en: Liquid color strength
+tr: Jačina boje stila Tekuće
+
+en: How much of the chosen color the blur layer takes.
+tr: Koliko odabrane boje preuzima sloj zamućenja.
+
+en: Theme
+tr: Tema
+
+en: Color mode
+tr: Način boja
+
+en: High contrast always takes precedence.
+tr: Visoki kontrast uvijek ima prednost.
+
+en: Light
+tr: Svijetlo
+
+en: Dark
+tr: Tamno
+
+en: Accent color
+tr: Boja isticanja
+
+en: Animation duration
+tr: Trajanje animacije
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 je standardna brzina; više vrijednosti su sporije. Smanjeno kretanje ima prednost.
+
+en: Dock icon preset
+tr: Unaprijed postavljena veličina ikona Docka
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Prilagođena veličina iz postavki Docka zadržava se dok ne odaberete unaprijed postavljenu.
+
+en: Small - 32 px
+tr: Male – 32 px
+
+en: Medium - 40 px
+tr: Srednje – 40 px
+
+en: Large - 48 px
+tr: Velike – 48 px
+
+en: Keep custom size
+tr: Zadrži prilagođenu veličinu
+
+en: Show Windows Start in the Dock
+tr: Prikaži Start sustava Windows na Docku
+
+en: Show Task View in the Dock
+tr: Prikaži prikaz zadataka na Docku
+
+en: Reserve extra space for Dock animations
+tr: Rezerviraj dodatni prostor za animacije Docka
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Povećanje i odskakivanje pri pokretanju ne preklapaju se s maksimiziranim prozorima.
+
+en: Weather position
+tr: Položaj vremenske prognoze
+
+en: Left
+tr: Lijevo
+
+en: Right
+tr: Desno
+
+en: Keyboard indicator
+tr: Indikator tipkovnice
+
+en: Compact
+tr: Kompaktno
+
+en: Two lines
+tr: Dva retka
+
+en: Windows taskbar pins
+tr: Prikvačene stavke programske trake sustava Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Dodaj novootkrivene prikvačene stavke programske trake sustava Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Dok je programska traka zamijenjena, nove prikvačene stavke sustava Windows dodaju se na Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Povratna zamjena programske trake sustava Windows Dockom.
+
+en: Taskbar replacement
+tr: Zamjena programske trake
+
+en: Replace the Windows taskbar
+tr: Zamijeni programsku traku sustava Windows
+
+en: Changing this needs Apply.
+tr: Za ovu promjenu potrebno je kliknuti Primijeni.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Dok je Aether Shell pokrenut, skriva programsku traku sustava Windows i rezervira prostor ispod maksimiziranih aplikacija.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Stanje programske trake sustava Windows vraća se kad se ovaj način onemogući ili kad se Aether Shell zatvori. Zasebni pomoćnik za oporavak vraća je i ako se aplikacija neočekivano zaustavi. Ako oporavak ne uspije, ponovno pokrenite Eksplorer za Windows u Upravitelju zadataka.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Postavke sustava Windows ostaju izvorno sučelje sustava Windows. Aether Shell ne zamjenjuje njihovu stranicu programske trake; ovaj način konfigurirajte ovdje.
+
+en: Pinned applications from Windows
+tr: Prikvačene aplikacije iz sustava Windows
+
+en: &Import Windows taskbar pins
+tr: &Uvezi prikvačene stavke programske trake sustava Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Čita prikvačene prečace bez mijenjanja prikvačenih stavki sustava Windows. Neke prikvačene stavke sustava Windows 11 ili njihov redoslijed možda neće biti dostupni.
+
+en: Version {}
+tr: Verzija {}
+
+en: Created by Ibrahim Bouillet
+tr: Autor: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Izvorno sučelje radne površine sustava Windows – plutajući Dock i gornja traka stanja – koje radi uz Eksplorer.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Vremenski podaci: Open-Meteo.com (CC BY 4.0). Nisu priložene biblioteke za izvođenje jezika C++ trećih strana.
+
+en: &Official project
+tr: &Službeni projekt
+
+en: Licence
+tr: Licenca
+
+en: Taskbar replacement changes need Apply.
+tr: Za promjene zamjene programske trake potrebno je kliknuti Primijeni.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Promjene se spremaju automatski. Za pokretanje je potrebno kliknuti Primijeni.
+
+en: Changes save automatically.
+tr: Promjene se spremaju automatski.
+
+en: Press Apply to confirm this change.
+tr: Pritisnite Primijeni da biste potvrdili ovu promjenu.
+
+en: Smart transparency
+tr: Pametna prozirnost
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: U stilu Tekuće ovaj prozor zamućuje samo ispod svojeg teksta i kontrola: potpuno preko drugih prozora i ikona radne površine, blago preko slike radne površine, a nimalo ondje gdje ništa ne prikazuje.
+
+en: Languages on this PC
+tr: Jezici na ovom računalu
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell preuzima jezike koje ima Windows, pa mijenja jezik kad ga promijeni Windows.
+
+en: Add a language
+tr: Dodaj jezik
+
+en: &Download
+tr: &Preuzmi
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Svaki jezik dolazi iz izdanja ove verzije na GitHubu i provjerava se prije upotrebe. Kad se nađe na ovom računalu, odaberite ga gore.
+
+en: built in
+tr: ugrađen
+
+en: downloading, {}
+tr: preuzimanje, {}
+
+en: download failed
+tr: preuzimanje nije uspjelo
+
+## setup
+
+en: Aether Shell Setup
+tr: Instalacija programa Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Instalacijski program nije mogao stvoriti svoje sučelje. Zatvorite ga i pokušajte ponovno ili upotrijebite dokumentirane mogućnosti tihe instalacije.
+
+en: Options
+tr: Mogućnosti
+
+en: Install
+tr: Instalacija
+
+en: Done
+tr: Gotovo
+
+en: Remove Aether Shell
+tr: Ukloni Aether Shell
+
+en: Repair Aether Shell
+tr: Popravi Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Izvorni Dock i gornja traka stanja za Windows, koji rade uz Eksplorer.
+
+en: Replaces the Windows taskbar while it runs
+tr: Zamjenjuje programsku traku sustava Windows dok je pokrenut
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Da biste vratili programsku traku sustava Windows, izađite iz programa Aether Shell, isključite ovo u Postavkama > Radna površina ili na izborniku Start otvorite „Vrati programsku traku sustava Windows“.
+
+en: Starts when you sign in - your choice
+tr: Pokreće se kad se prijavite – po vašem izboru
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Nove instalacije prema zadanim postavkama pokreću se pri prijavi. Taj odabir možete poništiti prije instalacije ili ga kasnije isključiti u postavkama. Postojeći odabiri pokretanja i onemogućavanja u Upravitelju zadataka čuvaju se.
+
+en: Installs for your account
+tr: Instalira se za vaš račun
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Nisu potrebna administratorska prava. Vaše postavke i podaci ostaju u vašem korisničkom profilu.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Deinstalacija zadržava vaše postavke i podatke osim ako ih ne odlučite ukloniti.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Popravak vraća datoteke ovog paketa i zadržava vaše postavke. Ako je Aether Shell ostavio programsku traku sustava Windows skrivenom, popravak je vraća.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Instalacija preko postojeće verzije zadržava vaše postavke. Stariji paket se odbija osim ako izričito ne dopustite vraćanje na stariju verziju.
+
+en: MIT License
+tr: Licenca MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licenca je instalirana i kao datoteka LICENSE uz Aether Shell.
+
+en: Remove this installation
+tr: Ukloni ovu instalaciju
+
+en: Install location
+tr: Mjesto instalacije
+
+en: &Browse...
+tr: &Pregledaj...
+
+en: Also remove my settings, cache and logs
+tr: Ukloni i moje postavke, predmemoriju i zapisnike
+
+en: This cannot be undone.
+tr: Ovo se ne može poništiti.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Instalacijski program uredno će zatvoriti Aether Shell i ukloniti njegove instalirane datoteke, prečace, stavku pokretanja i registraciju u instaliranim aplikacijama. Ostale aplikacije i postavke sustava Windows ostaju netaknute.
+
+en: Your welcome
+tr: Vaša dobrodošlica
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Nakon što se prijavite ili otključate računalo, Aether Shell rukom ispisuje kratki pozdrav. Upišite ime kojim vas treba pozdraviti ili ostavite polje prazno za jednostavan pozdrav.
+
+en: Your first name
+tr: Vaše ime
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Neobavezno, na primjer ime. Ostaje na ovom računalu u vašim postavkama za Aether Shell i nikad se nikamo ne šalje. Promijenite ga ili isključite dobrodošlicu u Postavkama > Dobrodošlica.
+
+en: Shortcuts and startup
+tr: Prečaci i pokretanje
+
+en: Create Start menu shortcuts
+tr: Stvori prečace na izborniku Start
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell i Vrati programsku traku sustava Windows.
+
+en: Create a desktop shortcut
+tr: Stvori prečac na radnoj površini
+
+en: Shows your current choice.
+tr: Prikazuje vaš trenutni odabir.
+
+en: Recommended.
+tr: Preporučeno.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Poništite odabir ako to ne želite; onemogućavanja u Upravitelju zadataka poštuju se.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Instalacijom prihvaćate gornji odabir pokretanja. Pokretač može ponovno pokrenuti Aether Shell nakon rušenja, uz ograničen broj pokušaja. Izlaz i Vrati programsku traku sustava Windows ostaju dostupni. Vremenska prognoza je prema zadanim postavkama isključena. Nepotpisane binarne datoteke mogu izazvati upozorenje Windows SmartScreen.
+
+en: Removing this installation...
+tr: Uklanjanje ove instalacije...
+
+en: Repairing Aether Shell...
+tr: Popravljanje programa Aether Shell...
+
+en: Installing Aether Shell...
+tr: Instaliranje programa Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Zatvaranje programa Aether Shell i uklanjanje njegovih datoteka.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Provjera ugrađenog paketa i instaliranje njegovih datoteka. Napredak se prikazuje kao aktivnost: instalacijski program ne zna preostalo vrijeme.
+
+en: Please wait while the removal completes.
+tr: Pričekajte dok se uklanjanje ne dovrši.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Odustajanje je moguće dok se nova verzija ne aktivira; nakon toga instalacijski program sigurno završava.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell je deinstaliran.
+
+en: Aether Shell is ready.
+tr: Aether Shell je spreman.
+
+en: Setup was cancelled.
+tr: Instalacija je otkazana.
+
+en: Setup could not complete.
+tr: Instalaciju nije moguće dovršiti.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Vaši su podaci zadržani osim ako ste izričito odlučili ukloniti ih.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Možete ga popraviti ili deinstalirati u Postavkama sustava Windows > Aplikacije > Instalirane aplikacije.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Postupak je otkazan prije aktivacije. Vratite se na Mogućnosti da biste pokušali ponovno.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Provjerite pristup datotekama i slobodan prostor na disku, a zatim pokušajte ponovno. Ako je Aether Shell već prisutan, popravak može vratiti njegove datoteke. Kategorija pogreške: {}
+
+en: Setup log
+tr: Zapisnik instalacije
+
+en: Launch Aether Shell
+tr: Pokreni Aether Shell
+
+en: &Back
+tr: &Natrag
+
+en: &Next
+tr: &Dalje
+
+en: &Continue
+tr: N&astavi
+
+en: &Uninstall
+tr: &Deinstaliraj
+
+en: &Repair
+tr: &Popravi
+
+en: &Install
+tr: &Instaliraj
+
+en: &Close
+tr: &Zatvori
+
+en: Step {} of {}: {}
+tr: Korak {} od {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Odaberite mapu za instalaciju programa Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Odaberite potpuni put mape, na primjer onaj koji počinje slovom pogona.
+
+en: The install folder must be an absolute path.
+tr: Mapa za instalaciju mora biti apsolutni put.
+
+en: Setup stops at the next safe point.
+tr: Instalacija se zaustavlja na sljedećoj sigurnoj točki.
+
+en: Cancelling...
+tr: Odustajanje...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Instalacijski program sigurno dovršava trenutni korak; pričekajte.
+
+en: Updating Aether Shell
+tr: Ažuriranje programa Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Provjera potpisanog paketa i primjena ažuriranja.
+
+en: Update completed
+tr: Ažuriranje je dovršeno
+
+en: The update did not complete
+tr: Ažuriranje nije dovršeno
+
+en: Close
+tr: Zatvori
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Sučelje ažuriranja nije se moglo pokrenuti. Ažuriranje nije primijenjeno. Pokušajte ponovno ili upotrijebite popravak.
+
+en: Aether Shell Update
+tr: Ažuriranje programa Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Sučelje ažuriranja nije se moglo pokrenuti. Ažuriranje nije primijenjeno. Pokušajte ponovno ili upotrijebite popravak u Postavkama sustava Windows > Aplikacije > Instalirane aplikacije.
+
+en: Update completed.
+tr: Ažuriranje je dovršeno.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Ažuriranje nije dovršeno. Pogledajte zapisnik ažuriranja ili upotrijebite popravak.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell se nije mogao pokrenuti. Odaberite Popravi u Postavkama sustava Windows > Aplikacije > Instalirane aplikacije.
+
+en: Aether Shell Settings — update in progress
+tr: Postavke za Aether Shell – ažuriranje u tijeku
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Nastavi zamjenu programske trake
+
+en: Show Windows &notification area for 60 seconds
+tr: Prikaži &područje obavijesti sustava Windows 60 sekundi
+
+en: &Search…
+tr: &Pretraži…
+
+en: &Settings…
+tr: Po&stavke…
+
+en: View available &update…
+tr: Prikaži dostupno &ažuriranje…
+
+en: &Check for updates…
+tr: Pro&vjeri ažuriranja…
+
+en: &About Aether Shell
+tr: &O programu Aether Shell
+
+en: &Quit Aether Shell
+tr: &Izađi iz programa Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Promijeni &jezik unosa\tWin+razmaknica
+
+en: Open &network controls…
+tr: Otvori kontrole &mreže…
+
+en: &Weather settings…
+tr: Postavke &vremenske prognoze…
+
+en: Toggle output &mute
+tr: Uključi/isključi &utišavanje izlaza
+
+en: &Sound settings…
+tr: Postavke &zvuka…
+
+en: Toggle microphone &mute
+tr: Uključi/isključi &utišavanje mikrofona
+
+en: Start Windows &voice typing\tWin+H
+tr: Pokreni &glasovno tipkanje sustava Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Postavke &privatnosti mikrofona…
+
+en: &Power settings…
+tr: Postavke &napajanja…
+
+en: Open &notifications and calendar
+tr: Otvori &obavijesti i kalendar
+
+en: Open &calendar\tWin+Alt+D
+tr: Otvori &kalendar\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Prikaži &skrivene ikone
+
+en: Initializing
+tr: Inicijalizacija
+
+en: Unavailable
+tr: Nedostupno
+
+en: Unsupported
+tr: Nije podržano
+
+en: Error
+tr: Pogreška
+
+en: Available
+tr: Dostupno
+
+en: Unknown
+tr: Nepoznato
+
+en: Internet access
+tr: Pristup internetu
+
+en: Local network only
+tr: Samo lokalna mreža
+
+en: Limited Internet access
+tr: Ograničen pristup internetu
+
+en: No network connection
+tr: Nema mrežne veze
+
+en: Connectivity unknown
+tr: Povezivost nepoznata
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilna mreža
+
+en: Network
+tr: Mreža
+
+en: Offline
+tr: Izvan mreže
+
+en: Network status unavailable
+tr: Stanje mreže nije dostupno
+
+en: Quick controls
+tr: Brze kontrole
+
+en: Aether Shell menu
+tr: Izbornik programa Aether Shell
+
+en: Weather status unavailable
+tr: Stanje vremenske prognoze nije dostupno
+
+en: Cached weather
+tr: Vremenska prognoza iz predmemorije
+
+en: Observation (UTC): {}
+tr: Opažanje (UTC): {}
+
+en: Weather: {}
+tr: Vrijeme: {}
+
+en: Click to open weather settings
+tr: Kliknite da biste otvorili postavke vremenske prognoze
+
+en: Show hidden icons
+tr: Prikaži skrivene ikone
+
+en: Opens Windows' notification-area overflow
+tr: Otvara dodatne ikone područja obavijesti sustava Windows
+
+en: Input language: {}
+tr: Jezik unosa: {}
+
+en: Fallback input layout
+tr: Zamjenski raspored unosa
+
+en: Click to switch input language (Win+Space)
+tr: Kliknite da biste promijenili jezik unosa (Win+razmaknica)
+
+en: Network: {}
+tr: Mreža: {}
+
+en: Signal strength unavailable
+tr: Jačina signala nije dostupna
+
+en: Click to open Windows network settings
+tr: Kliknite da biste otvorili mrežne postavke sustava Windows
+
+en: Audio output
+tr: Audioizlaz
+
+en: Audio: {}
+tr: Zvuk: {}
+
+en: volume unknown
+tr: glasnoća nepoznata
+
+en: Muted
+tr: Utišano
+
+en: Sound on
+tr: Zvuk uključen
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Uređaj nije utišan
+
+en: Recording detection unsupported
+tr: Otkrivanje snimanja nije podržano
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Kliknite da biste uključili ili isključili utišavanje; desnom tipkom miša otvorite glasovno tipkanje sustava Windows i postavke privatnosti mikrofona
+
+en: Battery: {}
+tr: Baterija: {}
+
+en: Battery {}
+tr: Baterija {}
+
+en: Battery status unavailable
+tr: Stanje baterije nije dostupno
+
+en: Charging
+tr: Punjenje
+
+en: External power
+tr: Vanjsko napajanje
+
+en: Estimated remaining: {} h {} min
+tr: Procijenjeno preostalo vrijeme: {} h {} min
+
+en: Click to open power settings
+tr: Kliknite da biste otvorili postavke napajanja
+
+en: Clock status unavailable
+tr: Stanje sata nije dostupno
+
+en: Click to open calendar and notifications
+tr: Kliknite da biste otvorili kalendar i obavijesti
+
+en: Action failed: {}
+tr: Radnja nije uspjela: {}
+
+en: Aether Shell status bar
+tr: Traka stanja programa Aether Shell
+
+en: Update available
+tr: Dostupno je ažuriranje
+
+en: Cached
+tr: Iz predmemorije
+
+en: Start
+tr: Start
+
+en: Search
+tr: Pretraživanje
+
+en: Task View
+tr: Prikaz zadataka
+
+en: Application
+tr: Aplikacija
+
+en: Running application
+tr: Pokrenuta aplikacija
+
+en: More applications
+tr: Više aplikacija
+
+en: Aether Shell window previews
+tr: Pretpregledi prozora programa Aether Shell
+
+en: Minimized — preview unavailable
+tr: Minimizirano – pretpregled nije dostupan
+
+en: Preview unavailable
+tr: Pretpregled nije dostupan
+
+en: {} windows
+tr: Prozori: {}
+
+en: {} window
+tr: {} prozor
+
+en: Switches to this window
+tr: Prebacuje na ovaj prozor
+
+en: Minimized, preview unavailable
+tr: Minimizirano, pretpregled nije dostupan
+
+en: Minimized
+tr: Minimizirano
+
+en: Close {}
+tr: Zatvori {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Traži zatvaranje ovog prozora; aplikacija i dalje može zatražiti spremanje ili odustajanje
+
+en: Close requested
+tr: Zatraženo je zatvaranje
+
+en: Previous applications
+tr: Prethodne aplikacije
+
+en: Open
+tr: Otvori
+
+en: New instance
+tr: Nova instanca
+
+en: Unpin from Dock
+tr: Otkvači s Docka
+
+en: Pin to Dock
+tr: Prikvači na Dock
+
+en: Move left
+tr: Pomakni ulijevo
+
+en: Move right
+tr: Pomakni udesno
+
+en: Dock settings...
+tr: Postavke Docka...
+
+en: Import Windows taskbar pins
+tr: Uvezi prikvačene stavke programske trake sustava Windows
+
+en: Open Windows Start
+tr: Otvori Start sustava Windows
+
+en: Aether Shell Dock
+tr: Dock programa Aether Shell
+
+en: Pinned
+tr: Prikvačeno
+
+en: Running
+tr: Pokrenuto
+
+en: Needs attention
+tr: Zahtijeva pozornost
+
+en: Up arrow shows window previews
+tr: Strelica gore prikazuje pretpreglede prozora
+
+en: Installed application
+tr: Instalirana aplikacija
+
+en: Desktop application
+tr: Aplikacija za stolna računala
+
+en: File
+tr: Datoteka
+
+en: Folder
+tr: Mapa
+
+en: Windows tool
+tr: Alat sustava Windows
+
+en: Control Panel
+tr: Upravljačka ploča
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Kretanje   ·   Enter Otvori   ·   Esc Zatvori
+
+en: Search apps, settings and files
+tr: Pretražujte aplikacije, postavke i datoteke
+
+en: Search could not be completed.
+tr: Pretraživanje nije moguće dovršiti.
+
+en: Results
+tr: Rezultati
+
+en: Indexing applications…
+tr: Indeksiranje aplikacija…
+
+en: Type to search apps, settings and files
+tr: Počnite tipkati da biste pretražili aplikacije, postavke i datoteke
+
+en: Nothing matches
+tr: Nema rezultata
+
+en: Windows could not open this application.
+tr: Windows nije mogao otvoriti ovu aplikaciju.
+
+en: Menu
+tr: Izbornik
+
+en: Opens a submenu
+tr: Otvara podizbornik
+
+en: , opens a submenu
+tr: , otvara podizbornik
+
+en: Selected
+tr: Odabrano
+
+en: Checked
+tr: Potvrđeno
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Način rada u zrakoplovu
+
+en: Accessibility
+tr: Pristupačnost
+
+en: Energy saver
+tr: Ušteda energije
+
+en: Live captions
+tr: Titlovi uživo
+
+en: Night light
+tr: Noćno svjetlo
+
+en: Mobile hotspot
+tr: Mobilna pristupna točka
+
+en: Nearby sharing
+tr: Zajedničko korištenje u blizini
+
+en: Cast
+tr: Emitiranje
+
+en: Project
+tr: Projiciranje
+
+en: All settings
+tr: Sve postavke
+
+en: Connected
+tr: Povezano
+
+en: Not connected
+tr: Nije povezano
+
+en: , on
+tr: , uključeno
+
+en: , off
+tr: , isključeno
+
+en: , state unknown
+tr: , stanje nepoznato
+
+en: , opens Windows Settings
+tr: , otvara postavke sustava Windows
+
+en: , shows accessibility features
+tr: , prikazuje značajke pristupačnosti
+
+en: , requires Windows 11 version 22H2
+tr: , zahtijeva Windows 11 verzije 22H2
+
+en: Now playing: {}
+tr: Sada se reproducira: {}
+
+en: Untitled media
+tr: Medij bez naslova
+
+en: , switch source
+tr: , promijeni izvor
+
+en: Previous media item
+tr: Prethodna medijska stavka
+
+en: Pause
+tr: Pauza
+
+en: Play
+tr: Reproduciraj
+
+en: Next media item
+tr: Sljedeća medijska stavka
+
+en: {} details
+tr: Pojedinosti: {}
+
+en: Page {} of {}
+tr: Stranica {} od {}
+
+en: Next page
+tr: Sljedeća stranica
+
+en: First page
+tr: Prva stranica
+
+en: Brightness
+tr: Svjetlina
+
+en: Brightness, unavailable on this display
+tr: Svjetlina, nije dostupna na ovom zaslonu
+
+en: Volume
+tr: Glasnoća
+
+en: Volume, unavailable
+tr: Glasnoća, nije dostupna
+
+en: Unmute
+tr: Uključi zvuk
+
+en: Mute
+tr: Isključi zvuk
+
+en: Sound output and volume mixer
+tr: Audioizlaz i mješač glasnoće
+
+en: Back
+tr: Natrag
+
+en: , secured
+tr: , zaštićeno
+
+en: , open
+tr: , otvoreno
+
+en: , connected
+tr: , povezano
+
+en: Disconnect
+tr: Prekini vezu
+
+en: Show available networks
+tr: Prikaži dostupne mreže
+
+en: More Wi-Fi settings
+tr: Dodatne postavke Wi-Fi mreže
+
+en: Bluetooth and devices settings
+tr: Postavke za Bluetooth i uređaje
+
+en: Magnifier
+tr: Povećalo
+
+en: Narrator
+tr: Pripovjedač
+
+en: On-screen keyboard
+tr: Zaslonska tipkovnica
+
+en: Sticky keys
+tr: Ljepljive tipke
+
+en: More accessibility settings
+tr: Dodatne postavke pristupačnosti
+
+en: Volume mixer
+tr: Mješač glasnoće
+
+en: Choose output in Sound settings
+tr: Izlaz odaberite u postavkama zvuka
+
+en: Power and battery settings
+tr: Postavke napajanja i baterije
+
+en: Battery {} percent, {}
+tr: Baterija {} %, {}
+
+en: All Windows settings
+tr: Sve postavke sustava Windows
+
+en: The requested action could not be dispatched
+tr: Zatraženu radnju nije moguće proslijediti
+
+en: Aether Shell quick controls
+tr: Brze kontrole programa Aether Shell
+
+en: Media session active
+tr: Medijska sesija je aktivna
+
+en: No media session
+tr: Nema medijske sesije
+
+en: Current page
+tr: Trenutna stranica
+
+en:  - secured
+tr:  - zaštićeno
+
+en:  - open
+tr:  - otvoreno
+
+en:  - opens in Windows
+tr:  - otvara se u sustavu Windows
+
+en: Turned off by hardware or policy
+tr: Isključio hardver ili pravilo
+
+en: State unavailable - use Windows settings
+tr: Stanje nije dostupno – upotrijebite postavke sustava Windows
+
+en: Off
+tr: Isključeno
+
+en:  - signal {} of 5
+tr:  - signal {} od 5
+
+en: , no internet
+tr: , nema interneta
+
+en: On - not connected
+tr: Uključeno – nije povezano
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows ne dopušta aplikacijama prikaz mreža: provjerite Lokaciju u postavkama privatnosti
+
+en: No Wi-Fi adapter found
+tr: Nije pronađen Wi-Fi adapter
+
+en: Connecting to {}...
+tr: Povezivanje s mrežom {}...
+
+en:  - looking for networks
+tr:  - traženje mreža
+
+en: On
+tr: Uključeno
+
+en: A screen reader is running
+tr: Pokrenut je čitač zaslona
+
+en: Windows accessibility features
+tr: Značajke pristupačnosti sustava Windows
+
+en: Sound output
+tr: Audioizlaz
+
+en: Default output device
+tr: Zadani izlazni uređaj
+
+en: No output device available
+tr: Nema dostupnog izlaznog uređaja
+
+en: Battery unknown
+tr: Baterija nepoznata
+
+en: Status refresh could not be started
+tr: Osvježavanje stanja nije moguće pokrenuti
+
+en: Status refresh unavailable
+tr: Osvježavanje stanja nije dostupno
+
+en: Excellent signal
+tr: Izvrstan signal
+
+en: Good signal
+tr: Dobar signal
+
+en: Fair signal
+tr: Prosječan signal
+
+en: Weak signal
+tr: Slab signal
+
+en: Clear sky
+tr: Vedro
+
+en: Mainly clear
+tr: Pretežno vedro
+
+en: Partly cloudy
+tr: Djelomično oblačno
+
+en: Overcast
+tr: Oblačno
+
+en: Fog
+tr: Magla
+
+en: Drizzle
+tr: Rosulja
+
+en: Rain
+tr: Kiša
+
+en: Snow
+tr: Snijeg
+
+en: Rain showers
+tr: Pljuskovi
+
+en: Snow showers
+tr: Snježni pljuskovi
+
+en: Thunderstorm
+tr: Grmljavinsko nevrijeme
+
+## weather
+
+en: Morning
+tr: Jutro
+
+en: Afternoon
+tr: Poslijepodne
+
+en: Evening
+tr: Večer
+
+en: Night
+tr: Noć
+
+en: Now
+tr: Sada
+
+en: Today
+tr: Danas
+
+en: Low
+tr: Nizak
+
+en: Moderate
+tr: Umjeren
+
+en: High
+tr: Visok
+
+en: Very high
+tr: Vrlo visok
+
+en: Extreme
+tr: Ekstreman
+
+en: No connection to the weather service.
+tr: Nema veze sa servisom vremenske prognoze.
+
+en: The weather service is busy. Try again in a moment.
+tr: Servis vremenske prognoze je zauzet. Pokušajte ponovno za trenutak.
+
+en: The weather could not be loaded.
+tr: Vremensku prognozu nije moguće učitati.
+
+en: Could not update; showing the last forecast.
+tr: Ažuriranje nije uspjelo; prikazuje se posljednja prognoza.
+
+en: Try again
+tr: Pokušaj ponovno
+
+en: Your location
+tr: Vaša lokacija
+
+en: My location
+tr: Moja lokacija
+
+en: Precise location
+tr: Precizna lokacija
+
+en: Approximate location
+tr: Približna lokacija
+
+en: Chosen in Settings
+tr: Odabrano u postavkama
+
+en: Allow
+tr: Dopusti
+
+en: Use precise location
+tr: Koristi preciznu lokaciju
+
+en: See the weather where you are: allow your precise location.
+tr: Pogledajte vremensku prognozu ondje gdje jeste: dopustite preciznu lokaciju.
+
+en: Your position is approximate (about 10 km).
+tr: Vaš je položaj približan (oko 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Lokacija je za ovu aplikaciju isključena u sustavu Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Ovaj uređaj ne može javiti svoju lokaciju. Umjesto toga potražite grad.
+
+en: Reading Windows location…
+tr: Čitanje lokacije sustava Windows…
+
+en: Automatic weather follows your Windows location.
+tr: Automatska vremenska prognoza prati vašu lokaciju sustava Windows.
+
+en: Search for a city
+tr: Potražite grad
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Potražite grad ili dopustite lokaciju da biste vidjeli vremensku prognozu.
+
+en: Searching…
+tr: Pretraživanje…
+
+en: City search is unavailable.
+tr: Pretraživanje gradova nije dostupno.
+
+en: No city found.
+tr: Grad nije pronađen.
+
+en: Weather settings
+tr: Postavke vremenske prognoze
+
+en: Loading the weather…
+tr: Učitavanje vremenske prognoze…
+
+en: Loading…
+tr: Učitavanje…
+
+en: Updated {}
+tr: Ažurirano {}
+
+en: Near {}
+tr: U blizini mjesta {}
+
+en: Temperatures now
+tr: Trenutne temperature
+
+en: The map is unavailable.
+tr: Karta nije dostupna.
+
+en: Map: Natural Earth
+tr: Karta: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Vremenski podaci: Open-Meteo.com
+
+en: Feels like
+tr: Osjeća se kao
+
+en: Feels like {}
+tr: Osjeća se kao {}
+
+en: Close to the real temperature
+tr: Blizu stvarne temperature
+
+en: The wind makes it feel colder
+tr: Zbog vjetra se čini hladnije
+
+en: Humidity makes it feel warmer
+tr: Zbog vlage se čini toplije
+
+en: Humidity
+tr: Vlažnost
+
+en: Cloud cover {}
+tr: Naoblaka {}
+
+en: Wind
+tr: Vjetar
+
+en: Gusts {}
+tr: Udari {}
+
+en: Sunrise and sunset
+tr: Izlazak i zalazak sunca
+
+en: UV index
+tr: UV indeks
+
+en: Pressure
+tr: Tlak zraka
+
+en: At sea level
+tr: Na razini mora
+
+en: &Open the weather
+tr: &Otvori vremensku prognozu
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognoza za mjesto na kojem se nalazite, s točnošću od oko 100 m i s njegovom nadmorskom visinom. Isključeno: zaokruženo na oko 10 km.

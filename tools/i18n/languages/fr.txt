@@ -1,0 +1,2494 @@
+# French (France) (fr): Français (France). The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Choisissez la position Windows pour activer la météo automatique.
+
+en: Windows taskbar visible
+tr: Barre des tâches Windows visible
+
+en: Connected to {}
+tr: Connecté à {}
+
+en: {} is out of range
+tr: {} est hors de portée
+
+en: Connecting to {} took too long
+tr: La connexion à {} a pris trop de temps
+
+en: Use Windows to join {}
+tr: Utilisez Windows pour rejoindre {}
+
+en: Windows did not allow this connection
+tr: Windows n'a pas autorisé cette connexion
+
+en: Could not connect to {}
+tr: Impossible de se connecter à {}
+
+en: Connect to {}
+tr: Se connecter à {}
+
+en: That password was not accepted. Check it and try again.
+tr: Ce mot de passe n'a pas été accepté. Vérifiez-le et réessayez.
+
+en: Enter this network's password.
+tr: Saisissez le mot de passe de ce réseau.
+
+en: &Connect
+tr: Se &connecter
+
+en: Windows Settings could not be opened
+tr: Les Paramètres de Windows n'ont pas pu être ouverts
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: L'espace du Dock n'a pas pu être réservé ; rétablissement de la barre des tâches Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Remplacement indisponible : le contrôle de récupération n'a pas pu démarrer
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Barre des tâches Windows rétablie. L'espace du Dock n'a pas pu être réservé ; désactivez puis réactivez le remplacement pour réessayer.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Le contrôle de récupération est indisponible ; rétablissement de la barre des tâches Windows
+
+en: Windows notifications could not be opened
+tr: Les notifications de Windows n'ont pas pu être ouvertes
+
+en: The Windows calendar could not be opened
+tr: Le calendrier de Windows n'a pas pu être ouvert
+
+en: Windows did not show its hidden icons
+tr: Windows n'a pas affiché ses icônes cachées
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: L'actualisation automatique de la position est indisponible ; réessayez dans les paramètres Météo.
+
+en: Windows location
+tr: Position Windows
+
+en: Reading approximate Windows location…
+tr: Lecture de la position approximative de Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: La météo automatique suit la position approximative de Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: L'accès à la position de Windows est bloqué. La météo est indisponible.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows n'a pas pu fournir de position actuelle. La météo est indisponible.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Le service de localisation est indisponible. La météo est indisponible.
+
+en: Waiting for Windows location permission…
+tr: En attente de l'autorisation de localisation de Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Le choix de météo automatique n'a pas pu être enregistré.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: L'accès à la position de Windows est indisponible ou a été refusé. La météo est indisponible.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: La localisation de Windows n'a pas pu demander l'autorisation. Vérifiez les paramètres de localisation de Windows.
+
+en: Status worker unavailable
+tr: Service d'état indisponible
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows n'a pas pu effectuer cette action. Vérifiez ses paramètres.
+
+en: Reading Windows status; try the action again shortly
+tr: Lecture de l'état de Windows ; réessayez l'action dans un instant
+
+en: Could not disconnect
+tr: Impossible de se déconnecter
+
+en: The Windows accessibility feature could not be started
+tr: La fonction d'accessibilité de Windows n'a pas pu démarrer
+
+en: Windows could not change the audio output
+tr: Windows n'a pas pu changer la sortie audio
+
+en: The Windows control could not be opened
+tr: La commande Windows n'a pas pu être ouverte
+
+en: Keyboard shortcuts disabled
+tr: Raccourcis clavier désactivés
+
+en: Both keyboard shortcuts registered
+tr: Les deux raccourcis clavier sont enregistrés
+
+en: A keyboard shortcut is already in use by another application
+tr: Un raccourci clavier est déjà utilisé par une autre application
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Les paramètres rapides de Windows n'ont pas pu être ouverts. Décochez « Utiliser les paramètres rapides de Windows » dans les paramètres de la barre du haut pour utiliser les commandes d'Aether.
+
+en: Windows Start could not be opened
+tr: Démarrer de Windows n'a pas pu être ouvert
+
+en: Windows Task View could not be opened
+tr: La vue des tâches de Windows n'a pas pu être ouverte
+
+en: Windows keyboard layout switching was unavailable
+tr: Le changement de disposition du clavier de Windows était indisponible
+
+en: Windows voice typing could not be opened
+tr: La saisie vocale de Windows n'a pas pu être ouverte
+
+en: Windows taskbar could not be revealed
+tr: La barre des tâches Windows n'a pas pu être affichée
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Le remplacement de la barre des tâches n'a pas pu reprendre ; Windows reste disponible
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Le remplacement de la barre des tâches Windows est indisponible dans cette session
+
+en: Windows pin access is unavailable in this isolated session
+tr: L'accès aux épingles de Windows est indisponible dans cette session isolée
+
+en: Windows pinned applications could not be read
+tr: Les applications épinglées de Windows n'ont pas pu être lues
+
+en: Settings changed during pin import. Try import again.
+tr: Les paramètres ont changé pendant l'import des épingles. Relancez l'import.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: {} applications épinglées supplémentaires enregistrées. Certaines épingles de Windows peuvent rester indisponibles.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Épingles modifiées en mémoire ; l'enregistrement a échoué. Appliquez dans les Paramètres pour réessayer.
+
+en: Pins updated in memory; saving...
+tr: Épingles mises à jour en mémoire ; enregistrement...
+
+en: Imported pins could not be applied
+tr: Les épingles importées n'ont pas pu être appliquées
+
+en: Pin import is unavailable while closing
+tr: L'import des épingles est indisponible pendant la fermeture
+
+en: Settings could not be saved
+tr: Les paramètres n'ont pas pu être enregistrés
+
+en: Quit without saving the latest changes?
+tr: Quitter sans enregistrer les dernières modifications ?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Votre fichier de paramètres précédent est conservé. Laissez Aether Shell ouvert pour réessayer d'enregistrer.
+
+en: &Quit without saving
+tr: &Quitter sans enregistrer
+
+en: &Keep Aether Shell open
+tr: &Garder Aether Shell ouvert
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Exporter un diagnostic de base — version de l'application et build de Windows, sans journaux ni données personnelles
+
+en: Diagnostics exported.
+tr: Diagnostic exporté.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Le diagnostic n'a pas pu être enregistré dans le fichier choisi.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Les paramètres n'ont pas pu être lus en toute sécurité. Le fichier existant a été conservé.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell n'a pas pu démarrer ses éléments de bureau.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Le rétablissement de la barre des tâches Windows est en attente. Réessayez ou fermez Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: La barre des tâches Windows est affichée temporairement.
+
+en: Windows taskbar restored.
+tr: Barre des tâches Windows rétablie.
+
+en: Windows taskbar replacement is active.
+tr: Le remplacement de la barre des tâches Windows est actif.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: La barre des tâches Windows reste disponible. Le remplacement va réessayer sous peu.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: La barre des tâches Windows reste disponible. Désactivez puis réactivez le remplacement pour réessayer.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Barre des tâches Windows rétablie. Le remplacement va se reconnecter sous peu.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Barre des tâches Windows rétablie. Désactivez puis réactivez le remplacement pour réessayer.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Remplacement de la barre des tâches arrêté. Barre des tâches Windows rétablie.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Remplacement de la barre des tâches arrêté. Le rétablissement de la barre des tâches Windows n'a pas pu être confirmé.
+
+en: Activating taskbar replacement...
+tr: Activation du remplacement de la barre des tâches...
+
+en: Restoring Windows taskbar...
+tr: Rétablissement de la barre des tâches Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Reconnexion du remplacement de la barre des tâches...
+
+en: Showing the Windows taskbar temporarily...
+tr: Affichage temporaire de la barre des tâches Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell n'a pas pu rétablir la barre des tâches Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Redémarrez l'Explorateur Windows depuis le Gestionnaire des tâches (Ctrl+Maj+Échap), ou fermez puis rouvrez votre session.
+
+en: The Windows taskbar was restored to its saved state.
+tr: La barre des tâches Windows a été rétablie dans son état enregistré.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Aucun état enregistré de la barre des tâches n'a été trouvé. La barre des tâches Windows a été rendue visible ; son réglage de masquage automatique n'a pas été modifié.
+
+en: There was nothing to restore.
+tr: Il n'y avait rien à rétablir.
+
+en: Taskbar replacement is turned off.
+tr: Le remplacement de la barre des tâches est désactivé.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Le remplacement de la barre des tâches n'a pas pu être désactivé automatiquement. Désactivez-le dans Paramètres d'Aether Shell > Bureau.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Ligne de commande d'Aether Shell non reconnue ou non valide.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell n'a pas pu créer ses dossiers de données locaux.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell s'est arrêté après une erreur inattendue.
+
+## search-names
+
+en: Disk Management
+tr: Gestion des disques
+
+en: Local Users and Groups
+tr: Utilisateurs et groupes locaux
+
+en: Local Group Policy Editor
+tr: Éditeur de stratégie de groupe locale
+
+en: Manage User Certificates
+tr: Gérer les certificats utilisateur
+
+en: Manage Computer Certificates
+tr: Gérer les certificats de l'ordinateur
+
+en: Shared Folders
+tr: Dossiers partagés
+
+en: TPM Management
+tr: Gestion du module de plateforme sécurisée
+
+en: Network Connections
+tr: Connexions réseau
+
+en: System Properties
+tr: Propriétés système
+
+en: About Windows
+tr: À propos de Windows
+
+en: DirectX Diagnostic Tool
+tr: Outil de diagnostic DirectX
+
+en: Windows Features
+tr: Fonctionnalités de Windows
+
+en: System Restore
+tr: Restauration du système
+
+en: Advanced System Settings
+tr: Paramètres système avancés
+
+en: Volume Mixer
+tr: Mélangeur de volume
+
+en: Microsoft Management Console
+tr: Console de gestion Microsoft
+
+en: User Accounts (Advanced)
+tr: Comptes d'utilisateurs (avancé)
+
+en: Display settings
+tr: Paramètres d'affichage
+
+en: Night light settings
+tr: Paramètres de l'éclairage nocturne
+
+en: Graphics settings
+tr: Paramètres graphiques
+
+en: Sound settings
+tr: Paramètres du son
+
+en: Notification settings
+tr: Paramètres de notification
+
+en: Power & battery settings
+tr: Paramètres d'alimentation et de batterie
+
+en: Energy saver settings
+tr: Paramètres de l'économiseur d'énergie
+
+en: Storage settings
+tr: Paramètres de stockage
+
+en: Multitasking settings
+tr: Paramètres du mode multitâche
+
+en: Clipboard settings
+tr: Paramètres du Presse-papiers
+
+en: Remote Desktop settings
+tr: Paramètres du Bureau à distance
+
+en: About your PC
+tr: Informations système
+
+en: Bluetooth & devices settings
+tr: Paramètres Bluetooth et appareils
+
+en: Printers & scanners settings
+tr: Paramètres des imprimantes et scanners
+
+en: Mouse settings
+tr: Paramètres de la souris
+
+en: Touchpad settings
+tr: Paramètres du pavé tactile
+
+en: Network & internet settings
+tr: Paramètres réseau et Internet
+
+en: Wi-Fi settings
+tr: Paramètres Wi-Fi
+
+en: VPN settings
+tr: Paramètres VPN
+
+en: Proxy settings
+tr: Paramètres du proxy
+
+en: Airplane mode settings
+tr: Paramètres du mode Avion
+
+en: Mobile hotspot settings
+tr: Paramètres du point d'accès mobile
+
+en: Background settings
+tr: Paramètres de l'arrière-plan
+
+en: Color settings
+tr: Paramètres des couleurs
+
+en: Theme settings
+tr: Paramètres des thèmes
+
+en: Lock screen settings
+tr: Paramètres de l'écran de verrouillage
+
+en: Taskbar settings
+tr: Paramètres de la barre des tâches
+
+en: Font settings
+tr: Paramètres des polices
+
+en: Installed apps
+tr: Applications installées
+
+en: Default apps settings
+tr: Paramètres des applications par défaut
+
+en: Startup apps settings
+tr: Paramètres des applications de démarrage
+
+en: Account info
+tr: Informations du compte
+
+en: Sign-in options
+tr: Options de connexion
+
+en: Other users settings
+tr: Paramètres des autres utilisateurs
+
+en: Date & time settings
+tr: Paramètres de date et d'heure
+
+en: Language & region settings
+tr: Paramètres de langue et région
+
+en: Typing settings
+tr: Paramètres de saisie
+
+en: Accessibility settings
+tr: Paramètres d'accessibilité
+
+en: Privacy & security settings
+tr: Paramètres de confidentialité et sécurité
+
+en: Location settings
+tr: Paramètres de localisation
+
+en: Windows Update settings
+tr: Paramètres de Windows Update
+
+en: Recovery settings
+tr: Paramètres de récupération
+
+en: Activation settings
+tr: Paramètres d'activation
+
+en: For developers settings
+tr: Paramètres pour les développeurs
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub n'a pas pu être joint.
+
+en: GitHub did not answer the request just now.
+tr: GitHub n'a pas répondu à la demande pour le moment.
+
+en: The release did not pass verification, so nothing was installed.
+tr: La version n'a pas passé la vérification : rien n'a été installé.
+
+en: There is not enough free disk space.
+tr: L'espace disque libre est insuffisant.
+
+en: Windows refused access to the update files.
+tr: Windows a refusé l'accès aux fichiers de mise à jour.
+
+en: {} bytes
+tr: {} octets
+
+en: {} KB
+tr: {} Ko
+
+en: {} MB
+tr: {} Mo
+
+en: Status
+tr: État
+
+en: Check &now
+tr: &Rechercher maintenant
+
+en: Download and install
+tr: Télécharger et installer
+
+en: &Later
+tr: &Plus tard
+
+en: S&kip this version
+tr: I&gnorer cette version
+
+en: &Release details
+tr: &Détails de la version
+
+en: Disable &notifications
+tr: Désactiver les &notifications
+
+en: Release notes
+tr: Notes de version
+
+en: the new version
+tr: la nouvelle version
+
+en: Installed: {}.
+tr: Installée : {}.
+
+en: Automatic update checks are off
+tr: La recherche automatique des mises à jour est désactivée
+
+en: Check now looks for a newer release once.
+tr: « Rechercher maintenant » cherche une seule fois une version plus récente.
+
+en: Last checked {}
+tr: Dernière vérification : {}
+
+en: Not checked yet
+tr: Pas encore vérifié
+
+en: Checking for updates...
+tr: Recherche de mises à jour...
+
+en: Aether Shell is up to date
+tr: Aether Shell est à jour
+
+en: Latest published release: {}.
+tr: Dernière version publiée : {}.
+
+en: Version {} is available
+tr: La version {} est disponible
+
+en: Download size: {}.
+tr: Taille du téléchargement : {}.
+
+en: Downloading version {}...
+tr: Téléchargement de la version {}...
+
+en: Received {} of {} ({}%).
+tr: {} reçus sur {} ({} %).
+
+en: Received {}; total size unknown.
+tr: {} reçus ; taille totale inconnue.
+
+en: Version {} is ready to install
+tr: La version {} est prête à être installée
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Vérifiée avec le manifeste de version signé et SHA-256.
+
+en: The update could not be completed
+tr: La mise à jour n'a pas pu être effectuée
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Pour l'instant, elle s'installe à la main : ouvrez les détails de la version, puis téléchargez et lancez son installateur.
+
+en: Failure: {}.
+tr: Échec : {}.
+
+en: Choose Retry Download to try again.
+tr: Choisissez « Retélécharger » pour réessayer.
+
+en: Use Check now to try again.
+tr: Utilisez « Rechercher maintenant » pour réessayer.
+
+en: Next automatic check: {}.
+tr: Prochaine vérification automatique : {}.
+
+en: &Install update
+tr: &Installer la mise à jour
+
+en: Retry &Download
+tr: Re&télécharger
+
+en: &Download and install
+tr: &Télécharger et installer
+
+en: Windows' startup state could not be read in this session.
+tr: L'état de démarrage de Windows n'a pas pu être lu dans cette session.
+
+en: Windows will start it at your next sign-in.
+tr: Windows le démarrera à votre prochaine ouverture de session.
+
+en: Right now it will not start at sign-in.
+tr: Pour l'instant, il ne démarrera pas à l'ouverture de session.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Il est désactivé dans le Gestionnaire des tâches ou les Paramètres de Windows, qui décident tant qu'il n'y est pas réactivé.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows démarrerait une autre copie d'Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows indique un état de démarrage que cette version ne sait pas lire.
+
+en: The close action could not be completed.
+tr: La fermeture n'a pas pu être effectuée.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Saisissez un nombre complet avant d'enregistrer ; le champ marqué en rouge n'en est pas un.
+
+en: Settings could not be validated.
+tr: Les paramètres n'ont pas pu être validés.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Le démarrage à l'ouverture de session est resté tel quel, car les paramètres n'ont pas pu être enregistrés.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Les paramètres n'ont pas pu être enregistrés, et le démarrage de Windows à l'ouverture de session n'a pas pu être rétabli. Appliquez de nouveau pour réessayer.
+
+en: Settings saved.
+tr: Paramètres enregistrés.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Paramètres modifiés en mémoire ; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: Settings could not be applied.
+tr: Les paramètres n'ont pas pu être appliqués.
+
+en: Some values were corrected to their supported range.
+tr: Certaines valeurs ont été ramenées dans leur plage autorisée.
+
+en: Startup registration is unavailable in this session.
+tr: L'inscription au démarrage est indisponible dans cette session.
+
+en: Changing startup registration...
+tr: Modification de l'inscription au démarrage...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows n'a pas modifié l'inscription au démarrage. Vérifiez le réglage de démarrage dans le Gestionnaire des tâches.
+
+en: Startup registration could not be changed.
+tr: L'inscription au démarrage n'a pas pu être modifiée.
+
+en: Defaults saved; startup is disabled.
+tr: Valeurs par défaut enregistrées ; le démarrage est désactivé.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Valeurs par défaut appliquées ; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: Defaults could not be applied.
+tr: Les valeurs par défaut n'ont pas pu être appliquées.
+
+en: Startup was not disabled; settings were kept.
+tr: Le démarrage n'a pas été désactivé ; les paramètres ont été conservés.
+
+en: Location search is unavailable.
+tr: La recherche de lieu est indisponible.
+
+en: Searching Open-Meteo locations...
+tr: Recherche de lieux Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: La recherche de lieu a échoué. Vérifiez votre connexion et réessayez.
+
+en: No place matched that search.
+tr: Aucun lieu ne correspond à cette recherche.
+
+en: Choose a location to save it.
+tr: Choisissez un lieu pour l'enregistrer.
+
+en: Reset all settings?
+tr: Réinitialiser tous les paramètres ?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Les préférences et les applications épinglées reviennent à leurs valeurs par défaut, et le démarrage à l'ouverture de session est désactivé.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Votre choix concernant la barre des tâches Windows est conservé. Une sauvegarde du fichier de paramètres actuel est conservée.
+
+en: &Reset
+tr: &Réinitialiser
+
+en: Cancel
+tr: Annuler
+
+en: Pinned applications saved.
+tr: Applications épinglées enregistrées.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Épingles modifiées en mémoire ; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Les valeurs par défaut n'ont pas pu être rétablies, car l'inscription au démarrage est indisponible.
+
+en: Pinned application could not be added.
+tr: L'application n'a pas pu être épinglée.
+
+en: Choose an application to add first.
+tr: Choisissez d'abord une application à ajouter.
+
+en: Pinned applications could not be changed.
+tr: Les applications épinglées n'ont pas pu être modifiées.
+
+en: Choose a pinned application first.
+tr: Choisissez d'abord une application épinglée.
+
+en: Desktop status is unavailable in this session.
+tr: L'état du bureau est indisponible dans cette session.
+
+en: Desktop status is unavailable.
+tr: L'état du bureau est indisponible.
+
+en: Password
+tr: Mot de passe
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Téléchargement de la langue {} depuis GitHub ({}). L'anglais est affiché en attendant qu'elle soit prête.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: La langue {} n'a pas pu être téléchargée. L'anglais est affiché d'ici là ; choisissez « Télécharger » ci-dessous pour réessayer.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: La langue {} n'est pas encore sur ce PC. L'anglais est affiché jusqu'à ce qu'elle soit téléchargée.
+
+en: {} is on this PC.
+tr: La langue {} est sur ce PC.
+
+en: Every language is on this PC.
+tr: Toutes les langues sont sur ce PC.
+
+en: Choose a language to download first.
+tr: Choisissez d'abord une langue à télécharger.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Barre du haut
+
+en: Weather
+tr: Météo
+
+en: Updates
+tr: Mises à jour
+
+en: General
+tr: Général
+
+en: About
+tr: À propos
+
+en: Desktop
+tr: Bureau
+
+en: Appearance
+tr: Apparence
+
+en: Welcome
+tr: Bienvenue
+
+en: Aether Shell Settings
+tr: Paramètres d'Aether Shell
+
+en: Settings
+tr: Paramètres
+
+en: Reset defaults...
+tr: Rétablir les valeurs par défaut...
+
+en: &Apply
+tr: &Appliquer
+
+en: Liquid
+tr: Liquide
+
+en: Grain
+tr: Grain
+
+en: From {} to {}
+tr: De {} à {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Cette action n'a pas pu être effectuée.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Taille, espacement, mouvement et applications épinglées au Dock.
+
+en: Size and spacing
+tr: Taille et espacement
+
+en: Icon size
+tr: Taille des icônes
+
+en: {}, scaled with the Windows display scale.
+tr: {}, mis à l'échelle de l'affichage Windows.
+
+en: Bottom margin
+tr: Marge inférieure
+
+en: Space between the Dock and the bottom of the screen.
+tr: Espace entre le Dock et le bas de l'écran.
+
+en: Minimum side margin
+tr: Marge latérale minimale
+
+en: Space kept free at the left and right screen edges.
+tr: Espace laissé libre aux bords gauche et droit de l'écran.
+
+en: Icon spacing
+tr: Espacement des icônes
+
+en: Space between neighbouring icons.
+tr: Espace entre deux icônes voisines.
+
+en: Glass and motion
+tr: Verre et mouvement
+
+en: Glass opacity
+tr: Opacité du verre
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Une valeur plus basse laisse voir davantage le bureau flouté derrière le Dock.
+
+en: Hover magnification
+tr: Agrandissement au survol
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: À quel point une icône grossit sous le pointeur ; 1 le désactive.
+
+en: Behavior
+tr: Comportement
+
+en: Show running applications
+tr: Afficher les applications ouvertes
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Les applications ouvertes non épinglées apparaissent après les épinglées.
+
+en: Reserve screen space for the Dock
+tr: Réserver l'espace écran du Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Les fenêtres agrandies restent au-dessus du Dock au lieu de passer dessous.
+
+en: Automatically hide the Dock
+tr: Masquer automatiquement le Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Il se masque quand une fenêtre le recouvre ; amenez le pointeur au bord inférieur de l'écran pour le faire apparaître. Il reste visible sur le bureau, et les fenêtres prennent toute la hauteur de l'écran.
+
+en: Pinned applications
+tr: Applications épinglées
+
+en: Move &up
+tr: Monter (&U)
+
+en: Move &down
+tr: &Descendre
+
+en: &Remove
+tr: &Retirer
+
+en: &Add application
+tr: &Ajouter une application
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Les épingles conservent leur identité et leurs paramètres de lancement. Retirer une épingle empêche aussi la synchronisation automatique avec la barre des tâches Windows de la rajouter.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Position, horloge et éléments d'état affichés dans la barre d'état du haut.
+
+en: Presentation
+tr: Présentation
+
+en: Floating bar
+tr: Barre flottante
+
+en: Text on the desktop
+tr: Texte sur le bureau
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Barre flottante : la barre de verre sous le haut de l'écran. Texte sur le bureau : pas de barre, les mêmes éléments écrits tout en haut de l'écran, directement sur le fond d'écran ; cette bande reste libre de fenêtres, et la marge supérieure et l'opacité du verre ne s'appliquent pas. Avec le masquage automatique, le texte revient sur une bande de verre tant qu'une fenêtre se trouve dessous.
+
+en: Position and glass
+tr: Position et verre
+
+en: Top margin
+tr: Marge supérieure
+
+en: Space between the Top Bar and the top of the screen.
+tr: Espace entre la barre du haut et le haut de l'écran.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Une valeur plus basse laisse voir davantage le bureau flouté derrière la barre.
+
+en: Clock
+tr: Horloge
+
+en: Clock format
+tr: Format de l'heure
+
+en: Follow Windows
+tr: Comme Windows
+
+en: 12-hour
+tr: 12 heures
+
+en: 24-hour
+tr: 24 heures
+
+en: Date style
+tr: Style de la date
+
+en: Weekday, day and month
+tr: Jour de la semaine, jour et mois
+
+en: Short
+tr: Courte
+
+en: Long
+tr: Longue
+
+en: Show seconds
+tr: Afficher les secondes
+
+en: Show date
+tr: Afficher la date
+
+en: Status items
+tr: Éléments d'état
+
+en: Show battery
+tr: Afficher la batterie
+
+en: Hide battery when absent
+tr: Masquer la batterie en son absence
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Les PC de bureau sans batterie n'affichent rien au lieu d'une batterie inconnue.
+
+en: Show input language
+tr: Afficher la langue de saisie
+
+en: Show network
+tr: Afficher le réseau
+
+en: Show audio output
+tr: Afficher la sortie audio
+
+en: Show microphone
+tr: Afficher le microphone
+
+en: Show weather when enabled
+tr: Afficher la météo quand elle est activée
+
+en: Weather itself is turned on in Weather settings.
+tr: La météo elle-même s'active dans les paramètres Météo.
+
+en: Show hidden icons button
+tr: Afficher le bouton des icônes cachées
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Un petit chevron qui ouvre les icônes cachées de la zone de notification de Windows.
+
+en: Reserve screen space above windows
+tr: Réserver l'espace écran au-dessus des fenêtres
+
+en: Maximized windows stay below the Top Bar.
+tr: Les fenêtres agrandies restent sous la barre du haut.
+
+en: Automatically hide the Top Bar
+tr: Masquer automatiquement la barre du haut
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Elle se masque quand une fenêtre la recouvre ; amenez le pointeur au bord supérieur de l'écran pour la faire apparaître. Elle reste visible sur le bureau.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Utiliser les paramètres rapides de Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Désactivé : les commandes rapides d'Aether s'ouvrent sous la barre du haut. Activé : le panneau de Windows s'ouvre en bas de l'écran.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Des prévisions facultatives dans la barre du haut, fournies par Open-Meteo.
+
+en: Forecast
+tr: Prévisions
+
+en: Enable weather
+tr: Activer la météo
+
+en: Off by default: the forecast needs network requests.
+tr: Désactivée par défaut : les prévisions nécessitent des requêtes réseau.
+
+en: Temperature
+tr: Température
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Intervalle d'actualisation
+
+en: Location
+tr: Emplacement
+
+en: Locate automatically with Windows
+tr: Localiser automatiquement avec Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Utilise le service de localisation de Windows une fois que vous l'avez autorisé.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows demande l'autorisation d'accéder à la position. Vos coordonnées sont envoyées à Open-Meteo.com uniquement pour obtenir la prévision ; une clé de position est gardée en cache localement. Si la localisation est bloquée, la météo n'est pas disponible.
+
+en: Use &Windows location
+tr: Utiliser la position &Windows
+
+en: Location &settings
+tr: Paramètres de &localisation
+
+en: Choose automatic location or search for a place below.
+tr: Choisissez la position automatique ou cherchez un lieu ci-dessous.
+
+en: Search for a place
+tr: Chercher un lieu
+
+en: Searc&h
+tr: &Chercher
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Données météo d'Open-Meteo.com (CC BY 4.0). La recherche manuelle n'envoie que le texte que vous saisissez.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Versions signées du dépôt GitHub officiel, vérifiées avant l'installation.
+
+en: Preferences
+tr: Préférences
+
+en: Check for updates automatically
+tr: Rechercher automatiquement les mises à jour
+
+en: Check interval
+tr: Intervalle de vérification
+
+en: Release channel
+tr: Canal de publication
+
+en: Prereleases arrive earlier and change more often.
+tr: Les préversions arrivent plus tôt et changent plus souvent.
+
+en: Stable
+tr: Stable
+
+en: Prerelease
+tr: Préversion
+
+en: Show update notifications
+tr: Afficher les notifications de mise à jour
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Démarrage, mouvement, raccourcis clavier et diagnostic.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: La langue des barres, des menus, de la recherche, des Paramètres et de l'installation.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Les noms qui vous appartiennent ou qui appartiennent à d'autres programmes (applications, fichiers, réseaux Wi-Fi) ne sont jamais traduits. Avec une langue choisie, la barre du haut écrit la date dans cette langue ; « Comme Windows » garde votre format régional de Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: L'accueil écrit à la main trace des lettres latines : il salue en français, en anglais ou en espagnol. Choisissez sa langue dans Bienvenue.
+
+en: Language
+tr: Langue
+
+en: Interface language
+tr: Langue de l'interface
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: « Comme Windows » utilise la première de vos langues d'affichage Windows qui fait partie de celles-ci, et l'anglais sinon.
+
+en: Startup
+tr: Démarrage
+
+en: Start Aether Shell when I sign in
+tr: Démarrer Aether Shell à l'ouverture de session
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Ce changement nécessite Appliquer. Le Gestionnaire des tâches peut aussi le désactiver.
+
+en: Motion
+tr: Mouvement
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Le mouvement réduit supprime partout les animations décoratives.
+
+en: Reduced
+tr: Réduit
+
+en: Full
+tr: Complet
+
+en: Keyboard shortcuts
+tr: Raccourcis clavier
+
+en: Enable global keyboard shortcuts
+tr: Activer les raccourcis clavier globaux
+
+en: Search shortcut key
+tr: Touche du raccourci de recherche
+
+en: Dock shortcut key
+tr: Touche du raccourci du Dock
+
+en: Search shortcut modifiers
+tr: Touches de modification de la recherche
+
+en: Dock shortcut modifiers
+tr: Touches de modification du Dock
+
+en: Shortcut status unavailable
+tr: État des raccourcis indisponible
+
+en: Diagnostics
+tr: Diagnostic
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Le dossier des journaux contient les journaux d'Aether Shell de cet ordinateur. L'export du diagnostic n'enregistre que la version de l'application et la build de Windows, sans journaux ni données personnelles.
+
+en: Open &log folder
+tr: Ouvrir le dossier des &journaux
+
+en: &Export diagnostics...
+tr: &Exporter le diagnostic...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Un court message écrit à la main sur votre bureau après l'ouverture de session ou le déverrouillage de votre PC.
+
+en: Greeting
+tr: Salutation
+
+en: Show the welcome at sign-in and unlock
+tr: Afficher l'accueil à l'ouverture de session et au déverrouillage
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Il apparaît une fois la session ouverte par Windows, pendant qu'Aether Shell se prépare. Touchez, cliquez ou appuyez sur Échap pour le passer.
+
+en: Greeting language
+tr: Langue de la salutation
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut en français, Hello en anglais, Hola en espagnol. La plume écrit en lettres latines : dans toutes les autres langues, elle salue en anglais.
+
+en: Your name
+tr: Votre prénom
+
+en: Name to greet you with
+tr: Prénom pour vous saluer
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Facultatif, par exemple un prénom. Il reste sur ce PC dans vos paramètres d'Aether Shell et n'est jamais envoyé nulle part ni écrit dans un journal. Videz le champ pour le retirer.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Mode de couleur, accent, vitesse des animations et aspect du Dock et de la barre du haut.
+
+en: Style
+tr: Style
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Liquide : du verre en couches sur ce qui se trouve derrière, une couche de flou, la lumière du liquide, puis les icônes et le texte, toujours lisibles sur les pages claires comme sombres. Grain : verre dépoli, flouté et semi-transparent, avec un grain fin.
+
+en: Liquid blur
+tr: Flou du Liquide
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: À quel point la couche de flou sous le verre Liquide couvre ce qui se trouve derrière : 100 % floute tout. Une valeur plus basse montre la page plus nette, et le texte des barres peut alors se lire moins bien sur une page chargée.
+
+en: Liquid blur color
+tr: Couleur du flou Liquide
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatique garde les couleurs propres du verre. Le texte et les icônes restent lisibles quelle que soit la couleur.
+
+en: Automatic
+tr: Automatique
+
+en: White
+tr: Blanc
+
+en: Black
+tr: Noir
+
+en: Accent
+tr: Accent
+
+en: Blue
+tr: Bleu
+
+en: Violet
+tr: Violet
+
+en: Pink
+tr: Rose
+
+en: Red
+tr: Rouge
+
+en: Orange
+tr: Orange
+
+en: Yellow
+tr: Jaune
+
+en: Green
+tr: Vert
+
+en: Teal
+tr: Bleu-vert
+
+en: Liquid color strength
+tr: Intensité de la couleur du Liquide
+
+en: How much of the chosen color the blur layer takes.
+tr: La part de la couleur choisie que prend la couche de flou.
+
+en: Theme
+tr: Thème
+
+en: Color mode
+tr: Mode de couleur
+
+en: High contrast always takes precedence.
+tr: Le contraste élevé a toujours la priorité.
+
+en: Light
+tr: Clair
+
+en: Dark
+tr: Sombre
+
+en: Accent color
+tr: Couleur d'accentuation
+
+en: Animation duration
+tr: Durée des animations
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 correspond à la vitesse standard ; une valeur plus élevée ralentit. Le mouvement réduit a la priorité.
+
+en: Dock icon preset
+tr: Préréglage des icônes du Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Une taille personnalisée définie dans les paramètres du Dock est conservée jusqu'à ce que vous choisissiez un préréglage.
+
+en: Small - 32 px
+tr: Petit - 32 px
+
+en: Medium - 40 px
+tr: Moyen - 40 px
+
+en: Large - 48 px
+tr: Grand - 48 px
+
+en: Keep custom size
+tr: Garder la taille personnalisée
+
+en: Show Windows Start in the Dock
+tr: Afficher Démarrer de Windows dans le Dock
+
+en: Show Task View in the Dock
+tr: Afficher la vue des tâches dans le Dock
+
+en: Reserve extra space for Dock animations
+tr: Réserver de l'espace pour les animations du Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Évite que l'agrandissement et le rebond au lancement passent sous les fenêtres agrandies.
+
+en: Weather position
+tr: Position de la météo
+
+en: Left
+tr: Gauche
+
+en: Right
+tr: Droite
+
+en: Keyboard indicator
+tr: Indicateur du clavier
+
+en: Compact
+tr: Compact
+
+en: Two lines
+tr: Deux lignes
+
+en: Windows taskbar pins
+tr: Épingles de la barre des tâches Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Ajouter les nouvelles épingles de la barre des tâches Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Tant que la barre des tâches est remplacée, les nouvelles épingles de Windows sont ajoutées au Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Remplacement réversible de la barre des tâches Windows par le Dock.
+
+en: Taskbar replacement
+tr: Remplacement de la barre des tâches
+
+en: Replace the Windows taskbar
+tr: Remplacer la barre des tâches Windows
+
+en: Changing this needs Apply.
+tr: Ce changement nécessite Appliquer.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Tant qu'Aether Shell fonctionne, il masque la barre des tâches Windows et réserve de l'espace sous les applications agrandies.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: L'état de la barre des tâches Windows est rétabli quand ce mode est désactivé ou qu'Aether Shell se ferme. Un assistant de récupération séparé la rétablit aussi si l'application s'arrête de façon inattendue. Si la récupération échoue, redémarrez l'Explorateur Windows dans le Gestionnaire des tâches.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Les Paramètres de Windows restent l'interface native de Windows. Leur page Barre des tâches n'est pas remplacée par Aether Shell ; réglez ce mode ici.
+
+en: Pinned applications from Windows
+tr: Applications épinglées dans Windows
+
+en: &Import Windows taskbar pins
+tr: &Importer les épingles de la barre des tâches Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Lit les raccourcis épinglés sans modifier les épingles de Windows. Certaines épingles de Windows 11 ou leur ordre peuvent être indisponibles.
+
+en: Version {}
+tr: Version {}
+
+en: Created by Ibrahim Bouillet
+tr: Créé par Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Une interface de bureau Windows native - un Dock flottant et une barre d'état en haut - qui fonctionne aux côtés de l'Explorateur.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Données météo : Open-Meteo.com (CC BY 4.0). Aucune bibliothèque d'exécution C++ tierce n'est incluse.
+
+en: &Official project
+tr: Projet &officiel
+
+en: Licence
+tr: Licence
+
+en: Taskbar replacement changes need Apply.
+tr: Les changements du remplacement de la barre des tâches nécessitent Appliquer.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Les changements sont enregistrés automatiquement. Le démarrage nécessite Appliquer.
+
+en: Changes save automatically.
+tr: Les changements sont enregistrés automatiquement.
+
+en: Press Apply to confirm this change.
+tr: Appuyez sur Appliquer pour confirmer ce changement.
+
+en: Smart transparency
+tr: Transparence intelligente
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Avec le Liquide, cette fenêtre ne floute que sous son texte et ses commandes : entièrement sur les autres fenêtres et les icônes du bureau, légèrement sur le fond d'écran, et pas du tout là où elle n'affiche rien.
+
+en: Languages on this PC
+tr: Langues sur ce PC
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell télécharge les langues que Windows possède, et change ainsi de langue en même temps que Windows.
+
+en: Add a language
+tr: Ajouter une langue
+
+en: &Download
+tr: &Télécharger
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Chaque langue provient de la publication GitHub de cette version et est vérifiée avant d'être utilisée. Une fois qu'elle est sur ce PC, choisissez-la ci-dessus.
+
+en: built in
+tr: intégré
+
+en: downloading, {}
+tr: téléchargement, {}
+
+en: download failed
+tr: échec du téléchargement
+
+## setup
+
+en: Aether Shell Setup
+tr: Installation d'Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: L'installation n'a pas pu créer son interface. Fermez-la et réessayez, ou utilisez les options d'installation silencieuse documentées.
+
+en: Options
+tr: Options
+
+en: Install
+tr: Installation
+
+en: Done
+tr: Terminé
+
+en: Remove Aether Shell
+tr: Supprimer Aether Shell
+
+en: Repair Aether Shell
+tr: Réparer Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Un Dock et une barre d'état en haut natifs pour Windows, qui fonctionnent aux côtés de l'Explorateur.
+
+en: Replaces the Windows taskbar while it runs
+tr: Remplace la barre des tâches Windows pendant qu'il fonctionne
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Quittez Aether Shell, désactivez cette option dans Paramètres > Bureau, ou ouvrez « Restore Windows taskbar » dans le menu Démarrer pour retrouver la barre des tâches Windows.
+
+en: Starts when you sign in - your choice
+tr: Démarre à l'ouverture de session - à vous de choisir
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Les nouvelles installations démarrent à l'ouverture de session par défaut. Vous pouvez décocher ce choix avant d'installer, ou le désactiver plus tard dans les Paramètres. Les choix de démarrage existants et les désactivations du Gestionnaire des tâches sont conservés.
+
+en: Installs for your account
+tr: S'installe pour votre compte
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Aucun droit d'administrateur n'est nécessaire. Vos paramètres et vos données restent dans votre profil utilisateur.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: La désinstallation conserve vos paramètres et vos données, sauf si vous choisissez de les supprimer.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: La réparation rétablit les fichiers de ce paquet et conserve vos paramètres. Si Aether Shell a laissé la barre des tâches Windows masquée, la réparation la rétablit.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Installer par-dessus une version existante conserve vos paramètres. Un paquet plus ancien est refusé, sauf si vous autorisez explicitement un retour en arrière.
+
+en: MIT License
+tr: Licence MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: La licence est aussi installée sous le nom LICENSE à côté d'Aether Shell.
+
+en: Remove this installation
+tr: Supprimer cette installation
+
+en: Install location
+tr: Emplacement d'installation
+
+en: &Browse...
+tr: &Parcourir...
+
+en: Also remove my settings, cache and logs
+tr: Supprimer aussi mes paramètres, le cache et les journaux
+
+en: This cannot be undone.
+tr: Cette action est irréversible.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: L'installation fermera proprement Aether Shell et supprimera ses fichiers installés, ses raccourcis, son entrée de démarrage et son inscription dans les applications installées. Les autres applications et les paramètres de Windows ne sont pas touchés.
+
+en: Your welcome
+tr: Votre accueil
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Après l'ouverture de session ou le déverrouillage de votre PC, Aether Shell écrit un court message à la main. Tapez le prénom avec lequel il doit vous saluer, ou laissez vide pour un simple bonjour.
+
+en: Your first name
+tr: Votre prénom
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Facultatif, par exemple un prénom. Il reste sur ce PC dans vos paramètres d'Aether Shell et n'est jamais envoyé nulle part. Modifiez-le, ou désactivez l'accueil, dans Paramètres > Bienvenue.
+
+en: Shortcuts and startup
+tr: Raccourcis et démarrage
+
+en: Create Start menu shortcuts
+tr: Créer les raccourcis du menu Démarrer
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell et Restore Windows taskbar.
+
+en: Create a desktop shortcut
+tr: Créer un raccourci sur le bureau
+
+en: Shows your current choice.
+tr: Affiche votre choix actuel.
+
+en: Recommended.
+tr: Recommandé.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Décochez pour refuser ; les désactivations du Gestionnaire des tâches sont respectées.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Installer accepte le choix de démarrage ci-dessus. Le lanceur peut redémarrer Aether Shell après un plantage, avec un nombre limité de tentatives. Quitter et Restore Windows taskbar restent disponibles. La météo est désactivée par défaut. Des fichiers non signés peuvent déclencher un avertissement Windows SmartScreen.
+
+en: Removing this installation...
+tr: Suppression de cette installation...
+
+en: Repairing Aether Shell...
+tr: Réparation d'Aether Shell...
+
+en: Installing Aether Shell...
+tr: Installation d'Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Fermeture d'Aether Shell et suppression de ses fichiers.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Vérification du paquet intégré et installation de ses fichiers. La progression est indiquée comme une activité : l'installation ne connaît pas le temps restant.
+
+en: Please wait while the removal completes.
+tr: Veuillez patienter pendant la suppression.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Annuler reste possible jusqu'à l'activation de la nouvelle version ; ensuite, l'installation se termine en toute sécurité.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell a été désinstallé.
+
+en: Aether Shell is ready.
+tr: Aether Shell est prêt.
+
+en: Setup was cancelled.
+tr: L'installation a été annulée.
+
+en: Setup could not complete.
+tr: L'installation n'a pas pu aboutir.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Vos données ont été conservées, sauf si vous avez explicitement choisi de les supprimer.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Vous pouvez le réparer ou le désinstaller depuis Paramètres Windows > Applications > Applications installées.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: L'opération a été annulée avant l'activation. Revenez aux options pour réessayer.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Vérifiez l'accès aux fichiers et l'espace disque libre, puis réessayez. Si Aether Shell est déjà présent, la réparation peut rétablir ses fichiers. Catégorie d'erreur : {}
+
+en: Setup log
+tr: Journal d'installation
+
+en: Launch Aether Shell
+tr: Lancer Aether Shell
+
+en: &Back
+tr: &Précédent
+
+en: &Next
+tr: &Suivant
+
+en: &Continue
+tr: &Continuer
+
+en: &Uninstall
+tr: &Désinstaller
+
+en: &Repair
+tr: &Réparer
+
+en: &Install
+tr: &Installer
+
+en: &Close
+tr: &Fermer
+
+en: Step {} of {}: {}
+tr: Étape {} sur {} : {}
+
+en: Choose the Aether Shell installation folder
+tr: Choisissez le dossier d'installation d'Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Choisissez un chemin de dossier complet, par exemple qui commence par une lettre de lecteur.
+
+en: The install folder must be an absolute path.
+tr: Le dossier d'installation doit être un chemin absolu.
+
+en: Setup stops at the next safe point.
+tr: L'installation s'arrête au prochain point sûr.
+
+en: Cancelling...
+tr: Annulation...
+
+en: Setup is finishing the current step safely; please wait.
+tr: L'installation termine l'étape en cours en toute sécurité ; veuillez patienter.
+
+en: Updating Aether Shell
+tr: Mise à jour d'Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Vérification du paquet signé et application de la mise à jour.
+
+en: Update completed
+tr: Mise à jour terminée
+
+en: The update did not complete
+tr: La mise à jour n'a pas abouti
+
+en: Close
+tr: Fermer
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: L'interface de mise à jour n'a pas pu démarrer. La mise à jour n'a pas été appliquée. Réessayez ou utilisez la réparation.
+
+en: Aether Shell Update
+tr: Mise à jour d'Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: L'interface de mise à jour n'a pas pu démarrer. La mise à jour n'a pas été appliquée. Réessayez ou utilisez la réparation dans Paramètres Windows > Applications > Applications installées.
+
+en: Update completed.
+tr: Mise à jour terminée.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: La mise à jour n'a pas abouti. Consultez le journal de mise à jour ou utilisez la réparation.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell n'a pas pu démarrer. Choisissez Réparer dans Paramètres Windows > Applications > Applications installées.
+
+en: Aether Shell Settings — update in progress
+tr: Paramètres d'Aether Shell — mise à jour en cours
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Reprendre le remplacement de la barre des tâches
+
+en: Show Windows &notification area for 60 seconds
+tr: Afficher la zone de &notification de Windows pendant 60 secondes
+
+en: &Search…
+tr: &Rechercher…
+
+en: &Settings…
+tr: &Paramètres…
+
+en: View available &update…
+tr: Voir la mise à jour &disponible…
+
+en: &Check for updates…
+tr: Rechercher des &mises à jour…
+
+en: &About Aether Shell
+tr: À &propos d'Aether Shell
+
+en: &Quit Aether Shell
+tr: &Quitter Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Changer la langue de &saisie\tWin+Espace
+
+en: Open &network controls…
+tr: Ouvrir les commandes &réseau…
+
+en: &Weather settings…
+tr: Paramètres &météo…
+
+en: Toggle output &mute
+tr: Activer ou couper le &son
+
+en: &Sound settings…
+tr: Paramètres du s&on…
+
+en: Toggle microphone &mute
+tr: Activer ou couper le &microphone
+
+en: Start Windows &voice typing\tWin+H
+tr: Lancer la saisie &vocale de Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Paramètres de &confidentialité du microphone…
+
+en: &Power settings…
+tr: Paramètres d'&alimentation…
+
+en: Open &notifications and calendar
+tr: Ouvrir les &notifications et le calendrier
+
+en: Open &calendar\tWin+Alt+D
+tr: Ouvrir le &calendrier\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Afficher les icônes &cachées
+
+en: Initializing
+tr: Initialisation
+
+en: Unavailable
+tr: Indisponible
+
+en: Unsupported
+tr: Non pris en charge
+
+en: Error
+tr: Erreur
+
+en: Available
+tr: Disponible
+
+en: Unknown
+tr: Inconnu
+
+en: Internet access
+tr: Accès à Internet
+
+en: Local network only
+tr: Réseau local uniquement
+
+en: Limited Internet access
+tr: Accès à Internet limité
+
+en: No network connection
+tr: Aucune connexion réseau
+
+en: Connectivity unknown
+tr: Connectivité inconnue
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Cellulaire
+
+en: Network
+tr: Réseau
+
+en: Offline
+tr: Hors connexion
+
+en: Network status unavailable
+tr: État du réseau indisponible
+
+en: Quick controls
+tr: Commandes rapides
+
+en: Aether Shell menu
+tr: Menu d'Aether Shell
+
+en: Weather status unavailable
+tr: État de la météo indisponible
+
+en: Cached weather
+tr: Météo en cache
+
+en: Observation (UTC): {}
+tr: Observation (UTC) : {}
+
+en: Weather: {}
+tr: Météo : {}
+
+en: Click to open weather settings
+tr: Cliquez pour ouvrir les paramètres météo
+
+en: Show hidden icons
+tr: Afficher les icônes cachées
+
+en: Opens Windows' notification-area overflow
+tr: Ouvre le dépassement de la zone de notification de Windows
+
+en: Input language: {}
+tr: Langue de saisie : {}
+
+en: Fallback input layout
+tr: Disposition de secours
+
+en: Click to switch input language (Win+Space)
+tr: Cliquez pour changer la langue de saisie (Win+Espace)
+
+en: Network: {}
+tr: Réseau : {}
+
+en: Signal strength unavailable
+tr: Force du signal indisponible
+
+en: Click to open Windows network settings
+tr: Cliquez pour ouvrir les paramètres réseau de Windows
+
+en: Audio output
+tr: Sortie audio
+
+en: Audio: {}
+tr: Audio : {}
+
+en: volume unknown
+tr: volume inconnu
+
+en: Muted
+tr: Muet
+
+en: Sound on
+tr: Son activé
+
+en: Microphone: {}
+tr: Microphone : {}
+
+en: Endpoint unmuted
+tr: Microphone actif
+
+en: Recording detection unsupported
+tr: Détection d'enregistrement non prise en charge
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Cliquez pour couper ou rétablir le son ; clic droit pour la saisie vocale de Windows et la confidentialité du microphone
+
+en: Battery: {}
+tr: Batterie : {}
+
+en: Battery {}
+tr: Batterie {}
+
+en: Battery status unavailable
+tr: État de la batterie indisponible
+
+en: Charging
+tr: En charge
+
+en: External power
+tr: Alimentation secteur
+
+en: Estimated remaining: {} h {} min
+tr: Autonomie estimée : {} h {} min
+
+en: Click to open power settings
+tr: Cliquez pour ouvrir les paramètres d'alimentation
+
+en: Clock status unavailable
+tr: État de l'horloge indisponible
+
+en: Click to open calendar and notifications
+tr: Cliquez pour ouvrir le calendrier et les notifications
+
+en: Action failed: {}
+tr: Échec de l'action : {}
+
+en: Aether Shell status bar
+tr: Barre d'état d'Aether Shell
+
+en: Update available
+tr: Mise à jour disponible
+
+en: Cached
+tr: En cache
+
+en: Start
+tr: Démarrer
+
+en: Search
+tr: Rechercher
+
+en: Task View
+tr: Vue des tâches
+
+en: Application
+tr: Application
+
+en: Running application
+tr: Application ouverte
+
+en: More applications
+tr: Autres applications
+
+en: Aether Shell window previews
+tr: Aperçus des fenêtres d'Aether Shell
+
+en: Minimized — preview unavailable
+tr: Réduite — aperçu indisponible
+
+en: Preview unavailable
+tr: Aperçu indisponible
+
+en: {} windows
+tr: Fenêtres de {}
+
+en: {} window
+tr: Fenêtre de {}
+
+en: Switches to this window
+tr: Bascule vers cette fenêtre
+
+en: Minimized, preview unavailable
+tr: Réduite, aperçu indisponible
+
+en: Minimized
+tr: Réduite
+
+en: Close {}
+tr: Fermer {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Demande à cette fenêtre de se fermer ; l'application peut encore proposer d'enregistrer ou d'annuler
+
+en: Close requested
+tr: Fermeture demandée
+
+en: Previous applications
+tr: Applications précédentes
+
+en: Open
+tr: Ouvrir
+
+en: New instance
+tr: Nouvelle instance
+
+en: Unpin from Dock
+tr: Désépingler du Dock
+
+en: Pin to Dock
+tr: Épingler au Dock
+
+en: Move left
+tr: Déplacer à gauche
+
+en: Move right
+tr: Déplacer à droite
+
+en: Dock settings...
+tr: Paramètres du Dock...
+
+en: Import Windows taskbar pins
+tr: Importer les épingles de la barre des tâches Windows
+
+en: Open Windows Start
+tr: Ouvrir Démarrer de Windows
+
+en: Aether Shell Dock
+tr: Dock d'Aether Shell
+
+en: Pinned
+tr: Épinglée
+
+en: Running
+tr: Ouverte
+
+en: Needs attention
+tr: Demande votre attention
+
+en: Up arrow shows window previews
+tr: La flèche haut affiche les aperçus des fenêtres
+
+en: Installed application
+tr: Application installée
+
+en: Desktop application
+tr: Application de bureau
+
+en: File
+tr: Fichier
+
+en: Folder
+tr: Dossier
+
+en: Windows tool
+tr: Outil Windows
+
+en: Control Panel
+tr: Panneau de configuration
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Naviguer   ·   Entrée Ouvrir   ·   Échap Fermer
+
+en: Search apps, settings and files
+tr: Rechercher des applications, des paramètres et des fichiers
+
+en: Search could not be completed.
+tr: La recherche n'a pas pu aboutir.
+
+en: Results
+tr: Résultats
+
+en: Indexing applications…
+tr: Indexation des applications…
+
+en: Type to search apps, settings and files
+tr: Tapez pour rechercher des applications, des paramètres et des fichiers
+
+en: Nothing matches
+tr: Aucun résultat
+
+en: Windows could not open this application.
+tr: Windows n'a pas pu ouvrir cette application.
+
+en: Menu
+tr: Menu
+
+en: Opens a submenu
+tr: Ouvre un sous-menu
+
+en: , opens a submenu
+tr: , ouvre un sous-menu
+
+en: Selected
+tr: Sélectionné
+
+en: Checked
+tr: Coché
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Mode Avion
+
+en: Accessibility
+tr: Accessibilité
+
+en: Energy saver
+tr: Économiseur d'énergie
+
+en: Live captions
+tr: Sous-titres en direct
+
+en: Night light
+tr: Éclairage nocturne
+
+en: Mobile hotspot
+tr: Point d'accès mobile
+
+en: Nearby sharing
+tr: Partage de proximité
+
+en: Cast
+tr: Caster
+
+en: Project
+tr: Projeter
+
+en: All settings
+tr: Tous les paramètres
+
+en: Connected
+tr: Connecté
+
+en: Not connected
+tr: Non connecté
+
+en: , on
+tr: , activé
+
+en: , off
+tr: , désactivé
+
+en: , state unknown
+tr: , état inconnu
+
+en: , opens Windows Settings
+tr: , ouvre les Paramètres de Windows
+
+en: , shows accessibility features
+tr: , affiche les fonctions d'accessibilité
+
+en: , requires Windows 11 version 22H2
+tr: , nécessite Windows 11 version 22H2
+
+en: Now playing: {}
+tr: En cours de lecture : {}
+
+en: Untitled media
+tr: Média sans titre
+
+en: , switch source
+tr: , changer de source
+
+en: Previous media item
+tr: Élément précédent
+
+en: Pause
+tr: Pause
+
+en: Play
+tr: Lecture
+
+en: Next media item
+tr: Élément suivant
+
+en: {} details
+tr: Détails : {}
+
+en: Page {} of {}
+tr: Page {} sur {}
+
+en: Next page
+tr: Page suivante
+
+en: First page
+tr: Première page
+
+en: Brightness
+tr: Luminosité
+
+en: Brightness, unavailable on this display
+tr: Luminosité, indisponible sur cet écran
+
+en: Volume
+tr: Volume
+
+en: Volume, unavailable
+tr: Volume, indisponible
+
+en: Unmute
+tr: Rétablir le son
+
+en: Mute
+tr: Couper le son
+
+en: Sound output and volume mixer
+tr: Sortie audio et mélangeur de volume
+
+en: Back
+tr: Retour
+
+en: , secured
+tr: , sécurisé
+
+en: , open
+tr: , ouvert
+
+en: , connected
+tr: , connecté
+
+en: Disconnect
+tr: Déconnecter
+
+en: Show available networks
+tr: Afficher les réseaux disponibles
+
+en: More Wi-Fi settings
+tr: Plus de paramètres Wi-Fi
+
+en: Bluetooth and devices settings
+tr: Paramètres Bluetooth et appareils
+
+en: Magnifier
+tr: Loupe
+
+en: Narrator
+tr: Narrateur
+
+en: On-screen keyboard
+tr: Clavier visuel
+
+en: Sticky keys
+tr: Touches rémanentes
+
+en: More accessibility settings
+tr: Plus de paramètres d'accessibilité
+
+en: Volume mixer
+tr: Mélangeur de volume
+
+en: Choose output in Sound settings
+tr: Choisir la sortie dans les paramètres du son
+
+en: Power and battery settings
+tr: Paramètres d'alimentation et de batterie
+
+en: Battery {} percent, {}
+tr: Batterie à {} pour cent, {}
+
+en: All Windows settings
+tr: Tous les paramètres de Windows
+
+en: The requested action could not be dispatched
+tr: L'action demandée n'a pas pu être transmise
+
+en: Aether Shell quick controls
+tr: Commandes rapides d'Aether Shell
+
+en: Media session active
+tr: Session multimédia active
+
+en: No media session
+tr: Aucune session multimédia
+
+en: Current page
+tr: Page actuelle
+
+en:  - secured
+tr:  - sécurisé
+
+en:  - open
+tr:  - ouvert
+
+en:  - opens in Windows
+tr:  - s'ouvre dans Windows
+
+en: Turned off by hardware or policy
+tr: Désactivé par le matériel ou une stratégie
+
+en: State unavailable - use Windows settings
+tr: État indisponible - utilisez les paramètres de Windows
+
+en: Off
+tr: Désactivé
+
+en:  - signal {} of 5
+tr:  - signal {} sur 5
+
+en: , no internet
+tr: , pas d'Internet
+
+en: On - not connected
+tr: Activé - non connecté
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows n'autorise pas les applications à lister les réseaux : vérifiez la localisation dans les paramètres de confidentialité
+
+en: No Wi-Fi adapter found
+tr: Aucun adaptateur Wi-Fi trouvé
+
+en: Connecting to {}...
+tr: Connexion à {}...
+
+en:  - looking for networks
+tr:  - recherche de réseaux
+
+en: On
+tr: Activé
+
+en: A screen reader is running
+tr: Un lecteur d'écran est en cours d'exécution
+
+en: Windows accessibility features
+tr: Fonctions d'accessibilité de Windows
+
+en: Sound output
+tr: Sortie audio
+
+en: Default output device
+tr: Périphérique de sortie par défaut
+
+en: No output device available
+tr: Aucun périphérique de sortie disponible
+
+en: Battery unknown
+tr: Batterie inconnue
+
+en: Status refresh could not be started
+tr: L'actualisation de l'état n'a pas pu démarrer
+
+en: Status refresh unavailable
+tr: Actualisation de l'état indisponible
+
+en: Excellent signal
+tr: Excellent signal
+
+en: Good signal
+tr: Bon signal
+
+en: Fair signal
+tr: Signal moyen
+
+en: Weak signal
+tr: Signal faible
+
+en: Clear sky
+tr: Ciel dégagé
+
+en: Mainly clear
+tr: Plutôt dégagé
+
+en: Partly cloudy
+tr: Partiellement nuageux
+
+en: Overcast
+tr: Couvert
+
+en: Fog
+tr: Brouillard
+
+en: Drizzle
+tr: Bruine
+
+en: Rain
+tr: Pluie
+
+en: Snow
+tr: Neige
+
+en: Rain showers
+tr: Averses
+
+en: Snow showers
+tr: Averses de neige
+
+en: Thunderstorm
+tr: Orage
+
+## weather
+
+en: Morning
+tr: Matin
+
+en: Afternoon
+tr: Après-midi
+
+en: Evening
+tr: Soir
+
+en: Night
+tr: Nuit
+
+en: Now
+tr: Maintenant
+
+en: Today
+tr: Aujourd'hui
+
+en: Low
+tr: Faible
+
+en: Moderate
+tr: Modéré
+
+en: High
+tr: Élevé
+
+en: Very high
+tr: Très élevé
+
+en: Extreme
+tr: Extrême
+
+en: No connection to the weather service.
+tr: Pas de connexion au service météo.
+
+en: The weather service is busy. Try again in a moment.
+tr: Le service météo est occupé. Réessayez dans un instant.
+
+en: The weather could not be loaded.
+tr: La météo n'a pas pu être chargée.
+
+en: Could not update; showing the last forecast.
+tr: Mise à jour impossible ; affichage de la dernière prévision.
+
+en: Try again
+tr: Réessayer
+
+en: Your location
+tr: Votre position
+
+en: My location
+tr: Ma position
+
+en: Precise location
+tr: Position précise
+
+en: Approximate location
+tr: Position approximative
+
+en: Chosen in Settings
+tr: Choisie dans les Paramètres
+
+en: Allow
+tr: Autoriser
+
+en: Use precise location
+tr: Utiliser la position précise
+
+en: See the weather where you are: allow your precise location.
+tr: Voyez la météo là où vous êtes : autorisez votre position précise.
+
+en: Your position is approximate (about 10 km).
+tr: Votre position est approximative (environ 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: La localisation est désactivée pour cette application dans Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Cet appareil ne peut pas indiquer sa position. Recherchez plutôt une ville.
+
+en: Reading Windows location…
+tr: Lecture de la position de Windows…
+
+en: Automatic weather follows your Windows location.
+tr: La météo automatique suit votre position Windows.
+
+en: Search for a city
+tr: Rechercher une ville
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Recherchez une ville ou autorisez votre position pour voir la météo.
+
+en: Searching…
+tr: Recherche…
+
+en: City search is unavailable.
+tr: La recherche de villes n'est pas disponible.
+
+en: No city found.
+tr: Aucune ville trouvée.
+
+en: Weather settings
+tr: Paramètres météo
+
+en: Loading the weather…
+tr: Chargement de la météo…
+
+en: Loading…
+tr: Chargement…
+
+en: Updated {}
+tr: Mis à jour à {}
+
+en: Near {}
+tr: Près de {}
+
+en: Temperatures now
+tr: Températures actuelles
+
+en: The map is unavailable.
+tr: La carte n'est pas disponible.
+
+en: Map: Natural Earth
+tr: Carte : Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Données météo : Open-Meteo.com
+
+en: Feels like
+tr: Ressenti
+
+en: Feels like {}
+tr: Ressenti {}
+
+en: Close to the real temperature
+tr: Proche de la température réelle
+
+en: The wind makes it feel colder
+tr: Le vent donne une sensation plus froide
+
+en: Humidity makes it feel warmer
+tr: L'humidité donne une sensation plus chaude
+
+en: Humidity
+tr: Humidité
+
+en: Cloud cover {}
+tr: Couverture nuageuse {}
+
+en: Wind
+tr: Vent
+
+en: Gusts {}
+tr: Rafales {}
+
+en: Sunrise and sunset
+tr: Lever et coucher du soleil
+
+en: UV index
+tr: Indice UV
+
+en: Pressure
+tr: Pression
+
+en: At sea level
+tr: Au niveau de la mer
+
+en: &Open the weather
+tr: &Ouvrir la météo
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: La prévision pour l'endroit où vous êtes, à environ 100 m près, avec son altitude. Désactivé : arrondie à environ 10 km.

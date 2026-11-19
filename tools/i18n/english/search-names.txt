@@ -1,0 +1,124 @@
+# D70: Windows' tools and Settings pages as Search names them (src/applications/CatalogRules.cpp). The French is the
+# name written there; Search shows the interface's language and finds an entry by any of the five.
+
+en: Disk Management
+
+en: Local Users and Groups
+
+en: Local Group Policy Editor
+
+en: Manage User Certificates
+
+en: Manage Computer Certificates
+
+en: Shared Folders
+
+en: TPM Management
+
+en: Network Connections
+
+en: System Properties
+
+en: About Windows
+
+en: DirectX Diagnostic Tool
+
+en: Windows Features
+
+en: System Restore
+
+en: Advanced System Settings
+
+en: Volume Mixer
+
+en: Microsoft Management Console
+
+en: User Accounts (Advanced)
+
+en: Display settings
+
+en: Night light settings
+
+en: Graphics settings
+
+en: Sound settings
+
+en: Notification settings
+
+en: Power & battery settings
+
+en: Energy saver settings
+
+en: Storage settings
+
+en: Multitasking settings
+
+en: Clipboard settings
+
+en: Remote Desktop settings
+
+en: About your PC
+
+en: Bluetooth & devices settings
+
+en: Printers & scanners settings
+
+en: Mouse settings
+
+en: Touchpad settings
+
+en: Network & internet settings
+
+en: Wi-Fi settings
+
+en: VPN settings
+
+en: Proxy settings
+
+en: Airplane mode settings
+
+en: Mobile hotspot settings
+
+en: Background settings
+
+en: Color settings
+
+en: Theme settings
+
+en: Lock screen settings
+
+en: Taskbar settings
+
+en: Font settings
+
+en: Installed apps
+
+en: Default apps settings
+
+en: Startup apps settings
+
+en: Account info
+
+en: Sign-in options
+
+en: Other users settings
+
+en: Date & time settings
+
+en: Language & region settings
+
+en: Typing settings
+
+en: Accessibility settings
+
+en: Privacy & security settings
+
+en: Location settings
+
+en: Windows Update settings
+
+en: Recovery settings
+
+en: Activation settings
+
+en: For developers settings

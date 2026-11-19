@@ -1,0 +1,183 @@
+# D70: the shell's own messages (src/app): statuses shown in Settings, Quick Settings and dialogs.
+
+en: Choose Windows location to enable automatic weather.
+
+en: Windows taskbar visible
+
+en: Connected to {}
+
+en: {} is out of range
+
+en: Connecting to {} took too long
+
+en: Use Windows to join {}
+
+en: Windows did not allow this connection
+
+en: Could not connect to {}
+
+en: Connect to {}
+
+en: That password was not accepted. Check it and try again.
+
+en: Enter this network's password.
+
+en: &Connect
+
+en: Windows Settings could not be opened
+
+en: Dock space could not be reserved; restoring Windows taskbar
+
+en: Replacement unavailable: recovery observer could not start
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+
+en: Windows notifications could not be opened
+
+en: The Windows calendar could not be opened
+
+en: Windows did not show its hidden icons
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+
+en: Windows location
+
+en: Reading approximate Windows location…
+
+en: Automatic weather follows approximate Windows location.
+
+en: Windows location access is blocked. Weather is unavailable.
+
+en: Windows could not provide a current location. Weather is unavailable.
+
+en: Location worker unavailable. Weather is unavailable.
+
+en: Waiting for Windows location permission…
+
+en: The automatic weather choice could not be saved.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+
+en: Windows location could not request permission. Review Windows location settings.
+
+en: Status worker unavailable
+
+en: Windows could not complete this action. Review its settings.
+
+en: Reading Windows status; try the action again shortly
+
+en: Could not disconnect
+
+en: The Windows accessibility feature could not be started
+
+en: Windows could not change the audio output
+
+en: The Windows control could not be opened
+
+en: Keyboard shortcuts disabled
+
+en: Both keyboard shortcuts registered
+
+en: A keyboard shortcut is already in use by another application
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+
+en: Windows Start could not be opened
+
+en: Windows Task View could not be opened
+
+en: Windows keyboard layout switching was unavailable
+
+en: Windows voice typing could not be opened
+
+en: Windows taskbar could not be revealed
+
+en: Taskbar replacement could not resume; Windows remains available
+
+en: Windows taskbar replacement is unavailable in this session
+
+en: Windows pin access is unavailable in this isolated session
+
+en: Windows pinned applications could not be read
+
+en: Settings changed during pin import. Try import again.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+
+en: Pins updated in memory; saving...
+
+en: Imported pins could not be applied
+
+en: Pin import is unavailable while closing
+
+en: Settings could not be saved
+
+en: Quit without saving the latest changes?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+
+en: &Quit without saving
+
+en: &Keep Aether Shell open
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+
+en: Diagnostics exported.
+
+en: Diagnostics could not be saved to the chosen file.
+
+en: Settings could not be read safely. The existing file was preserved.
+
+en: Aether Shell could not start its desktop surfaces.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+
+en: Windows taskbar restored.
+
+en: Windows taskbar replacement is active.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+
+en: Activating taskbar replacement...
+
+en: Restoring Windows taskbar...
+
+en: Reconnecting taskbar replacement...
+
+en: Showing the Windows taskbar temporarily...
+
+en: Aether Shell could not restore the Windows taskbar.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+
+en: The Windows taskbar was restored to its saved state.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+
+en: There was nothing to restore.
+
+en: Taskbar replacement is turned off.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+
+en: Unrecognized or invalid Aether Shell command line.
+
+en: Aether Shell could not create its local data folders.
+
+en: Aether Shell stopped after an unexpected error.

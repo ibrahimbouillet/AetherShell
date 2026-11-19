@@ -321,6 +321,9 @@ struct DesignTokens {
     // D63: the Liquid style, chosen in Settings: surfaces that can are drawn as pure water bending the desktop
     // picture (LiquidRenderer) instead of the Grain glass. Never in high contrast.
     bool liquid = false;
+    // D84: a Liquid form window (Settings) blurs only under its own content, and only as much as what lies behind it
+    // needs; elsewhere it is clear. Set by the application from Settings > Appearance; meaningful with `liquid` only.
+    bool liquidSmart = false;
     LiquidGlassTokens liquidGlass;   // D66: dark mode's band by default; MakeDesignTokens sets light mode's
     GlassTokens glass;
     FormTokens form;

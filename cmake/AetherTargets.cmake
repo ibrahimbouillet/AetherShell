@@ -135,3 +135,28 @@ function(aether_add_module_tests module)
             LABELS "network;${module}" TIMEOUT 300)
     endif()
 endfunction()
+
+# D83: gives a test executable the language packs built from tools/i18n (the ones a release publishes) in
+# AETHER_TEST_LANGUAGE_PACKS, when Python is here. Nothing in the source tree is written.
+function(aether_use_test_language_packs target)
+    if(NOT TARGET ${target})
+        return()
+    endif()
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(NOT Python3_Interpreter_FOUND)
+        return()
+    endif()
+    set(_packs "${CMAKE_BINARY_DIR}/language-packs")
+    if(NOT TARGET aether_test_language_packs)
+        file(GLOB _texts CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/tools/i18n/english/*.txt" "${PROJECT_SOURCE_DIR}/tools/i18n/languages/*.txt")
+        add_custom_command(OUTPUT "${_packs}/packs.stamp"
+            COMMAND Python3::Interpreter "${PROJECT_SOURCE_DIR}/tools/i18n/languages.py" packs "${_packs}"
+            COMMAND "${CMAKE_COMMAND}" -E touch "${_packs}/packs.stamp"
+            DEPENDS ${_texts} "${PROJECT_SOURCE_DIR}/tools/i18n/languages.py"
+            COMMENT "Language packs for the tests"
+            VERBATIM)
+        add_custom_target(aether_test_language_packs DEPENDS "${_packs}/packs.stamp")
+    endif()
+    add_dependencies(${target} aether_test_language_packs)
+    target_compile_definitions(${target} PRIVATE AETHER_TEST_LANGUAGE_PACKS="${_packs}")
+endfunction()

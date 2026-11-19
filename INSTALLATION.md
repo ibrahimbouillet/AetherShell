@@ -5,12 +5,14 @@
 🇸🇦 [العربية](docs/i18n/ar/INSTALLATION.md) · 🇧🇩 [বাংলা](docs/i18n/bn/INSTALLATION.md) · 🇵🇰 [اردو](docs/i18n/ur/INSTALLATION.md)
 
 Use only the setup executable from the [official repository's Releases page](https://github.com/ibrahimbouillet/AetherShell/releases).
-The current release, 3.5 [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3),
+The current release, Alpha 4 [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4),
 is a manual-install preview; wider Version 1 qualification remains open. The earlier
 [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) remains available.
 
 Run setup as your ordinary Windows user. Since Alpha 4 setup speaks the language you chose in Aether Shell's Settings
-or, without one, the first of your Windows display languages that is one of the interface's ten, and English otherwise. The wizard explains the product, displays the MIT license,
+or, without one, your Windows display language (any of the interface's 41), and English otherwise. After installing, setup
+downloads the interface languages your Windows has from the release (a few tens of KB each); offline, Aether Shell
+downloads them when it starts. The wizard explains the product, displays the MIT license,
 and lets you choose a folder (default `%LOCALAPPDATA%\Programs\AetherShell`), shortcuts and optional
 startup. It installs a stable launcher, a maintenance setup and versioned program files. It can
 create a Start Menu shortcut and a per-user entry in Windows Installed apps. No administrator
@@ -30,7 +32,7 @@ Unsigned application/setup binaries can trigger SmartScreen. This alpha has no A
 publisher certificate. Check the exact release source and SHA-256 before deciding to run it:
 
 ```powershell
-Get-FileHash .\AetherShell-0.3.5-alpha.3-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\AetherShell-0.4.0-alpha.4-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Compare with the corresponding checksums asset. A checksum alone does not authenticate a publisher.

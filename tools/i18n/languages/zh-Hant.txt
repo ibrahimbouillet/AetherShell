@@ -1,0 +1,2494 @@
+# Chinese (Traditional) (zh-Hant): 中文（繁體）. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: 請選擇 Windows 位置以啟用自動天氣。
+
+en: Windows taskbar visible
+tr: Windows 工作列可見
+
+en: Connected to {}
+tr: 已連線到 {}
+
+en: {} is out of range
+tr: {} 超出範圍
+
+en: Connecting to {} took too long
+tr: 連線到 {} 的時間過長
+
+en: Use Windows to join {}
+tr: 請使用 Windows 加入 {}
+
+en: Windows did not allow this connection
+tr: Windows 不允許此連線
+
+en: Could not connect to {}
+tr: 無法連線到 {}
+
+en: Connect to {}
+tr: 連線到 {}
+
+en: That password was not accepted. Check it and try again.
+tr: 不接受該密碼。請檢查後再試一次。
+
+en: Enter this network's password.
+tr: 輸入此網路的密碼。
+
+en: &Connect
+tr: 連線(&C)
+
+en: Windows Settings could not be opened
+tr: 無法開啟 Windows 設定
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: 無法為 Dock 保留空間；正在還原 Windows 工作列
+
+en: Replacement unavailable: recovery observer could not start
+tr: 無法取代：復原監看程式無法啟動
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: 已還原 Windows 工作列。無法為 Dock 保留空間；請關閉再重新開啟取代功能以重試。
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: 無法使用復原監看；正在還原 Windows 工作列
+
+en: Windows notifications could not be opened
+tr: 無法開啟 Windows 通知
+
+en: The Windows calendar could not be opened
+tr: 無法開啟 Windows 行事曆
+
+en: Windows did not show its hidden icons
+tr: Windows 未顯示其隱藏的圖示
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: 無法使用自動位置重新整理；請在天氣設定中重試。
+
+en: Windows location
+tr: Windows 位置
+
+en: Reading approximate Windows location…
+tr: 正在讀取 Windows 概略位置…
+
+en: Automatic weather follows approximate Windows location.
+tr: 自動天氣會依照 Windows 概略位置。
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windows 位置存取已遭封鎖。無法使用天氣。
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows 無法提供目前位置。無法使用天氣。
+
+en: Location worker unavailable. Weather is unavailable.
+tr: 位置背景工作無法使用。無法使用天氣。
+
+en: Waiting for Windows location permission…
+tr: 正在等候 Windows 位置權限…
+
+en: The automatic weather choice could not be saved.
+tr: 無法儲存自動天氣選擇。
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windows 位置存取無法使用或遭到拒絕。無法使用天氣。
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows 位置無法要求權限。請檢查 Windows 位置設定。
+
+en: Status worker unavailable
+tr: 狀態背景工作無法使用
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows 無法完成此動作。請檢查其設定。
+
+en: Reading Windows status; try the action again shortly
+tr: 正在讀取 Windows 狀態；請稍後再試一次此動作
+
+en: Could not disconnect
+tr: 無法中斷連線
+
+en: The Windows accessibility feature could not be started
+tr: 無法啟動 Windows 協助工具功能
+
+en: Windows could not change the audio output
+tr: Windows 無法變更音訊輸出
+
+en: The Windows control could not be opened
+tr: 無法開啟 Windows 控制項
+
+en: Keyboard shortcuts disabled
+tr: 鍵盤快速鍵已停用
+
+en: Both keyboard shortcuts registered
+tr: 兩個鍵盤快速鍵皆已註冊
+
+en: A keyboard shortcut is already in use by another application
+tr: 鍵盤快速鍵已被另一個應用程式使用
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: 無法要求 Windows 快速設定。若要使用 Aether 控制項，請在頂端列設定中清除「使用 Windows 快速設定」。
+
+en: Windows Start could not be opened
+tr: 無法開啟 Windows 開始
+
+en: Windows Task View could not be opened
+tr: 無法開啟 Windows 工作檢視
+
+en: Windows keyboard layout switching was unavailable
+tr: 無法切換 Windows 鍵盤配置
+
+en: Windows voice typing could not be opened
+tr: 無法開啟 Windows 語音輸入
+
+en: Windows taskbar could not be revealed
+tr: 無法顯示 Windows 工作列
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: 無法繼續取代工作列；Windows 仍可使用
+
+en: Windows taskbar replacement is unavailable in this session
+tr: 此工作階段無法使用 Windows 工作列取代
+
+en: Windows pin access is unavailable in this isolated session
+tr: 此隔離工作階段無法存取 Windows 釘選
+
+en: Windows pinned applications could not be read
+tr: 無法讀取 Windows 釘選的應用程式
+
+en: Settings changed during pin import. Try import again.
+tr: 匯入釘選期間設定已變更。請再次匯入。
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: 已另外儲存 {} 個釘選的應用程式。部分 Windows 釘選可能仍無法使用。
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: 釘選已在記憶體中變更；儲存失敗。請在設定中套用以重試。
+
+en: Pins updated in memory; saving...
+tr: 釘選已在記憶體中更新；正在儲存...
+
+en: Imported pins could not be applied
+tr: 無法套用匯入的釘選
+
+en: Pin import is unavailable while closing
+tr: 關閉期間無法匯入釘選
+
+en: Settings could not be saved
+tr: 無法儲存設定
+
+en: Quit without saving the latest changes?
+tr: 要結束而不儲存最新的變更嗎？
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: 先前的設定檔已保留。請讓 Aether Shell 保持開啟，以再次嘗試儲存。
+
+en: &Quit without saving
+tr: 結束而不儲存(&Q)
+
+en: &Keep Aether Shell open
+tr: 讓 Aether Shell 保持開啟(&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: 匯出基本診斷資訊 — 應用程式版本和 Windows 組建，不含記錄或個人資料
+
+en: Diagnostics exported.
+tr: 已匯出診斷資訊。
+
+en: Diagnostics could not be saved to the chosen file.
+tr: 無法將診斷資訊儲存至選擇的檔案。
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: 無法安全地讀取設定。已保留現有檔案。
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell 無法啟動其桌面介面。
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windows 工作列的還原仍在擱置中。請重試或關閉 Aether Shell。
+
+en: The Windows taskbar is shown temporarily.
+tr: 已暫時顯示 Windows 工作列。
+
+en: Windows taskbar restored.
+tr: 已還原 Windows 工作列。
+
+en: Windows taskbar replacement is active.
+tr: Windows 工作列取代已啟用。
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows 工作列仍可使用。稍後將重試取代。
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows 工作列仍可使用。請關閉再重新開啟取代功能以重試。
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: 已還原 Windows 工作列。取代功能將於稍後重新連線。
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: 已還原 Windows 工作列。請關閉再重新開啟取代功能以重試。
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: 工作列取代已停止。已還原 Windows 工作列。
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: 工作列取代已停止。無法確認 Windows 工作列是否已還原。
+
+en: Activating taskbar replacement...
+tr: 正在啟用工作列取代...
+
+en: Restoring Windows taskbar...
+tr: 正在還原 Windows 工作列...
+
+en: Reconnecting taskbar replacement...
+tr: 正在重新連線工作列取代...
+
+en: Showing the Windows taskbar temporarily...
+tr: 正在暫時顯示 Windows 工作列...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell 無法還原 Windows 工作列。
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: 請從工作管理員 (Ctrl+Shift+Esc) 重新啟動 Windows 檔案總管，或登出後再重新登入。
+
+en: The Windows taskbar was restored to its saved state.
+tr: 已將 Windows 工作列還原為其儲存的狀態。
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: 找不到儲存的工作列狀態。已顯示 Windows 工作列；其自動隱藏設定未變更。
+
+en: There was nothing to restore.
+tr: 沒有可還原的項目。
+
+en: Taskbar replacement is turned off.
+tr: 工作列取代已關閉。
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: 無法自動關閉工作列取代。請在 Aether Shell 設定 > 桌面中將其關閉。
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: 無法辨識或無效的 Aether Shell 命令列。
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell 無法建立其本機資料資料夾。
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell 因未預期的錯誤而停止。
+
+## search-names
+
+en: Disk Management
+tr: 磁碟管理
+
+en: Local Users and Groups
+tr: 本機使用者和群組
+
+en: Local Group Policy Editor
+tr: 本機群組原則編輯器
+
+en: Manage User Certificates
+tr: 管理使用者憑證
+
+en: Manage Computer Certificates
+tr: 管理電腦憑證
+
+en: Shared Folders
+tr: 共用資料夾
+
+en: TPM Management
+tr: TPM 管理
+
+en: Network Connections
+tr: 網路連線
+
+en: System Properties
+tr: 系統內容
+
+en: About Windows
+tr: 關於 Windows
+
+en: DirectX Diagnostic Tool
+tr: DirectX 診斷工具
+
+en: Windows Features
+tr: Windows 功能
+
+en: System Restore
+tr: 系統還原
+
+en: Advanced System Settings
+tr: 進階系統設定
+
+en: Volume Mixer
+tr: 音量混合程式
+
+en: Microsoft Management Console
+tr: Microsoft 管理主控台
+
+en: User Accounts (Advanced)
+tr: 使用者帳戶 (進階)
+
+en: Display settings
+tr: 顯示器設定
+
+en: Night light settings
+tr: 夜間光線設定
+
+en: Graphics settings
+tr: 圖形設定
+
+en: Sound settings
+tr: 音效設定
+
+en: Notification settings
+tr: 通知設定
+
+en: Power & battery settings
+tr: 電源與電池設定
+
+en: Energy saver settings
+tr: 省電模式設定
+
+en: Storage settings
+tr: 儲存體設定
+
+en: Multitasking settings
+tr: 多工設定
+
+en: Clipboard settings
+tr: 剪貼簿設定
+
+en: Remote Desktop settings
+tr: 遠端桌面設定
+
+en: About your PC
+tr: 關於您的電腦
+
+en: Bluetooth & devices settings
+tr: 藍牙與裝置設定
+
+en: Printers & scanners settings
+tr: 印表機與掃描器設定
+
+en: Mouse settings
+tr: 滑鼠設定
+
+en: Touchpad settings
+tr: 觸控板設定
+
+en: Network & internet settings
+tr: 網路和網際網路設定
+
+en: Wi-Fi settings
+tr: Wi-Fi 設定
+
+en: VPN settings
+tr: VPN 設定
+
+en: Proxy settings
+tr: Proxy 設定
+
+en: Airplane mode settings
+tr: 飛航模式設定
+
+en: Mobile hotspot settings
+tr: 行動熱點設定
+
+en: Background settings
+tr: 背景設定
+
+en: Color settings
+tr: 色彩設定
+
+en: Theme settings
+tr: 佈景主題設定
+
+en: Lock screen settings
+tr: 鎖定畫面設定
+
+en: Taskbar settings
+tr: 工作列設定
+
+en: Font settings
+tr: 字型設定
+
+en: Installed apps
+tr: 已安裝的應用程式
+
+en: Default apps settings
+tr: 預設應用程式設定
+
+en: Startup apps settings
+tr: 啟動應用程式設定
+
+en: Account info
+tr: 您的資訊
+
+en: Sign-in options
+tr: 登入選項
+
+en: Other users settings
+tr: 其他使用者設定
+
+en: Date & time settings
+tr: 日期和時間設定
+
+en: Language & region settings
+tr: 語言與地區設定
+
+en: Typing settings
+tr: 輸入設定
+
+en: Accessibility settings
+tr: 協助工具設定
+
+en: Privacy & security settings
+tr: 隱私權與安全性設定
+
+en: Location settings
+tr: 位置設定
+
+en: Windows Update settings
+tr: Windows Update 設定
+
+en: Recovery settings
+tr: 復原設定
+
+en: Activation settings
+tr: 啟用設定
+
+en: For developers settings
+tr: 開發人員專用設定
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: 無法連線到 GitHub。
+
+en: GitHub did not answer the request just now.
+tr: GitHub 目前未回應要求。
+
+en: The release did not pass verification, so nothing was installed.
+tr: 版本未通過驗證，因此未安裝任何內容。
+
+en: There is not enough free disk space.
+tr: 可用磁碟空間不足。
+
+en: Windows refused access to the update files.
+tr: Windows 拒絕存取更新檔案。
+
+en: {} bytes
+tr: {} 位元組
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: 狀態
+
+en: Check &now
+tr: 立即檢查(&N)
+
+en: Download and install
+tr: 下載並安裝
+
+en: &Later
+tr: 稍後(&L)
+
+en: S&kip this version
+tr: 略過此版本(&K)
+
+en: &Release details
+tr: 版本詳細資料(&R)
+
+en: Disable &notifications
+tr: 停用通知(&N)
+
+en: Release notes
+tr: 版本資訊
+
+en: the new version
+tr: 新版本
+
+en: Installed: {}.
+tr: 已安裝：{}。
+
+en: Automatic update checks are off
+tr: 自動更新檢查已關閉
+
+en: Check now looks for a newer release once.
+tr: 「立即檢查」會尋找一次較新的版本。
+
+en: Last checked {}
+tr: 上次檢查時間：{}
+
+en: Not checked yet
+tr: 尚未檢查
+
+en: Checking for updates...
+tr: 正在檢查更新...
+
+en: Aether Shell is up to date
+tr: Aether Shell 已是最新版本
+
+en: Latest published release: {}.
+tr: 最新發佈的版本：{}。
+
+en: Version {} is available
+tr: 有可用的版本 {}
+
+en: Download size: {}.
+tr: 下載大小：{}。
+
+en: Downloading version {}...
+tr: 正在下載版本 {}...
+
+en: Received {} of {} ({}%).
+tr: 已接收 {}/{} ({}%)。
+
+en: Received {}; total size unknown.
+tr: 已接收 {}；總大小未知。
+
+en: Version {} is ready to install
+tr: 版本 {} 已可安裝
+
+en: Verified with the signed release manifest and SHA-256.
+tr: 已使用簽署的版本資訊清單和 SHA-256 驗證。
+
+en: The update could not be completed
+tr: 無法完成更新
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: 目前需手動安裝：開啟「版本詳細資料」，然後下載並執行其安裝程式。
+
+en: Failure: {}.
+tr: 失敗：{}。
+
+en: Choose Retry Download to try again.
+tr: 選擇「重試下載」以再試一次。
+
+en: Use Check now to try again.
+tr: 使用「立即檢查」以再試一次。
+
+en: Next automatic check: {}.
+tr: 下次自動檢查：{}。
+
+en: &Install update
+tr: 安裝更新(&I)
+
+en: Retry &Download
+tr: 重試下載(&D)
+
+en: &Download and install
+tr: 下載並安裝(&D)
+
+en: Windows' startup state could not be read in this session.
+tr: 無法在此工作階段中讀取 Windows 的啟動狀態。
+
+en: Windows will start it at your next sign-in.
+tr: Windows 會在您下次登入時啟動它。
+
+en: Right now it will not start at sign-in.
+tr: 目前它不會在登入時啟動。
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: 它已在工作管理員或 Windows 設定中關閉；在該處重新開啟之前，將以該處的設定為準。
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows 會啟動另一個 Aether Shell 複本。
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows 回報了此版本無法讀取的啟動狀態。
+
+en: The close action could not be completed.
+tr: 無法完成關閉動作。
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: 儲存前請輸入完整的數字；標示為紅色的欄位不是數字。
+
+en: Settings could not be validated.
+tr: 無法驗證設定。
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: 由於無法儲存設定，登入時啟動維持不變。
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: 無法儲存設定，也無法還原 Windows 的登入時啟動。請再次套用以重試。
+
+en: Settings saved.
+tr: 已儲存設定。
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: 設定已在記憶體中變更；儲存失敗。請再次套用以重試。
+
+en: Settings could not be applied.
+tr: 無法套用設定。
+
+en: Some values were corrected to their supported range.
+tr: 部分值已修正為支援的範圍。
+
+en: Startup registration is unavailable in this session.
+tr: 此工作階段無法使用啟動登錄。
+
+en: Changing startup registration...
+tr: 正在變更啟動登錄...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows 未變更啟動登錄。請檢查工作管理員的啟動設定。
+
+en: Startup registration could not be changed.
+tr: 無法變更啟動登錄。
+
+en: Defaults saved; startup is disabled.
+tr: 已儲存預設值；已停用啟動。
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: 已套用預設值；儲存失敗。請再次套用以重試。
+
+en: Defaults could not be applied.
+tr: 無法套用預設值。
+
+en: Startup was not disabled; settings were kept.
+tr: 未停用啟動；已保留設定。
+
+en: Location search is unavailable.
+tr: 無法使用位置搜尋。
+
+en: Searching Open-Meteo locations...
+tr: 正在搜尋 Open-Meteo 位置...
+
+en: Location search failed. Check your connection and try again.
+tr: 位置搜尋失敗。請檢查您的連線，然後再試一次。
+
+en: No place matched that search.
+tr: 沒有符合該搜尋的地點。
+
+en: Choose a location to save it.
+tr: 選擇要儲存的位置。
+
+en: Reset all settings?
+tr: 要重設所有設定嗎？
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: 喜好設定和釘選的應用程式會回復為預設值，且登入時啟動會關閉。
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: 您的 Windows 工作列選擇會保留。目前設定檔的備份也會保留。
+
+en: &Reset
+tr: 重設(&R)
+
+en: Cancel
+tr: 取消
+
+en: Pinned applications saved.
+tr: 已儲存釘選的應用程式。
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: 釘選已在記憶體中變更；儲存失敗。請再次套用以重試。
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: 由於無法使用啟動登錄，因此無法還原預設值。
+
+en: Pinned application could not be added.
+tr: 無法新增釘選的應用程式。
+
+en: Choose an application to add first.
+tr: 請先選擇要新增的應用程式。
+
+en: Pinned applications could not be changed.
+tr: 無法變更釘選的應用程式。
+
+en: Choose a pinned application first.
+tr: 請先選擇釘選的應用程式。
+
+en: Desktop status is unavailable in this session.
+tr: 此工作階段無法使用桌面狀態。
+
+en: Desktop status is unavailable.
+tr: 無法使用桌面狀態。
+
+en: Password
+tr: 密碼
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: 正在從 GitHub 下載 {}（{}）。在準備就緒之前會顯示英文。
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: 無法下載 {}。下載完成之前會顯示英文；請選擇下方的「下載」再試一次。
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: 此電腦上還沒有 {}。下載完成之前會顯示英文。
+
+en: {} is on this PC.
+tr: {} 已在此電腦上。
+
+en: Every language is on this PC.
+tr: 所有語言都已在此電腦上。
+
+en: Choose a language to download first.
+tr: 請先選擇要下載的語言。
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: 頂端列
+
+en: Weather
+tr: 天氣
+
+en: Updates
+tr: 更新
+
+en: General
+tr: 一般
+
+en: About
+tr: 關於
+
+en: Desktop
+tr: 桌面
+
+en: Appearance
+tr: 外觀
+
+en: Welcome
+tr: 歡迎
+
+en: Aether Shell Settings
+tr: Aether Shell 設定
+
+en: Settings
+tr: 設定
+
+en: Reset defaults...
+tr: 重設為預設值...
+
+en: &Apply
+tr: 套用(&A)
+
+en: Liquid
+tr: 液態
+
+en: Grain
+tr: 磨砂
+
+en: From {} to {}
+tr: 從 {} 到 {}
+
+en: px
+tr: px
+
+en: min
+tr: 分鐘
+
+en: h
+tr: 小時
+
+en: This action could not be completed.
+tr: 無法完成此動作。
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: 大小、間距、動態效果，以及釘選到 Dock 的應用程式。
+
+en: Size and spacing
+tr: 大小與間距
+
+en: Icon size
+tr: 圖示大小
+
+en: {}, scaled with the Windows display scale.
+tr: {}，依 Windows 顯示比例縮放。
+
+en: Bottom margin
+tr: 下邊界
+
+en: Space between the Dock and the bottom of the screen.
+tr: Dock 與螢幕底部之間的空間。
+
+en: Minimum side margin
+tr: 最小側邊界
+
+en: Space kept free at the left and right screen edges.
+tr: 螢幕左右邊緣保留的空白空間。
+
+en: Icon spacing
+tr: 圖示間距
+
+en: Space between neighbouring icons.
+tr: 相鄰圖示之間的空間。
+
+en: Glass and motion
+tr: 玻璃與動態效果
+
+en: Glass opacity
+tr: 玻璃不透明度
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: 值越低，Dock 後方模糊的桌面就顯示得越多。
+
+en: Hover magnification
+tr: 暫留放大
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: 指標停留時圖示放大的程度；1 表示關閉。
+
+en: Behavior
+tr: 行為
+
+en: Show running applications
+tr: 顯示執行中的應用程式
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: 未釘選的已開啟應用程式會顯示在釘選的應用程式之後。
+
+en: Reserve screen space for the Dock
+tr: 為 Dock 保留螢幕空間
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: 最大化的視窗會停留在 Dock 上方，而不是在其下方。
+
+en: Automatically hide the Dock
+tr: 自動隱藏 Dock
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: 應用程式視窗遮住它時會隱藏；將指標移到螢幕底部邊緣即可顯示。它在桌面上會保持顯示，且視窗可使用完整的螢幕高度。
+
+en: Pinned applications
+tr: 釘選的應用程式
+
+en: Move &up
+tr: 上移(&U)
+
+en: Move &down
+tr: 下移(&D)
+
+en: &Remove
+tr: 移除(&R)
+
+en: &Add application
+tr: 新增應用程式(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: 釘選會保留其識別和啟動設定。移除釘選也會讓 Windows 工作列自動同步不再將其加回。
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: 頂端狀態列中顯示的位置、時鐘和狀態項目。
+
+en: Presentation
+tr: 呈現方式
+
+en: Floating bar
+tr: 浮動列
+
+en: Text on the desktop
+tr: 桌面上的文字
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: 浮動列：位於螢幕頂端下方的玻璃列。桌面上的文字：沒有列，相同的項目直接寫在螢幕最上方的桌面圖片上；該區域不會被視窗佔用，且上邊界和玻璃不透明度不適用。啟用自動隱藏時，只要下方有視窗，文字就會回到一條玻璃帶上。
+
+en: Position and glass
+tr: 位置與玻璃
+
+en: Top margin
+tr: 上邊界
+
+en: Space between the Top Bar and the top of the screen.
+tr: 頂端列與螢幕頂端之間的空間。
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: 值越低，列後方模糊的桌面就顯示得越多。
+
+en: Clock
+tr: 時鐘
+
+en: Clock format
+tr: 時鐘格式
+
+en: Follow Windows
+tr: 遵循 Windows
+
+en: 12-hour
+tr: 12 小時制
+
+en: 24-hour
+tr: 24 小時制
+
+en: Date style
+tr: 日期樣式
+
+en: Weekday, day and month
+tr: 星期、日和月
+
+en: Short
+tr: 簡短
+
+en: Long
+tr: 完整
+
+en: Show seconds
+tr: 顯示秒數
+
+en: Show date
+tr: 顯示日期
+
+en: Status items
+tr: 狀態項目
+
+en: Show battery
+tr: 顯示電池
+
+en: Hide battery when absent
+tr: 沒有電池時隱藏電池
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: 沒有電池的桌上型電腦不會顯示任何內容，而不是顯示未知的電池。
+
+en: Show input language
+tr: 顯示輸入語言
+
+en: Show network
+tr: 顯示網路
+
+en: Show audio output
+tr: 顯示音訊輸出
+
+en: Show microphone
+tr: 顯示麥克風
+
+en: Show weather when enabled
+tr: 啟用時顯示天氣
+
+en: Weather itself is turned on in Weather settings.
+tr: 天氣本身需在天氣設定中開啟。
+
+en: Show hidden icons button
+tr: 顯示「顯示隱藏的圖示」按鈕
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: 開啟 Windows 隱藏的通知區域圖示的小型箭號。
+
+en: Reserve screen space above windows
+tr: 在視窗上方保留螢幕空間
+
+en: Maximized windows stay below the Top Bar.
+tr: 最大化的視窗會停留在頂端列下方。
+
+en: Automatically hide the Top Bar
+tr: 自動隱藏頂端列
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: 應用程式視窗遮住它時會隱藏；將指標移到螢幕頂端邊緣即可顯示。它在桌面上會保持顯示。
+
+en: Use Windows Quick Settings (Windows 11)
+tr: 使用 Windows 快速設定 (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: 關閉：Aether 的快速控制項會在頂端列下方開啟。開啟：Windows 本身的面板會在螢幕底部開啟。
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: 頂端列中的選用天氣預報，由 Open-Meteo 提供。
+
+en: Forecast
+tr: 天氣預報
+
+en: Enable weather
+tr: 啟用天氣
+
+en: Off by default: the forecast needs network requests.
+tr: 預設為關閉：天氣預報需要網路要求。
+
+en: Temperature
+tr: 溫度
+
+en: Celsius
+tr: 攝氏
+
+en: Fahrenheit
+tr: 華氏
+
+en: Refresh interval
+tr: 重新整理間隔
+
+en: Location
+tr: 位置
+
+en: Locate automatically with Windows
+tr: 使用 Windows 自動定位
+
+en: Uses the Windows location service after you allow it.
+tr: 在您允許後使用 Windows 定位服務。
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows 會要求位置權限。您的座標只會傳送到 Open-Meteo.com 以取得天氣預報；位置金鑰會快取在本機。如果位置遭到封鎖，將無法使用天氣。
+
+en: Use &Windows location
+tr: 使用 Windows 位置(&W)
+
+en: Location &settings
+tr: 位置設定(&S)
+
+en: Choose automatic location or search for a place below.
+tr: 選擇自動位置，或在下方搜尋地點。
+
+en: Search for a place
+tr: 搜尋地點
+
+en: Searc&h
+tr: 搜尋(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: 天氣資料由 Open-Meteo.com 提供 (CC BY 4.0)。手動搜尋只會傳送您輸入的文字。
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: 來自官方 GitHub 存放庫的已簽署版本，安裝前會經過驗證。
+
+en: Preferences
+tr: 喜好設定
+
+en: Check for updates automatically
+tr: 自動檢查更新
+
+en: Check interval
+tr: 檢查間隔
+
+en: Release channel
+tr: 發行通道
+
+en: Prereleases arrive earlier and change more often.
+tr: 發行前版本較早推出，變更也較頻繁。
+
+en: Stable
+tr: 穩定版
+
+en: Prerelease
+tr: 發行前版本
+
+en: Show update notifications
+tr: 顯示更新通知
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: 啟動、動態效果、鍵盤快速鍵和診斷。
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: 列、功能表、搜尋、設定和安裝程式的語言。
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: 屬於您或其他程式的名稱 (應用程式、檔案、Wi-Fi 網路) 一律不會翻譯。選擇語言後，頂端列會以該語言顯示日期；「遵循 Windows」會保留您的 Windows 地區格式。
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: 手寫歡迎訊息使用拉丁字母書寫：以法文、英文或西班牙文問候。請在「歡迎」中選擇其語言。
+
+en: Language
+tr: 語言
+
+en: Interface language
+tr: 顯示語言
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: 「遵循 Windows」會使用您的 Windows 顯示語言中第一個屬於這些語言的語言，否則使用英文。
+
+en: Startup
+tr: 啟動
+
+en: Start Aether Shell when I sign in
+tr: 登入時啟動 Aether Shell
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: 變更此設定需要套用。工作管理員也可以將其關閉。
+
+en: Motion
+tr: 動態效果
+
+en: Reduced motion removes decorative movement everywhere.
+tr: 「減少」會移除所有地方的裝飾性動態效果。
+
+en: Reduced
+tr: 減少
+
+en: Full
+tr: 完整
+
+en: Keyboard shortcuts
+tr: 鍵盤快速鍵
+
+en: Enable global keyboard shortcuts
+tr: 啟用全域鍵盤快速鍵
+
+en: Search shortcut key
+tr: 搜尋快速鍵按鍵
+
+en: Dock shortcut key
+tr: Dock 快速鍵按鍵
+
+en: Search shortcut modifiers
+tr: 搜尋快速鍵輔助按鍵
+
+en: Dock shortcut modifiers
+tr: Dock 快速鍵輔助按鍵
+
+en: Shortcut status unavailable
+tr: 無法取得快速鍵狀態
+
+en: Diagnostics
+tr: 診斷
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: 記錄資料夾存放此電腦的 Aether Shell 記錄。匯出診斷資訊只會儲存應用程式版本和 Windows 組建 - 不含記錄或個人資料。
+
+en: Open &log folder
+tr: 開啟記錄資料夾(&L)
+
+en: &Export diagnostics...
+tr: 匯出診斷資訊(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: 您登入或解除鎖定電腦後，桌面上出現的簡短手寫問候。
+
+en: Greeting
+tr: 問候
+
+en: Show the welcome at sign-in and unlock
+tr: 在登入和解除鎖定時顯示歡迎
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: 會在 Windows 讓您登入後、Aether Shell 準備就緒期間出現。觸控、按一下或按 Esc 即可略過。
+
+en: Greeting language
+tr: 問候語言
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: 法文為 Salut，英文為 Hello，西班牙文為 Hola。筆跡使用拉丁字母書寫：在其他所有語言中都會以英文問候。
+
+en: Your name
+tr: 您的名稱
+
+en: Name to greet you with
+tr: 用於問候您的名稱
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: 選用，例如名字。它只會保留在此電腦的 Aether Shell 設定中，絕不會傳送到任何地方或寫入記錄。清除欄位即可移除。
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: 色彩模式、輔色、動態效果速度，以及 Dock 和頂端列的外觀。
+
+en: Style
+tr: 樣式
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: 液態：疊在後方內容上的多層玻璃、一層模糊層、液體的光線，接著是圖示和文字，在淺色和深色頁面上都能保持清晰易讀。磨砂：模糊且半透明的毛玻璃，帶有細緻顆粒。
+
+en: Liquid blur
+tr: 液態模糊
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: 液態玻璃下方的模糊層覆蓋後方內容的程度：100% 會全部模糊。值越低，頁面顯示得越清晰，但列上的文字在內容繁雜的頁面上可能較不易閱讀。
+
+en: Liquid blur color
+tr: 液態模糊色彩
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: 「自動」會保留玻璃本身的色彩。無論色彩為何，文字和圖示都能保持清晰易讀。
+
+en: Automatic
+tr: 自動
+
+en: White
+tr: 白色
+
+en: Black
+tr: 黑色
+
+en: Accent
+tr: 輔色
+
+en: Blue
+tr: 藍色
+
+en: Violet
+tr: 紫色
+
+en: Pink
+tr: 粉紅色
+
+en: Red
+tr: 紅色
+
+en: Orange
+tr: 橙色
+
+en: Yellow
+tr: 黃色
+
+en: Green
+tr: 綠色
+
+en: Teal
+tr: 藍綠色
+
+en: Liquid color strength
+tr: 液態色彩強度
+
+en: How much of the chosen color the blur layer takes.
+tr: 模糊層套用所選色彩的程度。
+
+en: Theme
+tr: 佈景主題
+
+en: Color mode
+tr: 色彩模式
+
+en: High contrast always takes precedence.
+tr: 高對比一律優先。
+
+en: Light
+tr: 淺色
+
+en: Dark
+tr: 深色
+
+en: Accent color
+tr: 輔色
+
+en: Animation duration
+tr: 動畫持續時間
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 為標準速度；值越高越慢。「減少」動態效果優先。
+
+en: Dock icon preset
+tr: Dock 圖示預設
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: 在您選擇預設之前，會保留 Dock 設定中的自訂大小。
+
+en: Small - 32 px
+tr: 小 - 32 px
+
+en: Medium - 40 px
+tr: 中 - 40 px
+
+en: Large - 48 px
+tr: 大 - 48 px
+
+en: Keep custom size
+tr: 保留自訂大小
+
+en: Show Windows Start in the Dock
+tr: 在 Dock 中顯示 Windows 開始
+
+en: Show Task View in the Dock
+tr: 在 Dock 中顯示工作檢視
+
+en: Reserve extra space for Dock animations
+tr: 為 Dock 動畫保留額外空間
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: 讓放大效果和啟動彈跳不會碰到最大化的視窗。
+
+en: Weather position
+tr: 天氣位置
+
+en: Left
+tr: 左
+
+en: Right
+tr: 右
+
+en: Keyboard indicator
+tr: 鍵盤指示器
+
+en: Compact
+tr: 精簡
+
+en: Two lines
+tr: 兩行
+
+en: Windows taskbar pins
+tr: Windows 工作列釘選
+
+en: Add newly discovered Windows taskbar pins
+tr: 新增新發現的 Windows 工作列釘選
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: 取代工作列期間，新的 Windows 釘選會新增至 Dock。
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: 以 Dock 取代 Windows 工作列 (可還原)。
+
+en: Taskbar replacement
+tr: 工作列取代
+
+en: Replace the Windows taskbar
+tr: 取代 Windows 工作列
+
+en: Changing this needs Apply.
+tr: 變更此設定需要套用。
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Aether Shell 執行時會隱藏 Windows 工作列，並在最大化的應用程式下方保留空間。
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: 停用此模式或結束 Aether Shell 時，會還原 Windows 工作列狀態。如果應用程式意外停止，另一個獨立的復原協助程式也會將其還原。如果復原失敗，請在工作管理員中重新啟動 Windows 檔案總管。
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows 設定仍是原生的 Windows 介面。其工作列頁面不會被 Aether Shell 取代；請在這裡設定此模式。
+
+en: Pinned applications from Windows
+tr: 來自 Windows 的釘選應用程式
+
+en: &Import Windows taskbar pins
+tr: 匯入 Windows 工作列釘選(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: 讀取釘選的捷徑，而不變更 Windows 釘選。部分 Windows 11 釘選或其順序可能無法使用。
+
+en: Version {}
+tr: 版本 {}
+
+en: Created by Ibrahim Bouillet
+tr: 由 Ibrahim Bouillet 建立
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: 原生 Windows 桌面介面 - 浮動 Dock 和頂端狀態列 - 與檔案總管並行執行。
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: 天氣資料：Open-Meteo.com (CC BY 4.0)。未隨附任何協力廠商 C++ 執行階段程式庫。
+
+en: &Official project
+tr: 官方專案(&O)
+
+en: Licence
+tr: 授權
+
+en: Taskbar replacement changes need Apply.
+tr: 工作列取代的變更需要套用。
+
+en: Changes save automatically. Startup needs Apply.
+tr: 變更會自動儲存。啟動需要套用。
+
+en: Changes save automatically.
+tr: 變更會自動儲存。
+
+en: Press Apply to confirm this change.
+tr: 按「套用」以確認此變更。
+
+en: Smart transparency
+tr: 智慧透明
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: 在液態樣式中，此視窗只會在自身的文字和控制項下方進行模糊：位於其他視窗和桌面圖示上方時完全模糊，位於桌面圖片上方時稍微模糊，未顯示任何內容之處則完全不模糊。
+
+en: Languages on this PC
+tr: 此電腦上的語言
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell 會下載 Windows 中已有的語言，因此會隨 Windows 一起切換語言。
+
+en: Add a language
+tr: 新增語言
+
+en: &Download
+tr: 下載(&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: 每種語言都來自此版本的 GitHub 發行版，使用前會經過檢查。下載到此電腦後，請在上方選擇它。
+
+en: built in
+tr: 內建
+
+en: downloading, {}
+tr: 正在下載，{}
+
+en: download failed
+tr: 下載失敗
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell 安裝程式
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: 安裝程式無法建立其介面。請將其關閉後再試一次，或使用文件中說明的無訊息安裝選項。
+
+en: Options
+tr: 選項
+
+en: Install
+tr: 安裝
+
+en: Done
+tr: 完成
+
+en: Remove Aether Shell
+tr: 移除 Aether Shell
+
+en: Repair Aether Shell
+tr: 修復 Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: 適用於 Windows 的原生 Dock 和頂端狀態列，與檔案總管並行執行。
+
+en: Replaces the Windows taskbar while it runs
+tr: 執行時會取代 Windows 工作列
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: 若要取回 Windows 工作列，請結束 Aether Shell、在 設定 > 桌面 中關閉此功能，或從開始功能表開啟「還原 Windows 工作列」。
+
+en: Starts when you sign in - your choice
+tr: 登入時啟動 - 由您選擇
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: 新安裝預設會在登入時啟動。您可以在安裝前清除此選擇，或稍後在設定中將其關閉。現有的啟動選擇和工作管理員中的停用設定會保留。
+
+en: Installs for your account
+tr: 為您的帳戶安裝
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: 不需要系統管理員權限。您的設定和資料會保留在您的使用者設定檔中。
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: 除非您選擇移除，否則解除安裝會保留您的設定和資料。
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: 修復會還原此套件的檔案並保留您的設定。如果 Aether Shell 讓 Windows 工作列保持隱藏，修復會將其還原。
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: 覆蓋現有版本安裝會保留您的設定。除非您明確允許降級，否則會拒絕較舊的套件。
+
+en: MIT License
+tr: MIT 授權
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: 授權也會以 LICENSE 的形式安裝在 Aether Shell 旁。
+
+en: Remove this installation
+tr: 移除此安裝
+
+en: Install location
+tr: 安裝位置
+
+en: &Browse...
+tr: 瀏覽(&B)...
+
+en: Also remove my settings, cache and logs
+tr: 同時移除我的設定、快取和記錄
+
+en: This cannot be undone.
+tr: 此動作無法復原。
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: 安裝程式會正常關閉 Aether Shell，並移除其已安裝的檔案、捷徑、啟動項目和在「已安裝的應用程式」中的登錄。其他應用程式和 Windows 設定不會受到影響。
+
+en: Your welcome
+tr: 您的歡迎
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: 您登入或解除鎖定電腦後，Aether Shell 會手寫一段簡短的問候。請輸入它問候您時要使用的名稱，或保留空白以使用簡單的 Hello。
+
+en: Your first name
+tr: 您的名字
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: 選用，例如名字。它只會保留在此電腦的 Aether Shell 設定中，絕不會傳送到任何地方。您可以在 設定 > 歡迎 中變更它或關閉歡迎。
+
+en: Shortcuts and startup
+tr: 捷徑和啟動
+
+en: Create Start menu shortcuts
+tr: 建立開始功能表捷徑
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell 和「還原 Windows 工作列」。
+
+en: Create a desktop shortcut
+tr: 建立桌面捷徑
+
+en: Shows your current choice.
+tr: 顯示您目前的選擇。
+
+en: Recommended.
+tr: 建議。
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: 清除即可退出；工作管理員中的停用設定會受到遵循。
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: 進行安裝即表示接受上述啟動選擇。啟動器可在當機後重新啟動 Aether Shell，並有重試次數上限。結束和「還原 Windows 工作列」仍可使用。天氣預設為關閉。未簽署的二進位檔可能會觸發 Windows SmartScreen 警告。
+
+en: Removing this installation...
+tr: 正在移除此安裝...
+
+en: Repairing Aether Shell...
+tr: 正在修復 Aether Shell...
+
+en: Installing Aether Shell...
+tr: 正在安裝 Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: 正在關閉 Aether Shell 並移除其檔案。
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: 正在驗證內嵌套件並安裝其檔案。進度會以活動方式顯示：安裝程式不知道剩餘時間。
+
+en: Please wait while the removal completes.
+tr: 請稍候，正在完成移除。
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: 在新版本啟用之前都可以取消；之後安裝程式會安全地完成。
+
+en: Aether Shell was uninstalled.
+tr: 已解除安裝 Aether Shell。
+
+en: Aether Shell is ready.
+tr: Aether Shell 已準備就緒。
+
+en: Setup was cancelled.
+tr: 已取消安裝。
+
+en: Setup could not complete.
+tr: 安裝無法完成。
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: 除非您明確選擇移除，否則已保留您的資料。
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: 您可以從 Windows 設定 > 應用程式 > 已安裝的應用程式進行修復或解除安裝。
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: 作業已在啟用前取消。請返回「選項」再試一次。
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: 請檢查檔案存取權和可用磁碟空間，然後再試一次。如果 Aether Shell 已存在，修復可還原其檔案。錯誤類別：{}
+
+en: Setup log
+tr: 安裝記錄
+
+en: Launch Aether Shell
+tr: 啟動 Aether Shell
+
+en: &Back
+tr: 上一步(&B)
+
+en: &Next
+tr: 下一步(&N)
+
+en: &Continue
+tr: 繼續(&C)
+
+en: &Uninstall
+tr: 解除安裝(&U)
+
+en: &Repair
+tr: 修復(&R)
+
+en: &Install
+tr: 安裝(&I)
+
+en: &Close
+tr: 關閉(&C)
+
+en: Step {} of {}: {}
+tr: 第 {} 步，共 {} 步：{}
+
+en: Choose the Aether Shell installation folder
+tr: 選擇 Aether Shell 安裝資料夾
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: 請選擇完整的資料夾路徑，例如以磁碟機代號開頭的路徑。
+
+en: The install folder must be an absolute path.
+tr: 安裝資料夾必須是絕對路徑。
+
+en: Setup stops at the next safe point.
+tr: 安裝程式會在下一個安全點停止。
+
+en: Cancelling...
+tr: 正在取消...
+
+en: Setup is finishing the current step safely; please wait.
+tr: 安裝程式正在安全地完成目前的步驟；請稍候。
+
+en: Updating Aether Shell
+tr: 正在更新 Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: 正在驗證已簽署的套件並套用更新。
+
+en: Update completed
+tr: 更新完成
+
+en: The update did not complete
+tr: 更新未完成
+
+en: Close
+tr: 關閉
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: 更新介面無法啟動。尚未套用更新。請再試一次或使用修復。
+
+en: Aether Shell Update
+tr: Aether Shell 更新
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: 更新介面無法啟動。尚未套用更新。請再試一次，或在 Windows 設定 > 應用程式 > 已安裝的應用程式中使用修復。
+
+en: Update completed.
+tr: 更新完成。
+
+en: Update did not complete. See the updater log or use Repair.
+tr: 更新未完成。請查看更新程式記錄或使用修復。
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell 無法啟動。請在 Windows 設定 > 應用程式 > 已安裝的應用程式中選擇修復。
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell 設定 — 正在更新
+
+## shell
+
+en: &Resume taskbar replacement
+tr: 繼續取代工作列(&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: 顯示 Windows 通知區域 60 秒(&N)
+
+en: &Search…
+tr: 搜尋(&S)…
+
+en: &Settings…
+tr: 設定(&S)…
+
+en: View available &update…
+tr: 檢視可用的更新(&U)…
+
+en: &Check for updates…
+tr: 檢查更新(&C)…
+
+en: &About Aether Shell
+tr: 關於 Aether Shell(&A)
+
+en: &Quit Aether Shell
+tr: 結束 Aether Shell(&Q)
+
+en: Switch &input language\tWin+Space
+tr: 切換輸入語言(&I)\tWin+Space
+
+en: Open &network controls…
+tr: 開啟網路控制項(&N)…
+
+en: &Weather settings…
+tr: 天氣設定(&W)…
+
+en: Toggle output &mute
+tr: 切換輸出靜音(&M)
+
+en: &Sound settings…
+tr: 音效設定(&S)…
+
+en: Toggle microphone &mute
+tr: 切換麥克風靜音(&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: 啟動 Windows 語音輸入(&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: 麥克風隱私權設定(&P)…
+
+en: &Power settings…
+tr: 電源設定(&P)…
+
+en: Open &notifications and calendar
+tr: 開啟通知和行事曆(&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: 開啟行事曆(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: 顯示隱藏的圖示(&H)
+
+en: Initializing
+tr: 正在初始化
+
+en: Unavailable
+tr: 無法使用
+
+en: Unsupported
+tr: 不支援
+
+en: Error
+tr: 錯誤
+
+en: Available
+tr: 可用
+
+en: Unknown
+tr: 未知
+
+en: Internet access
+tr: 網際網路存取
+
+en: Local network only
+tr: 僅限區域網路
+
+en: Limited Internet access
+tr: 有限的網際網路存取
+
+en: No network connection
+tr: 沒有網路連線
+
+en: Connectivity unknown
+tr: 連線狀態未知
+
+en: Ethernet
+tr: 乙太網路
+
+en: Cellular
+tr: 行動數據
+
+en: Network
+tr: 網路
+
+en: Offline
+tr: 離線
+
+en: Network status unavailable
+tr: 無法取得網路狀態
+
+en: Quick controls
+tr: 快速控制項
+
+en: Aether Shell menu
+tr: Aether Shell 功能表
+
+en: Weather status unavailable
+tr: 無法取得天氣狀態
+
+en: Cached weather
+tr: 快取的天氣
+
+en: Observation (UTC): {}
+tr: 觀測時間 (UTC)：{}
+
+en: Weather: {}
+tr: 天氣：{}
+
+en: Click to open weather settings
+tr: 按一下以開啟天氣設定
+
+en: Show hidden icons
+tr: 顯示隱藏的圖示
+
+en: Opens Windows' notification-area overflow
+tr: 開啟 Windows 通知區域溢位
+
+en: Input language: {}
+tr: 輸入語言：{}
+
+en: Fallback input layout
+tr: 後援輸入配置
+
+en: Click to switch input language (Win+Space)
+tr: 按一下以切換輸入語言 (Win+Space)
+
+en: Network: {}
+tr: 網路：{}
+
+en: Signal strength unavailable
+tr: 無法取得訊號強度
+
+en: Click to open Windows network settings
+tr: 按一下以開啟 Windows 網路設定
+
+en: Audio output
+tr: 音訊輸出
+
+en: Audio: {}
+tr: 音訊：{}
+
+en: volume unknown
+tr: 音量未知
+
+en: Muted
+tr: 已靜音
+
+en: Sound on
+tr: 音效已開啟
+
+en: Microphone: {}
+tr: 麥克風：{}
+
+en: Endpoint unmuted
+tr: 端點已取消靜音
+
+en: Recording detection unsupported
+tr: 不支援錄音偵測
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: 按一下以切換靜音；按一下滑鼠右鍵以使用 Windows 語音輸入和麥克風隱私權設定
+
+en: Battery: {}
+tr: 電池：{}
+
+en: Battery {}
+tr: 電池 {}
+
+en: Battery status unavailable
+tr: 無法取得電池狀態
+
+en: Charging
+tr: 正在充電
+
+en: External power
+tr: 外部電源
+
+en: Estimated remaining: {} h {} min
+tr: 預估剩餘時間：{} 小時 {} 分鐘
+
+en: Click to open power settings
+tr: 按一下以開啟電源設定
+
+en: Clock status unavailable
+tr: 無法取得時鐘狀態
+
+en: Click to open calendar and notifications
+tr: 按一下以開啟行事曆和通知
+
+en: Action failed: {}
+tr: 動作失敗：{}
+
+en: Aether Shell status bar
+tr: Aether Shell 狀態列
+
+en: Update available
+tr: 有可用的更新
+
+en: Cached
+tr: 已快取
+
+en: Start
+tr: 開始
+
+en: Search
+tr: 搜尋
+
+en: Task View
+tr: 工作檢視
+
+en: Application
+tr: 應用程式
+
+en: Running application
+tr: 執行中的應用程式
+
+en: More applications
+tr: 更多應用程式
+
+en: Aether Shell window previews
+tr: Aether Shell 視窗預覽
+
+en: Minimized — preview unavailable
+tr: 已最小化 — 無法預覽
+
+en: Preview unavailable
+tr: 無法預覽
+
+en: {} windows
+tr: {} 個視窗
+
+en: {} window
+tr: {} 個視窗
+
+en: Switches to this window
+tr: 切換到此視窗
+
+en: Minimized, preview unavailable
+tr: 已最小化，無法預覽
+
+en: Minimized
+tr: 已最小化
+
+en: Close {}
+tr: 關閉 {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: 要求此視窗關閉；應用程式仍可要求儲存或取消
+
+en: Close requested
+tr: 已要求關閉
+
+en: Previous applications
+tr: 先前的應用程式
+
+en: Open
+tr: 開啟
+
+en: New instance
+tr: 新執行個體
+
+en: Unpin from Dock
+tr: 從 Dock 取消釘選
+
+en: Pin to Dock
+tr: 釘選到 Dock
+
+en: Move left
+tr: 向左移
+
+en: Move right
+tr: 向右移
+
+en: Dock settings...
+tr: Dock 設定...
+
+en: Import Windows taskbar pins
+tr: 匯入 Windows 工作列釘選
+
+en: Open Windows Start
+tr: 開啟 Windows 開始
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: 已釘選
+
+en: Running
+tr: 執行中
+
+en: Needs attention
+tr: 需要注意
+
+en: Up arrow shows window previews
+tr: 按向上鍵可顯示視窗預覽
+
+en: Installed application
+tr: 已安裝的應用程式
+
+en: Desktop application
+tr: 桌面應用程式
+
+en: File
+tr: 檔案
+
+en: Folder
+tr: 資料夾
+
+en: Windows tool
+tr: Windows 工具
+
+en: Control Panel
+tr: 控制台
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ 瀏覽   ·   Enter 開啟   ·   Esc 關閉
+
+en: Search apps, settings and files
+tr: 搜尋應用程式、設定和檔案
+
+en: Search could not be completed.
+tr: 無法完成搜尋。
+
+en: Results
+tr: 結果
+
+en: Indexing applications…
+tr: 正在為應用程式編製索引…
+
+en: Type to search apps, settings and files
+tr: 輸入以搜尋應用程式、設定和檔案
+
+en: Nothing matches
+tr: 沒有相符的項目
+
+en: Windows could not open this application.
+tr: Windows 無法開啟此應用程式。
+
+en: Menu
+tr: 功能表
+
+en: Opens a submenu
+tr: 開啟子功能表
+
+en: , opens a submenu
+tr: ，開啟子功能表
+
+en: Selected
+tr: 已選取
+
+en: Checked
+tr: 已核取
+
+en: Bluetooth
+tr: 藍牙
+
+en: Airplane mode
+tr: 飛航模式
+
+en: Accessibility
+tr: 協助工具
+
+en: Energy saver
+tr: 省電模式
+
+en: Live captions
+tr: 即時輔助字幕
+
+en: Night light
+tr: 夜間光線
+
+en: Mobile hotspot
+tr: 行動熱點
+
+en: Nearby sharing
+tr: 鄰近分享
+
+en: Cast
+tr: 投放
+
+en: Project
+tr: 投影
+
+en: All settings
+tr: 所有設定
+
+en: Connected
+tr: 已連線
+
+en: Not connected
+tr: 未連線
+
+en: , on
+tr: ，開啟
+
+en: , off
+tr: ，關閉
+
+en: , state unknown
+tr: ，狀態未知
+
+en: , opens Windows Settings
+tr: ，開啟 Windows 設定
+
+en: , shows accessibility features
+tr: ，顯示協助工具功能
+
+en: , requires Windows 11 version 22H2
+tr: ，需要 Windows 11 版本 22H2
+
+en: Now playing: {}
+tr: 正在播放：{}
+
+en: Untitled media
+tr: 無標題媒體
+
+en: , switch source
+tr: ，切換來源
+
+en: Previous media item
+tr: 上一個媒體項目
+
+en: Pause
+tr: 暫停
+
+en: Play
+tr: 播放
+
+en: Next media item
+tr: 下一個媒體項目
+
+en: {} details
+tr: {} 詳細資料
+
+en: Page {} of {}
+tr: 第 {} 頁，共 {} 頁
+
+en: Next page
+tr: 下一頁
+
+en: First page
+tr: 第一頁
+
+en: Brightness
+tr: 亮度
+
+en: Brightness, unavailable on this display
+tr: 亮度，此顯示器無法使用
+
+en: Volume
+tr: 音量
+
+en: Volume, unavailable
+tr: 音量，無法使用
+
+en: Unmute
+tr: 取消靜音
+
+en: Mute
+tr: 靜音
+
+en: Sound output and volume mixer
+tr: 音效輸出和音量混合程式
+
+en: Back
+tr: 返回
+
+en: , secured
+tr: ，安全
+
+en: , open
+tr: ，開放
+
+en: , connected
+tr: ，已連線
+
+en: Disconnect
+tr: 中斷連線
+
+en: Show available networks
+tr: 顯示可用的網路
+
+en: More Wi-Fi settings
+tr: 更多 Wi-Fi 設定
+
+en: Bluetooth and devices settings
+tr: 藍牙與裝置設定
+
+en: Magnifier
+tr: 放大鏡
+
+en: Narrator
+tr: 朗讀程式
+
+en: On-screen keyboard
+tr: 螢幕小鍵盤
+
+en: Sticky keys
+tr: 相黏鍵
+
+en: More accessibility settings
+tr: 更多協助工具設定
+
+en: Volume mixer
+tr: 音量混合程式
+
+en: Choose output in Sound settings
+tr: 在音效設定中選擇輸出
+
+en: Power and battery settings
+tr: 電源與電池設定
+
+en: Battery {} percent, {}
+tr: 電池 {}%，{}
+
+en: All Windows settings
+tr: 所有 Windows 設定
+
+en: The requested action could not be dispatched
+tr: 無法分派要求的動作
+
+en: Aether Shell quick controls
+tr: Aether Shell 快速控制項
+
+en: Media session active
+tr: 媒體工作階段作用中
+
+en: No media session
+tr: 沒有媒體工作階段
+
+en: Current page
+tr: 目前頁面
+
+en:  - secured
+tr:  - 安全
+
+en:  - open
+tr:  - 開放
+
+en:  - opens in Windows
+tr:  - 在 Windows 中開啟
+
+en: Turned off by hardware or policy
+tr: 已由硬體或原則關閉
+
+en: State unavailable - use Windows settings
+tr: 無法取得狀態 - 請使用 Windows 設定
+
+en: Off
+tr: 關閉
+
+en:  - signal {} of 5
+tr:  - 訊號 {}/5
+
+en: , no internet
+tr: ，沒有網際網路
+
+en: On - not connected
+tr: 開啟 - 未連線
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows 不允許應用程式列出網路：請檢查隱私權設定中的位置
+
+en: No Wi-Fi adapter found
+tr: 找不到 Wi-Fi 介面卡
+
+en: Connecting to {}...
+tr: 正在連線到 {}...
+
+en:  - looking for networks
+tr:  - 正在尋找網路
+
+en: On
+tr: 開啟
+
+en: A screen reader is running
+tr: 螢幕助讀程式正在執行
+
+en: Windows accessibility features
+tr: Windows 協助工具功能
+
+en: Sound output
+tr: 音效輸出
+
+en: Default output device
+tr: 預設輸出裝置
+
+en: No output device available
+tr: 沒有可用的輸出裝置
+
+en: Battery unknown
+tr: 電池狀態未知
+
+en: Status refresh could not be started
+tr: 無法開始重新整理狀態
+
+en: Status refresh unavailable
+tr: 無法重新整理狀態
+
+en: Excellent signal
+tr: 訊號極佳
+
+en: Good signal
+tr: 訊號良好
+
+en: Fair signal
+tr: 訊號尚可
+
+en: Weak signal
+tr: 訊號微弱
+
+en: Clear sky
+tr: 晴朗
+
+en: Mainly clear
+tr: 大致晴朗
+
+en: Partly cloudy
+tr: 局部多雲
+
+en: Overcast
+tr: 陰天
+
+en: Fog
+tr: 霧
+
+en: Drizzle
+tr: 毛毛雨
+
+en: Rain
+tr: 雨
+
+en: Snow
+tr: 雪
+
+en: Rain showers
+tr: 陣雨
+
+en: Snow showers
+tr: 陣雪
+
+en: Thunderstorm
+tr: 雷雨
+
+## weather
+
+en: Morning
+tr: 早上
+
+en: Afternoon
+tr: 下午
+
+en: Evening
+tr: 傍晚
+
+en: Night
+tr: 夜間
+
+en: Now
+tr: 現在
+
+en: Today
+tr: 今天
+
+en: Low
+tr: 低
+
+en: Moderate
+tr: 中等
+
+en: High
+tr: 高
+
+en: Very high
+tr: 非常高
+
+en: Extreme
+tr: 極高
+
+en: No connection to the weather service.
+tr: 無法連線到天氣服務。
+
+en: The weather service is busy. Try again in a moment.
+tr: 天氣服務忙碌中。請稍後再試一次。
+
+en: The weather could not be loaded.
+tr: 無法載入天氣。
+
+en: Could not update; showing the last forecast.
+tr: 無法更新；顯示上次的天氣預報。
+
+en: Try again
+tr: 再試一次
+
+en: Your location
+tr: 您的位置
+
+en: My location
+tr: 我的位置
+
+en: Precise location
+tr: 精確位置
+
+en: Approximate location
+tr: 概略位置
+
+en: Chosen in Settings
+tr: 在設定中選擇
+
+en: Allow
+tr: 允許
+
+en: Use precise location
+tr: 使用精確位置
+
+en: See the weather where you are: allow your precise location.
+tr: 查看您所在地的天氣：請允許您的精確位置。
+
+en: Your position is approximate (about 10 km).
+tr: 您的位置為概略位置 (約 10 公里)。
+
+en: Location is turned off for this app in Windows.
+tr: 已在 Windows 中為此應用程式關閉位置。
+
+en: This device cannot report its location. Search for a city instead.
+tr: 此裝置無法回報其位置。請改為搜尋城市。
+
+en: Reading Windows location…
+tr: 正在讀取 Windows 位置…
+
+en: Automatic weather follows your Windows location.
+tr: 自動天氣會依照您的 Windows 位置。
+
+en: Search for a city
+tr: 搜尋城市
+
+en: Search for a city, or allow your location, to see the weather.
+tr: 搜尋城市或允許您的位置，以查看天氣。
+
+en: Searching…
+tr: 正在搜尋…
+
+en: City search is unavailable.
+tr: 無法使用城市搜尋。
+
+en: No city found.
+tr: 找不到城市。
+
+en: Weather settings
+tr: 天氣設定
+
+en: Loading the weather…
+tr: 正在載入天氣…
+
+en: Loading…
+tr: 正在載入…
+
+en: Updated {}
+tr: 更新時間：{}
+
+en: Near {}
+tr: {} 附近
+
+en: Temperatures now
+tr: 目前溫度
+
+en: The map is unavailable.
+tr: 無法使用地圖。
+
+en: Map: Natural Earth
+tr: 地圖：Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: 天氣資料由 Open-Meteo.com 提供
+
+en: Feels like
+tr: 體感溫度
+
+en: Feels like {}
+tr: 體感溫度 {}
+
+en: Close to the real temperature
+tr: 接近實際溫度
+
+en: The wind makes it feel colder
+tr: 風讓體感更冷
+
+en: Humidity makes it feel warmer
+tr: 濕度讓體感更熱
+
+en: Humidity
+tr: 濕度
+
+en: Cloud cover {}
+tr: 雲量 {}
+
+en: Wind
+tr: 風
+
+en: Gusts {}
+tr: 陣風 {}
+
+en: Sunrise and sunset
+tr: 日出和日落
+
+en: UV index
+tr: 紫外線指數
+
+en: Pressure
+tr: 氣壓
+
+en: At sea level
+tr: 海平面
+
+en: &Open the weather
+tr: 開啟天氣(&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: 您所在地的天氣預報，精確度約 100 公尺，並使用其自身高度。關閉：四捨五入至約 10 公里。

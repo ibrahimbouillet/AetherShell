@@ -1,0 +1,2494 @@
+# Hungarian (hu): Magyar. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Az automatikus időjárás engedélyezéséhez válassza a Windows-helyet.
+
+en: Windows taskbar visible
+tr: A Windows tálcája látható
+
+en: Connected to {}
+tr: Csatlakozva: {}
+
+en: {} is out of range
+tr: A(z) {} hatótávolságon kívül van
+
+en: Connecting to {} took too long
+tr: A(z) {} hálózathoz való csatlakozás túl sokáig tartott
+
+en: Use Windows to join {}
+tr: A(z) {} hálózathoz a Windows segítségével csatlakozzon
+
+en: Windows did not allow this connection
+tr: A Windows nem engedélyezte ezt a kapcsolatot
+
+en: Could not connect to {}
+tr: Nem sikerült csatlakozni a következőhöz: {}
+
+en: Connect to {}
+tr: Csatlakozás a következőhöz: {}
+
+en: That password was not accepted. Check it and try again.
+tr: A jelszót nem fogadta el a rendszer. Ellenőrizze, és próbálkozzon újra.
+
+en: Enter this network's password.
+tr: Adja meg a hálózat jelszavát.
+
+en: &Connect
+tr: &Csatlakozás
+
+en: Windows Settings could not be opened
+tr: Nem sikerült megnyitni a Windows Gépházat
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Nem sikerült helyet foglalni a Dock számára; a Windows tálcájának visszaállítása
+
+en: Replacement unavailable: recovery observer could not start
+tr: A csere nem érhető el: a helyreállítási figyelő nem tudott elindulni
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: A Windows tálcája visszaállítva. Nem sikerült helyet foglalni a Dock számára; az újrapróbálkozáshoz kapcsolja ki, majd be a cserét.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: A helyreállítási figyelés nem érhető el; a Windows tálcájának visszaállítása
+
+en: Windows notifications could not be opened
+tr: Nem sikerült megnyitni a Windows értesítéseit
+
+en: The Windows calendar could not be opened
+tr: Nem sikerült megnyitni a Windows naptárát
+
+en: Windows did not show its hidden icons
+tr: A Windows nem jelenítette meg a rejtett ikonjait
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: A hely automatikus frissítése nem érhető el; próbálkozzon újra az Időjárás beállításaiban.
+
+en: Windows location
+tr: Windows-hely
+
+en: Reading approximate Windows location…
+tr: A Windows hozzávetőleges helyének beolvasása…
+
+en: Automatic weather follows approximate Windows location.
+tr: Az automatikus időjárás a Windows hozzávetőleges helyét követi.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: A Windows-helyhez való hozzáférés le van tiltva. Az időjárás nem érhető el.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: A Windows nem tudta megadni az aktuális helyet. Az időjárás nem érhető el.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: A helymeghatározó folyamat nem érhető el. Az időjárás nem érhető el.
+
+en: Waiting for Windows location permission…
+tr: Várakozás a Windows helyengedélyére…
+
+en: The automatic weather choice could not be saved.
+tr: Nem sikerült menteni az automatikus időjárás beállítását.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: A Windows-helyhez való hozzáférés nem érhető el, vagy elutasították. Az időjárás nem érhető el.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: A Windows-hely nem tudott engedélyt kérni. Ellenőrizze a Windows helybeállításait.
+
+en: Status worker unavailable
+tr: Az állapotfolyamat nem érhető el
+
+en: Windows could not complete this action. Review its settings.
+tr: A Windows nem tudta végrehajtani ezt a műveletet. Ellenőrizze a beállításait.
+
+en: Reading Windows status; try the action again shortly
+tr: A Windows állapotának beolvasása; hamarosan próbálja újra a műveletet
+
+en: Could not disconnect
+tr: Nem sikerült bontani a kapcsolatot
+
+en: The Windows accessibility feature could not be started
+tr: Nem sikerült elindítani a Windows akadálymentességi funkcióját
+
+en: Windows could not change the audio output
+tr: A Windows nem tudta módosítani a hangkimenetet
+
+en: The Windows control could not be opened
+tr: Nem sikerült megnyitni a Windows-vezérlőt
+
+en: Keyboard shortcuts disabled
+tr: Billentyűparancsok letiltva
+
+en: Both keyboard shortcuts registered
+tr: Mindkét billentyűparancs regisztrálva
+
+en: A keyboard shortcut is already in use by another application
+tr: Egy billentyűparancsot már egy másik alkalmazás használ
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Nem sikerült lekérni a Windows gyorsbeállításait. Az Aether-vezérlők használatához törölje „A Windows gyorsbeállításainak használata” jelölését a Felső sáv beállításaiban.
+
+en: Windows Start could not be opened
+tr: Nem sikerült megnyitni a Windows Start menüjét
+
+en: Windows Task View could not be opened
+tr: Nem sikerült megnyitni a Windows Feladatnézetét
+
+en: Windows keyboard layout switching was unavailable
+tr: A Windows billentyűzetkiosztás-váltása nem volt elérhető
+
+en: Windows voice typing could not be opened
+tr: Nem sikerült megnyitni a Windows hangalapú gépelését
+
+en: Windows taskbar could not be revealed
+tr: Nem sikerült megjeleníteni a Windows tálcáját
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: A tálcacsere nem tudott folytatódni; a Windows továbbra is elérhető
+
+en: Windows taskbar replacement is unavailable in this session
+tr: A Windows tálcájának cseréje nem érhető el ebben a munkamenetben
+
+en: Windows pin access is unavailable in this isolated session
+tr: A Windows rögzített elemeihez való hozzáférés nem érhető el ebben az elkülönített munkamenetben
+
+en: Windows pinned applications could not be read
+tr: Nem sikerült beolvasni a Windows rögzített alkalmazásait
+
+en: Settings changed during pin import. Try import again.
+tr: A beállítások megváltoztak a rögzített elemek importálása közben. Próbálja újra az importálást.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: További rögzített alkalmazások mentve: {}. Előfordulhat, hogy egyes Windows-rögzítések továbbra sem érhetők el.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: A rögzített elemek a memóriában módosultak; a mentés nem sikerült. Az újrapróbálkozáshoz kattintson az Alkalmaz gombra a beállításokban.
+
+en: Pins updated in memory; saving...
+tr: A rögzített elemek a memóriában frissültek; mentés...
+
+en: Imported pins could not be applied
+tr: Nem sikerült alkalmazni az importált rögzített elemeket
+
+en: Pin import is unavailable while closing
+tr: A rögzített elemek importálása bezárás közben nem érhető el
+
+en: Settings could not be saved
+tr: Nem sikerült menteni a beállításokat
+
+en: Quit without saving the latest changes?
+tr: Kilép a legutóbbi módosítások mentése nélkül?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Az előző beállításfájl megmaradt. Hagyja nyitva az Aether Shellt, hogy újra megpróbálhassa a mentést.
+
+en: &Quit without saving
+tr: &Kilépés mentés nélkül
+
+en: &Keep Aether Shell open
+tr: Az Aether Shell &nyitva hagyása
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Alapszintű diagnosztika exportálása – alkalmazásverzió és Windows-build, naplók és személyes adatok nélkül
+
+en: Diagnostics exported.
+tr: Diagnosztika exportálva.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Nem sikerült menteni a diagnosztikát a kiválasztott fájlba.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Nem sikerült biztonságosan beolvasni a beállításokat. A meglévő fájl megmaradt.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Az Aether Shell nem tudta elindítani az asztali felületeit.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: A Windows tálcájának visszaállítása függőben van. Próbálkozzon újra, vagy zárja be az Aether Shellt.
+
+en: The Windows taskbar is shown temporarily.
+tr: A Windows tálcája ideiglenesen látható.
+
+en: Windows taskbar restored.
+tr: A Windows tálcája visszaállítva.
+
+en: Windows taskbar replacement is active.
+tr: A Windows tálcájának cseréje aktív.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: A Windows tálcája továbbra is elérhető. A csere hamarosan újra próbálkozik.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: A Windows tálcája továbbra is elérhető. Az újrapróbálkozáshoz kapcsolja ki, majd be a cserét.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: A Windows tálcája visszaállítva. A csere hamarosan újra csatlakozik.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: A Windows tálcája visszaállítva. Az újrapróbálkozáshoz kapcsolja ki, majd be a cserét.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: A tálcacsere leállt. A Windows tálcája visszaállítva.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: A tálcacsere leállt. A Windows tálcájának visszaállítását nem sikerült megerősíteni.
+
+en: Activating taskbar replacement...
+tr: A tálcacsere aktiválása...
+
+en: Restoring Windows taskbar...
+tr: A Windows tálcájának visszaállítása...
+
+en: Reconnecting taskbar replacement...
+tr: A tálcacsere újracsatlakoztatása...
+
+en: Showing the Windows taskbar temporarily...
+tr: A Windows tálcájának ideiglenes megjelenítése...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Az Aether Shell nem tudta visszaállítani a Windows tálcáját.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Indítsa újra a Windows Intézőt a Feladatkezelőből (Ctrl+Shift+Esc), vagy jelentkezzen ki, majd jelentkezzen be újra.
+
+en: The Windows taskbar was restored to its saved state.
+tr: A Windows tálcája visszaállt a mentett állapotába.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Nem található mentett tálcaállapot. A Windows tálcája láthatóvá vált; az automatikus elrejtés beállítása nem változott.
+
+en: There was nothing to restore.
+tr: Nem volt mit visszaállítani.
+
+en: Taskbar replacement is turned off.
+tr: A tálcacsere ki van kapcsolva.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: A tálcacserét nem sikerült automatikusan kikapcsolni. Kapcsolja ki az Aether Shell beállításai > Asztal lapon.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Ismeretlen vagy érvénytelen Aether Shell-parancssor.
+
+en: Aether Shell could not create its local data folders.
+tr: Az Aether Shell nem tudta létrehozni a helyi adatmappáit.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Az Aether Shell váratlan hiba miatt leállt.
+
+## search-names
+
+en: Disk Management
+tr: Lemezkezelés
+
+en: Local Users and Groups
+tr: Helyi felhasználók és csoportok
+
+en: Local Group Policy Editor
+tr: Helyi csoportházirend-szerkesztő
+
+en: Manage User Certificates
+tr: Felhasználói tanúsítványok kezelése
+
+en: Manage Computer Certificates
+tr: Számítógép-tanúsítványok kezelése
+
+en: Shared Folders
+tr: Megosztott mappák
+
+en: TPM Management
+tr: TPM-kezelés
+
+en: Network Connections
+tr: Hálózati kapcsolatok
+
+en: System Properties
+tr: Rendszertulajdonságok
+
+en: About Windows
+tr: A Windows névjegye
+
+en: DirectX Diagnostic Tool
+tr: DirectX diagnosztikai eszköz
+
+en: Windows Features
+tr: Windows-szolgáltatások
+
+en: System Restore
+tr: Rendszer-visszaállítás
+
+en: Advanced System Settings
+tr: Speciális rendszerbeállítások
+
+en: Volume Mixer
+tr: Hangerőkeverő
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Felhasználói fiókok (speciális)
+
+en: Display settings
+tr: Kijelzőbeállítások
+
+en: Night light settings
+tr: Éjszakai fény beállításai
+
+en: Graphics settings
+tr: Grafikus beállítások
+
+en: Sound settings
+tr: Hangbeállítások
+
+en: Notification settings
+tr: Értesítési beállítások
+
+en: Power & battery settings
+tr: Energiaellátás és akkumulátor beállításai
+
+en: Energy saver settings
+tr: Energiatakarékos mód beállításai
+
+en: Storage settings
+tr: Tárolási beállítások
+
+en: Multitasking settings
+tr: Többfeladatos működés beállításai
+
+en: Clipboard settings
+tr: Vágólap beállításai
+
+en: Remote Desktop settings
+tr: Távoli asztal beállításai
+
+en: About your PC
+tr: Névjegy
+
+en: Bluetooth & devices settings
+tr: Bluetooth és eszközök beállításai
+
+en: Printers & scanners settings
+tr: Nyomtatók és szkennerek beállításai
+
+en: Mouse settings
+tr: Egérbeállítások
+
+en: Touchpad settings
+tr: Érintőpad beállításai
+
+en: Network & internet settings
+tr: Hálózat és internet beállításai
+
+en: Wi-Fi settings
+tr: Wi-Fi-beállítások
+
+en: VPN settings
+tr: VPN-beállítások
+
+en: Proxy settings
+tr: Proxybeállítások
+
+en: Airplane mode settings
+tr: Repülési üzemmód beállításai
+
+en: Mobile hotspot settings
+tr: Mobil hotspot beállításai
+
+en: Background settings
+tr: Háttérbeállítások
+
+en: Color settings
+tr: Színbeállítások
+
+en: Theme settings
+tr: Témabeállítások
+
+en: Lock screen settings
+tr: Zárolási képernyő beállításai
+
+en: Taskbar settings
+tr: Tálcabeállítások
+
+en: Font settings
+tr: Betűtípus-beállítások
+
+en: Installed apps
+tr: Telepített alkalmazások
+
+en: Default apps settings
+tr: Alapértelmezett alkalmazások beállításai
+
+en: Startup apps settings
+tr: Indítási alkalmazások beállításai
+
+en: Account info
+tr: Az Ön adatai
+
+en: Sign-in options
+tr: Bejelentkezési lehetőségek
+
+en: Other users settings
+tr: Egyéb felhasználók beállításai
+
+en: Date & time settings
+tr: Dátum és idő beállításai
+
+en: Language & region settings
+tr: Nyelv és régió beállításai
+
+en: Typing settings
+tr: Gépelési beállítások
+
+en: Accessibility settings
+tr: Akadálymentességi beállítások
+
+en: Privacy & security settings
+tr: Adatvédelem és biztonság beállításai
+
+en: Location settings
+tr: Helybeállítások
+
+en: Windows Update settings
+tr: Windows Update beállításai
+
+en: Recovery settings
+tr: Helyreállítási beállítások
+
+en: Activation settings
+tr: Aktiválási beállítások
+
+en: For developers settings
+tr: Fejlesztői beállítások
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: A GitHub nem érhető el.
+
+en: GitHub did not answer the request just now.
+tr: A GitHub most nem válaszolt a kérésre.
+
+en: The release did not pass verification, so nothing was installed.
+tr: A kiadás nem ment át az ellenőrzésen, ezért semmi sem lett telepítve.
+
+en: There is not enough free disk space.
+tr: Nincs elég szabad lemezterület.
+
+en: Windows refused access to the update files.
+tr: A Windows megtagadta a hozzáférést a frissítési fájlokhoz.
+
+en: {} bytes
+tr: {} bájt
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Állapot
+
+en: Check &now
+tr: Ellenőrzés &most
+
+en: Download and install
+tr: Letöltés és telepítés
+
+en: &Later
+tr: &Később
+
+en: S&kip this version
+tr: E verzió k&ihagyása
+
+en: &Release details
+tr: Kiadás &részletei
+
+en: Disable &notifications
+tr: Értesítések &letiltása
+
+en: Release notes
+tr: Kibocsátási megjegyzések
+
+en: the new version
+tr: az új verzió
+
+en: Installed: {}.
+tr: Telepítve: {}.
+
+en: Automatic update checks are off
+tr: Az automatikus frissítéskeresés ki van kapcsolva
+
+en: Check now looks for a newer release once.
+tr: Az Ellenőrzés most egyszer keres újabb kiadást.
+
+en: Last checked {}
+tr: Utolsó ellenőrzés: {}
+
+en: Not checked yet
+tr: Még nem volt ellenőrzés
+
+en: Checking for updates...
+tr: Frissítések keresése...
+
+en: Aether Shell is up to date
+tr: Az Aether Shell naprakész
+
+en: Latest published release: {}.
+tr: Legutóbbi közzétett kiadás: {}.
+
+en: Version {} is available
+tr: A(z) {} verzió elérhető
+
+en: Download size: {}.
+tr: Letöltési méret: {}.
+
+en: Downloading version {}...
+tr: A(z) {} verzió letöltése...
+
+en: Received {} of {} ({}%).
+tr: Fogadva: {} / {} ({}%).
+
+en: Received {}; total size unknown.
+tr: Fogadva: {}; a teljes méret ismeretlen.
+
+en: Version {} is ready to install
+tr: A(z) {} verzió készen áll a telepítésre
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Ellenőrizve az aláírt kiadási jegyzékkel és SHA-256-tal.
+
+en: The update could not be completed
+tr: Nem sikerült befejezni a frissítést
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Egyelőre kézzel települ: nyissa meg a kiadás részleteit, majd töltse le és futtassa a telepítőjét.
+
+en: Failure: {}.
+tr: Hiba: {}.
+
+en: Choose Retry Download to try again.
+tr: Az újrapróbálkozáshoz válassza a Letöltés újrapróbálása lehetőséget.
+
+en: Use Check now to try again.
+tr: Az újrapróbálkozáshoz használja az Ellenőrzés most lehetőséget.
+
+en: Next automatic check: {}.
+tr: Következő automatikus ellenőrzés: {}.
+
+en: &Install update
+tr: Frissítés &telepítése
+
+en: Retry &Download
+tr: Letöltés ú&jrapróbálása
+
+en: &Download and install
+tr: Letöltés és tele&pítés
+
+en: Windows' startup state could not be read in this session.
+tr: A Windows indítási állapotát nem sikerült beolvasni ebben a munkamenetben.
+
+en: Windows will start it at your next sign-in.
+tr: A Windows a következő bejelentkezéskor elindítja.
+
+en: Right now it will not start at sign-in.
+tr: Jelenleg nem indul el bejelentkezéskor.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Ki van kapcsolva a Feladatkezelőben vagy a Windows Gépházban, és azok döntenek, amíg ott be nem kapcsolja.
+
+en: Windows would start another copy of Aether Shell.
+tr: A Windows az Aether Shell egy másik példányát indítaná el.
+
+en: Windows reports a startup state this version cannot read.
+tr: A Windows olyan indítási állapotot jelez, amelyet ez a verzió nem tud értelmezni.
+
+en: The close action could not be completed.
+tr: Nem sikerült végrehajtani a bezárási műveletet.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Mentés előtt adjon meg egy teljes számot; a pirossal jelölt mező nem az.
+
+en: Settings could not be validated.
+tr: Nem sikerült ellenőrizni a beállításokat.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: A bejelentkezéskori indítás változatlan maradt, mert nem sikerült menteni a beállításokat.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Nem sikerült menteni a beállításokat, és a Windows bejelentkezéskori indítását sem sikerült visszaállítani. Az újrapróbálkozáshoz kattintson ismét az Alkalmaz gombra.
+
+en: Settings saved.
+tr: Beállítások mentve.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: A beállítások a memóriában módosultak; a mentés nem sikerült. Az újrapróbálkozáshoz kattintson ismét az Alkalmaz gombra.
+
+en: Settings could not be applied.
+tr: Nem sikerült alkalmazni a beállításokat.
+
+en: Some values were corrected to their supported range.
+tr: Egyes értékek a támogatott tartományra lettek javítva.
+
+en: Startup registration is unavailable in this session.
+tr: Az indítási regisztráció nem érhető el ebben a munkamenetben.
+
+en: Changing startup registration...
+tr: Az indítási regisztráció módosítása...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: A Windows nem módosította az indítási regisztrációt. Ellenőrizze a Feladatkezelő indítási beállítását.
+
+en: Startup registration could not be changed.
+tr: Nem sikerült módosítani az indítási regisztrációt.
+
+en: Defaults saved; startup is disabled.
+tr: Az alapértékek mentve; az indítás letiltva.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Az alapértékek alkalmazva; a mentés nem sikerült. Az újrapróbálkozáshoz kattintson ismét az Alkalmaz gombra.
+
+en: Defaults could not be applied.
+tr: Nem sikerült alkalmazni az alapértékeket.
+
+en: Startup was not disabled; settings were kept.
+tr: Az indítás nem lett letiltva; a beállítások megmaradtak.
+
+en: Location search is unavailable.
+tr: A helykeresés nem érhető el.
+
+en: Searching Open-Meteo locations...
+tr: Helyek keresése az Open-Meteón...
+
+en: Location search failed. Check your connection and try again.
+tr: A helykeresés nem sikerült. Ellenőrizze a kapcsolatot, és próbálkozzon újra.
+
+en: No place matched that search.
+tr: Egyetlen hely sem felel meg a keresésnek.
+
+en: Choose a location to save it.
+tr: Válasszon ki egy helyet a mentéshez.
+
+en: Reset all settings?
+tr: Visszaállítja az összes beállítást?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: A beállítások és a rögzített alkalmazások visszaállnak az alapértékekre, a bejelentkezéskori indítás pedig kikapcsol.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: A Windows tálcájával kapcsolatos választása megmarad. Az aktuális beállításfájlról biztonsági másolat is megmarad.
+
+en: &Reset
+tr: &Visszaállítás
+
+en: Cancel
+tr: Mégse
+
+en: Pinned applications saved.
+tr: Rögzített alkalmazások mentve.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: A rögzített elemek a memóriában módosultak; a mentés nem sikerült. Az újrapróbálkozáshoz kattintson ismét az Alkalmaz gombra.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Az alapértékeket nem sikerült visszaállítani, mert az indítási regisztráció nem érhető el.
+
+en: Pinned application could not be added.
+tr: Nem sikerült hozzáadni a rögzített alkalmazást.
+
+en: Choose an application to add first.
+tr: Először válassza ki a hozzáadni kívánt alkalmazást.
+
+en: Pinned applications could not be changed.
+tr: Nem sikerült módosítani a rögzített alkalmazásokat.
+
+en: Choose a pinned application first.
+tr: Először válasszon ki egy rögzített alkalmazást.
+
+en: Desktop status is unavailable in this session.
+tr: Az asztal állapota nem érhető el ebben a munkamenetben.
+
+en: Desktop status is unavailable.
+tr: Az asztal állapota nem érhető el.
+
+en: Password
+tr: Jelszó
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: A(z) {} nyelv letöltése a GitHubról ({}). Amíg el nem készül, a felület angolul jelenik meg.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: A(z) {} nyelvet nem sikerült letölteni. Addig a felület angolul jelenik meg; az újrapróbálkozáshoz válassza lent a Letöltés gombot.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: A(z) {} nyelv még nincs ezen a számítógépen. Amíg le nem töltődik, a felület angolul jelenik meg.
+
+en: {} is on this PC.
+tr: A(z) {} nyelv megtalálható ezen a számítógépen.
+
+en: Every language is on this PC.
+tr: Minden nyelv megtalálható ezen a számítógépen.
+
+en: Choose a language to download first.
+tr: Először válassza ki a letölteni kívánt nyelvet.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Felső sáv
+
+en: Weather
+tr: Időjárás
+
+en: Updates
+tr: Frissítések
+
+en: General
+tr: Általános
+
+en: About
+tr: Névjegy
+
+en: Desktop
+tr: Asztal
+
+en: Appearance
+tr: Megjelenés
+
+en: Welcome
+tr: Üdvözlés
+
+en: Aether Shell Settings
+tr: Aether Shell beállításai
+
+en: Settings
+tr: Beállítások
+
+en: Reset defaults...
+tr: Alapértékek visszaállítása...
+
+en: &Apply
+tr: &Alkalmaz
+
+en: Liquid
+tr: Folyékony
+
+en: Grain
+tr: Szemcsés
+
+en: From {} to {}
+tr: {} – {}
+
+en: px
+tr: px
+
+en: min
+tr: perc
+
+en: h
+tr: óra
+
+en: This action could not be completed.
+tr: Nem sikerült végrehajtani ezt a műveletet.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Méret, térköz, mozgás és a Dockra rögzített alkalmazások.
+
+en: Size and spacing
+tr: Méret és térköz
+
+en: Icon size
+tr: Ikonméret
+
+en: {}, scaled with the Windows display scale.
+tr: {}, a Windows kijelzőméretezésével skálázva.
+
+en: Bottom margin
+tr: Alsó margó
+
+en: Space between the Dock and the bottom of the screen.
+tr: A Dock és a képernyő alja közötti távolság.
+
+en: Minimum side margin
+tr: Minimális oldalmargó
+
+en: Space kept free at the left and right screen edges.
+tr: A képernyő bal és jobb szélén szabadon hagyott hely.
+
+en: Icon spacing
+tr: Ikonok térköze
+
+en: Space between neighbouring icons.
+tr: A szomszédos ikonok közötti távolság.
+
+en: Glass and motion
+tr: Üveg és mozgás
+
+en: Glass opacity
+tr: Üveg átlátszatlansága
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Kisebb értékeknél több látszik a Dock mögötti elmosott asztalból.
+
+en: Hover magnification
+tr: Nagyítás rámutatáskor
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Mennyire nő meg egy ikon a mutató alatt; az 1 kikapcsolja.
+
+en: Behavior
+tr: Működés
+
+en: Show running applications
+tr: Futó alkalmazások megjelenítése
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: A nem rögzített megnyitott alkalmazások a rögzítettek után jelennek meg.
+
+en: Reserve screen space for the Dock
+tr: Képernyőterület fenntartása a Dock számára
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: A teljes méretű ablakok a Dock fölött maradnak, nem alatta.
+
+en: Automatically hide the Dock
+tr: A Dock automatikus elrejtése
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Elrejtőzik, amikor egy alkalmazásablak eltakarja; a megjelenítéséhez vigye a mutatót a képernyő alsó szélére. Az asztalon látható marad, az ablakok pedig a képernyő teljes magasságát kapják.
+
+en: Pinned applications
+tr: Rögzített alkalmazások
+
+en: Move &up
+tr: Mozgatás &fel
+
+en: Move &down
+tr: Mozgatás &le
+
+en: &Remove
+tr: &Eltávolítás
+
+en: &Add application
+tr: &Alkalmazás hozzáadása
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: A rögzített elemek megtartják azonosságukat és indítási beállításaikat. Egy rögzített elem eltávolítása azt is megakadályozza, hogy a Windows tálcájával való automatikus szinkronizálás újra hozzáadja.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Elhelyezés, óra és a Felső állapotsávban megjelenő állapotelemek.
+
+en: Presentation
+tr: Megjelenítés
+
+en: Floating bar
+tr: Lebegő sáv
+
+en: Text on the desktop
+tr: Szöveg az asztalon
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Lebegő sáv: üvegsáv a képernyő teteje alatt. Szöveg az asztalon: nincs sáv, ugyanazok az elemek a képernyő legtetején, közvetlenül az asztalháttér fölött jelennek meg; ez a csík ablakoktól mentes marad, a felső margó és az üveg átlátszatlansága pedig nem érvényes. Automatikus elrejtéskor a szöveg egy üvegcsíkon tér vissza, amíg ablak van alatta.
+
+en: Position and glass
+tr: Hely és üveg
+
+en: Top margin
+tr: Felső margó
+
+en: Space between the Top Bar and the top of the screen.
+tr: A Felső sáv és a képernyő teteje közötti távolság.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Kisebb értékeknél több látszik a sáv mögötti elmosott asztalból.
+
+en: Clock
+tr: Óra
+
+en: Clock format
+tr: Óraformátum
+
+en: Follow Windows
+tr: A Windows követése
+
+en: 12-hour
+tr: 12 órás
+
+en: 24-hour
+tr: 24 órás
+
+en: Date style
+tr: Dátumstílus
+
+en: Weekday, day and month
+tr: Hét napja, nap és hónap
+
+en: Short
+tr: Rövid
+
+en: Long
+tr: Hosszú
+
+en: Show seconds
+tr: Másodpercek megjelenítése
+
+en: Show date
+tr: Dátum megjelenítése
+
+en: Status items
+tr: Állapotelemek
+
+en: Show battery
+tr: Akkumulátor megjelenítése
+
+en: Hide battery when absent
+tr: Akkumulátor elrejtése, ha nincs
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Az akkumulátor nélküli asztali gépek semmit sem jelenítenek meg ismeretlen akkumulátor helyett.
+
+en: Show input language
+tr: Beviteli nyelv megjelenítése
+
+en: Show network
+tr: Hálózat megjelenítése
+
+en: Show audio output
+tr: Hangkimenet megjelenítése
+
+en: Show microphone
+tr: Mikrofon megjelenítése
+
+en: Show weather when enabled
+tr: Időjárás megjelenítése, ha engedélyezve van
+
+en: Weather itself is turned on in Weather settings.
+tr: Magát az időjárást az Időjárás beállításaiban lehet bekapcsolni.
+
+en: Show hidden icons button
+tr: Rejtett ikonok gombjának megjelenítése
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Egy kis nyíl, amely megnyitja a Windows értesítési területének rejtett ikonjait.
+
+en: Reserve screen space above windows
+tr: Képernyőterület fenntartása az ablakok fölött
+
+en: Maximized windows stay below the Top Bar.
+tr: A teljes méretű ablakok a Felső sáv alatt maradnak.
+
+en: Automatically hide the Top Bar
+tr: A Felső sáv automatikus elrejtése
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Elrejtőzik, amikor egy alkalmazásablak eltakarja; a megjelenítéséhez vigye a mutatót a képernyő felső szélére. Az asztalon látható marad.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: A Windows gyorsbeállításainak használata (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Ki: az Aether gyorsvezérlői a Felső sáv alatt nyílnak meg. Be: a Windows saját panelje nyílik meg a képernyő alján.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Opcionális időjárás-előrejelzés a Felső sávban, az Open-Meteo szolgáltatásával.
+
+en: Forecast
+tr: Előrejelzés
+
+en: Enable weather
+tr: Időjárás engedélyezése
+
+en: Off by default: the forecast needs network requests.
+tr: Alapértelmezés szerint ki: az előrejelzéshez hálózati kérések szükségesek.
+
+en: Temperature
+tr: Hőmérséklet
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Frissítési időköz
+
+en: Location
+tr: Hely
+
+en: Locate automatically with Windows
+tr: Automatikus helymeghatározás a Windows segítségével
+
+en: Uses the Windows location service after you allow it.
+tr: A Windows helyszolgáltatását használja, miután engedélyezi.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: A Windows engedélyt kér a helyhez. A koordinátái csak az előrejelzés lekéréséhez kerülnek elküldésre az Open-Meteo.com részére; egy helykulcs helyben gyorsítótárazódik. Ha a hely le van tiltva, az időjárás nem érhető el.
+
+en: Use &Windows location
+tr: &Windows-hely használata
+
+en: Location &settings
+tr: &Helybeállítások
+
+en: Choose automatic location or search for a place below.
+tr: Válassza az automatikus helyet, vagy keressen egy helyet alább.
+
+en: Search for a place
+tr: Hely keresése
+
+en: Searc&h
+tr: Ke&resés
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Időjárási adatok: Open-Meteo.com (CC BY 4.0). A kézi keresés csak a beírt szöveget küldi el.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Aláírt kiadások a hivatalos GitHub-adattárból, telepítés előtt ellenőrizve.
+
+en: Preferences
+tr: Beállítások
+
+en: Check for updates automatically
+tr: Frissítések automatikus keresése
+
+en: Check interval
+tr: Ellenőrzési időköz
+
+en: Release channel
+tr: Kiadási csatorna
+
+en: Prereleases arrive earlier and change more often.
+tr: Az előzetes kiadások hamarabb érkeznek, és gyakrabban változnak.
+
+en: Stable
+tr: Stabil
+
+en: Prerelease
+tr: Előzetes kiadás
+
+en: Show update notifications
+tr: Frissítési értesítések megjelenítése
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Indítás, mozgás, billentyűparancsok és diagnosztika.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: A sávok, menük, a Keresés, a Beállítások és a telepítő nyelve.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Az Önhöz vagy más programokhoz tartozó nevek (alkalmazások, fájlok, Wi-Fi-hálózatok) soha nincsenek lefordítva. Kiválasztott nyelv esetén a Felső sáv ezen a nyelven írja ki a dátumot; A Windows követése megtartja a Windows területi formátumát.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: A kézzel írt üdvözlés latin betűket ír: franciául, angolul vagy spanyolul köszön. A nyelvét az Üdvözlés lapon válassza ki.
+
+en: Language
+tr: Nyelv
+
+en: Interface language
+tr: Felület nyelve
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: A Windows követése a Windows megjelenítési nyelvei közül az elsőt használja, amely ezek között szerepel, egyébként az angolt.
+
+en: Startup
+tr: Indítás
+
+en: Start Aether Shell when I sign in
+tr: Az Aether Shell indítása bejelentkezéskor
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: A módosításhoz az Alkalmaz gombra kell kattintani. A Feladatkezelő is kikapcsolhatja.
+
+en: Motion
+tr: Mozgás
+
+en: Reduced motion removes decorative movement everywhere.
+tr: A csökkentett mozgás mindenhol eltávolítja a díszítő mozgást.
+
+en: Reduced
+tr: Csökkentett
+
+en: Full
+tr: Teljes
+
+en: Keyboard shortcuts
+tr: Billentyűparancsok
+
+en: Enable global keyboard shortcuts
+tr: Globális billentyűparancsok engedélyezése
+
+en: Search shortcut key
+tr: A Keresés billentyűparancsa
+
+en: Dock shortcut key
+tr: A Dock billentyűparancsa
+
+en: Search shortcut modifiers
+tr: A Keresés módosítóbillentyűi
+
+en: Dock shortcut modifiers
+tr: A Dock módosítóbillentyűi
+
+en: Shortcut status unavailable
+tr: A billentyűparancsok állapota nem érhető el
+
+en: Diagnostics
+tr: Diagnosztika
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: A naplómappa tartalmazza a számítógép Aether Shell-naplóit. A diagnosztika exportálása csak az alkalmazás verzióját és a Windows buildszámát menti – naplókat és személyes adatokat nem.
+
+en: Open &log folder
+tr: &Naplómappa megnyitása
+
+en: &Export diagnostics...
+tr: Diagnosztika &exportálása...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Rövid, kézzel írt üdvözlés az asztalon, miután bejelentkezik vagy feloldja a számítógép zárolását.
+
+en: Greeting
+tr: Üdvözlés
+
+en: Show the welcome at sign-in and unlock
+tr: Üdvözlés megjelenítése bejelentkezéskor és zárolás feloldásakor
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Akkor jelenik meg, amikor a Windows bejelentkeztette, amíg az Aether Shell elkészül. A kihagyásához koppintson, kattintson vagy nyomja le az Esc billentyűt.
+
+en: Greeting language
+tr: Üdvözlés nyelve
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut franciául, Hello angolul, Hola spanyolul. A toll latin betűket ír: minden más nyelven angolul köszön.
+
+en: Your name
+tr: Az Ön neve
+
+en: Name to greet you with
+tr: Név, amellyel köszönti
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Nem kötelező, például egy utónév. Ezen a számítógépen marad az Aether Shell beállításai között, és soha nem kerül elküldésre vagy naplóba. Az eltávolításához törölje a mező tartalmát.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Színmód, kiemelőszín, mozgási sebesség, valamint a Dock és a Felső sáv megjelenése.
+
+en: Style
+tr: Stílus
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Folyékony: rétegzett üveg a mögötte lévő tartalom fölött, egy elmosási réteg, a folyadék fénye, majd az ikonok és a szöveg, amelyek világos és sötét oldalakon is olvashatók maradnak. Szemcsés: matt üveg, elmosott és félig áttetsző, finom szemcsézettel.
+
+en: Liquid blur
+tr: A Folyékony stílus elmosása
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Mennyire takarja el a Folyékony üveg alatti elmosási réteg a mögötte lévő tartalmat: 100% mindent elmos. Kisebb értékeknél élesebben látszik az oldal, és a sávok szövege ilyenkor nehezebben olvasható egy zsúfolt oldal fölött.
+
+en: Liquid blur color
+tr: A Folyékony stílus elmosásának színe
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Az Automatikus megtartja az üveg saját színeit. A szöveg és az ikonok színtől függetlenül olvashatók maradnak.
+
+en: Automatic
+tr: Automatikus
+
+en: White
+tr: Fehér
+
+en: Black
+tr: Fekete
+
+en: Accent
+tr: Kiemelőszín
+
+en: Blue
+tr: Kék
+
+en: Violet
+tr: Ibolya
+
+en: Pink
+tr: Rózsaszín
+
+en: Red
+tr: Piros
+
+en: Orange
+tr: Narancssárga
+
+en: Yellow
+tr: Sárga
+
+en: Green
+tr: Zöld
+
+en: Teal
+tr: Kékeszöld
+
+en: Liquid color strength
+tr: A Folyékony stílus színerőssége
+
+en: How much of the chosen color the blur layer takes.
+tr: A kiválasztott színből mennyit vesz fel az elmosási réteg.
+
+en: Theme
+tr: Téma
+
+en: Color mode
+tr: Színmód
+
+en: High contrast always takes precedence.
+tr: A nagy kontraszt mindig elsőbbséget élvez.
+
+en: Light
+tr: Világos
+
+en: Dark
+tr: Sötét
+
+en: Accent color
+tr: Kiemelőszín
+
+en: Animation duration
+tr: Animáció időtartama
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: Az 1 a normál sebesség; a nagyobb értékek lassabbak. A csökkentett mozgás elsőbbséget élvez.
+
+en: Dock icon preset
+tr: Dock-ikonok előre beállított mérete
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: A Dock beállításaiban megadott egyéni méret megmarad, amíg ki nem választ egy előre beállított méretet.
+
+en: Small - 32 px
+tr: Kicsi – 32 px
+
+en: Medium - 40 px
+tr: Közepes – 40 px
+
+en: Large - 48 px
+tr: Nagy – 48 px
+
+en: Keep custom size
+tr: Egyéni méret megtartása
+
+en: Show Windows Start in the Dock
+tr: A Windows Start gombjának megjelenítése a Dockon
+
+en: Show Task View in the Dock
+tr: A Feladatnézet megjelenítése a Dockon
+
+en: Reserve extra space for Dock animations
+tr: Extra hely fenntartása a Dock animációi számára
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: A nagyítás és az indítási ugrálás nem fedi a teljes méretű ablakokat.
+
+en: Weather position
+tr: Időjárás helye
+
+en: Left
+tr: Bal
+
+en: Right
+tr: Jobb
+
+en: Keyboard indicator
+tr: Billentyűzetjelző
+
+en: Compact
+tr: Kompakt
+
+en: Two lines
+tr: Két sor
+
+en: Windows taskbar pins
+tr: A Windows tálcájának rögzített elemei
+
+en: Add newly discovered Windows taskbar pins
+tr: A Windows tálcáján újonnan észlelt rögzített elemek hozzáadása
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Amíg a tálca le van cserélve, az új Windows-rögzítések a Dockra kerülnek.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: A Windows tálcájának visszafordítható cseréje a Dockra.
+
+en: Taskbar replacement
+tr: Tálcacsere
+
+en: Replace the Windows taskbar
+tr: A Windows tálcájának cseréje
+
+en: Changing this needs Apply.
+tr: A módosításhoz az Alkalmaz gombra kell kattintani.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Amíg az Aether Shell fut, elrejti a Windows tálcáját, és helyet tart fenn a teljes méretű alkalmazások alatt.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: A Windows tálcájának állapota visszaáll, ha ez a mód le van tiltva, vagy ha az Aether Shell kilép. Egy külön helyreállító segédprogram akkor is visszaállítja, ha az alkalmazás váratlanul leáll. Ha a helyreállítás sikertelen, indítsa újra a Windows Intézőt a Feladatkezelőben.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: A Windows Gépház továbbra is a Windows natív felülete marad. Tálcabeállítási lapját az Aether Shell nem cseréli le; ezt a módot itt konfigurálja.
+
+en: Pinned applications from Windows
+tr: Rögzített alkalmazások a Windowsból
+
+en: &Import Windows taskbar pins
+tr: A Windows tálcáján rögzített elemek &importálása
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Beolvassa a rögzített parancsikonokat a Windows rögzített elemeinek módosítása nélkül. Előfordulhat, hogy egyes Windows 11-es rögzített elemek vagy azok sorrendje nem érhető el.
+
+en: Version {}
+tr: {} verzió
+
+en: Created by Ibrahim Bouillet
+tr: Készítette: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Natív Windows asztali felület – lebegő Dock és Felső állapotsáv –, amely a Fájlkezelő mellett fut.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Időjárási adatok: Open-Meteo.com (CC BY 4.0). Nem tartalmaz külső féltől származó C++ futtatókörnyezeti kódtárakat.
+
+en: &Official project
+tr: &Hivatalos projekt
+
+en: Licence
+tr: Licenc
+
+en: Taskbar replacement changes need Apply.
+tr: A tálcacsere módosításaihoz az Alkalmaz gombra kell kattintani.
+
+en: Changes save automatically. Startup needs Apply.
+tr: A módosítások automatikusan mentődnek. Az indításhoz az Alkalmaz gombra kell kattintani.
+
+en: Changes save automatically.
+tr: A módosítások automatikusan mentődnek.
+
+en: Press Apply to confirm this change.
+tr: A módosítás megerősítéséhez kattintson az Alkalmaz gombra.
+
+en: Smart transparency
+tr: Intelligens átlátszóság
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: A Folyékony stílusban ez az ablak csak a szövege és a vezérlői alatt mossa el a hátteret: teljesen más ablakok és asztali ikonok fölött, enyhén az asztalháttér fölött, és egyáltalán nem ott, ahol semmit sem jelenít meg.
+
+en: Languages on this PC
+tr: Nyelvek ezen a számítógépen
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Az Aether Shell letölti a Windowsban meglévő nyelveket, így a Windowsszal együtt vált nyelvet.
+
+en: Add a language
+tr: Nyelv hozzáadása
+
+en: &Download
+tr: &Letöltés
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Minden nyelv ennek a verziónak a GitHub-kiadásából származik, és használat előtt ellenőrzésen esik át. Ha már ezen a számítógépen van, válassza ki fent.
+
+en: built in
+tr: beépített
+
+en: downloading, {}
+tr: letöltés folyamatban, {}
+
+en: download failed
+tr: sikertelen letöltés
+
+## setup
+
+en: Aether Shell Setup
+tr: Az Aether Shell telepítője
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: A telepítő nem tudta létrehozni a felületét. Zárja be, és próbálkozzon újra, vagy használja a dokumentált csendes telepítési beállításokat.
+
+en: Options
+tr: Beállítások
+
+en: Install
+tr: Telepítés
+
+en: Done
+tr: Kész
+
+en: Remove Aether Shell
+tr: Az Aether Shell eltávolítása
+
+en: Repair Aether Shell
+tr: Az Aether Shell javítása
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Natív Dock és Felső állapotsáv Windowshoz, amely a Fájlkezelő mellett fut.
+
+en: Replaces the Windows taskbar while it runs
+tr: Futás közben lecseréli a Windows tálcáját
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: A Windows tálcájának visszaállításához lépjen ki az Aether Shellből, kapcsolja ki ezt a Beállítások > Asztal lapon, vagy nyissa meg a Start menüben „A Windows tálcájának visszaállítása” parancsikont.
+
+en: Starts when you sign in - your choice
+tr: Bejelentkezéskor elindul – az Ön döntése szerint
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Az új telepítések alapértelmezés szerint bejelentkezéskor indulnak. Ezt a választást telepítés előtt törölheti, vagy később kikapcsolhatja a Beállításokban. A meglévő indítási beállítások és a Feladatkezelőben végzett letiltások megmaradnak.
+
+en: Installs for your account
+tr: Telepítés a saját fiókjához
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Nincs szükség rendszergazdai jogosultságokra. A beállításai és adatai a felhasználói profiljában maradnak.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Az eltávolítás megtartja a beállításait és adatait, hacsak nem választja azok eltávolítását.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: A javítás visszaállítja a csomag fájljait, és megtartja a beállításait. Ha az Aether Shell rejtve hagyta a Windows tálcáját, a javítás visszaállítja.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Meglévő verzió fölé telepítve a beállítások megmaradnak. A régebbi csomagot a telepítő elutasítja, hacsak kifejezetten nem engedélyezi a visszalépést.
+
+en: MIT License
+tr: MIT-licenc
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: A licenc LICENSE néven az Aether Shell mellé is települ.
+
+en: Remove this installation
+tr: A telepítés eltávolítása
+
+en: Install location
+tr: Telepítési hely
+
+en: &Browse...
+tr: &Tallózás...
+
+en: Also remove my settings, cache and logs
+tr: A beállításaim, a gyorsítótár és a naplók eltávolítása is
+
+en: This cannot be undone.
+tr: Ez nem vonható vissza.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: A telepítő szabályosan bezárja az Aether Shellt, és eltávolítja a telepített fájljait, parancsikonjait, indítási bejegyzését és a Telepített alkalmazások közötti regisztrációját. A többi alkalmazás és a Windows beállításai érintetlenek maradnak.
+
+en: Your welcome
+tr: Az Ön üdvözlése
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Miután bejelentkezik vagy feloldja a számítógép zárolását, az Aether Shell kézírással rövid üdvözlést ír. Írja be a nevet, amellyel köszöntse, vagy hagyja üresen egy egyszerű köszönéshez.
+
+en: Your first name
+tr: Az Ön utóneve
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Nem kötelező, például egy utónév. Ezen a számítógépen marad az Aether Shell beállításai között, és soha nem kerül elküldésre. Módosíthatja, vagy kikapcsolhatja az üdvözlést a Beállítások > Üdvözlés lapon.
+
+en: Shortcuts and startup
+tr: Parancsikonok és indítás
+
+en: Create Start menu shortcuts
+tr: Start menü-parancsikonok létrehozása
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell és A Windows tálcájának visszaállítása.
+
+en: Create a desktop shortcut
+tr: Asztali parancsikon létrehozása
+
+en: Shows your current choice.
+tr: Az aktuális választását mutatja.
+
+en: Recommended.
+tr: Ajánlott.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Törölje a jelölést, ha nem kéri; a Feladatkezelőben végzett letiltásokat a rendszer tiszteletben tartja.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: A telepítéssel elfogadja a fenti indítási választást. Az indító összeomlás után újraindíthatja az Aether Shellt, korlátozott számú újrapróbálkozással. A Kilépés és A Windows tálcájának visszaállítása továbbra is elérhető. Az időjárás alapértelmezés szerint ki van kapcsolva. Az aláíratlan bináris fájlok Windows SmartScreen-figyelmeztetést válthatnak ki.
+
+en: Removing this installation...
+tr: A telepítés eltávolítása...
+
+en: Repairing Aether Shell...
+tr: Az Aether Shell javítása...
+
+en: Installing Aether Shell...
+tr: Az Aether Shell telepítése...
+
+en: Closing Aether Shell and removing its files.
+tr: Az Aether Shell bezárása és fájljainak eltávolítása.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: A beágyazott csomag ellenőrzése és fájljainak telepítése. Az előrehaladás tevékenységként jelenik meg: a telepítő nem ismeri a hátralévő időt.
+
+en: Please wait while the removal completes.
+tr: Várjon, amíg az eltávolítás befejeződik.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: A Mégse az új verzió aktiválásáig érhető el; utána a telepítő biztonságosan befejeződik.
+
+en: Aether Shell was uninstalled.
+tr: Az Aether Shell eltávolítása megtörtént.
+
+en: Aether Shell is ready.
+tr: Az Aether Shell készen áll.
+
+en: Setup was cancelled.
+tr: A telepítés megszakadt.
+
+en: Setup could not complete.
+tr: Nem sikerült befejezni a telepítést.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Az adatai megmaradtak, hacsak kifejezetten nem választotta az eltávolításukat.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Javíthatja vagy eltávolíthatja a Windows Gépház > Alkalmazások > Telepített alkalmazások lapon.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: A művelet az aktiválás előtt megszakadt. Az újrapróbálkozáshoz térjen vissza a Beállítások lapra.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Ellenőrizze a fájlhozzáférést és a szabad lemezterületet, majd próbálkozzon újra. Ha az Aether Shell már telepítve van, a Javítás visszaállíthatja a fájljait. Hibakategória: {}
+
+en: Setup log
+tr: Telepítési napló
+
+en: Launch Aether Shell
+tr: Az Aether Shell indítása
+
+en: &Back
+tr: &Vissza
+
+en: &Next
+tr: &Tovább
+
+en: &Continue
+tr: &Folytatás
+
+en: &Uninstall
+tr: &Eltávolítás
+
+en: &Repair
+tr: &Javítás
+
+en: &Install
+tr: Tele&pítés
+
+en: &Close
+tr: &Bezárás
+
+en: Step {} of {}: {}
+tr: {}/{}. lépés: {}
+
+en: Choose the Aether Shell installation folder
+tr: Válassza ki az Aether Shell telepítési mappáját
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Adjon meg egy teljes mappaelérési utat, például egy meghajtóbetűjellel kezdődőt.
+
+en: The install folder must be an absolute path.
+tr: A telepítési mappának abszolút elérési útnak kell lennie.
+
+en: Setup stops at the next safe point.
+tr: A telepítés a következő biztonságos ponton leáll.
+
+en: Cancelling...
+tr: Megszakítás...
+
+en: Setup is finishing the current step safely; please wait.
+tr: A telepítő biztonságosan befejezi az aktuális lépést; várjon.
+
+en: Updating Aether Shell
+tr: Az Aether Shell frissítése
+
+en: Verifying the signed package and applying the update.
+tr: Az aláírt csomag ellenőrzése és a frissítés alkalmazása.
+
+en: Update completed
+tr: A frissítés befejeződött
+
+en: The update did not complete
+tr: A frissítés nem fejeződött be
+
+en: Close
+tr: Bezárás
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: A frissítési felület nem tudott elindulni. A frissítés nem lett alkalmazva. Próbálkozzon újra, vagy használja a Javítás lehetőséget.
+
+en: Aether Shell Update
+tr: Aether Shell-frissítés
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: A frissítési felület nem tudott elindulni. A frissítés nem lett alkalmazva. Próbálkozzon újra, vagy használja a Javítás lehetőséget a Windows Gépház > Alkalmazások > Telepített alkalmazások lapon.
+
+en: Update completed.
+tr: A frissítés befejeződött.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: A frissítés nem fejeződött be. Tekintse meg a frissítő naplóját, vagy használja a Javítás lehetőséget.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Az Aether Shell nem tudott elindulni. Válassza a Javítás lehetőséget a Windows Gépház > Alkalmazások > Telepített alkalmazások lapon.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell beállításai – frissítés folyamatban
+
+## shell
+
+en: &Resume taskbar replacement
+tr: Tálcacsere &folytatása
+
+en: Show Windows &notification area for 60 seconds
+tr: A Windows &értesítési területének megjelenítése 60 másodpercre
+
+en: &Search…
+tr: &Keresés…
+
+en: &Settings…
+tr: &Beállítások…
+
+en: View available &update…
+tr: Elérhető frissítés &megtekintése…
+
+en: &Check for updates…
+tr: Frissítések kere&sése…
+
+en: &About Aether Shell
+tr: Az Aether Shell &névjegye
+
+en: &Quit Aether Shell
+tr: Ki&lépés az Aether Shellből
+
+en: Switch &input language\tWin+Space
+tr: &Beviteli nyelv váltása\tWin+Szóköz
+
+en: Open &network controls…
+tr: &Hálózati vezérlők megnyitása…
+
+en: &Weather settings…
+tr: &Időjárás beállításai…
+
+en: Toggle output &mute
+tr: Kimenet &némítása be/ki
+
+en: &Sound settings…
+tr: &Hangbeállítások…
+
+en: Toggle microphone &mute
+tr: Mikrofon &némítása be/ki
+
+en: Start Windows &voice typing\tWin+H
+tr: Windows hangalapú &gépelés indítása\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofon &adatvédelmi beállításai…
+
+en: &Power settings…
+tr: &Energiaellátási beállítások…
+
+en: Open &notifications and calendar
+tr: &Értesítések és naptár megnyitása
+
+en: Open &calendar\tWin+Alt+D
+tr: &Naptár megnyitása\tWin+Alt+D
+
+en: Show &hidden icons
+tr: &Rejtett ikonok megjelenítése
+
+en: Initializing
+tr: Inicializálás
+
+en: Unavailable
+tr: Nem érhető el
+
+en: Unsupported
+tr: Nem támogatott
+
+en: Error
+tr: Hiba
+
+en: Available
+tr: Elérhető
+
+en: Unknown
+tr: Ismeretlen
+
+en: Internet access
+tr: Internet-hozzáférés
+
+en: Local network only
+tr: Csak helyi hálózat
+
+en: Limited Internet access
+tr: Korlátozott internet-hozzáférés
+
+en: No network connection
+tr: Nincs hálózati kapcsolat
+
+en: Connectivity unknown
+tr: Ismeretlen kapcsolódás
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilhálózat
+
+en: Network
+tr: Hálózat
+
+en: Offline
+tr: Offline
+
+en: Network status unavailable
+tr: A hálózat állapota nem érhető el
+
+en: Quick controls
+tr: Gyorsvezérlők
+
+en: Aether Shell menu
+tr: Aether Shell menü
+
+en: Weather status unavailable
+tr: Az időjárás állapota nem érhető el
+
+en: Cached weather
+tr: Gyorsítótárazott időjárás
+
+en: Observation (UTC): {}
+tr: Megfigyelés (UTC): {}
+
+en: Weather: {}
+tr: Időjárás: {}
+
+en: Click to open weather settings
+tr: Kattintson az időjárás-beállítások megnyitásához
+
+en: Show hidden icons
+tr: Rejtett ikonok megjelenítése
+
+en: Opens Windows' notification-area overflow
+tr: Megnyitja a Windows értesítési területének túlcsordulási menüjét
+
+en: Input language: {}
+tr: Beviteli nyelv: {}
+
+en: Fallback input layout
+tr: Tartalék beviteli kiosztás
+
+en: Click to switch input language (Win+Space)
+tr: Kattintson a beviteli nyelv váltásához (Win+Szóköz)
+
+en: Network: {}
+tr: Hálózat: {}
+
+en: Signal strength unavailable
+tr: A jelerősség nem érhető el
+
+en: Click to open Windows network settings
+tr: Kattintson a Windows hálózati beállításainak megnyitásához
+
+en: Audio output
+tr: Hangkimenet
+
+en: Audio: {}
+tr: Hang: {}
+
+en: volume unknown
+tr: ismeretlen hangerő
+
+en: Muted
+tr: Némítva
+
+en: Sound on
+tr: Hang bekapcsolva
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Az eszköz nincs némítva
+
+en: Recording detection unsupported
+tr: A felvételészlelés nem támogatott
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Kattintson a némítás be- vagy kikapcsolásához; kattintson a jobb gombbal a Windows hangalapú gépeléséhez és a mikrofon adatvédelmi beállításaihoz
+
+en: Battery: {}
+tr: Akkumulátor: {}
+
+en: Battery {}
+tr: Akkumulátor: {}
+
+en: Battery status unavailable
+tr: Az akkumulátor állapota nem érhető el
+
+en: Charging
+tr: Töltés
+
+en: External power
+tr: Külső tápellátás
+
+en: Estimated remaining: {} h {} min
+tr: Becsült hátralévő idő: {} óra {} perc
+
+en: Click to open power settings
+tr: Kattintson az energiaellátási beállítások megnyitásához
+
+en: Clock status unavailable
+tr: Az óra állapota nem érhető el
+
+en: Click to open calendar and notifications
+tr: Kattintson a naptár és az értesítések megnyitásához
+
+en: Action failed: {}
+tr: A művelet sikertelen: {}
+
+en: Aether Shell status bar
+tr: Aether Shell állapotsáv
+
+en: Update available
+tr: Frissítés érhető el
+
+en: Cached
+tr: Gyorsítótárazott
+
+en: Start
+tr: Start
+
+en: Search
+tr: Keresés
+
+en: Task View
+tr: Feladatnézet
+
+en: Application
+tr: Alkalmazás
+
+en: Running application
+tr: Futó alkalmazás
+
+en: More applications
+tr: További alkalmazások
+
+en: Aether Shell window previews
+tr: Aether Shell ablak-előnézetek
+
+en: Minimized — preview unavailable
+tr: Kis méretre állítva – az előnézet nem érhető el
+
+en: Preview unavailable
+tr: Az előnézet nem érhető el
+
+en: {} windows
+tr: {} ablak
+
+en: {} window
+tr: {} ablak
+
+en: Switches to this window
+tr: Átvált erre az ablakra
+
+en: Minimized, preview unavailable
+tr: Kis méretre állítva, az előnézet nem érhető el
+
+en: Minimized
+tr: Kis méretre állítva
+
+en: Close {}
+tr: {} bezárása
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Az ablak bezárását kéri; az alkalmazás még kérheti a mentést vagy a megszakítást
+
+en: Close requested
+tr: Bezárás kérve
+
+en: Previous applications
+tr: Előző alkalmazások
+
+en: Open
+tr: Megnyitás
+
+en: New instance
+tr: Új példány
+
+en: Unpin from Dock
+tr: Rögzítés feloldása a Dockon
+
+en: Pin to Dock
+tr: Rögzítés a Dockon
+
+en: Move left
+tr: Mozgatás balra
+
+en: Move right
+tr: Mozgatás jobbra
+
+en: Dock settings...
+tr: Dock beállításai...
+
+en: Import Windows taskbar pins
+tr: A Windows tálcáján rögzített elemek importálása
+
+en: Open Windows Start
+tr: A Windows Start menüjének megnyitása
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Rögzítve
+
+en: Running
+tr: Fut
+
+en: Needs attention
+tr: Figyelmet igényel
+
+en: Up arrow shows window previews
+tr: A Fel nyíl az ablakok előnézetét jeleníti meg
+
+en: Installed application
+tr: Telepített alkalmazás
+
+en: Desktop application
+tr: Asztali alkalmazás
+
+en: File
+tr: Fájl
+
+en: Folder
+tr: Mappa
+
+en: Windows tool
+tr: Windows-eszköz
+
+en: Control Panel
+tr: Vezérlőpult
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Navigálás   ·   Enter Megnyitás   ·   Esc Bezárás
+
+en: Search apps, settings and files
+tr: Alkalmazások, beállítások és fájlok keresése
+
+en: Search could not be completed.
+tr: Nem sikerült befejezni a keresést.
+
+en: Results
+tr: Találatok
+
+en: Indexing applications…
+tr: Alkalmazások indexelése…
+
+en: Type to search apps, settings and files
+tr: Kezdjen el gépelni alkalmazások, beállítások és fájlok kereséséhez
+
+en: Nothing matches
+tr: Nincs találat
+
+en: Windows could not open this application.
+tr: A Windows nem tudta megnyitni ezt az alkalmazást.
+
+en: Menu
+tr: Menü
+
+en: Opens a submenu
+tr: Almenüt nyit meg
+
+en: , opens a submenu
+tr: , almenüt nyit meg
+
+en: Selected
+tr: Kiválasztva
+
+en: Checked
+tr: Bejelölve
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Repülési üzemmód
+
+en: Accessibility
+tr: Akadálymentesség
+
+en: Energy saver
+tr: Energiatakarékos mód
+
+en: Live captions
+tr: Élő feliratok
+
+en: Night light
+tr: Éjszakai fény
+
+en: Mobile hotspot
+tr: Mobil hotspot
+
+en: Nearby sharing
+tr: Megosztás a közelben
+
+en: Cast
+tr: Továbbítás
+
+en: Project
+tr: Kivetítés
+
+en: All settings
+tr: Minden beállítás
+
+en: Connected
+tr: Csatlakoztatva
+
+en: Not connected
+tr: Nincs csatlakoztatva
+
+en: , on
+tr: , bekapcsolva
+
+en: , off
+tr: , kikapcsolva
+
+en: , state unknown
+tr: , ismeretlen állapot
+
+en: , opens Windows Settings
+tr: , megnyitja a Windows Gépházat
+
+en: , shows accessibility features
+tr: , megjeleníti az akadálymentességi funkciókat
+
+en: , requires Windows 11 version 22H2
+tr: , Windows 11 22H2-es verziója szükséges
+
+en: Now playing: {}
+tr: Most játszott: {}
+
+en: Untitled media
+tr: Cím nélküli média
+
+en: , switch source
+tr: , forrás váltása
+
+en: Previous media item
+tr: Előző médiaelem
+
+en: Pause
+tr: Szünet
+
+en: Play
+tr: Lejátszás
+
+en: Next media item
+tr: Következő médiaelem
+
+en: {} details
+tr: {} – részletek
+
+en: Page {} of {}
+tr: {}/{}. oldal
+
+en: Next page
+tr: Következő oldal
+
+en: First page
+tr: Első oldal
+
+en: Brightness
+tr: Fényerő
+
+en: Brightness, unavailable on this display
+tr: Fényerő, ezen a kijelzőn nem érhető el
+
+en: Volume
+tr: Hangerő
+
+en: Volume, unavailable
+tr: Hangerő, nem érhető el
+
+en: Unmute
+tr: Némítás feloldása
+
+en: Mute
+tr: Némítás
+
+en: Sound output and volume mixer
+tr: Hangkimenet és hangerőkeverő
+
+en: Back
+tr: Vissza
+
+en: , secured
+tr: , biztonságos
+
+en: , open
+tr: , nyílt
+
+en: , connected
+tr: , csatlakoztatva
+
+en: Disconnect
+tr: Kapcsolat bontása
+
+en: Show available networks
+tr: Elérhető hálózatok megjelenítése
+
+en: More Wi-Fi settings
+tr: További Wi-Fi-beállítások
+
+en: Bluetooth and devices settings
+tr: Bluetooth és eszközök beállításai
+
+en: Magnifier
+tr: Nagyító
+
+en: Narrator
+tr: Narrátor
+
+en: On-screen keyboard
+tr: Képernyő-billentyűzet
+
+en: Sticky keys
+tr: Beragadó billentyűk
+
+en: More accessibility settings
+tr: További akadálymentességi beállítások
+
+en: Volume mixer
+tr: Hangerőkeverő
+
+en: Choose output in Sound settings
+tr: Kimenet kiválasztása a Hangbeállításokban
+
+en: Power and battery settings
+tr: Energiaellátás és akkumulátor beállításai
+
+en: Battery {} percent, {}
+tr: Akkumulátor: {} százalék, {}
+
+en: All Windows settings
+tr: Minden Windows-beállítás
+
+en: The requested action could not be dispatched
+tr: A kért műveletet nem sikerült továbbítani
+
+en: Aether Shell quick controls
+tr: Aether Shell gyorsvezérlők
+
+en: Media session active
+tr: Médiamunkamenet aktív
+
+en: No media session
+tr: Nincs médiamunkamenet
+
+en: Current page
+tr: Aktuális oldal
+
+en:  - secured
+tr:  – biztonságos
+
+en:  - open
+tr:  – nyílt
+
+en:  - opens in Windows
+tr:  – Windowsban nyílik meg
+
+en: Turned off by hardware or policy
+tr: Hardver vagy házirend által kikapcsolva
+
+en: State unavailable - use Windows settings
+tr: Az állapot nem érhető el – használja a Windows beállításait
+
+en: Off
+tr: Ki
+
+en:  - signal {} of 5
+tr:  – jelerősség: {}/5
+
+en: , no internet
+tr: , nincs internet
+
+en: On - not connected
+tr: Be – nincs csatlakoztatva
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: A Windows nem engedi az alkalmazásoknak a hálózatok listázását: ellenőrizze a Helyet az Adatvédelmi beállításokban
+
+en: No Wi-Fi adapter found
+tr: Nem található Wi-Fi-adapter
+
+en: Connecting to {}...
+tr: Csatlakozás: {}...
+
+en:  - looking for networks
+tr:  – hálózatok keresése
+
+en: On
+tr: Be
+
+en: A screen reader is running
+tr: Képernyőolvasó fut
+
+en: Windows accessibility features
+tr: Windows akadálymentességi funkciók
+
+en: Sound output
+tr: Hangkimenet
+
+en: Default output device
+tr: Alapértelmezett kimeneti eszköz
+
+en: No output device available
+tr: Nincs elérhető kimeneti eszköz
+
+en: Battery unknown
+tr: Ismeretlen akkumulátor
+
+en: Status refresh could not be started
+tr: Az állapotfrissítést nem sikerült elindítani
+
+en: Status refresh unavailable
+tr: Az állapotfrissítés nem érhető el
+
+en: Excellent signal
+tr: Kiváló jel
+
+en: Good signal
+tr: Jó jel
+
+en: Fair signal
+tr: Közepes jel
+
+en: Weak signal
+tr: Gyenge jel
+
+en: Clear sky
+tr: Derült
+
+en: Mainly clear
+tr: Többnyire derült
+
+en: Partly cloudy
+tr: Részben felhős
+
+en: Overcast
+tr: Borult
+
+en: Fog
+tr: Köd
+
+en: Drizzle
+tr: Szitálás
+
+en: Rain
+tr: Eső
+
+en: Snow
+tr: Havazás
+
+en: Rain showers
+tr: Záporok
+
+en: Snow showers
+tr: Hózáporok
+
+en: Thunderstorm
+tr: Zivatar
+
+## weather
+
+en: Morning
+tr: Reggel
+
+en: Afternoon
+tr: Délután
+
+en: Evening
+tr: Este
+
+en: Night
+tr: Éjszaka
+
+en: Now
+tr: Most
+
+en: Today
+tr: Ma
+
+en: Low
+tr: Alacsony
+
+en: Moderate
+tr: Mérsékelt
+
+en: High
+tr: Magas
+
+en: Very high
+tr: Nagyon magas
+
+en: Extreme
+tr: Extrém
+
+en: No connection to the weather service.
+tr: Nincs kapcsolat az időjárási szolgáltatással.
+
+en: The weather service is busy. Try again in a moment.
+tr: Az időjárási szolgáltatás foglalt. Próbálkozzon újra egy kis idő múlva.
+
+en: The weather could not be loaded.
+tr: Nem sikerült betölteni az időjárást.
+
+en: Could not update; showing the last forecast.
+tr: Nem sikerült frissíteni; a legutóbbi előrejelzés látható.
+
+en: Try again
+tr: Újra
+
+en: Your location
+tr: Az Ön helye
+
+en: My location
+tr: Saját hely
+
+en: Precise location
+tr: Pontos hely
+
+en: Approximate location
+tr: Hozzávetőleges hely
+
+en: Chosen in Settings
+tr: A Beállításokban kiválasztva
+
+en: Allow
+tr: Engedélyezés
+
+en: Use precise location
+tr: Pontos hely használata
+
+en: See the weather where you are: allow your precise location.
+tr: Nézze meg az időjárást ott, ahol van: engedélyezze a pontos helyét.
+
+en: Your position is approximate (about 10 km).
+tr: A helye hozzávetőleges (kb. 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: A hely ki van kapcsolva ennél az alkalmazásnál a Windowsban.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Ez az eszköz nem tudja jelenteni a helyét. Keressen inkább egy várost.
+
+en: Reading Windows location…
+tr: A Windows-hely beolvasása…
+
+en: Automatic weather follows your Windows location.
+tr: Az automatikus időjárás a Windows-helyét követi.
+
+en: Search for a city
+tr: Város keresése
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Az időjárás megtekintéséhez keressen egy várost, vagy engedélyezze a helymeghatározást.
+
+en: Searching…
+tr: Keresés…
+
+en: City search is unavailable.
+tr: A városkeresés nem érhető el.
+
+en: No city found.
+tr: Nem található város.
+
+en: Weather settings
+tr: Időjárás beállításai
+
+en: Loading the weather…
+tr: Az időjárás betöltése…
+
+en: Loading…
+tr: Betöltés…
+
+en: Updated {}
+tr: Frissítve: {}
+
+en: Near {}
+tr: {} közelében
+
+en: Temperatures now
+tr: Jelenlegi hőmérsékletek
+
+en: The map is unavailable.
+tr: A térkép nem érhető el.
+
+en: Map: Natural Earth
+tr: Térkép: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Időjárási adatok: Open-Meteo.com
+
+en: Feels like
+tr: Hőérzet
+
+en: Feels like {}
+tr: Hőérzet: {}
+
+en: Close to the real temperature
+tr: Közel a valós hőmérséklethez
+
+en: The wind makes it feel colder
+tr: A szél miatt hidegebbnek érződik
+
+en: Humidity makes it feel warmer
+tr: A páratartalom miatt melegebbnek érződik
+
+en: Humidity
+tr: Páratartalom
+
+en: Cloud cover {}
+tr: Felhőzet: {}
+
+en: Wind
+tr: Szél
+
+en: Gusts {}
+tr: Széllökések: {}
+
+en: Sunrise and sunset
+tr: Napkelte és napnyugta
+
+en: UV index
+tr: UV-index
+
+en: Pressure
+tr: Légnyomás
+
+en: At sea level
+tr: Tengerszinten
+
+en: &Open the weather
+tr: Az időjárás &megnyitása
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Előrejelzés arra a helyre, ahol tartózkodik, körülbelül 100 m pontossággal, a saját tengerszint feletti magasságával. Ki: körülbelül 10 km-re kerekítve.

@@ -1,0 +1,2494 @@
+# Hebrew (he): עברית. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: בחר את המיקום של Windows כדי להפעיל מזג אוויר אוטומטי.
+
+en: Windows taskbar visible
+tr: שורת המשימות של Windows גלויה
+
+en: Connected to {}
+tr: מחובר אל {}
+
+en: {} is out of range
+tr: {} מחוץ לטווח
+
+en: Connecting to {} took too long
+tr: ההתחברות אל {} נמשכה זמן רב מדי
+
+en: Use Windows to join {}
+tr: השתמש ב-Windows כדי להצטרף אל {}
+
+en: Windows did not allow this connection
+tr: Windows לא אישרה את החיבור הזה
+
+en: Could not connect to {}
+tr: לא ניתן להתחבר אל {}
+
+en: Connect to {}
+tr: התחבר אל {}
+
+en: That password was not accepted. Check it and try again.
+tr: הסיסמה לא התקבלה. בדוק אותה ונסה שוב.
+
+en: Enter this network's password.
+tr: הזן את הסיסמה של רשת זו.
+
+en: &Connect
+tr: התחבר (&C)
+
+en: Windows Settings could not be opened
+tr: לא ניתן לפתוח את ההגדרות של Windows
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: לא ניתן לשריין מקום עבור ה-Dock. משחזר את שורת המשימות של Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: ההחלפה אינה זמינה: לא ניתן להפעיל את משגיח השחזור
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: שורת המשימות של Windows שוחזרה. לא ניתן לשריין מקום עבור ה-Dock. כבה את ההחלפה והפעל אותה שוב כדי לנסות שוב.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: השגחת השחזור אינה זמינה. משחזר את שורת המשימות של Windows
+
+en: Windows notifications could not be opened
+tr: לא ניתן לפתוח את ההודעות של Windows
+
+en: The Windows calendar could not be opened
+tr: לא ניתן לפתוח את לוח השנה של Windows
+
+en: Windows did not show its hidden icons
+tr: Windows לא הציגה את הסמלים המוסתרים שלה
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: רענון המיקום האוטומטי אינו זמין. נסה שוב בהגדרות מזג האוויר.
+
+en: Windows location
+tr: המיקום של Windows
+
+en: Reading approximate Windows location…
+tr: קורא את המיקום המשוער של Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: מזג האוויר האוטומטי עוקב אחר המיקום המשוער של Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: הגישה למיקום של Windows חסומה. מזג האוויר אינו זמין.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows לא הצליחה לספק מיקום נוכחי. מזג האוויר אינו זמין.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: שירות המיקום אינו זמין. מזג האוויר אינו זמין.
+
+en: Waiting for Windows location permission…
+tr: ממתין להרשאת המיקום של Windows…
+
+en: The automatic weather choice could not be saved.
+tr: לא ניתן לשמור את הבחירה במזג אוויר אוטומטי.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: הגישה למיקום של Windows אינה זמינה או שנדחתה. מזג האוויר אינו זמין.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: המיקום של Windows לא הצליח לבקש הרשאה. בדוק את הגדרות המיקום של Windows.
+
+en: Status worker unavailable
+tr: שירות המצב אינו זמין
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows לא הצליחה להשלים פעולה זו. בדוק את ההגדרות שלה.
+
+en: Reading Windows status; try the action again shortly
+tr: קורא את המצב של Windows. נסה שוב את הפעולה בעוד רגע
+
+en: Could not disconnect
+tr: לא ניתן להתנתק
+
+en: The Windows accessibility feature could not be started
+tr: לא ניתן להפעיל את תכונת הנגישות של Windows
+
+en: Windows could not change the audio output
+tr: Windows לא הצליחה לשנות את פלט השמע
+
+en: The Windows control could not be opened
+tr: לא ניתן לפתוח את הפקד של Windows
+
+en: Keyboard shortcuts disabled
+tr: קיצורי המקשים מושבתים
+
+en: Both keyboard shortcuts registered
+tr: שני קיצורי המקשים נרשמו
+
+en: A keyboard shortcut is already in use by another application
+tr: קיצור מקשים כבר נמצא בשימוש על-ידי יישום אחר
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: לא ניתן לבקש את ההגדרות המהירות של Windows. נקה את האפשרות 'השתמש בהגדרות המהירות של Windows' בהגדרות הסרגל העליון כדי להשתמש בפקדים של Aether.
+
+en: Windows Start could not be opened
+tr: לא ניתן לפתוח את התחל של Windows
+
+en: Windows Task View could not be opened
+tr: לא ניתן לפתוח את תצוגת המשימות של Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: החלפת פריסת המקלדת של Windows לא הייתה זמינה
+
+en: Windows voice typing could not be opened
+tr: לא ניתן לפתוח את ההקלדה הקולית של Windows
+
+en: Windows taskbar could not be revealed
+tr: לא ניתן להציג את שורת המשימות של Windows
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: לא ניתן לחדש את החלפת שורת המשימות. Windows נשארת זמינה
+
+en: Windows taskbar replacement is unavailable in this session
+tr: החלפת שורת המשימות של Windows אינה זמינה בהפעלה זו
+
+en: Windows pin access is unavailable in this isolated session
+tr: הגישה להצמדות של Windows אינה זמינה בהפעלה מבודדת זו
+
+en: Windows pinned applications could not be read
+tr: לא ניתן לקרוא את היישומים המוצמדים של Windows
+
+en: Settings changed during pin import. Try import again.
+tr: ההגדרות השתנו במהלך ייבוא ההצמדות. נסה לייבא שוב.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: נשמרו {} יישומים מוצמדים נוספים. ייתכן שחלק מההצמדות של Windows לא יהיו זמינות.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: ההצמדות השתנו בזיכרון, אך השמירה נכשלה. לחץ על 'החל' בהגדרות כדי לנסות שוב.
+
+en: Pins updated in memory; saving...
+tr: ההצמדות עודכנו בזיכרון. שומר...
+
+en: Imported pins could not be applied
+tr: לא ניתן להחיל את ההצמדות שיובאו
+
+en: Pin import is unavailable while closing
+tr: ייבוא ההצמדות אינו זמין בזמן הסגירה
+
+en: Settings could not be saved
+tr: לא ניתן לשמור את ההגדרות
+
+en: Quit without saving the latest changes?
+tr: לצאת מבלי לשמור את השינויים האחרונים?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: קובץ ההגדרות הקודם שלך נשמר. השאר את Aether Shell פתוח כדי לנסות לשמור שוב.
+
+en: &Quit without saving
+tr: צא מבלי לשמור (&Q)
+
+en: &Keep Aether Shell open
+tr: השאר את Aether Shell פתוח (&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: ייצא נתוני אבחון בסיסיים — גרסת היישום וגרסת ה-Build של Windows, ללא יומנים או נתונים אישיים
+
+en: Diagnostics exported.
+tr: נתוני האבחון יוצאו.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: לא ניתן לשמור את נתוני האבחון בקובץ שנבחר.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: לא ניתן לקרוא את ההגדרות בבטחה. הקובץ הקיים נשמר.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell לא הצליח להפעיל את רכיבי שולחן העבודה שלו.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: שחזור שורת המשימות של Windows ממתין. נסה שוב או סגור את Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: שורת המשימות של Windows מוצגת באופן זמני.
+
+en: Windows taskbar restored.
+tr: שורת המשימות של Windows שוחזרה.
+
+en: Windows taskbar replacement is active.
+tr: החלפת שורת המשימות של Windows פעילה.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: שורת המשימות של Windows נשארת זמינה. ההחלפה תנסה שוב בקרוב.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: שורת המשימות של Windows נשארת זמינה. כבה את ההחלפה והפעל אותה שוב כדי לנסות שוב.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: שורת המשימות של Windows שוחזרה. ההחלפה תתחבר מחדש בקרוב.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: שורת המשימות של Windows שוחזרה. כבה את ההחלפה והפעל אותה שוב כדי לנסות שוב.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: החלפת שורת המשימות הופסקה. שורת המשימות של Windows שוחזרה.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: החלפת שורת המשימות הופסקה. לא ניתן לאשר את שחזור שורת המשימות של Windows.
+
+en: Activating taskbar replacement...
+tr: מפעיל את החלפת שורת המשימות...
+
+en: Restoring Windows taskbar...
+tr: משחזר את שורת המשימות של Windows...
+
+en: Reconnecting taskbar replacement...
+tr: מתחבר מחדש להחלפת שורת המשימות...
+
+en: Showing the Windows taskbar temporarily...
+tr: מציג את שורת המשימות של Windows באופן זמני...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell לא הצליח לשחזר את שורת המשימות של Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: הפעל מחדש את סייר Windows ממנהל המשימות (Ctrl+Shift+Esc), או צא והיכנס שוב.
+
+en: The Windows taskbar was restored to its saved state.
+tr: שורת המשימות של Windows שוחזרה למצב השמור שלה.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: לא נמצא מצב שמור של שורת המשימות. שורת המשימות של Windows הוצגה; הגדרת ההסתרה האוטומטית שלה לא שונתה.
+
+en: There was nothing to restore.
+tr: לא היה מה לשחזר.
+
+en: Taskbar replacement is turned off.
+tr: החלפת שורת המשימות כבויה.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: לא ניתן לכבות את החלפת שורת המשימות באופן אוטומטי. כבה אותה בהגדרות של Aether Shell > שולחן העבודה.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: שורת פקודה לא מזוהה או לא חוקית של Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell לא הצליח ליצור את תיקיות הנתונים המקומיות שלו.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell הופסק לאחר שגיאה בלתי צפויה.
+
+## search-names
+
+en: Disk Management
+tr: ניהול דיסקים
+
+en: Local Users and Groups
+tr: משתמשים וקבוצות מקומיים
+
+en: Local Group Policy Editor
+tr: עורך מדיניות קבוצתית מקומית
+
+en: Manage User Certificates
+tr: נהל אישורי משתמש
+
+en: Manage Computer Certificates
+tr: נהל אישורי מחשב
+
+en: Shared Folders
+tr: תיקיות משותפות
+
+en: TPM Management
+tr: ניהול TPM
+
+en: Network Connections
+tr: חיבורי רשת
+
+en: System Properties
+tr: מאפייני מערכת
+
+en: About Windows
+tr: אודות Windows
+
+en: DirectX Diagnostic Tool
+tr: כלי האבחון של DirectX
+
+en: Windows Features
+tr: תכונות Windows
+
+en: System Restore
+tr: שחזור מערכת
+
+en: Advanced System Settings
+tr: הגדרות מערכת מתקדמות
+
+en: Volume Mixer
+tr: מערבל עוצמת הקול
+
+en: Microsoft Management Console
+tr: מסוף הניהול של Microsoft
+
+en: User Accounts (Advanced)
+tr: חשבונות משתמשים (מתקדם)
+
+en: Display settings
+tr: הגדרות תצוגה
+
+en: Night light settings
+tr: הגדרות אור לילה
+
+en: Graphics settings
+tr: הגדרות גרפיקה
+
+en: Sound settings
+tr: הגדרות קול
+
+en: Notification settings
+tr: הגדרות הודעות
+
+en: Power & battery settings
+tr: הגדרות צריכת חשמל וסוללה
+
+en: Energy saver settings
+tr: הגדרות חיסכון באנרגיה
+
+en: Storage settings
+tr: הגדרות אחסון
+
+en: Multitasking settings
+tr: הגדרות ריבוי משימות
+
+en: Clipboard settings
+tr: הגדרות לוח
+
+en: Remote Desktop settings
+tr: הגדרות שולחן עבודה מרוחק
+
+en: About your PC
+tr: אודות המחשב שלך
+
+en: Bluetooth & devices settings
+tr: הגדרות Bluetooth והתקנים
+
+en: Printers & scanners settings
+tr: הגדרות מדפסות וסורקים
+
+en: Mouse settings
+tr: הגדרות עכבר
+
+en: Touchpad settings
+tr: הגדרות משטח מגע
+
+en: Network & internet settings
+tr: הגדרות רשת ואינטרנט
+
+en: Wi-Fi settings
+tr: הגדרות Wi-Fi
+
+en: VPN settings
+tr: הגדרות VPN
+
+en: Proxy settings
+tr: הגדרות Proxy
+
+en: Airplane mode settings
+tr: הגדרות מצב טיסה
+
+en: Mobile hotspot settings
+tr: הגדרות נקודה חמה לנייד
+
+en: Background settings
+tr: הגדרות רקע
+
+en: Color settings
+tr: הגדרות צבעים
+
+en: Theme settings
+tr: הגדרות ערכות נושא
+
+en: Lock screen settings
+tr: הגדרות מסך נעילה
+
+en: Taskbar settings
+tr: הגדרות שורת המשימות
+
+en: Font settings
+tr: הגדרות גופנים
+
+en: Installed apps
+tr: יישומים מותקנים
+
+en: Default apps settings
+tr: הגדרות יישומי ברירת מחדל
+
+en: Startup apps settings
+tr: הגדרות יישומי הפעלה
+
+en: Account info
+tr: פרטי חשבון
+
+en: Sign-in options
+tr: אפשרויות כניסה
+
+en: Other users settings
+tr: הגדרות משתמשים אחרים
+
+en: Date & time settings
+tr: הגדרות תאריך ושעה
+
+en: Language & region settings
+tr: הגדרות שפה ואזור
+
+en: Typing settings
+tr: הגדרות הקלדה
+
+en: Accessibility settings
+tr: הגדרות נגישות
+
+en: Privacy & security settings
+tr: הגדרות פרטיות ואבטחה
+
+en: Location settings
+tr: הגדרות מיקום
+
+en: Windows Update settings
+tr: הגדרות Windows Update
+
+en: Recovery settings
+tr: הגדרות שחזור
+
+en: Activation settings
+tr: הגדרות הפעלה
+
+en: For developers settings
+tr: הגדרות למפתחים
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: לא ניתן להתחבר ל-GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub לא השיב לבקשה כרגע.
+
+en: The release did not pass verification, so nothing was installed.
+tr: הגרסה לא עברה את האימות, לכן לא הותקן דבר.
+
+en: There is not enough free disk space.
+tr: אין מספיק שטח פנוי בדיסק.
+
+en: Windows refused access to the update files.
+tr: Windows סירבה לגשת לקובצי העדכון.
+
+en: {} bytes
+tr: {} בתים
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: מצב
+
+en: Check &now
+tr: בדוק כעת (&N)
+
+en: Download and install
+tr: הורד והתקן
+
+en: &Later
+tr: מאוחר יותר (&L)
+
+en: S&kip this version
+tr: דלג על גרסה זו (&K)
+
+en: &Release details
+tr: פרטי הגרסה (&R)
+
+en: Disable &notifications
+tr: השבת הודעות (&N)
+
+en: Release notes
+tr: הערות גרסה
+
+en: the new version
+tr: הגרסה החדשה
+
+en: Installed: {}.
+tr: מותקנת: {}.
+
+en: Automatic update checks are off
+tr: בדיקות העדכונים האוטומטיות כבויות
+
+en: Check now looks for a newer release once.
+tr: 'בדוק כעת' מחפש גרסה חדשה יותר פעם אחת.
+
+en: Last checked {}
+tr: נבדק לאחרונה {}
+
+en: Not checked yet
+tr: עדיין לא נבדק
+
+en: Checking for updates...
+tr: מחפש עדכונים...
+
+en: Aether Shell is up to date
+tr: Aether Shell מעודכן
+
+en: Latest published release: {}.
+tr: הגרסה האחרונה שפורסמה: {}.
+
+en: Version {} is available
+tr: גרסה {} זמינה
+
+en: Download size: {}.
+tr: גודל ההורדה: {}.
+
+en: Downloading version {}...
+tr: מוריד את גרסה {}...
+
+en: Received {} of {} ({}%).
+tr: התקבלו {} מתוך {} ({}%).
+
+en: Received {}; total size unknown.
+tr: התקבלו {}; הגודל הכולל אינו ידוע.
+
+en: Version {} is ready to install
+tr: גרסה {} מוכנה להתקנה
+
+en: Verified with the signed release manifest and SHA-256.
+tr: אומת באמצעות מניפסט הגרסה החתום ו-SHA-256.
+
+en: The update could not be completed
+tr: לא ניתן להשלים את העדכון
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: בשלב זה ההתקנה ידנית: פתח את פרטי הגרסה, ואז הורד והפעל את תוכנית ההתקנה שלה.
+
+en: Failure: {}.
+tr: כשל: {}.
+
+en: Choose Retry Download to try again.
+tr: בחר 'נסה שוב להוריד' כדי לנסות שוב.
+
+en: Use Check now to try again.
+tr: השתמש ב'בדוק כעת' כדי לנסות שוב.
+
+en: Next automatic check: {}.
+tr: הבדיקה האוטומטית הבאה: {}.
+
+en: &Install update
+tr: התקן עדכון (&I)
+
+en: Retry &Download
+tr: נסה שוב להוריד (&D)
+
+en: &Download and install
+tr: הורד והתקן (&D)
+
+en: Windows' startup state could not be read in this session.
+tr: לא ניתן לקרוא את מצב ההפעלה של Windows בהפעלה זו.
+
+en: Windows will start it at your next sign-in.
+tr: Windows תפעיל אותו בכניסה הבאה שלך.
+
+en: Right now it will not start at sign-in.
+tr: כרגע הוא לא יופעל בכניסה.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: הוא כבוי במנהל המשימות או בהגדרות של Windows, שקובעים עד שיופעל שם מחדש.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows הייתה מפעילה עותק נוסף של Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows מדווחת על מצב הפעלה שגרסה זו אינה יכולה לקרוא.
+
+en: The close action could not be completed.
+tr: לא ניתן להשלים את פעולת הסגירה.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: הזן מספר שלם לפני השמירה; השדה המסומן באדום אינו מספר.
+
+en: Settings could not be validated.
+tr: לא ניתן לאמת את ההגדרות.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: ההפעלה בכניסה נשארה כפי שהייתה, כי לא ניתן היה לשמור את ההגדרות.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: לא ניתן לשמור את ההגדרות, ולא ניתן להחזיר את ההפעלה בכניסה של Windows. לחץ שוב על 'החל' כדי לנסות שוב.
+
+en: Settings saved.
+tr: ההגדרות נשמרו.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: ההגדרות השתנו בזיכרון, אך השמירה נכשלה. לחץ שוב על 'החל' כדי לנסות שוב.
+
+en: Settings could not be applied.
+tr: לא ניתן להחיל את ההגדרות.
+
+en: Some values were corrected to their supported range.
+tr: חלק מהערכים תוקנו לטווח הנתמך שלהם.
+
+en: Startup registration is unavailable in this session.
+tr: רישום ההפעלה אינו זמין בהפעלה זו.
+
+en: Changing startup registration...
+tr: משנה את רישום ההפעלה...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows לא שינתה את רישום ההפעלה. בדוק את הגדרת ההפעלה במנהל המשימות.
+
+en: Startup registration could not be changed.
+tr: לא ניתן לשנות את רישום ההפעלה.
+
+en: Defaults saved; startup is disabled.
+tr: ברירות המחדל נשמרו; ההפעלה מושבתת.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: ברירות המחדל הוחלו, אך השמירה נכשלה. לחץ שוב על 'החל' כדי לנסות שוב.
+
+en: Defaults could not be applied.
+tr: לא ניתן להחיל את ברירות המחדל.
+
+en: Startup was not disabled; settings were kept.
+tr: ההפעלה לא הושבתה; ההגדרות נשמרו.
+
+en: Location search is unavailable.
+tr: חיפוש המיקום אינו זמין.
+
+en: Searching Open-Meteo locations...
+tr: מחפש מיקומים ב-Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: חיפוש המיקום נכשל. בדוק את החיבור שלך ונסה שוב.
+
+en: No place matched that search.
+tr: אף מקום לא תאם לחיפוש זה.
+
+en: Choose a location to save it.
+tr: בחר מיקום כדי לשמור אותו.
+
+en: Reset all settings?
+tr: לאפס את כל ההגדרות?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: ההעדפות והיישומים המוצמדים יחזרו לברירות המחדל שלהם, וההפעלה בכניסה תכובה.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: הבחירה שלך לגבי שורת המשימות של Windows נשמרת. גם עותק גיבוי של קובץ ההגדרות הנוכחי נשמר.
+
+en: &Reset
+tr: אפס (&R)
+
+en: Cancel
+tr: ביטול
+
+en: Pinned applications saved.
+tr: היישומים המוצמדים נשמרו.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: ההצמדות השתנו בזיכרון, אך השמירה נכשלה. לחץ שוב על 'החל' כדי לנסות שוב.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: לא ניתן לשחזר את ברירות המחדל, כי רישום ההפעלה אינו זמין.
+
+en: Pinned application could not be added.
+tr: לא ניתן להוסיף את היישום המוצמד.
+
+en: Choose an application to add first.
+tr: בחר תחילה יישום להוספה.
+
+en: Pinned applications could not be changed.
+tr: לא ניתן לשנות את היישומים המוצמדים.
+
+en: Choose a pinned application first.
+tr: בחר תחילה יישום מוצמד.
+
+en: Desktop status is unavailable in this session.
+tr: מצב שולחן העבודה אינו זמין בהפעלה זו.
+
+en: Desktop status is unavailable.
+tr: מצב שולחן העבודה אינו זמין.
+
+en: Password
+tr: סיסמה
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: מוריד את השפה {} מ-GitHub ({}). עד שתהיה מוכנה, הממשק מוצג באנגלית.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: לא ניתן היה להוריד את השפה {}. עד שתורד, הממשק מוצג באנגלית; כדי לנסות שוב, בחר 'הורד' למטה.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: השפה {} עדיין לא נמצאת במחשב זה. עד שתורד, הממשק מוצג באנגלית.
+
+en: {} is on this PC.
+tr: השפה {} נמצאת במחשב זה.
+
+en: Every language is on this PC.
+tr: כל השפות נמצאות במחשב זה.
+
+en: Choose a language to download first.
+tr: בחר תחילה שפה להורדה.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: הסרגל העליון
+
+en: Weather
+tr: מזג אוויר
+
+en: Updates
+tr: עדכונים
+
+en: General
+tr: כללי
+
+en: About
+tr: אודות
+
+en: Desktop
+tr: שולחן העבודה
+
+en: Appearance
+tr: מראה
+
+en: Welcome
+tr: קבלת פנים
+
+en: Aether Shell Settings
+tr: הגדרות Aether Shell
+
+en: Settings
+tr: הגדרות
+
+en: Reset defaults...
+tr: אפס לברירות המחדל...
+
+en: &Apply
+tr: החל (&A)
+
+en: Liquid
+tr: נוזלי
+
+en: Grain
+tr: גרעיני
+
+en: From {} to {}
+tr: מ-{} עד {}
+
+en: px
+tr: px
+
+en: min
+tr: דק'
+
+en: h
+tr: שע'
+
+en: This action could not be completed.
+tr: לא ניתן להשלים פעולה זו.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: גודל, מרווחים, תנועה והיישומים המוצמדים ל-Dock.
+
+en: Size and spacing
+tr: גודל ומרווחים
+
+en: Icon size
+tr: גודל הסמלים
+
+en: {}, scaled with the Windows display scale.
+tr: {}, בהתאם לשינוי קנה המידה של התצוגה ב-Windows.
+
+en: Bottom margin
+tr: שוליים תחתונים
+
+en: Space between the Dock and the bottom of the screen.
+tr: המרווח בין ה-Dock לתחתית המסך.
+
+en: Minimum side margin
+tr: שוליים צדדיים מינימליים
+
+en: Space kept free at the left and right screen edges.
+tr: המרווח שנשאר פנוי בקצוות השמאלי והימני של המסך.
+
+en: Icon spacing
+tr: מרווח בין סמלים
+
+en: Space between neighbouring icons.
+tr: המרווח בין סמלים סמוכים.
+
+en: Glass and motion
+tr: זכוכית ותנועה
+
+en: Glass opacity
+tr: אטימות הזכוכית
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: ערכים נמוכים יותר מציגים יותר משולחן העבודה המטושטש שמאחורי ה-Dock.
+
+en: Hover magnification
+tr: הגדלה בריחוף
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: כמה סמל גדל מתחת למצביע; 1 מכבה זאת.
+
+en: Behavior
+tr: התנהגות
+
+en: Show running applications
+tr: הצג יישומים פועלים
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: יישומים פתוחים שאינם מוצמדים מופיעים אחרי היישומים המוצמדים.
+
+en: Reserve screen space for the Dock
+tr: שריין שטח מסך עבור ה-Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: חלונות מוגדלים נשארים מעל ה-Dock במקום מתחתיו.
+
+en: Automatically hide the Dock
+tr: הסתר את ה-Dock באופן אוטומטי
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: מוסתר כשחלון של יישום מכסה אותו; הזז את המצביע לקצה התחתון של המסך כדי להציג אותו. הוא נשאר על שולחן העבודה, והחלונות מקבלים את מלוא גובה המסך.
+
+en: Pinned applications
+tr: יישומים מוצמדים
+
+en: Move &up
+tr: הזז למעלה (&U)
+
+en: Move &down
+tr: הזז למטה (&D)
+
+en: &Remove
+tr: הסר (&R)
+
+en: &Add application
+tr: הוסף יישום (&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: ההצמדות שומרות על הזהות ועל הגדרות ההפעלה שלהן. הסרת הצמדה גם מונעת מהסנכרון האוטומטי עם שורת המשימות של Windows להוסיף אותה שוב.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: מיקום, שעון ופריטי המצב המוצגים בסרגל המצב העליון.
+
+en: Presentation
+tr: תצוגה
+
+en: Floating bar
+tr: סרגל צף
+
+en: Text on the desktop
+tr: טקסט על שולחן העבודה
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: סרגל צף: סרגל הזכוכית מתחת לראש המסך. טקסט על שולחן העבודה: ללא סרגל, אותם פריטים כתובים בראש המסך ממש, ישירות מעל תמונת שולחן העבודה; רצועה זו נשארת פנויה מחלונות, והשוליים העליונים ואטימות הזכוכית אינם חלים. עם הסתרה אוטומטית, הטקסט חוזר על רצועת זכוכית כשחלון נמצא מתחתיו.
+
+en: Position and glass
+tr: מיקום וזכוכית
+
+en: Top margin
+tr: שוליים עליונים
+
+en: Space between the Top Bar and the top of the screen.
+tr: המרווח בין הסרגל העליון לראש המסך.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: ערכים נמוכים יותר מציגים יותר משולחן העבודה המטושטש שמאחורי הסרגל.
+
+en: Clock
+tr: שעון
+
+en: Clock format
+tr: תבנית השעון
+
+en: Follow Windows
+tr: כמו ב-Windows
+
+en: 12-hour
+tr: 12 שעות
+
+en: 24-hour
+tr: 24 שעות
+
+en: Date style
+tr: סגנון התאריך
+
+en: Weekday, day and month
+tr: יום בשבוע, יום וחודש
+
+en: Short
+tr: קצר
+
+en: Long
+tr: ארוך
+
+en: Show seconds
+tr: הצג שניות
+
+en: Show date
+tr: הצג תאריך
+
+en: Status items
+tr: פריטי מצב
+
+en: Show battery
+tr: הצג סוללה
+
+en: Hide battery when absent
+tr: הסתר את הסוללה כשאין סוללה
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: מחשבים שולחניים ללא סוללה אינם מציגים דבר במקום סוללה לא ידועה.
+
+en: Show input language
+tr: הצג את שפת הקלט
+
+en: Show network
+tr: הצג רשת
+
+en: Show audio output
+tr: הצג את פלט השמע
+
+en: Show microphone
+tr: הצג מיקרופון
+
+en: Show weather when enabled
+tr: הצג מזג אוויר כשהוא מופעל
+
+en: Weather itself is turned on in Weather settings.
+tr: מזג האוויר עצמו מופעל בהגדרות מזג האוויר.
+
+en: Show hidden icons button
+tr: הצג את לחצן הסמלים המוסתרים
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: חץ קטן שפותח את הסמלים המוסתרים באזור ההודעות של Windows.
+
+en: Reserve screen space above windows
+tr: שריין שטח מסך מעל החלונות
+
+en: Maximized windows stay below the Top Bar.
+tr: חלונות מוגדלים נשארים מתחת לסרגל העליון.
+
+en: Automatically hide the Top Bar
+tr: הסתר את הסרגל העליון באופן אוטומטי
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: מוסתר כשחלון של יישום מכסה אותו; הזז את המצביע לקצה העליון של המסך כדי להציג אותו. הוא נשאר על שולחן העבודה.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: השתמש בהגדרות המהירות של Windows ‏(Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: כבוי: הפקדים המהירים של Aether נפתחים מתחת לסרגל העליון. מופעל: החלונית של Windows עצמה נפתחת בתחתית המסך.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: תחזית אופציונלית בסרגל העליון, מסופקת על-ידי Open-Meteo.
+
+en: Forecast
+tr: תחזית
+
+en: Enable weather
+tr: הפעל מזג אוויר
+
+en: Off by default: the forecast needs network requests.
+tr: כבוי כברירת מחדל: התחזית דורשת בקשות רשת.
+
+en: Temperature
+tr: טמפרטורה
+
+en: Celsius
+tr: צלזיוס
+
+en: Fahrenheit
+tr: פרנהייט
+
+en: Refresh interval
+tr: מרווח הרענון
+
+en: Location
+tr: מיקום
+
+en: Locate automatically with Windows
+tr: אתר באופן אוטומטי באמצעות Windows
+
+en: Uses the Windows location service after you allow it.
+tr: משתמש בשירות המיקום של Windows לאחר שתאשר זאת.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows מבקשת הרשאת מיקום. הקואורדינטות שלך נשלחות אל Open-Meteo.com רק כדי לקבל את התחזית; מפתח מיקום נשמר במטמון מקומי. אם המיקום חסום, מזג האוויר אינו זמין.
+
+en: Use &Windows location
+tr: השתמש במיקום של Windows (&W)
+
+en: Location &settings
+tr: הגדרות מיקום (&S)
+
+en: Choose automatic location or search for a place below.
+tr: בחר מיקום אוטומטי או חפש מקום למטה.
+
+en: Search for a place
+tr: חפש מקום
+
+en: Searc&h
+tr: חפש (&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: נתוני מזג אוויר מאת Open-Meteo.com ‏(CC BY 4.0). חיפוש ידני שולח רק את הטקסט שאתה מזין.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: גרסאות חתומות ממאגר GitHub הרשמי, מאומתות לפני ההתקנה.
+
+en: Preferences
+tr: העדפות
+
+en: Check for updates automatically
+tr: חפש עדכונים באופן אוטומטי
+
+en: Check interval
+tr: מרווח הבדיקה
+
+en: Release channel
+tr: ערוץ גרסאות
+
+en: Prereleases arrive earlier and change more often.
+tr: גרסאות טרום-הפצה מגיעות מוקדם יותר ומשתנות לעתים קרובות יותר.
+
+en: Stable
+tr: יציב
+
+en: Prerelease
+tr: טרום-הפצה
+
+en: Show update notifications
+tr: הצג הודעות עדכון
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: הפעלה, תנועה, קיצורי מקשים ואבחון.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: השפה של הסרגלים, התפריטים, החיפוש, ההגדרות ותוכנית ההתקנה.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: שמות ששייכים לך או לתוכניות אחרות (יישומים, קבצים, רשתות Wi-Fi) לעולם אינם מתורגמים. עם שפה שנבחרה, הסרגל העליון כותב בה את התאריך; 'כמו ב-Windows' שומר על התבנית האזורית שלך ב-Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: קבלת הפנים בכתב יד כותבת באותיות לטיניות: היא מברכת בצרפתית, באנגלית או בספרדית. בחר את השפה שלה ב'קבלת פנים'.
+
+en: Language
+tr: שפה
+
+en: Interface language
+tr: שפת הממשק
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: 'כמו ב-Windows' משתמש בשפה הראשונה מבין שפות התצוגה שלך ב-Windows שנמצאת ברשימה זו, ובאנגלית אם אין כזו.
+
+en: Startup
+tr: הפעלה
+
+en: Start Aether Shell when I sign in
+tr: הפעל את Aether Shell כשאני נכנס
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: שינוי זה דורש 'החל'. ניתן גם לכבות זאת במנהל המשימות.
+
+en: Motion
+tr: תנועה
+
+en: Reduced motion removes decorative movement everywhere.
+tr: תנועה מופחתת מסירה תנועה דקורטיבית בכל מקום.
+
+en: Reduced
+tr: מופחתת
+
+en: Full
+tr: מלאה
+
+en: Keyboard shortcuts
+tr: קיצורי מקשים
+
+en: Enable global keyboard shortcuts
+tr: הפעל קיצורי מקשים גלובליים
+
+en: Search shortcut key
+tr: מקש הקיצור של החיפוש
+
+en: Dock shortcut key
+tr: מקש הקיצור של ה-Dock
+
+en: Search shortcut modifiers
+tr: מקשי הצירוף של קיצור החיפוש
+
+en: Dock shortcut modifiers
+tr: מקשי הצירוף של קיצור ה-Dock
+
+en: Shortcut status unavailable
+tr: מצב קיצורי המקשים אינו זמין
+
+en: Diagnostics
+tr: אבחון
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: תיקיית היומנים מכילה את יומני Aether Shell של מחשב זה. ייצוא נתוני אבחון שומר רק את גרסת היישום ואת גרסת ה-Build של Windows - ללא יומנים או נתונים אישיים.
+
+en: Open &log folder
+tr: פתח את תיקיית היומנים (&L)
+
+en: &Export diagnostics...
+tr: ייצא נתוני אבחון (&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: ברכה קצרה בכתב יד על שולחן העבודה לאחר שאתה נכנס או מבטל את נעילת המחשב.
+
+en: Greeting
+tr: ברכה
+
+en: Show the welcome at sign-in and unlock
+tr: הצג את קבלת הפנים בכניסה ובביטול הנעילה
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: היא מופיעה לאחר ש-Windows השלימה את הכניסה שלך, בזמן ש-Aether Shell מתכונן. גע, לחץ או הקש Escape כדי לדלג עליה.
+
+en: Greeting language
+tr: שפת הברכה
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut בצרפתית, Hello באנגלית, Hola בספרדית. העט כותב אותיות לטיניות: בכל שפה אחרת הוא מברך באנגלית.
+
+en: Your name
+tr: השם שלך
+
+en: Name to greet you with
+tr: השם שבו תתקבל בברכה
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: אופציונלי, לדוגמה שם פרטי. הוא נשאר במחשב זה בהגדרות Aether Shell, ולעולם אינו נשלח לשום מקום או נכתב ביומן. נקה את השדה כדי להסיר אותו.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: מצב צבע, צבע הדגשה, מהירות התנועה והמראה של ה-Dock והסרגל העליון.
+
+en: Style
+tr: סגנון
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: נוזלי: זכוכית בשכבות מעל מה שנמצא מאחור, שכבת טשטוש, האור של הנוזל, ואז הסמלים והטקסט, קריאים מעל דפים בהירים וכהים. גרעיני: זכוכית חלבית, מטושטשת ושקופה למחצה, עם גרעיניות עדינה.
+
+en: Liquid blur
+tr: טשטוש נוזלי
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: עד כמה שכבת הטשטוש שמתחת לזכוכית הנוזלית מכסה את מה שנמצא מאחור: 100% מטשטש הכול. ערכים נמוכים יותר מציגים את הדף חד יותר, ואז הטקסט בסרגלים עלול להיות פחות קריא מעל דף עמוס.
+
+en: Liquid blur color
+tr: צבע הטשטוש הנוזלי
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: 'אוטומטי' שומר על הצבעים של הזכוכית עצמה. הטקסט והסמלים נשארים קריאים בכל צבע.
+
+en: Automatic
+tr: אוטומטי
+
+en: White
+tr: לבן
+
+en: Black
+tr: שחור
+
+en: Accent
+tr: צבע הדגשה
+
+en: Blue
+tr: כחול
+
+en: Violet
+tr: סגול
+
+en: Pink
+tr: ורוד
+
+en: Red
+tr: אדום
+
+en: Orange
+tr: כתום
+
+en: Yellow
+tr: צהוב
+
+en: Green
+tr: ירוק
+
+en: Teal
+tr: טורקיז
+
+en: Liquid color strength
+tr: עוצמת הצבע הנוזלי
+
+en: How much of the chosen color the blur layer takes.
+tr: כמה מהצבע שנבחר מקבלת שכבת הטשטוש.
+
+en: Theme
+tr: ערכת נושא
+
+en: Color mode
+tr: מצב צבע
+
+en: High contrast always takes precedence.
+tr: ניגודיות גבוהה תמיד מקבלת עדיפות.
+
+en: Light
+tr: בהיר
+
+en: Dark
+tr: כהה
+
+en: Accent color
+tr: צבע הדגשה
+
+en: Animation duration
+tr: משך ההנפשה
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 היא המהירות הרגילה; ערכים גבוהים יותר איטיים יותר. תנועה מופחתת מקבלת עדיפות.
+
+en: Dock icon preset
+tr: הגדרה קבועה מראש לסמלי ה-Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: גודל מותאם אישית מהגדרות ה-Dock נשמר עד שתבחר הגדרה קבועה מראש.
+
+en: Small - 32 px
+tr: קטן - 32 px
+
+en: Medium - 40 px
+tr: בינוני - 40 px
+
+en: Large - 48 px
+tr: גדול - 48 px
+
+en: Keep custom size
+tr: שמור על הגודל המותאם אישית
+
+en: Show Windows Start in the Dock
+tr: הצג את התחל של Windows ב-Dock
+
+en: Show Task View in the Dock
+tr: הצג את תצוגת המשימות ב-Dock
+
+en: Reserve extra space for Dock animations
+tr: שריין מקום נוסף להנפשות ה-Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: מרחיק את ההגדלה ואת הקפיצה בהפעלה מחלונות מוגדלים.
+
+en: Weather position
+tr: מיקום מזג האוויר
+
+en: Left
+tr: שמאל
+
+en: Right
+tr: ימין
+
+en: Keyboard indicator
+tr: מחוון המקלדת
+
+en: Compact
+tr: דחוס
+
+en: Two lines
+tr: שתי שורות
+
+en: Windows taskbar pins
+tr: הצמדות בשורת המשימות של Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: הוסף הצמדות חדשות שהתגלו בשורת המשימות של Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: כל עוד שורת המשימות מוחלפת, הצמדות חדשות של Windows מתווספות ל-Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: החלפה הפיכה של שורת המשימות של Windows על-ידי ה-Dock.
+
+en: Taskbar replacement
+tr: החלפת שורת המשימות
+
+en: Replace the Windows taskbar
+tr: החלף את שורת המשימות של Windows
+
+en: Changing this needs Apply.
+tr: שינוי זה דורש 'החל'.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: כל עוד Aether Shell פועל, הוא מסתיר את שורת המשימות של Windows ומשריין מקום מתחת ליישומים מוגדלים.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: מצב שורת המשימות של Windows משוחזר כשמצב זה מושבת או כש-Aether Shell נסגר. כלי שחזור נפרד משחזר אותה גם אם היישום נעצר באופן בלתי צפוי. אם השחזור נכשל, הפעל מחדש את סייר Windows במנהל המשימות.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: ההגדרות של Windows נשארות הממשק המקורי של Windows. דף שורת המשימות שלהן אינו מוחלף על-ידי Aether Shell; קבע את התצורה של מצב זה כאן.
+
+en: Pinned applications from Windows
+tr: יישומים מוצמדים מ-Windows
+
+en: &Import Windows taskbar pins
+tr: ייבא הצמדות משורת המשימות של Windows (&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: קורא קיצורי דרך מוצמדים מבלי לשנות את ההצמדות של Windows. ייתכן שחלק מההצמדות של Windows 11 או הסדר שלהן לא יהיו זמינים.
+
+en: Version {}
+tr: גרסה {}
+
+en: Created by Ibrahim Bouillet
+tr: נוצר על-ידי Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: ממשק שולחן עבודה מקורי של Windows - Dock צף וסרגל מצב עליון - הפועל לצד הסייר.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: נתוני מזג אוויר: Open-Meteo.com ‏(CC BY 4.0). לא כלולות ספריות זמן ריצה של C++ של צד שלישי.
+
+en: &Official project
+tr: הפרויקט הרשמי (&O)
+
+en: Licence
+tr: רישיון
+
+en: Taskbar replacement changes need Apply.
+tr: שינויים בהחלפת שורת המשימות דורשים 'החל'.
+
+en: Changes save automatically. Startup needs Apply.
+tr: השינויים נשמרים באופן אוטומטי. ההפעלה דורשת 'החל'.
+
+en: Changes save automatically.
+tr: השינויים נשמרים באופן אוטומטי.
+
+en: Press Apply to confirm this change.
+tr: לחץ על 'החל' כדי לאשר שינוי זה.
+
+en: Smart transparency
+tr: שקיפות חכמה
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: בסגנון נוזלי, חלון זה מטשטש רק מתחת לטקסט ולפקדים שלו: באופן מלא מעל חלונות אחרים וסמלי שולחן העבודה, קלות מעל תמונת שולחן העבודה, וכלל לא במקום שבו הוא אינו מציג דבר.
+
+en: Languages on this PC
+tr: שפות במחשב זה
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell מוריד את השפות שקיימות ב-Windows, כך שהוא מחליף שפה כש-Windows מחליף שפה.
+
+en: Add a language
+tr: הוסף שפה
+
+en: &Download
+tr: הורד (&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: כל שפה מגיעה מפרסום הגרסה הזו ב-GitHub ונבדקת לפני השימוש בה. כשהיא נמצאת במחשב זה, בחר בה למעלה.
+
+en: built in
+tr: מובנית
+
+en: downloading, {}
+tr: בהורדה, {}
+
+en: download failed
+tr: ההורדה נכשלה
+
+## setup
+
+en: Aether Shell Setup
+tr: התקנת Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: תוכנית ההתקנה לא הצליחה ליצור את הממשק שלה. סגור אותה ונסה שוב, או השתמש באפשרויות ההתקנה השקטה המתועדות.
+
+en: Options
+tr: אפשרויות
+
+en: Install
+tr: התקנה
+
+en: Done
+tr: סיום
+
+en: Remove Aether Shell
+tr: הסר את Aether Shell
+
+en: Repair Aether Shell
+tr: תקן את Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Dock מקורי וסרגל מצב עליון עבור Windows, הפועלים לצד הסייר.
+
+en: Replaces the Windows taskbar while it runs
+tr: מחליף את שורת המשימות של Windows בזמן שהוא פועל
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: צא מ-Aether Shell, כבה זאת בהגדרות > שולחן העבודה, או פתח את "שחזר את שורת המשימות של Windows" בתפריט התחל כדי לקבל בחזרה את שורת המשימות של Windows.
+
+en: Starts when you sign in - your choice
+tr: מופעל בעת הכניסה - לבחירתך
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: התקנות חדשות מופעלות בעת הכניסה כברירת מחדל. ניתן לנקות בחירה זו לפני ההתקנה, או לכבות אותה מאוחר יותר בהגדרות. בחירות הפעלה קיימות והשבתות במנהל המשימות נשמרות.
+
+en: Installs for your account
+tr: מותקן עבור החשבון שלך
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: אין צורך בהרשאות מנהל מערכת. ההגדרות והנתונים שלך נשארים בפרופיל המשתמש שלך.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: הסרת ההתקנה שומרת על ההגדרות והנתונים שלך, אלא אם תבחר להסיר אותם.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: התיקון משחזר את הקבצים של חבילה זו ושומר על ההגדרות שלך. אם Aether Shell השאיר את שורת המשימות של Windows מוסתרת, התיקון משחזר אותה.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: התקנה מעל גרסה קיימת שומרת על ההגדרות שלך. חבילה ישנה יותר נדחית, אלא אם תתיר במפורש שנמוך גרסה.
+
+en: MIT License
+tr: רישיון MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: הרישיון מותקן גם כקובץ LICENSE לצד Aether Shell.
+
+en: Remove this installation
+tr: הסר התקנה זו
+
+en: Install location
+tr: מיקום ההתקנה
+
+en: &Browse...
+tr: עיון (&B)...
+
+en: Also remove my settings, cache and logs
+tr: הסר גם את ההגדרות, המטמון והיומנים שלי
+
+en: This cannot be undone.
+tr: לא ניתן לבטל פעולה זו.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: תוכנית ההתקנה תסגור את Aether Shell בצורה מסודרת ותסיר את הקבצים המותקנים שלו, את קיצורי הדרך, את רשומת ההפעלה ואת הרישום שלו ב'יישומים מותקנים'. יישומים אחרים והגדרות Windows לא ישתנו.
+
+en: Your welcome
+tr: קבלת הפנים שלך
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: לאחר שאתה נכנס או מבטל את נעילת המחשב, Aether Shell כותב ברכה קצרה בכתב יד. הקלד את השם שבו הוא יברך אותך, או השאר את השדה ריק לשלום פשוט.
+
+en: Your first name
+tr: השם הפרטי שלך
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: אופציונלי, לדוגמה שם פרטי. הוא נשאר במחשב זה בהגדרות Aether Shell ולעולם אינו נשלח לשום מקום. ניתן לשנות אותו, או לכבות את קבלת הפנים, בהגדרות > קבלת פנים.
+
+en: Shortcuts and startup
+tr: קיצורי דרך והפעלה
+
+en: Create Start menu shortcuts
+tr: צור קיצורי דרך בתפריט התחל
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell ו'שחזר את שורת המשימות של Windows'.
+
+en: Create a desktop shortcut
+tr: צור קיצור דרך בשולחן העבודה
+
+en: Shows your current choice.
+tr: מציג את הבחירה הנוכחית שלך.
+
+en: Recommended.
+tr: מומלץ.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: נקה כדי לוותר; השבתות במנהל המשימות נשמרות.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: ההתקנה מקבלת את בחירת ההפעלה שלמעלה. מפעיל התוכנית יכול להפעיל מחדש את Aether Shell לאחר קריסה, עם מגבלת ניסיונות חוזרים. 'יציאה' ו'שחזר את שורת המשימות של Windows' נשארים זמינים. מזג האוויר כבוי כברירת מחדל. קבצים בינאריים לא חתומים עלולים להפעיל אזהרה של Windows SmartScreen.
+
+en: Removing this installation...
+tr: מסיר התקנה זו...
+
+en: Repairing Aether Shell...
+tr: מתקן את Aether Shell...
+
+en: Installing Aether Shell...
+tr: מתקין את Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: סוגר את Aether Shell ומסיר את הקבצים שלו.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: מאמת את החבילה המוטמעת ומתקין את הקבצים שלה. ההתקדמות מוצגת כפעילות: תוכנית ההתקנה אינה יודעת כמה זמן נותר.
+
+en: Please wait while the removal completes.
+tr: המתן עד שההסרה תושלם.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: ניתן לבטל עד שהגרסה החדשה מופעלת; לאחר מכן תוכנית ההתקנה מסיימת בבטחה.
+
+en: Aether Shell was uninstalled.
+tr: ההתקנה של Aether Shell הוסרה.
+
+en: Aether Shell is ready.
+tr: Aether Shell מוכן.
+
+en: Setup was cancelled.
+tr: ההתקנה בוטלה.
+
+en: Setup could not complete.
+tr: לא ניתן להשלים את ההתקנה.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: הנתונים שלך נשמרו, אלא אם בחרת במפורש להסיר אותם.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: ניתן לתקן או להסיר אותו מהגדרות Windows > יישומים > יישומים מותקנים.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: הפעולה בוטלה לפני ההפעלה. חזור אל 'אפשרויות' כדי לנסות שוב.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: בדוק את הגישה לקבצים ואת השטח הפנוי בדיסק, ונסה שוב. אם Aether Shell כבר קיים, 'תיקון' יכול לשחזר את הקבצים שלו. קטגוריית השגיאה: {}
+
+en: Setup log
+tr: יומן ההתקנה
+
+en: Launch Aether Shell
+tr: הפעל את Aether Shell
+
+en: &Back
+tr: הקודם (&B)
+
+en: &Next
+tr: הבא (&N)
+
+en: &Continue
+tr: המשך (&C)
+
+en: &Uninstall
+tr: הסר התקנה (&U)
+
+en: &Repair
+tr: תקן (&R)
+
+en: &Install
+tr: התקן (&I)
+
+en: &Close
+tr: סגור (&C)
+
+en: Step {} of {}: {}
+tr: שלב {} מתוך {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: בחר את תיקיית ההתקנה של Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: בחר נתיב תיקייה מלא, לדוגמה נתיב שמתחיל באות כונן.
+
+en: The install folder must be an absolute path.
+tr: תיקיית ההתקנה חייבת להיות נתיב מוחלט.
+
+en: Setup stops at the next safe point.
+tr: תוכנית ההתקנה תיעצר בנקודה הבטוחה הבאה.
+
+en: Cancelling...
+tr: מבטל...
+
+en: Setup is finishing the current step safely; please wait.
+tr: תוכנית ההתקנה מסיימת את השלב הנוכחי בבטחה; המתן.
+
+en: Updating Aether Shell
+tr: מעדכן את Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: מאמת את החבילה החתומה ומחיל את העדכון.
+
+en: Update completed
+tr: העדכון הושלם
+
+en: The update did not complete
+tr: העדכון לא הושלם
+
+en: Close
+tr: סגור
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: לא ניתן להפעיל את ממשק העדכון. העדכון לא הוחל. נסה שוב או השתמש ב'תיקון'.
+
+en: Aether Shell Update
+tr: עדכון Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: לא ניתן להפעיל את ממשק העדכון. העדכון לא הוחל. נסה שוב או השתמש ב'תיקון' בהגדרות Windows > יישומים > יישומים מותקנים.
+
+en: Update completed.
+tr: העדכון הושלם.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: העדכון לא הושלם. עיין ביומן העדכון או השתמש ב'תיקון'.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: לא ניתן להפעיל את Aether Shell. בחר 'תיקון' בהגדרות Windows > יישומים > יישומים מותקנים.
+
+en: Aether Shell Settings — update in progress
+tr: הגדרות Aether Shell — עדכון מתבצע
+
+## shell
+
+en: &Resume taskbar replacement
+tr: חדש את החלפת שורת המשימות (&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: הצג את אזור ההודעות של Windows למשך 60 שניות (&N)
+
+en: &Search…
+tr: חיפוש (&S)…
+
+en: &Settings…
+tr: הגדרות (&S)…
+
+en: View available &update…
+tr: הצג עדכון זמין (&U)…
+
+en: &Check for updates…
+tr: חפש עדכונים (&C)…
+
+en: &About Aether Shell
+tr: אודות Aether Shell (&A)
+
+en: &Quit Aether Shell
+tr: צא מ-Aether Shell (&Q)
+
+en: Switch &input language\tWin+Space
+tr: החלף את שפת הקלט (&I)\tWin+רווח
+
+en: Open &network controls…
+tr: פתח את פקדי הרשת (&N)…
+
+en: &Weather settings…
+tr: הגדרות מזג האוויר (&W)…
+
+en: Toggle output &mute
+tr: הפעל/בטל השתקת פלט (&M)
+
+en: &Sound settings…
+tr: הגדרות קול (&S)…
+
+en: Toggle microphone &mute
+tr: הפעל/בטל השתקת מיקרופון (&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: הפעל את ההקלדה הקולית של Windows (&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: הגדרות פרטיות של המיקרופון (&P)…
+
+en: &Power settings…
+tr: הגדרות צריכת חשמל (&P)…
+
+en: Open &notifications and calendar
+tr: פתח את ההודעות ולוח השנה (&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: פתח את לוח השנה (&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: הצג סמלים מוסתרים (&H)
+
+en: Initializing
+tr: מאתחל
+
+en: Unavailable
+tr: לא זמין
+
+en: Unsupported
+tr: לא נתמך
+
+en: Error
+tr: שגיאה
+
+en: Available
+tr: זמין
+
+en: Unknown
+tr: לא ידוע
+
+en: Internet access
+tr: גישה לאינטרנט
+
+en: Local network only
+tr: רשת מקומית בלבד
+
+en: Limited Internet access
+tr: גישה מוגבלת לאינטרנט
+
+en: No network connection
+tr: אין חיבור לרשת
+
+en: Connectivity unknown
+tr: קישוריות לא ידועה
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: סלולרי
+
+en: Network
+tr: רשת
+
+en: Offline
+tr: לא מקוון
+
+en: Network status unavailable
+tr: מצב הרשת אינו זמין
+
+en: Quick controls
+tr: פקדים מהירים
+
+en: Aether Shell menu
+tr: תפריט Aether Shell
+
+en: Weather status unavailable
+tr: מצב מזג האוויר אינו זמין
+
+en: Cached weather
+tr: מזג אוויר מהמטמון
+
+en: Observation (UTC): {}
+tr: תצפית (UTC): {}
+
+en: Weather: {}
+tr: מזג אוויר: {}
+
+en: Click to open weather settings
+tr: לחץ כדי לפתוח את הגדרות מזג האוויר
+
+en: Show hidden icons
+tr: הצג סמלים מוסתרים
+
+en: Opens Windows' notification-area overflow
+tr: פותח את הסמלים הנוספים באזור ההודעות של Windows
+
+en: Input language: {}
+tr: שפת קלט: {}
+
+en: Fallback input layout
+tr: פריסת קלט חלופית
+
+en: Click to switch input language (Win+Space)
+tr: לחץ כדי להחליף את שפת הקלט (Win+רווח)
+
+en: Network: {}
+tr: רשת: {}
+
+en: Signal strength unavailable
+tr: עוצמת האות אינה זמינה
+
+en: Click to open Windows network settings
+tr: לחץ כדי לפתוח את הגדרות הרשת של Windows
+
+en: Audio output
+tr: פלט שמע
+
+en: Audio: {}
+tr: שמע: {}
+
+en: volume unknown
+tr: עוצמת קול לא ידועה
+
+en: Muted
+tr: מושתק
+
+en: Sound on
+tr: הקול מופעל
+
+en: Microphone: {}
+tr: מיקרופון: {}
+
+en: Endpoint unmuted
+tr: ההתקן אינו מושתק
+
+en: Recording detection unsupported
+tr: זיהוי הקלטה אינו נתמך
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: לחץ כדי להפעיל או לבטל השתקה; לחיצה ימנית להקלדה קולית של Windows ולהגדרות הפרטיות של המיקרופון
+
+en: Battery: {}
+tr: סוללה: {}
+
+en: Battery {}
+tr: סוללה {}
+
+en: Battery status unavailable
+tr: מצב הסוללה אינו זמין
+
+en: Charging
+tr: בטעינה
+
+en: External power
+tr: מתח חיצוני
+
+en: Estimated remaining: {} h {} min
+tr: זמן משוער שנותר: {} שע' {} דק'
+
+en: Click to open power settings
+tr: לחץ כדי לפתוח את הגדרות צריכת החשמל
+
+en: Clock status unavailable
+tr: מצב השעון אינו זמין
+
+en: Click to open calendar and notifications
+tr: לחץ כדי לפתוח את לוח השנה וההודעות
+
+en: Action failed: {}
+tr: הפעולה נכשלה: {}
+
+en: Aether Shell status bar
+tr: סרגל המצב של Aether Shell
+
+en: Update available
+tr: עדכון זמין
+
+en: Cached
+tr: מהמטמון
+
+en: Start
+tr: התחל
+
+en: Search
+tr: חיפוש
+
+en: Task View
+tr: תצוגת משימות
+
+en: Application
+tr: יישום
+
+en: Running application
+tr: יישום פועל
+
+en: More applications
+tr: יישומים נוספים
+
+en: Aether Shell window previews
+tr: תצוגות מקדימות של חלונות Aether Shell
+
+en: Minimized — preview unavailable
+tr: ממוזער — אין תצוגה מקדימה
+
+en: Preview unavailable
+tr: אין תצוגה מקדימה
+
+en: {} windows
+tr: {} חלונות
+
+en: {} window
+tr: חלון {}
+
+en: Switches to this window
+tr: עובר לחלון זה
+
+en: Minimized, preview unavailable
+tr: ממוזער, אין תצוגה מקדימה
+
+en: Minimized
+tr: ממוזער
+
+en: Close {}
+tr: סגור את {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: מבקש מחלון זה להיסגר; היישום עדיין יכול לבקש לשמור או לבטל
+
+en: Close requested
+tr: התבקשה סגירה
+
+en: Previous applications
+tr: יישומים קודמים
+
+en: Open
+tr: פתח
+
+en: New instance
+tr: מופע חדש
+
+en: Unpin from Dock
+tr: בטל הצמדה מה-Dock
+
+en: Pin to Dock
+tr: הצמד ל-Dock
+
+en: Move left
+tr: הזז שמאלה
+
+en: Move right
+tr: הזז ימינה
+
+en: Dock settings...
+tr: הגדרות Dock...
+
+en: Import Windows taskbar pins
+tr: ייבא הצמדות משורת המשימות של Windows
+
+en: Open Windows Start
+tr: פתח את התחל של Windows
+
+en: Aether Shell Dock
+tr: Dock של Aether Shell
+
+en: Pinned
+tr: מוצמד
+
+en: Running
+tr: פועל
+
+en: Needs attention
+tr: דורש תשומת לב
+
+en: Up arrow shows window previews
+tr: חץ למעלה מציג תצוגות מקדימות של חלונות
+
+en: Installed application
+tr: יישום מותקן
+
+en: Desktop application
+tr: יישום שולחן עבודה
+
+en: File
+tr: קובץ
+
+en: Folder
+tr: תיקייה
+
+en: Windows tool
+tr: כלי של Windows
+
+en: Control Panel
+tr: לוח הבקרה
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ ניווט   ·   Enter פתיחה   ·   Esc סגירה
+
+en: Search apps, settings and files
+tr: חפש יישומים, הגדרות וקבצים
+
+en: Search could not be completed.
+tr: לא ניתן להשלים את החיפוש.
+
+en: Results
+tr: תוצאות
+
+en: Indexing applications…
+tr: יוצר אינדקס של יישומים…
+
+en: Type to search apps, settings and files
+tr: הקלד כדי לחפש יישומים, הגדרות וקבצים
+
+en: Nothing matches
+tr: אין התאמות
+
+en: Windows could not open this application.
+tr: Windows לא הצליחה לפתוח יישום זה.
+
+en: Menu
+tr: תפריט
+
+en: Opens a submenu
+tr: פותח תפריט משנה
+
+en: , opens a submenu
+tr: , פותח תפריט משנה
+
+en: Selected
+tr: נבחר
+
+en: Checked
+tr: מסומן
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: מצב טיסה
+
+en: Accessibility
+tr: נגישות
+
+en: Energy saver
+tr: חיסכון באנרגיה
+
+en: Live captions
+tr: כתוביות בזמן אמת
+
+en: Night light
+tr: אור לילה
+
+en: Mobile hotspot
+tr: נקודה חמה לנייד
+
+en: Nearby sharing
+tr: שיתוף בקרבת מקום
+
+en: Cast
+tr: העברה
+
+en: Project
+tr: הקרנה
+
+en: All settings
+tr: כל ההגדרות
+
+en: Connected
+tr: מחובר
+
+en: Not connected
+tr: לא מחובר
+
+en: , on
+tr: , מופעל
+
+en: , off
+tr: , כבוי
+
+en: , state unknown
+tr: , מצב לא ידוע
+
+en: , opens Windows Settings
+tr: , פותח את ההגדרות של Windows
+
+en: , shows accessibility features
+tr: , מציג את תכונות הנגישות
+
+en: , requires Windows 11 version 22H2
+tr: , דורש Windows 11 גרסה 22H2
+
+en: Now playing: {}
+tr: מתנגן כעת: {}
+
+en: Untitled media
+tr: מדיה ללא שם
+
+en: , switch source
+tr: , החלף מקור
+
+en: Previous media item
+tr: פריט המדיה הקודם
+
+en: Pause
+tr: השהה
+
+en: Play
+tr: הפעל
+
+en: Next media item
+tr: פריט המדיה הבא
+
+en: {} details
+tr: פרטים של {}
+
+en: Page {} of {}
+tr: עמוד {} מתוך {}
+
+en: Next page
+tr: העמוד הבא
+
+en: First page
+tr: העמוד הראשון
+
+en: Brightness
+tr: בהירות
+
+en: Brightness, unavailable on this display
+tr: בהירות, לא זמינה בתצוגה זו
+
+en: Volume
+tr: עוצמת קול
+
+en: Volume, unavailable
+tr: עוצמת קול, לא זמינה
+
+en: Unmute
+tr: בטל השתקה
+
+en: Mute
+tr: השתק
+
+en: Sound output and volume mixer
+tr: פלט קול ומערבל עוצמת הקול
+
+en: Back
+tr: חזרה
+
+en: , secured
+tr: , מאובטחת
+
+en: , open
+tr: , פתוחה
+
+en: , connected
+tr: , מחוברת
+
+en: Disconnect
+tr: התנתק
+
+en: Show available networks
+tr: הצג רשתות זמינות
+
+en: More Wi-Fi settings
+tr: הגדרות Wi-Fi נוספות
+
+en: Bluetooth and devices settings
+tr: הגדרות Bluetooth והתקנים
+
+en: Magnifier
+tr: זכוכית מגדלת
+
+en: Narrator
+tr: קריין
+
+en: On-screen keyboard
+tr: מקלדת על המסך
+
+en: Sticky keys
+tr: מקשים דביקים
+
+en: More accessibility settings
+tr: הגדרות נגישות נוספות
+
+en: Volume mixer
+tr: מערבל עוצמת הקול
+
+en: Choose output in Sound settings
+tr: בחר פלט בהגדרות הקול
+
+en: Power and battery settings
+tr: הגדרות צריכת חשמל וסוללה
+
+en: Battery {} percent, {}
+tr: סוללה {} אחוז, {}
+
+en: All Windows settings
+tr: כל ההגדרות של Windows
+
+en: The requested action could not be dispatched
+tr: לא ניתן היה לשלוח את הפעולה המבוקשת
+
+en: Aether Shell quick controls
+tr: הפקדים המהירים של Aether Shell
+
+en: Media session active
+tr: הפעלת מדיה פעילה
+
+en: No media session
+tr: אין הפעלת מדיה
+
+en: Current page
+tr: העמוד הנוכחי
+
+en:  - secured
+tr:  - מאובטחת
+
+en:  - open
+tr:  - פתוחה
+
+en:  - opens in Windows
+tr:  - נפתח ב-Windows
+
+en: Turned off by hardware or policy
+tr: כבוי על-ידי החומרה או על-ידי מדיניות
+
+en: State unavailable - use Windows settings
+tr: המצב אינו זמין - השתמש בהגדרות של Windows
+
+en: Off
+tr: כבוי
+
+en:  - signal {} of 5
+tr:  - אות {} מתוך 5
+
+en: , no internet
+tr: , אין אינטרנט
+
+en: On - not connected
+tr: מופעל - לא מחובר
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows אינה מאפשרת ליישומים להציג רשתות: בדוק את 'מיקום' בהגדרות הפרטיות
+
+en: No Wi-Fi adapter found
+tr: לא נמצא מתאם Wi-Fi
+
+en: Connecting to {}...
+tr: מתחבר אל {}...
+
+en:  - looking for networks
+tr:  - מחפש רשתות
+
+en: On
+tr: מופעל
+
+en: A screen reader is running
+tr: קורא מסך פועל
+
+en: Windows accessibility features
+tr: תכונות הנגישות של Windows
+
+en: Sound output
+tr: פלט קול
+
+en: Default output device
+tr: התקן פלט ברירת מחדל
+
+en: No output device available
+tr: אין התקן פלט זמין
+
+en: Battery unknown
+tr: מצב הסוללה לא ידוע
+
+en: Status refresh could not be started
+tr: לא ניתן להתחיל את רענון המצב
+
+en: Status refresh unavailable
+tr: רענון המצב אינו זמין
+
+en: Excellent signal
+tr: אות מצוין
+
+en: Good signal
+tr: אות טוב
+
+en: Fair signal
+tr: אות סביר
+
+en: Weak signal
+tr: אות חלש
+
+en: Clear sky
+tr: שמיים בהירים
+
+en: Mainly clear
+tr: בהיר ברובו
+
+en: Partly cloudy
+tr: מעונן חלקית
+
+en: Overcast
+tr: מעונן
+
+en: Fog
+tr: ערפל
+
+en: Drizzle
+tr: טפטוף
+
+en: Rain
+tr: גשם
+
+en: Snow
+tr: שלג
+
+en: Rain showers
+tr: ממטרי גשם
+
+en: Snow showers
+tr: ממטרי שלג
+
+en: Thunderstorm
+tr: סופת רעמים
+
+## weather
+
+en: Morning
+tr: בוקר
+
+en: Afternoon
+tr: צהריים
+
+en: Evening
+tr: ערב
+
+en: Night
+tr: לילה
+
+en: Now
+tr: עכשיו
+
+en: Today
+tr: היום
+
+en: Low
+tr: נמוך
+
+en: Moderate
+tr: בינוני
+
+en: High
+tr: גבוה
+
+en: Very high
+tr: גבוה מאוד
+
+en: Extreme
+tr: קיצוני
+
+en: No connection to the weather service.
+tr: אין חיבור לשירות מזג האוויר.
+
+en: The weather service is busy. Try again in a moment.
+tr: שירות מזג האוויר עמוס. נסה שוב בעוד רגע.
+
+en: The weather could not be loaded.
+tr: לא ניתן לטעון את מזג האוויר.
+
+en: Could not update; showing the last forecast.
+tr: לא ניתן לעדכן; מוצגת התחזית האחרונה.
+
+en: Try again
+tr: נסה שוב
+
+en: Your location
+tr: המיקום שלך
+
+en: My location
+tr: המיקום שלי
+
+en: Precise location
+tr: מיקום מדויק
+
+en: Approximate location
+tr: מיקום משוער
+
+en: Chosen in Settings
+tr: נבחר בהגדרות
+
+en: Allow
+tr: אפשר
+
+en: Use precise location
+tr: השתמש במיקום מדויק
+
+en: See the weather where you are: allow your precise location.
+tr: ראה את מזג האוויר במקום שבו אתה נמצא: אפשר את המיקום המדויק שלך.
+
+en: Your position is approximate (about 10 km).
+tr: המיקום שלך משוער (כ-10 ק"מ).
+
+en: Location is turned off for this app in Windows.
+tr: המיקום כבוי עבור יישום זה ב-Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: התקן זה אינו יכול לדווח על המיקום שלו. חפש עיר במקום זאת.
+
+en: Reading Windows location…
+tr: קורא את המיקום של Windows…
+
+en: Automatic weather follows your Windows location.
+tr: מזג האוויר האוטומטי עוקב אחר המיקום שלך ב-Windows.
+
+en: Search for a city
+tr: חפש עיר
+
+en: Search for a city, or allow your location, to see the weather.
+tr: חפש עיר, או אפשר את המיקום שלך, כדי לראות את מזג האוויר.
+
+en: Searching…
+tr: מחפש…
+
+en: City search is unavailable.
+tr: חיפוש ערים אינו זמין.
+
+en: No city found.
+tr: לא נמצאה עיר.
+
+en: Weather settings
+tr: הגדרות מזג אוויר
+
+en: Loading the weather…
+tr: טוען את מזג האוויר…
+
+en: Loading…
+tr: טוען…
+
+en: Updated {}
+tr: עודכן {}
+
+en: Near {}
+tr: ליד {}
+
+en: Temperatures now
+tr: הטמפרטורות כעת
+
+en: The map is unavailable.
+tr: המפה אינה זמינה.
+
+en: Map: Natural Earth
+tr: מפה: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: נתוני מזג אוויר מאת Open-Meteo.com
+
+en: Feels like
+tr: מרגיש כמו
+
+en: Feels like {}
+tr: מרגיש כמו {}
+
+en: Close to the real temperature
+tr: קרוב לטמפרטורה האמיתית
+
+en: The wind makes it feel colder
+tr: הרוח גורמת להרגיש קר יותר
+
+en: Humidity makes it feel warmer
+tr: הלחות גורמת להרגיש חם יותר
+
+en: Humidity
+tr: לחות
+
+en: Cloud cover {}
+tr: כיסוי עננים {}
+
+en: Wind
+tr: רוח
+
+en: Gusts {}
+tr: משבים {}
+
+en: Sunrise and sunset
+tr: זריחה ושקיעה
+
+en: UV index
+tr: מדד UV
+
+en: Pressure
+tr: לחץ אוויר
+
+en: At sea level
+tr: בגובה פני הים
+
+en: &Open the weather
+tr: פתח את מזג האוויר (&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: התחזית למקום שבו אתה נמצא, ברמת דיוק של כ-100 מ', עם הגובה שלו. כבוי: מעוגל לכ-10 ק"מ.

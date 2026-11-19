@@ -21,6 +21,7 @@ struct AppPaths {
     std::filesystem::path logDir;     // <dataRoot>\logs
     std::filesystem::path cacheDir;   // <dataRoot>\cache    (weather, release metadata)
     std::filesystem::path updatesDir; // <dataRoot>\updates  (downloads and staging)
+    std::filesystem::path languagesDir; // <dataRoot>\languages (D83: language packs downloaded from GitHub)
     std::filesystem::path executablePath;
     std::filesystem::path executableDir;
 

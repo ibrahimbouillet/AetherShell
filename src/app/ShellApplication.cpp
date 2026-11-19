@@ -52,6 +52,7 @@
 #include "status/audio/MicrophoneProvider.h"
 #include "topbar/TopBarWindow.h"
 #include "ui/form/ConfirmDialog.h"
+#include "updates/LanguagePacks.h"
 #include "updates/UpdateCoordinator.h"
 #include "weather/ForecastClient.h"
 #include "weather/GeocodingClient.h"
@@ -65,6 +66,7 @@
 #include <shobjidl.h>
 #include <wtsapi32.h>
 #include <array>
+#include <format>
 #include <cmath>
 #include <future>
 #include <atomic>
@@ -77,6 +79,36 @@
 
 namespace aether::app {
 namespace {
+
+// Startup timing (measured by the application itself, so a restart needs no stopwatch): milliseconds from a UTC
+// FILETIME to now, or -1 when it is unknown.
+std::int64_t MillisecondsSince(const FILETIME& then) noexcept {
+    FILETIME now{};
+    ::GetSystemTimePreciseAsFileTime(&now);
+    const auto value = [](const FILETIME& t) { return (static_cast<std::int64_t>(t.dwHighDateTime) << 32) | t.dwLowDateTime; };
+    if (value(then) <= 0 || value(now) < value(then)) return -1;
+    return (value(now) - value(then)) / 10000;
+}
+// When this process was created (before any of its code ran: the loader's work counts).
+std::int64_t MillisecondsSinceProcessStart() noexcept {
+    FILETIME created{}, exited{}, kernel{}, user{};
+    if (!::GetProcessTimes(::GetCurrentProcess(), &created, &exited, &kernel, &user)) return -1;
+    return MillisecondsSince(created);
+}
+// When this Windows session was signed in to (the console sign-in; a later unlock does not change it).
+std::int64_t MillisecondsSinceSignIn() noexcept {
+    WTSINFOW* info = nullptr;
+    DWORD bytes = 0;
+    if (!::WTSQuerySessionInformationW(WTS_CURRENT_SERVER_HANDLE, WTS_CURRENT_SESSION, WTSSessionInfo, reinterpret_cast<LPWSTR*>(&info),
+                                       &bytes) || !info) {
+        return -1;
+    }
+    FILETIME logon{};
+    logon.dwLowDateTime = info->LogonTime.LowPart;
+    logon.dwHighDateTime = static_cast<DWORD>(info->LogonTime.HighPart);
+    ::WTSFreeMemory(info);
+    return MillisecondsSince(logon);
+}
 constexpr UINT_PTR kUpdaterPollTimer = 0xA371;
 constexpr UINT_PTR kTaskbarPollTimer = 0xA372;
 constexpr UINT_PTR kTaskbarResumeTimer = 0xA373;
@@ -143,6 +175,10 @@ struct ShellApplication::Impl {
     WorkerPool wifiWorker{{1, L"Aether Wi-Fi", ComApartment::MultiThreaded}};         // a scan takes seconds
     // D65: the desktop picture, decoded on its own thread: the application worker can be busy for seconds.
     WorkerPool pictureWorker{{1, L"Aether desktop picture", ComApartment::MultiThreaded}};
+    // D83: language packs, downloaded from the version's GitHub release one after the other.
+    WorkerPool languageWorker{{1, L"Aether languages", ComApartment::None}};
+    std::array<settings::ui::LanguagePackState, i18n::kLanguageCount> languageStates{};   // Missing: look on disk
+    std::vector<i18n::Language> languagesWaiting;   // asked for before the HTTP client exists
     CancellationSource cancellation;
     std::shared_ptr<CancellationSource> locationCancellation=std::make_shared<CancellationSource>();
     std::shared_ptr<RadioCompletionGate> locationGate=std::make_shared<RadioCompletionGate>();
@@ -486,6 +522,7 @@ struct ShellApplication::Impl {
         const bool hold = !closing && (welcomeController.Presenting() || welcomeController.Covering() || arrivalReplay);
         if (hold == welcomeHoldsBars) return;
         welcomeHoldsBars = hold;
+        if (!hold && !closing) LogStartupReady();
         if (!hold && !closing) {
             // D66: the welcome hands over to bars that have just come out. With Auto-Hide they stay a moment, as if
             // in use, rather than leaving at once because the page left open covers them.
@@ -629,6 +666,68 @@ struct ShellApplication::Impl {
         }
     }
     // Appearance broadcasts arrive in bursts (theme, contrast, colors); one re-application each burst.
+    // D83: the language the interface should show: the one chosen in Settings, else Windows' own.
+    [[nodiscard]] i18n::Language WantedLanguage() const {
+        if (!settings || !settings->Loaded()) return i18n::SystemLanguage();
+        const auto chosen = settings->Current().general.language;
+        return chosen == settings::InterfaceLanguage::Automatic ? i18n::SystemLanguage()
+                                                                : static_cast<i18n::Language>(static_cast<int>(chosen) - 1);
+    }
+    [[nodiscard]] settings::ui::LanguagePackState LanguageState(i18n::Language language) const {
+        if (language == i18n::Language::English) return settings::ui::LanguagePackState::Installed;
+        const auto state = languageStates[static_cast<std::size_t>(language)];
+        if (state != settings::ui::LanguagePackState::Missing) return state;
+        return i18n::PackInstalled(language, paths.languagesDir) ? settings::ui::LanguagePackState::Installed : settings::ui::LanguagePackState::Missing;
+    }
+    // Downloads `language`'s pack on the language thread; the interface switches to it when it was the one wanted.
+    void DownloadLanguage(i18n::Language language) {
+        const auto index = static_cast<std::size_t>(language);
+        if (closing || index >= i18n::kLanguageCount || language == i18n::Language::English || !i18n::Available(language)) return;
+        if (languageStates[index] == settings::ui::LanguagePackState::Downloading) return;
+        languageStates[index] = settings::ui::LanguagePackState::Downloading;
+        if (settingsWindow) settingsWindow->RefreshLanguages();
+        if (!http) { languagesWaiting.push_back(language); return; }
+        const auto weak = std::weak_ptr<bool>(alive);
+        const auto cancel = cancellation.Token();
+        net::IHttpClient* client = http.get();
+        const auto directory = paths.languagesDir;
+        AETHER_LOG_INFO("app", "language pack {}: downloading", i18n::Info(language).code);
+        const bool posted = languageWorker.Post([this, weak, cancel, client, language, directory] {
+            auto installed = updates::InstallLanguagePack(*client, language, directory, cancel);
+            dispatcher.Post([this, weak, language, installed = std::move(installed)] {
+                if (const auto live = weak.lock(); !live || !*live) return;
+                OnLanguageDownloaded(language, installed);
+            });
+        });
+        if (!posted) languageStates[index] = settings::ui::LanguagePackState::Failed;
+    }
+    void OnLanguageDownloaded(i18n::Language language, const Result<void>& installed) {
+        const auto index = static_cast<std::size_t>(language);
+        languageStates[index] = installed ? settings::ui::LanguagePackState::Installed : settings::ui::LanguagePackState::Failed;
+        if (installed) AETHER_LOG_INFO("app", "language pack {}: ready", i18n::Info(language).code);
+        else AETHER_LOG_WARN("app", "language pack {}: {}", i18n::Info(language).code, installed.error().Describe());
+        if (installed && language == WantedLanguage() && i18n::CurrentLanguage() != language) QueueApplySettings();
+        if (settingsWindow) settingsWindow->RefreshLanguages();
+    }
+    // D83: every language Windows has gets its pack, so the interface changes language with Windows.
+    void SyncWindowsLanguages() {
+        for (const auto language : i18n::WindowsLanguages()) {
+            if (language == i18n::Language::English || !i18n::Available(language)) continue;
+            if (LanguageState(language) == settings::ui::LanguagePackState::Installed) continue;
+            DownloadLanguage(language);
+        }
+    }
+    void StartLanguageDownloads() {
+        auto waiting = std::move(languagesWaiting);
+        languagesWaiting.clear();
+        for (const auto language : waiting) {
+            languageStates[static_cast<std::size_t>(language)] = settings::ui::LanguagePackState::Missing;
+            DownloadLanguage(language);
+        }
+        SyncWindowsLanguages();
+    }
+    bool ApplyInterfaceLanguage(const settings::Settings& value);
+
     void QueueApplySettings() {
         if (applyQueued || closing) return;
         const auto weak = std::weak_ptr<bool>(alive);
@@ -657,9 +756,27 @@ struct ShellApplication::Impl {
         return settings::StartupRegistration(*registry).IsEnabled(paths.executableDir.parent_path().parent_path() / L"AetherShell.exe");
     }
     // AS4-02: enough to read back why a sign-in did or did not bring Aether up: nothing private.
+    // Logged once, when the person can use the bars: at the welcome's hand-over, or when the surfaces are up without one.
+    bool startupReadyLogged = false;
+    void LogStartupReady() {
+        if (startupReadyLogged) return;
+        startupReadyLogged = true;
+        const auto process = MillisecondsSinceProcessStart();
+        const auto signIn = MillisecondsSinceSignIn();
+        AETHER_LOG_INFO("app", "startup: bars ready {} ms after the process started{}", process,
+                        command.autostart && signIn >= 0 ? std::format(", {:.1f} s after sign-in", static_cast<double>(signIn) / 1000.0) : std::string());
+    }
     void LogStartupDiagnostics() {
         const auto now = ::GetTickCount64();
-        AETHER_LOG_INFO("app", "startup: autostart {}, {} s after boot, surfaces up {} ms after launch", command.autostart, now / 1000, now - launchedAt);
+        const auto process = MillisecondsSinceProcessStart();
+        const auto signIn = MillisecondsSinceSignIn();
+        // The time from sign-in to this process is Windows' (the sign-in task waits for the desktop); from the process
+        // to the surfaces it is Aether's own start.
+        AETHER_LOG_INFO("app", "startup: autostart {}, {} s after boot, process started {} after sign-in, surfaces up {} ms after the process started ({} ms in the shell)",
+                        command.autostart, now / 1000,
+                        signIn >= 0 && process >= 0 ? std::format("{:.1f} s", static_cast<double>(signIn - process) / 1000.0) : std::string("?"),
+                        process, now - launchedAt);
+        if (!WelcomeEnabled() || !(welcomeController.Presenting() || welcomeController.Covering())) LogStartupReady();
         const auto standardRoot = platform::DefaultDataRoot();
         if (command.dataDirectory && (!standardRoot || !platform::SameDataRoot(paths.dataRoot, *standardRoot))) return;
         const bool stored = settings && settings->Current().general.startWithWindows;
@@ -1584,15 +1701,28 @@ graphics::LiquidGlassTokens LiquidGlassFrom(const settings::Settings& value, con
     return glass;
 }
 
-// D70: the interface's language from Settings: the Windows display language when it follows Windows.
-static bool ApplyInterfaceLanguage(const settings::Settings& value) {
+// D70/D83: the interface's language from Settings (the Windows display language when it follows Windows). A language
+// whose pack is not here yet is downloaded; English is shown until it is.
+bool ShellApplication::Impl::ApplyInterfaceLanguage(const settings::Settings& value) {
     const auto chosen = value.general.language;
-    const auto language = chosen == settings::InterfaceLanguage::Automatic
-        ? i18n::SystemLanguage() : static_cast<i18n::Language>(static_cast<int>(chosen) - 1);
+    const bool automatic = chosen == settings::InterfaceLanguage::Automatic;
+    const auto wanted = automatic ? i18n::SystemLanguage() : static_cast<i18n::Language>(static_cast<int>(chosen) - 1);
+    if (!i18n::HasTexts(wanted)) {
+        if (i18n::PackInstalled(wanted, paths.languagesDir)) {
+            if (auto loaded = i18n::LoadInstalledPack(wanted, paths.languagesDir); !loaded) {
+                AETHER_LOG_WARN("app", "language pack {} on disk is unusable ({}); downloading it again", i18n::Info(wanted).code, loaded.error().Describe());
+                DownloadLanguage(wanted);
+            }
+        } else {
+            DownloadLanguage(wanted);
+        }
+    }
+    const auto shown = i18n::HasTexts(wanted) ? wanted : i18n::Language::English;
     const auto revision = i18n::Revision();
-    i18n::SetLanguage(language, chosen != settings::InterfaceLanguage::Automatic);
+    i18n::SetLanguage(shown, !automatic && shown == wanted);
     if (i18n::Revision() == revision) return false;
-    AETHER_LOG_INFO("app", "interface language: {}{}", i18n::Info(language).code, chosen == settings::InterfaceLanguage::Automatic ? " (Windows)" : "");
+    AETHER_LOG_INFO("app", "interface language: {}{}{}", i18n::Info(shown).code, automatic ? " (Windows)" : "",
+                    shown == wanted ? "" : " until the pack is downloaded");
     return true;
 }
 
@@ -1630,6 +1760,7 @@ void ShellApplication::Impl::ApplySettings() {
     // D79: Settings follows the chosen style too: Liquid there when Liquid is chosen, Grain otherwise.
     appTokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && appTokens.mode != graphics::ThemeMode::HighContrast;
     appTokens.liquidGlass = LiquidGlassFrom(value, appTokens);
+    appTokens.liquidSmart = appTokens.liquid && value.general.liquidSmart;   // D84
     appMotion = motion;
     if (settingsWindow) settingsWindow->SetTheme(appTokens, appMotion);
     if (relocalized) {
@@ -1736,6 +1867,11 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.catalog = [this] { return applications; };
     actions.importTaskbarPins = [this] { ImportTaskbarPins(true); };
     actions.taskbarStatus = [this] { return taskbarStatus; };
+    actions.languageState = [this](i18n::Language language) { return LanguageState(language); };
+    actions.downloadLanguage = [this](i18n::Language language) {
+        if (LanguageState(language) == settings::ui::LanguagePackState::Failed) languageStates[static_cast<std::size_t>(language)] = settings::ui::LanguagePackState::Missing;
+        DownloadLanguage(language);
+    };
     actions.geocoding = geocoding.get();
     actions.requestWindowsLocation=[this]{RequestWindowsWeatherLocation();};
     actions.openLocationSettings=[this]{OpenWindowsSettings(L"ms-settings:privacy-location");};
@@ -1774,6 +1910,7 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     actions.exportDiagnostics = [this] { ExportDiagnostics(); };
     appTokens = graphics::MakeAppDesignTokens(graphics::AppearanceOptions{});
     actions.scheduler = &scheduler;
+    actions.graphics = &graphics;   // D84: Liquid's smart transparency composes the blur with the shell's device
     // D63: the Appearance page's two previews: the arrival, small, over this desktop's picture, in each style.
     actions.stylePreview = [this](bool liquid, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra) {
         auto* renderer = graphics.Material();
@@ -1941,11 +2078,16 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
         switch (ClassifySettingChange(action, section)) {
             case SettingChangeScope::WorkArea: return;
-            case SettingChangeScope::Locale: providers->clock->NotifyTimeChanged(); providers->keyboard->Refresh(); return;
+            case SettingChangeScope::Locale:
+                providers->clock->NotifyTimeChanged(); providers->keyboard->Refresh();
+                SyncWindowsLanguages();   // D83: a language added to Windows gets its pack
+                if (WantedLanguage() != i18n::CurrentLanguage()) QueueApplySettings();
+                return;
             case SettingChangeScope::Appearance: QueueApplySettings(); return;
         }
     }));
     if (updates) connections.push_back(updates->Subscribe([this](const updates::UpdateSnapshot& snapshot){ if(settingsWindow)settingsWindow->SetUpdateSnapshot(snapshot); RefreshUpdateOffer(snapshot); }));
+    StartLanguageDownloads();   // D83: the packs asked for before the HTTP client existed, and Windows' languages
     (void)tracker->Start([this](const std::vector<apps::RunningApplication>& running){ OnRunningApplications(running); });
     const auto weak = std::weak_ptr<bool>(alive); const auto cancel = cancellation.Token();
     if (nativeTaskbarAccess) {
@@ -2238,6 +2380,7 @@ void ShellApplication::Impl::Stop() noexcept {
     locationWorker.Shutdown();
     wifiWorker.Shutdown();
     pictureWorker.Shutdown();
+    languageWorker.Shutdown();   // before the HTTP client its downloads use
     controlsWorker.Shutdown(); mediaBrightness.reset();
     worker.Shutdown();
     search.reset(); tracker.reset(); icons.reset(); launcher.reset(); catalog.reset();
@@ -2367,7 +2510,7 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
         if(!result) { ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Settings could not be read safely. The existing file was preserved.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); return; }
         if (impl_->command.action == StartupAction::Quit) { ::PostQuitMessage(0); return; }
         if (impl_->command.action == StartupAction::RestoreTaskbar) (void)impl_->settings->Update([](settings::Settings& s) { s.general.replaceWindowsTaskbar = false; });
-        (void)ApplyInterfaceLanguage(impl_->settings->Current());   // D70: before any surface makes its texts
+        (void)impl_->ApplyInterfaceLanguage(impl_->settings->Current());   // D70: before any surface makes its texts
         // Documented native fallback: the surfaces (and so the shared presentation) failed to start.
         if(auto started=impl_->StartSurfaces();!started) { AETHER_LOG_ERROR("app","native surfaces could not start ({})",ToString(started.error().code)); ::MessageBoxW(nullptr,std::wstring(i18n::Tr(L"Aether Shell could not start its desktop surfaces.")).c_str(),L"Aether Shell",MB_OK|MB_ICONERROR); ::PostQuitMessage(1); }
         else if(result->status==settings::LoadStatus::Defaults&&impl_->nativeTaskbarAccess&&impl_->command.action==StartupAction::None)

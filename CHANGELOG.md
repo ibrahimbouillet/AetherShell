@@ -6,11 +6,22 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
-## [0.4.0-alpha.4] — in progress, not published
+## [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4) — 2026-11-19
 
-Alpha 4 (D62–D80). Its test builds keep this number until the owner calls Alpha 4 complete.
+Alpha 4 (D62–D84). Release notes: [docs/releases/0.4.0-alpha.4.md](docs/releases/0.4.0-alpha.4.md).
 
 ### Added
+
+- **41 interface languages, downloaded when needed** (D83): the 38 languages Windows 11 offers, plus Bengali, Hindi and
+  Urdu. English is built in; every other language is a pack of about 70 KB attached to the release, checked against the
+  size and SHA-256 compiled into the programs before it is used. Setup and each start download the languages Windows has,
+  so Aether changes language when Windows does. Settings → Language shows the state of the chosen language, the languages
+  on this PC with their sizes, and *Add a language*. Setup's own texts are built in, in every language.
+- **Smart transparency** (D84): in Liquid, the Settings window stays clear where it shows nothing and blurs only under its
+  own text and controls: fully over other windows and desktop icons, lightly over the desktop picture, fading at the
+  edges. Settings → Appearance → *Smart transparency* turns it off.
+- **Startup timing in the log:** each start notes when the process started after sign-in, when its surfaces were up and
+  when the bars were ready.
 
 - **The weather window** (D78): a click on the Top Bar's weather opens Aether's own weather page below it (Settings →
   Weather → *Open the weather* opens it too). The place, its local time and part of the day over a sky that follows the hour

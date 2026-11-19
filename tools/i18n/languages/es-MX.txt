@@ -1,0 +1,267 @@
+# Spanish (Mexico) (es-MX): Español (México). The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+# A variant of es: only the texts that differ from it are listed.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Elige la ubicación de Windows para activar el clima automático.
+
+en: Windows did not show its hidden icons
+tr: Windows no mostró sus íconos ocultos
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: La actualización automática de la ubicación no está disponible; vuelve a intentarlo en la configuración del Clima.
+
+en: Automatic weather follows approximate Windows location.
+tr: El clima automático sigue la ubicación aproximada de Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: El acceso a la ubicación de Windows está bloqueado. El clima no está disponible.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows no pudo proporcionar una ubicación actual. El clima no está disponible.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: El servicio de ubicación no está disponible. El clima no está disponible.
+
+en: The automatic weather choice could not be saved.
+tr: No se pudo guardar la elección del clima automático.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: El acceso a la ubicación de Windows no está disponible o se denegó. El clima no está disponible.
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: No se pudo abrir la configuración rápida de Windows. Desmarca "Usar la configuración rápida de Windows" en la configuración de la barra superior para usar los controles de Aether.
+
+## settings-messages
+
+en: GitHub did not answer the request just now.
+tr: GitHub no respondió a la solicitud en este momento.
+
+en: Check now looks for a newer release once.
+tr: "Comprobar ahora" busca una versión más reciente una sola vez.
+
+en: Not checked yet
+tr: Todavía no se ha comprobado
+
+en: Choose Retry Download to try again.
+tr: Elige "Reintentar descarga" para volver a intentarlo.
+
+en: Use Check now to try again.
+tr: Usa "Comprobar ahora" para volver a intentarlo.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: El inicio al iniciar sesión se dejó como estaba, porque no se pudo guardar la configuración.
+
+en: Choose an application to add first.
+tr: Primero elige una aplicación para agregar.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: No se pudo descargar {}. Se muestra el inglés hasta que se descargue; elige "Descargar" abajo para volver a intentarlo.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} aún no está en esta PC. Se muestra el inglés hasta que se descargue.
+
+en: {} is on this PC.
+tr: {} está en esta PC.
+
+en: Every language is on this PC.
+tr: Todos los idiomas están en esta PC.
+
+## settings-pages
+
+en: Weather
+tr: Clima
+
+en: Icon size
+tr: Tamaño de los íconos
+
+en: Icon spacing
+tr: Espaciado entre íconos
+
+en: Space between neighbouring icons.
+tr: Espacio entre íconos contiguos.
+
+en: Glass and motion
+tr: Vidrio y movimiento
+
+en: Glass opacity
+tr: Opacidad del vidrio
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Cuánto crece un ícono bajo el puntero; 1 lo desactiva.
+
+en: &Add application
+tr: &Agregar aplicación
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Los anclajes conservan su identidad y su configuración de inicio. Quitar un anclaje también impide que la sincronización automática con la barra de tareas de Windows lo vuelva a agregar.
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Barra flotante: la barra de vidrio bajo el borde superior de la pantalla. Texto sobre el escritorio: sin barra, los mismos elementos escritos en lo más alto de la pantalla, directamente sobre el fondo de escritorio; esa franja queda libre de ventanas, y el margen superior y la opacidad del vidrio no se aplican. Con la ocultación automática, el texto vuelve sobre una franja de vidrio mientras haya una ventana debajo.
+
+en: Position and glass
+tr: Posición y vidrio
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Las PC de escritorio sin batería no muestran nada en lugar de una batería desconocida.
+
+en: Show weather when enabled
+tr: Mostrar el clima si está activado
+
+en: Weather itself is turned on in Weather settings.
+tr: El clima se activa en la configuración del Clima.
+
+en: Show hidden icons button
+tr: Mostrar el botón de íconos ocultos
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Una pequeña flecha que abre los íconos ocultos del área de notificación de Windows.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Un pronóstico opcional en la barra superior, proporcionado por Open-Meteo.
+
+en: Forecast
+tr: Pronóstico
+
+en: Enable weather
+tr: Activar el clima
+
+en: Off by default: the forecast needs network requests.
+tr: Desactivado de forma predeterminada: el pronóstico necesita conexiones de red.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows pide permiso de ubicación. Tus coordenadas se envían a Open-Meteo.com solo para obtener el pronóstico; se guarda localmente una clave de ubicación. Si la ubicación está bloqueada, el clima no está disponible.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Los nombres que son tuyos o de otros programas (aplicaciones, archivos, redes Wi-Fi) nunca se traducen. Con un idioma elegido, la barra superior escribe la fecha en ese idioma; "Igual que Windows" conserva tu formato regional de Windows.
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: "Igual que Windows" usa el primero de tus idiomas de Windows que sea uno de estos y, si no, el inglés.
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Un breve saludo escrito a mano en tu escritorio después de iniciar sesión o desbloquear la PC.
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Aparece cuando Windows ha iniciado tu sesión, mientras Aether Shell se prepara. Toca, haz clic o presiona Esc para omitirlo.
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Opcional, por ejemplo un nombre de pila. Se queda en esta PC, en tu configuración de Aether Shell, y nunca se envía a ninguna parte ni se escribe en un registro. Borra el campo para quitarlo.
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Líquido: vidrio en capas sobre lo que hay detrás, una capa de desenfoque, la luz del líquido y luego los íconos y el texto, legibles sobre páginas claras y oscuras. Grano: vidrio esmerilado, desenfocado y semitransparente, con un grano fino.
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Cuánto cubre la capa de desenfoque bajo el vidrio Líquido lo que hay detrás: 100 % lo desenfoca todo. Los valores más bajos muestran la página más nítida, y el texto de las barras puede leerse peor sobre una página recargada.
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automático conserva los colores propios del vidrio. El texto y los íconos siguen siendo legibles sea cual sea el color.
+
+en: Dock icon preset
+tr: Tamaño predefinido de los íconos del Dock
+
+en: Weather position
+tr: Posición del clima
+
+en: Add newly discovered Windows taskbar pins
+tr: Agregar los nuevos anclajes de la barra de tareas de Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Mientras la barra de tareas está sustituida, los nuevos anclajes de Windows se agregan al Dock.
+
+en: Press Apply to confirm this change.
+tr: Presiona Aplicar para confirmar este cambio.
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: En Líquido, esta ventana desenfoca solo bajo su texto y sus controles: por completo sobre otras ventanas e íconos del escritorio, ligeramente sobre el fondo de escritorio y nada en las zonas vacías.
+
+en: Languages on this PC
+tr: Idiomas en esta PC
+
+en: Add a language
+tr: Agregar un idioma
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Cada idioma proviene de la publicación de esta versión en GitHub y se comprueba antes de usarse. Cuando esté en esta PC, elígelo arriba.
+
+## setup
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Sal de Aether Shell, desactívalo en Configuración > Escritorio, o abre "Restore Windows taskbar" en el menú Inicio para recuperar la barra de tareas de Windows.
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Al iniciar sesión o desbloquear la PC, Aether Shell escribe a mano un breve saludo. Escribe el nombre con el que debe saludarte, o déjalo vacío para un simple hola.
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Opcional, por ejemplo un nombre de pila. Se queda en esta PC, en tu configuración de Aether Shell, y nunca se envía a ninguna parte. Cámbialo o desactiva la bienvenida en Configuración > Bienvenida.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Al instalar aceptas la opción de inicio anterior. El iniciador puede reiniciar Aether Shell después de un error grave, con un número limitado de intentos. Salir y Restore Windows taskbar siguen disponibles. El clima está desactivado de forma predeterminada. Los archivos sin firmar pueden provocar una advertencia de Windows SmartScreen.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell se desinstaló.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Tus datos se conservaron, salvo que hayas elegido expresamente quitarlos.
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: No se pudo iniciar la interfaz de actualización. No se aplicó la actualización. Vuelve a intentarlo o usa Reparar.
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: No se pudo iniciar la interfaz de actualización. No se aplicó la actualización. Vuelve a intentarlo o usa Reparar en Configuración de Windows > Aplicaciones > Aplicaciones instaladas.
+
+## shell
+
+en: &Weather settings…
+tr: Configuración del &clima…
+
+en: Show &hidden icons
+tr: Mostrar los íconos &ocultos
+
+en: Cellular
+tr: Celular
+
+en: Weather status unavailable
+tr: Estado del clima no disponible
+
+en: Cached weather
+tr: Clima en caché
+
+en: Weather: {}
+tr: Clima: {}
+
+en: Click to open weather settings
+tr: Haz clic para abrir la configuración del clima
+
+en: Show hidden icons
+tr: Mostrar los íconos ocultos
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Navegar   ·   Entrar Abrir   ·   Esc Cerrar
+
+en: Live captions
+tr: Subtítulos en vivo
+
+## weather
+
+en: The weather could not be loaded.
+tr: No se pudo cargar el clima.
+
+en: See the weather where you are: allow your precise location.
+tr: Consulta el clima donde estás: permite tu ubicación precisa.
+
+en: Automatic weather follows your Windows location.
+tr: El clima automático sigue tu ubicación de Windows.
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Busca una ciudad o permite tu ubicación para ver el clima.
+
+en: Weather settings
+tr: Configuración del clima
+
+en: Loading the weather…
+tr: Cargando el clima…
+
+en: &Open the weather
+tr: &Abrir el clima

@@ -1,0 +1,2494 @@
+# Japanese (ja): 日本語. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: 自動天気を有効にするには、Windows の位置情報を選択してください。
+
+en: Windows taskbar visible
+tr: Windows のタスク バーを表示中
+
+en: Connected to {}
+tr: {} に接続しました
+
+en: {} is out of range
+tr: {} は範囲外です
+
+en: Connecting to {} took too long
+tr: {} への接続に時間がかかりすぎました
+
+en: Use Windows to join {}
+tr: Windows を使用して {} に参加してください
+
+en: Windows did not allow this connection
+tr: Windows はこの接続を許可しませんでした
+
+en: Could not connect to {}
+tr: {} に接続できませんでした
+
+en: Connect to {}
+tr: {} に接続
+
+en: That password was not accepted. Check it and try again.
+tr: このパスワードは受け入れられませんでした。確認してもう一度お試しください。
+
+en: Enter this network's password.
+tr: このネットワークのパスワードを入力してください。
+
+en: &Connect
+tr: 接続(&C)
+
+en: Windows Settings could not be opened
+tr: Windows の設定を開けませんでした
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Dock の領域を確保できませんでした。Windows のタスク バーを復元しています
+
+en: Replacement unavailable: recovery observer could not start
+tr: 置き換えを利用できません: 回復監視を開始できませんでした
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows のタスク バーを復元しました。Dock の領域を確保できませんでした。再試行するには、置き換えをオフにしてから再度オンにしてください。
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: 回復監視を利用できません。Windows のタスク バーを復元しています
+
+en: Windows notifications could not be opened
+tr: Windows の通知を開けませんでした
+
+en: The Windows calendar could not be opened
+tr: Windows のカレンダーを開けませんでした
+
+en: Windows did not show its hidden icons
+tr: Windows は隠れているインジケーターを表示しませんでした
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: 位置情報の自動更新を利用できません。天気の設定で再試行してください。
+
+en: Windows location
+tr: Windows の位置情報
+
+en: Reading approximate Windows location…
+tr: Windows のおおよその位置情報を読み取っています…
+
+en: Automatic weather follows approximate Windows location.
+tr: 自動天気は Windows のおおよその位置情報に従います。
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windows の位置情報へのアクセスがブロックされています。天気は利用できません。
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows は現在の位置情報を提供できませんでした。天気は利用できません。
+
+en: Location worker unavailable. Weather is unavailable.
+tr: 位置情報サービスを利用できません。天気は利用できません。
+
+en: Waiting for Windows location permission…
+tr: Windows の位置情報の許可を待っています…
+
+en: The automatic weather choice could not be saved.
+tr: 自動天気の選択を保存できませんでした。
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windows の位置情報へのアクセスが利用できないか、拒否されました。天気は利用できません。
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows の位置情報が許可を要求できませんでした。Windows の位置情報の設定を確認してください。
+
+en: Status worker unavailable
+tr: 状態サービスを利用できません
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows はこの操作を完了できませんでした。関連する設定を確認してください。
+
+en: Reading Windows status; try the action again shortly
+tr: Windows の状態を読み取っています。しばらくしてからもう一度操作してください
+
+en: Could not disconnect
+tr: 切断できませんでした
+
+en: The Windows accessibility feature could not be started
+tr: Windows のアクセシビリティ機能を開始できませんでした
+
+en: Windows could not change the audio output
+tr: Windows はオーディオ出力を変更できませんでした
+
+en: The Windows control could not be opened
+tr: Windows のコントロールを開けませんでした
+
+en: Keyboard shortcuts disabled
+tr: キーボード ショートカットは無効です
+
+en: Both keyboard shortcuts registered
+tr: 両方のキーボード ショートカットを登録しました
+
+en: A keyboard shortcut is already in use by another application
+tr: キーボード ショートカットが別のアプリケーションで既に使用されています
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windows のクイック設定を要求できませんでした。Aether のコントロールを使用するには、トップ バーの設定で [Windows のクイック設定を使用する] をオフにしてください。
+
+en: Windows Start could not be opened
+tr: Windows のスタートを開けませんでした
+
+en: Windows Task View could not be opened
+tr: Windows のタスク ビューを開けませんでした
+
+en: Windows keyboard layout switching was unavailable
+tr: Windows のキーボード レイアウトを切り替えられませんでした
+
+en: Windows voice typing could not be opened
+tr: Windows の音声入力を開けませんでした
+
+en: Windows taskbar could not be revealed
+tr: Windows のタスク バーを表示できませんでした
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: タスク バーの置き換えを再開できませんでした。Windows は引き続き利用できます
+
+en: Windows taskbar replacement is unavailable in this session
+tr: このセッションでは Windows のタスク バーの置き換えを利用できません
+
+en: Windows pin access is unavailable in this isolated session
+tr: この分離されたセッションでは Windows のピン留めにアクセスできません
+
+en: Windows pinned applications could not be read
+tr: Windows のピン留めされたアプリケーションを読み取れませんでした
+
+en: Settings changed during pin import. Try import again.
+tr: ピン留めのインポート中に設定が変更されました。もう一度インポートしてください。
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: ピン留めされたアプリケーションを {} 個追加で保存しました。一部の Windows のピン留めは利用できない場合があります。
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: ピン留めはメモリ上で変更されましたが、保存に失敗しました。再試行するには、設定で [適用] を選択してください。
+
+en: Pins updated in memory; saving...
+tr: ピン留めをメモリ上で更新しました。保存しています...
+
+en: Imported pins could not be applied
+tr: インポートしたピン留めを適用できませんでした
+
+en: Pin import is unavailable while closing
+tr: 終了中はピン留めをインポートできません
+
+en: Settings could not be saved
+tr: 設定を保存できませんでした
+
+en: Quit without saving the latest changes?
+tr: 最新の変更を保存せずに終了しますか?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: 以前の設定ファイルは保持されています。もう一度保存を試すには、Aether Shell を開いたままにしてください。
+
+en: &Quit without saving
+tr: 保存せずに終了(&Q)
+
+en: &Keep Aether Shell open
+tr: Aether Shell を開いたままにする(&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: 基本的な診断情報をエクスポート — アプリのバージョンと Windows のビルドのみ。ログや個人データは含まれません
+
+en: Diagnostics exported.
+tr: 診断情報をエクスポートしました。
+
+en: Diagnostics could not be saved to the chosen file.
+tr: 選択したファイルに診断情報を保存できませんでした。
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: 設定を安全に読み取れませんでした。既存のファイルは保持されました。
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell はデスクトップ要素を開始できませんでした。
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windows のタスク バーの復元が保留中です。再試行するか、Aether Shell を閉じてください。
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows のタスク バーを一時的に表示しています。
+
+en: Windows taskbar restored.
+tr: Windows のタスク バーを復元しました。
+
+en: Windows taskbar replacement is active.
+tr: Windows のタスク バーの置き換えが有効です。
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows のタスク バーは引き続き利用できます。まもなく置き換えを再試行します。
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows のタスク バーは引き続き利用できます。再試行するには、置き換えをオフにしてから再度オンにしてください。
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows のタスク バーを復元しました。まもなく置き換えが再接続されます。
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows のタスク バーを復元しました。再試行するには、置き換えをオフにしてから再度オンにしてください。
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: タスク バーの置き換えを停止しました。Windows のタスク バーを復元しました。
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: タスク バーの置き換えを停止しました。Windows のタスク バーの復元を確認できませんでした。
+
+en: Activating taskbar replacement...
+tr: タスク バーの置き換えを有効にしています...
+
+en: Restoring Windows taskbar...
+tr: Windows のタスク バーを復元しています...
+
+en: Reconnecting taskbar replacement...
+tr: タスク バーの置き換えを再接続しています...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windows のタスク バーを一時的に表示しています...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell は Windows のタスク バーを復元できませんでした。
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: タスク マネージャー (Ctrl+Shift+Esc) からエクスプローラーを再起動するか、サインアウトしてもう一度サインインしてください。
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows のタスク バーを保存された状態に復元しました。
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: 保存されたタスク バーの状態が見つかりませんでした。Windows のタスク バーを表示しました。自動的に隠す設定は変更されていません。
+
+en: There was nothing to restore.
+tr: 復元するものはありませんでした。
+
+en: Taskbar replacement is turned off.
+tr: タスク バーの置き換えはオフです。
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: タスク バーの置き換えを自動的にオフにできませんでした。Aether Shell の設定 > デスクトップでオフにしてください。
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: 認識できないか無効な Aether Shell のコマンド ラインです。
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell はローカル データ フォルダーを作成できませんでした。
+
+en: Aether Shell stopped after an unexpected error.
+tr: 予期しないエラーが発生したため、Aether Shell は停止しました。
+
+## search-names
+
+en: Disk Management
+tr: ディスクの管理
+
+en: Local Users and Groups
+tr: ローカル ユーザーとグループ
+
+en: Local Group Policy Editor
+tr: ローカル グループ ポリシー エディター
+
+en: Manage User Certificates
+tr: ユーザー証明書の管理
+
+en: Manage Computer Certificates
+tr: コンピューター証明書の管理
+
+en: Shared Folders
+tr: 共有フォルダー
+
+en: TPM Management
+tr: TPM の管理
+
+en: Network Connections
+tr: ネットワーク接続
+
+en: System Properties
+tr: システムのプロパティ
+
+en: About Windows
+tr: Windows のバージョン情報
+
+en: DirectX Diagnostic Tool
+tr: DirectX 診断ツール
+
+en: Windows Features
+tr: Windows の機能
+
+en: System Restore
+tr: システムの復元
+
+en: Advanced System Settings
+tr: システムの詳細設定
+
+en: Volume Mixer
+tr: 音量ミキサー
+
+en: Microsoft Management Console
+tr: Microsoft 管理コンソール
+
+en: User Accounts (Advanced)
+tr: ユーザー アカウント (詳細)
+
+en: Display settings
+tr: ディスプレイの設定
+
+en: Night light settings
+tr: 夜間モードの設定
+
+en: Graphics settings
+tr: グラフィックの設定
+
+en: Sound settings
+tr: サウンドの設定
+
+en: Notification settings
+tr: 通知の設定
+
+en: Power & battery settings
+tr: 電源とバッテリーの設定
+
+en: Energy saver settings
+tr: 省エネ機能の設定
+
+en: Storage settings
+tr: ストレージの設定
+
+en: Multitasking settings
+tr: マルチタスクの設定
+
+en: Clipboard settings
+tr: クリップボードの設定
+
+en: Remote Desktop settings
+tr: リモート デスクトップの設定
+
+en: About your PC
+tr: PC のバージョン情報
+
+en: Bluetooth & devices settings
+tr: Bluetooth とデバイスの設定
+
+en: Printers & scanners settings
+tr: プリンターとスキャナーの設定
+
+en: Mouse settings
+tr: マウスの設定
+
+en: Touchpad settings
+tr: タッチパッドの設定
+
+en: Network & internet settings
+tr: ネットワークとインターネットの設定
+
+en: Wi-Fi settings
+tr: Wi-Fi の設定
+
+en: VPN settings
+tr: VPN の設定
+
+en: Proxy settings
+tr: プロキシの設定
+
+en: Airplane mode settings
+tr: 機内モードの設定
+
+en: Mobile hotspot settings
+tr: モバイル ホットスポットの設定
+
+en: Background settings
+tr: 背景の設定
+
+en: Color settings
+tr: 色の設定
+
+en: Theme settings
+tr: テーマの設定
+
+en: Lock screen settings
+tr: ロック画面の設定
+
+en: Taskbar settings
+tr: タスク バーの設定
+
+en: Font settings
+tr: フォントの設定
+
+en: Installed apps
+tr: インストールされているアプリ
+
+en: Default apps settings
+tr: 既定のアプリの設定
+
+en: Startup apps settings
+tr: スタートアップ アプリの設定
+
+en: Account info
+tr: アカウント情報
+
+en: Sign-in options
+tr: サインイン オプション
+
+en: Other users settings
+tr: 他のユーザーの設定
+
+en: Date & time settings
+tr: 日付と時刻の設定
+
+en: Language & region settings
+tr: 言語と地域の設定
+
+en: Typing settings
+tr: 入力の設定
+
+en: Accessibility settings
+tr: アクセシビリティの設定
+
+en: Privacy & security settings
+tr: プライバシーとセキュリティの設定
+
+en: Location settings
+tr: 位置情報の設定
+
+en: Windows Update settings
+tr: Windows Update の設定
+
+en: Recovery settings
+tr: 回復の設定
+
+en: Activation settings
+tr: ライセンス認証の設定
+
+en: For developers settings
+tr: 開発者向けの設定
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub に接続できませんでした。
+
+en: GitHub did not answer the request just now.
+tr: GitHub は現在、要求に応答しませんでした。
+
+en: The release did not pass verification, so nothing was installed.
+tr: リリースが検証に合格しなかったため、何もインストールされませんでした。
+
+en: There is not enough free disk space.
+tr: ディスクの空き領域が不足しています。
+
+en: Windows refused access to the update files.
+tr: Windows が更新ファイルへのアクセスを拒否しました。
+
+en: {} bytes
+tr: {} バイト
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: 状態
+
+en: Check &now
+tr: 今すぐ確認(&N)
+
+en: Download and install
+tr: ダウンロードしてインストール
+
+en: &Later
+tr: 後で(&L)
+
+en: S&kip this version
+tr: このバージョンをスキップ(&K)
+
+en: &Release details
+tr: リリースの詳細(&R)
+
+en: Disable &notifications
+tr: 通知を無効にする(&N)
+
+en: Release notes
+tr: リリース ノート
+
+en: the new version
+tr: 新しいバージョン
+
+en: Installed: {}.
+tr: インストール済み: {}。
+
+en: Automatic update checks are off
+tr: 更新プログラムの自動確認はオフです
+
+en: Check now looks for a newer release once.
+tr: [今すぐ確認] では、新しいリリースを 1 回だけ探します。
+
+en: Last checked {}
+tr: 最終確認日時 {}
+
+en: Not checked yet
+tr: まだ確認していません
+
+en: Checking for updates...
+tr: 更新プログラムを確認しています...
+
+en: Aether Shell is up to date
+tr: Aether Shell は最新の状態です
+
+en: Latest published release: {}.
+tr: 公開されている最新リリース: {}。
+
+en: Version {} is available
+tr: バージョン {} を利用できます
+
+en: Download size: {}.
+tr: ダウンロード サイズ: {}。
+
+en: Downloading version {}...
+tr: バージョン {} をダウンロードしています...
+
+en: Received {} of {} ({}%).
+tr: {} / {} を受信しました ({}%)。
+
+en: Received {}; total size unknown.
+tr: {} を受信しました。合計サイズは不明です。
+
+en: Version {} is ready to install
+tr: バージョン {} をインストールする準備ができました
+
+en: Verified with the signed release manifest and SHA-256.
+tr: 署名済みのリリース マニフェストと SHA-256 で検証しました。
+
+en: The update could not be completed
+tr: 更新を完了できませんでした
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: 現在は手動でインストールします: [リリースの詳細] を開き、セットアップをダウンロードして実行してください。
+
+en: Failure: {}.
+tr: 失敗: {}。
+
+en: Choose Retry Download to try again.
+tr: もう一度試すには、[ダウンロードを再試行] を選択してください。
+
+en: Use Check now to try again.
+tr: もう一度試すには、[今すぐ確認] を使用してください。
+
+en: Next automatic check: {}.
+tr: 次回の自動確認: {}。
+
+en: &Install update
+tr: 更新プログラムをインストール(&I)
+
+en: Retry &Download
+tr: ダウンロードを再試行(&D)
+
+en: &Download and install
+tr: ダウンロードしてインストール(&D)
+
+en: Windows' startup state could not be read in this session.
+tr: このセッションでは Windows のスタートアップ状態を読み取れませんでした。
+
+en: Windows will start it at your next sign-in.
+tr: 次回のサインイン時に Windows によって起動されます。
+
+en: Right now it will not start at sign-in.
+tr: 現在、サインイン時には起動しません。
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: タスク マネージャーまたは Windows の設定でオフになっています。そこで再びオンにするまで、その設定が優先されます。
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows は Aether Shell の別のコピーを起動しようとしています。
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows が、このバージョンでは読み取れないスタートアップ状態を報告しています。
+
+en: The close action could not be completed.
+tr: 閉じる操作を完了できませんでした。
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: 保存する前に完全な数値を入力してください。赤で示されたフィールドは数値ではありません。
+
+en: Settings could not be validated.
+tr: 設定を検証できませんでした。
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: 設定を保存できなかったため、サインイン時の起動は変更されていません。
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: 設定を保存できず、Windows のサインイン時の起動を元に戻すこともできませんでした。再試行するには、もう一度 [適用] を選択してください。
+
+en: Settings saved.
+tr: 設定を保存しました。
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: 設定はメモリ上で変更されましたが、保存に失敗しました。再試行するには、もう一度 [適用] を選択してください。
+
+en: Settings could not be applied.
+tr: 設定を適用できませんでした。
+
+en: Some values were corrected to their supported range.
+tr: 一部の値をサポートされている範囲に修正しました。
+
+en: Startup registration is unavailable in this session.
+tr: このセッションではスタートアップ登録を利用できません。
+
+en: Changing startup registration...
+tr: スタートアップ登録を変更しています...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows はスタートアップ登録を変更しませんでした。タスク マネージャーのスタートアップ設定を確認してください。
+
+en: Startup registration could not be changed.
+tr: スタートアップ登録を変更できませんでした。
+
+en: Defaults saved; startup is disabled.
+tr: 既定値を保存しました。スタートアップは無効です。
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: 既定値を適用しましたが、保存に失敗しました。再試行するには、もう一度 [適用] を選択してください。
+
+en: Defaults could not be applied.
+tr: 既定値を適用できませんでした。
+
+en: Startup was not disabled; settings were kept.
+tr: スタートアップは無効になりませんでした。設定は保持されました。
+
+en: Location search is unavailable.
+tr: 場所の検索を利用できません。
+
+en: Searching Open-Meteo locations...
+tr: Open-Meteo で場所を検索しています...
+
+en: Location search failed. Check your connection and try again.
+tr: 場所の検索に失敗しました。接続を確認して、もう一度お試しください。
+
+en: No place matched that search.
+tr: この検索に一致する場所はありません。
+
+en: Choose a location to save it.
+tr: 保存する場所を選択してください。
+
+en: Reset all settings?
+tr: すべての設定をリセットしますか?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: 基本設定とピン留めされたアプリケーションが既定に戻り、サインイン時の起動はオフになります。
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Windows のタスク バーに関する選択は保持されます。現在の設定ファイルのバックアップも保持されます。
+
+en: &Reset
+tr: リセット(&R)
+
+en: Cancel
+tr: キャンセル
+
+en: Pinned applications saved.
+tr: ピン留めされたアプリケーションを保存しました。
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: ピン留めはメモリ上で変更されましたが、保存に失敗しました。再試行するには、もう一度 [適用] を選択してください。
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: スタートアップ登録を利用できないため、既定値を復元できませんでした。
+
+en: Pinned application could not be added.
+tr: ピン留めするアプリケーションを追加できませんでした。
+
+en: Choose an application to add first.
+tr: 最初に追加するアプリケーションを選択してください。
+
+en: Pinned applications could not be changed.
+tr: ピン留めされたアプリケーションを変更できませんでした。
+
+en: Choose a pinned application first.
+tr: 最初にピン留めされたアプリケーションを選択してください。
+
+en: Desktop status is unavailable in this session.
+tr: このセッションではデスクトップの状態を利用できません。
+
+en: Desktop status is unavailable.
+tr: デスクトップの状態を利用できません。
+
+en: Password
+tr: パスワード
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: {} を GitHub からダウンロードしています ({})。準備ができるまでは英語で表示されます。
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {} をダウンロードできませんでした。ダウンロードされるまでは英語で表示されます。もう一度試すには、下の [ダウンロード] を選択してください。
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} はまだこの PC にありません。ダウンロードされるまでは英語で表示されます。
+
+en: {} is on this PC.
+tr: {} はこの PC にあります。
+
+en: Every language is on this PC.
+tr: すべての言語がこの PC にあります。
+
+en: Choose a language to download first.
+tr: 最初にダウンロードする言語を選択してください。
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: トップ バー
+
+en: Weather
+tr: 天気
+
+en: Updates
+tr: 更新
+
+en: General
+tr: 全般
+
+en: About
+tr: バージョン情報
+
+en: Desktop
+tr: デスクトップ
+
+en: Appearance
+tr: 外観
+
+en: Welcome
+tr: ようこそ
+
+en: Aether Shell Settings
+tr: Aether Shell の設定
+
+en: Settings
+tr: 設定
+
+en: Reset defaults...
+tr: 既定値にリセット...
+
+en: &Apply
+tr: 適用(&A)
+
+en: Liquid
+tr: リキッド
+
+en: Grain
+tr: グレイン
+
+en: From {} to {}
+tr: {} から {} まで
+
+en: px
+tr: px
+
+en: min
+tr: 分
+
+en: h
+tr: 時間
+
+en: This action could not be completed.
+tr: この操作を完了できませんでした。
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: サイズ、間隔、モーション、Dock にピン留めされたアプリケーション。
+
+en: Size and spacing
+tr: サイズと間隔
+
+en: Icon size
+tr: アイコンのサイズ
+
+en: {}, scaled with the Windows display scale.
+tr: {} (Windows のディスプレイの拡大縮小に合わせて調整されます)。
+
+en: Bottom margin
+tr: 下の余白
+
+en: Space between the Dock and the bottom of the screen.
+tr: Dock と画面の下端との間隔。
+
+en: Minimum side margin
+tr: 左右の最小余白
+
+en: Space kept free at the left and right screen edges.
+tr: 画面の左右の端に空けておく領域。
+
+en: Icon spacing
+tr: アイコンの間隔
+
+en: Space between neighbouring icons.
+tr: 隣り合うアイコンの間隔。
+
+en: Glass and motion
+tr: ガラスとモーション
+
+en: Glass opacity
+tr: ガラスの不透明度
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: 値を小さくすると、Dock の背後にあるぼかされたデスクトップがより多く見えます。
+
+en: Hover magnification
+tr: ホバー時の拡大
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: ポインターを合わせたときにアイコンが拡大する度合い。1 にするとオフになります。
+
+en: Behavior
+tr: 動作
+
+en: Show running applications
+tr: 実行中のアプリケーションを表示する
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: ピン留めされていない開いているアプリケーションは、ピン留めされたアプリケーションの後に表示されます。
+
+en: Reserve screen space for the Dock
+tr: Dock 用に画面の領域を確保する
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: 最大化されたウィンドウは、Dock の下に重ならず、その上側に収まります。
+
+en: Automatically hide the Dock
+tr: Dock を自動的に隠す
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: アプリケーションのウィンドウに覆われている間は非表示になります。表示するには、ポインターを画面の下端に移動します。デスクトップ上では表示されたままで、ウィンドウは画面の高さ全体を使用できます。
+
+en: Pinned applications
+tr: ピン留めされたアプリケーション
+
+en: Move &up
+tr: 上へ移動(&U)
+
+en: Move &down
+tr: 下へ移動(&D)
+
+en: &Remove
+tr: 削除(&R)
+
+en: &Add application
+tr: アプリケーションの追加(&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: ピン留めは、その識別情報と起動設定を保持します。ピン留めを削除すると、Windows のタスク バーとの自動同期によって再び追加されることもなくなります。
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: トップ ステータス バーに表示される位置、時計、状態項目。
+
+en: Presentation
+tr: 表示方法
+
+en: Floating bar
+tr: フローティング バー
+
+en: Text on the desktop
+tr: デスクトップ上のテキスト
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: フローティング バー: 画面の上端の少し下に表示されるガラスのバー。デスクトップ上のテキスト: バーはなく、同じ項目を画面の最上部に、デスクトップの画像の上へ直接表示します。この帯状の領域にはウィンドウが重ならず、上の余白とガラスの不透明度は適用されません。自動的に隠す設定では、下にウィンドウがある間、テキストはガラスの帯の上に表示されます。
+
+en: Position and glass
+tr: 位置とガラス
+
+en: Top margin
+tr: 上の余白
+
+en: Space between the Top Bar and the top of the screen.
+tr: トップ バーと画面の上端との間隔。
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: 値を小さくすると、バーの背後にあるぼかされたデスクトップがより多く見えます。
+
+en: Clock
+tr: 時計
+
+en: Clock format
+tr: 時計の形式
+
+en: Follow Windows
+tr: Windows に従う
+
+en: 12-hour
+tr: 12 時間制
+
+en: 24-hour
+tr: 24 時間制
+
+en: Date style
+tr: 日付のスタイル
+
+en: Weekday, day and month
+tr: 曜日、日、月
+
+en: Short
+tr: 短い形式
+
+en: Long
+tr: 長い形式
+
+en: Show seconds
+tr: 秒を表示する
+
+en: Show date
+tr: 日付を表示する
+
+en: Status items
+tr: 状態項目
+
+en: Show battery
+tr: バッテリーを表示する
+
+en: Hide battery when absent
+tr: バッテリーがない場合は非表示にする
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: バッテリーのないデスクトップ PC では、不明なバッテリーを表示する代わりに何も表示しません。
+
+en: Show input language
+tr: 入力言語を表示する
+
+en: Show network
+tr: ネットワークを表示する
+
+en: Show audio output
+tr: オーディオ出力を表示する
+
+en: Show microphone
+tr: マイクを表示する
+
+en: Show weather when enabled
+tr: 天気が有効な場合は表示する
+
+en: Weather itself is turned on in Weather settings.
+tr: 天気自体は天気の設定でオンにします。
+
+en: Show hidden icons button
+tr: 隠れているインジケーターのボタンを表示する
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Windows の通知領域にある隠れているアイコンを開く小さな矢印ボタン。
+
+en: Reserve screen space above windows
+tr: ウィンドウの上側に画面の領域を確保する
+
+en: Maximized windows stay below the Top Bar.
+tr: 最大化されたウィンドウは、トップ バーの下側に収まります。
+
+en: Automatically hide the Top Bar
+tr: トップ バーを自動的に隠す
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: アプリケーションのウィンドウに覆われている間は非表示になります。表示するには、ポインターを画面の上端に移動します。デスクトップ上では表示されたままです。
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Windows のクイック設定を使用する (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: オフ: Aether のクイック コントロールがトップ バーの下に開きます。オン: Windows 独自のパネルが画面の下部に開きます。
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: トップ バーに表示できる天気予報 (Open-Meteo 提供)。
+
+en: Forecast
+tr: 天気予報
+
+en: Enable weather
+tr: 天気を有効にする
+
+en: Off by default: the forecast needs network requests.
+tr: 既定ではオフです。天気予報にはネットワーク要求が必要です。
+
+en: Temperature
+tr: 気温
+
+en: Celsius
+tr: 摂氏
+
+en: Fahrenheit
+tr: 華氏
+
+en: Refresh interval
+tr: 更新間隔
+
+en: Location
+tr: 場所
+
+en: Locate automatically with Windows
+tr: Windows で自動的に位置を特定する
+
+en: Uses the Windows location service after you allow it.
+tr: 許可すると、Windows の位置情報サービスを使用します。
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows から位置情報の許可を求められます。座標は天気予報の取得のためだけに Open-Meteo.com に送信され、位置情報キーはローカルにキャッシュされます。位置情報がブロックされている場合、天気は利用できません。
+
+en: Use &Windows location
+tr: Windows の位置情報を使用(&W)
+
+en: Location &settings
+tr: 位置情報の設定(&S)
+
+en: Choose automatic location or search for a place below.
+tr: 自動の位置情報を選択するか、下で場所を検索してください。
+
+en: Search for a place
+tr: 場所を検索
+
+en: Searc&h
+tr: 検索(&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: 天気データ提供: Open-Meteo.com (CC BY 4.0)。手動検索では、入力したテキストのみが送信されます。
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: 公式 GitHub リポジトリの署名付きリリース。インストール前に検証されます。
+
+en: Preferences
+tr: 基本設定
+
+en: Check for updates automatically
+tr: 更新プログラムを自動的に確認する
+
+en: Check interval
+tr: 確認の間隔
+
+en: Release channel
+tr: リリース チャネル
+
+en: Prereleases arrive earlier and change more often.
+tr: プレリリースはより早く提供され、変更もより頻繁です。
+
+en: Stable
+tr: 安定版
+
+en: Prerelease
+tr: プレリリース
+
+en: Show update notifications
+tr: 更新の通知を表示する
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: スタートアップ、モーション、キーボード ショートカット、診断。
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: バー、メニュー、検索、設定、セットアップの言語。
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: ユーザーや他のプログラムに属する名前 (アプリケーション、ファイル、Wi-Fi ネットワーク) は翻訳されません。言語を選択すると、トップ バーの日付もその言語で表示されます。[Windows に従う] では、Windows の地域の形式が保持されます。
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: 手書きのようこそはラテン文字で書かれ、フランス語、英語、スペイン語のいずれかであいさつします。その言語は [ようこそ] で選択します。
+
+en: Language
+tr: 言語
+
+en: Interface language
+tr: 表示言語
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: [Windows に従う] では、Windows の表示言語のうち、ここにある言語の最初のものを使用します。該当しない場合は英語を使用します。
+
+en: Startup
+tr: スタートアップ
+
+en: Start Aether Shell when I sign in
+tr: サインイン時に Aether Shell を起動する
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: この変更には [適用] が必要です。タスク マネージャーからオフにすることもできます。
+
+en: Motion
+tr: モーション
+
+en: Reduced motion removes decorative movement everywhere.
+tr: [控えめ] にすると、装飾的な動きがすべて削除されます。
+
+en: Reduced
+tr: 控えめ
+
+en: Full
+tr: すべて
+
+en: Keyboard shortcuts
+tr: キーボード ショートカット
+
+en: Enable global keyboard shortcuts
+tr: グローバル キーボード ショートカットを有効にする
+
+en: Search shortcut key
+tr: 検索のショートカット キー
+
+en: Dock shortcut key
+tr: Dock のショートカット キー
+
+en: Search shortcut modifiers
+tr: 検索のショートカットの修飾キー
+
+en: Dock shortcut modifiers
+tr: Dock のショートカットの修飾キー
+
+en: Shortcut status unavailable
+tr: ショートカットの状態を利用できません
+
+en: Diagnostics
+tr: 診断
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: ログ フォルダーには、このコンピューターの Aether Shell のログが保存されています。診断情報のエクスポートで保存されるのは、アプリのバージョンと Windows のビルドのみです - ログや個人データは含まれません。
+
+en: Open &log folder
+tr: ログ フォルダーを開く(&L)
+
+en: &Export diagnostics...
+tr: 診断情報のエクスポート(&E)...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: サインインまたは PC のロック解除の後にデスクトップに表示される、短い手書きのあいさつ。
+
+en: Greeting
+tr: あいさつ
+
+en: Show the welcome at sign-in and unlock
+tr: サインイン時とロック解除時にようこそを表示する
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Windows へのサインインが完了した後、Aether Shell の準備中に表示されます。スキップするには、タッチ、クリック、または Esc キーを押します。
+
+en: Greeting language
+tr: あいさつの言語
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: フランス語では Salut、英語では Hello、スペイン語では Hola。ペンはラテン文字を書くため、その他の言語では英語であいさつします。
+
+en: Your name
+tr: お名前
+
+en: Name to greet you with
+tr: あいさつに使う名前
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: 省略可能です (例: 名)。この PC の Aether Shell の設定に保存され、どこにも送信されず、ログにも書き込まれません。削除するには、フィールドを空にします。
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: カラー モード、アクセント、モーションの速度、Dock とトップ バーの外観。
+
+en: Style
+tr: スタイル
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: リキッド: 背後にあるものの上に重なるガラスの層、ぼかしの層、リキッドの光、そしてアイコンとテキスト。明るいページでも暗いページでも読みやすさが保たれます。グレイン: ぼかされた半透明のすりガラスに、細かな粒子を加えたもの。
+
+en: Liquid blur
+tr: リキッドのぼかし
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: リキッド ガラスの下にあるぼかしの層が背後をどの程度覆うか。100% ですべてをぼかします。値を小さくするとページがよりくっきり見えますが、情報量の多いページではバー上のテキストが読みにくくなることがあります。
+
+en: Liquid blur color
+tr: リキッドのぼかしの色
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: [自動] では、ガラス本来の色が保たれます。どの色でも、テキストとアイコンは読みやすく保たれます。
+
+en: Automatic
+tr: 自動
+
+en: White
+tr: 白
+
+en: Black
+tr: 黒
+
+en: Accent
+tr: アクセント
+
+en: Blue
+tr: 青
+
+en: Violet
+tr: 紫
+
+en: Pink
+tr: ピンク
+
+en: Red
+tr: 赤
+
+en: Orange
+tr: オレンジ
+
+en: Yellow
+tr: 黄
+
+en: Green
+tr: 緑
+
+en: Teal
+tr: ティール
+
+en: Liquid color strength
+tr: リキッドの色の強さ
+
+en: How much of the chosen color the blur layer takes.
+tr: ぼかしの層に、選択した色をどの程度反映させるか。
+
+en: Theme
+tr: テーマ
+
+en: Color mode
+tr: カラー モード
+
+en: High contrast always takes precedence.
+tr: ハイ コントラストが常に優先されます。
+
+en: Light
+tr: ライト
+
+en: Dark
+tr: ダーク
+
+en: Accent color
+tr: アクセント カラー
+
+en: Animation duration
+tr: アニメーションの長さ
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 が標準の速度です。値を大きくすると遅くなります。[控えめ] のモーションが優先されます。
+
+en: Dock icon preset
+tr: Dock アイコンのプリセット
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Dock の設定で指定したカスタム サイズは、プリセットを選択するまで保持されます。
+
+en: Small - 32 px
+tr: 小 - 32 px
+
+en: Medium - 40 px
+tr: 中 - 40 px
+
+en: Large - 48 px
+tr: 大 - 48 px
+
+en: Keep custom size
+tr: カスタム サイズを保持する
+
+en: Show Windows Start in the Dock
+tr: Dock に Windows のスタートを表示する
+
+en: Show Task View in the Dock
+tr: Dock にタスク ビューを表示する
+
+en: Reserve extra space for Dock animations
+tr: Dock のアニメーション用に追加の領域を確保する
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: 拡大や起動時のバウンドが、最大化されたウィンドウにかからないようにします。
+
+en: Weather position
+tr: 天気の位置
+
+en: Left
+tr: 左
+
+en: Right
+tr: 右
+
+en: Keyboard indicator
+tr: キーボードのインジケーター
+
+en: Compact
+tr: コンパクト
+
+en: Two lines
+tr: 2 行
+
+en: Windows taskbar pins
+tr: Windows のタスク バーのピン留め
+
+en: Add newly discovered Windows taskbar pins
+tr: 新しく見つかった Windows のタスク バーのピン留めを追加する
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: タスク バーが置き換えられている間、Windows の新しいピン留めが Dock に追加されます。
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Dock による Windows のタスク バーの置き換え (元に戻すことができます)。
+
+en: Taskbar replacement
+tr: タスク バーの置き換え
+
+en: Replace the Windows taskbar
+tr: Windows のタスク バーを置き換える
+
+en: Changing this needs Apply.
+tr: この変更には [適用] が必要です。
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Aether Shell の実行中は、Windows のタスク バーを非表示にし、最大化されたアプリケーションの下に領域を確保します。
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: このモードを無効にするか Aether Shell を終了すると、Windows のタスク バーの状態が復元されます。アプリケーションが予期せず停止した場合も、別の回復ヘルパーによって復元されます。回復に失敗した場合は、タスク マネージャーでエクスプローラーを再起動してください。
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows の設定は、Windows ネイティブのインターフェイスのままです。そのタスク バーのページは Aether Shell によって置き換えられません。このモードはここで構成してください。
+
+en: Pinned applications from Windows
+tr: Windows のピン留めされたアプリケーション
+
+en: &Import Windows taskbar pins
+tr: Windows のタスク バーのピン留めをインポート(&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Windows のピン留めを変更せずに、ピン留めされたショートカットを読み取ります。Windows 11 の一部のピン留めやその順序は、利用できない場合があります。
+
+en: Version {}
+tr: バージョン {}
+
+en: Created by Ibrahim Bouillet
+tr: 作成者: Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: エクスプローラーと並行して動作する、Windows ネイティブのデスクトップ インターフェイス - フローティング Dock とトップ ステータス バー。
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: 天気データ: Open-Meteo.com (CC BY 4.0)。サードパーティ製の C++ ランタイム ライブラリは同梱されていません。
+
+en: &Official project
+tr: 公式プロジェクト(&O)
+
+en: Licence
+tr: ライセンス
+
+en: Taskbar replacement changes need Apply.
+tr: タスク バーの置き換えの変更には [適用] が必要です。
+
+en: Changes save automatically. Startup needs Apply.
+tr: 変更は自動的に保存されます。スタートアップには [適用] が必要です。
+
+en: Changes save automatically.
+tr: 変更は自動的に保存されます。
+
+en: Press Apply to confirm this change.
+tr: この変更を確定するには、[適用] を押してください。
+
+en: Smart transparency
+tr: スマート透明効果
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: リキッドでは、このウィンドウは自身のテキストとコントロールの下だけをぼかします。ほかのウィンドウやデスクトップ アイコンの上では完全に、デスクトップの画像の上では軽くぼかし、何も表示していない部分ではまったくぼかしません。
+
+en: Languages on this PC
+tr: この PC にある言語
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell は Windows にある言語をダウンロードするので、Windows の言語が変わると Aether Shell の言語も変わります。
+
+en: Add a language
+tr: 言語の追加
+
+en: &Download
+tr: ダウンロード(&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: どの言語も、このバージョンの GitHub リリースから取得され、使用前に検証されます。この PC に追加されたら、上で選択してください。
+
+en: built in
+tr: 組み込み
+
+en: downloading, {}
+tr: ダウンロード中、{}
+
+en: download failed
+tr: ダウンロード失敗
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell セットアップ
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: セットアップのインターフェイスを作成できませんでした。セットアップを閉じてもう一度お試しいただくか、ドキュメントに記載されているサイレント セットアップのオプションを使用してください。
+
+en: Options
+tr: オプション
+
+en: Install
+tr: インストール
+
+en: Done
+tr: 完了
+
+en: Remove Aether Shell
+tr: Aether Shell の削除
+
+en: Repair Aether Shell
+tr: Aether Shell の修復
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: エクスプローラーと並行して動作する、Windows 用のネイティブな Dock とトップ ステータス バー。
+
+en: Replaces the Windows taskbar while it runs
+tr: 実行中は Windows のタスク バーを置き換えます
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Windows のタスク バーに戻すには、Aether Shell を終了するか、[設定] > [デスクトップ] でこの機能をオフにするか、スタート メニューの「Windows のタスク バーを復元」を開きます。
+
+en: Starts when you sign in - your choice
+tr: サインイン時に起動 - 選択できます
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: 新規インストールでは、既定でサインイン時に起動します。この選択はインストール前に解除することも、後で設定でオフにすることもできます。既存のスタートアップの選択と、タスク マネージャーでの無効化は保持されます。
+
+en: Installs for your account
+tr: お使いのアカウントにインストールします
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: 管理者権限は必要ありません。設定とデータはユーザー プロファイルに保存されます。
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: アンインストールしても、削除を選択しない限り、設定とデータは保持されます。
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: 修復では、このパッケージのファイルを復元し、設定は保持します。Aether Shell によって Windows のタスク バーが非表示のままになっている場合は、修復によって復元されます。
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: 既存のバージョンに上書きインストールしても、設定は保持されます。ダウングレードを明示的に許可しない限り、古いパッケージは拒否されます。
+
+en: MIT License
+tr: MIT ライセンス
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: ライセンスは、Aether Shell と同じ場所に LICENSE としてもインストールされます。
+
+en: Remove this installation
+tr: このインストールを削除する
+
+en: Install location
+tr: インストール先
+
+en: &Browse...
+tr: 参照(&B)...
+
+en: Also remove my settings, cache and logs
+tr: 設定、キャッシュ、ログも削除する
+
+en: This cannot be undone.
+tr: この操作は元に戻せません。
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: セットアップは Aether Shell を正常に終了し、インストールされたファイル、ショートカット、スタートアップ エントリ、[インストールされているアプリ] への登録を削除します。他のアプリケーションと Windows の設定は変更されません。
+
+en: Your welcome
+tr: ようこそ
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: サインインまたは PC のロック解除の後、Aether Shell が短いあいさつを手書きで表示します。あいさつに使う名前を入力するか、シンプルな Hello にする場合は空のままにしてください。
+
+en: Your first name
+tr: 名 (ファースト ネーム)
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: 省略可能です (例: 名)。この PC の Aether Shell の設定に保存され、どこにも送信されません。変更したり、ようこそをオフにしたりするには、[設定] > [ようこそ] を使用します。
+
+en: Shortcuts and startup
+tr: ショートカットとスタートアップ
+
+en: Create Start menu shortcuts
+tr: スタート メニューのショートカットを作成する
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell と「Windows のタスク バーを復元」。
+
+en: Create a desktop shortcut
+tr: デスクトップのショートカットを作成する
+
+en: Shows your current choice.
+tr: 現在の選択が表示されています。
+
+en: Recommended.
+tr: 推奨。
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: 起動しない場合はオフにします。タスク マネージャーでの無効化は尊重されます。
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: インストールすると、上記のスタートアップの選択に同意したことになります。ランチャーは、クラッシュ後に回数の上限内で Aether Shell を再起動できます。終了と「Windows のタスク バーを復元」は引き続き利用できます。天気は既定でオフです。署名されていないバイナリでは、Windows SmartScreen の警告が表示される場合があります。
+
+en: Removing this installation...
+tr: このインストールを削除しています...
+
+en: Repairing Aether Shell...
+tr: Aether Shell を修復しています...
+
+en: Installing Aether Shell...
+tr: Aether Shell をインストールしています...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shell を終了し、ファイルを削除しています。
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: 埋め込みパッケージを検証し、ファイルをインストールしています。セットアップは残り時間を把握できないため、進行状況はアクティビティとして表示されます。
+
+en: Please wait while the removal completes.
+tr: 削除が完了するまでお待ちください。
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: 新しいバージョンが有効になるまではキャンセルできます。その後は、セットアップが安全に完了します。
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell をアンインストールしました。
+
+en: Aether Shell is ready.
+tr: Aether Shell の準備ができました。
+
+en: Setup was cancelled.
+tr: セットアップはキャンセルされました。
+
+en: Setup could not complete.
+tr: セットアップを完了できませんでした。
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: 削除を明示的に選択しない限り、データは保持されています。
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Windows の [設定] > [アプリ] > [インストールされているアプリ] から修復またはアンインストールできます。
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: 有効化の前に操作がキャンセルされました。もう一度試すには、[オプション] に戻ってください。
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: ファイルへのアクセスとディスクの空き領域を確認してから、もう一度お試しください。Aether Shell が既に存在する場合は、修復でファイルを復元できます。エラーの種類: {}
+
+en: Setup log
+tr: セットアップ ログ
+
+en: Launch Aether Shell
+tr: Aether Shell を起動する
+
+en: &Back
+tr: 戻る(&B)
+
+en: &Next
+tr: 次へ(&N)
+
+en: &Continue
+tr: 続行(&C)
+
+en: &Uninstall
+tr: アンインストール(&U)
+
+en: &Repair
+tr: 修復(&R)
+
+en: &Install
+tr: インストール(&I)
+
+en: &Close
+tr: 閉じる(&C)
+
+en: Step {} of {}: {}
+tr: ステップ {}/{}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Aether Shell のインストール先フォルダーを選択してください
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: ドライブ文字で始まるパスなど、完全なフォルダー パスを選択してください。
+
+en: The install folder must be an absolute path.
+tr: インストール フォルダーは絶対パスである必要があります。
+
+en: Setup stops at the next safe point.
+tr: セットアップは次の安全なポイントで停止します。
+
+en: Cancelling...
+tr: キャンセルしています...
+
+en: Setup is finishing the current step safely; please wait.
+tr: セットアップは現在のステップを安全に完了しています。しばらくお待ちください。
+
+en: Updating Aether Shell
+tr: Aether Shell を更新しています
+
+en: Verifying the signed package and applying the update.
+tr: 署名済みパッケージを検証し、更新を適用しています。
+
+en: Update completed
+tr: 更新が完了しました
+
+en: The update did not complete
+tr: 更新は完了しませんでした
+
+en: Close
+tr: 閉じる
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: 更新のインターフェイスを開始できませんでした。更新は適用されていません。もう一度お試しいただくか、修復を使用してください。
+
+en: Aether Shell Update
+tr: Aether Shell の更新
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: 更新のインターフェイスを開始できませんでした。更新は適用されていません。もう一度お試しいただくか、Windows の [設定] > [アプリ] > [インストールされているアプリ] で修復を使用してください。
+
+en: Update completed.
+tr: 更新が完了しました。
+
+en: Update did not complete. See the updater log or use Repair.
+tr: 更新は完了しませんでした。アップデーターのログを確認するか、修復を使用してください。
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell を起動できませんでした。Windows の [設定] > [アプリ] > [インストールされているアプリ] で [修復] を選択してください。
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell の設定 — 更新中
+
+## shell
+
+en: &Resume taskbar replacement
+tr: タスク バーの置き換えを再開(&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: Windows の通知領域を 60 秒間表示(&N)
+
+en: &Search…
+tr: 検索(&S)…
+
+en: &Settings…
+tr: 設定(&S)…
+
+en: View available &update…
+tr: 利用可能な更新を表示(&U)…
+
+en: &Check for updates…
+tr: 更新プログラムの確認(&C)…
+
+en: &About Aether Shell
+tr: Aether Shell のバージョン情報(&A)
+
+en: &Quit Aether Shell
+tr: Aether Shell を終了(&Q)
+
+en: Switch &input language\tWin+Space
+tr: 入力言語の切り替え(&I)\tWin+Space
+
+en: Open &network controls…
+tr: ネットワーク コントロールを開く(&N)…
+
+en: &Weather settings…
+tr: 天気の設定(&W)…
+
+en: Toggle output &mute
+tr: 出力のミュートの切り替え(&M)
+
+en: &Sound settings…
+tr: サウンドの設定(&S)…
+
+en: Toggle microphone &mute
+tr: マイクのミュートの切り替え(&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: Windows の音声入力を開始(&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: マイクのプライバシー設定(&P)…
+
+en: &Power settings…
+tr: 電源の設定(&P)…
+
+en: Open &notifications and calendar
+tr: 通知とカレンダーを開く(&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: カレンダーを開く(&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: 隠れているインジケーターを表示(&H)
+
+en: Initializing
+tr: 初期化しています
+
+en: Unavailable
+tr: 利用できません
+
+en: Unsupported
+tr: サポートされていません
+
+en: Error
+tr: エラー
+
+en: Available
+tr: 利用可能
+
+en: Unknown
+tr: 不明
+
+en: Internet access
+tr: インターネット アクセス
+
+en: Local network only
+tr: ローカル ネットワークのみ
+
+en: Limited Internet access
+tr: インターネット アクセスが制限されています
+
+en: No network connection
+tr: ネットワーク接続なし
+
+en: Connectivity unknown
+tr: 接続状態が不明です
+
+en: Ethernet
+tr: イーサネット
+
+en: Cellular
+tr: 携帯ネットワーク
+
+en: Network
+tr: ネットワーク
+
+en: Offline
+tr: オフライン
+
+en: Network status unavailable
+tr: ネットワークの状態を利用できません
+
+en: Quick controls
+tr: クイック コントロール
+
+en: Aether Shell menu
+tr: Aether Shell メニュー
+
+en: Weather status unavailable
+tr: 天気の状態を利用できません
+
+en: Cached weather
+tr: キャッシュされた天気
+
+en: Observation (UTC): {}
+tr: 観測時刻 (UTC): {}
+
+en: Weather: {}
+tr: 天気: {}
+
+en: Click to open weather settings
+tr: クリックして天気の設定を開きます
+
+en: Show hidden icons
+tr: 隠れているインジケーターを表示
+
+en: Opens Windows' notification-area overflow
+tr: Windows の通知領域のオーバーフローを開きます
+
+en: Input language: {}
+tr: 入力言語: {}
+
+en: Fallback input layout
+tr: 代替の入力レイアウト
+
+en: Click to switch input language (Win+Space)
+tr: クリックして入力言語を切り替えます (Win+Space)
+
+en: Network: {}
+tr: ネットワーク: {}
+
+en: Signal strength unavailable
+tr: 信号強度を利用できません
+
+en: Click to open Windows network settings
+tr: クリックして Windows のネットワーク設定を開きます
+
+en: Audio output
+tr: オーディオ出力
+
+en: Audio: {}
+tr: オーディオ: {}
+
+en: volume unknown
+tr: 音量は不明
+
+en: Muted
+tr: ミュート
+
+en: Sound on
+tr: サウンド オン
+
+en: Microphone: {}
+tr: マイク: {}
+
+en: Endpoint unmuted
+tr: エンドポイントのミュートを解除済み
+
+en: Recording detection unsupported
+tr: 録音の検出はサポートされていません
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: クリックしてミュートを切り替えます。右クリックで Windows の音声入力とマイクのプライバシー設定を表示します
+
+en: Battery: {}
+tr: バッテリー: {}
+
+en: Battery {}
+tr: バッテリー {}
+
+en: Battery status unavailable
+tr: バッテリーの状態を利用できません
+
+en: Charging
+tr: 充電中
+
+en: External power
+tr: 外部電源
+
+en: Estimated remaining: {} h {} min
+tr: 推定残り時間: {} 時間 {} 分
+
+en: Click to open power settings
+tr: クリックして電源の設定を開きます
+
+en: Clock status unavailable
+tr: 時計の状態を利用できません
+
+en: Click to open calendar and notifications
+tr: クリックしてカレンダーと通知を開きます
+
+en: Action failed: {}
+tr: 操作に失敗しました: {}
+
+en: Aether Shell status bar
+tr: Aether Shell ステータス バー
+
+en: Update available
+tr: 利用可能な更新があります
+
+en: Cached
+tr: キャッシュ済み
+
+en: Start
+tr: スタート
+
+en: Search
+tr: 検索
+
+en: Task View
+tr: タスク ビュー
+
+en: Application
+tr: アプリケーション
+
+en: Running application
+tr: 実行中のアプリケーション
+
+en: More applications
+tr: その他のアプリケーション
+
+en: Aether Shell window previews
+tr: Aether Shell のウィンドウ プレビュー
+
+en: Minimized — preview unavailable
+tr: 最小化 — プレビューを利用できません
+
+en: Preview unavailable
+tr: プレビューを利用できません
+
+en: {} windows
+tr: {} 個のウィンドウ
+
+en: {} window
+tr: {} 個のウィンドウ
+
+en: Switches to this window
+tr: このウィンドウに切り替えます
+
+en: Minimized, preview unavailable
+tr: 最小化、プレビューを利用できません
+
+en: Minimized
+tr: 最小化
+
+en: Close {}
+tr: {} を閉じる
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: このウィンドウに閉じるよう要求します。アプリケーション側で保存やキャンセルを確認できます
+
+en: Close requested
+tr: 閉じる要求を送信しました
+
+en: Previous applications
+tr: 前のアプリケーション
+
+en: Open
+tr: 開く
+
+en: New instance
+tr: 新しいインスタンス
+
+en: Unpin from Dock
+tr: Dock からピン留めを外す
+
+en: Pin to Dock
+tr: Dock にピン留めする
+
+en: Move left
+tr: 左へ移動
+
+en: Move right
+tr: 右へ移動
+
+en: Dock settings...
+tr: Dock の設定...
+
+en: Import Windows taskbar pins
+tr: Windows のタスク バーのピン留めをインポート
+
+en: Open Windows Start
+tr: Windows のスタートを開く
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: ピン留め済み
+
+en: Running
+tr: 実行中
+
+en: Needs attention
+tr: 注意が必要
+
+en: Up arrow shows window previews
+tr: 上方向キーでウィンドウのプレビューを表示します
+
+en: Installed application
+tr: インストールされているアプリケーション
+
+en: Desktop application
+tr: デスクトップ アプリケーション
+
+en: File
+tr: ファイル
+
+en: Folder
+tr: フォルダー
+
+en: Windows tool
+tr: Windows ツール
+
+en: Control Panel
+tr: コントロール パネル
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ 移動   ·   Enter 開く   ·   Esc 閉じる
+
+en: Search apps, settings and files
+tr: アプリ、設定、ファイルを検索
+
+en: Search could not be completed.
+tr: 検索を完了できませんでした。
+
+en: Results
+tr: 結果
+
+en: Indexing applications…
+tr: アプリケーションのインデックスを作成しています…
+
+en: Type to search apps, settings and files
+tr: 入力して、アプリ、設定、ファイルを検索します
+
+en: Nothing matches
+tr: 一致する項目はありません
+
+en: Windows could not open this application.
+tr: Windows はこのアプリケーションを開けませんでした。
+
+en: Menu
+tr: メニュー
+
+en: Opens a submenu
+tr: サブメニューを開きます
+
+en: , opens a submenu
+tr: 、サブメニューを開きます
+
+en: Selected
+tr: 選択済み
+
+en: Checked
+tr: チェック済み
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: 機内モード
+
+en: Accessibility
+tr: アクセシビリティ
+
+en: Energy saver
+tr: 省エネ機能
+
+en: Live captions
+tr: ライブ キャプション
+
+en: Night light
+tr: 夜間モード
+
+en: Mobile hotspot
+tr: モバイル ホットスポット
+
+en: Nearby sharing
+tr: 近距離共有
+
+en: Cast
+tr: キャスト
+
+en: Project
+tr: 表示
+
+en: All settings
+tr: すべての設定
+
+en: Connected
+tr: 接続済み
+
+en: Not connected
+tr: 未接続
+
+en: , on
+tr: 、オン
+
+en: , off
+tr: 、オフ
+
+en: , state unknown
+tr: 、状態不明
+
+en: , opens Windows Settings
+tr: 、Windows の設定を開きます
+
+en: , shows accessibility features
+tr: 、アクセシビリティ機能を表示します
+
+en: , requires Windows 11 version 22H2
+tr: 、Windows 11 バージョン 22H2 が必要です
+
+en: Now playing: {}
+tr: 再生中: {}
+
+en: Untitled media
+tr: 無題のメディア
+
+en: , switch source
+tr: 、ソースの切り替え
+
+en: Previous media item
+tr: 前のメディア項目
+
+en: Pause
+tr: 一時停止
+
+en: Play
+tr: 再生
+
+en: Next media item
+tr: 次のメディア項目
+
+en: {} details
+tr: {} の詳細
+
+en: Page {} of {}
+tr: ページ {}/{}
+
+en: Next page
+tr: 次のページ
+
+en: First page
+tr: 最初のページ
+
+en: Brightness
+tr: 明るさ
+
+en: Brightness, unavailable on this display
+tr: 明るさ、このディスプレイでは利用できません
+
+en: Volume
+tr: 音量
+
+en: Volume, unavailable
+tr: 音量、利用できません
+
+en: Unmute
+tr: ミュート解除
+
+en: Mute
+tr: ミュート
+
+en: Sound output and volume mixer
+tr: サウンド出力と音量ミキサー
+
+en: Back
+tr: 戻る
+
+en: , secured
+tr: 、セキュリティ保護あり
+
+en: , open
+tr: 、オープン
+
+en: , connected
+tr: 、接続済み
+
+en: Disconnect
+tr: 切断
+
+en: Show available networks
+tr: 利用可能なネットワークを表示
+
+en: More Wi-Fi settings
+tr: その他の Wi-Fi 設定
+
+en: Bluetooth and devices settings
+tr: Bluetooth とデバイスの設定
+
+en: Magnifier
+tr: 拡大鏡
+
+en: Narrator
+tr: ナレーター
+
+en: On-screen keyboard
+tr: スクリーン キーボード
+
+en: Sticky keys
+tr: 固定キー
+
+en: More accessibility settings
+tr: その他のアクセシビリティ設定
+
+en: Volume mixer
+tr: 音量ミキサー
+
+en: Choose output in Sound settings
+tr: サウンドの設定で出力を選択
+
+en: Power and battery settings
+tr: 電源とバッテリーの設定
+
+en: Battery {} percent, {}
+tr: バッテリー {} パーセント、{}
+
+en: All Windows settings
+tr: Windows のすべての設定
+
+en: The requested action could not be dispatched
+tr: 要求された操作を送信できませんでした
+
+en: Aether Shell quick controls
+tr: Aether Shell のクイック コントロール
+
+en: Media session active
+tr: メディア セッションがアクティブ
+
+en: No media session
+tr: メディア セッションなし
+
+en: Current page
+tr: 現在のページ
+
+en:  - secured
+tr:  - セキュリティ保護あり
+
+en:  - open
+tr:  - オープン
+
+en:  - opens in Windows
+tr:  - Windows で開きます
+
+en: Turned off by hardware or policy
+tr: ハードウェアまたはポリシーによってオフになっています
+
+en: State unavailable - use Windows settings
+tr: 状態を利用できません - Windows の設定を使用してください
+
+en: Off
+tr: オフ
+
+en:  - signal {} of 5
+tr:  - 信号 {}/5
+
+en: , no internet
+tr: 、インターネットなし
+
+en: On - not connected
+tr: オン - 未接続
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows はアプリにネットワークの一覧表示を許可していません。プライバシーの設定で位置情報を確認してください
+
+en: No Wi-Fi adapter found
+tr: Wi-Fi アダプターが見つかりません
+
+en: Connecting to {}...
+tr: {} に接続しています...
+
+en:  - looking for networks
+tr:  - ネットワークを探しています
+
+en: On
+tr: オン
+
+en: A screen reader is running
+tr: スクリーン リーダーが実行中です
+
+en: Windows accessibility features
+tr: Windows のアクセシビリティ機能
+
+en: Sound output
+tr: サウンド出力
+
+en: Default output device
+tr: 既定の出力デバイス
+
+en: No output device available
+tr: 利用可能な出力デバイスがありません
+
+en: Battery unknown
+tr: バッテリーは不明
+
+en: Status refresh could not be started
+tr: 状態の更新を開始できませんでした
+
+en: Status refresh unavailable
+tr: 状態の更新を利用できません
+
+en: Excellent signal
+tr: 信号強度: 非常に強い
+
+en: Good signal
+tr: 信号強度: 強い
+
+en: Fair signal
+tr: 信号強度: 普通
+
+en: Weak signal
+tr: 信号強度: 弱い
+
+en: Clear sky
+tr: 快晴
+
+en: Mainly clear
+tr: おおむね晴れ
+
+en: Partly cloudy
+tr: 一部曇り
+
+en: Overcast
+tr: 曇り
+
+en: Fog
+tr: 霧
+
+en: Drizzle
+tr: 霧雨
+
+en: Rain
+tr: 雨
+
+en: Snow
+tr: 雪
+
+en: Rain showers
+tr: にわか雨
+
+en: Snow showers
+tr: にわか雪
+
+en: Thunderstorm
+tr: 雷雨
+
+## weather
+
+en: Morning
+tr: 朝
+
+en: Afternoon
+tr: 午後
+
+en: Evening
+tr: 夕方
+
+en: Night
+tr: 夜
+
+en: Now
+tr: 現在
+
+en: Today
+tr: 今日
+
+en: Low
+tr: 低い
+
+en: Moderate
+tr: 中程度
+
+en: High
+tr: 高い
+
+en: Very high
+tr: 非常に高い
+
+en: Extreme
+tr: 極端に高い
+
+en: No connection to the weather service.
+tr: 天気サービスに接続できません。
+
+en: The weather service is busy. Try again in a moment.
+tr: 天気サービスが混み合っています。しばらくしてからもう一度お試しください。
+
+en: The weather could not be loaded.
+tr: 天気を読み込めませんでした。
+
+en: Could not update; showing the last forecast.
+tr: 更新できませんでした。前回の予報を表示しています。
+
+en: Try again
+tr: 再試行
+
+en: Your location
+tr: 現在の場所
+
+en: My location
+tr: 現在地
+
+en: Precise location
+tr: 正確な位置情報
+
+en: Approximate location
+tr: おおよその位置情報
+
+en: Chosen in Settings
+tr: 設定で選択
+
+en: Allow
+tr: 許可
+
+en: Use precise location
+tr: 正確な位置情報を使用
+
+en: See the weather where you are: allow your precise location.
+tr: 今いる場所の天気を表示するには、正確な位置情報を許可してください。
+
+en: Your position is approximate (about 10 km).
+tr: 位置はおおよそです (約 10 km)。
+
+en: Location is turned off for this app in Windows.
+tr: Windows で、このアプリの位置情報がオフになっています。
+
+en: This device cannot report its location. Search for a city instead.
+tr: このデバイスは位置情報を報告できません。代わりに都市を検索してください。
+
+en: Reading Windows location…
+tr: Windows の位置情報を読み取っています…
+
+en: Automatic weather follows your Windows location.
+tr: 自動天気は Windows の位置情報に従います。
+
+en: Search for a city
+tr: 都市を検索
+
+en: Search for a city, or allow your location, to see the weather.
+tr: 天気を表示するには、都市を検索するか、位置情報を許可してください。
+
+en: Searching…
+tr: 検索しています…
+
+en: City search is unavailable.
+tr: 都市の検索を利用できません。
+
+en: No city found.
+tr: 都市が見つかりません。
+
+en: Weather settings
+tr: 天気の設定
+
+en: Loading the weather…
+tr: 天気を読み込んでいます…
+
+en: Loading…
+tr: 読み込んでいます…
+
+en: Updated {}
+tr: {} に更新
+
+en: Near {}
+tr: {} 付近
+
+en: Temperatures now
+tr: 現在の気温
+
+en: The map is unavailable.
+tr: 地図を利用できません。
+
+en: Map: Natural Earth
+tr: 地図: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: 天気データ提供: Open-Meteo.com
+
+en: Feels like
+tr: 体感温度
+
+en: Feels like {}
+tr: 体感温度 {}
+
+en: Close to the real temperature
+tr: 実際の気温に近い
+
+en: The wind makes it feel colder
+tr: 風のため実際より寒く感じます
+
+en: Humidity makes it feel warmer
+tr: 湿度のため実際より暑く感じます
+
+en: Humidity
+tr: 湿度
+
+en: Cloud cover {}
+tr: 雲量 {}
+
+en: Wind
+tr: 風
+
+en: Gusts {}
+tr: 突風 {}
+
+en: Sunrise and sunset
+tr: 日の出と日の入り
+
+en: UV index
+tr: UV 指数
+
+en: Pressure
+tr: 気圧
+
+en: At sea level
+tr: 海面気圧
+
+en: &Open the weather
+tr: 天気を開く(&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: 今いる場所の予報 (精度約 100 m、その地点の標高を使用)。オフ: 約 10 km に丸められます。

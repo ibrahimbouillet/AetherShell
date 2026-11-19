@@ -1,0 +1,2494 @@
+# Romanian (ro): Română. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Alegeți locația Windows pentru a activa vremea automată.
+
+en: Windows taskbar visible
+tr: Bara de activități Windows este vizibilă
+
+en: Connected to {}
+tr: Conectat la {}
+
+en: {} is out of range
+tr: {} este în afara razei de acoperire
+
+en: Connecting to {} took too long
+tr: Conectarea la {} a durat prea mult
+
+en: Use Windows to join {}
+tr: Utilizați Windows pentru a vă conecta la {}
+
+en: Windows did not allow this connection
+tr: Windows nu a permis această conexiune
+
+en: Could not connect to {}
+tr: Nu s-a putut realiza conectarea la {}
+
+en: Connect to {}
+tr: Conectare la {}
+
+en: That password was not accepted. Check it and try again.
+tr: Parola nu a fost acceptată. Verificați-o și încercați din nou.
+
+en: Enter this network's password.
+tr: Introduceți parola acestei rețele.
+
+en: &Connect
+tr: &Conectare
+
+en: Windows Settings could not be opened
+tr: Setările Windows nu s-au putut deschide
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Spațiul pentru Dock nu a putut fi rezervat; se restabilește bara de activități Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: Înlocuire indisponibilă: monitorul de recuperare nu a putut porni
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Bara de activități Windows a fost restabilită. Spațiul pentru Dock nu a putut fi rezervat; dezactivați și reactivați înlocuirea pentru a reîncerca.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Monitorizarea pentru recuperare nu este disponibilă; se restabilește bara de activități Windows
+
+en: Windows notifications could not be opened
+tr: Notificările Windows nu s-au putut deschide
+
+en: The Windows calendar could not be opened
+tr: Calendarul Windows nu s-a putut deschide
+
+en: Windows did not show its hidden icons
+tr: Windows nu și-a afișat pictogramele ascunse
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Reîmprospătarea automată a locației nu este disponibilă; reîncercați din setările Vremea.
+
+en: Windows location
+tr: Locație Windows
+
+en: Reading approximate Windows location…
+tr: Se citește locația aproximativă Windows…
+
+en: Automatic weather follows approximate Windows location.
+tr: Vremea automată urmează locația aproximativă Windows.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Accesul la locația Windows este blocat. Vremea nu este disponibilă.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows nu a putut furniza o locație curentă. Vremea nu este disponibilă.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Serviciul de locație nu este disponibil. Vremea nu este disponibilă.
+
+en: Waiting for Windows location permission…
+tr: Se așteaptă permisiunea de locație Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Alegerea vremii automate nu a putut fi salvată.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Accesul la locația Windows nu este disponibil sau a fost refuzat. Vremea nu este disponibilă.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Locația Windows nu a putut solicita permisiunea. Verificați setările de locație Windows.
+
+en: Status worker unavailable
+tr: Serviciul de stare nu este disponibil
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows nu a putut finaliza această acțiune. Verificați setările acesteia.
+
+en: Reading Windows status; try the action again shortly
+tr: Se citește starea Windows; reîncercați acțiunea în scurt timp
+
+en: Could not disconnect
+tr: Nu s-a putut realiza deconectarea
+
+en: The Windows accessibility feature could not be started
+tr: Caracteristica de accesibilitate Windows nu a putut porni
+
+en: Windows could not change the audio output
+tr: Windows nu a putut schimba ieșirea audio
+
+en: The Windows control could not be opened
+tr: Controlul Windows nu s-a putut deschide
+
+en: Keyboard shortcuts disabled
+tr: Comenzile rapide de la tastatură sunt dezactivate
+
+en: Both keyboard shortcuts registered
+tr: Ambele comenzi rapide de la tastatură sunt înregistrate
+
+en: A keyboard shortcut is already in use by another application
+tr: O comandă rapidă de la tastatură este deja utilizată de altă aplicație
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Setările rapide Windows nu au putut fi solicitate. Debifați „Utilizați Setările rapide Windows” în setările Barei de sus pentru a utiliza controalele Aether.
+
+en: Windows Start could not be opened
+tr: Start din Windows nu s-a putut deschide
+
+en: Windows Task View could not be opened
+tr: Vizualizare activități din Windows nu s-a putut deschide
+
+en: Windows keyboard layout switching was unavailable
+tr: Comutarea aspectului de tastatură Windows nu a fost disponibilă
+
+en: Windows voice typing could not be opened
+tr: Tastarea vocală Windows nu s-a putut deschide
+
+en: Windows taskbar could not be revealed
+tr: Bara de activități Windows nu a putut fi afișată
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Înlocuirea barei de activități nu a putut fi reluată; Windows rămâne disponibil
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Înlocuirea barei de activități Windows nu este disponibilă în această sesiune
+
+en: Windows pin access is unavailable in this isolated session
+tr: Accesul la elementele fixate Windows nu este disponibil în această sesiune izolată
+
+en: Windows pinned applications could not be read
+tr: Aplicațiile fixate în Windows nu au putut fi citite
+
+en: Settings changed during pin import. Try import again.
+tr: Setările s-au modificat în timpul importului elementelor fixate. Încercați din nou importul.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: S-au salvat {} aplicații fixate suplimentare. Este posibil ca unele elemente fixate Windows să rămână indisponibile.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Elementele fixate s-au modificat în memorie; salvarea nu a reușit. Aplicați din Setări pentru a reîncerca.
+
+en: Pins updated in memory; saving...
+tr: Elementele fixate au fost actualizate în memorie; se salvează...
+
+en: Imported pins could not be applied
+tr: Elementele fixate importate nu au putut fi aplicate
+
+en: Pin import is unavailable while closing
+tr: Importul elementelor fixate nu este disponibil în timpul închiderii
+
+en: Settings could not be saved
+tr: Setările nu au putut fi salvate
+
+en: Quit without saving the latest changes?
+tr: Ieșiți fără a salva ultimele modificări?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Fișierul de setări anterior este păstrat. Păstrați Aether Shell deschis pentru a încerca din nou salvarea.
+
+en: &Quit without saving
+tr: &Ieșire fără salvare
+
+en: &Keep Aether Shell open
+tr: &Păstrați Aether Shell deschis
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Exportați diagnosticarea de bază — versiunea aplicației și versiunea Windows, fără jurnale sau date personale
+
+en: Diagnostics exported.
+tr: Diagnosticarea a fost exportată.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Diagnosticarea nu a putut fi salvată în fișierul ales.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Setările nu au putut fi citite în siguranță. Fișierul existent a fost păstrat.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell nu a putut porni elementele sale de desktop.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Restabilirea barei de activități Windows este în așteptare. Reîncercați sau închideți Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Bara de activități Windows este afișată temporar.
+
+en: Windows taskbar restored.
+tr: Bara de activități Windows a fost restabilită.
+
+en: Windows taskbar replacement is active.
+tr: Înlocuirea barei de activități Windows este activă.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Bara de activități Windows rămâne disponibilă. Înlocuirea se va reîncerca în scurt timp.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Bara de activități Windows rămâne disponibilă. Dezactivați și reactivați înlocuirea pentru a reîncerca.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Bara de activități Windows a fost restabilită. Înlocuirea se va reconecta în scurt timp.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Bara de activități Windows a fost restabilită. Dezactivați și reactivați înlocuirea pentru a reîncerca.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Înlocuirea barei de activități s-a oprit. Bara de activități Windows a fost restabilită.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Înlocuirea barei de activități s-a oprit. Restabilirea barei de activități Windows nu a putut fi confirmată.
+
+en: Activating taskbar replacement...
+tr: Se activează înlocuirea barei de activități...
+
+en: Restoring Windows taskbar...
+tr: Se restabilește bara de activități Windows...
+
+en: Reconnecting taskbar replacement...
+tr: Se reconectează înlocuirea barei de activități...
+
+en: Showing the Windows taskbar temporarily...
+tr: Se afișează temporar bara de activități Windows...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell nu a putut restabili bara de activități Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Reporniți Windows Explorer din Managerul de activități (Ctrl+Shift+Esc) sau deconectați-vă și conectați-vă din nou.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Bara de activități Windows a fost restabilită la starea salvată.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Nu s-a găsit nicio stare salvată a barei de activități. Bara de activități Windows a fost făcută vizibilă; setarea de ascundere automată nu a fost modificată.
+
+en: There was nothing to restore.
+tr: Nu era nimic de restabilit.
+
+en: Taskbar replacement is turned off.
+tr: Înlocuirea barei de activități este dezactivată.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Înlocuirea barei de activități nu a putut fi dezactivată automat. Dezactivați-o în Setări Aether Shell > Desktop.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Linie de comandă Aether Shell nerecunoscută sau nevalidă.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell nu a putut crea folderele de date locale.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell s-a oprit după o eroare neașteptată.
+
+## search-names
+
+en: Disk Management
+tr: Gestionare disc
+
+en: Local Users and Groups
+tr: Utilizatori și grupuri locale
+
+en: Local Group Policy Editor
+tr: Editor politică de grup locală
+
+en: Manage User Certificates
+tr: Gestionare certificate utilizator
+
+en: Manage Computer Certificates
+tr: Gestionare certificate computer
+
+en: Shared Folders
+tr: Foldere partajate
+
+en: TPM Management
+tr: Gestionare TPM
+
+en: Network Connections
+tr: Conexiuni la rețea
+
+en: System Properties
+tr: Proprietăți sistem
+
+en: About Windows
+tr: Despre Windows
+
+en: DirectX Diagnostic Tool
+tr: Instrument de diagnosticare DirectX
+
+en: Windows Features
+tr: Caracteristici Windows
+
+en: System Restore
+tr: Restaurare sistem
+
+en: Advanced System Settings
+tr: Setări complexe de sistem
+
+en: Volume Mixer
+tr: Mixer de volum
+
+en: Microsoft Management Console
+tr: Consolă de gestionare Microsoft
+
+en: User Accounts (Advanced)
+tr: Conturi utilizator (complex)
+
+en: Display settings
+tr: Setări afișaj
+
+en: Night light settings
+tr: Setări Lumină de noapte
+
+en: Graphics settings
+tr: Setări grafică
+
+en: Sound settings
+tr: Setări sunet
+
+en: Notification settings
+tr: Setări notificări
+
+en: Power & battery settings
+tr: Setări alimentare și baterie
+
+en: Energy saver settings
+tr: Setări Economizor de energie
+
+en: Storage settings
+tr: Setări stocare
+
+en: Multitasking settings
+tr: Setări multitasking
+
+en: Clipboard settings
+tr: Setări clipboard
+
+en: Remote Desktop settings
+tr: Setări Desktop la distanță
+
+en: About your PC
+tr: Despre PC-ul dvs.
+
+en: Bluetooth & devices settings
+tr: Setări Bluetooth și dispozitive
+
+en: Printers & scanners settings
+tr: Setări imprimante și scanere
+
+en: Mouse settings
+tr: Setări mouse
+
+en: Touchpad settings
+tr: Setări touchpad
+
+en: Network & internet settings
+tr: Setări rețea și internet
+
+en: Wi-Fi settings
+tr: Setări Wi-Fi
+
+en: VPN settings
+tr: Setări VPN
+
+en: Proxy settings
+tr: Setări proxy
+
+en: Airplane mode settings
+tr: Setări Mod Avion
+
+en: Mobile hotspot settings
+tr: Setări hotspot mobil
+
+en: Background settings
+tr: Setări fundal
+
+en: Color settings
+tr: Setări culori
+
+en: Theme settings
+tr: Setări teme
+
+en: Lock screen settings
+tr: Setări ecran de blocare
+
+en: Taskbar settings
+tr: Setări bară de activități
+
+en: Font settings
+tr: Setări fonturi
+
+en: Installed apps
+tr: Aplicații instalate
+
+en: Default apps settings
+tr: Setări aplicații implicite
+
+en: Startup apps settings
+tr: Setări aplicații de pornire
+
+en: Account info
+tr: Informații cont
+
+en: Sign-in options
+tr: Opțiuni de conectare
+
+en: Other users settings
+tr: Setări alți utilizatori
+
+en: Date & time settings
+tr: Setări dată și oră
+
+en: Language & region settings
+tr: Setări limbă și regiune
+
+en: Typing settings
+tr: Setări tastare
+
+en: Accessibility settings
+tr: Setări accesibilitate
+
+en: Privacy & security settings
+tr: Setări confidențialitate și securitate
+
+en: Location settings
+tr: Setări locație
+
+en: Windows Update settings
+tr: Setări Windows Update
+
+en: Recovery settings
+tr: Setări recuperare
+
+en: Activation settings
+tr: Setări activare
+
+en: For developers settings
+tr: Setări pentru dezvoltatori
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub nu a putut fi accesat.
+
+en: GitHub did not answer the request just now.
+tr: GitHub nu a răspuns la solicitare chiar acum.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Versiunea nu a trecut verificarea, așa că nu s-a instalat nimic.
+
+en: There is not enough free disk space.
+tr: Nu există suficient spațiu liber pe disc.
+
+en: Windows refused access to the update files.
+tr: Windows a refuzat accesul la fișierele de actualizare.
+
+en: {} bytes
+tr: {} octeți
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Stare
+
+en: Check &now
+tr: &Verificați acum
+
+en: Download and install
+tr: Descărcați și instalați
+
+en: &Later
+tr: &Mai târziu
+
+en: S&kip this version
+tr: &Omiteți această versiune
+
+en: &Release details
+tr: &Detalii versiune
+
+en: Disable &notifications
+tr: Dezactivați &notificările
+
+en: Release notes
+tr: Note de lansare
+
+en: the new version
+tr: versiunea nouă
+
+en: Installed: {}.
+tr: Instalată: {}.
+
+en: Automatic update checks are off
+tr: Verificarea automată a actualizărilor este dezactivată
+
+en: Check now looks for a newer release once.
+tr: „Verificați acum” caută o singură dată o versiune mai nouă.
+
+en: Last checked {}
+tr: Ultima verificare: {}
+
+en: Not checked yet
+tr: Nu s-a verificat încă
+
+en: Checking for updates...
+tr: Se caută actualizări...
+
+en: Aether Shell is up to date
+tr: Aether Shell este actualizat
+
+en: Latest published release: {}.
+tr: Cea mai recentă versiune publicată: {}.
+
+en: Version {} is available
+tr: Versiunea {} este disponibilă
+
+en: Download size: {}.
+tr: Dimensiunea descărcării: {}.
+
+en: Downloading version {}...
+tr: Se descarcă versiunea {}...
+
+en: Received {} of {} ({}%).
+tr: S-au primit {} din {} ({}%).
+
+en: Received {}; total size unknown.
+tr: S-au primit {}; dimensiune totală necunoscută.
+
+en: Version {} is ready to install
+tr: Versiunea {} este gata de instalare
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Verificată cu manifestul semnat al versiunii și SHA-256.
+
+en: The update could not be completed
+tr: Actualizarea nu a putut fi finalizată
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Deocamdată se instalează manual: deschideți Detalii versiune, apoi descărcați și rulați programul de instalare.
+
+en: Failure: {}.
+tr: Eroare: {}.
+
+en: Choose Retry Download to try again.
+tr: Alegeți „Reîncercați descărcarea” pentru a încerca din nou.
+
+en: Use Check now to try again.
+tr: Utilizați „Verificați acum” pentru a încerca din nou.
+
+en: Next automatic check: {}.
+tr: Următoarea verificare automată: {}.
+
+en: &Install update
+tr: &Instalați actualizarea
+
+en: Retry &Download
+tr: Reîncercați &descărcarea
+
+en: &Download and install
+tr: &Descărcați și instalați
+
+en: Windows' startup state could not be read in this session.
+tr: Starea de pornire Windows nu a putut fi citită în această sesiune.
+
+en: Windows will start it at your next sign-in.
+tr: Windows îl va porni la următoarea conectare.
+
+en: Right now it will not start at sign-in.
+tr: Deocamdată nu va porni la conectare.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Este dezactivat în Managerul de activități sau în Setări Windows, care decid până când este reactivat acolo.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows ar porni o altă copie a Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows raportează o stare de pornire pe care această versiune nu o poate citi.
+
+en: The close action could not be completed.
+tr: Acțiunea de închidere nu a putut fi finalizată.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Introduceți un număr complet înainte de a salva; câmpul marcat cu roșu nu este unul.
+
+en: Settings could not be validated.
+tr: Setările nu au putut fi validate.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Pornirea la conectare a fost lăsată așa cum era, deoarece setările nu au putut fi salvate.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Setările nu au putut fi salvate, iar pornirea Windows la conectare nu a putut fi restabilită. Aplicați din nou pentru a reîncerca.
+
+en: Settings saved.
+tr: Setările au fost salvate.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Setările s-au modificat în memorie; salvarea nu a reușit. Aplicați din nou pentru a reîncerca.
+
+en: Settings could not be applied.
+tr: Setările nu au putut fi aplicate.
+
+en: Some values were corrected to their supported range.
+tr: Unele valori au fost corectate la intervalul acceptat.
+
+en: Startup registration is unavailable in this session.
+tr: Înregistrarea la pornire nu este disponibilă în această sesiune.
+
+en: Changing startup registration...
+tr: Se modifică înregistrarea la pornire...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows nu a modificat înregistrarea la pornire. Verificați setarea de pornire din Managerul de activități.
+
+en: Startup registration could not be changed.
+tr: Înregistrarea la pornire nu a putut fi modificată.
+
+en: Defaults saved; startup is disabled.
+tr: Setările implicite au fost salvate; pornirea este dezactivată.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Setările implicite au fost aplicate; salvarea nu a reușit. Aplicați din nou pentru a reîncerca.
+
+en: Defaults could not be applied.
+tr: Setările implicite nu au putut fi aplicate.
+
+en: Startup was not disabled; settings were kept.
+tr: Pornirea nu a fost dezactivată; setările au fost păstrate.
+
+en: Location search is unavailable.
+tr: Căutarea locațiilor nu este disponibilă.
+
+en: Searching Open-Meteo locations...
+tr: Se caută locații Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Căutarea locațiilor nu a reușit. Verificați conexiunea și încercați din nou.
+
+en: No place matched that search.
+tr: Niciun loc nu corespunde căutării.
+
+en: Choose a location to save it.
+tr: Alegeți o locație pentru a o salva.
+
+en: Reset all settings?
+tr: Resetați toate setările?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Preferințele și aplicațiile fixate revin la valorile implicite, iar pornirea la conectare este dezactivată.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Alegerea dvs. privind bara de activități Windows este păstrată. Se păstrează o copie de rezervă a fișierului de setări curent.
+
+en: &Reset
+tr: &Resetare
+
+en: Cancel
+tr: Anulare
+
+en: Pinned applications saved.
+tr: Aplicațiile fixate au fost salvate.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Elementele fixate s-au modificat în memorie; salvarea nu a reușit. Aplicați din nou pentru a reîncerca.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Setările implicite nu au putut fi restabilite, deoarece înregistrarea la pornire nu este disponibilă.
+
+en: Pinned application could not be added.
+tr: Aplicația fixată nu a putut fi adăugată.
+
+en: Choose an application to add first.
+tr: Alegeți mai întâi o aplicație de adăugat.
+
+en: Pinned applications could not be changed.
+tr: Aplicațiile fixate nu au putut fi modificate.
+
+en: Choose a pinned application first.
+tr: Alegeți mai întâi o aplicație fixată.
+
+en: Desktop status is unavailable in this session.
+tr: Starea desktopului nu este disponibilă în această sesiune.
+
+en: Desktop status is unavailable.
+tr: Starea desktopului nu este disponibilă.
+
+en: Password
+tr: Parolă
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Se descarcă limba {} de pe GitHub ({}). Până când este gata, se afișează engleza.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: Limba {} nu a putut fi descărcată. Până atunci se afișează engleza; alegeți „Descărcați” mai jos pentru a încerca din nou.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: Limba {} nu se află încă pe acest PC. Până când este descărcată, se afișează engleza.
+
+en: {} is on this PC.
+tr: Limba {} se află pe acest PC.
+
+en: Every language is on this PC.
+tr: Toate limbile se află pe acest PC.
+
+en: Choose a language to download first.
+tr: Alegeți mai întâi o limbă de descărcat.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Bara de sus
+
+en: Weather
+tr: Vremea
+
+en: Updates
+tr: Actualizări
+
+en: General
+tr: General
+
+en: About
+tr: Despre
+
+en: Desktop
+tr: Desktop
+
+en: Appearance
+tr: Aspect
+
+en: Welcome
+tr: Bun venit
+
+en: Aether Shell Settings
+tr: Setări Aether Shell
+
+en: Settings
+tr: Setări
+
+en: Reset defaults...
+tr: Restabilire setări implicite...
+
+en: &Apply
+tr: &Aplicare
+
+en: Liquid
+tr: Lichid
+
+en: Grain
+tr: Granulat
+
+en: From {} to {}
+tr: De la {} la {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: h
+
+en: This action could not be completed.
+tr: Această acțiune nu a putut fi finalizată.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Dimensiune, spațiere, mișcare și aplicațiile fixate în Dock.
+
+en: Size and spacing
+tr: Dimensiune și spațiere
+
+en: Icon size
+tr: Dimensiunea pictogramelor
+
+en: {}, scaled with the Windows display scale.
+tr: {}, scalat cu scara de afișare Windows.
+
+en: Bottom margin
+tr: Margine inferioară
+
+en: Space between the Dock and the bottom of the screen.
+tr: Spațiul dintre Dock și marginea de jos a ecranului.
+
+en: Minimum side margin
+tr: Margine laterală minimă
+
+en: Space kept free at the left and right screen edges.
+tr: Spațiu lăsat liber la marginile din stânga și din dreapta ale ecranului.
+
+en: Icon spacing
+tr: Spațierea pictogramelor
+
+en: Space between neighbouring icons.
+tr: Spațiul dintre pictogramele vecine.
+
+en: Glass and motion
+tr: Sticlă și mișcare
+
+en: Glass opacity
+tr: Opacitatea sticlei
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Valorile mai mici arată mai mult din desktopul estompat din spatele Dock-ului.
+
+en: Hover magnification
+tr: Mărire la trecerea cu indicatorul
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Cât de mult crește o pictogramă sub indicator; 1 dezactivează mărirea.
+
+en: Behavior
+tr: Comportament
+
+en: Show running applications
+tr: Afișați aplicațiile care rulează
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Aplicațiile deschise care nu sunt fixate apar după cele fixate.
+
+en: Reserve screen space for the Dock
+tr: Rezervați spațiu pe ecran pentru Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Ferestrele maximizate rămân deasupra Dock-ului în loc să treacă sub el.
+
+en: Automatically hide the Dock
+tr: Ascundeți automat Dock-ul
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Se ascunde cât timp o fereastră de aplicație îl acoperă; mutați indicatorul la marginea de jos a ecranului pentru a-l afișa. Rămâne vizibil pe desktop, iar ferestrele ocupă toată înălțimea ecranului.
+
+en: Pinned applications
+tr: Aplicații fixate
+
+en: Move &up
+tr: Mutare în &sus
+
+en: Move &down
+tr: Mutare în &jos
+
+en: &Remove
+tr: &Eliminare
+
+en: &Add application
+tr: &Adăugare aplicație
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Elementele fixate își păstrează identitatea și setările de lansare. Eliminarea unui element fixat împiedică și sincronizarea automată cu bara de activități Windows să îl adauge din nou.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Poziția, ceasul și elementele de stare afișate în bara de stare de sus.
+
+en: Presentation
+tr: Prezentare
+
+en: Floating bar
+tr: Bară flotantă
+
+en: Text on the desktop
+tr: Text pe desktop
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Bară flotantă: bara de sticlă de sub marginea de sus a ecranului. Text pe desktop: fără bară, aceleași elemente scrise chiar în partea de sus a ecranului, direct peste imaginea desktopului; acea fâșie rămâne liberă de ferestre, iar marginea superioară și opacitatea sticlei nu se aplică. Cu ascunderea automată, textul revine pe o fâșie de sticlă cât timp o fereastră se află dedesubt.
+
+en: Position and glass
+tr: Poziție și sticlă
+
+en: Top margin
+tr: Margine superioară
+
+en: Space between the Top Bar and the top of the screen.
+tr: Spațiul dintre Bara de sus și marginea de sus a ecranului.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Valorile mai mici arată mai mult din desktopul estompat din spatele barei.
+
+en: Clock
+tr: Ceas
+
+en: Clock format
+tr: Formatul ceasului
+
+en: Follow Windows
+tr: Ca în Windows
+
+en: 12-hour
+tr: 12 ore
+
+en: 24-hour
+tr: 24 de ore
+
+en: Date style
+tr: Stilul datei
+
+en: Weekday, day and month
+tr: Ziua săptămânii, ziua și luna
+
+en: Short
+tr: Scurt
+
+en: Long
+tr: Lung
+
+en: Show seconds
+tr: Afișați secundele
+
+en: Show date
+tr: Afișați data
+
+en: Status items
+tr: Elemente de stare
+
+en: Show battery
+tr: Afișați bateria
+
+en: Hide battery when absent
+tr: Ascundeți bateria dacă lipsește
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: PC-urile desktop fără baterie nu afișează nimic în loc de o baterie necunoscută.
+
+en: Show input language
+tr: Afișați limba de intrare
+
+en: Show network
+tr: Afișați rețeaua
+
+en: Show audio output
+tr: Afișați ieșirea audio
+
+en: Show microphone
+tr: Afișați microfonul
+
+en: Show weather when enabled
+tr: Afișați vremea când este activată
+
+en: Weather itself is turned on in Weather settings.
+tr: Vremea în sine se activează din setările Vremea.
+
+en: Show hidden icons button
+tr: Afișați butonul pentru pictogramele ascunse
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: O săgeată mică ce deschide pictogramele ascunse din zona de notificare Windows.
+
+en: Reserve screen space above windows
+tr: Rezervați spațiu pe ecran deasupra ferestrelor
+
+en: Maximized windows stay below the Top Bar.
+tr: Ferestrele maximizate rămân sub Bara de sus.
+
+en: Automatically hide the Top Bar
+tr: Ascundeți automat Bara de sus
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Se ascunde cât timp o fereastră de aplicație o acoperă; mutați indicatorul la marginea de sus a ecranului pentru a o afișa. Rămâne vizibilă pe desktop.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Utilizați Setările rapide Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Dezactivat: controalele rapide Aether se deschid sub Bara de sus. Activat: panoul Windows se deschide în partea de jos a ecranului.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: O prognoză opțională în Bara de sus, furnizată de Open-Meteo.
+
+en: Forecast
+tr: Prognoză
+
+en: Enable weather
+tr: Activați vremea
+
+en: Off by default: the forecast needs network requests.
+tr: Dezactivată implicit: prognoza necesită solicitări de rețea.
+
+en: Temperature
+tr: Temperatură
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Interval de reîmprospătare
+
+en: Location
+tr: Locație
+
+en: Locate automatically with Windows
+tr: Localizare automată cu Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Utilizează serviciul de locație Windows după ce îl permiteți.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows solicită permisiunea de locație. Coordonatele dvs. sunt trimise către Open-Meteo.com doar pentru a obține prognoza; o cheie de locație este memorată local în cache. Dacă locația este blocată, vremea nu este disponibilă.
+
+en: Use &Windows location
+tr: Utilizați locația &Windows
+
+en: Location &settings
+tr: &Setări locație
+
+en: Choose automatic location or search for a place below.
+tr: Alegeți locația automată sau căutați un loc mai jos.
+
+en: Search for a place
+tr: Căutați un loc
+
+en: Searc&h
+tr: &Căutare
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Date meteo de la Open-Meteo.com (CC BY 4.0). Căutarea manuală trimite doar textul pe care îl introduceți.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Versiuni semnate din depozitul GitHub oficial, verificate înainte de instalare.
+
+en: Preferences
+tr: Preferințe
+
+en: Check for updates automatically
+tr: Căutați automat actualizări
+
+en: Check interval
+tr: Interval de verificare
+
+en: Release channel
+tr: Canal de lansare
+
+en: Prereleases arrive earlier and change more often.
+tr: Versiunile preliminare sosesc mai devreme și se schimbă mai des.
+
+en: Stable
+tr: Stabil
+
+en: Prerelease
+tr: Versiune preliminară
+
+en: Show update notifications
+tr: Afișați notificările de actualizare
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Pornire, mișcare, comenzi rapide de la tastatură și diagnosticare.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Limba barelor, meniurilor, căutării, Setărilor și a programului de instalare.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Numele care vă aparțin sau aparțin altor programe (aplicații, fișiere, rețele Wi-Fi) nu se traduc niciodată. Cu o limbă aleasă, Bara de sus scrie data în acea limbă; „Ca în Windows” păstrează formatul regional Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Mesajul de bun venit scris de mână folosește litere latine: salută în franceză, engleză sau spaniolă. Alegeți-i limba în Bun venit.
+
+en: Language
+tr: Limbă
+
+en: Interface language
+tr: Limba interfeței
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: „Ca în Windows” folosește prima dintre limbile de afișare Windows care se află printre acestea și, altfel, engleza.
+
+en: Startup
+tr: Pornire
+
+en: Start Aether Shell when I sign in
+tr: Porniți Aether Shell când mă conectez
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Modificarea necesită Aplicare. Managerul de activități o poate dezactiva și el.
+
+en: Motion
+tr: Mișcare
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Mișcarea redusă elimină peste tot mișcările decorative.
+
+en: Reduced
+tr: Redusă
+
+en: Full
+tr: Completă
+
+en: Keyboard shortcuts
+tr: Comenzi rapide de la tastatură
+
+en: Enable global keyboard shortcuts
+tr: Activați comenzile rapide globale de la tastatură
+
+en: Search shortcut key
+tr: Tasta comenzii rapide pentru căutare
+
+en: Dock shortcut key
+tr: Tasta comenzii rapide pentru Dock
+
+en: Search shortcut modifiers
+tr: Modificatorii comenzii rapide pentru căutare
+
+en: Dock shortcut modifiers
+tr: Modificatorii comenzii rapide pentru Dock
+
+en: Shortcut status unavailable
+tr: Starea comenzilor rapide nu este disponibilă
+
+en: Diagnostics
+tr: Diagnosticare
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Folderul de jurnale conține jurnalele Aether Shell de pe acest computer. Exportarea diagnosticării salvează doar versiunea aplicației și versiunea Windows - fără jurnale sau date personale.
+
+en: Open &log folder
+tr: Deschideți folderul de &jurnale
+
+en: &Export diagnostics...
+tr: &Exportați diagnosticarea...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Un scurt salut scris de mână pe desktop după ce vă conectați sau deblocați PC-ul.
+
+en: Greeting
+tr: Salut
+
+en: Show the welcome at sign-in and unlock
+tr: Afișați mesajul de bun venit la conectare și la deblocare
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Apare după ce Windows v-a conectat, în timp ce Aether Shell se pregătește. Atingeți, faceți clic sau apăsați Esc pentru a-l omite.
+
+en: Greeting language
+tr: Limba salutului
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut în franceză, Hello în engleză, Hola în spaniolă. Stiloul scrie litere latine: în toate celelalte limbi salută în engleză.
+
+en: Your name
+tr: Numele dvs.
+
+en: Name to greet you with
+tr: Numele cu care să fiți salutat
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Opțional, de exemplu un prenume. Rămâne pe acest PC, în setările Aether Shell, și nu este trimis nicăieri și nici scris într-un jurnal. Goliți câmpul pentru a-l elimina.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Modul de culoare, accentul, viteza mișcării și aspectul Dock-ului și al Barei de sus.
+
+en: Style
+tr: Stil
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Lichid: sticlă în straturi peste ceea ce se află în spate, un strat de estompare, lumina lichidului, apoi pictogramele și textul, lizibile peste pagini luminoase și întunecate. Granulat: sticlă mată, estompată și semitransparentă, cu o granulație fină.
+
+en: Liquid blur
+tr: Estompare Lichid
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Cât de mult acoperă stratul de estompare de sub sticla Lichid ceea ce se află în spate: 100% estompează totul. Valorile mai mici arată pagina mai clar, iar textul de pe bare se poate citi mai greu peste o pagină încărcată.
+
+en: Liquid blur color
+tr: Culoarea estompării Lichid
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automat păstrează culorile proprii ale sticlei. Textul și pictogramele rămân lizibile indiferent de culoare.
+
+en: Automatic
+tr: Automat
+
+en: White
+tr: Alb
+
+en: Black
+tr: Negru
+
+en: Accent
+tr: Accent
+
+en: Blue
+tr: Albastru
+
+en: Violet
+tr: Violet
+
+en: Pink
+tr: Roz
+
+en: Red
+tr: Roșu
+
+en: Orange
+tr: Portocaliu
+
+en: Yellow
+tr: Galben
+
+en: Green
+tr: Verde
+
+en: Teal
+tr: Verde-albăstrui
+
+en: Liquid color strength
+tr: Intensitatea culorii Lichid
+
+en: How much of the chosen color the blur layer takes.
+tr: Cât din culoarea aleasă preia stratul de estompare.
+
+en: Theme
+tr: Temă
+
+en: Color mode
+tr: Mod de culoare
+
+en: High contrast always takes precedence.
+tr: Contrastul ridicat are întotdeauna prioritate.
+
+en: Light
+tr: Luminos
+
+en: Dark
+tr: Întunecat
+
+en: Accent color
+tr: Culoare de accent
+
+en: Animation duration
+tr: Durata animațiilor
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 este viteza standard; valorile mai mari sunt mai lente. Mișcarea redusă are prioritate.
+
+en: Dock icon preset
+tr: Presetare pictograme Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: O dimensiune particularizată din setările Dock este păstrată până când alegeți o presetare.
+
+en: Small - 32 px
+tr: Mică - 32 px
+
+en: Medium - 40 px
+tr: Medie - 40 px
+
+en: Large - 48 px
+tr: Mare - 48 px
+
+en: Keep custom size
+tr: Păstrați dimensiunea particularizată
+
+en: Show Windows Start in the Dock
+tr: Afișați Start din Windows în Dock
+
+en: Show Task View in the Dock
+tr: Afișați Vizualizare activități în Dock
+
+en: Reserve extra space for Dock animations
+tr: Rezervați spațiu suplimentar pentru animațiile Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Ține mărirea și saltul la lansare departe de ferestrele maximizate.
+
+en: Weather position
+tr: Poziția vremii
+
+en: Left
+tr: Stânga
+
+en: Right
+tr: Dreapta
+
+en: Keyboard indicator
+tr: Indicator de tastatură
+
+en: Compact
+tr: Compact
+
+en: Two lines
+tr: Două rânduri
+
+en: Windows taskbar pins
+tr: Elemente fixate în bara de activități Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: Adăugați elementele fixate noi descoperite în bara de activități Windows
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Cât timp bara de activități este înlocuită, elementele fixate noi din Windows sunt adăugate în Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Înlocuirea reversibilă a barei de activități Windows cu Dock-ul.
+
+en: Taskbar replacement
+tr: Înlocuirea barei de activități
+
+en: Replace the Windows taskbar
+tr: Înlocuiți bara de activități Windows
+
+en: Changing this needs Apply.
+tr: Modificarea necesită Aplicare.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Cât timp rulează, Aether Shell ascunde bara de activități Windows și rezervă spațiu sub aplicațiile maximizate.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Starea barei de activități Windows este restabilită când acest mod este dezactivat sau când Aether Shell se închide. Un asistent de recuperare separat o restabilește și dacă aplicația se oprește neașteptat. Dacă recuperarea nu reușește, reporniți Windows Explorer din Managerul de activități.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Setările Windows rămân interfața nativă Windows. Pagina sa pentru bara de activități nu este înlocuită de Aether Shell; configurați acest mod aici.
+
+en: Pinned applications from Windows
+tr: Aplicații fixate din Windows
+
+en: &Import Windows taskbar pins
+tr: &Importați elementele fixate în bara de activități Windows
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Citește comenzile rapide fixate fără a modifica elementele fixate Windows. Este posibil ca unele elemente fixate Windows 11 sau ordinea lor să nu fie disponibile.
+
+en: Version {}
+tr: Versiunea {}
+
+en: Created by Ibrahim Bouillet
+tr: Creat de Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: O interfață desktop Windows nativă - un Dock flotant și o bară de stare de sus - care rulează alături de Explorer.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Date meteo: Open-Meteo.com (CC BY 4.0). Nu sunt incluse biblioteci de runtime C++ de la terți.
+
+en: &Official project
+tr: Proiect &oficial
+
+en: Licence
+tr: Licență
+
+en: Taskbar replacement changes need Apply.
+tr: Modificările înlocuirii barei de activități necesită Aplicare.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Modificările se salvează automat. Pornirea necesită Aplicare.
+
+en: Changes save automatically.
+tr: Modificările se salvează automat.
+
+en: Press Apply to confirm this change.
+tr: Apăsați Aplicare pentru a confirma această modificare.
+
+en: Smart transparency
+tr: Transparență inteligentă
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: În stilul Lichid, această fereastră estompează fundalul doar sub textul și controalele sale: complet peste alte ferestre și pictogramele de pe desktop, ușor peste imaginea desktopului și deloc acolo unde nu afișează nimic.
+
+en: Languages on this PC
+tr: Limbi pe acest PC
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell descarcă limbile pe care le are Windows, astfel încât își schimbă limba odată cu Windows.
+
+en: Add a language
+tr: Adăugați o limbă
+
+en: &Download
+tr: &Descărcați
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Fiecare limbă provine din lansarea acestei versiuni pe GitHub și este verificată înainte de a fi folosită. După ce se află pe acest PC, alegeți-o mai sus.
+
+en: built in
+tr: integrată
+
+en: downloading, {}
+tr: se descarcă, {}
+
+en: download failed
+tr: descărcarea a eșuat
+
+## setup
+
+en: Aether Shell Setup
+tr: Instalare Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Programul de instalare nu și-a putut crea interfața. Închideți-l și încercați din nou sau utilizați opțiunile documentate de instalare silențioasă.
+
+en: Options
+tr: Opțiuni
+
+en: Install
+tr: Instalare
+
+en: Done
+tr: Gata
+
+en: Remove Aether Shell
+tr: Eliminare Aether Shell
+
+en: Repair Aether Shell
+tr: Reparare Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Un Dock și o bară de stare de sus native pentru Windows, care rulează alături de Explorer.
+
+en: Replaces the Windows taskbar while it runs
+tr: Înlocuiește bara de activități Windows cât timp rulează
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Ieșiți din Aether Shell, dezactivați această opțiune în Setări > Desktop sau deschideți „Restore Windows taskbar” din meniul Start pentru a recupera bara de activități Windows.
+
+en: Starts when you sign in - your choice
+tr: Pornește când vă conectați - la alegerea dvs.
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Instalările noi pornesc implicit la conectare. Puteți debifa această opțiune înainte de instalare sau o puteți dezactiva ulterior în Setări. Opțiunile de pornire existente și dezactivările din Managerul de activități sunt păstrate.
+
+en: Installs for your account
+tr: Se instalează pentru contul dvs.
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Nu sunt necesare drepturi de administrator. Setările și datele dvs. rămân în profilul dvs. de utilizator.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Dezinstalarea păstrează setările și datele dvs., cu excepția cazului în care alegeți să le eliminați.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Repararea restaurează fișierele acestui pachet și vă păstrează setările. Dacă Aether Shell a lăsat bara de activități Windows ascunsă, repararea o restabilește.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Instalarea peste o versiune existentă vă păstrează setările. Un pachet mai vechi este respins, cu excepția cazului în care permiteți explicit revenirea la o versiune anterioară.
+
+en: MIT License
+tr: Licență MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Licența este instalată și ca LICENSE lângă Aether Shell.
+
+en: Remove this installation
+tr: Eliminați această instalare
+
+en: Install location
+tr: Locație de instalare
+
+en: &Browse...
+tr: &Răsfoire...
+
+en: Also remove my settings, cache and logs
+tr: Eliminați și setările, memoria cache și jurnalele mele
+
+en: This cannot be undone.
+tr: Acțiunea nu poate fi anulată.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Programul de instalare va închide corect Aether Shell și îi va elimina fișierele instalate, comenzile rapide, intrarea de pornire și înregistrarea din Aplicații instalate. Celelalte aplicații și setările Windows nu sunt atinse.
+
+en: Your welcome
+tr: Mesajul dvs. de bun venit
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: După ce vă conectați sau deblocați PC-ul, Aether Shell scrie de mână un scurt salut. Tastați numele cu care să vă salute sau lăsați câmpul gol pentru un simplu salut.
+
+en: Your first name
+tr: Prenumele dvs.
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Opțional, de exemplu un prenume. Rămâne pe acest PC, în setările Aether Shell, și nu este trimis nicăieri. Modificați-l sau dezactivați mesajul de bun venit din Setări > Bun venit.
+
+en: Shortcuts and startup
+tr: Comenzi rapide și pornire
+
+en: Create Start menu shortcuts
+tr: Creați comenzi rapide în meniul Start
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell și Restore Windows taskbar.
+
+en: Create a desktop shortcut
+tr: Creați o comandă rapidă pe desktop
+
+en: Shows your current choice.
+tr: Afișează opțiunea dvs. curentă.
+
+en: Recommended.
+tr: Recomandat.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Debifați pentru a renunța; dezactivările din Managerul de activități sunt respectate.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Instalarea acceptă opțiunea de pornire de mai sus. Lansatorul poate reporni Aether Shell după o defecțiune, cu un număr limitat de reîncercări. Ieșirea și Restore Windows taskbar rămân disponibile. Vremea este dezactivată implicit. Fișierele binare nesemnate pot declanșa un avertisment Windows SmartScreen.
+
+en: Removing this installation...
+tr: Se elimină această instalare...
+
+en: Repairing Aether Shell...
+tr: Se repară Aether Shell...
+
+en: Installing Aether Shell...
+tr: Se instalează Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Se închide Aether Shell și se elimină fișierele sale.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Se verifică pachetul încorporat și se instalează fișierele sale. Progresul este afișat ca activitate: programul de instalare nu cunoaște timpul rămas.
+
+en: Please wait while the removal completes.
+tr: Așteptați finalizarea eliminării.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Anularea este disponibilă până la activarea versiunii noi; apoi instalarea se încheie în siguranță.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell a fost dezinstalat.
+
+en: Aether Shell is ready.
+tr: Aether Shell este gata.
+
+en: Setup was cancelled.
+tr: Instalarea a fost anulată.
+
+en: Setup could not complete.
+tr: Instalarea nu a putut fi finalizată.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Datele dvs. au fost păstrate, cu excepția cazului în care ați ales explicit să le eliminați.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Îl puteți repara sau dezinstala din Setări Windows > Aplicații > Aplicații instalate.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Operațiunea a fost anulată înainte de activare. Reveniți la Opțiuni pentru a încerca din nou.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Verificați accesul la fișiere și spațiul liber pe disc, apoi încercați din nou. Dacă Aether Shell este deja prezent, repararea îi poate restaura fișierele. Categoria erorii: {}
+
+en: Setup log
+tr: Jurnal de instalare
+
+en: Launch Aether Shell
+tr: Lansați Aether Shell
+
+en: &Back
+tr: Îna&poi
+
+en: &Next
+tr: &Următorul
+
+en: &Continue
+tr: &Continuare
+
+en: &Uninstall
+tr: &Dezinstalare
+
+en: &Repair
+tr: &Reparare
+
+en: &Install
+tr: &Instalare
+
+en: &Close
+tr: Î&nchidere
+
+en: Step {} of {}: {}
+tr: Pasul {} din {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Alegeți folderul de instalare Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Alegeți o cale completă de folder, de exemplu una care începe cu o literă de unitate.
+
+en: The install folder must be an absolute path.
+tr: Folderul de instalare trebuie să fie o cale absolută.
+
+en: Setup stops at the next safe point.
+tr: Instalarea se oprește la următorul punct sigur.
+
+en: Cancelling...
+tr: Se anulează...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Instalarea finalizează în siguranță pasul curent; așteptați.
+
+en: Updating Aether Shell
+tr: Se actualizează Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Se verifică pachetul semnat și se aplică actualizarea.
+
+en: Update completed
+tr: Actualizare finalizată
+
+en: The update did not complete
+tr: Actualizarea nu s-a finalizat
+
+en: Close
+tr: Închidere
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Interfața de actualizare nu a putut porni. Actualizarea nu a fost aplicată. Încercați din nou sau utilizați Reparare.
+
+en: Aether Shell Update
+tr: Actualizare Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Interfața de actualizare nu a putut porni. Actualizarea nu a fost aplicată. Încercați din nou sau utilizați Reparare din Setări Windows > Aplicații > Aplicații instalate.
+
+en: Update completed.
+tr: Actualizare finalizată.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Actualizarea nu s-a finalizat. Consultați jurnalul de actualizare sau utilizați Reparare.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell nu a putut porni. Alegeți Reparare din Setări Windows > Aplicații > Aplicații instalate.
+
+en: Aether Shell Settings — update in progress
+tr: Setări Aether Shell — actualizare în curs
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Reluați înlocuirea barei de activități
+
+en: Show Windows &notification area for 60 seconds
+tr: Afișați zona de &notificare Windows timp de 60 de secunde
+
+en: &Search…
+tr: &Căutare…
+
+en: &Settings…
+tr: &Setări…
+
+en: View available &update…
+tr: Vizualizați &actualizarea disponibilă…
+
+en: &Check for updates…
+tr: Căutați act&ualizări…
+
+en: &About Aether Shell
+tr: &Despre Aether Shell
+
+en: &Quit Aether Shell
+tr: &Ieșire din Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Comutați &limba de intrare\tWin+Spațiu
+
+en: Open &network controls…
+tr: Deschideți controalele de &rețea…
+
+en: &Weather settings…
+tr: Setări &vreme…
+
+en: Toggle output &mute
+tr: Activați/dezactivați &sunetul ieșirii
+
+en: &Sound settings…
+tr: Setări s&unet…
+
+en: Toggle microphone &mute
+tr: Activați/dezactivați &microfonul
+
+en: Start Windows &voice typing\tWin+H
+tr: Porniți tastarea &vocală Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Setări de &confidențialitate pentru microfon…
+
+en: &Power settings…
+tr: Setări de &alimentare…
+
+en: Open &notifications and calendar
+tr: Deschideți &notificările și calendarul
+
+en: Open &calendar\tWin+Alt+D
+tr: Deschideți &calendarul\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Afișați pictogramele &ascunse
+
+en: Initializing
+tr: Se inițializează
+
+en: Unavailable
+tr: Indisponibil
+
+en: Unsupported
+tr: Neacceptat
+
+en: Error
+tr: Eroare
+
+en: Available
+tr: Disponibil
+
+en: Unknown
+tr: Necunoscut
+
+en: Internet access
+tr: Acces la internet
+
+en: Local network only
+tr: Doar rețea locală
+
+en: Limited Internet access
+tr: Acces limitat la internet
+
+en: No network connection
+tr: Nicio conexiune la rețea
+
+en: Connectivity unknown
+tr: Conectivitate necunoscută
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Celular
+
+en: Network
+tr: Rețea
+
+en: Offline
+tr: Offline
+
+en: Network status unavailable
+tr: Starea rețelei nu este disponibilă
+
+en: Quick controls
+tr: Controale rapide
+
+en: Aether Shell menu
+tr: Meniu Aether Shell
+
+en: Weather status unavailable
+tr: Starea vremii nu este disponibilă
+
+en: Cached weather
+tr: Vreme din cache
+
+en: Observation (UTC): {}
+tr: Observație (UTC): {}
+
+en: Weather: {}
+tr: Vremea: {}
+
+en: Click to open weather settings
+tr: Faceți clic pentru a deschide setările vremii
+
+en: Show hidden icons
+tr: Afișați pictogramele ascunse
+
+en: Opens Windows' notification-area overflow
+tr: Deschide zona de debordare a zonei de notificare Windows
+
+en: Input language: {}
+tr: Limba de intrare: {}
+
+en: Fallback input layout
+tr: Aspect de tastatură de rezervă
+
+en: Click to switch input language (Win+Space)
+tr: Faceți clic pentru a comuta limba de intrare (Win+Spațiu)
+
+en: Network: {}
+tr: Rețea: {}
+
+en: Signal strength unavailable
+tr: Puterea semnalului nu este disponibilă
+
+en: Click to open Windows network settings
+tr: Faceți clic pentru a deschide setările de rețea Windows
+
+en: Audio output
+tr: Ieșire audio
+
+en: Audio: {}
+tr: Audio: {}
+
+en: volume unknown
+tr: volum necunoscut
+
+en: Muted
+tr: Sunet dezactivat
+
+en: Sound on
+tr: Sunet activat
+
+en: Microphone: {}
+tr: Microfon: {}
+
+en: Endpoint unmuted
+tr: Microfon activat
+
+en: Recording detection unsupported
+tr: Detectarea înregistrării nu este acceptată
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Faceți clic pentru a activa sau dezactiva sunetul; clic dreapta pentru tastarea vocală Windows și setările de confidențialitate pentru microfon
+
+en: Battery: {}
+tr: Baterie: {}
+
+en: Battery {}
+tr: Baterie {}
+
+en: Battery status unavailable
+tr: Starea bateriei nu este disponibilă
+
+en: Charging
+tr: Se încarcă
+
+en: External power
+tr: Alimentare externă
+
+en: Estimated remaining: {} h {} min
+tr: Timp rămas estimat: {} h {} min
+
+en: Click to open power settings
+tr: Faceți clic pentru a deschide setările de alimentare
+
+en: Clock status unavailable
+tr: Starea ceasului nu este disponibilă
+
+en: Click to open calendar and notifications
+tr: Faceți clic pentru a deschide calendarul și notificările
+
+en: Action failed: {}
+tr: Acțiunea nu a reușit: {}
+
+en: Aether Shell status bar
+tr: Bara de stare Aether Shell
+
+en: Update available
+tr: Actualizare disponibilă
+
+en: Cached
+tr: Din cache
+
+en: Start
+tr: Start
+
+en: Search
+tr: Căutare
+
+en: Task View
+tr: Vizualizare activități
+
+en: Application
+tr: Aplicație
+
+en: Running application
+tr: Aplicație care rulează
+
+en: More applications
+tr: Mai multe aplicații
+
+en: Aether Shell window previews
+tr: Previzualizări ferestre Aether Shell
+
+en: Minimized — preview unavailable
+tr: Minimizată — previzualizare indisponibilă
+
+en: Preview unavailable
+tr: Previzualizare indisponibilă
+
+en: {} windows
+tr: Ferestre {}
+
+en: {} window
+tr: Fereastră {}
+
+en: Switches to this window
+tr: Comută la această fereastră
+
+en: Minimized, preview unavailable
+tr: Minimizată, previzualizare indisponibilă
+
+en: Minimized
+tr: Minimizată
+
+en: Close {}
+tr: Închidere {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Îi cere acestei ferestre să se închidă; aplicația poate cere în continuare salvarea sau anularea
+
+en: Close requested
+tr: Închidere solicitată
+
+en: Previous applications
+tr: Aplicații anterioare
+
+en: Open
+tr: Deschidere
+
+en: New instance
+tr: Instanță nouă
+
+en: Unpin from Dock
+tr: Anulați fixarea din Dock
+
+en: Pin to Dock
+tr: Fixați în Dock
+
+en: Move left
+tr: Mutare la stânga
+
+en: Move right
+tr: Mutare la dreapta
+
+en: Dock settings...
+tr: Setări Dock...
+
+en: Import Windows taskbar pins
+tr: Importați elementele fixate în bara de activități Windows
+
+en: Open Windows Start
+tr: Deschideți Start din Windows
+
+en: Aether Shell Dock
+tr: Dock Aether Shell
+
+en: Pinned
+tr: Fixată
+
+en: Running
+tr: Rulează
+
+en: Needs attention
+tr: Necesită atenție
+
+en: Up arrow shows window previews
+tr: Săgeata în sus afișează previzualizările ferestrelor
+
+en: Installed application
+tr: Aplicație instalată
+
+en: Desktop application
+tr: Aplicație desktop
+
+en: File
+tr: Fișier
+
+en: Folder
+tr: Folder
+
+en: Windows tool
+tr: Instrument Windows
+
+en: Control Panel
+tr: Panou de control
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Navigare   ·   Enter Deschidere   ·   Esc Închidere
+
+en: Search apps, settings and files
+tr: Căutați aplicații, setări și fișiere
+
+en: Search could not be completed.
+tr: Căutarea nu a putut fi finalizată.
+
+en: Results
+tr: Rezultate
+
+en: Indexing applications…
+tr: Se indexează aplicațiile…
+
+en: Type to search apps, settings and files
+tr: Tastați pentru a căuta aplicații, setări și fișiere
+
+en: Nothing matches
+tr: Nicio potrivire
+
+en: Windows could not open this application.
+tr: Windows nu a putut deschide această aplicație.
+
+en: Menu
+tr: Meniu
+
+en: Opens a submenu
+tr: Deschide un submeniu
+
+en: , opens a submenu
+tr: , deschide un submeniu
+
+en: Selected
+tr: Selectat
+
+en: Checked
+tr: Bifat
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Mod Avion
+
+en: Accessibility
+tr: Accesibilitate
+
+en: Energy saver
+tr: Economizor de energie
+
+en: Live captions
+tr: Subtitrări live
+
+en: Night light
+tr: Lumină de noapte
+
+en: Mobile hotspot
+tr: Hotspot mobil
+
+en: Nearby sharing
+tr: Partajare în apropiere
+
+en: Cast
+tr: Transmitere
+
+en: Project
+tr: Proiectare
+
+en: All settings
+tr: Toate setările
+
+en: Connected
+tr: Conectat
+
+en: Not connected
+tr: Neconectat
+
+en: , on
+tr: , activat
+
+en: , off
+tr: , dezactivat
+
+en: , state unknown
+tr: , stare necunoscută
+
+en: , opens Windows Settings
+tr: , deschide Setări Windows
+
+en: , shows accessibility features
+tr: , afișează caracteristicile de accesibilitate
+
+en: , requires Windows 11 version 22H2
+tr: , necesită Windows 11 versiunea 22H2
+
+en: Now playing: {}
+tr: Se redă acum: {}
+
+en: Untitled media
+tr: Conținut media fără titlu
+
+en: , switch source
+tr: , comutați sursa
+
+en: Previous media item
+tr: Elementul media anterior
+
+en: Pause
+tr: Pauză
+
+en: Play
+tr: Redare
+
+en: Next media item
+tr: Elementul media următor
+
+en: {} details
+tr: Detalii {}
+
+en: Page {} of {}
+tr: Pagina {} din {}
+
+en: Next page
+tr: Pagina următoare
+
+en: First page
+tr: Prima pagină
+
+en: Brightness
+tr: Luminozitate
+
+en: Brightness, unavailable on this display
+tr: Luminozitate, indisponibilă pe acest afișaj
+
+en: Volume
+tr: Volum
+
+en: Volume, unavailable
+tr: Volum, indisponibil
+
+en: Unmute
+tr: Activare sunet
+
+en: Mute
+tr: Dezactivare sunet
+
+en: Sound output and volume mixer
+tr: Ieșire sunet și mixer de volum
+
+en: Back
+tr: Înapoi
+
+en: , secured
+tr: , securizată
+
+en: , open
+tr: , deschisă
+
+en: , connected
+tr: , conectată
+
+en: Disconnect
+tr: Deconectare
+
+en: Show available networks
+tr: Afișați rețelele disponibile
+
+en: More Wi-Fi settings
+tr: Mai multe setări Wi-Fi
+
+en: Bluetooth and devices settings
+tr: Setări Bluetooth și dispozitive
+
+en: Magnifier
+tr: Lupă
+
+en: Narrator
+tr: Narator
+
+en: On-screen keyboard
+tr: Tastatură de pe ecran
+
+en: Sticky keys
+tr: Taste adezive
+
+en: More accessibility settings
+tr: Mai multe setări de accesibilitate
+
+en: Volume mixer
+tr: Mixer de volum
+
+en: Choose output in Sound settings
+tr: Alegeți ieșirea în setările de sunet
+
+en: Power and battery settings
+tr: Setări alimentare și baterie
+
+en: Battery {} percent, {}
+tr: Baterie {} la sută, {}
+
+en: All Windows settings
+tr: Toate setările Windows
+
+en: The requested action could not be dispatched
+tr: Acțiunea solicitată nu a putut fi transmisă
+
+en: Aether Shell quick controls
+tr: Controale rapide Aether Shell
+
+en: Media session active
+tr: Sesiune media activă
+
+en: No media session
+tr: Nicio sesiune media
+
+en: Current page
+tr: Pagina curentă
+
+en:  - secured
+tr:  - securizată
+
+en:  - open
+tr:  - deschisă
+
+en:  - opens in Windows
+tr:  - se deschide în Windows
+
+en: Turned off by hardware or policy
+tr: Dezactivat de hardware sau de politică
+
+en: State unavailable - use Windows settings
+tr: Stare indisponibilă - utilizați setările Windows
+
+en: Off
+tr: Dezactivat
+
+en:  - signal {} of 5
+tr:  - semnal {} din 5
+
+en: , no internet
+tr: , fără internet
+
+en: On - not connected
+tr: Activat - neconectat
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows nu permite aplicațiilor să listeze rețelele: verificați Locație în setările de confidențialitate
+
+en: No Wi-Fi adapter found
+tr: Nu s-a găsit niciun adaptor Wi-Fi
+
+en: Connecting to {}...
+tr: Se conectează la {}...
+
+en:  - looking for networks
+tr:  - se caută rețele
+
+en: On
+tr: Activat
+
+en: A screen reader is running
+tr: Un cititor de ecran rulează
+
+en: Windows accessibility features
+tr: Caracteristici de accesibilitate Windows
+
+en: Sound output
+tr: Ieșire sunet
+
+en: Default output device
+tr: Dispozitiv de ieșire implicit
+
+en: No output device available
+tr: Niciun dispozitiv de ieșire disponibil
+
+en: Battery unknown
+tr: Baterie necunoscută
+
+en: Status refresh could not be started
+tr: Reîmprospătarea stării nu a putut porni
+
+en: Status refresh unavailable
+tr: Reîmprospătarea stării nu este disponibilă
+
+en: Excellent signal
+tr: Semnal excelent
+
+en: Good signal
+tr: Semnal bun
+
+en: Fair signal
+tr: Semnal acceptabil
+
+en: Weak signal
+tr: Semnal slab
+
+en: Clear sky
+tr: Cer senin
+
+en: Mainly clear
+tr: Predominant senin
+
+en: Partly cloudy
+tr: Parțial noros
+
+en: Overcast
+tr: Înnorat
+
+en: Fog
+tr: Ceață
+
+en: Drizzle
+tr: Burniță
+
+en: Rain
+tr: Ploaie
+
+en: Snow
+tr: Ninsoare
+
+en: Rain showers
+tr: Averse de ploaie
+
+en: Snow showers
+tr: Averse de ninsoare
+
+en: Thunderstorm
+tr: Furtună
+
+## weather
+
+en: Morning
+tr: Dimineață
+
+en: Afternoon
+tr: După-amiază
+
+en: Evening
+tr: Seară
+
+en: Night
+tr: Noapte
+
+en: Now
+tr: Acum
+
+en: Today
+tr: Astăzi
+
+en: Low
+tr: Scăzut
+
+en: Moderate
+tr: Moderat
+
+en: High
+tr: Ridicat
+
+en: Very high
+tr: Foarte ridicat
+
+en: Extreme
+tr: Extrem
+
+en: No connection to the weather service.
+tr: Nicio conexiune la serviciul meteo.
+
+en: The weather service is busy. Try again in a moment.
+tr: Serviciul meteo este ocupat. Încercați din nou peste câteva momente.
+
+en: The weather could not be loaded.
+tr: Vremea nu a putut fi încărcată.
+
+en: Could not update; showing the last forecast.
+tr: Actualizarea nu a reușit; se afișează ultima prognoză.
+
+en: Try again
+tr: Încercați din nou
+
+en: Your location
+tr: Locația dvs.
+
+en: My location
+tr: Locația mea
+
+en: Precise location
+tr: Locație precisă
+
+en: Approximate location
+tr: Locație aproximativă
+
+en: Chosen in Settings
+tr: Aleasă în Setări
+
+en: Allow
+tr: Permiteți
+
+en: Use precise location
+tr: Utilizați locația precisă
+
+en: See the weather where you are: allow your precise location.
+tr: Vedeți vremea acolo unde vă aflați: permiteți locația precisă.
+
+en: Your position is approximate (about 10 km).
+tr: Locația dvs. este aproximativă (circa 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Locația este dezactivată pentru această aplicație în Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Acest dispozitiv nu își poate raporta locația. Căutați în schimb un oraș.
+
+en: Reading Windows location…
+tr: Se citește locația Windows…
+
+en: Automatic weather follows your Windows location.
+tr: Vremea automată urmează locația dvs. Windows.
+
+en: Search for a city
+tr: Căutați un oraș
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Căutați un oraș sau permiteți locația pentru a vedea vremea.
+
+en: Searching…
+tr: Se caută…
+
+en: City search is unavailable.
+tr: Căutarea orașelor nu este disponibilă.
+
+en: No city found.
+tr: Nu s-a găsit niciun oraș.
+
+en: Weather settings
+tr: Setări vreme
+
+en: Loading the weather…
+tr: Se încarcă vremea…
+
+en: Loading…
+tr: Se încarcă…
+
+en: Updated {}
+tr: Actualizat la {}
+
+en: Near {}
+tr: Lângă {}
+
+en: Temperatures now
+tr: Temperaturi acum
+
+en: The map is unavailable.
+tr: Harta nu este disponibilă.
+
+en: Map: Natural Earth
+tr: Hartă: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Date meteo de la Open-Meteo.com
+
+en: Feels like
+tr: Temperatură resimțită
+
+en: Feels like {}
+tr: Resimțită {}
+
+en: Close to the real temperature
+tr: Apropiată de temperatura reală
+
+en: The wind makes it feel colder
+tr: Vântul o face să pară mai rece
+
+en: Humidity makes it feel warmer
+tr: Umiditatea o face să pară mai caldă
+
+en: Humidity
+tr: Umiditate
+
+en: Cloud cover {}
+tr: Nebulozitate {}
+
+en: Wind
+tr: Vânt
+
+en: Gusts {}
+tr: Rafale {}
+
+en: Sunrise and sunset
+tr: Răsărit și apus
+
+en: UV index
+tr: Indice UV
+
+en: Pressure
+tr: Presiune
+
+en: At sea level
+tr: La nivelul mării
+
+en: &Open the weather
+tr: &Deschideți vremea
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Prognoza pentru locul în care vă aflați, cu o precizie de circa 100 m și altitudinea sa. Dezactivat: rotunjită la circa 10 km.

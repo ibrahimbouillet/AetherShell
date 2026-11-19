@@ -5,13 +5,15 @@
 🇸🇦 [العربية](../ar/INSTALLATION.md) · 🇧🇩 [বাংলা](../bn/INSTALLATION.md) · 🇵🇰 [اردو](../ur/INSTALLATION.md)
 
 Use somente o executável de instalação da [página de Releases do repositório oficial](https://github.com/ibrahimbouillet/AetherShell/releases).
-A versão atual, 3.5 [0.3.5-alpha.3](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.3.5-alpha.3), é uma
+A versão atual, o Alpha 4 [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4), é uma
 prévia de instalação manual; a qualificação mais ampla da Versão 1 continua em aberto. A versão anterior
 [0.2.0-alpha.2](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.2.0-alpha.2) continua disponível.
 
 Execute a instalação como o seu usuário comum do Windows. Desde o Alpha 4, a instalação fala o idioma que você escolheu
-nas Configurações do Aether Shell ou, na falta dele, o primeiro dos seus idiomas de exibição do Windows que for um dos
-dez idiomas da interface, e o inglês caso contrário. O assistente explica o produto, exibe a licença MIT e permite
+nas Configurações do Aether Shell ou, na falta dele, o idioma de exibição do seu Windows (qualquer um dos 41 idiomas da
+interface), e o inglês caso contrário. Ao concluir, ela baixa da versão publicada os idiomas da interface que o seu
+Windows tem (algumas dezenas de KB cada um); sem conexão, o Aether Shell os baixa ao iniciar. O assistente explica o
+produto, exibe a licença MIT e permite
 escolher uma pasta (padrão `%LOCALAPPDATA%\Programs\AetherShell`), atalhos e a inicialização opcional. Ele instala um
 inicializador estável, uma instalação de manutenção e os arquivos de programa versionados. Pode criar um atalho no menu
 Iniciar e uma entrada por usuário em Aplicativos instalados do Windows. Não usa direitos de administrador nem substitui o
@@ -31,7 +33,7 @@ Binários de aplicativo e de instalação sem assinatura podem acionar o SmartSc
 de editor Authenticode. Confira a origem exata da versão e o SHA-256 antes de decidir executá-la:
 
 ```powershell
-Get-FileHash .\AetherShell-0.3.5-alpha.3-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\AetherShell-0.4.0-alpha.4-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Compare com o arquivo de somas de verificação correspondente. Uma soma de verificação, por si só, não autentica um

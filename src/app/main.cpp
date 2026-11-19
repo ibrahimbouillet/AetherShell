@@ -16,9 +16,10 @@
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     using namespace aether;
     try {
-        {   // D70/D74: until Settings are read, the language saved by the earlier run (any version), else Windows'
+        {   // D70/D74/D83: until Settings are read, the language saved by the earlier run (any version), else Windows',
+            // from its downloaded pack; English while the pack is not here.
             const auto root = platform::DefaultDataRoot();
-            i18n::SetLanguage(root ? i18n::StartupLanguage(*root / L"config" / L"settings.json") : i18n::SystemLanguage());
+            if (root) (void)i18n::StartIn(*root / L"config" / L"settings.json", *root / L"languages");
         }
         const auto arguments = app::ProcessArguments();
         auto guard = app::DispatchWindowCornerGuard(arguments);

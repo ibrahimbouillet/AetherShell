@@ -1,0 +1,115 @@
+en: Morning
+
+en: Afternoon
+
+en: Evening
+
+en: Night
+
+en: Now
+
+en: Today
+
+en: Low
+
+en: Moderate
+
+en: High
+
+en: Very high
+
+en: Extreme
+
+en: No connection to the weather service.
+
+en: The weather service is busy. Try again in a moment.
+
+en: The weather could not be loaded.
+
+en: Could not update; showing the last forecast.
+
+en: Try again
+
+en: Your location
+
+en: My location
+
+en: Precise location
+
+en: Approximate location
+
+en: Chosen in Settings
+
+en: Allow
+
+en: Use precise location
+
+en: See the weather where you are: allow your precise location.
+
+en: Your position is approximate (about 10 km).
+
+en: Location is turned off for this app in Windows.
+
+en: This device cannot report its location. Search for a city instead.
+
+en: Reading Windows location…
+
+en: Automatic weather follows your Windows location.
+
+en: Search for a city
+
+en: Search for a city, or allow your location, to see the weather.
+
+en: Searching…
+
+en: City search is unavailable.
+
+en: No city found.
+
+en: Weather settings
+
+en: Loading the weather…
+
+en: Loading…
+
+en: Updated {}
+
+en: Near {}
+
+en: Temperatures now
+
+en: The map is unavailable.
+
+en: Map: Natural Earth
+
+en: Weather data by Open-Meteo.com
+
+en: Feels like
+
+en: Feels like {}
+
+en: Close to the real temperature
+
+en: The wind makes it feel colder
+
+en: Humidity makes it feel warmer
+
+en: Humidity
+
+en: Cloud cover {}
+
+en: Wind
+
+en: Gusts {}
+
+en: Sunrise and sunset
+
+en: UV index
+
+en: Pressure
+
+en: At sea level
+
+en: &Open the weather
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.

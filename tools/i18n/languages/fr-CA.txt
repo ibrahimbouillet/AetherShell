@@ -1,0 +1,122 @@
+# French (Canada) (fr-CA): Français (Canada). The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+# A variant of fr: only the texts that differ from it are listed.
+
+## app
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: L'espace du Dock n'a pas pu être réservé; rétablissement de la barre des tâches Windows
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Barre des tâches Windows rétablie. L'espace du Dock n'a pas pu être réservé; désactivez puis réactivez le remplacement pour réessayer.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Le contrôle de récupération est indisponible; rétablissement de la barre des tâches Windows
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: L'actualisation automatique de la position est indisponible; réessayez dans les paramètres Météo.
+
+en: Reading Windows status; try the action again shortly
+tr: Lecture de l'état de Windows; réessayez l'action dans un instant
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Le remplacement de la barre des tâches n'a pas pu reprendre; Windows reste disponible
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Épingles modifiées en mémoire; l'enregistrement a échoué. Appliquez dans les Paramètres pour réessayer.
+
+en: Pins updated in memory; saving...
+tr: Épingles mises à jour en mémoire; enregistrement...
+
+en: Quit without saving the latest changes?
+tr: Quitter sans enregistrer les dernières modifications?
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Aucun état enregistré de la barre des tâches n'a été trouvé. La barre des tâches Windows a été rendue visible; son réglage de masquage automatique n'a pas été modifié.
+
+## search-names
+
+en: Printers & scanners settings
+tr: Paramètres des imprimantes et numériseurs
+
+## settings-messages
+
+en: Received {}; total size unknown.
+tr: {} reçus; taille totale inconnue.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Saisissez un nombre complet avant d'enregistrer; le champ marqué en rouge n'en est pas un.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Paramètres modifiés en mémoire; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: Defaults saved; startup is disabled.
+tr: Valeurs par défaut enregistrées; le démarrage est désactivé.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Valeurs par défaut appliquées; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: Startup was not disabled; settings were kept.
+tr: Le démarrage n'a pas été désactivé; les paramètres ont été conservés.
+
+en: Reset all settings?
+tr: Réinitialiser tous les paramètres?
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Épingles modifiées en mémoire; l'enregistrement a échoué. Appliquez de nouveau pour réessayer.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: La langue {} n'a pas pu être téléchargée. L'anglais est affiché d'ici là; choisissez « Télécharger » ci-dessous pour réessayer.
+
+## settings-pages
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: À quel point une icône grossit sous le pointeur; 1 le désactive.
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Il se masque quand une fenêtre le recouvre; amenez le pointeur au bord inférieur de l'écran pour le faire apparaître. Il reste visible sur le bureau, et les fenêtres prennent toute la hauteur de l'écran.
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Barre flottante : la barre de verre sous le haut de l'écran. Texte sur le bureau : pas de barre, les mêmes éléments écrits tout en haut de l'écran, directement sur le fond d'écran; cette bande reste libre de fenêtres, et la marge supérieure et l'opacité du verre ne s'appliquent pas. Avec le masquage automatique, le texte revient sur une bande de verre tant qu'une fenêtre se trouve dessous.
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Elle se masque quand une fenêtre la recouvre; amenez le pointeur au bord supérieur de l'écran pour la faire apparaître. Elle reste visible sur le bureau.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows demande l'autorisation d'accéder à la position. Vos coordonnées sont envoyées à Open-Meteo.com uniquement pour obtenir la prévision; une clé de position est gardée en cache localement. Si la localisation est bloquée, la météo n'est pas disponible.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Les noms qui vous appartiennent ou qui appartiennent à d'autres programmes (applications, fichiers, réseaux Wi-Fi) ne sont jamais traduits. Avec une langue choisie, la barre du haut écrit la date dans cette langue; « Comme Windows » garde votre format régional de Windows.
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 correspond à la vitesse standard; une valeur plus élevée ralentit. Le mouvement réduit a la priorité.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Les Paramètres de Windows restent l'interface native de Windows. Leur page Barre des tâches n'est pas remplacée par Aether Shell; réglez ce mode ici.
+
+## setup
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Décochez pour refuser; les désactivations du Gestionnaire des tâches sont respectées.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Annuler reste possible jusqu'à l'activation de la nouvelle version; ensuite, l'installation se termine en toute sécurité.
+
+en: Setup is finishing the current step safely; please wait.
+tr: L'installation termine l'étape en cours en toute sécurité; veuillez patienter.
+
+## shell
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Cliquez pour couper ou rétablir le son; clic droit pour la saisie vocale de Windows et la confidentialité du microphone
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Demande à cette fenêtre de se fermer; l'application peut encore proposer d'enregistrer ou d'annuler
+
+en: Cast
+tr: Diffuser
+
+## weather
+
+en: Could not update; showing the last forecast.
+tr: Mise à jour impossible; affichage de la dernière prévision.

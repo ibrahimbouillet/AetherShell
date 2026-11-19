@@ -3478,3 +3478,32 @@ case uses an own window); Windows 10.
 build/wf-claude-v4` (package privacy audit passed) from the tree this entry describes; it carries test 4.10's sign-in
 task as well. Test 4.10's build moved to `dist/test-4.10/`. Committed locally; not pushed, tagged, published or
 installed.
+
+### S-082 — Alpha 4, test 4.12 and release: languages downloaded from the release, Liquid's smart transparency (Claude, 2026-11-19)
+
+**What changed:** the interface speaks 41 languages (the 38 Windows 11 offers, plus Bengali, Hindi and Urdu). English
+is built in; each other language is a pack attached to the release (D83, FR-042), checked against the size and SHA-256
+compiled into the programs (`src/core/LanguageTable.inc`) before it is used. Setup downloads the packs of the Windows
+display languages after installing; each start downloads what is still missing, and a change of Windows display
+language or of the Locale setting is followed. Settings → Language shows the chosen language's state, the languages on
+this PC with their sizes, and *Add a language*. In Liquid, the Settings window has smart transparency (D84, FR-044):
+clear where it shows nothing, blurred under its own text and controls, fully over other windows and desktop icons,
+lightly over the desktop picture, fading over three cells. Each start logs its timing (T69).
+
+| Check | Result |
+| --- | --- |
+| Language data (`tools/i18n/languages.py check`, then `packs` and `verify` in `scripts/package.ps1`) | 0 problems; 40 packs, 826 texts each, 2,829,685 bytes in all, every pack's size and SHA-256 equal to `LanguageTable.inc` |
+| Unit gate (`ctest -L unit -j 8`, Debug) | **26/26**. The first run failed `aether_search_tests` (the known timing case under parallel load); it passed alone and in a second whole run. New: `SmartGlassTests.cpp` (9 mask and own-content cases), `LanguagePacksTests.cpp` (URL, refused bytes, sizes, statuses and redirects, a real pack installed) |
+| Native smart glass (`aether_ui_form_integration_tests`) | pass: over the private test pattern, stripes' edge loss mean 0.011 (largest 3) far from the content and 3.53 (largest 98) under it; the blur window lies directly below the form with its click-through styles and the form's client rect; turned off, no window is left |
+| Integration, whole suite (`ctest -L integration`, Debug) | 15/19 first run. **settings_ui** (3 cases) and **settings design dropdown**: the tests addressed the Appearance page by control IDs that the new *Smart transparency* check shifted by one; tests updated (and the new check covered), then `aether_settings_ui_integration_tests` **44/44**. **search_ui** (finite exit) and **weather_ui** (Escape and buttons) each failed once and passed on rerun, 17/17 and 7/7 |
+| Native ui_form motion | 30/32: `dark/light scrolling frames stay registered while moving` fail only `distinct >= 20` (18 distinct frames captured, **0 incoherent**): the capture thread's throughput on this machine, known since S-079 and failing the same way with the 0.3.5 build. Smart glass is not used by these cases |
+| Owner's look (real Settings window, Liquid) | approved 2026-11-19 after the gradient blur replaced the semi-transparent pane: "Dès qu'il y a un plan derrière, il est flouté" |
+
+**Not executed, so not claimed:** a download from the published release by an installed build on another PC; a
+native speaker's reading of the new languages; smart transparency on Windows 10 or with transparency effects off (it
+then stays off); a standard account.
+
+**Release build 4.12:** `AetherShell-0.4.0-alpha.4-win-x64-setup.exe`, 8739840 bytes (10752512 for test 4.11, which carried every language), SHA-256
+`eb0cbce0968767edc47b76b5b35f043775e13f151d9dfba3fe11b42d0f2d46aa`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4` (package privacy audit passed) from the tree
+this entry describes, with the 40 language packs and the checksums file. The manifest is unsigned and stays local.
+Test 4.11's build moved to `dist/test-4.11/`.

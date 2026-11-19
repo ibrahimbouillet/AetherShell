@@ -1,0 +1,2494 @@
+# Arabic (ar): العربية. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: اختر موقع Windows لتفعيل الطقس التلقائي.
+
+en: Windows taskbar visible
+tr: شريط مهام Windows ظاهر
+
+en: Connected to {}
+tr: متصل بـ {}
+
+en: {} is out of range
+tr: {} خارج النطاق
+
+en: Connecting to {} took too long
+tr: استغرق الاتصال بـ {} وقتًا طويلًا
+
+en: Use Windows to join {}
+tr: استخدم Windows للانضمام إلى {}
+
+en: Windows did not allow this connection
+tr: لم يسمح Windows بهذا الاتصال
+
+en: Could not connect to {}
+tr: تعذّر الاتصال بـ {}
+
+en: Connect to {}
+tr: الاتصال بـ {}
+
+en: That password was not accepted. Check it and try again.
+tr: لم يتم قبول كلمة المرور هذه. تحقق منها وحاول مرة أخرى.
+
+en: Enter this network's password.
+tr: أدخل كلمة مرور هذه الشبكة.
+
+en: &Connect
+tr: اتصال (&C)
+
+en: Windows Settings could not be opened
+tr: تعذّر فتح إعدادات Windows
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: تعذّر حجز مساحة Dock؛ جارٍ استعادة شريط مهام Windows
+
+en: Replacement unavailable: recovery observer could not start
+tr: الاستبدال غير متاح: تعذّر بدء مراقب الاسترداد
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: تمت استعادة شريط مهام Windows. تعذّر حجز مساحة Dock؛ أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: مراقبة الاسترداد غير متاحة؛ جارٍ استعادة شريط مهام Windows
+
+en: Windows notifications could not be opened
+tr: تعذّر فتح إشعارات Windows
+
+en: The Windows calendar could not be opened
+tr: تعذّر فتح تقويم Windows
+
+en: Windows did not show its hidden icons
+tr: لم يعرض Windows أيقوناته المخفية
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: تحديث الموقع التلقائي غير متاح؛ أعد المحاولة من إعدادات الطقس.
+
+en: Windows location
+tr: موقع Windows
+
+en: Reading approximate Windows location…
+tr: جارٍ قراءة موقع Windows التقريبي…
+
+en: Automatic weather follows approximate Windows location.
+tr: يتبع الطقس التلقائي موقع Windows التقريبي.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: الوصول إلى موقع Windows محظور. الطقس غير متاح.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: تعذّر على Windows توفير موقع حالي. الطقس غير متاح.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: خدمة الموقع غير متاحة. الطقس غير متاح.
+
+en: Waiting for Windows location permission…
+tr: بانتظار إذن موقع Windows…
+
+en: The automatic weather choice could not be saved.
+tr: تعذّر حفظ اختيار الطقس التلقائي.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: الوصول إلى موقع Windows غير متاح أو تم رفضه. الطقس غير متاح.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: تعذّر على موقع Windows طلب الإذن. راجع إعدادات الموقع في Windows.
+
+en: Status worker unavailable
+tr: خدمة الحالة غير متاحة
+
+en: Windows could not complete this action. Review its settings.
+tr: تعذّر على Windows إكمال هذا الإجراء. راجع إعداداته.
+
+en: Reading Windows status; try the action again shortly
+tr: جارٍ قراءة حالة Windows؛ أعد المحاولة بعد قليل
+
+en: Could not disconnect
+tr: تعذّر قطع الاتصال
+
+en: The Windows accessibility feature could not be started
+tr: تعذّر تشغيل ميزة إمكانية الوصول في Windows
+
+en: Windows could not change the audio output
+tr: تعذّر على Windows تغيير خرج الصوت
+
+en: The Windows control could not be opened
+tr: تعذّر فتح عنصر التحكم في Windows
+
+en: Keyboard shortcuts disabled
+tr: اختصارات لوحة المفاتيح معطّلة
+
+en: Both keyboard shortcuts registered
+tr: تم تسجيل اختصاري لوحة المفاتيح كليهما
+
+en: A keyboard shortcut is already in use by another application
+tr: اختصار لوحة المفاتيح مستخدم بالفعل من قِبل تطبيق آخر
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: تعذّر طلب الإعدادات السريعة في Windows. ألغِ تحديد "استخدام الإعدادات السريعة في Windows" في إعدادات الشريط العلوي لاستخدام عناصر تحكم Aether.
+
+en: Windows Start could not be opened
+tr: تعذّر فتح قائمة ابدأ في Windows
+
+en: Windows Task View could not be opened
+tr: تعذّر فتح عرض المهام في Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: كان تبديل تخطيط لوحة المفاتيح في Windows غير متاح
+
+en: Windows voice typing could not be opened
+tr: تعذّر فتح الكتابة الصوتية في Windows
+
+en: Windows taskbar could not be revealed
+tr: تعذّر إظهار شريط مهام Windows
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: تعذّر استئناف استبدال شريط المهام؛ يظل Windows متاحًا
+
+en: Windows taskbar replacement is unavailable in this session
+tr: استبدال شريط مهام Windows غير متاح في هذه الجلسة
+
+en: Windows pin access is unavailable in this isolated session
+tr: الوصول إلى عناصر Windows المثبتة غير متاح في هذه الجلسة المعزولة
+
+en: Windows pinned applications could not be read
+tr: تعذّرت قراءة التطبيقات المثبتة في Windows
+
+en: Settings changed during pin import. Try import again.
+tr: تغيّرت الإعدادات أثناء استيراد العناصر المثبتة. أعد محاولة الاستيراد.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: تم حفظ {} تطبيقات مثبتة إضافية. قد تظل بعض عناصر Windows المثبتة غير متاحة.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: تغيّرت العناصر المثبتة في الذاكرة؛ فشل الحفظ. اضغط تطبيق في الإعدادات لإعادة المحاولة.
+
+en: Pins updated in memory; saving...
+tr: تم تحديث العناصر المثبتة في الذاكرة؛ جارٍ الحفظ...
+
+en: Imported pins could not be applied
+tr: تعذّر تطبيق العناصر المثبتة المستوردة
+
+en: Pin import is unavailable while closing
+tr: استيراد العناصر المثبتة غير متاح أثناء الإغلاق
+
+en: Settings could not be saved
+tr: تعذّر حفظ الإعدادات
+
+en: Quit without saving the latest changes?
+tr: هل تريد الخروج دون حفظ آخر التغييرات؟
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: تم الاحتفاظ بملف إعداداتك السابق. أبقِ Aether Shell مفتوحًا لإعادة محاولة الحفظ.
+
+en: &Quit without saving
+tr: إنهاء دون حفظ (&Q)
+
+en: &Keep Aether Shell open
+tr: إبقاء Aether Shell مفتوحًا (&K)
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: تصدير التشخيص الأساسي — إصدار التطبيق وبنية Windows، دون سجلات أو بيانات شخصية
+
+en: Diagnostics exported.
+tr: تم تصدير التشخيص.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: تعذّر حفظ التشخيص في الملف المختار.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: تعذّرت قراءة الإعدادات بأمان. تم الاحتفاظ بالملف الحالي.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: تعذّر على Aether Shell بدء أسطح سطح المكتب الخاصة به.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: استعادة شريط مهام Windows معلّقة. أعد المحاولة أو أغلق Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: يظهر شريط مهام Windows مؤقتًا.
+
+en: Windows taskbar restored.
+tr: تمت استعادة شريط مهام Windows.
+
+en: Windows taskbar replacement is active.
+tr: استبدال شريط مهام Windows نشط.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: يظل شريط مهام Windows متاحًا. سيعيد الاستبدال المحاولة قريبًا.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: يظل شريط مهام Windows متاحًا. أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: تمت استعادة شريط مهام Windows. سيُعاد توصيل الاستبدال قريبًا.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: تمت استعادة شريط مهام Windows. أوقف الاستبدال ثم شغّله لإعادة المحاولة.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: توقف استبدال شريط المهام. تمت استعادة شريط مهام Windows.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: توقف استبدال شريط المهام. تعذّر تأكيد استعادة شريط مهام Windows.
+
+en: Activating taskbar replacement...
+tr: جارٍ تفعيل استبدال شريط المهام...
+
+en: Restoring Windows taskbar...
+tr: جارٍ استعادة شريط مهام Windows...
+
+en: Reconnecting taskbar replacement...
+tr: جارٍ إعادة توصيل استبدال شريط المهام...
+
+en: Showing the Windows taskbar temporarily...
+tr: جارٍ إظهار شريط مهام Windows مؤقتًا...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: تعذّر على Aether Shell استعادة شريط مهام Windows.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: أعد تشغيل مستكشف Windows من إدارة المهام (Ctrl+Shift+Esc)، أو سجّل الخروج ثم الدخول مرة أخرى.
+
+en: The Windows taskbar was restored to its saved state.
+tr: تمت استعادة شريط مهام Windows إلى حالته المحفوظة.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: لم يتم العثور على حالة محفوظة لشريط المهام. تم إظهار شريط مهام Windows؛ ولم يتغير إعداد الإخفاء التلقائي الخاص به.
+
+en: There was nothing to restore.
+tr: لم يكن هناك ما يمكن استعادته.
+
+en: Taskbar replacement is turned off.
+tr: استبدال شريط المهام متوقف.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: تعذّر إيقاف استبدال شريط المهام تلقائيًا. أوقفه من إعدادات Aether Shell > سطح المكتب.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: سطر أوامر Aether Shell غير معروفة أو غير صالحة.
+
+en: Aether Shell could not create its local data folders.
+tr: تعذّر على Aether Shell إنشاء مجلدات بياناته المحلية.
+
+en: Aether Shell stopped after an unexpected error.
+tr: توقف Aether Shell بعد خطأ غير متوقع.
+
+## search-names
+
+en: Disk Management
+tr: إدارة الأقراص
+
+en: Local Users and Groups
+tr: المستخدمون والمجموعات المحلية
+
+en: Local Group Policy Editor
+tr: محرر نُهج المجموعة المحلية
+
+en: Manage User Certificates
+tr: إدارة شهادات المستخدم
+
+en: Manage Computer Certificates
+tr: إدارة شهادات الكمبيوتر
+
+en: Shared Folders
+tr: المجلدات المشتركة
+
+en: TPM Management
+tr: إدارة TPM
+
+en: Network Connections
+tr: اتصالات الشبكة
+
+en: System Properties
+tr: خصائص النظام
+
+en: About Windows
+tr: حول Windows
+
+en: DirectX Diagnostic Tool
+tr: أداة تشخيص DirectX
+
+en: Windows Features
+tr: ميزات Windows
+
+en: System Restore
+tr: استعادة النظام
+
+en: Advanced System Settings
+tr: إعدادات النظام المتقدمة
+
+en: Volume Mixer
+tr: خلاط الصوت
+
+en: Microsoft Management Console
+tr: وحدة تحكم إدارة Microsoft
+
+en: User Accounts (Advanced)
+tr: حسابات المستخدمين (متقدم)
+
+en: Display settings
+tr: إعدادات العرض
+
+en: Night light settings
+tr: إعدادات الإضاءة الليلية
+
+en: Graphics settings
+tr: إعدادات الرسومات
+
+en: Sound settings
+tr: إعدادات الصوت
+
+en: Notification settings
+tr: إعدادات الإشعارات
+
+en: Power & battery settings
+tr: إعدادات الطاقة والبطارية
+
+en: Energy saver settings
+tr: إعدادات توفير الطاقة
+
+en: Storage settings
+tr: إعدادات التخزين
+
+en: Multitasking settings
+tr: إعدادات تعدد المهام
+
+en: Clipboard settings
+tr: إعدادات الحافظة
+
+en: Remote Desktop settings
+tr: إعدادات سطح المكتب البعيد
+
+en: About your PC
+tr: حول جهاز الكمبيوتر
+
+en: Bluetooth & devices settings
+tr: إعدادات Bluetooth والأجهزة
+
+en: Printers & scanners settings
+tr: إعدادات الطابعات والماسحات الضوئية
+
+en: Mouse settings
+tr: إعدادات الماوس
+
+en: Touchpad settings
+tr: إعدادات لوحة اللمس
+
+en: Network & internet settings
+tr: إعدادات الشبكة والإنترنت
+
+en: Wi-Fi settings
+tr: إعدادات Wi-Fi
+
+en: VPN settings
+tr: إعدادات VPN
+
+en: Proxy settings
+tr: إعدادات الوكيل
+
+en: Airplane mode settings
+tr: إعدادات وضع الطائرة
+
+en: Mobile hotspot settings
+tr: إعدادات نقطة الاتصال المتنقلة
+
+en: Background settings
+tr: إعدادات الخلفية
+
+en: Color settings
+tr: إعدادات الألوان
+
+en: Theme settings
+tr: إعدادات السمات
+
+en: Lock screen settings
+tr: إعدادات شاشة القفل
+
+en: Taskbar settings
+tr: إعدادات شريط المهام
+
+en: Font settings
+tr: إعدادات الخطوط
+
+en: Installed apps
+tr: التطبيقات المثبتة
+
+en: Default apps settings
+tr: إعدادات التطبيقات الافتراضية
+
+en: Startup apps settings
+tr: إعدادات تطبيقات بدء التشغيل
+
+en: Account info
+tr: معلومات الحساب
+
+en: Sign-in options
+tr: خيارات تسجيل الدخول
+
+en: Other users settings
+tr: إعدادات المستخدمين الآخرين
+
+en: Date & time settings
+tr: إعدادات التاريخ والوقت
+
+en: Language & region settings
+tr: إعدادات اللغة والمنطقة
+
+en: Typing settings
+tr: إعدادات الكتابة
+
+en: Accessibility settings
+tr: إعدادات إمكانية الوصول
+
+en: Privacy & security settings
+tr: إعدادات الخصوصية والأمان
+
+en: Location settings
+tr: إعدادات الموقع
+
+en: Windows Update settings
+tr: إعدادات Windows Update
+
+en: Recovery settings
+tr: إعدادات الاسترداد
+
+en: Activation settings
+tr: إعدادات التنشيط
+
+en: For developers settings
+tr: إعدادات المطورين
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: تعذّر الوصول إلى GitHub.
+
+en: GitHub did not answer the request just now.
+tr: لم يستجب GitHub للطلب قبل قليل.
+
+en: The release did not pass verification, so nothing was installed.
+tr: لم تجتز النسخة التحقق، لذلك لم يتم تثبيت أي شيء.
+
+en: There is not enough free disk space.
+tr: لا توجد مساحة كافية على القرص.
+
+en: Windows refused access to the update files.
+tr: رفض Windows الوصول إلى ملفات التحديث.
+
+en: {} bytes
+tr: {} بايت
+
+en: {} KB
+tr: {} ك.ب
+
+en: {} MB
+tr: {} م.ب
+
+en: Status
+tr: الحالة
+
+en: Check &now
+tr: التحقق الآن (&N)
+
+en: Download and install
+tr: تنزيل وتثبيت
+
+en: &Later
+tr: لاحقًا (&L)
+
+en: S&kip this version
+tr: تخطي هذا الإصدار (&K)
+
+en: &Release details
+tr: تفاصيل الإصدار (&R)
+
+en: Disable &notifications
+tr: تعطيل الإشعارات (&N)
+
+en: Release notes
+tr: ملاحظات الإصدار
+
+en: the new version
+tr: الإصدار الجديد
+
+en: Installed: {}.
+tr: المثبّتة: {}.
+
+en: Automatic update checks are off
+tr: التحقق التلقائي من التحديثات متوقف
+
+en: Check now looks for a newer release once.
+tr: يبحث "التحقق الآن" عن إصدار أحدث مرة واحدة.
+
+en: Last checked {}
+tr: آخر تحقق: {}
+
+en: Not checked yet
+tr: لم يتم التحقق بعد
+
+en: Checking for updates...
+tr: جارٍ التحقق من التحديثات...
+
+en: Aether Shell is up to date
+tr: Aether Shell محدَّث
+
+en: Latest published release: {}.
+tr: آخر إصدار منشور: {}.
+
+en: Version {} is available
+tr: الإصدار {} متاح
+
+en: Download size: {}.
+tr: حجم التنزيل: {}.
+
+en: Downloading version {}...
+tr: جارٍ تنزيل الإصدار {}...
+
+en: Received {} of {} ({}%).
+tr: تم استلام {} من {} ({}%).
+
+en: Received {}; total size unknown.
+tr: تم استلام {}؛ الحجم الإجمالي غير معروف.
+
+en: Version {} is ready to install
+tr: الإصدار {} جاهز للتثبيت
+
+en: Verified with the signed release manifest and SHA-256.
+tr: تم التحقق منها باستخدام بيان الإصدار الموقّع وSHA-256.
+
+en: The update could not be completed
+tr: تعذّر إكمال التحديث
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: يتم التثبيت يدويًا في الوقت الحالي: افتح تفاصيل الإصدار، ثم نزّل برنامج الإعداد وشغّله.
+
+en: Failure: {}.
+tr: الفشل: {}.
+
+en: Choose Retry Download to try again.
+tr: اختر "إعادة محاولة التنزيل" للمحاولة مرة أخرى.
+
+en: Use Check now to try again.
+tr: استخدم "التحقق الآن" لإعادة المحاولة.
+
+en: Next automatic check: {}.
+tr: التحقق التلقائي التالي: {}.
+
+en: &Install update
+tr: تثبيت التحديث (&I)
+
+en: Retry &Download
+tr: إعادة محاولة التنزيل (&D)
+
+en: &Download and install
+tr: تنزيل وتثبيت (&D)
+
+en: Windows' startup state could not be read in this session.
+tr: تعذّرت قراءة حالة بدء التشغيل في Windows ضمن هذه الجلسة.
+
+en: Windows will start it at your next sign-in.
+tr: سيشغّله Windows عند تسجيل دخولك التالي.
+
+en: Right now it will not start at sign-in.
+tr: حاليًا لن يبدأ عند تسجيل الدخول.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: إنه معطّل في إدارة المهام أو إعدادات Windows، وهما يحسمان الأمر إلى أن يتم تشغيله هناك.
+
+en: Windows would start another copy of Aether Shell.
+tr: سيشغّل Windows نسخة أخرى من Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: يُبلغ Windows عن حالة بدء تشغيل لا يستطيع هذا الإصدار قراءتها.
+
+en: The close action could not be completed.
+tr: تعذّر إكمال إجراء الإغلاق.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: أدخل رقمًا كاملًا قبل الحفظ؛ الحقل المحدد بالأحمر ليس رقمًا.
+
+en: Settings could not be validated.
+tr: تعذّر التحقق من صحة الإعدادات.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: تم ترك البدء عند تسجيل الدخول كما هو، لأن الإعدادات لم تُحفظ.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: تعذّر حفظ الإعدادات وتعذّر إرجاع البدء عند تسجيل الدخول في Windows. اضغط تطبيق مرة أخرى لإعادة المحاولة.
+
+en: Settings saved.
+tr: تم حفظ الإعدادات.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: تغيّرت الإعدادات في الذاكرة؛ فشل الحفظ. اضغط تطبيق مرة أخرى لإعادة المحاولة.
+
+en: Settings could not be applied.
+tr: تعذّر تطبيق الإعدادات.
+
+en: Some values were corrected to their supported range.
+tr: تم تصحيح بعض القيم إلى النطاق المدعوم.
+
+en: Startup registration is unavailable in this session.
+tr: تسجيل بدء التشغيل غير متاح في هذه الجلسة.
+
+en: Changing startup registration...
+tr: جارٍ تغيير تسجيل بدء التشغيل...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: لم يغيّر Windows تسجيل بدء التشغيل. تحقق من إعداد بدء التشغيل في إدارة المهام.
+
+en: Startup registration could not be changed.
+tr: تعذّر تغيير تسجيل بدء التشغيل.
+
+en: Defaults saved; startup is disabled.
+tr: تم حفظ الإعدادات الافتراضية؛ بدء التشغيل معطّل.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: تم تطبيق الإعدادات الافتراضية؛ فشل الحفظ. اضغط تطبيق مرة أخرى لإعادة المحاولة.
+
+en: Defaults could not be applied.
+tr: تعذّر تطبيق الإعدادات الافتراضية.
+
+en: Startup was not disabled; settings were kept.
+tr: لم يتم إيقاف بدء التشغيل؛ تم الاحتفاظ بالإعدادات.
+
+en: Location search is unavailable.
+tr: البحث عن الموقع غير متاح.
+
+en: Searching Open-Meteo locations...
+tr: جارٍ البحث عن المواقع في Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: فشل البحث عن الموقع. تحقق من اتصالك وأعد المحاولة.
+
+en: No place matched that search.
+tr: لا يوجد مكان مطابق لهذا البحث.
+
+en: Choose a location to save it.
+tr: اختر موقعًا لحفظه.
+
+en: Reset all settings?
+tr: هل تريد إعادة تعيين كل الإعدادات؟
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: تعود التفضيلات والتطبيقات المثبتة إلى الإعدادات الافتراضية ويتم إيقاف البدء عند تسجيل الدخول.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: يتم الاحتفاظ باختيارك بشأن شريط مهام Windows. ويتم الاحتفاظ بنسخة احتياطية من ملف الإعدادات الحالي.
+
+en: &Reset
+tr: إعادة تعيين (&R)
+
+en: Cancel
+tr: إلغاء
+
+en: Pinned applications saved.
+tr: تم حفظ التطبيقات المثبتة.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: تغيّرت العناصر المثبتة في الذاكرة؛ فشل الحفظ. اضغط تطبيق مرة أخرى لإعادة المحاولة.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: تعذّرت استعادة الإعدادات الافتراضية لأن تسجيل بدء التشغيل غير متاح.
+
+en: Pinned application could not be added.
+tr: تعذّرت إضافة التطبيق المثبت.
+
+en: Choose an application to add first.
+tr: اختر تطبيقًا لإضافته أولًا.
+
+en: Pinned applications could not be changed.
+tr: تعذّر تغيير التطبيقات المثبتة.
+
+en: Choose a pinned application first.
+tr: اختر تطبيقًا مثبتًا أولًا.
+
+en: Desktop status is unavailable in this session.
+tr: حالة سطح المكتب غير متاحة في هذه الجلسة.
+
+en: Desktop status is unavailable.
+tr: حالة سطح المكتب غير متاحة.
+
+en: Password
+tr: كلمة المرور
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: جارٍ تنزيل اللغة {} من GitHub ({}). تُعرض الإنجليزية إلى أن تصبح جاهزة.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: تعذّر تنزيل اللغة {}. تُعرض الإنجليزية إلى أن يتم تنزيلها؛ اختر "تنزيل" أدناه للمحاولة مرة أخرى.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: اللغة {} غير موجودة على هذا الكمبيوتر بعد. تُعرض الإنجليزية إلى أن يتم تنزيلها.
+
+en: {} is on this PC.
+tr: اللغة {} موجودة على هذا الكمبيوتر.
+
+en: Every language is on this PC.
+tr: كل اللغات موجودة على هذا الكمبيوتر.
+
+en: Choose a language to download first.
+tr: اختر لغة لتنزيلها أولًا.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: الشريط العلوي
+
+en: Weather
+tr: الطقس
+
+en: Updates
+tr: التحديثات
+
+en: General
+tr: عام
+
+en: About
+tr: حول
+
+en: Desktop
+tr: سطح المكتب
+
+en: Appearance
+tr: المظهر
+
+en: Welcome
+tr: الترحيب
+
+en: Aether Shell Settings
+tr: إعدادات Aether Shell
+
+en: Settings
+tr: الإعدادات
+
+en: Reset defaults...
+tr: إعادة تعيين الإعدادات الافتراضية...
+
+en: &Apply
+tr: تطبيق (&A)
+
+en: Liquid
+tr: سائل
+
+en: Grain
+tr: حُبيبات
+
+en: From {} to {}
+tr: من {} إلى {}
+
+en: px
+tr: بكسل
+
+en: min
+tr: د
+
+en: h
+tr: س
+
+en: This action could not be completed.
+tr: تعذّر إكمال هذا الإجراء.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: الحجم والتباعد والحركة والتطبيقات المثبتة في Dock.
+
+en: Size and spacing
+tr: الحجم والتباعد
+
+en: Icon size
+tr: حجم الأيقونات
+
+en: {}, scaled with the Windows display scale.
+tr: {}، ويتغير حجمه وفق مقياس العرض في Windows.
+
+en: Bottom margin
+tr: الهامش السفلي
+
+en: Space between the Dock and the bottom of the screen.
+tr: المسافة بين Dock وأسفل الشاشة.
+
+en: Minimum side margin
+tr: الحد الأدنى للهامش الجانبي
+
+en: Space kept free at the left and right screen edges.
+tr: مساحة تُترك فارغة عند حافتي الشاشة اليسرى واليمنى.
+
+en: Icon spacing
+tr: تباعد الأيقونات
+
+en: Space between neighbouring icons.
+tr: المسافة بين الأيقونات المتجاورة.
+
+en: Glass and motion
+tr: الزجاج والحركة
+
+en: Glass opacity
+tr: عتامة الزجاج
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: تُظهر القيم الأقل مزيدًا من سطح المكتب الضبابي خلف Dock.
+
+en: Hover magnification
+tr: التكبير عند التمرير
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: مقدار تكبّر الأيقونة تحت المؤشر؛ القيمة 1 تعطّل ذلك.
+
+en: Behavior
+tr: السلوك
+
+en: Show running applications
+tr: إظهار التطبيقات قيد التشغيل
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: تظهر التطبيقات المفتوحة غير المثبتة بعد المثبتة.
+
+en: Reserve screen space for the Dock
+tr: حجز مساحة على الشاشة لـ Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: تبقى النوافذ المكبّرة فوق Dock بدلًا من أن تكون تحته.
+
+en: Automatically hide the Dock
+tr: إخفاء Dock تلقائيًا
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: يختفي عندما تغطيه نافذة تطبيق؛ حرّك المؤشر إلى الحافة السفلية للشاشة لإظهاره. يبقى على سطح المكتب، وتحصل النوافذ على كامل ارتفاع الشاشة.
+
+en: Pinned applications
+tr: التطبيقات المثبتة
+
+en: Move &up
+tr: نقل لأعلى (&U)
+
+en: Move &down
+tr: نقل لأسفل (&D)
+
+en: &Remove
+tr: إزالة (&R)
+
+en: &Add application
+tr: إضافة تطبيق (&A)
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: تحتفظ العناصر المثبتة بهويتها وإعدادات تشغيلها. وإزالة عنصر مثبت توقف أيضًا مزامنة شريط مهام Windows التلقائية عن إضافته مرة أخرى.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: الموضع والساعة وعناصر الحالة المعروضة في شريط الحالة العلوي.
+
+en: Presentation
+tr: طريقة العرض
+
+en: Floating bar
+tr: شريط عائم
+
+en: Text on the desktop
+tr: نص على سطح المكتب
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: شريط عائم: شريط زجاجي أسفل أعلى الشاشة. نص على سطح المكتب: بلا شريط، والعناصر نفسها مكتوبة في أعلى الشاشة تمامًا فوق صورة سطح المكتب مباشرة؛ تبقى هذه الشريحة خالية من النوافذ، ولا ينطبق الهامش العلوي ولا عتامة الزجاج. مع الإخفاء التلقائي يعود النص على شريحة زجاجية ما دامت نافذة تحته.
+
+en: Position and glass
+tr: الموضع والزجاج
+
+en: Top margin
+tr: الهامش العلوي
+
+en: Space between the Top Bar and the top of the screen.
+tr: المسافة بين الشريط العلوي وأعلى الشاشة.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: تُظهر القيم الأقل مزيدًا من سطح المكتب الضبابي خلف الشريط.
+
+en: Clock
+tr: الساعة
+
+en: Clock format
+tr: تنسيق الساعة
+
+en: Follow Windows
+tr: اتباع Windows
+
+en: 12-hour
+tr: 12 ساعة
+
+en: 24-hour
+tr: 24 ساعة
+
+en: Date style
+tr: نمط التاريخ
+
+en: Weekday, day and month
+tr: اليوم والتاريخ والشهر
+
+en: Short
+tr: قصير
+
+en: Long
+tr: طويل
+
+en: Show seconds
+tr: إظهار الثواني
+
+en: Show date
+tr: إظهار التاريخ
+
+en: Status items
+tr: عناصر الحالة
+
+en: Show battery
+tr: إظهار البطارية
+
+en: Hide battery when absent
+tr: إخفاء البطارية عند غيابها
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: لا تعرض أجهزة الكمبيوتر المكتبية التي لا بطارية فيها شيئًا بدلًا من بطارية مجهولة.
+
+en: Show input language
+tr: إظهار لغة الإدخال
+
+en: Show network
+tr: إظهار الشبكة
+
+en: Show audio output
+tr: إظهار خرج الصوت
+
+en: Show microphone
+tr: إظهار الميكروفون
+
+en: Show weather when enabled
+tr: إظهار الطقس عند تفعيله
+
+en: Weather itself is turned on in Weather settings.
+tr: يتم تفعيل الطقس نفسه من إعدادات الطقس.
+
+en: Show hidden icons button
+tr: إظهار زر الأيقونات المخفية
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: سهم صغير يفتح أيقونات منطقة إشعارات Windows المخفية.
+
+en: Reserve screen space above windows
+tr: حجز مساحة على الشاشة فوق النوافذ
+
+en: Maximized windows stay below the Top Bar.
+tr: تبقى النوافذ المكبّرة تحت الشريط العلوي.
+
+en: Automatically hide the Top Bar
+tr: إخفاء الشريط العلوي تلقائيًا
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: يختفي عندما تغطيه نافذة تطبيق؛ حرّك المؤشر إلى الحافة العلوية للشاشة لإظهاره. يبقى على سطح المكتب.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: استخدام الإعدادات السريعة في Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: متوقف: تفتح عناصر التحكم السريعة في Aether أسفل الشريط العلوي. قيد التشغيل: تفتح لوحة Windows نفسها في أسفل الشاشة.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: توقعات اختيارية في الشريط العلوي، يوفرها Open-Meteo.
+
+en: Forecast
+tr: التوقعات
+
+en: Enable weather
+tr: تفعيل الطقس
+
+en: Off by default: the forecast needs network requests.
+tr: متوقف افتراضيًا: تحتاج التوقعات إلى طلبات عبر الشبكة.
+
+en: Temperature
+tr: درجة الحرارة
+
+en: Celsius
+tr: مئوية
+
+en: Fahrenheit
+tr: فهرنهايت
+
+en: Refresh interval
+tr: فاصل التحديث
+
+en: Location
+tr: الموقع
+
+en: Locate automatically with Windows
+tr: تحديد الموقع تلقائيًا عبر Windows
+
+en: Uses the Windows location service after you allow it.
+tr: يستخدم خدمة الموقع في Windows بعد أن تسمح بذلك.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: يطلب Windows إذن الموقع. تُرسل إحداثياتك إلى Open-Meteo.com فقط للحصول على التوقعات؛ ويُخزَّن مفتاح موقع مؤقتًا على جهازك. إذا كان الموقع محظورًا فإن الطقس غير متاح.
+
+en: Use &Windows location
+tr: استخدام موقع Windows (&W)
+
+en: Location &settings
+tr: إعدادات الموقع (&S)
+
+en: Choose automatic location or search for a place below.
+tr: اختر الموقع التلقائي أو ابحث عن مكان أدناه.
+
+en: Search for a place
+tr: البحث عن مكان
+
+en: Searc&h
+tr: بحث (&H)
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: بيانات الطقس من Open-Meteo.com (CC BY 4.0). يرسل البحث اليدوي النص الذي تدخله فقط.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: إصدارات موقّعة من مستودع GitHub الرسمي، يتم التحقق منها قبل التثبيت.
+
+en: Preferences
+tr: التفضيلات
+
+en: Check for updates automatically
+tr: التحقق من التحديثات تلقائيًا
+
+en: Check interval
+tr: فاصل التحقق
+
+en: Release channel
+tr: قناة الإصدارات
+
+en: Prereleases arrive earlier and change more often.
+tr: تصل الإصدارات التجريبية أبكر وتتغير بوتيرة أكبر.
+
+en: Stable
+tr: مستقر
+
+en: Prerelease
+tr: تجريبي
+
+en: Show update notifications
+tr: إظهار إشعارات التحديث
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: بدء التشغيل والحركة واختصارات لوحة المفاتيح والتشخيص.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: لغة الأشرطة والقوائم والبحث والإعدادات وبرنامج الإعداد.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: لا تُترجم أبدًا الأسماء التي تخصّك أو تخص برامج أخرى (التطبيقات والملفات وشبكات Wi-Fi). وعند اختيار لغة، يكتب الشريط العلوي التاريخ بها؛ أما "اتباع Windows" فيُبقي تنسيقك الإقليمي في Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: يكتب الترحيب المكتوب بخط اليد بحروف لاتينية: فهو يحيّي بالفرنسية أو الإنجليزية أو الإسبانية. اختر لغته في الترحيب.
+
+en: Language
+tr: اللغة
+
+en: Interface language
+tr: لغة الواجهة
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: يستخدم "اتباع Windows" أول لغات عرض Windows لديك التي تكون من هذه اللغات، وإلا فالإنجليزية.
+
+en: Startup
+tr: بدء التشغيل
+
+en: Start Aether Shell when I sign in
+tr: تشغيل Aether Shell عند تسجيل دخولي
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: يتطلب تغيير هذا الضغط على تطبيق. ويمكن لإدارة المهام أيضًا إيقافه.
+
+en: Motion
+tr: الحركة
+
+en: Reduced motion removes decorative movement everywhere.
+tr: تقليل الحركة يزيل الحركة الزخرفية في كل مكان.
+
+en: Reduced
+tr: مخفّض
+
+en: Full
+tr: كامل
+
+en: Keyboard shortcuts
+tr: اختصارات لوحة المفاتيح
+
+en: Enable global keyboard shortcuts
+tr: تفعيل اختصارات لوحة المفاتيح العامة
+
+en: Search shortcut key
+tr: مفتاح اختصار البحث
+
+en: Dock shortcut key
+tr: مفتاح اختصار Dock
+
+en: Search shortcut modifiers
+tr: مفاتيح تعديل اختصار البحث
+
+en: Dock shortcut modifiers
+tr: مفاتيح تعديل اختصار Dock
+
+en: Shortcut status unavailable
+tr: حالة الاختصار غير متاحة
+
+en: Diagnostics
+tr: التشخيص
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: يحتوي مجلد السجلات على سجلات Aether Shell الخاصة بهذا الكمبيوتر. يحفظ تصدير التشخيص إصدار التطبيق وبنية Windows فقط - دون سجلات أو بيانات شخصية.
+
+en: Open &log folder
+tr: فتح مجلد السجلات (&L)
+
+en: &Export diagnostics...
+tr: تصدير التشخيص... (&E)
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: تحية قصيرة مكتوبة بخط اليد على سطح المكتب بعد تسجيل الدخول أو فتح قفل الكمبيوتر.
+
+en: Greeting
+tr: التحية
+
+en: Show the welcome at sign-in and unlock
+tr: إظهار الترحيب عند تسجيل الدخول وفتح القفل
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: يظهر بعد أن يسجّل Windows دخولك، بينما يستعد Aether Shell. المس أو انقر أو اضغط Esc لتخطيه.
+
+en: Greeting language
+tr: لغة التحية
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut بالفرنسية وHello بالإنجليزية وHola بالإسبانية. يكتب القلم بحروف لاتينية: وفي كل اللغات الأخرى يحيّي بالإنجليزية.
+
+en: Your name
+tr: اسمك
+
+en: Name to greet you with
+tr: الاسم الذي سيُحيّيك به
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: اختياري، مثل اسمك الأول. يبقى على هذا الكمبيوتر في إعدادات Aether Shell الخاصة بك ولا يُرسل إلى أي مكان ولا يُكتب في أي سجل. امسح الحقل لإزالته.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: وضع الألوان واللون المميز وسرعة الحركة ومظهر Dock والشريط العلوي.
+
+en: Style
+tr: النمط
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: سائل: زجاج بطبقات فوق ما خلفه، وطبقة ضبابية، وضوء السائل، ثم الأيقونات والنص، مقروءة فوق الصفحات الفاتحة والداكنة. حُبيبات: زجاج مصنفر ضبابي وشبه شفاف بحبيبات دقيقة.
+
+en: Liquid blur
+tr: ضبابية "سائل"
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: مقدار ما تغطيه طبقة الضبابية تحت الزجاج السائل مما خلفه: 100% تُضبّب كل شيء. القيم الأقل تُظهر الصفحة أوضح، وقد يصعب قراءة النص على الأشرطة فوق صفحة مزدحمة.
+
+en: Liquid blur color
+tr: لون ضبابية "سائل"
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: يُبقي "تلقائي" ألوان الزجاج نفسه. يبقى النص والأيقونات مقروءة أيًّا كان اللون.
+
+en: Automatic
+tr: تلقائي
+
+en: White
+tr: أبيض
+
+en: Black
+tr: أسود
+
+en: Accent
+tr: اللون المميز
+
+en: Blue
+tr: أزرق
+
+en: Violet
+tr: بنفسجي
+
+en: Pink
+tr: وردي
+
+en: Red
+tr: أحمر
+
+en: Orange
+tr: برتقالي
+
+en: Yellow
+tr: أصفر
+
+en: Green
+tr: أخضر
+
+en: Teal
+tr: أزرق مخضر
+
+en: Liquid color strength
+tr: شدة لون "سائل"
+
+en: How much of the chosen color the blur layer takes.
+tr: مقدار ما تأخذه طبقة الضبابية من اللون المختار.
+
+en: Theme
+tr: السمة
+
+en: Color mode
+tr: وضع الألوان
+
+en: High contrast always takes precedence.
+tr: التباين العالي له الأولوية دائمًا.
+
+en: Light
+tr: فاتح
+
+en: Dark
+tr: داكن
+
+en: Accent color
+tr: اللون المميز
+
+en: Animation duration
+tr: مدة الحركة
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 هي السرعة القياسية؛ والقيم الأعلى أبطأ. وتقليل الحركة له الأولوية.
+
+en: Dock icon preset
+tr: حجم أيقونات Dock المسبق
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: يُحتفظ بالحجم المخصص من إعدادات Dock حتى تختار إعدادًا مسبقًا.
+
+en: Small - 32 px
+tr: صغير - 32 بكسل
+
+en: Medium - 40 px
+tr: متوسط - 40 بكسل
+
+en: Large - 48 px
+tr: كبير - 48 بكسل
+
+en: Keep custom size
+tr: الإبقاء على الحجم المخصص
+
+en: Show Windows Start in the Dock
+tr: إظهار قائمة ابدأ في Windows داخل Dock
+
+en: Show Task View in the Dock
+tr: إظهار عرض المهام داخل Dock
+
+en: Reserve extra space for Dock animations
+tr: حجز مساحة إضافية لحركات Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: يُبعد التكبير وقفزة التشغيل عن النوافذ المكبّرة.
+
+en: Weather position
+tr: موضع الطقس
+
+en: Left
+tr: اليسار
+
+en: Right
+tr: اليمين
+
+en: Keyboard indicator
+tr: مؤشر لوحة المفاتيح
+
+en: Compact
+tr: مضغوط
+
+en: Two lines
+tr: سطران
+
+en: Windows taskbar pins
+tr: العناصر المثبتة في شريط مهام Windows
+
+en: Add newly discovered Windows taskbar pins
+tr: إضافة عناصر شريط مهام Windows المثبتة المكتشفة حديثًا
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: أثناء استبدال شريط المهام، تُضاف عناصر Windows المثبتة الجديدة إلى Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: استبدال قابل للتراجع لشريط مهام Windows بـ Dock.
+
+en: Taskbar replacement
+tr: استبدال شريط المهام
+
+en: Replace the Windows taskbar
+tr: استبدال شريط مهام Windows
+
+en: Changing this needs Apply.
+tr: يتطلب تغيير هذا الضغط على تطبيق.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: أثناء تشغيل Aether Shell يخفي شريط مهام Windows ويحجز مساحة أسفل التطبيقات المكبّرة.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: تُستعاد حالة شريط مهام Windows عند تعطيل هذا الوضع أو إنهاء Aether Shell. ويعيدها أيضًا مساعد استرداد منفصل إذا توقف التطبيق على نحو غير متوقع. وإذا فشل الاسترداد فأعد تشغيل مستكشف Windows من إدارة المهام.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: تظل إعدادات Windows هي واجهة Windows الأصلية. ولا يستبدل Aether Shell صفحة شريط المهام فيها؛ اضبط هذا الوضع هنا.
+
+en: Pinned applications from Windows
+tr: التطبيقات المثبتة من Windows
+
+en: &Import Windows taskbar pins
+tr: استيراد عناصر شريط مهام Windows المثبتة (&I)
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: يقرأ الاختصارات المثبتة دون تغيير عناصر Windows المثبتة. وقد لا تتوفر بعض عناصر Windows 11 المثبتة أو ترتيبها.
+
+en: Version {}
+tr: الإصدار {}
+
+en: Created by Ibrahim Bouillet
+tr: من تطوير Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: واجهة سطح مكتب أصلية لنظام Windows - Dock عائم وشريط حالة علوي - تعمل جنبًا إلى جنب مع مستكشف الملفات.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: بيانات الطقس: Open-Meteo.com (CC BY 4.0). لا تُضمَّن أي مكتبات وقت تشغيل C++ من جهات خارجية.
+
+en: &Official project
+tr: المشروع الرسمي (&O)
+
+en: Licence
+tr: الترخيص
+
+en: Taskbar replacement changes need Apply.
+tr: تتطلب تغييرات استبدال شريط المهام الضغط على تطبيق.
+
+en: Changes save automatically. Startup needs Apply.
+tr: تُحفظ التغييرات تلقائيًا. أما بدء التشغيل فيتطلب تطبيق.
+
+en: Changes save automatically.
+tr: تُحفظ التغييرات تلقائيًا.
+
+en: Press Apply to confirm this change.
+tr: اضغط تطبيق لتأكيد هذا التغيير.
+
+en: Smart transparency
+tr: الشفافية الذكية
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: مع "سائل"، تُضبِّب هذه النافذة ما خلفها تحت نصها وعناصر التحكم فيها فقط: بالكامل فوق النوافذ الأخرى وأيقونات سطح المكتب، وبشكل خفيف فوق صورة سطح المكتب، ولا تُضبِّب إطلاقًا حيث لا تعرض شيئًا.
+
+en: Languages on this PC
+tr: اللغات على هذا الكمبيوتر
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: يُنزّل Aether Shell اللغات الموجودة في Windows، فيغيّر لغته عندما يغيّر Windows لغته.
+
+en: Add a language
+tr: إضافة لغة
+
+en: &Download
+tr: تنزيل (&D)
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: تأتي كل لغة من إصدار هذه النسخة على GitHub، ويتم التحقق منها قبل استخدامها. وبمجرد وجودها على هذا الكمبيوتر، اخترها أعلاه.
+
+en: built in
+tr: مضمّنة
+
+en: downloading, {}
+tr: جارٍ التنزيل، {}
+
+en: download failed
+tr: تعذّر التنزيل
+
+## setup
+
+en: Aether Shell Setup
+tr: إعداد Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: تعذّر على برنامج الإعداد إنشاء واجهته. أغلقه وأعد المحاولة، أو استخدم خيارات الإعداد الصامت الموثّقة.
+
+en: Options
+tr: الخيارات
+
+en: Install
+tr: تثبيت
+
+en: Done
+tr: تم
+
+en: Remove Aether Shell
+tr: إزالة Aether Shell
+
+en: Repair Aether Shell
+tr: إصلاح Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Dock وشريط حالة علوي أصليان لنظام Windows، يعملان جنبًا إلى جنب مع مستكشف الملفات.
+
+en: Replaces the Windows taskbar while it runs
+tr: يستبدل شريط مهام Windows أثناء تشغيله
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: أنهِ Aether Shell، أو أوقف هذا من الإعدادات > سطح المكتب، أو افتح "استعادة شريط مهام Windows" من قائمة ابدأ لإعادة شريط مهام Windows.
+
+en: Starts when you sign in - your choice
+tr: يبدأ عند تسجيل دخولك - اختيارك
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: تبدأ التثبيتات الجديدة عند تسجيل الدخول افتراضيًا. يمكنك إلغاء هذا الاختيار قبل التثبيت أو إيقافه لاحقًا من الإعدادات. تُحفظ خيارات بدء التشغيل الحالية وحالات التعطيل من إدارة المهام.
+
+en: Installs for your account
+tr: يُثبَّت لحسابك
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: لا حاجة إلى صلاحيات المسؤول. تبقى إعداداتك وبياناتك في ملف المستخدم الخاص بك.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: تُبقي إزالة التثبيت إعداداتك وبياناتك ما لم تختر إزالتها.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: يستعيد الإصلاح ملفات هذه الحزمة ويُبقي إعداداتك. وإذا ترك Aether Shell شريط مهام Windows مخفيًا فإن الإصلاح يعيده.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: التثبيت فوق إصدار موجود يُبقي إعداداتك. ويُرفض الإصدار الأقدم ما لم تسمح صراحةً بالرجوع إلى إصدار أقدم.
+
+en: MIT License
+tr: ترخيص MIT
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: يُثبَّت الترخيص أيضًا باسم LICENSE بجوار Aether Shell.
+
+en: Remove this installation
+tr: إزالة هذا التثبيت
+
+en: Install location
+tr: موقع التثبيت
+
+en: &Browse...
+tr: استعراض... (&B)
+
+en: Also remove my settings, cache and logs
+tr: إزالة إعداداتي والذاكرة المؤقتة والسجلات أيضًا
+
+en: This cannot be undone.
+tr: لا يمكن التراجع عن هذا.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: سيغلق برنامج الإعداد Aether Shell بسلاسة ويزيل ملفاته المثبتة واختصاراته وإدخال بدء التشغيل وتسجيله في التطبيقات المثبتة. أما التطبيقات الأخرى وإعدادات Windows فلا تُمسّ.
+
+en: Your welcome
+tr: ترحيبك
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: بعد تسجيل الدخول أو فتح قفل الكمبيوتر يكتب Aether Shell تحية قصيرة بخط اليد. اكتب الاسم الذي يحيّيك به، أو اتركه فارغًا لتحية بسيطة.
+
+en: Your first name
+tr: اسمك الأول
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: اختياري، مثل اسمك الأول. يبقى على هذا الكمبيوتر في إعدادات Aether Shell الخاصة بك ولا يُرسل إلى أي مكان. غيّره أو أوقف الترحيب من الإعدادات > الترحيب.
+
+en: Shortcuts and startup
+tr: الاختصارات وبدء التشغيل
+
+en: Create Start menu shortcuts
+tr: إنشاء اختصارات في قائمة ابدأ
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell و"استعادة شريط مهام Windows".
+
+en: Create a desktop shortcut
+tr: إنشاء اختصار على سطح المكتب
+
+en: Shows your current choice.
+tr: يعرض اختيارك الحالي.
+
+en: Recommended.
+tr: موصى به.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: ألغِ التحديد لعدم الاشتراك؛ وتُحترم حالات التعطيل من إدارة المهام.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: يقبل التثبيت اختيار بدء التشغيل أعلاه. يمكن للمشغّل إعادة تشغيل Aether Shell بعد تعطّله، بحدّ أقصى لعدد المحاولات. ويظل "إنهاء" و"استعادة شريط مهام Windows" متاحين. الطقس متوقف افتراضيًا. قد تُظهر الملفات غير الموقّعة تحذير Windows SmartScreen.
+
+en: Removing this installation...
+tr: جارٍ إزالة هذا التثبيت...
+
+en: Repairing Aether Shell...
+tr: جارٍ إصلاح Aether Shell...
+
+en: Installing Aether Shell...
+tr: جارٍ تثبيت Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: جارٍ إغلاق Aether Shell وإزالة ملفاته.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: جارٍ التحقق من الحزمة المضمّنة وتثبيت ملفاتها. يُعرض التقدم كنشاط: فبرنامج الإعداد لا يعرف الوقت المتبقي.
+
+en: Please wait while the removal completes.
+tr: يرجى الانتظار حتى تكتمل الإزالة.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: يظل الإلغاء متاحًا إلى أن يتم تنشيط الإصدار الجديد؛ وبعدها يُنهي برنامج الإعداد عمله بأمان.
+
+en: Aether Shell was uninstalled.
+tr: تمت إزالة تثبيت Aether Shell.
+
+en: Aether Shell is ready.
+tr: Aether Shell جاهز.
+
+en: Setup was cancelled.
+tr: تم إلغاء الإعداد.
+
+en: Setup could not complete.
+tr: تعذّر إكمال الإعداد.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: تم الاحتفاظ ببياناتك ما لم تختر إزالتها صراحةً.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: يمكنك إصلاحه أو إزالة تثبيته من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: تم إلغاء العملية قبل التنشيط. ارجع إلى الخيارات لإعادة المحاولة.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: تحقق من الوصول إلى الملفات والمساحة الحرة على القرص ثم أعد المحاولة. وإذا كان Aether Shell موجودًا بالفعل فيمكن للإصلاح استعادة ملفاته. فئة الخطأ: {}
+
+en: Setup log
+tr: سجل الإعداد
+
+en: Launch Aether Shell
+tr: تشغيل Aether Shell
+
+en: &Back
+tr: رجوع (&B)
+
+en: &Next
+tr: التالي (&N)
+
+en: &Continue
+tr: متابعة (&C)
+
+en: &Uninstall
+tr: إلغاء التثبيت (&U)
+
+en: &Repair
+tr: إصلاح (&R)
+
+en: &Install
+tr: تثبيت (&I)
+
+en: &Close
+tr: إغلاق (&C)
+
+en: Step {} of {}: {}
+tr: الخطوة {} من {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: اختر مجلد تثبيت Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: اختر مسار مجلد كاملًا، مثل مسار يبدأ بحرف محرك أقراص.
+
+en: The install folder must be an absolute path.
+tr: يجب أن يكون مجلد التثبيت مسارًا مطلقًا.
+
+en: Setup stops at the next safe point.
+tr: سيتوقف برنامج الإعداد عند أقرب نقطة آمنة.
+
+en: Cancelling...
+tr: جارٍ الإلغاء...
+
+en: Setup is finishing the current step safely; please wait.
+tr: يُنهي برنامج الإعداد الخطوة الحالية بأمان؛ يرجى الانتظار.
+
+en: Updating Aether Shell
+tr: جارٍ تحديث Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: جارٍ التحقق من الحزمة الموقّعة وتطبيق التحديث.
+
+en: Update completed
+tr: اكتمل التحديث
+
+en: The update did not complete
+tr: لم يكتمل التحديث
+
+en: Close
+tr: إغلاق
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: تعذّر بدء واجهة التحديث. لم يتم تطبيق التحديث. أعد المحاولة أو استخدم الإصلاح.
+
+en: Aether Shell Update
+tr: تحديث Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: تعذّر بدء واجهة التحديث. لم يتم تطبيق التحديث. أعد المحاولة أو استخدم الإصلاح من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+
+en: Update completed.
+tr: اكتمل التحديث.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: لم يكتمل التحديث. راجع سجل المحدّث أو استخدم الإصلاح.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: تعذّر بدء Aether Shell. اختر إصلاح من إعدادات Windows > التطبيقات > التطبيقات المثبتة.
+
+en: Aether Shell Settings — update in progress
+tr: إعدادات Aether Shell — التحديث قيد التنفيذ
+
+## shell
+
+en: &Resume taskbar replacement
+tr: استئناف استبدال شريط المهام (&R)
+
+en: Show Windows &notification area for 60 seconds
+tr: إظهار منطقة إشعارات Windows لمدة 60 ثانية (&N)
+
+en: &Search…
+tr: بحث… (&S)
+
+en: &Settings…
+tr: الإعدادات… (&E)
+
+en: View available &update…
+tr: عرض التحديث المتاح… (&U)
+
+en: &Check for updates…
+tr: التحقق من التحديثات… (&C)
+
+en: &About Aether Shell
+tr: حول Aether Shell (&A)
+
+en: &Quit Aether Shell
+tr: إنهاء Aether Shell (&Q)
+
+en: Switch &input language\tWin+Space
+tr: تبديل لغة الإدخال (&I)\tWin+Space
+
+en: Open &network controls…
+tr: فتح عناصر التحكم بالشبكة… (&N)
+
+en: &Weather settings…
+tr: إعدادات الطقس… (&W)
+
+en: Toggle output &mute
+tr: تبديل كتم خرج الصوت (&M)
+
+en: &Sound settings…
+tr: إعدادات الصوت… (&S)
+
+en: Toggle microphone &mute
+tr: تبديل كتم الميكروفون (&M)
+
+en: Start Windows &voice typing\tWin+H
+tr: بدء الكتابة الصوتية في Windows (&V)\tWin+H
+
+en: Microphone &privacy settings…
+tr: إعدادات خصوصية الميكروفون… (&P)
+
+en: &Power settings…
+tr: إعدادات الطاقة… (&P)
+
+en: Open &notifications and calendar
+tr: فتح الإشعارات والتقويم (&N)
+
+en: Open &calendar\tWin+Alt+D
+tr: فتح التقويم (&C)\tWin+Alt+D
+
+en: Show &hidden icons
+tr: إظهار الأيقونات المخفية (&H)
+
+en: Initializing
+tr: جارٍ التهيئة
+
+en: Unavailable
+tr: غير متاح
+
+en: Unsupported
+tr: غير مدعوم
+
+en: Error
+tr: خطأ
+
+en: Available
+tr: متاح
+
+en: Unknown
+tr: غير معروف
+
+en: Internet access
+tr: الوصول إلى الإنترنت
+
+en: Local network only
+tr: الشبكة المحلية فقط
+
+en: Limited Internet access
+tr: وصول محدود إلى الإنترنت
+
+en: No network connection
+tr: لا يوجد اتصال بالشبكة
+
+en: Connectivity unknown
+tr: الاتصال غير معروف
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: شبكة الجوال
+
+en: Network
+tr: الشبكة
+
+en: Offline
+tr: غير متصل
+
+en: Network status unavailable
+tr: حالة الشبكة غير متاحة
+
+en: Quick controls
+tr: عناصر التحكم السريعة
+
+en: Aether Shell menu
+tr: قائمة Aether Shell
+
+en: Weather status unavailable
+tr: حالة الطقس غير متاحة
+
+en: Cached weather
+tr: طقس مخزّن مؤقتًا
+
+en: Observation (UTC): {}
+tr: الرصد (UTC): {}
+
+en: Weather: {}
+tr: الطقس: {}
+
+en: Click to open weather settings
+tr: انقر لفتح إعدادات الطقس
+
+en: Show hidden icons
+tr: إظهار الأيقونات المخفية
+
+en: Opens Windows' notification-area overflow
+tr: يفتح الأيقونات الزائدة في منطقة إشعارات Windows
+
+en: Input language: {}
+tr: لغة الإدخال: {}
+
+en: Fallback input layout
+tr: تخطيط إدخال احتياطي
+
+en: Click to switch input language (Win+Space)
+tr: انقر لتبديل لغة الإدخال (Win+Space)
+
+en: Network: {}
+tr: الشبكة: {}
+
+en: Signal strength unavailable
+tr: قوة الإشارة غير متاحة
+
+en: Click to open Windows network settings
+tr: انقر لفتح إعدادات الشبكة في Windows
+
+en: Audio output
+tr: خرج الصوت
+
+en: Audio: {}
+tr: الصوت: {}
+
+en: volume unknown
+tr: مستوى الصوت غير معروف
+
+en: Muted
+tr: مكتوم
+
+en: Sound on
+tr: الصوت يعمل
+
+en: Microphone: {}
+tr: الميكروفون: {}
+
+en: Endpoint unmuted
+tr: نقطة النهاية غير مكتومة
+
+en: Recording detection unsupported
+tr: اكتشاف التسجيل غير مدعوم
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: انقر لتبديل الكتم؛ وانقر بزر الماوس الأيمن للكتابة الصوتية في Windows وإعدادات خصوصية الميكروفون
+
+en: Battery: {}
+tr: البطارية: {}
+
+en: Battery {}
+tr: البطارية {}
+
+en: Battery status unavailable
+tr: حالة البطارية غير متاحة
+
+en: Charging
+tr: قيد الشحن
+
+en: External power
+tr: طاقة خارجية
+
+en: Estimated remaining: {} h {} min
+tr: المتبقي تقريبًا: {} س {} د
+
+en: Click to open power settings
+tr: انقر لفتح إعدادات الطاقة
+
+en: Clock status unavailable
+tr: حالة الساعة غير متاحة
+
+en: Click to open calendar and notifications
+tr: انقر لفتح التقويم والإشعارات
+
+en: Action failed: {}
+tr: فشل الإجراء: {}
+
+en: Aether Shell status bar
+tr: شريط حالة Aether Shell
+
+en: Update available
+tr: يتوفر تحديث
+
+en: Cached
+tr: مخزّن مؤقتًا
+
+en: Start
+tr: ابدأ
+
+en: Search
+tr: بحث
+
+en: Task View
+tr: عرض المهام
+
+en: Application
+tr: تطبيق
+
+en: Running application
+tr: تطبيق قيد التشغيل
+
+en: More applications
+tr: المزيد من التطبيقات
+
+en: Aether Shell window previews
+tr: معاينات نوافذ Aether Shell
+
+en: Minimized — preview unavailable
+tr: مصغّرة — المعاينة غير متاحة
+
+en: Preview unavailable
+tr: المعاينة غير متاحة
+
+en: {} windows
+tr: {} نوافذ
+
+en: {} window
+tr: {} نافذة
+
+en: Switches to this window
+tr: ينتقل إلى هذه النافذة
+
+en: Minimized, preview unavailable
+tr: مصغّرة، المعاينة غير متاحة
+
+en: Minimized
+tr: مصغّرة
+
+en: Close {}
+tr: إغلاق {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: يطلب إغلاق هذه النافذة؛ ويمكن للتطبيق أن يطلب الحفظ أو الإلغاء
+
+en: Close requested
+tr: تم طلب الإغلاق
+
+en: Previous applications
+tr: التطبيقات السابقة
+
+en: Open
+tr: فتح
+
+en: New instance
+tr: نسخة جديدة
+
+en: Unpin from Dock
+tr: إلغاء التثبيت من Dock
+
+en: Pin to Dock
+tr: التثبيت في Dock
+
+en: Move left
+tr: نقل لليسار
+
+en: Move right
+tr: نقل لليمين
+
+en: Dock settings...
+tr: إعدادات Dock...
+
+en: Import Windows taskbar pins
+tr: استيراد عناصر شريط مهام Windows المثبتة
+
+en: Open Windows Start
+tr: فتح قائمة ابدأ في Windows
+
+en: Aether Shell Dock
+tr: Dock الخاص بـ Aether Shell
+
+en: Pinned
+tr: مثبّت
+
+en: Running
+tr: قيد التشغيل
+
+en: Needs attention
+tr: يحتاج إلى انتباه
+
+en: Up arrow shows window previews
+tr: يعرض السهم لأعلى معاينات النوافذ
+
+en: Installed application
+tr: تطبيق مثبّت
+
+en: Desktop application
+tr: تطبيق سطح المكتب
+
+en: File
+tr: ملف
+
+en: Folder
+tr: مجلد
+
+en: Windows tool
+tr: أداة Windows
+
+en: Control Panel
+tr: لوحة التحكم
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ تنقّل   ·   Enter فتح   ·   Esc إغلاق
+
+en: Search apps, settings and files
+tr: ابحث في التطبيقات والإعدادات والملفات
+
+en: Search could not be completed.
+tr: تعذّر إكمال البحث.
+
+en: Results
+tr: النتائج
+
+en: Indexing applications…
+tr: جارٍ فهرسة التطبيقات…
+
+en: Type to search apps, settings and files
+tr: اكتب للبحث في التطبيقات والإعدادات والملفات
+
+en: Nothing matches
+tr: لا يوجد ما يطابق
+
+en: Windows could not open this application.
+tr: تعذّر على Windows فتح هذا التطبيق.
+
+en: Menu
+tr: القائمة
+
+en: Opens a submenu
+tr: يفتح قائمة فرعية
+
+en: , opens a submenu
+tr: ، يفتح قائمة فرعية
+
+en: Selected
+tr: محدّد
+
+en: Checked
+tr: محدَّد بعلامة
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: وضع الطائرة
+
+en: Accessibility
+tr: إمكانية الوصول
+
+en: Energy saver
+tr: توفير الطاقة
+
+en: Live captions
+tr: التعليقات التوضيحية المباشرة
+
+en: Night light
+tr: الإضاءة الليلية
+
+en: Mobile hotspot
+tr: نقطة الاتصال المتنقلة
+
+en: Nearby sharing
+tr: المشاركة القريبة
+
+en: Cast
+tr: إرسال الشاشة
+
+en: Project
+tr: عرض على شاشة أخرى
+
+en: All settings
+tr: كل الإعدادات
+
+en: Connected
+tr: متصل
+
+en: Not connected
+tr: غير متصل
+
+en: , on
+tr: ، قيد التشغيل
+
+en: , off
+tr: ، متوقف
+
+en: , state unknown
+tr: ، الحالة غير معروفة
+
+en: , opens Windows Settings
+tr: ، يفتح إعدادات Windows
+
+en: , shows accessibility features
+tr: ، يعرض ميزات إمكانية الوصول
+
+en: , requires Windows 11 version 22H2
+tr: ، يتطلب Windows 11 الإصدار 22H2
+
+en: Now playing: {}
+tr: قيد التشغيل الآن: {}
+
+en: Untitled media
+tr: وسائط بلا عنوان
+
+en: , switch source
+tr: ، تبديل المصدر
+
+en: Previous media item
+tr: عنصر الوسائط السابق
+
+en: Pause
+tr: إيقاف مؤقت
+
+en: Play
+tr: تشغيل
+
+en: Next media item
+tr: عنصر الوسائط التالي
+
+en: {} details
+tr: تفاصيل {}
+
+en: Page {} of {}
+tr: الصفحة {} من {}
+
+en: Next page
+tr: الصفحة التالية
+
+en: First page
+tr: الصفحة الأولى
+
+en: Brightness
+tr: السطوع
+
+en: Brightness, unavailable on this display
+tr: السطوع، غير متاح على هذه الشاشة
+
+en: Volume
+tr: مستوى الصوت
+
+en: Volume, unavailable
+tr: مستوى الصوت، غير متاح
+
+en: Unmute
+tr: إلغاء الكتم
+
+en: Mute
+tr: كتم الصوت
+
+en: Sound output and volume mixer
+tr: خرج الصوت وخلاط مستوى الصوت
+
+en: Back
+tr: رجوع
+
+en: , secured
+tr: ، مؤمّنة
+
+en: , open
+tr: ، مفتوحة
+
+en: , connected
+tr: ، متصلة
+
+en: Disconnect
+tr: قطع الاتصال
+
+en: Show available networks
+tr: إظهار الشبكات المتاحة
+
+en: More Wi-Fi settings
+tr: المزيد من إعدادات Wi-Fi
+
+en: Bluetooth and devices settings
+tr: إعدادات Bluetooth والأجهزة
+
+en: Magnifier
+tr: المكبّر
+
+en: Narrator
+tr: الراوي
+
+en: On-screen keyboard
+tr: لوحة المفاتيح على الشاشة
+
+en: Sticky keys
+tr: المفاتيح اللاصقة
+
+en: More accessibility settings
+tr: المزيد من إعدادات إمكانية الوصول
+
+en: Volume mixer
+tr: خلاط الصوت
+
+en: Choose output in Sound settings
+tr: اختر جهاز الخرج من إعدادات الصوت
+
+en: Power and battery settings
+tr: إعدادات الطاقة والبطارية
+
+en: Battery {} percent, {}
+tr: البطارية {} بالمائة، {}
+
+en: All Windows settings
+tr: كل إعدادات Windows
+
+en: The requested action could not be dispatched
+tr: تعذّر تنفيذ الإجراء المطلوب
+
+en: Aether Shell quick controls
+tr: عناصر التحكم السريعة في Aether Shell
+
+en: Media session active
+tr: جلسة وسائط نشطة
+
+en: No media session
+tr: لا توجد جلسة وسائط
+
+en: Current page
+tr: الصفحة الحالية
+
+en:  - secured
+tr: - مؤمّنة
+
+en:  - open
+tr: - مفتوحة
+
+en:  - opens in Windows
+tr: - يُفتح في Windows
+
+en: Turned off by hardware or policy
+tr: معطّل بواسطة العتاد أو السياسة
+
+en: State unavailable - use Windows settings
+tr: الحالة غير متاحة - استخدم إعدادات Windows
+
+en: Off
+tr: متوقف
+
+en:  - signal {} of 5
+tr: - الإشارة {} من 5
+
+en: , no internet
+tr: ، لا يوجد إنترنت
+
+en: On - not connected
+tr: قيد التشغيل - غير متصل
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: لا يسمح Windows للتطبيقات بسرد الشبكات: تحقق من الموقع في إعدادات الخصوصية
+
+en: No Wi-Fi adapter found
+tr: لم يتم العثور على محوّل Wi-Fi
+
+en: Connecting to {}...
+tr: جارٍ الاتصال بـ {}...
+
+en:  - looking for networks
+tr: - جارٍ البحث عن شبكات
+
+en: On
+tr: قيد التشغيل
+
+en: A screen reader is running
+tr: قارئ الشاشة قيد التشغيل
+
+en: Windows accessibility features
+tr: ميزات إمكانية الوصول في Windows
+
+en: Sound output
+tr: خرج الصوت
+
+en: Default output device
+tr: جهاز الخرج الافتراضي
+
+en: No output device available
+tr: لا يوجد جهاز خرج متاح
+
+en: Battery unknown
+tr: بطارية غير معروفة
+
+en: Status refresh could not be started
+tr: تعذّر بدء تحديث الحالة
+
+en: Status refresh unavailable
+tr: تحديث الحالة غير متاح
+
+en: Excellent signal
+tr: إشارة ممتازة
+
+en: Good signal
+tr: إشارة جيدة
+
+en: Fair signal
+tr: إشارة مقبولة
+
+en: Weak signal
+tr: إشارة ضعيفة
+
+en: Clear sky
+tr: سماء صافية
+
+en: Mainly clear
+tr: صافٍ في الغالب
+
+en: Partly cloudy
+tr: غائم جزئيًا
+
+en: Overcast
+tr: غائم كليًا
+
+en: Fog
+tr: ضباب
+
+en: Drizzle
+tr: رذاذ
+
+en: Rain
+tr: مطر
+
+en: Snow
+tr: ثلج
+
+en: Rain showers
+tr: زخات مطر
+
+en: Snow showers
+tr: زخات ثلج
+
+en: Thunderstorm
+tr: عاصفة رعدية
+
+## weather
+
+en: Morning
+tr: الصباح
+
+en: Afternoon
+tr: بعد الظهر
+
+en: Evening
+tr: المساء
+
+en: Night
+tr: الليل
+
+en: Now
+tr: الآن
+
+en: Today
+tr: اليوم
+
+en: Low
+tr: منخفض
+
+en: Moderate
+tr: معتدل
+
+en: High
+tr: مرتفع
+
+en: Very high
+tr: مرتفع جدًا
+
+en: Extreme
+tr: شديد
+
+en: No connection to the weather service.
+tr: لا يوجد اتصال بخدمة الطقس.
+
+en: The weather service is busy. Try again in a moment.
+tr: خدمة الطقس مشغولة. حاول مرة أخرى بعد قليل.
+
+en: The weather could not be loaded.
+tr: تعذّر تحميل الطقس.
+
+en: Could not update; showing the last forecast.
+tr: تعذّر التحديث؛ يُعرض آخر توقع.
+
+en: Try again
+tr: إعادة المحاولة
+
+en: Your location
+tr: موقعك
+
+en: My location
+tr: موقعي
+
+en: Precise location
+tr: الموقع الدقيق
+
+en: Approximate location
+tr: موقع تقريبي
+
+en: Chosen in Settings
+tr: مختار في الإعدادات
+
+en: Allow
+tr: السماح
+
+en: Use precise location
+tr: استخدام الموقع الدقيق
+
+en: See the weather where you are: allow your precise location.
+tr: اعرف الطقس حيث أنت: اسمح بموقعك الدقيق.
+
+en: Your position is approximate (about 10 km).
+tr: موقعك تقريبي (نحو 10 كم).
+
+en: Location is turned off for this app in Windows.
+tr: الموقع متوقف لهذا التطبيق في Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: لا يستطيع هذا الجهاز تحديد موقعه. ابحث عن مدينة بدلًا من ذلك.
+
+en: Reading Windows location…
+tr: جارٍ قراءة موقع Windows…
+
+en: Automatic weather follows your Windows location.
+tr: يتبع الطقس التلقائي موقعك في Windows.
+
+en: Search for a city
+tr: ابحث عن مدينة
+
+en: Search for a city, or allow your location, to see the weather.
+tr: ابحث عن مدينة أو اسمح بالوصول إلى موقعك لرؤية الطقس.
+
+en: Searching…
+tr: جارٍ البحث…
+
+en: City search is unavailable.
+tr: البحث عن المدن غير متاح.
+
+en: No city found.
+tr: لم يُعثر على أي مدينة.
+
+en: Weather settings
+tr: إعدادات الطقس
+
+en: Loading the weather…
+tr: جارٍ تحميل الطقس…
+
+en: Loading…
+tr: جارٍ التحميل…
+
+en: Updated {}
+tr: حُدِّث في {}
+
+en: Near {}
+tr: بالقرب من {}
+
+en: Temperatures now
+tr: درجات الحرارة الآن
+
+en: The map is unavailable.
+tr: الخريطة غير متاحة.
+
+en: Map: Natural Earth
+tr: الخريطة: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: بيانات الطقس من Open-Meteo.com
+
+en: Feels like
+tr: الإحساس الفعلي
+
+en: Feels like {}
+tr: الإحساس {}
+
+en: Close to the real temperature
+tr: قريبة من درجة الحرارة الفعلية
+
+en: The wind makes it feel colder
+tr: الرياح تجعل الجو يبدو أبرد
+
+en: Humidity makes it feel warmer
+tr: الرطوبة تجعل الجو يبدو أدفأ
+
+en: Humidity
+tr: الرطوبة
+
+en: Cloud cover {}
+tr: الغطاء السحابي {}
+
+en: Wind
+tr: الرياح
+
+en: Gusts {}
+tr: هبّات {}
+
+en: Sunrise and sunset
+tr: الشروق والغروب
+
+en: UV index
+tr: مؤشر الأشعة فوق البنفسجية
+
+en: Pressure
+tr: الضغط
+
+en: At sea level
+tr: عند مستوى سطح البحر
+
+en: &Open the weather
+tr: فتح الطقس (&O)
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: التوقعات لمكان وجودك بدقة نحو 100 م ومع ارتفاعه. عند الإيقاف: تُقرَّب إلى نحو 10 كم.

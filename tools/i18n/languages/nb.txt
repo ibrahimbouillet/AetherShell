@@ -1,0 +1,2494 @@
+# Norwegian (Bokmål) (nb): Norsk bokmål. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Velg Windows-plassering for å aktivere automatisk vær.
+
+en: Windows taskbar visible
+tr: Windows-oppgavelinjen er synlig
+
+en: Connected to {}
+tr: Koblet til {}
+
+en: {} is out of range
+tr: {} er utenfor rekkevidde
+
+en: Connecting to {} took too long
+tr: Det tok for lang tid å koble til {}
+
+en: Use Windows to join {}
+tr: Bruk Windows for å koble til {}
+
+en: Windows did not allow this connection
+tr: Windows tillot ikke denne tilkoblingen
+
+en: Could not connect to {}
+tr: Kan ikke koble til {}
+
+en: Connect to {}
+tr: Koble til {}
+
+en: That password was not accepted. Check it and try again.
+tr: Passordet ble ikke godtatt. Kontroller det, og prøv på nytt.
+
+en: Enter this network's password.
+tr: Skriv inn passordet for dette nettverket.
+
+en: &Connect
+tr: &Koble til
+
+en: Windows Settings could not be opened
+tr: Kan ikke åpne Windows-innstillinger
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Kan ikke reservere plass til Dock; gjenoppretter Windows-oppgavelinjen
+
+en: Replacement unavailable: recovery observer could not start
+tr: Erstatning er ikke tilgjengelig: gjenopprettingsovervåkingen kunne ikke starte
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows-oppgavelinjen er gjenopprettet. Kan ikke reservere plass til Dock; slå erstatningen av og på for å prøve på nytt.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Gjenopprettingsovervåking er ikke tilgjengelig; gjenoppretter Windows-oppgavelinjen
+
+en: Windows notifications could not be opened
+tr: Kan ikke åpne Windows-varsler
+
+en: The Windows calendar could not be opened
+tr: Kan ikke åpne Windows-kalenderen
+
+en: Windows did not show its hidden icons
+tr: Windows viste ikke de skjulte ikonene
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Automatisk oppdatering av plasseringen er ikke tilgjengelig; prøv på nytt i værinnstillingene.
+
+en: Windows location
+tr: Windows-plassering
+
+en: Reading approximate Windows location…
+tr: Leser omtrentlig Windows-plassering…
+
+en: Automatic weather follows approximate Windows location.
+tr: Automatisk vær følger den omtrentlige Windows-plasseringen.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Tilgang til Windows-plasseringen er blokkert. Været er ikke tilgjengelig.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows kunne ikke angi en gjeldende plassering. Været er ikke tilgjengelig.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Plasseringstjenesten er ikke tilgjengelig. Været er ikke tilgjengelig.
+
+en: Waiting for Windows location permission…
+tr: Venter på plasseringstillatelse fra Windows…
+
+en: The automatic weather choice could not be saved.
+tr: Valget av automatisk vær kunne ikke lagres.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Tilgang til Windows-plasseringen er ikke tilgjengelig eller ble avslått. Været er ikke tilgjengelig.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows-plasseringen kunne ikke be om tillatelse. Se gjennom plasseringsinnstillingene i Windows.
+
+en: Status worker unavailable
+tr: Statustjenesten er ikke tilgjengelig
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows kunne ikke fullføre denne handlingen. Se gjennom innstillingene for den.
+
+en: Reading Windows status; try the action again shortly
+tr: Leser Windows-status; prøv handlingen på nytt om litt
+
+en: Could not disconnect
+tr: Kan ikke koble fra
+
+en: The Windows accessibility feature could not be started
+tr: Kan ikke starte tilgjengelighetsfunksjonen i Windows
+
+en: Windows could not change the audio output
+tr: Windows kunne ikke endre lydutgangen
+
+en: The Windows control could not be opened
+tr: Kan ikke åpne Windows-kontrollen
+
+en: Keyboard shortcuts disabled
+tr: Hurtigtaster er deaktivert
+
+en: Both keyboard shortcuts registered
+tr: Begge hurtigtastene er registrert
+
+en: A keyboard shortcut is already in use by another application
+tr: En hurtigtast brukes allerede av et annet program
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Kan ikke be om Hurtiginnstillinger i Windows. Fjern merket for «Bruk Hurtiginnstillinger i Windows» i Topplinje-innstillingene for å bruke Aether-kontrollene.
+
+en: Windows Start could not be opened
+tr: Kan ikke åpne Start i Windows
+
+en: Windows Task View could not be opened
+tr: Kan ikke åpne Oppgavevisning i Windows
+
+en: Windows keyboard layout switching was unavailable
+tr: Bytte av tastaturoppsett i Windows var ikke tilgjengelig
+
+en: Windows voice typing could not be opened
+tr: Kan ikke åpne taleskriving i Windows
+
+en: Windows taskbar could not be revealed
+tr: Kan ikke vise Windows-oppgavelinjen
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Erstatning av oppgavelinjen kunne ikke gjenopptas; Windows er fortsatt tilgjengelig
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Erstatning av Windows-oppgavelinjen er ikke tilgjengelig i denne økten
+
+en: Windows pin access is unavailable in this isolated session
+tr: Tilgang til festede elementer i Windows er ikke tilgjengelig i denne isolerte økten
+
+en: Windows pinned applications could not be read
+tr: Kan ikke lese festede programmer i Windows
+
+en: Settings changed during pin import. Try import again.
+tr: Innstillingene ble endret under importen av festede elementer. Prøv å importere på nytt.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: Lagret {} ekstra festede programmer. Noen festede elementer i Windows kan fortsatt være utilgjengelige.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Festede elementer er endret i minnet; lagringen mislyktes. Klikk på Bruk i Innstillinger for å prøve på nytt.
+
+en: Pins updated in memory; saving...
+tr: Festede elementer er oppdatert i minnet; lagrer...
+
+en: Imported pins could not be applied
+tr: Kan ikke bruke de importerte festede elementene
+
+en: Pin import is unavailable while closing
+tr: Import av festede elementer er ikke tilgjengelig under lukking
+
+en: Settings could not be saved
+tr: Kan ikke lagre innstillingene
+
+en: Quit without saving the latest changes?
+tr: Vil du avslutte uten å lagre de siste endringene?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Den forrige innstillingsfilen beholdes. La Aether Shell være åpen for å prøve å lagre på nytt.
+
+en: &Quit without saving
+tr: &Avslutt uten å lagre
+
+en: &Keep Aether Shell open
+tr: &La Aether Shell være åpen
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Eksporter grunnleggende diagnostikk – appversjon og Windows-build, ingen logger eller personlige data
+
+en: Diagnostics exported.
+tr: Diagnostikken er eksportert.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Kan ikke lagre diagnostikken i den valgte filen.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Innstillingene kunne ikke leses trygt. Den eksisterende filen er bevart.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell kunne ikke starte skrivebordsflatene sine.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Gjenoppretting av Windows-oppgavelinjen venter. Prøv på nytt, eller lukk Aether Shell.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows-oppgavelinjen vises midlertidig.
+
+en: Windows taskbar restored.
+tr: Windows-oppgavelinjen er gjenopprettet.
+
+en: Windows taskbar replacement is active.
+tr: Erstatning av Windows-oppgavelinjen er aktiv.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows-oppgavelinjen er fortsatt tilgjengelig. Erstatningen prøver på nytt om litt.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows-oppgavelinjen er fortsatt tilgjengelig. Slå erstatningen av og på for å prøve på nytt.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows-oppgavelinjen er gjenopprettet. Erstatningen kobler til igjen om litt.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows-oppgavelinjen er gjenopprettet. Slå erstatningen av og på for å prøve på nytt.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Erstatning av oppgavelinjen er stoppet. Windows-oppgavelinjen er gjenopprettet.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Erstatning av oppgavelinjen er stoppet. Gjenopprettingen av Windows-oppgavelinjen kunne ikke bekreftes.
+
+en: Activating taskbar replacement...
+tr: Aktiverer erstatning av oppgavelinjen...
+
+en: Restoring Windows taskbar...
+tr: Gjenoppretter Windows-oppgavelinjen...
+
+en: Reconnecting taskbar replacement...
+tr: Kobler til erstatning av oppgavelinjen igjen...
+
+en: Showing the Windows taskbar temporarily...
+tr: Viser Windows-oppgavelinjen midlertidig...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell kunne ikke gjenopprette Windows-oppgavelinjen.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Start Windows Utforsker på nytt fra Oppgavebehandling (Ctrl+Skift+Esc), eller logg av og logg på igjen.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows-oppgavelinjen ble gjenopprettet til den lagrede tilstanden.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Fant ingen lagret tilstand for oppgavelinjen. Windows-oppgavelinjen ble gjort synlig; innstillingen for automatisk skjuling ble ikke endret.
+
+en: There was nothing to restore.
+tr: Det var ingenting å gjenopprette.
+
+en: Taskbar replacement is turned off.
+tr: Erstatning av oppgavelinjen er slått av.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Erstatning av oppgavelinjen kunne ikke slås av automatisk. Slå den av i Aether Shell-innstillinger > Skrivebord.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Ukjent eller ugyldig kommandolinje for Aether Shell.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell kunne ikke opprette de lokale datamappene sine.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell stoppet etter en uventet feil.
+
+## search-names
+
+en: Disk Management
+tr: Diskbehandling
+
+en: Local Users and Groups
+tr: Lokale brukere og grupper
+
+en: Local Group Policy Editor
+tr: Redigeringsprogram for lokal gruppepolicy
+
+en: Manage User Certificates
+tr: Administrer brukersertifikater
+
+en: Manage Computer Certificates
+tr: Administrer datamaskinsertifikater
+
+en: Shared Folders
+tr: Delte mapper
+
+en: TPM Management
+tr: TPM-administrasjon
+
+en: Network Connections
+tr: Nettverkstilkoblinger
+
+en: System Properties
+tr: Systemegenskaper
+
+en: About Windows
+tr: Om Windows
+
+en: DirectX Diagnostic Tool
+tr: DirectX-diagnoseverktøy
+
+en: Windows Features
+tr: Windows-funksjoner
+
+en: System Restore
+tr: Systemgjenoppretting
+
+en: Advanced System Settings
+tr: Avanserte systeminnstillinger
+
+en: Volume Mixer
+tr: Volummikser
+
+en: Microsoft Management Console
+tr: Microsoft Management Console
+
+en: User Accounts (Advanced)
+tr: Brukerkontoer (avansert)
+
+en: Display settings
+tr: Skjerminnstillinger
+
+en: Night light settings
+tr: Innstillinger for nattlys
+
+en: Graphics settings
+tr: Grafikkinnstillinger
+
+en: Sound settings
+tr: Lydinnstillinger
+
+en: Notification settings
+tr: Varslingsinnstillinger
+
+en: Power & battery settings
+tr: Innstillinger for strøm og batteri
+
+en: Energy saver settings
+tr: Innstillinger for strømsparing
+
+en: Storage settings
+tr: Lagringsinnstillinger
+
+en: Multitasking settings
+tr: Innstillinger for fleroppgavekjøring
+
+en: Clipboard settings
+tr: Innstillinger for utklippstavle
+
+en: Remote Desktop settings
+tr: Innstillinger for eksternt skrivebord
+
+en: About your PC
+tr: Om PC-en
+
+en: Bluetooth & devices settings
+tr: Innstillinger for Bluetooth og enheter
+
+en: Printers & scanners settings
+tr: Innstillinger for skrivere og skannere
+
+en: Mouse settings
+tr: Innstillinger for mus
+
+en: Touchpad settings
+tr: Innstillinger for styreflate
+
+en: Network & internet settings
+tr: Innstillinger for nettverk og Internett
+
+en: Wi-Fi settings
+tr: Wi-Fi-innstillinger
+
+en: VPN settings
+tr: VPN-innstillinger
+
+en: Proxy settings
+tr: Proxy-innstillinger
+
+en: Airplane mode settings
+tr: Innstillinger for flymodus
+
+en: Mobile hotspot settings
+tr: Innstillinger for mobilt tilgangspunkt
+
+en: Background settings
+tr: Bakgrunnsinnstillinger
+
+en: Color settings
+tr: Fargeinnstillinger
+
+en: Theme settings
+tr: Temainnstillinger
+
+en: Lock screen settings
+tr: Innstillinger for låseskjerm
+
+en: Taskbar settings
+tr: Innstillinger for oppgavelinje
+
+en: Font settings
+tr: Innstillinger for skrifter
+
+en: Installed apps
+tr: Installerte apper
+
+en: Default apps settings
+tr: Innstillinger for standardapper
+
+en: Startup apps settings
+tr: Innstillinger for oppstartsapper
+
+en: Account info
+tr: Din informasjon
+
+en: Sign-in options
+tr: Påloggingsalternativer
+
+en: Other users settings
+tr: Innstillinger for andre brukere
+
+en: Date & time settings
+tr: Innstillinger for dato og klokkeslett
+
+en: Language & region settings
+tr: Innstillinger for språk og område
+
+en: Typing settings
+tr: Innstillinger for skriving
+
+en: Accessibility settings
+tr: Innstillinger for tilgjengelighet
+
+en: Privacy & security settings
+tr: Innstillinger for personvern og sikkerhet
+
+en: Location settings
+tr: Plasseringsinnstillinger
+
+en: Windows Update settings
+tr: Innstillinger for Windows Update
+
+en: Recovery settings
+tr: Innstillinger for gjenoppretting
+
+en: Activation settings
+tr: Aktiveringsinnstillinger
+
+en: For developers settings
+tr: Innstillinger for utviklere
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: Kan ikke nå GitHub.
+
+en: GitHub did not answer the request just now.
+tr: GitHub svarte ikke på forespørselen akkurat nå.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Utgivelsen besto ikke verifiseringen, så ingenting ble installert.
+
+en: There is not enough free disk space.
+tr: Det er ikke nok ledig diskplass.
+
+en: Windows refused access to the update files.
+tr: Windows nektet tilgang til oppdateringsfilene.
+
+en: {} bytes
+tr: {} byte
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Status
+
+en: Check &now
+tr: Sjekk &nå
+
+en: Download and install
+tr: Last ned og installer
+
+en: &Later
+tr: &Senere
+
+en: S&kip this version
+tr: &Hopp over denne versjonen
+
+en: &Release details
+tr: &Utgivelsesdetaljer
+
+en: Disable &notifications
+tr: Deaktiver &varsler
+
+en: Release notes
+tr: Utgivelsesmerknader
+
+en: the new version
+tr: den nye versjonen
+
+en: Installed: {}.
+tr: Installert: {}.
+
+en: Automatic update checks are off
+tr: Automatiske oppdateringssjekker er av
+
+en: Check now looks for a newer release once.
+tr: Sjekk nå ser etter en nyere utgivelse én gang.
+
+en: Last checked {}
+tr: Sist sjekket {}
+
+en: Not checked yet
+tr: Ikke sjekket ennå
+
+en: Checking for updates...
+tr: Ser etter oppdateringer...
+
+en: Aether Shell is up to date
+tr: Aether Shell er oppdatert
+
+en: Latest published release: {}.
+tr: Siste publiserte utgivelse: {}.
+
+en: Version {} is available
+tr: Versjon {} er tilgjengelig
+
+en: Download size: {}.
+tr: Nedlastingsstørrelse: {}.
+
+en: Downloading version {}...
+tr: Laster ned versjon {}...
+
+en: Received {} of {} ({}%).
+tr: Mottatt {} av {} ({} %).
+
+en: Received {}; total size unknown.
+tr: Mottatt {}; total størrelse ukjent.
+
+en: Version {} is ready to install
+tr: Versjon {} er klar til å installeres
+
+en: Verified with the signed release manifest and SHA-256.
+tr: Verifisert med det signerte utgivelsesmanifestet og SHA-256.
+
+en: The update could not be completed
+tr: Oppdateringen kunne ikke fullføres
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Den installeres manuelt foreløpig: Åpne Utgivelsesdetaljer, og last ned og kjør installasjonsprogrammet.
+
+en: Failure: {}.
+tr: Feil: {}.
+
+en: Choose Retry Download to try again.
+tr: Velg Prøv nedlasting på nytt for å prøve igjen.
+
+en: Use Check now to try again.
+tr: Bruk Sjekk nå for å prøve på nytt.
+
+en: Next automatic check: {}.
+tr: Neste automatiske sjekk: {}.
+
+en: &Install update
+tr: &Installer oppdatering
+
+en: Retry &Download
+tr: Prøv &nedlasting på nytt
+
+en: &Download and install
+tr: &Last ned og installer
+
+en: Windows' startup state could not be read in this session.
+tr: Oppstartstilstanden i Windows kunne ikke leses i denne økten.
+
+en: Windows will start it at your next sign-in.
+tr: Windows starter det ved neste pålogging.
+
+en: Right now it will not start at sign-in.
+tr: Akkurat nå starter det ikke ved pålogging.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Det er slått av i Oppgavebehandling eller Windows-innstillinger, som bestemmer til det slås på der igjen.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows ville startet en annen kopi av Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows rapporterer en oppstartstilstand som denne versjonen ikke kan lese.
+
+en: The close action could not be completed.
+tr: Lukkehandlingen kunne ikke fullføres.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Skriv inn et fullstendig tall før du lagrer; feltet som er merket med rødt, er ikke det.
+
+en: Settings could not be validated.
+tr: Innstillingene kunne ikke valideres.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Oppstart ved pålogging ble ikke endret fordi innstillingene ikke kunne lagres.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Innstillingene kunne ikke lagres, og oppstart ved Windows-pålogging kunne ikke tilbakestilles. Klikk på Bruk igjen for å prøve på nytt.
+
+en: Settings saved.
+tr: Innstillingene er lagret.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Innstillingene er endret i minnet; lagringen mislyktes. Klikk på Bruk igjen for å prøve på nytt.
+
+en: Settings could not be applied.
+tr: Innstillingene kunne ikke brukes.
+
+en: Some values were corrected to their supported range.
+tr: Noen verdier ble korrigert til det støttede området.
+
+en: Startup registration is unavailable in this session.
+tr: Registrering av oppstart er ikke tilgjengelig i denne økten.
+
+en: Changing startup registration...
+tr: Endrer registrering av oppstart...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows endret ikke registreringen av oppstart. Kontroller oppstartsinnstillingen i Oppgavebehandling.
+
+en: Startup registration could not be changed.
+tr: Registreringen av oppstart kunne ikke endres.
+
+en: Defaults saved; startup is disabled.
+tr: Standardinnstillingene er lagret; oppstart er deaktivert.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Standardinnstillingene er brukt; lagringen mislyktes. Klikk på Bruk igjen for å prøve på nytt.
+
+en: Defaults could not be applied.
+tr: Standardinnstillingene kunne ikke brukes.
+
+en: Startup was not disabled; settings were kept.
+tr: Oppstart ble ikke deaktivert; innstillingene ble beholdt.
+
+en: Location search is unavailable.
+tr: Plasseringssøk er ikke tilgjengelig.
+
+en: Searching Open-Meteo locations...
+tr: Søker etter steder hos Open-Meteo...
+
+en: Location search failed. Check your connection and try again.
+tr: Plasseringssøket mislyktes. Kontroller tilkoblingen, og prøv på nytt.
+
+en: No place matched that search.
+tr: Ingen steder samsvarte med søket.
+
+en: Choose a location to save it.
+tr: Velg en plassering for å lagre den.
+
+en: Reset all settings?
+tr: Vil du tilbakestille alle innstillingene?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Innstillinger og festede programmer går tilbake til standardverdiene, og oppstart ved pålogging slås av.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Valget for Windows-oppgavelinjen beholdes. En sikkerhetskopi av den gjeldende innstillingsfilen beholdes.
+
+en: &Reset
+tr: &Tilbakestill
+
+en: Cancel
+tr: Avbryt
+
+en: Pinned applications saved.
+tr: Festede programmer er lagret.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Festede elementer er endret i minnet; lagringen mislyktes. Klikk på Bruk igjen for å prøve på nytt.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Standardinnstillingene kunne ikke gjenopprettes fordi registrering av oppstart ikke er tilgjengelig.
+
+en: Pinned application could not be added.
+tr: Det festede programmet kunne ikke legges til.
+
+en: Choose an application to add first.
+tr: Velg først et program som skal legges til.
+
+en: Pinned applications could not be changed.
+tr: De festede programmene kunne ikke endres.
+
+en: Choose a pinned application first.
+tr: Velg først et festet program.
+
+en: Desktop status is unavailable in this session.
+tr: Skrivebordsstatus er ikke tilgjengelig i denne økten.
+
+en: Desktop status is unavailable.
+tr: Skrivebordsstatus er ikke tilgjengelig.
+
+en: Password
+tr: Passord
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: Laster ned {} fra GitHub ({}). Engelsk vises til språket er klart.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {} kunne ikke lastes ned. Engelsk vises til det er lastet ned; velg Last ned nedenfor for å prøve igjen.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} er ikke på denne PC-en ennå. Engelsk vises til språket er lastet ned.
+
+en: {} is on this PC.
+tr: {} er på denne PC-en.
+
+en: Every language is on this PC.
+tr: Alle språk er på denne PC-en.
+
+en: Choose a language to download first.
+tr: Velg først et språk du vil laste ned.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Topplinje
+
+en: Weather
+tr: Vær
+
+en: Updates
+tr: Oppdateringer
+
+en: General
+tr: Generelt
+
+en: About
+tr: Om
+
+en: Desktop
+tr: Skrivebord
+
+en: Appearance
+tr: Utseende
+
+en: Welcome
+tr: Velkomst
+
+en: Aether Shell Settings
+tr: Aether Shell-innstillinger
+
+en: Settings
+tr: Innstillinger
+
+en: Reset defaults...
+tr: Tilbakestill til standard...
+
+en: &Apply
+tr: &Bruk
+
+en: Liquid
+tr: Flytende
+
+en: Grain
+tr: Korn
+
+en: From {} to {}
+tr: Fra {} til {}
+
+en: px
+tr: px
+
+en: min
+tr: min
+
+en: h
+tr: t
+
+en: This action could not be completed.
+tr: Denne handlingen kunne ikke fullføres.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Størrelse, avstand, bevegelse og programmene som er festet til Dock.
+
+en: Size and spacing
+tr: Størrelse og avstand
+
+en: Icon size
+tr: Ikonstørrelse
+
+en: {}, scaled with the Windows display scale.
+tr: {}, skalert med skjermskaleringen i Windows.
+
+en: Bottom margin
+tr: Nedre marg
+
+en: Space between the Dock and the bottom of the screen.
+tr: Avstand mellom Dock og nederkanten av skjermen.
+
+en: Minimum side margin
+tr: Minste sidemarg
+
+en: Space kept free at the left and right screen edges.
+tr: Plass som holdes fri ved venstre og høyre skjermkant.
+
+en: Icon spacing
+tr: Ikonavstand
+
+en: Space between neighbouring icons.
+tr: Avstand mellom ikoner ved siden av hverandre.
+
+en: Glass and motion
+tr: Glass og bevegelse
+
+en: Glass opacity
+tr: Glassets ugjennomsiktighet
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Lavere verdier viser mer av det uskarpe skrivebordet bak Dock.
+
+en: Hover magnification
+tr: Forstørrelse ved peking
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Hvor mye et ikon vokser under pekeren; 1 slår det av.
+
+en: Behavior
+tr: Virkemåte
+
+en: Show running applications
+tr: Vis kjørende programmer
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Åpne programmer som ikke er festet, vises etter de festede.
+
+en: Reserve screen space for the Dock
+tr: Reserver skjermplass til Dock
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maksimerte vinduer holdes over Dock i stedet for under den.
+
+en: Automatically hide the Dock
+tr: Skjul Dock automatisk
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Skjules mens et programvindu dekker den; flytt pekeren til nederkanten av skjermen for å vise den. Den blir på skrivebordet, og vinduer får hele skjermhøyden.
+
+en: Pinned applications
+tr: Festede programmer
+
+en: Move &up
+tr: Flytt &opp
+
+en: Move &down
+tr: Flytt &ned
+
+en: &Remove
+tr: &Fjern
+
+en: &Add application
+tr: &Legg til program
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Festede elementer beholder identiteten og startinnstillingene sine. Når du fjerner et festet element, legger heller ikke den automatiske synkroniseringen med Windows-oppgavelinjen det til igjen.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Plassering, klokke og statuselementene som vises på den øverste statuslinjen.
+
+en: Presentation
+tr: Presentasjon
+
+en: Floating bar
+tr: Flytende linje
+
+en: Text on the desktop
+tr: Tekst på skrivebordet
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Flytende linje: glasslinjen under toppen av skjermen. Tekst på skrivebordet: ingen linje, de samme elementene skrevet helt øverst på skjermen, rett over skrivebordsbildet; den stripen holdes fri for vinduer, og toppmargen og glassets ugjennomsiktighet gjelder ikke. Med automatisk skjuling kommer teksten tilbake på en glasstripe når et vindu ligger under den.
+
+en: Position and glass
+tr: Plassering og glass
+
+en: Top margin
+tr: Toppmarg
+
+en: Space between the Top Bar and the top of the screen.
+tr: Avstand mellom Topplinje og toppen av skjermen.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Lavere verdier viser mer av det uskarpe skrivebordet bak linjen.
+
+en: Clock
+tr: Klokke
+
+en: Clock format
+tr: Klokkeformat
+
+en: Follow Windows
+tr: Følg Windows
+
+en: 12-hour
+tr: 12 timer
+
+en: 24-hour
+tr: 24 timer
+
+en: Date style
+tr: Datostil
+
+en: Weekday, day and month
+tr: Ukedag, dag og måned
+
+en: Short
+tr: Kort
+
+en: Long
+tr: Lang
+
+en: Show seconds
+tr: Vis sekunder
+
+en: Show date
+tr: Vis dato
+
+en: Status items
+tr: Statuselementer
+
+en: Show battery
+tr: Vis batteri
+
+en: Hide battery when absent
+tr: Skjul batteri når det mangler
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Stasjonære PC-er uten batteri viser ingenting i stedet for et ukjent batteri.
+
+en: Show input language
+tr: Vis inndataspråk
+
+en: Show network
+tr: Vis nettverk
+
+en: Show audio output
+tr: Vis lydutgang
+
+en: Show microphone
+tr: Vis mikrofon
+
+en: Show weather when enabled
+tr: Vis vær når det er aktivert
+
+en: Weather itself is turned on in Weather settings.
+tr: Selve været slås på i værinnstillingene.
+
+en: Show hidden icons button
+tr: Vis knapp for skjulte ikoner
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: En liten vinkel som åpner de skjulte ikonene i varslingsområdet i Windows.
+
+en: Reserve screen space above windows
+tr: Reserver skjermplass over vinduer
+
+en: Maximized windows stay below the Top Bar.
+tr: Maksimerte vinduer holdes under Topplinje.
+
+en: Automatically hide the Top Bar
+tr: Skjul Topplinje automatisk
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Skjules mens et programvindu dekker den; flytt pekeren til overkanten av skjermen for å vise den. Den blir på skrivebordet.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Bruk Hurtiginnstillinger i Windows (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Av: Aethers hurtigkontroller åpnes under Topplinje. På: Windows' eget panel åpnes nederst på skjermen.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: En valgfri værmelding i Topplinje, levert av Open-Meteo.
+
+en: Forecast
+tr: Værmelding
+
+en: Enable weather
+tr: Aktiver vær
+
+en: Off by default: the forecast needs network requests.
+tr: Av som standard: værmeldingen krever nettverksforespørsler.
+
+en: Temperature
+tr: Temperatur
+
+en: Celsius
+tr: Celsius
+
+en: Fahrenheit
+tr: Fahrenheit
+
+en: Refresh interval
+tr: Oppdateringsintervall
+
+en: Location
+tr: Plassering
+
+en: Locate automatically with Windows
+tr: Finn plassering automatisk med Windows
+
+en: Uses the Windows location service after you allow it.
+tr: Bruker plasseringstjenesten i Windows etter at du har tillatt det.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows ber om plasseringstillatelse. Koordinatene dine sendes bare til Open-Meteo.com for å hente værmeldingen; en plasseringsnøkkel bufres lokalt. Hvis plassering er blokkert, er været ikke tilgjengelig.
+
+en: Use &Windows location
+tr: Bruk &Windows-plassering
+
+en: Location &settings
+tr: Plasserings&innstillinger
+
+en: Choose automatic location or search for a place below.
+tr: Velg automatisk plassering, eller søk etter et sted nedenfor.
+
+en: Search for a place
+tr: Søk etter et sted
+
+en: Searc&h
+tr: S&øk
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Værdata fra Open-Meteo.com (CC BY 4.0). Manuelt søk sender bare teksten du skriver inn.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Signerte utgivelser fra det offisielle GitHub-repositoriet, verifisert før installasjon.
+
+en: Preferences
+tr: Preferanser
+
+en: Check for updates automatically
+tr: Se etter oppdateringer automatisk
+
+en: Check interval
+tr: Intervall for sjekk
+
+en: Release channel
+tr: Utgivelseskanal
+
+en: Prereleases arrive earlier and change more often.
+tr: Forhåndsversjoner kommer tidligere og endres oftere.
+
+en: Stable
+tr: Stabil
+
+en: Prerelease
+tr: Forhåndsversjon
+
+en: Show update notifications
+tr: Vis oppdateringsvarsler
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Oppstart, bevegelse, hurtigtaster og diagnostikk.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Språket i linjene, menyene, Søk, Innstillinger og installasjonsprogrammet.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Navn som tilhører deg eller andre programmer (apper, filer, Wi-Fi-nettverk), oversettes aldri. Med et valgt språk skriver Topplinje datoen på det språket; Følg Windows beholder det regionale formatet ditt i Windows.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: Den håndskrevne velkomsten skriver latinske bokstaver: den hilser på fransk, engelsk eller spansk. Velg språket under Velkomst.
+
+en: Language
+tr: Språk
+
+en: Interface language
+tr: Grensesnittspråk
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Følg Windows bruker det første av visningsspråkene dine i Windows som er blant disse, og ellers engelsk.
+
+en: Startup
+tr: Oppstart
+
+en: Start Aether Shell when I sign in
+tr: Start Aether Shell når jeg logger på
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Endringen krever Bruk. Oppgavebehandling kan også slå det av.
+
+en: Motion
+tr: Bevegelse
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Redusert bevegelse fjerner dekorative bevegelser overalt.
+
+en: Reduced
+tr: Redusert
+
+en: Full
+tr: Full
+
+en: Keyboard shortcuts
+tr: Hurtigtaster
+
+en: Enable global keyboard shortcuts
+tr: Aktiver globale hurtigtaster
+
+en: Search shortcut key
+tr: Hurtigtast for Søk
+
+en: Dock shortcut key
+tr: Hurtigtast for Dock
+
+en: Search shortcut modifiers
+tr: Endringstaster for Søk
+
+en: Dock shortcut modifiers
+tr: Endringstaster for Dock
+
+en: Shortcut status unavailable
+tr: Status for hurtigtaster er ikke tilgjengelig
+
+en: Diagnostics
+tr: Diagnostikk
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Loggmappen inneholder Aether Shell-loggene for denne datamaskinen. Eksporter diagnostikk lagrer bare appversjonen og Windows-build - ingen logger eller personlige data.
+
+en: Open &log folder
+tr: Åpne &loggmappe
+
+en: &Export diagnostics...
+tr: &Eksporter diagnostikk...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: En kort håndskrevet hilsen på skrivebordet etter at du logger på eller låser opp PC-en.
+
+en: Greeting
+tr: Hilsen
+
+en: Show the welcome at sign-in and unlock
+tr: Vis velkomsten ved pålogging og opplåsing
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Den vises etter at Windows har logget deg på, mens Aether Shell gjør seg klar. Trykk, klikk eller trykk på Esc for å hoppe over den.
+
+en: Greeting language
+tr: Språk for hilsen
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Salut på fransk, Hello på engelsk, Hola på spansk. Pennen skriver latinske bokstaver: på alle andre språk hilser den på engelsk.
+
+en: Your name
+tr: Navnet ditt
+
+en: Name to greet you with
+tr: Navn du skal hilses med
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: Valgfritt, for eksempel et fornavn. Det blir på denne PC-en i Aether Shell-innstillingene dine og sendes aldri noe sted eller skrives til en logg. Tøm feltet for å fjerne det.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Fargemodus, aksent, bevegelseshastighet og utseendet til Dock og Topplinje.
+
+en: Style
+tr: Stil
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Flytende: glass i lag over det som ligger bak, et uskarphetslag, væskens lys og deretter ikonene og teksten, som holdes lesbare over lyse og mørke sider. Korn: frostet glass, uskarpt og halvgjennomsiktig, med et fint korn.
+
+en: Liquid blur
+tr: Uskarphet for Flytende
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Hvor mye uskarphetslaget under Flytende-glasset dekker det som ligger bak: 100 % gjør alt uskarpt. Lavere verdier viser siden skarpere, og tekst på linjene kan da bli vanskeligere å lese over en travel side.
+
+en: Liquid blur color
+tr: Uskarphetsfarge for Flytende
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatisk beholder glassets egne farger. Tekst og ikoner holdes lesbare uansett farge.
+
+en: Automatic
+tr: Automatisk
+
+en: White
+tr: Hvit
+
+en: Black
+tr: Svart
+
+en: Accent
+tr: Aksent
+
+en: Blue
+tr: Blå
+
+en: Violet
+tr: Fiolett
+
+en: Pink
+tr: Rosa
+
+en: Red
+tr: Rød
+
+en: Orange
+tr: Oransje
+
+en: Yellow
+tr: Gul
+
+en: Green
+tr: Grønn
+
+en: Teal
+tr: Blågrønn
+
+en: Liquid color strength
+tr: Fargestyrke for Flytende
+
+en: How much of the chosen color the blur layer takes.
+tr: Hvor mye av den valgte fargen uskarphetslaget får.
+
+en: Theme
+tr: Tema
+
+en: Color mode
+tr: Fargemodus
+
+en: High contrast always takes precedence.
+tr: Høy kontrast har alltid forrang.
+
+en: Light
+tr: Lys
+
+en: Dark
+tr: Mørk
+
+en: Accent color
+tr: Aksentfarge
+
+en: Animation duration
+tr: Animasjonsvarighet
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 er standardhastigheten; høyere verdier er langsommere. Redusert bevegelse har forrang.
+
+en: Dock icon preset
+tr: Forhåndsinnstilling for ikoner i Dock
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: En egendefinert størrelse fra Dock-innstillingene beholdes til du velger en forhåndsinnstilling.
+
+en: Small - 32 px
+tr: Liten - 32 px
+
+en: Medium - 40 px
+tr: Middels - 40 px
+
+en: Large - 48 px
+tr: Stor - 48 px
+
+en: Keep custom size
+tr: Behold egendefinert størrelse
+
+en: Show Windows Start in the Dock
+tr: Vis Start i Windows i Dock
+
+en: Show Task View in the Dock
+tr: Vis Oppgavevisning i Dock
+
+en: Reserve extra space for Dock animations
+tr: Reserver ekstra plass til animasjoner i Dock
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Holder forstørrelse og oppstartshopp unna maksimerte vinduer.
+
+en: Weather position
+tr: Plassering av vær
+
+en: Left
+tr: Venstre
+
+en: Right
+tr: Høyre
+
+en: Keyboard indicator
+tr: Tastaturindikator
+
+en: Compact
+tr: Kompakt
+
+en: Two lines
+tr: To linjer
+
+en: Windows taskbar pins
+tr: Festede elementer på Windows-oppgavelinjen
+
+en: Add newly discovered Windows taskbar pins
+tr: Legg til nyoppdagede festede elementer fra Windows-oppgavelinjen
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Mens oppgavelinjen er erstattet, legges nye festede elementer fra Windows til i Dock.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Reversibel erstatning av Windows-oppgavelinjen med Dock.
+
+en: Taskbar replacement
+tr: Erstatning av oppgavelinjen
+
+en: Replace the Windows taskbar
+tr: Erstatt Windows-oppgavelinjen
+
+en: Changing this needs Apply.
+tr: Endringen krever Bruk.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Mens Aether Shell kjører, skjuler det Windows-oppgavelinjen og reserverer plass under maksimerte programmer.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Tilstanden til Windows-oppgavelinjen gjenopprettes når denne modusen deaktiveres eller Aether Shell avsluttes. Et separat gjenopprettingsverktøy gjenoppretter den også hvis programmet stopper uventet. Hvis gjenopprettingen mislykkes, starter du Windows Utforsker på nytt i Oppgavebehandling.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows-innstillinger forblir det opprinnelige Windows-grensesnittet. Oppgavelinjesiden erstattes ikke av Aether Shell; konfigurer denne modusen her.
+
+en: Pinned applications from Windows
+tr: Festede programmer fra Windows
+
+en: &Import Windows taskbar pins
+tr: &Importer festede elementer fra Windows-oppgavelinjen
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Leser festede snarveier uten å endre festede elementer i Windows. Noen festede elementer i Windows 11 eller rekkefølgen deres er kanskje ikke tilgjengelige.
+
+en: Version {}
+tr: Versjon {}
+
+en: Created by Ibrahim Bouillet
+tr: Laget av Ibrahim Bouillet
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Et innebygd skrivebordsgrensesnitt for Windows - en flytende Dock og en øverste statuslinje - som kjører side om side med Utforsker.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Værdata: Open-Meteo.com (CC BY 4.0). Ingen C++-kjøretidsbiblioteker fra tredjeparter følger med.
+
+en: &Official project
+tr: &Offisielt prosjekt
+
+en: Licence
+tr: Lisens
+
+en: Taskbar replacement changes need Apply.
+tr: Endringer i erstatning av oppgavelinjen krever Bruk.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Endringer lagres automatisk. Oppstart krever Bruk.
+
+en: Changes save automatically.
+tr: Endringer lagres automatisk.
+
+en: Press Apply to confirm this change.
+tr: Klikk på Bruk for å bekrefte endringen.
+
+en: Smart transparency
+tr: Smart gjennomsiktighet
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Med Flytende gjør dette vinduet bakgrunnen uskarp bare under teksten og kontrollene sine: helt over andre vinduer og skrivebordsikoner, litt over skrivebordsbildet og ikke i det hele tatt der det ikke viser noe.
+
+en: Languages on this PC
+tr: Språk på denne PC-en
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell laster ned språkene Windows har, slik at det bytter språk når Windows gjør det.
+
+en: Add a language
+tr: Legg til et språk
+
+en: &Download
+tr: &Last ned
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Hvert språk kommer fra GitHub-utgivelsen for denne versjonen og kontrolleres før det brukes. Når det er på denne PC-en, velger du det ovenfor.
+
+en: built in
+tr: innebygd
+
+en: downloading, {}
+tr: laster ned, {}
+
+en: download failed
+tr: nedlastingen mislyktes
+
+## setup
+
+en: Aether Shell Setup
+tr: Installasjon av Aether Shell
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Installasjonsprogrammet kunne ikke opprette grensesnittet sitt. Lukk det og prøv på nytt, eller bruk de dokumenterte alternativene for stille installasjon.
+
+en: Options
+tr: Alternativer
+
+en: Install
+tr: Installer
+
+en: Done
+tr: Ferdig
+
+en: Remove Aether Shell
+tr: Fjern Aether Shell
+
+en: Repair Aether Shell
+tr: Reparer Aether Shell
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: En innebygd Dock og øverste statuslinje for Windows, som kjører side om side med Utforsker.
+
+en: Replaces the Windows taskbar while it runs
+tr: Erstatter Windows-oppgavelinjen mens det kjører
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Avslutt Aether Shell, slå dette av i Innstillinger > Skrivebord, eller åpne «Gjenopprett Windows-oppgavelinjen» på Start-menyen for å få tilbake Windows-oppgavelinjen.
+
+en: Starts when you sign in - your choice
+tr: Starter når du logger på - ditt valg
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Nye installasjoner starter som standard ved pålogging. Du kan fjerne merket før du installerer, eller slå det av senere i Innstillinger. Eksisterende oppstartsvalg og deaktiveringer i Oppgavebehandling bevares.
+
+en: Installs for your account
+tr: Installeres for kontoen din
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Det kreves ingen administratorrettigheter. Innstillingene og dataene dine blir i brukerprofilen din.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Avinstallering beholder innstillingene og dataene dine med mindre du velger å fjerne dem.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Reparasjon gjenoppretter filene i denne pakken og beholder innstillingene dine. Hvis Aether Shell lot Windows-oppgavelinjen være skjult, gjenoppretter reparasjonen den.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Installasjon over en eksisterende versjon beholder innstillingene dine. En eldre pakke avvises med mindre du uttrykkelig tillater en nedgradering.
+
+en: MIT License
+tr: MIT-lisens
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Lisensen installeres også som LICENSE ved siden av Aether Shell.
+
+en: Remove this installation
+tr: Fjern denne installasjonen
+
+en: Install location
+tr: Installasjonsplassering
+
+en: &Browse...
+tr: &Bla gjennom...
+
+en: Also remove my settings, cache and logs
+tr: Fjern også innstillingene, hurtigbufferen og loggene mine
+
+en: This cannot be undone.
+tr: Dette kan ikke angres.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Installasjonsprogrammet lukker Aether Shell på en ryddig måte og fjerner de installerte filene, snarveiene, oppstartsoppføringen og registreringen i Installerte apper. Andre programmer og Windows-innstillinger berøres ikke.
+
+en: Your welcome
+tr: Din velkomst
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Etter at du logger på eller låser opp PC-en, skriver Aether Shell en kort hilsen for hånd. Skriv inn navnet den skal hilse deg med, eller la feltet stå tomt for et enkelt hei.
+
+en: Your first name
+tr: Fornavnet ditt
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: Valgfritt, for eksempel et fornavn. Det blir på denne PC-en i Aether Shell-innstillingene dine og sendes aldri noe sted. Endre det, eller slå av velkomsten, i Innstillinger > Velkomst.
+
+en: Shortcuts and startup
+tr: Snarveier og oppstart
+
+en: Create Start menu shortcuts
+tr: Opprett snarveier på Start-menyen
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell og Gjenopprett Windows-oppgavelinjen.
+
+en: Create a desktop shortcut
+tr: Opprett en snarvei på skrivebordet
+
+en: Shows your current choice.
+tr: Viser det gjeldende valget ditt.
+
+en: Recommended.
+tr: Anbefalt.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Fjern merket for å velge bort; deaktiveringer i Oppgavebehandling respekteres.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Når du installerer, godtar du oppstartsvalget ovenfor. Startprogrammet kan starte Aether Shell på nytt etter et krasj, med et begrenset antall forsøk. Avslutt og Gjenopprett Windows-oppgavelinjen er fortsatt tilgjengelige. Været er av som standard. Usignerte binærfiler kan utløse en advarsel fra Windows SmartScreen.
+
+en: Removing this installation...
+tr: Fjerner denne installasjonen...
+
+en: Repairing Aether Shell...
+tr: Reparerer Aether Shell...
+
+en: Installing Aether Shell...
+tr: Installerer Aether Shell...
+
+en: Closing Aether Shell and removing its files.
+tr: Lukker Aether Shell og fjerner filene.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Verifiserer den innebygde pakken og installerer filene. Fremdriften vises som aktivitet: installasjonsprogrammet vet ikke hvor lang tid som gjenstår.
+
+en: Please wait while the removal completes.
+tr: Vent mens fjerningen fullføres.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Avbryt er tilgjengelig til den nye versjonen er aktivert; deretter fullføres installasjonen trygt.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell ble avinstallert.
+
+en: Aether Shell is ready.
+tr: Aether Shell er klar.
+
+en: Setup was cancelled.
+tr: Installasjonen ble avbrutt.
+
+en: Setup could not complete.
+tr: Installasjonen kunne ikke fullføres.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Dataene dine ble beholdt med mindre du uttrykkelig valgte å fjerne dem.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Du kan reparere eller avinstallere det fra Windows-innstillinger > Apper > Installerte apper.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: Operasjonen ble avbrutt før aktivering. Gå tilbake til Alternativer for å prøve på nytt.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Kontroller filtilgangen og ledig diskplass, og prøv deretter på nytt. Hvis Aether Shell allerede finnes, kan Reparer gjenopprette filene. Feilkategori: {}
+
+en: Setup log
+tr: Installasjonslogg
+
+en: Launch Aether Shell
+tr: Start Aether Shell
+
+en: &Back
+tr: &Tilbake
+
+en: &Next
+tr: &Neste
+
+en: &Continue
+tr: &Fortsett
+
+en: &Uninstall
+tr: &Avinstaller
+
+en: &Repair
+tr: &Reparer
+
+en: &Install
+tr: &Installer
+
+en: &Close
+tr: &Lukk
+
+en: Step {} of {}: {}
+tr: Trinn {} av {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Velg installasjonsmappen for Aether Shell
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Velg en fullstendig mappebane, for eksempel en som begynner med en stasjonsbokstav.
+
+en: The install folder must be an absolute path.
+tr: Installasjonsmappen må være en absolutt bane.
+
+en: Setup stops at the next safe point.
+tr: Installasjonen stopper ved neste trygge punkt.
+
+en: Cancelling...
+tr: Avbryter...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Installasjonen fullfører gjeldende trinn trygt; vent litt.
+
+en: Updating Aether Shell
+tr: Oppdaterer Aether Shell
+
+en: Verifying the signed package and applying the update.
+tr: Verifiserer den signerte pakken og bruker oppdateringen.
+
+en: Update completed
+tr: Oppdateringen er fullført
+
+en: The update did not complete
+tr: Oppdateringen ble ikke fullført
+
+en: Close
+tr: Lukk
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Oppdateringsgrensesnittet kunne ikke starte. Oppdateringen er ikke brukt. Prøv på nytt, eller bruk Reparer.
+
+en: Aether Shell Update
+tr: Oppdatering av Aether Shell
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Oppdateringsgrensesnittet kunne ikke starte. Oppdateringen er ikke brukt. Prøv på nytt, eller bruk Reparer i Windows-innstillinger > Apper > Installerte apper.
+
+en: Update completed.
+tr: Oppdateringen er fullført.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Oppdateringen ble ikke fullført. Se oppdateringsloggen, eller bruk Reparer.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell kunne ikke starte. Velg Reparer i Windows-innstillinger > Apper > Installerte apper.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell-innstillinger – oppdatering pågår
+
+## shell
+
+en: &Resume taskbar replacement
+tr: &Gjenoppta erstatning av oppgavelinjen
+
+en: Show Windows &notification area for 60 seconds
+tr: Vis &varslingsområdet i Windows i 60 sekunder
+
+en: &Search…
+tr: &Søk…
+
+en: &Settings…
+tr: &Innstillinger…
+
+en: View available &update…
+tr: Vis tilgjengelig &oppdatering…
+
+en: &Check for updates…
+tr: Se etter &oppdateringer…
+
+en: &About Aether Shell
+tr: &Om Aether Shell
+
+en: &Quit Aether Shell
+tr: &Avslutt Aether Shell
+
+en: Switch &input language\tWin+Space
+tr: Bytt &inndataspråk\tWin+Mellomrom
+
+en: Open &network controls…
+tr: Åpne &nettverkskontroller…
+
+en: &Weather settings…
+tr: &Værinnstillinger…
+
+en: Toggle output &mute
+tr: Slå &lyd av/på for utgang
+
+en: &Sound settings…
+tr: L&ydinnstillinger…
+
+en: Toggle microphone &mute
+tr: Slå &mikrofon av/på
+
+en: Start Windows &voice typing\tWin+H
+tr: Start &taleskriving i Windows\tWin+H
+
+en: Microphone &privacy settings…
+tr: Personverninnstillinger for &mikrofon…
+
+en: &Power settings…
+tr: &Strøminnstillinger…
+
+en: Open &notifications and calendar
+tr: Åpne &varsler og kalender
+
+en: Open &calendar\tWin+Alt+D
+tr: Åpne &kalender\tWin+Alt+D
+
+en: Show &hidden icons
+tr: Vis &skjulte ikoner
+
+en: Initializing
+tr: Initialiserer
+
+en: Unavailable
+tr: Ikke tilgjengelig
+
+en: Unsupported
+tr: Støttes ikke
+
+en: Error
+tr: Feil
+
+en: Available
+tr: Tilgjengelig
+
+en: Unknown
+tr: Ukjent
+
+en: Internet access
+tr: Internett-tilgang
+
+en: Local network only
+tr: Bare lokalt nettverk
+
+en: Limited Internet access
+tr: Begrenset Internett-tilgang
+
+en: No network connection
+tr: Ingen nettverkstilkobling
+
+en: Connectivity unknown
+tr: Tilkobling ukjent
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Mobilnettverk
+
+en: Network
+tr: Nettverk
+
+en: Offline
+tr: Frakoblet
+
+en: Network status unavailable
+tr: Nettverksstatus er ikke tilgjengelig
+
+en: Quick controls
+tr: Hurtigkontroller
+
+en: Aether Shell menu
+tr: Aether Shell-meny
+
+en: Weather status unavailable
+tr: Værstatus er ikke tilgjengelig
+
+en: Cached weather
+tr: Bufret vær
+
+en: Observation (UTC): {}
+tr: Observasjon (UTC): {}
+
+en: Weather: {}
+tr: Vær: {}
+
+en: Click to open weather settings
+tr: Klikk for å åpne værinnstillingene
+
+en: Show hidden icons
+tr: Vis skjulte ikoner
+
+en: Opens Windows' notification-area overflow
+tr: Åpner overflyten i varslingsområdet i Windows
+
+en: Input language: {}
+tr: Inndataspråk: {}
+
+en: Fallback input layout
+tr: Reserveoppsett for inndata
+
+en: Click to switch input language (Win+Space)
+tr: Klikk for å bytte inndataspråk (Win+Mellomrom)
+
+en: Network: {}
+tr: Nettverk: {}
+
+en: Signal strength unavailable
+tr: Signalstyrke er ikke tilgjengelig
+
+en: Click to open Windows network settings
+tr: Klikk for å åpne nettverksinnstillingene i Windows
+
+en: Audio output
+tr: Lydutgang
+
+en: Audio: {}
+tr: Lyd: {}
+
+en: volume unknown
+tr: volum ukjent
+
+en: Muted
+tr: Lyd av
+
+en: Sound on
+tr: Lyd på
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Enhetens lyd er på
+
+en: Recording detection unsupported
+tr: Registrering av opptak støttes ikke
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Klikk for å slå lyd av/på; høyreklikk for taleskriving i Windows og personverninnstillinger for mikrofon
+
+en: Battery: {}
+tr: Batteri: {}
+
+en: Battery {}
+tr: Batteri {}
+
+en: Battery status unavailable
+tr: Batteristatus er ikke tilgjengelig
+
+en: Charging
+tr: Lader
+
+en: External power
+tr: Ekstern strøm
+
+en: Estimated remaining: {} h {} min
+tr: Beregnet gjenværende tid: {} t {} min
+
+en: Click to open power settings
+tr: Klikk for å åpne strøminnstillingene
+
+en: Clock status unavailable
+tr: Klokkestatus er ikke tilgjengelig
+
+en: Click to open calendar and notifications
+tr: Klikk for å åpne kalender og varsler
+
+en: Action failed: {}
+tr: Handlingen mislyktes: {}
+
+en: Aether Shell status bar
+tr: Aether Shell-statuslinje
+
+en: Update available
+tr: Oppdatering tilgjengelig
+
+en: Cached
+tr: Bufret
+
+en: Start
+tr: Start
+
+en: Search
+tr: Søk
+
+en: Task View
+tr: Oppgavevisning
+
+en: Application
+tr: Program
+
+en: Running application
+tr: Kjørende program
+
+en: More applications
+tr: Flere programmer
+
+en: Aether Shell window previews
+tr: Forhåndsvisninger av vinduer i Aether Shell
+
+en: Minimized — preview unavailable
+tr: Minimert – forhåndsvisning ikke tilgjengelig
+
+en: Preview unavailable
+tr: Forhåndsvisning ikke tilgjengelig
+
+en: {} windows
+tr: {} vinduer
+
+en: {} window
+tr: {} vindu
+
+en: Switches to this window
+tr: Bytter til dette vinduet
+
+en: Minimized, preview unavailable
+tr: Minimert, forhåndsvisning ikke tilgjengelig
+
+en: Minimized
+tr: Minimert
+
+en: Close {}
+tr: Lukk {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Ber dette vinduet om å lukkes; programmet kan fortsatt be om å lagre eller avbryte
+
+en: Close requested
+tr: Lukking forespurt
+
+en: Previous applications
+tr: Forrige programmer
+
+en: Open
+tr: Åpne
+
+en: New instance
+tr: Ny forekomst
+
+en: Unpin from Dock
+tr: Løsne fra Dock
+
+en: Pin to Dock
+tr: Fest til Dock
+
+en: Move left
+tr: Flytt til venstre
+
+en: Move right
+tr: Flytt til høyre
+
+en: Dock settings...
+tr: Dock-innstillinger...
+
+en: Import Windows taskbar pins
+tr: Importer festede elementer fra Windows-oppgavelinjen
+
+en: Open Windows Start
+tr: Åpne Start i Windows
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Festet
+
+en: Running
+tr: Kjører
+
+en: Needs attention
+tr: Krever oppmerksomhet
+
+en: Up arrow shows window previews
+tr: Pil opp viser forhåndsvisninger av vinduer
+
+en: Installed application
+tr: Installert program
+
+en: Desktop application
+tr: Skrivebordsprogram
+
+en: File
+tr: Fil
+
+en: Folder
+tr: Mappe
+
+en: Windows tool
+tr: Windows-verktøy
+
+en: Control Panel
+tr: Kontrollpanel
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Naviger   ·   Enter Åpne   ·   Esc Lukk
+
+en: Search apps, settings and files
+tr: Søk etter apper, innstillinger og filer
+
+en: Search could not be completed.
+tr: Søket kunne ikke fullføres.
+
+en: Results
+tr: Resultater
+
+en: Indexing applications…
+tr: Indekserer programmer…
+
+en: Type to search apps, settings and files
+tr: Skriv for å søke etter apper, innstillinger og filer
+
+en: Nothing matches
+tr: Ingen treff
+
+en: Windows could not open this application.
+tr: Windows kunne ikke åpne dette programmet.
+
+en: Menu
+tr: Meny
+
+en: Opens a submenu
+tr: Åpner en undermeny
+
+en: , opens a submenu
+tr: , åpner en undermeny
+
+en: Selected
+tr: Valgt
+
+en: Checked
+tr: Avmerket
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Flymodus
+
+en: Accessibility
+tr: Tilgjengelighet
+
+en: Energy saver
+tr: Strømsparing
+
+en: Live captions
+tr: Direkteteksting
+
+en: Night light
+tr: Nattlys
+
+en: Mobile hotspot
+tr: Mobilt tilgangspunkt
+
+en: Nearby sharing
+tr: Deling i nærheten
+
+en: Cast
+tr: Cast
+
+en: Project
+tr: Prosjekter
+
+en: All settings
+tr: Alle innstillinger
+
+en: Connected
+tr: Tilkoblet
+
+en: Not connected
+tr: Ikke tilkoblet
+
+en: , on
+tr: , på
+
+en: , off
+tr: , av
+
+en: , state unknown
+tr: , ukjent tilstand
+
+en: , opens Windows Settings
+tr: , åpner Windows-innstillinger
+
+en: , shows accessibility features
+tr: , viser tilgjengelighetsfunksjoner
+
+en: , requires Windows 11 version 22H2
+tr: , krever Windows 11 versjon 22H2
+
+en: Now playing: {}
+tr: Spilles nå: {}
+
+en: Untitled media
+tr: Medier uten tittel
+
+en: , switch source
+tr: , bytt kilde
+
+en: Previous media item
+tr: Forrige medieelement
+
+en: Pause
+tr: Pause
+
+en: Play
+tr: Spill av
+
+en: Next media item
+tr: Neste medieelement
+
+en: {} details
+tr: Detaljer om {}
+
+en: Page {} of {}
+tr: Side {} av {}
+
+en: Next page
+tr: Neste side
+
+en: First page
+tr: Første side
+
+en: Brightness
+tr: Lysstyrke
+
+en: Brightness, unavailable on this display
+tr: Lysstyrke, ikke tilgjengelig på denne skjermen
+
+en: Volume
+tr: Volum
+
+en: Volume, unavailable
+tr: Volum, ikke tilgjengelig
+
+en: Unmute
+tr: Slå på lyd
+
+en: Mute
+tr: Demp
+
+en: Sound output and volume mixer
+tr: Lydutgang og volummikser
+
+en: Back
+tr: Tilbake
+
+en: , secured
+tr: , sikret
+
+en: , open
+tr: , åpent
+
+en: , connected
+tr: , tilkoblet
+
+en: Disconnect
+tr: Koble fra
+
+en: Show available networks
+tr: Vis tilgjengelige nettverk
+
+en: More Wi-Fi settings
+tr: Flere Wi-Fi-innstillinger
+
+en: Bluetooth and devices settings
+tr: Innstillinger for Bluetooth og enheter
+
+en: Magnifier
+tr: Forstørrelsesglass
+
+en: Narrator
+tr: Skjermleser
+
+en: On-screen keyboard
+tr: Skjermtastatur
+
+en: Sticky keys
+tr: Trege taster
+
+en: More accessibility settings
+tr: Flere tilgjengelighetsinnstillinger
+
+en: Volume mixer
+tr: Volummikser
+
+en: Choose output in Sound settings
+tr: Velg utgang i Lydinnstillinger
+
+en: Power and battery settings
+tr: Innstillinger for strøm og batteri
+
+en: Battery {} percent, {}
+tr: Batteri {} prosent, {}
+
+en: All Windows settings
+tr: Alle Windows-innstillinger
+
+en: The requested action could not be dispatched
+tr: Den forespurte handlingen kunne ikke sendes
+
+en: Aether Shell quick controls
+tr: Hurtigkontroller i Aether Shell
+
+en: Media session active
+tr: Medieøkt aktiv
+
+en: No media session
+tr: Ingen medieøkt
+
+en: Current page
+tr: Gjeldende side
+
+en:  - secured
+tr:  - sikret
+
+en:  - open
+tr:  - åpent
+
+en:  - opens in Windows
+tr:  - åpnes i Windows
+
+en: Turned off by hardware or policy
+tr: Slått av av maskinvare eller policy
+
+en: State unavailable - use Windows settings
+tr: Tilstand ikke tilgjengelig - bruk Windows-innstillinger
+
+en: Off
+tr: Av
+
+en:  - signal {} of 5
+tr:  - signal {} av 5
+
+en: , no internet
+tr: , ingen Internett
+
+en: On - not connected
+tr: På - ikke tilkoblet
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows lar ikke apper vise nettverk: kontroller Plassering i personverninnstillingene
+
+en: No Wi-Fi adapter found
+tr: Fant ingen Wi-Fi-adapter
+
+en: Connecting to {}...
+tr: Kobler til {}...
+
+en:  - looking for networks
+tr:  - søker etter nettverk
+
+en: On
+tr: På
+
+en: A screen reader is running
+tr: En skjermleser kjører
+
+en: Windows accessibility features
+tr: Tilgjengelighetsfunksjoner i Windows
+
+en: Sound output
+tr: Lydutgang
+
+en: Default output device
+tr: Standard utgangsenhet
+
+en: No output device available
+tr: Ingen utgangsenhet tilgjengelig
+
+en: Battery unknown
+tr: Batteri ukjent
+
+en: Status refresh could not be started
+tr: Statusoppdateringen kunne ikke startes
+
+en: Status refresh unavailable
+tr: Statusoppdatering ikke tilgjengelig
+
+en: Excellent signal
+tr: Utmerket signal
+
+en: Good signal
+tr: Godt signal
+
+en: Fair signal
+tr: Middels signal
+
+en: Weak signal
+tr: Svakt signal
+
+en: Clear sky
+tr: Klar himmel
+
+en: Mainly clear
+tr: Stort sett klart
+
+en: Partly cloudy
+tr: Delvis skyet
+
+en: Overcast
+tr: Overskyet
+
+en: Fog
+tr: Tåke
+
+en: Drizzle
+tr: Yr
+
+en: Rain
+tr: Regn
+
+en: Snow
+tr: Snø
+
+en: Rain showers
+tr: Regnbyger
+
+en: Snow showers
+tr: Snøbyger
+
+en: Thunderstorm
+tr: Tordenvær
+
+## weather
+
+en: Morning
+tr: Morgen
+
+en: Afternoon
+tr: Ettermiddag
+
+en: Evening
+tr: Kveld
+
+en: Night
+tr: Natt
+
+en: Now
+tr: Nå
+
+en: Today
+tr: I dag
+
+en: Low
+tr: Lav
+
+en: Moderate
+tr: Moderat
+
+en: High
+tr: Høy
+
+en: Very high
+tr: Svært høy
+
+en: Extreme
+tr: Ekstrem
+
+en: No connection to the weather service.
+tr: Ingen tilkobling til værtjenesten.
+
+en: The weather service is busy. Try again in a moment.
+tr: Værtjenesten er opptatt. Prøv igjen om et øyeblikk.
+
+en: The weather could not be loaded.
+tr: Været kunne ikke lastes inn.
+
+en: Could not update; showing the last forecast.
+tr: Kunne ikke oppdatere; viser den siste værmeldingen.
+
+en: Try again
+tr: Prøv på nytt
+
+en: Your location
+tr: Plasseringen din
+
+en: My location
+tr: Min plassering
+
+en: Precise location
+tr: Nøyaktig plassering
+
+en: Approximate location
+tr: Omtrentlig plassering
+
+en: Chosen in Settings
+tr: Valgt i Innstillinger
+
+en: Allow
+tr: Tillat
+
+en: Use precise location
+tr: Bruk nøyaktig plassering
+
+en: See the weather where you are: allow your precise location.
+tr: Se været der du er: tillat nøyaktig plassering.
+
+en: Your position is approximate (about 10 km).
+tr: Posisjonen din er omtrentlig (omtrent 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Plassering er slått av for denne appen i Windows.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Denne enheten kan ikke rapportere plasseringen sin. Søk etter en by i stedet.
+
+en: Reading Windows location…
+tr: Leser Windows-plassering…
+
+en: Automatic weather follows your Windows location.
+tr: Automatisk vær følger Windows-plasseringen din.
+
+en: Search for a city
+tr: Søk etter en by
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Søk etter en by, eller tillat plasseringen din, for å se været.
+
+en: Searching…
+tr: Søker…
+
+en: City search is unavailable.
+tr: Bysøk er ikke tilgjengelig.
+
+en: No city found.
+tr: Fant ingen by.
+
+en: Weather settings
+tr: Værinnstillinger
+
+en: Loading the weather…
+tr: Laster inn været…
+
+en: Loading…
+tr: Laster inn…
+
+en: Updated {}
+tr: Oppdatert {}
+
+en: Near {}
+tr: Nær {}
+
+en: Temperatures now
+tr: Temperaturer nå
+
+en: The map is unavailable.
+tr: Kartet er ikke tilgjengelig.
+
+en: Map: Natural Earth
+tr: Kart: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Værdata fra Open-Meteo.com
+
+en: Feels like
+tr: Føles som
+
+en: Feels like {}
+tr: Føles som {}
+
+en: Close to the real temperature
+tr: Nær den faktiske temperaturen
+
+en: The wind makes it feel colder
+tr: Vinden gjør at det føles kaldere
+
+en: Humidity makes it feel warmer
+tr: Luftfuktigheten gjør at det føles varmere
+
+en: Humidity
+tr: Luftfuktighet
+
+en: Cloud cover {}
+tr: Skydekke {}
+
+en: Wind
+tr: Vind
+
+en: Gusts {}
+tr: Vindkast {}
+
+en: Sunrise and sunset
+tr: Soloppgang og solnedgang
+
+en: UV index
+tr: UV-indeks
+
+en: Pressure
+tr: Lufttrykk
+
+en: At sea level
+tr: Ved havnivå
+
+en: &Open the weather
+tr: &Åpne været
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Værmeldingen for der du er, med omtrent 100 m nøyaktighet og egen høyde. Av: avrundet til omtrent 10 km.

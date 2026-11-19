@@ -10,6 +10,7 @@
 #include "settings/StartupRegistration.h"
 #include "applications/ApplicationTypes.h"
 #include "core/Dispatcher.h"
+#include "core/Localization.h"
 #include "core/Signal.h"
 #include "graphics/Animation.h"
 #include "graphics/Theme.h"
@@ -25,6 +26,7 @@
 
 namespace aether::graphics {
 class FrameScheduler;
+class GraphicsDevice;
 }
 
 namespace aether::settings::ui {
@@ -33,6 +35,9 @@ enum class SettingsPage { Dock, TopBar, Weather, Updates, General, About, Deskto
 
 // Tone of a footer status message (drawn as a status badge; high contrast keeps the text alone).
 enum class StatusTone { Neutral, Info, Success, Warning, Error, Busy };
+
+// D83: a language's pack on this PC. English is built in (Installed).
+enum class LanguagePackState : std::uint8_t { Missing, Downloading, Installed, Failed };
 
 // What a reset (or another destructive Settings action) asks before it runs.
 struct SettingsConfirmation {
@@ -59,11 +64,18 @@ struct SettingsCallbacks {
     std::function<std::wstring()> weatherLocationStatus;
     // Optional display-refresh pacing for hover/page/indicator motion; null uses a short timer.
     graphics::FrameScheduler* scheduler = nullptr;
+    // D84: the device Liquid's smart transparency composes with; null keeps the window's ordinary glass.
+    graphics::GraphicsDevice* graphics = nullptr;
     // Confirmation seam: returns true to proceed. Null shows the shared glass confirmation dialog.
     std::function<bool(const SettingsConfirmation&)> confirm;
     // D63: a frame of the arrival in a style (true: Liquid) `seconds` in, `width` x `height` pixels, as top-down
     // premultiplied BGRA, for the Appearance page's two animated previews. Null, or false, shows none.
     std::function<bool(bool liquid, float seconds, UINT width, UINT height, std::vector<std::uint8_t>& bgra)> stylePreview;
+    // D83: where each language's pack is, and a download of one from the version's GitHub release (a retry after a
+    // failure too). The application calls RefreshLanguages when a state changes. Null: every pack reads as missing
+    // and nothing is downloaded.
+    std::function<LanguagePackState(i18n::Language)> languageState;
+    std::function<void(i18n::Language)> downloadLanguage;
 };
 
 class SettingsWindow {
@@ -94,6 +106,8 @@ public:
     void SetTheme(const graphics::DesignTokens& tokens, const graphics::MotionPolicy& motion);
     // D70: shows every text in the current interface language (i18n::CurrentLanguage), rebuilding the open page.
     void Relocalize();
+    // D83: the Language page again after a pack's download started, ended or failed (nothing when it is not open).
+    void RefreshLanguages();
 
     // The scrolling content region (pixels), for tests and diagnostics.
     struct ContentScroll {

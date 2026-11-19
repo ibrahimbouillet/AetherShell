@@ -258,7 +258,7 @@ void PaintFocusRingWithin(ID2D1DeviceContext* context, const D2D1_RECT_F& rect, 
 }
 
 void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const DesignTokens& tokens, FormMaterial material,
-                     const D2D1_RECT_F* body, bool framed) {
+                     const D2D1_RECT_F* body, bool framed, bool smart) {
     if (!context || !Usable(area) || material == FormMaterial::Native) return;
     // D81: what belongs to the window - Liquid's sheen and rim of light, a maximized window's rounded body - is placed
     // on the whole client, whichever part of it this call repaints. Each child window and each invalidated rectangle
@@ -288,6 +288,13 @@ void PaintBackground(ID2D1DeviceContext* context, const D2D1_RECT_F& area, const
         style.noise = tokens.transparencyEnabled && !liquid;
     }
     const float pixel = PixelOf(context);
+    if (smart && liquid && material == FormMaterial::Acrylic && !framed) {
+        // D84: the blur lies in the window below, where the content needs it; the client stays clear and keeps
+        // Liquid's light: its sheen and the rim that outlines the window.
+        FillLiquidSheen(context, whole, kWindowFrameRadius, light);
+        StrokeLiquidRim(context, whole, kWindowFrameRadius, light, pixel, 0.8f);
+        return;
+    }
     if (!framed) {
         // DWM rounds and borders a normal window: the material fills what is repainted, the light follows the window.
         graphics::PaintGlassPanel(context, area, materialTokens, style);

@@ -815,7 +815,9 @@ struct WeatherWindow::Impl final : aether::ui::accessibility::IAccessibleSurface
         searchCancel = CancellationSource{};
         const auto token = searchCancel.Token();
         const auto ticket = ++searchGeneration;
-        const std::string_view code = i18n::Info(i18n::CurrentLanguage()).code;
+        // The geocoder takes a language's primary subtag ("pt", not "pt-BR"; "zh", not "zh-Hans").
+        std::string_view code = i18n::Info(i18n::CurrentLanguage()).code;
+        code = code.substr(0, code.find('-'));
         const std::wstring language(code.begin(), code.end());
         auto* ui = &context.dispatcher;
         const auto weak = std::weak_ptr<bool>(alive);

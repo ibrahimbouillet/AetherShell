@@ -1,0 +1,2494 @@
+# Turkish (tr): Türkçe. The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+
+## app
+
+en: Choose Windows location to enable automatic weather.
+tr: Otomatik hava durumunu etkinleştirmek için Windows konumunu seçin.
+
+en: Windows taskbar visible
+tr: Windows görev çubuğu görünür
+
+en: Connected to {}
+tr: Bağlandı: {}
+
+en: {} is out of range
+tr: {} kapsama alanı dışında
+
+en: Connecting to {} took too long
+tr: {} ile bağlantı kurmak çok uzun sürdü
+
+en: Use Windows to join {}
+tr: {} ağına katılmak için Windows'u kullanın
+
+en: Windows did not allow this connection
+tr: Windows bu bağlantıya izin vermedi
+
+en: Could not connect to {}
+tr: Bağlanılamadı: {}
+
+en: Connect to {}
+tr: Bağlan: {}
+
+en: That password was not accepted. Check it and try again.
+tr: Bu parola kabul edilmedi. Parolayı kontrol edip yeniden deneyin.
+
+en: Enter this network's password.
+tr: Bu ağın parolasını girin.
+
+en: &Connect
+tr: &Bağlan
+
+en: Windows Settings could not be opened
+tr: Windows Ayarları açılamadı
+
+en: Dock space could not be reserved; restoring Windows taskbar
+tr: Dock için alan ayrılamadı; Windows görev çubuğu geri yükleniyor
+
+en: Replacement unavailable: recovery observer could not start
+tr: Değiştirme kullanılamıyor: kurtarma gözlemcisi başlatılamadı
+
+en: Windows taskbar restored. Dock space could not be reserved; turn replacement off and on to retry.
+tr: Windows görev çubuğu geri yüklendi. Dock için alan ayrılamadı; yeniden denemek için değiştirmeyi kapatıp yeniden açın.
+
+en: Recovery observation is unavailable; restoring Windows taskbar
+tr: Kurtarma gözlemi kullanılamıyor; Windows görev çubuğu geri yükleniyor
+
+en: Windows notifications could not be opened
+tr: Windows bildirimleri açılamadı
+
+en: The Windows calendar could not be opened
+tr: Windows takvimi açılamadı
+
+en: Windows did not show its hidden icons
+tr: Windows gizli simgelerini göstermedi
+
+en: Automatic location refresh is unavailable; retry in Weather settings.
+tr: Otomatik konum yenileme kullanılamıyor; Hava durumu ayarlarından yeniden deneyin.
+
+en: Windows location
+tr: Windows konumu
+
+en: Reading approximate Windows location…
+tr: Yaklaşık Windows konumu okunuyor…
+
+en: Automatic weather follows approximate Windows location.
+tr: Otomatik hava durumu yaklaşık Windows konumunu izler.
+
+en: Windows location access is blocked. Weather is unavailable.
+tr: Windows konum erişimi engellendi. Hava durumu kullanılamıyor.
+
+en: Windows could not provide a current location. Weather is unavailable.
+tr: Windows geçerli bir konum sağlayamadı. Hava durumu kullanılamıyor.
+
+en: Location worker unavailable. Weather is unavailable.
+tr: Konum hizmeti kullanılamıyor. Hava durumu kullanılamıyor.
+
+en: Waiting for Windows location permission…
+tr: Windows konum izni bekleniyor…
+
+en: The automatic weather choice could not be saved.
+tr: Otomatik hava durumu seçimi kaydedilemedi.
+
+en: Windows location access is unavailable or was denied. Weather is unavailable.
+tr: Windows konum erişimi kullanılamıyor veya reddedildi. Hava durumu kullanılamıyor.
+
+en: Windows location could not request permission. Review Windows location settings.
+tr: Windows konumu izin isteyemedi. Windows konum ayarlarını gözden geçirin.
+
+en: Status worker unavailable
+tr: Durum hizmeti kullanılamıyor
+
+en: Windows could not complete this action. Review its settings.
+tr: Windows bu eylemi tamamlayamadı. İlgili ayarları gözden geçirin.
+
+en: Reading Windows status; try the action again shortly
+tr: Windows durumu okunuyor; eylemi birazdan yeniden deneyin
+
+en: Could not disconnect
+tr: Bağlantı kesilemedi
+
+en: The Windows accessibility feature could not be started
+tr: Windows erişilebilirlik özelliği başlatılamadı
+
+en: Windows could not change the audio output
+tr: Windows ses çıkışını değiştiremedi
+
+en: The Windows control could not be opened
+tr: Windows denetimi açılamadı
+
+en: Keyboard shortcuts disabled
+tr: Klavye kısayolları devre dışı
+
+en: Both keyboard shortcuts registered
+tr: Her iki klavye kısayolu da kaydedildi
+
+en: A keyboard shortcut is already in use by another application
+tr: Bir klavye kısayolu başka bir uygulama tarafından zaten kullanılıyor
+
+en: Windows Quick Settings could not be requested. Clear 'Use Windows Quick Settings' in Top Bar settings to use Aether controls.
+tr: Windows Hızlı Ayarlar istenemedi. Aether denetimlerini kullanmak için Üst Çubuk ayarlarında 'Windows Hızlı Ayarlar'ı kullan' seçeneğini temizleyin.
+
+en: Windows Start could not be opened
+tr: Windows Başlat açılamadı
+
+en: Windows Task View could not be opened
+tr: Windows Görev Görünümü açılamadı
+
+en: Windows keyboard layout switching was unavailable
+tr: Windows klavye düzeni değiştirme kullanılamadı
+
+en: Windows voice typing could not be opened
+tr: Windows sesle yazma açılamadı
+
+en: Windows taskbar could not be revealed
+tr: Windows görev çubuğu gösterilemedi
+
+en: Taskbar replacement could not resume; Windows remains available
+tr: Görev çubuğu değiştirme sürdürülemedi; Windows kullanılabilir durumda kalıyor
+
+en: Windows taskbar replacement is unavailable in this session
+tr: Windows görev çubuğu değiştirme bu oturumda kullanılamıyor
+
+en: Windows pin access is unavailable in this isolated session
+tr: Windows sabitlemelerine erişim bu yalıtılmış oturumda kullanılamıyor
+
+en: Windows pinned applications could not be read
+tr: Windows'a sabitlenmiş uygulamalar okunamadı
+
+en: Settings changed during pin import. Try import again.
+tr: Sabitlemeler içeri aktarılırken ayarlar değişti. İçeri aktarmayı yeniden deneyin.
+
+en: Saved {} additional pinned applications. Some Windows pins may remain unavailable.
+tr: {} ek sabitlenmiş uygulama kaydedildi. Bazı Windows sabitlemeleri kullanılamıyor olabilir.
+
+en: Pins changed in memory; saving failed. Apply in Settings to retry.
+tr: Sabitlemeler bellekte değişti; kaydetme başarısız oldu. Yeniden denemek için Ayarlar'da Uygula'yı seçin.
+
+en: Pins updated in memory; saving...
+tr: Sabitlemeler bellekte güncellendi; kaydediliyor...
+
+en: Imported pins could not be applied
+tr: İçeri aktarılan sabitlemeler uygulanamadı
+
+en: Pin import is unavailable while closing
+tr: Kapatılırken sabitlemeler içeri aktarılamaz
+
+en: Settings could not be saved
+tr: Ayarlar kaydedilemedi
+
+en: Quit without saving the latest changes?
+tr: Son değişiklikler kaydedilmeden çıkılsın mı?
+
+en: Your previous settings file is kept. Keep Aether Shell open to try saving again.
+tr: Önceki ayarlar dosyanız korunuyor. Kaydetmeyi yeniden denemek için Aether Shell'i açık tutun.
+
+en: &Quit without saving
+tr: &Kaydetmeden çık
+
+en: &Keep Aether Shell open
+tr: Aether Shell'i &açık tut
+
+en: Export basic diagnostics — app version and Windows build, no logs or personal data
+tr: Temel tanılama verilerini dışarı aktar — uygulama sürümü ve Windows derlemesi; günlük veya kişisel veri yok
+
+en: Diagnostics exported.
+tr: Tanılama verileri dışarı aktarıldı.
+
+en: Diagnostics could not be saved to the chosen file.
+tr: Tanılama verileri seçilen dosyaya kaydedilemedi.
+
+en: Settings could not be read safely. The existing file was preserved.
+tr: Ayarlar güvenli bir şekilde okunamadı. Mevcut dosya korundu.
+
+en: Aether Shell could not start its desktop surfaces.
+tr: Aether Shell masaüstü yüzeylerini başlatamadı.
+
+en: Windows taskbar restoration is pending. Retry or close Aether Shell.
+tr: Windows görev çubuğunun geri yüklenmesi bekliyor. Yeniden deneyin veya Aether Shell'i kapatın.
+
+en: The Windows taskbar is shown temporarily.
+tr: Windows görev çubuğu geçici olarak gösteriliyor.
+
+en: Windows taskbar restored.
+tr: Windows görev çubuğu geri yüklendi.
+
+en: Windows taskbar replacement is active.
+tr: Windows görev çubuğu değiştirme etkin.
+
+en: Windows taskbar remains available. Replacement will retry shortly.
+tr: Windows görev çubuğu kullanılabilir durumda kalıyor. Değiştirme birazdan yeniden denenecek.
+
+en: Windows taskbar remains available. Turn replacement off and on to retry.
+tr: Windows görev çubuğu kullanılabilir durumda kalıyor. Yeniden denemek için değiştirmeyi kapatıp yeniden açın.
+
+en: Windows taskbar restored. Replacement will reconnect shortly.
+tr: Windows görev çubuğu geri yüklendi. Değiştirme birazdan yeniden bağlanacak.
+
+en: Windows taskbar restored. Turn replacement off and on to retry.
+tr: Windows görev çubuğu geri yüklendi. Yeniden denemek için değiştirmeyi kapatıp yeniden açın.
+
+en: Taskbar replacement stopped. Windows taskbar restored.
+tr: Görev çubuğu değiştirme durduruldu. Windows görev çubuğu geri yüklendi.
+
+en: Taskbar replacement stopped. Windows taskbar restoration could not be confirmed.
+tr: Görev çubuğu değiştirme durduruldu. Windows görev çubuğunun geri yüklendiği doğrulanamadı.
+
+en: Activating taskbar replacement...
+tr: Görev çubuğu değiştirme etkinleştiriliyor...
+
+en: Restoring Windows taskbar...
+tr: Windows görev çubuğu geri yükleniyor...
+
+en: Reconnecting taskbar replacement...
+tr: Görev çubuğu değiştirme yeniden bağlanıyor...
+
+en: Showing the Windows taskbar temporarily...
+tr: Windows görev çubuğu geçici olarak gösteriliyor...
+
+en: Aether Shell could not restore the Windows taskbar.
+tr: Aether Shell, Windows görev çubuğunu geri yükleyemedi.
+
+en: Restart Windows Explorer from Task Manager (Ctrl+Shift+Esc), or sign out and sign in again.
+tr: Windows Gezgini'ni Görev Yöneticisi'nden (Ctrl+Shift+Esc) yeniden başlatın veya oturumu kapatıp yeniden açın.
+
+en: The Windows taskbar was restored to its saved state.
+tr: Windows görev çubuğu kaydedilmiş durumuna geri yüklendi.
+
+en: No saved taskbar state was found. The Windows taskbar was made visible; its auto-hide setting was not changed.
+tr: Kaydedilmiş görev çubuğu durumu bulunamadı. Windows görev çubuğu görünür hale getirildi; otomatik gizleme ayarı değiştirilmedi.
+
+en: There was nothing to restore.
+tr: Geri yüklenecek bir şey yoktu.
+
+en: Taskbar replacement is turned off.
+tr: Görev çubuğu değiştirme kapalı.
+
+en: Taskbar replacement could not be turned off automatically. Turn it off in Aether Shell Settings > Desktop.
+tr: Görev çubuğu değiştirme otomatik olarak kapatılamadı. Aether Shell Ayarları > Masaüstü bölümünden kapatın.
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Tanınmayan veya geçersiz Aether Shell komut satırı.
+
+en: Aether Shell could not create its local data folders.
+tr: Aether Shell yerel veri klasörlerini oluşturamadı.
+
+en: Aether Shell stopped after an unexpected error.
+tr: Aether Shell beklenmeyen bir hatadan sonra durdu.
+
+## search-names
+
+en: Disk Management
+tr: Disk Yönetimi
+
+en: Local Users and Groups
+tr: Yerel Kullanıcılar ve Gruplar
+
+en: Local Group Policy Editor
+tr: Yerel Grup İlkesi Düzenleyicisi
+
+en: Manage User Certificates
+tr: Kullanıcı sertifikalarını yönet
+
+en: Manage Computer Certificates
+tr: Bilgisayar sertifikalarını yönet
+
+en: Shared Folders
+tr: Paylaşılan Klasörler
+
+en: TPM Management
+tr: TPM Yönetimi
+
+en: Network Connections
+tr: Ağ Bağlantıları
+
+en: System Properties
+tr: Sistem Özellikleri
+
+en: About Windows
+tr: Windows Hakkında
+
+en: DirectX Diagnostic Tool
+tr: DirectX Tanılama Aracı
+
+en: Windows Features
+tr: Windows Özellikleri
+
+en: System Restore
+tr: Sistem Geri Yükleme
+
+en: Advanced System Settings
+tr: Gelişmiş sistem ayarları
+
+en: Volume Mixer
+tr: Ses Karıştırıcısı
+
+en: Microsoft Management Console
+tr: Microsoft Yönetim Konsolu
+
+en: User Accounts (Advanced)
+tr: Kullanıcı Hesapları (Gelişmiş)
+
+en: Display settings
+tr: Ekran ayarları
+
+en: Night light settings
+tr: Gece ışığı ayarları
+
+en: Graphics settings
+tr: Grafik ayarları
+
+en: Sound settings
+tr: Ses ayarları
+
+en: Notification settings
+tr: Bildirim ayarları
+
+en: Power & battery settings
+tr: Güç ve pil ayarları
+
+en: Energy saver settings
+tr: Enerji tasarrufu ayarları
+
+en: Storage settings
+tr: Depolama ayarları
+
+en: Multitasking settings
+tr: Çoklu görev ayarları
+
+en: Clipboard settings
+tr: Pano ayarları
+
+en: Remote Desktop settings
+tr: Uzak Masaüstü ayarları
+
+en: About your PC
+tr: Bilgisayarınız hakkında
+
+en: Bluetooth & devices settings
+tr: Bluetooth ve cihazlar ayarları
+
+en: Printers & scanners settings
+tr: Yazıcılar ve tarayıcılar ayarları
+
+en: Mouse settings
+tr: Fare ayarları
+
+en: Touchpad settings
+tr: Dokunmatik yüzey ayarları
+
+en: Network & internet settings
+tr: Ağ ve internet ayarları
+
+en: Wi-Fi settings
+tr: Wi-Fi ayarları
+
+en: VPN settings
+tr: VPN ayarları
+
+en: Proxy settings
+tr: Ara sunucu ayarları
+
+en: Airplane mode settings
+tr: Uçak modu ayarları
+
+en: Mobile hotspot settings
+tr: Mobil etkin nokta ayarları
+
+en: Background settings
+tr: Arka plan ayarları
+
+en: Color settings
+tr: Renk ayarları
+
+en: Theme settings
+tr: Tema ayarları
+
+en: Lock screen settings
+tr: Kilit ekranı ayarları
+
+en: Taskbar settings
+tr: Görev çubuğu ayarları
+
+en: Font settings
+tr: Yazı tipi ayarları
+
+en: Installed apps
+tr: Yüklü uygulamalar
+
+en: Default apps settings
+tr: Varsayılan uygulamalar ayarları
+
+en: Startup apps settings
+tr: Başlangıç uygulamaları ayarları
+
+en: Account info
+tr: Hesap bilgileri
+
+en: Sign-in options
+tr: Oturum açma seçenekleri
+
+en: Other users settings
+tr: Diğer kullanıcılar ayarları
+
+en: Date & time settings
+tr: Tarih ve saat ayarları
+
+en: Language & region settings
+tr: Dil ve bölge ayarları
+
+en: Typing settings
+tr: Yazma ayarları
+
+en: Accessibility settings
+tr: Erişilebilirlik ayarları
+
+en: Privacy & security settings
+tr: Gizlilik ve güvenlik ayarları
+
+en: Location settings
+tr: Konum ayarları
+
+en: Windows Update settings
+tr: Windows Update ayarları
+
+en: Recovery settings
+tr: Kurtarma ayarları
+
+en: Activation settings
+tr: Etkinleştirme ayarları
+
+en: For developers settings
+tr: Geliştiriciler için ayarlar
+
+## settings-messages
+
+en: GitHub could not be reached.
+tr: GitHub'a ulaşılamadı.
+
+en: GitHub did not answer the request just now.
+tr: GitHub şu anda isteğe yanıt vermedi.
+
+en: The release did not pass verification, so nothing was installed.
+tr: Sürüm doğrulamayı geçemedi; bu nedenle hiçbir şey yüklenmedi.
+
+en: There is not enough free disk space.
+tr: Yeterli boş disk alanı yok.
+
+en: Windows refused access to the update files.
+tr: Windows güncelleştirme dosyalarına erişimi reddetti.
+
+en: {} bytes
+tr: {} bayt
+
+en: {} KB
+tr: {} KB
+
+en: {} MB
+tr: {} MB
+
+en: Status
+tr: Durum
+
+en: Check &now
+tr: Şimdi &denetle
+
+en: Download and install
+tr: İndir ve yükle
+
+en: &Later
+tr: &Daha sonra
+
+en: S&kip this version
+tr: Bu sürümü &atla
+
+en: &Release details
+tr: &Sürüm ayrıntıları
+
+en: Disable &notifications
+tr: &Bildirimleri devre dışı bırak
+
+en: Release notes
+tr: Sürüm notları
+
+en: the new version
+tr: yeni sürüm
+
+en: Installed: {}.
+tr: Yüklü: {}.
+
+en: Automatic update checks are off
+tr: Otomatik güncelleştirme denetimleri kapalı
+
+en: Check now looks for a newer release once.
+tr: Şimdi denetle, daha yeni bir sürümü bir kez arar.
+
+en: Last checked {}
+tr: Son denetim: {}
+
+en: Not checked yet
+tr: Henüz denetlenmedi
+
+en: Checking for updates...
+tr: Güncelleştirmeler denetleniyor...
+
+en: Aether Shell is up to date
+tr: Aether Shell güncel
+
+en: Latest published release: {}.
+tr: Yayımlanan en son sürüm: {}.
+
+en: Version {} is available
+tr: {} sürümü kullanılabilir
+
+en: Download size: {}.
+tr: İndirme boyutu: {}.
+
+en: Downloading version {}...
+tr: {} sürümü indiriliyor...
+
+en: Received {} of {} ({}%).
+tr: {} / {} alındı (%{}).
+
+en: Received {}; total size unknown.
+tr: {} alındı; toplam boyut bilinmiyor.
+
+en: Version {} is ready to install
+tr: {} sürümü yüklenmeye hazır
+
+en: Verified with the signed release manifest and SHA-256.
+tr: İmzalı sürüm bildirimi ve SHA-256 ile doğrulandı.
+
+en: The update could not be completed
+tr: Güncelleştirme tamamlanamadı
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+tr: Şimdilik elle yükleniyor: Sürüm ayrıntılarını açın, ardından kurulum programını indirip çalıştırın.
+
+en: Failure: {}.
+tr: Hata: {}.
+
+en: Choose Retry Download to try again.
+tr: Yeniden denemek için İndirmeyi yeniden dene'yi seçin.
+
+en: Use Check now to try again.
+tr: Yeniden denemek için Şimdi denetle'yi kullanın.
+
+en: Next automatic check: {}.
+tr: Sonraki otomatik denetim: {}.
+
+en: &Install update
+tr: Güncelleştirmeyi &yükle
+
+en: Retry &Download
+tr: İndirmeyi &yeniden dene
+
+en: &Download and install
+tr: İ&ndir ve yükle
+
+en: Windows' startup state could not be read in this session.
+tr: Windows'un başlangıç durumu bu oturumda okunamadı.
+
+en: Windows will start it at your next sign-in.
+tr: Windows, bir sonraki oturum açışınızda başlatacak.
+
+en: Right now it will not start at sign-in.
+tr: Şu anda oturum açıldığında başlamayacak.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+tr: Görev Yöneticisi'nde veya Windows Ayarları'nda kapatılmış; orada yeniden açılana kadar karar onlarındır.
+
+en: Windows would start another copy of Aether Shell.
+tr: Windows, Aether Shell'in başka bir kopyasını başlatırdı.
+
+en: Windows reports a startup state this version cannot read.
+tr: Windows bu sürümün okuyamadığı bir başlangıç durumu bildiriyor.
+
+en: The close action could not be completed.
+tr: Kapatma eylemi tamamlanamadı.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+tr: Kaydetmeden önce tam bir sayı girin; kırmızıyla işaretlenen alan bir sayı değil.
+
+en: Settings could not be validated.
+tr: Ayarlar doğrulanamadı.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+tr: Ayarlar kaydedilemediği için oturum açıldığında başlatma olduğu gibi bırakıldı.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+tr: Ayarlar kaydedilemedi ve Windows'un oturum açıldığında başlatma ayarı geri alınamadı. Yeniden denemek için Uygula'yı yeniden seçin.
+
+en: Settings saved.
+tr: Ayarlar kaydedildi.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+tr: Ayarlar bellekte değişti; kaydetme başarısız oldu. Yeniden denemek için Uygula'yı yeniden seçin.
+
+en: Settings could not be applied.
+tr: Ayarlar uygulanamadı.
+
+en: Some values were corrected to their supported range.
+tr: Bazı değerler desteklenen aralığa göre düzeltildi.
+
+en: Startup registration is unavailable in this session.
+tr: Başlangıç kaydı bu oturumda kullanılamıyor.
+
+en: Changing startup registration...
+tr: Başlangıç kaydı değiştiriliyor...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+tr: Windows başlangıç kaydını değiştirmedi. Görev Yöneticisi'nin başlangıç ayarını kontrol edin.
+
+en: Startup registration could not be changed.
+tr: Başlangıç kaydı değiştirilemedi.
+
+en: Defaults saved; startup is disabled.
+tr: Varsayılanlar kaydedildi; başlangıç devre dışı.
+
+en: Defaults applied; saving failed. Apply again to retry.
+tr: Varsayılanlar uygulandı; kaydetme başarısız oldu. Yeniden denemek için Uygula'yı yeniden seçin.
+
+en: Defaults could not be applied.
+tr: Varsayılanlar uygulanamadı.
+
+en: Startup was not disabled; settings were kept.
+tr: Başlangıç devre dışı bırakılmadı; ayarlar korundu.
+
+en: Location search is unavailable.
+tr: Konum arama kullanılamıyor.
+
+en: Searching Open-Meteo locations...
+tr: Open-Meteo konumları aranıyor...
+
+en: Location search failed. Check your connection and try again.
+tr: Konum araması başarısız oldu. Bağlantınızı kontrol edip yeniden deneyin.
+
+en: No place matched that search.
+tr: Bu aramayla eşleşen bir yer yok.
+
+en: Choose a location to save it.
+tr: Kaydetmek için bir konum seçin.
+
+en: Reset all settings?
+tr: Tüm ayarlar sıfırlansın mı?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+tr: Tercihler ve sabitlenmiş uygulamalar varsayılanlarına döner ve oturum açıldığında başlatma kapatılır.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+tr: Windows görev çubuğu seçiminiz korunur. Geçerli ayarlar dosyasının bir yedeği saklanır.
+
+en: &Reset
+tr: &Sıfırla
+
+en: Cancel
+tr: İptal
+
+en: Pinned applications saved.
+tr: Sabitlenmiş uygulamalar kaydedildi.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+tr: Sabitlemeler bellekte değişti; kaydetme başarısız oldu. Yeniden denemek için Uygula'yı yeniden seçin.
+
+en: Defaults could not be restored because startup registration is unavailable.
+tr: Başlangıç kaydı kullanılamadığından varsayılanlar geri yüklenemedi.
+
+en: Pinned application could not be added.
+tr: Sabitlenmiş uygulama eklenemedi.
+
+en: Choose an application to add first.
+tr: Önce eklenecek bir uygulama seçin.
+
+en: Pinned applications could not be changed.
+tr: Sabitlenmiş uygulamalar değiştirilemedi.
+
+en: Choose a pinned application first.
+tr: Önce sabitlenmiş bir uygulama seçin.
+
+en: Desktop status is unavailable in this session.
+tr: Masaüstü durumu bu oturumda kullanılamıyor.
+
+en: Desktop status is unavailable.
+tr: Masaüstü durumu kullanılamıyor.
+
+en: Password
+tr: Parola
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+tr: {} GitHub'dan indiriliyor ({}). Hazır olana kadar İngilizce gösterilir.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+tr: {} indirilemedi. İndirilene kadar İngilizce gösterilir; yeniden denemek için aşağıdaki İndir'i seçin.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+tr: {} henüz bu bilgisayarda yok. İndirilene kadar İngilizce gösterilir.
+
+en: {} is on this PC.
+tr: {} bu bilgisayarda mevcut.
+
+en: Every language is on this PC.
+tr: Tüm diller bu bilgisayarda mevcut.
+
+en: Choose a language to download first.
+tr: Önce indirilecek bir dil seçin.
+
+## settings-pages
+
+en: Dock
+tr: Dock
+
+en: Top Bar
+tr: Üst Çubuk
+
+en: Weather
+tr: Hava durumu
+
+en: Updates
+tr: Güncelleştirmeler
+
+en: General
+tr: Genel
+
+en: About
+tr: Hakkında
+
+en: Desktop
+tr: Masaüstü
+
+en: Appearance
+tr: Görünüm
+
+en: Welcome
+tr: Karşılama
+
+en: Aether Shell Settings
+tr: Aether Shell Ayarları
+
+en: Settings
+tr: Ayarlar
+
+en: Reset defaults...
+tr: Varsayılanları geri yükle...
+
+en: &Apply
+tr: &Uygula
+
+en: Liquid
+tr: Sıvı
+
+en: Grain
+tr: Gren
+
+en: From {} to {}
+tr: {} ile {} arası
+
+en: px
+tr: px
+
+en: min
+tr: dk
+
+en: h
+tr: sa
+
+en: This action could not be completed.
+tr: Bu eylem tamamlanamadı.
+
+en: Size, spacing, motion and the applications pinned to the Dock.
+tr: Boyut, aralık, hareket ve Dock'a sabitlenmiş uygulamalar.
+
+en: Size and spacing
+tr: Boyut ve aralık
+
+en: Icon size
+tr: Simge boyutu
+
+en: {}, scaled with the Windows display scale.
+tr: {}, Windows ekran ölçeğine göre ölçeklendirilir.
+
+en: Bottom margin
+tr: Alt kenar boşluğu
+
+en: Space between the Dock and the bottom of the screen.
+tr: Dock ile ekranın altı arasındaki boşluk.
+
+en: Minimum side margin
+tr: En küçük yan kenar boşluğu
+
+en: Space kept free at the left and right screen edges.
+tr: Ekranın sol ve sağ kenarlarında boş bırakılan alan.
+
+en: Icon spacing
+tr: Simge aralığı
+
+en: Space between neighbouring icons.
+tr: Komşu simgeler arasındaki boşluk.
+
+en: Glass and motion
+tr: Cam ve hareket
+
+en: Glass opacity
+tr: Cam opaklığı
+
+en: Lower values show more of the blurred desktop behind the Dock.
+tr: Düşük değerler, Dock'un arkasındaki bulanık masaüstünü daha fazla gösterir.
+
+en: Hover magnification
+tr: Üzerine gelindiğinde büyütme
+
+en: How much an icon grows under the pointer; 1 turns it off.
+tr: Bir simgenin işaretçinin altında ne kadar büyüyeceği; 1 bunu kapatır.
+
+en: Behavior
+tr: Davranış
+
+en: Show running applications
+tr: Çalışan uygulamaları göster
+
+en: Open applications that are not pinned appear after the pinned ones.
+tr: Sabitlenmemiş açık uygulamalar, sabitlenmiş olanlardan sonra görünür.
+
+en: Reserve screen space for the Dock
+tr: Dock için ekran alanı ayır
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Ekranı kaplayan pencereler Dock'un altında değil, üstünde kalır.
+
+en: Automatically hide the Dock
+tr: Dock'u otomatik olarak gizle
+
+en: Hides while an application window covers it; move the pointer to the bottom edge of the screen to show it. It stays on the desktop, and windows get the full screen height.
+tr: Bir uygulama penceresi üzerini kapladığında gizlenir; göstermek için işaretçiyi ekranın alt kenarına götürün. Masaüstünde kalır ve pencereler ekranın tüm yüksekliğini kullanır.
+
+en: Pinned applications
+tr: Sabitlenmiş uygulamalar
+
+en: Move &up
+tr: &Yukarı taşı
+
+en: Move &down
+tr: &Aşağı taşı
+
+en: &Remove
+tr: &Kaldır
+
+en: &Add application
+tr: Uygulama &ekle
+
+en: Pins keep their identity and launch settings. Removing a pin also stops the automatic Windows taskbar sync from adding it again.
+tr: Sabitlemeler kimliklerini ve başlatma ayarlarını korur. Bir sabitlemeyi kaldırmak, otomatik Windows görev çubuğu eşitlemesinin onu yeniden eklemesini de engeller.
+
+en: Position, clock and the status items shown in the Top Status Bar.
+tr: Üst Durum Çubuğu'nda gösterilen konum, saat ve durum öğeleri.
+
+en: Presentation
+tr: Sunum
+
+en: Floating bar
+tr: Yüzen çubuk
+
+en: Text on the desktop
+tr: Masaüstünde metin
+
+en: Floating bar: the glass bar below the top of the screen. Text on the desktop: no bar, the same items written at the very top of the screen, straight over the desktop picture; that strip stays free of windows, and the top margin and glass opacity do not apply. With automatic hiding, the text comes back on a strip of glass while a window is under it.
+tr: Yüzen çubuk: ekranın üst kısmının hemen altındaki cam çubuk. Masaüstünde metin: çubuk yok; aynı öğeler ekranın en üstüne, doğrudan masaüstü resminin üzerine yazılır; bu şerit pencerelerden uzak tutulur, üst kenar boşluğu ve cam opaklığı uygulanmaz. Otomatik gizleme açıkken, altında bir pencere olduğunda metin bir cam şerit üzerinde geri gelir.
+
+en: Position and glass
+tr: Konum ve cam
+
+en: Top margin
+tr: Üst kenar boşluğu
+
+en: Space between the Top Bar and the top of the screen.
+tr: Üst Çubuk ile ekranın üstü arasındaki boşluk.
+
+en: Lower values show more of the blurred desktop behind the bar.
+tr: Düşük değerler, çubuğun arkasındaki bulanık masaüstünü daha fazla gösterir.
+
+en: Clock
+tr: Saat
+
+en: Clock format
+tr: Saat biçimi
+
+en: Follow Windows
+tr: Windows'u izle
+
+en: 12-hour
+tr: 12 saat
+
+en: 24-hour
+tr: 24 saat
+
+en: Date style
+tr: Tarih stili
+
+en: Weekday, day and month
+tr: Hafta günü, gün ve ay
+
+en: Short
+tr: Kısa
+
+en: Long
+tr: Uzun
+
+en: Show seconds
+tr: Saniyeleri göster
+
+en: Show date
+tr: Tarihi göster
+
+en: Status items
+tr: Durum öğeleri
+
+en: Show battery
+tr: Pili göster
+
+en: Hide battery when absent
+tr: Pil yoksa gizle
+
+en: Desktop PCs without a battery show nothing instead of an unknown battery.
+tr: Pili olmayan masaüstü bilgisayarlar bilinmeyen bir pil yerine hiçbir şey göstermez.
+
+en: Show input language
+tr: Giriş dilini göster
+
+en: Show network
+tr: Ağı göster
+
+en: Show audio output
+tr: Ses çıkışını göster
+
+en: Show microphone
+tr: Mikrofonu göster
+
+en: Show weather when enabled
+tr: Etkinleştirildiğinde hava durumunu göster
+
+en: Weather itself is turned on in Weather settings.
+tr: Hava durumunun kendisi Hava durumu ayarlarından açılır.
+
+en: Show hidden icons button
+tr: Gizli simgeler düğmesini göster
+
+en: A small chevron that opens Windows' hidden notification-area icons.
+tr: Windows'un gizli bildirim alanı simgelerini açan küçük bir ok.
+
+en: Reserve screen space above windows
+tr: Pencerelerin üstünde ekran alanı ayır
+
+en: Maximized windows stay below the Top Bar.
+tr: Ekranı kaplayan pencereler Üst Çubuk'un altında kalır.
+
+en: Automatically hide the Top Bar
+tr: Üst Çubuk'u otomatik olarak gizle
+
+en: Hides while an application window covers it; move the pointer to the top edge of the screen to show it. It stays on the desktop.
+tr: Bir uygulama penceresi üzerini kapladığında gizlenir; göstermek için işaretçiyi ekranın üst kenarına götürün. Masaüstünde kalır.
+
+en: Use Windows Quick Settings (Windows 11)
+tr: Windows Hızlı Ayarlar'ı kullan (Windows 11)
+
+en: Off: Aether's quick controls open below the Top Bar. On: Windows' own panel opens at the bottom of the screen.
+tr: Kapalı: Aether'in hızlı denetimleri Üst Çubuk'un altında açılır. Açık: Windows'un kendi paneli ekranın altında açılır.
+
+en: An optional forecast in the Top Bar, provided by Open-Meteo.
+tr: Üst Çubuk'ta Open-Meteo tarafından sağlanan isteğe bağlı bir tahmin.
+
+en: Forecast
+tr: Tahmin
+
+en: Enable weather
+tr: Hava durumunu etkinleştir
+
+en: Off by default: the forecast needs network requests.
+tr: Varsayılan olarak kapalı: tahmin için ağ istekleri gerekir.
+
+en: Temperature
+tr: Sıcaklık
+
+en: Celsius
+tr: Santigrat
+
+en: Fahrenheit
+tr: Fahrenhayt
+
+en: Refresh interval
+tr: Yenileme aralığı
+
+en: Location
+tr: Konum
+
+en: Locate automatically with Windows
+tr: Windows ile otomatik olarak konum bul
+
+en: Uses the Windows location service after you allow it.
+tr: İzin verdikten sonra Windows konum hizmetini kullanır.
+
+en: Windows asks for location permission. Your coordinates are sent to Open-Meteo.com only to get the forecast; a location key is cached locally. If location is blocked, weather is unavailable.
+tr: Windows konum izni ister. Koordinatlarınız yalnızca tahmini almak için Open-Meteo.com'a gönderilir; bir konum anahtarı yerel olarak önbelleğe alınır. Konum engellenirse hava durumu kullanılamaz.
+
+en: Use &Windows location
+tr: &Windows konumunu kullan
+
+en: Location &settings
+tr: Konum &ayarları
+
+en: Choose automatic location or search for a place below.
+tr: Otomatik konumu seçin veya aşağıda bir yer arayın.
+
+en: Search for a place
+tr: Yer ara
+
+en: Searc&h
+tr: A&ra
+
+en: Weather data by Open-Meteo.com (CC BY 4.0). Manual search sends only the text you enter.
+tr: Hava durumu verileri Open-Meteo.com tarafından sağlanır (CC BY 4.0). El ile arama yalnızca girdiğiniz metni gönderir.
+
+en: Signed releases from the official GitHub repository, verified before installation.
+tr: Resmi GitHub deposundan imzalı sürümler, yüklemeden önce doğrulanır.
+
+en: Preferences
+tr: Tercihler
+
+en: Check for updates automatically
+tr: Güncelleştirmeleri otomatik olarak denetle
+
+en: Check interval
+tr: Denetim aralığı
+
+en: Release channel
+tr: Sürüm kanalı
+
+en: Prereleases arrive earlier and change more often.
+tr: Ön sürümler daha erken gelir ve daha sık değişir.
+
+en: Stable
+tr: Kararlı
+
+en: Prerelease
+tr: Ön sürüm
+
+en: Show update notifications
+tr: Güncelleştirme bildirimlerini göster
+
+en: Startup, motion, keyboard shortcuts and diagnostics.
+tr: Başlangıç, hareket, klavye kısayolları ve tanılama.
+
+en: The language of the bars, menus, Search, Settings and setup.
+tr: Çubukların, menülerin, Arama'nın, Ayarlar'ın ve kurulumun dili.
+
+en: Names that belong to you or to other programs (applications, files, Wi-Fi networks) are never translated. With a chosen language, the Top Bar writes the date in it; Follow Windows keeps your Windows regional format.
+tr: Size veya başka programlara ait adlar (uygulamalar, dosyalar, Wi-Fi ağları) hiçbir zaman çevrilmez. Bir dil seçildiğinde Üst Çubuk tarihi o dilde yazar; Windows'u izle, Windows bölgesel biçiminizi korur.
+
+en: The handwritten welcome writes Latin letters: it greets in French, English or Spanish. Choose its language in Welcome.
+tr: El yazısı karşılama Latin harfleriyle yazar: Fransızca, İngilizce veya İspanyolca selamlar. Dilini Karşılama bölümünden seçin.
+
+en: Language
+tr: Dil
+
+en: Interface language
+tr: Arabirim dili
+
+en: Follow Windows uses the first of your Windows display languages that is one of these, and English otherwise.
+tr: Windows'u izle, Windows görüntüleme dillerinizden burada bulunan ilkini, yoksa İngilizceyi kullanır.
+
+en: Startup
+tr: Başlangıç
+
+en: Start Aether Shell when I sign in
+tr: Oturum açtığımda Aether Shell'i başlat
+
+en: Changing this needs Apply. Task Manager can also turn it off.
+tr: Bunu değiştirmek için Uygula gerekir. Görev Yöneticisi de bunu kapatabilir.
+
+en: Motion
+tr: Hareket
+
+en: Reduced motion removes decorative movement everywhere.
+tr: Azaltılmış hareket, dekoratif hareketi her yerden kaldırır.
+
+en: Reduced
+tr: Azaltılmış
+
+en: Full
+tr: Tam
+
+en: Keyboard shortcuts
+tr: Klavye kısayolları
+
+en: Enable global keyboard shortcuts
+tr: Genel klavye kısayollarını etkinleştir
+
+en: Search shortcut key
+tr: Arama kısayol tuşu
+
+en: Dock shortcut key
+tr: Dock kısayol tuşu
+
+en: Search shortcut modifiers
+tr: Arama kısayolu değiştirici tuşları
+
+en: Dock shortcut modifiers
+tr: Dock kısayolu değiştirici tuşları
+
+en: Shortcut status unavailable
+tr: Kısayol durumu kullanılamıyor
+
+en: Diagnostics
+tr: Tanılama
+
+en: The log folder holds this computer's Aether Shell logs. Export diagnostics saves the app version and Windows build only - no logs or personal data.
+tr: Günlük klasörü bu bilgisayarın Aether Shell günlüklerini içerir. Tanılama verilerini dışarı aktarma yalnızca uygulama sürümünü ve Windows derlemesini kaydeder - günlük veya kişisel veri yok.
+
+en: Open &log folder
+tr: &Günlük klasörünü aç
+
+en: &Export diagnostics...
+tr: Tanılama verilerini &dışarı aktar...
+
+en: A short handwritten greeting on your desktop after you sign in or unlock your PC.
+tr: Oturum açtıktan veya bilgisayarınızın kilidini açtıktan sonra masaüstünüzde el yazısıyla kısa bir selamlama.
+
+en: Greeting
+tr: Selamlama
+
+en: Show the welcome at sign-in and unlock
+tr: Oturum açarken ve kilidi açarken karşılamayı göster
+
+en: It appears after Windows has signed you in, while Aether Shell gets ready. Touch, click or press Escape to skip it.
+tr: Windows oturumunuzu açtıktan sonra, Aether Shell hazırlanırken görünür. Atlamak için dokunun, tıklayın veya Esc tuşuna basın.
+
+en: Greeting language
+tr: Selamlama dili
+
+en: Salut in French, Hello in English, Hola in Spanish. The pen writes Latin letters: in every other language it greets in English.
+tr: Fransızca Salut, İngilizce Hello, İspanyolca Hola. Kalem Latin harfleriyle yazar: diğer tüm dillerde İngilizce selamlar.
+
+en: Your name
+tr: Adınız
+
+en: Name to greet you with
+tr: Sizi selamlayacağı ad
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere or written to a log. Clear the field to remove it.
+tr: İsteğe bağlı, örneğin bir ad. Bu bilgisayarda Aether Shell ayarlarınızda kalır; hiçbir yere gönderilmez ve günlüğe yazılmaz. Kaldırmak için alanı temizleyin.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Renk modu, vurgu rengi, hareket hızı ve Dock ile Üst Çubuk'un görünümü.
+
+en: Style
+tr: Stil
+
+en: Liquid: glass in layers over what lies behind, a blur layer, the liquid's light, then the icons and text, kept readable over light and dark pages. Grain: frosted glass, blurred and semi-transparent, with a fine grain.
+tr: Sıvı: arkada kalanın üzerinde katmanlar halinde cam, bir bulanıklık katmanı, sıvının ışığı, ardından simgeler ve metin; açık ve koyu sayfalarda okunaklı kalır. Gren: buzlu cam; bulanık ve yarı saydam, ince bir grenle.
+
+en: Liquid blur
+tr: Sıvı bulanıklığı
+
+en: How much the blur layer under the Liquid glass covers what lies behind: 100% blurs it all. Lower values show the page sharper, and text on the bars can then read less well over a busy page.
+tr: Sıvı camın altındaki bulanıklık katmanının arkada kalanı ne kadar kapladığı: %100 her şeyi bulanıklaştırır. Düşük değerler sayfayı daha net gösterir; bu durumda çubuklardaki metin karmaşık bir sayfa üzerinde daha zor okunabilir.
+
+en: Liquid blur color
+tr: Sıvı bulanıklık rengi
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Otomatik, camın kendi renklerini korur. Metin ve simgeler renk ne olursa olsun okunaklı kalır.
+
+en: Automatic
+tr: Otomatik
+
+en: White
+tr: Beyaz
+
+en: Black
+tr: Siyah
+
+en: Accent
+tr: Vurgu
+
+en: Blue
+tr: Mavi
+
+en: Violet
+tr: Mor
+
+en: Pink
+tr: Pembe
+
+en: Red
+tr: Kırmızı
+
+en: Orange
+tr: Turuncu
+
+en: Yellow
+tr: Sarı
+
+en: Green
+tr: Yeşil
+
+en: Teal
+tr: Deniz mavisi
+
+en: Liquid color strength
+tr: Sıvı renk yoğunluğu
+
+en: How much of the chosen color the blur layer takes.
+tr: Bulanıklık katmanının seçilen renkten ne kadar aldığı.
+
+en: Theme
+tr: Tema
+
+en: Color mode
+tr: Renk modu
+
+en: High contrast always takes precedence.
+tr: Yüksek karşıtlık her zaman önceliklidir.
+
+en: Light
+tr: Açık
+
+en: Dark
+tr: Koyu
+
+en: Accent color
+tr: Vurgu rengi
+
+en: Animation duration
+tr: Animasyon süresi
+
+en: 1 is the standard speed; higher values are slower. Reduced motion takes precedence.
+tr: 1 standart hızdır; daha yüksek değerler daha yavaştır. Azaltılmış hareket önceliklidir.
+
+en: Dock icon preset
+tr: Dock simgesi ön ayarı
+
+en: A custom size from Dock settings is kept until you choose a preset.
+tr: Dock ayarlarındaki özel bir boyut, bir ön ayar seçene kadar korunur.
+
+en: Small - 32 px
+tr: Küçük - 32 px
+
+en: Medium - 40 px
+tr: Orta - 40 px
+
+en: Large - 48 px
+tr: Büyük - 48 px
+
+en: Keep custom size
+tr: Özel boyutu koru
+
+en: Show Windows Start in the Dock
+tr: Windows Başlat'ı Dock'ta göster
+
+en: Show Task View in the Dock
+tr: Görev Görünümü'nü Dock'ta göster
+
+en: Reserve extra space for Dock animations
+tr: Dock animasyonları için ek alan ayır
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Büyütmeyi ve başlatma sıçramasını ekranı kaplayan pencerelerden uzak tutar.
+
+en: Weather position
+tr: Hava durumu konumu
+
+en: Left
+tr: Sol
+
+en: Right
+tr: Sağ
+
+en: Keyboard indicator
+tr: Klavye göstergesi
+
+en: Compact
+tr: Kompakt
+
+en: Two lines
+tr: İki satır
+
+en: Windows taskbar pins
+tr: Windows görev çubuğu sabitlemeleri
+
+en: Add newly discovered Windows taskbar pins
+tr: Yeni bulunan Windows görev çubuğu sabitlemelerini ekle
+
+en: While the taskbar is replaced, new Windows pins are added to the Dock.
+tr: Görev çubuğu değiştirildiği sürece yeni Windows sabitlemeleri Dock'a eklenir.
+
+en: Reversible replacement of the Windows taskbar by the Dock.
+tr: Windows görev çubuğunun Dock ile geri alınabilir şekilde değiştirilmesi.
+
+en: Taskbar replacement
+tr: Görev çubuğu değiştirme
+
+en: Replace the Windows taskbar
+tr: Windows görev çubuğunu değiştir
+
+en: Changing this needs Apply.
+tr: Bunu değiştirmek için Uygula gerekir.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: Aether Shell çalışırken Windows görev çubuğunu gizler ve ekranı kaplayan uygulamaların altında alan ayırır.
+
+en: Windows taskbar state is restored when this mode is disabled or Aether Shell exits. A separate recovery helper also restores it if the application stops unexpectedly. If recovery fails, restart Windows Explorer in Task Manager.
+tr: Bu mod devre dışı bırakıldığında veya Aether Shell kapandığında Windows görev çubuğu durumu geri yüklenir. Uygulama beklenmedik şekilde durursa ayrı bir kurtarma yardımcısı da onu geri yükler. Kurtarma başarısız olursa Görev Yöneticisi'nden Windows Gezgini'ni yeniden başlatın.
+
+en: Windows Settings remains the native Windows interface. Its taskbar page is not replaced by Aether Shell; configure this mode here.
+tr: Windows Ayarları yerel Windows arabirimi olarak kalır. Görev çubuğu sayfası Aether Shell tarafından değiştirilmez; bu modu burada yapılandırın.
+
+en: Pinned applications from Windows
+tr: Windows'tan sabitlenmiş uygulamalar
+
+en: &Import Windows taskbar pins
+tr: Windows görev çubuğu sabitlemelerini &içeri aktar
+
+en: Reads pinned shortcuts without changing Windows pins. Some Windows 11 pins or their order may be unavailable.
+tr: Windows sabitlemelerini değiştirmeden sabitlenmiş kısayolları okur. Bazı Windows 11 sabitlemeleri veya sıraları kullanılamayabilir.
+
+en: Version {}
+tr: Sürüm {}
+
+en: Created by Ibrahim Bouillet
+tr: Ibrahim Bouillet tarafından oluşturuldu
+
+en: A native Windows desktop interface - a floating Dock and Top Status Bar - running alongside Explorer.
+tr: Gezgin ile birlikte çalışan yerel bir Windows masaüstü arabirimi - yüzen bir Dock ve Üst Durum Çubuğu.
+
+en: Weather data: Open-Meteo.com (CC BY 4.0). No third-party C++ runtime libraries are bundled.
+tr: Hava durumu verileri: Open-Meteo.com (CC BY 4.0). Üçüncü taraf C++ çalışma zamanı kitaplıkları dahil edilmez.
+
+en: &Official project
+tr: &Resmi proje
+
+en: Licence
+tr: Lisans
+
+en: Taskbar replacement changes need Apply.
+tr: Görev çubuğu değiştirme değişiklikleri için Uygula gerekir.
+
+en: Changes save automatically. Startup needs Apply.
+tr: Değişiklikler otomatik olarak kaydedilir. Başlangıç için Uygula gerekir.
+
+en: Changes save automatically.
+tr: Değişiklikler otomatik olarak kaydedilir.
+
+en: Press Apply to confirm this change.
+tr: Bu değişikliği onaylamak için Uygula'ya basın.
+
+en: Smart transparency
+tr: Akıllı saydamlık
+
+en: In Liquid, this window blurs only under its text and controls: fully over other windows and desktop icons, lightly over the desktop picture, and not at all where it shows nothing.
+tr: Sıvı stilinde bu pencere yalnızca kendi metninin ve denetimlerinin altını bulanıklaştırır: diğer pencerelerin ve masaüstü simgelerinin üzerinde tamamen, masaüstü resminin üzerinde hafifçe, hiçbir şey göstermediği yerlerde ise hiç.
+
+en: Languages on this PC
+tr: Bu bilgisayardaki diller
+
+en: Aether Shell downloads the languages Windows has, so it changes language when Windows does.
+tr: Aether Shell, Windows'ta bulunan dilleri indirir; böylece Windows dil değiştirdiğinde o da değiştirir.
+
+en: Add a language
+tr: Dil ekle
+
+en: &Download
+tr: İ&ndir
+
+en: Every language comes from this version's GitHub release and is checked before it is used. Once it is on this PC, choose it above.
+tr: Her dil, bu sürümün GitHub'daki yayınından gelir ve kullanılmadan önce denetlenir. Bu bilgisayarda olduğunda yukarıdan seçin.
+
+en: built in
+tr: yerleşik
+
+en: downloading, {}
+tr: indiriliyor, {}
+
+en: download failed
+tr: indirme başarısız oldu
+
+## setup
+
+en: Aether Shell Setup
+tr: Aether Shell Kurulumu
+
+en: Setup could not create its interface. Close it and try again, or use the documented silent setup options.
+tr: Kurulum arabirimini oluşturamadı. Kapatıp yeniden deneyin veya belgelenen sessiz kurulum seçeneklerini kullanın.
+
+en: Options
+tr: Seçenekler
+
+en: Install
+tr: Yükle
+
+en: Done
+tr: Bitti
+
+en: Remove Aether Shell
+tr: Aether Shell'i kaldır
+
+en: Repair Aether Shell
+tr: Aether Shell'i onar
+
+en: A native Dock and Top Status Bar for Windows, running alongside Explorer.
+tr: Windows için Gezgin ile birlikte çalışan yerel bir Dock ve Üst Durum Çubuğu.
+
+en: Replaces the Windows taskbar while it runs
+tr: Çalışırken Windows görev çubuğunun yerini alır
+
+en: Quit Aether Shell, turn this off in Settings > Desktop, or open "Restore Windows taskbar" in the Start menu to get the Windows taskbar back.
+tr: Windows görev çubuğunu geri almak için Aether Shell'den çıkın, bunu Ayarlar > Masaüstü bölümünden kapatın veya Başlat menüsünde "Windows görev çubuğunu geri yükle"yi açın.
+
+en: Starts when you sign in - your choice
+tr: Oturum açtığınızda başlar - sizin seçiminiz
+
+en: New installations start at sign-in by default. You can clear that choice before installing, or turn it off later in Settings. Existing startup choices and Task Manager disables are preserved.
+tr: Yeni yüklemeler varsayılan olarak oturum açıldığında başlar. Bu seçimi yüklemeden önce temizleyebilir veya daha sonra Ayarlar'dan kapatabilirsiniz. Mevcut başlangıç seçimleri ve Görev Yöneticisi'nde yapılan devre dışı bırakmalar korunur.
+
+en: Installs for your account
+tr: Hesabınız için yüklenir
+
+en: No administrator rights are needed. Your settings and data stay in your user profile.
+tr: Yönetici hakları gerekmez. Ayarlarınız ve verileriniz kullanıcı profilinizde kalır.
+
+en: Uninstall keeps your settings and data unless you choose to remove them.
+tr: Kaldırma, siz kaldırmayı seçmedikçe ayarlarınızı ve verilerinizi korur.
+
+en: Repair restores this package's files and keeps your settings. If Aether Shell left the Windows taskbar hidden, repair restores it.
+tr: Onarma, bu paketin dosyalarını geri yükler ve ayarlarınızı korur. Aether Shell Windows görev çubuğunu gizli bıraktıysa onarma onu geri yükler.
+
+en: Installing over an existing version keeps your settings. An older package is rejected unless you explicitly permit a downgrade.
+tr: Mevcut bir sürümün üzerine yükleme ayarlarınızı korur. Sürüm düşürmeye açıkça izin vermediğiniz sürece daha eski bir paket reddedilir.
+
+en: MIT License
+tr: MIT Lisansı
+
+en: The licence is also installed as LICENSE next to Aether Shell.
+tr: Lisans, Aether Shell'in yanına LICENSE olarak da yüklenir.
+
+en: Remove this installation
+tr: Bu yüklemeyi kaldır
+
+en: Install location
+tr: Yükleme konumu
+
+en: &Browse...
+tr: &Gözat...
+
+en: Also remove my settings, cache and logs
+tr: Ayarlarımı, önbelleğimi ve günlüklerimi de kaldır
+
+en: This cannot be undone.
+tr: Bu işlem geri alınamaz.
+
+en: Setup will close Aether Shell gracefully and remove its installed files, shortcuts, startup entry and Installed apps registration. Other applications and Windows settings are left alone.
+tr: Kurulum Aether Shell'i düzgün bir şekilde kapatacak ve yüklü dosyalarını, kısayollarını, başlangıç girdisini ve Yüklü uygulamalar kaydını kaldıracaktır. Diğer uygulamalara ve Windows ayarlarına dokunulmaz.
+
+en: Your welcome
+tr: Karşılamanız
+
+en: After you sign in or unlock your PC, Aether Shell writes a short greeting by hand. Type the name it should greet you with, or leave it empty for a simple hello.
+tr: Oturum açtıktan veya bilgisayarınızın kilidini açtıktan sonra Aether Shell el yazısıyla kısa bir selamlama yazar. Sizi selamlayacağı adı yazın veya basit bir merhaba için boş bırakın.
+
+en: Your first name
+tr: Adınız
+
+en: Optional, for example a first name. It stays on this PC in your Aether Shell settings and is never sent anywhere. Change it, or turn the welcome off, in Settings > Welcome.
+tr: İsteğe bağlı, örneğin bir ad. Bu bilgisayarda Aether Shell ayarlarınızda kalır ve hiçbir yere gönderilmez. Değiştirmek veya karşılamayı kapatmak için Ayarlar > Karşılama bölümüne gidin.
+
+en: Shortcuts and startup
+tr: Kısayollar ve başlangıç
+
+en: Create Start menu shortcuts
+tr: Başlat menüsü kısayolları oluştur
+
+en: Aether Shell and Restore Windows taskbar.
+tr: Aether Shell ve Windows görev çubuğunu geri yükle.
+
+en: Create a desktop shortcut
+tr: Masaüstü kısayolu oluştur
+
+en: Shows your current choice.
+tr: Geçerli seçiminizi gösterir.
+
+en: Recommended.
+tr: Önerilir.
+
+en: Clear it to opt out; Task Manager disables are respected.
+tr: Vazgeçmek için temizleyin; Görev Yöneticisi'nde yapılan devre dışı bırakmalara uyulur.
+
+en: Installing accepts the startup choice above. The launcher can restart Aether Shell after a crash, with a bounded retry limit. Quit and Restore Windows taskbar remain available. Weather is off by default. Unsigned binaries may trigger a Windows SmartScreen warning.
+tr: Yükleme, yukarıdaki başlangıç seçimini kabul eder. Başlatıcı, sınırlı sayıda yeniden deneme ile bir çökmeden sonra Aether Shell'i yeniden başlatabilir. Çıkış ve Windows görev çubuğunu geri yükle kullanılabilir durumda kalır. Hava durumu varsayılan olarak kapalıdır. İmzasız ikili dosyalar bir Windows SmartScreen uyarısını tetikleyebilir.
+
+en: Removing this installation...
+tr: Bu yükleme kaldırılıyor...
+
+en: Repairing Aether Shell...
+tr: Aether Shell onarılıyor...
+
+en: Installing Aether Shell...
+tr: Aether Shell yükleniyor...
+
+en: Closing Aether Shell and removing its files.
+tr: Aether Shell kapatılıyor ve dosyaları kaldırılıyor.
+
+en: Verifying the embedded package and installing its files. Progress is shown as activity: setup does not know the remaining time.
+tr: Gömülü paket doğrulanıyor ve dosyaları yükleniyor. İlerleme etkinlik olarak gösterilir: kurulum kalan süreyi bilmez.
+
+en: Please wait while the removal completes.
+tr: Kaldırma işlemi tamamlanırken lütfen bekleyin.
+
+en: Cancel is available until the new version is activated; then setup finishes safely.
+tr: Yeni sürüm etkinleştirilene kadar İptal kullanılabilir; ardından kurulum güvenli bir şekilde tamamlanır.
+
+en: Aether Shell was uninstalled.
+tr: Aether Shell kaldırıldı.
+
+en: Aether Shell is ready.
+tr: Aether Shell hazır.
+
+en: Setup was cancelled.
+tr: Kurulum iptal edildi.
+
+en: Setup could not complete.
+tr: Kurulum tamamlanamadı.
+
+en: Your data was kept unless you explicitly chose to remove it.
+tr: Açıkça kaldırmayı seçmediyseniz verileriniz korundu.
+
+en: You can repair or uninstall it from Windows Settings > Apps > Installed apps.
+tr: Windows Ayarları > Uygulamalar > Yüklü uygulamalar bölümünden onarabilir veya kaldırabilirsiniz.
+
+en: The operation was cancelled before activation. Go back to Options to try again.
+tr: İşlem etkinleştirmeden önce iptal edildi. Yeniden denemek için Seçenekler'e dönün.
+
+en: Check file access and free disk space, then try again. If Aether Shell is already present, Repair can restore its files. Error category: {}
+tr: Dosya erişimini ve boş disk alanını kontrol edip yeniden deneyin. Aether Shell zaten varsa Onar dosyalarını geri yükleyebilir. Hata kategorisi: {}
+
+en: Setup log
+tr: Kurulum günlüğü
+
+en: Launch Aether Shell
+tr: Aether Shell'i başlat
+
+en: &Back
+tr: &Geri
+
+en: &Next
+tr: &İleri
+
+en: &Continue
+tr: &Devam
+
+en: &Uninstall
+tr: &Kaldır
+
+en: &Repair
+tr: &Onar
+
+en: &Install
+tr: &Yükle
+
+en: &Close
+tr: &Kapat
+
+en: Step {} of {}: {}
+tr: Adım {} / {}: {}
+
+en: Choose the Aether Shell installation folder
+tr: Aether Shell yükleme klasörünü seçin
+
+en: Choose a complete folder path, for example one that starts with a drive letter.
+tr: Tam bir klasör yolu seçin; örneğin sürücü harfiyle başlayan bir yol.
+
+en: The install folder must be an absolute path.
+tr: Yükleme klasörü mutlak bir yol olmalıdır.
+
+en: Setup stops at the next safe point.
+tr: Kurulum bir sonraki güvenli noktada durur.
+
+en: Cancelling...
+tr: İptal ediliyor...
+
+en: Setup is finishing the current step safely; please wait.
+tr: Kurulum geçerli adımı güvenli bir şekilde tamamlıyor; lütfen bekleyin.
+
+en: Updating Aether Shell
+tr: Aether Shell güncelleştiriliyor
+
+en: Verifying the signed package and applying the update.
+tr: İmzalı paket doğrulanıyor ve güncelleştirme uygulanıyor.
+
+en: Update completed
+tr: Güncelleştirme tamamlandı
+
+en: The update did not complete
+tr: Güncelleştirme tamamlanamadı
+
+en: Close
+tr: Kapat
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair.
+tr: Güncelleştirme arabirimi başlatılamadı. Güncelleştirme uygulanmadı. Yeniden deneyin veya Onar'ı kullanın.
+
+en: Aether Shell Update
+tr: Aether Shell Güncelleştirmesi
+
+en: The update interface could not start. The update has not been applied. Try again or use Repair in Windows Settings > Apps > Installed apps.
+tr: Güncelleştirme arabirimi başlatılamadı. Güncelleştirme uygulanmadı. Yeniden deneyin veya Windows Ayarları > Uygulamalar > Yüklü uygulamalar bölümünden Onar'ı kullanın.
+
+en: Update completed.
+tr: Güncelleştirme tamamlandı.
+
+en: Update did not complete. See the updater log or use Repair.
+tr: Güncelleştirme tamamlanamadı. Güncelleştirici günlüğüne bakın veya Onar'ı kullanın.
+
+en: Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.
+tr: Aether Shell başlatılamadı. Windows Ayarları > Uygulamalar > Yüklü uygulamalar bölümünden Onar'ı seçin.
+
+en: Aether Shell Settings — update in progress
+tr: Aether Shell Ayarları — güncelleştirme sürüyor
+
+## shell
+
+en: &Resume taskbar replacement
+tr: Görev çubuğu değiştirmeyi &sürdür
+
+en: Show Windows &notification area for 60 seconds
+tr: Windows &bildirim alanını 60 saniye göster
+
+en: &Search…
+tr: &Ara…
+
+en: &Settings…
+tr: A&yarlar…
+
+en: View available &update…
+tr: Kullanılabilir &güncelleştirmeyi görüntüle…
+
+en: &Check for updates…
+tr: Güncelleştirmeleri &denetle…
+
+en: &About Aether Shell
+tr: Aether Shell &hakkında
+
+en: &Quit Aether Shell
+tr: Aether Shell'den ç&ık
+
+en: Switch &input language\tWin+Space
+tr: G&iriş dilini değiştir\tWin+Ara Çubuğu
+
+en: Open &network controls…
+tr: Ağ &denetimlerini aç…
+
+en: &Weather settings…
+tr: &Hava durumu ayarları…
+
+en: Toggle output &mute
+tr: Çıkışın &sesini kapat/aç
+
+en: &Sound settings…
+tr: &Ses ayarları…
+
+en: Toggle microphone &mute
+tr: &Mikrofonun sesini kapat/aç
+
+en: Start Windows &voice typing\tWin+H
+tr: Windows &sesle yazmayı başlat\tWin+H
+
+en: Microphone &privacy settings…
+tr: Mikrofon &gizlilik ayarları…
+
+en: &Power settings…
+tr: &Güç ayarları…
+
+en: Open &notifications and calendar
+tr: &Bildirimleri ve takvimi aç
+
+en: Open &calendar\tWin+Alt+D
+tr: &Takvimi aç\tWin+Alt+D
+
+en: Show &hidden icons
+tr: &Gizli simgeleri göster
+
+en: Initializing
+tr: Başlatılıyor
+
+en: Unavailable
+tr: Kullanılamıyor
+
+en: Unsupported
+tr: Desteklenmiyor
+
+en: Error
+tr: Hata
+
+en: Available
+tr: Kullanılabilir
+
+en: Unknown
+tr: Bilinmiyor
+
+en: Internet access
+tr: İnternet erişimi
+
+en: Local network only
+tr: Yalnızca yerel ağ
+
+en: Limited Internet access
+tr: Sınırlı İnternet erişimi
+
+en: No network connection
+tr: Ağ bağlantısı yok
+
+en: Connectivity unknown
+tr: Bağlantı durumu bilinmiyor
+
+en: Ethernet
+tr: Ethernet
+
+en: Cellular
+tr: Hücresel
+
+en: Network
+tr: Ağ
+
+en: Offline
+tr: Çevrimdışı
+
+en: Network status unavailable
+tr: Ağ durumu kullanılamıyor
+
+en: Quick controls
+tr: Hızlı denetimler
+
+en: Aether Shell menu
+tr: Aether Shell menüsü
+
+en: Weather status unavailable
+tr: Hava durumu bilgisi kullanılamıyor
+
+en: Cached weather
+tr: Önbellekteki hava durumu
+
+en: Observation (UTC): {}
+tr: Gözlem (UTC): {}
+
+en: Weather: {}
+tr: Hava durumu: {}
+
+en: Click to open weather settings
+tr: Hava durumu ayarlarını açmak için tıklayın
+
+en: Show hidden icons
+tr: Gizli simgeleri göster
+
+en: Opens Windows' notification-area overflow
+tr: Windows'un bildirim alanı taşma menüsünü açar
+
+en: Input language: {}
+tr: Giriş dili: {}
+
+en: Fallback input layout
+tr: Yedek giriş düzeni
+
+en: Click to switch input language (Win+Space)
+tr: Giriş dilini değiştirmek için tıklayın (Win+Ara Çubuğu)
+
+en: Network: {}
+tr: Ağ: {}
+
+en: Signal strength unavailable
+tr: Sinyal gücü kullanılamıyor
+
+en: Click to open Windows network settings
+tr: Windows ağ ayarlarını açmak için tıklayın
+
+en: Audio output
+tr: Ses çıkışı
+
+en: Audio: {}
+tr: Ses: {}
+
+en: volume unknown
+tr: ses düzeyi bilinmiyor
+
+en: Muted
+tr: Sessiz
+
+en: Sound on
+tr: Ses açık
+
+en: Microphone: {}
+tr: Mikrofon: {}
+
+en: Endpoint unmuted
+tr: Cihazın sesi açık
+
+en: Recording detection unsupported
+tr: Kayıt algılama desteklenmiyor
+
+en: Click to toggle mute; right-click for Windows voice typing and microphone privacy settings
+tr: Sesi kapatmak/açmak için tıklayın; Windows sesle yazma ve mikrofon gizlilik ayarları için sağ tıklayın
+
+en: Battery: {}
+tr: Pil: {}
+
+en: Battery {}
+tr: Pil {}
+
+en: Battery status unavailable
+tr: Pil durumu kullanılamıyor
+
+en: Charging
+tr: Şarj oluyor
+
+en: External power
+tr: Harici güç
+
+en: Estimated remaining: {} h {} min
+tr: Tahmini kalan süre: {} sa {} dk
+
+en: Click to open power settings
+tr: Güç ayarlarını açmak için tıklayın
+
+en: Clock status unavailable
+tr: Saat durumu kullanılamıyor
+
+en: Click to open calendar and notifications
+tr: Takvimi ve bildirimleri açmak için tıklayın
+
+en: Action failed: {}
+tr: Eylem başarısız oldu: {}
+
+en: Aether Shell status bar
+tr: Aether Shell durum çubuğu
+
+en: Update available
+tr: Güncelleştirme var
+
+en: Cached
+tr: Önbellekte
+
+en: Start
+tr: Başlat
+
+en: Search
+tr: Ara
+
+en: Task View
+tr: Görev Görünümü
+
+en: Application
+tr: Uygulama
+
+en: Running application
+tr: Çalışan uygulama
+
+en: More applications
+tr: Daha fazla uygulama
+
+en: Aether Shell window previews
+tr: Aether Shell pencere önizlemeleri
+
+en: Minimized — preview unavailable
+tr: Simge durumunda — önizleme kullanılamıyor
+
+en: Preview unavailable
+tr: Önizleme kullanılamıyor
+
+en: {} windows
+tr: {} pencere
+
+en: {} window
+tr: {} pencere
+
+en: Switches to this window
+tr: Bu pencereye geçer
+
+en: Minimized, preview unavailable
+tr: Simge durumunda, önizleme kullanılamıyor
+
+en: Minimized
+tr: Simge durumunda
+
+en: Close {}
+tr: Kapat: {}
+
+en: Asks this window to close; the application can still ask to save or cancel
+tr: Bu pencereden kapanmasını ister; uygulama yine de kaydetmeyi veya iptal etmeyi isteyebilir
+
+en: Close requested
+tr: Kapatma istendi
+
+en: Previous applications
+tr: Önceki uygulamalar
+
+en: Open
+tr: Aç
+
+en: New instance
+tr: Yeni örnek
+
+en: Unpin from Dock
+tr: Dock'tan kaldır
+
+en: Pin to Dock
+tr: Dock'a sabitle
+
+en: Move left
+tr: Sola taşı
+
+en: Move right
+tr: Sağa taşı
+
+en: Dock settings...
+tr: Dock ayarları...
+
+en: Import Windows taskbar pins
+tr: Windows görev çubuğu sabitlemelerini içeri aktar
+
+en: Open Windows Start
+tr: Windows Başlat'ı aç
+
+en: Aether Shell Dock
+tr: Aether Shell Dock
+
+en: Pinned
+tr: Sabitlendi
+
+en: Running
+tr: Çalışıyor
+
+en: Needs attention
+tr: İlgilenilmesi gerekiyor
+
+en: Up arrow shows window previews
+tr: Yukarı ok pencere önizlemelerini gösterir
+
+en: Installed application
+tr: Yüklü uygulama
+
+en: Desktop application
+tr: Masaüstü uygulaması
+
+en: File
+tr: Dosya
+
+en: Folder
+tr: Klasör
+
+en: Windows tool
+tr: Windows aracı
+
+en: Control Panel
+tr: Denetim Masası
+
+en: ↑↓ Navigate   ·   Enter Open   ·   Esc Close
+tr: ↑↓ Gezin   ·   Enter Aç   ·   Esc Kapat
+
+en: Search apps, settings and files
+tr: Uygulama, ayar ve dosya arayın
+
+en: Search could not be completed.
+tr: Arama tamamlanamadı.
+
+en: Results
+tr: Sonuçlar
+
+en: Indexing applications…
+tr: Uygulamalar dizine ekleniyor…
+
+en: Type to search apps, settings and files
+tr: Uygulama, ayar ve dosya aramak için yazın
+
+en: Nothing matches
+tr: Eşleşen sonuç yok
+
+en: Windows could not open this application.
+tr: Windows bu uygulamayı açamadı.
+
+en: Menu
+tr: Menü
+
+en: Opens a submenu
+tr: Bir alt menü açar
+
+en: , opens a submenu
+tr: , bir alt menü açar
+
+en: Selected
+tr: Seçili
+
+en: Checked
+tr: İşaretli
+
+en: Bluetooth
+tr: Bluetooth
+
+en: Airplane mode
+tr: Uçak modu
+
+en: Accessibility
+tr: Erişilebilirlik
+
+en: Energy saver
+tr: Enerji tasarrufu
+
+en: Live captions
+tr: Canlı açıklamalı alt yazılar
+
+en: Night light
+tr: Gece ışığı
+
+en: Mobile hotspot
+tr: Mobil etkin nokta
+
+en: Nearby sharing
+tr: Yakındakilerle paylaşım
+
+en: Cast
+tr: Yayınla
+
+en: Project
+tr: Yansıt
+
+en: All settings
+tr: Tüm ayarlar
+
+en: Connected
+tr: Bağlı
+
+en: Not connected
+tr: Bağlı değil
+
+en: , on
+tr: , açık
+
+en: , off
+tr: , kapalı
+
+en: , state unknown
+tr: , durum bilinmiyor
+
+en: , opens Windows Settings
+tr: , Windows Ayarları'nı açar
+
+en: , shows accessibility features
+tr: , erişilebilirlik özelliklerini gösterir
+
+en: , requires Windows 11 version 22H2
+tr: , Windows 11 sürüm 22H2 gerektirir
+
+en: Now playing: {}
+tr: Şimdi yürütülüyor: {}
+
+en: Untitled media
+tr: Başlıksız medya
+
+en: , switch source
+tr: , kaynağı değiştir
+
+en: Previous media item
+tr: Önceki medya öğesi
+
+en: Pause
+tr: Duraklat
+
+en: Play
+tr: Yürüt
+
+en: Next media item
+tr: Sonraki medya öğesi
+
+en: {} details
+tr: {} ayrıntıları
+
+en: Page {} of {}
+tr: Sayfa {} / {}
+
+en: Next page
+tr: Sonraki sayfa
+
+en: First page
+tr: İlk sayfa
+
+en: Brightness
+tr: Parlaklık
+
+en: Brightness, unavailable on this display
+tr: Parlaklık, bu ekranda kullanılamıyor
+
+en: Volume
+tr: Ses düzeyi
+
+en: Volume, unavailable
+tr: Ses düzeyi, kullanılamıyor
+
+en: Unmute
+tr: Sesi aç
+
+en: Mute
+tr: Sesi kapat
+
+en: Sound output and volume mixer
+tr: Ses çıkışı ve ses karıştırıcısı
+
+en: Back
+tr: Geri
+
+en: , secured
+tr: , güvenli
+
+en: , open
+tr: , açık
+
+en: , connected
+tr: , bağlı
+
+en: Disconnect
+tr: Bağlantıyı kes
+
+en: Show available networks
+tr: Kullanılabilir ağları göster
+
+en: More Wi-Fi settings
+tr: Diğer Wi-Fi ayarları
+
+en: Bluetooth and devices settings
+tr: Bluetooth ve cihaz ayarları
+
+en: Magnifier
+tr: Büyüteç
+
+en: Narrator
+tr: Ekran Okuyucusu
+
+en: On-screen keyboard
+tr: Ekran klavyesi
+
+en: Sticky keys
+tr: Yapışkan tuşlar
+
+en: More accessibility settings
+tr: Diğer erişilebilirlik ayarları
+
+en: Volume mixer
+tr: Ses karıştırıcısı
+
+en: Choose output in Sound settings
+tr: Ses ayarlarında çıkışı seçin
+
+en: Power and battery settings
+tr: Güç ve pil ayarları
+
+en: Battery {} percent, {}
+tr: Pil yüzde {}, {}
+
+en: All Windows settings
+tr: Tüm Windows ayarları
+
+en: The requested action could not be dispatched
+tr: İstenen eylem gönderilemedi
+
+en: Aether Shell quick controls
+tr: Aether Shell hızlı denetimleri
+
+en: Media session active
+tr: Medya oturumu etkin
+
+en: No media session
+tr: Medya oturumu yok
+
+en: Current page
+tr: Geçerli sayfa
+
+en:  - secured
+tr:  - güvenli
+
+en:  - open
+tr:  - açık
+
+en:  - opens in Windows
+tr:  - Windows'ta açılır
+
+en: Turned off by hardware or policy
+tr: Donanım veya ilke tarafından kapatıldı
+
+en: State unavailable - use Windows settings
+tr: Durum kullanılamıyor - Windows ayarlarını kullanın
+
+en: Off
+tr: Kapalı
+
+en:  - signal {} of 5
+tr:  - sinyal {} / 5
+
+en: , no internet
+tr: , internet yok
+
+en: On - not connected
+tr: Açık - bağlı değil
+
+en: Windows is not letting apps list networks: check Location in Privacy settings
+tr: Windows, uygulamaların ağları listelemesine izin vermiyor: Gizlilik ayarlarında Konum'u kontrol edin
+
+en: No Wi-Fi adapter found
+tr: Wi-Fi bağdaştırıcısı bulunamadı
+
+en: Connecting to {}...
+tr: Bağlanılıyor: {}...
+
+en:  - looking for networks
+tr:  - ağlar aranıyor
+
+en: On
+tr: Açık
+
+en: A screen reader is running
+tr: Bir ekran okuyucu çalışıyor
+
+en: Windows accessibility features
+tr: Windows erişilebilirlik özellikleri
+
+en: Sound output
+tr: Ses çıkışı
+
+en: Default output device
+tr: Varsayılan çıkış cihazı
+
+en: No output device available
+tr: Kullanılabilir çıkış cihazı yok
+
+en: Battery unknown
+tr: Pil durumu bilinmiyor
+
+en: Status refresh could not be started
+tr: Durum yenileme başlatılamadı
+
+en: Status refresh unavailable
+tr: Durum yenileme kullanılamıyor
+
+en: Excellent signal
+tr: Mükemmel sinyal
+
+en: Good signal
+tr: İyi sinyal
+
+en: Fair signal
+tr: Orta sinyal
+
+en: Weak signal
+tr: Zayıf sinyal
+
+en: Clear sky
+tr: Açık hava
+
+en: Mainly clear
+tr: Çoğunlukla açık
+
+en: Partly cloudy
+tr: Parçalı bulutlu
+
+en: Overcast
+tr: Kapalı hava
+
+en: Fog
+tr: Sis
+
+en: Drizzle
+tr: Çisenti
+
+en: Rain
+tr: Yağmur
+
+en: Snow
+tr: Kar
+
+en: Rain showers
+tr: Sağanak yağmur
+
+en: Snow showers
+tr: Kar sağanağı
+
+en: Thunderstorm
+tr: Gök gürültülü fırtına
+
+## weather
+
+en: Morning
+tr: Sabah
+
+en: Afternoon
+tr: Öğleden sonra
+
+en: Evening
+tr: Akşam
+
+en: Night
+tr: Gece
+
+en: Now
+tr: Şimdi
+
+en: Today
+tr: Bugün
+
+en: Low
+tr: Düşük
+
+en: Moderate
+tr: Orta
+
+en: High
+tr: Yüksek
+
+en: Very high
+tr: Çok yüksek
+
+en: Extreme
+tr: Aşırı
+
+en: No connection to the weather service.
+tr: Hava durumu hizmetiyle bağlantı yok.
+
+en: The weather service is busy. Try again in a moment.
+tr: Hava durumu hizmeti meşgul. Birazdan yeniden deneyin.
+
+en: The weather could not be loaded.
+tr: Hava durumu yüklenemedi.
+
+en: Could not update; showing the last forecast.
+tr: Güncelleştirilemedi; son tahmin gösteriliyor.
+
+en: Try again
+tr: Yeniden dene
+
+en: Your location
+tr: Konumunuz
+
+en: My location
+tr: Konumum
+
+en: Precise location
+tr: Hassas konum
+
+en: Approximate location
+tr: Yaklaşık konum
+
+en: Chosen in Settings
+tr: Ayarlar'da seçildi
+
+en: Allow
+tr: İzin ver
+
+en: Use precise location
+tr: Hassas konumu kullan
+
+en: See the weather where you are: allow your precise location.
+tr: Bulunduğunuz yerin hava durumunu görün: hassas konumunuza izin verin.
+
+en: Your position is approximate (about 10 km).
+tr: Konumunuz yaklaşık (yaklaşık 10 km).
+
+en: Location is turned off for this app in Windows.
+tr: Windows'ta bu uygulama için konum kapalı.
+
+en: This device cannot report its location. Search for a city instead.
+tr: Bu cihaz konumunu bildiremiyor. Bunun yerine bir şehir arayın.
+
+en: Reading Windows location…
+tr: Windows konumu okunuyor…
+
+en: Automatic weather follows your Windows location.
+tr: Otomatik hava durumu Windows konumunuzu izler.
+
+en: Search for a city
+tr: Şehir ara
+
+en: Search for a city, or allow your location, to see the weather.
+tr: Hava durumunu görmek için bir şehir arayın veya konumunuza izin verin.
+
+en: Searching…
+tr: Aranıyor…
+
+en: City search is unavailable.
+tr: Şehir arama kullanılamıyor.
+
+en: No city found.
+tr: Şehir bulunamadı.
+
+en: Weather settings
+tr: Hava durumu ayarları
+
+en: Loading the weather…
+tr: Hava durumu yükleniyor…
+
+en: Loading…
+tr: Yükleniyor…
+
+en: Updated {}
+tr: Güncelleştirildi: {}
+
+en: Near {}
+tr: {} yakınında
+
+en: Temperatures now
+tr: Şu anki sıcaklıklar
+
+en: The map is unavailable.
+tr: Harita kullanılamıyor.
+
+en: Map: Natural Earth
+tr: Harita: Natural Earth
+
+en: Weather data by Open-Meteo.com
+tr: Hava durumu verileri: Open-Meteo.com
+
+en: Feels like
+tr: Hissedilen
+
+en: Feels like {}
+tr: Hissedilen {}
+
+en: Close to the real temperature
+tr: Gerçek sıcaklığa yakın
+
+en: The wind makes it feel colder
+tr: Rüzgar daha soğuk hissettiriyor
+
+en: Humidity makes it feel warmer
+tr: Nem daha sıcak hissettiriyor
+
+en: Humidity
+tr: Nem
+
+en: Cloud cover {}
+tr: Bulut örtüsü {}
+
+en: Wind
+tr: Rüzgar
+
+en: Gusts {}
+tr: Rüzgar hamlesi {}
+
+en: Sunrise and sunset
+tr: Gün doğumu ve gün batımı
+
+en: UV index
+tr: UV indeksi
+
+en: Pressure
+tr: Basınç
+
+en: At sea level
+tr: Deniz seviyesinde
+
+en: &Open the weather
+tr: Hava durumunu &aç
+
+en: The forecast for where you are, to about 100 m, with its own height. Off: rounded to about 10 km.
+tr: Bulunduğunuz yerin yaklaşık 100 m hassasiyetle, kendi yüksekliğiyle tahmini. Kapalı: yaklaşık 10 km'ye yuvarlanır.

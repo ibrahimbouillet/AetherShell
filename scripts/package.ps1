@@ -49,7 +49,18 @@ try {
     if (Test-Path -LiteralPath $signature) { Remove-Item -LiteralPath $signature -Force }
     & python ./scripts/release/make_manifest.py --version $version --channel $channel $setup
     if ($LASTEXITCODE -ne 0) { throw 'Manifest generation failed.' }
-    $files = @($setup)
+    # D83: every language but English is a release asset of its own, downloaded when a person needs it. The packs
+    # are built from tools/i18n and must be exactly the ones src/core/LanguageTable.inc (compiled into the setup and
+    # the application) describes, size and SHA-256.
+    $packageStage = 'language packs'
+    $packs = Join-Path $outputPath "AetherShell-$version-languages"
+    if (Test-Path -LiteralPath $packs) { Remove-Item -LiteralPath $packs -Recurse -Force }
+    & python ./tools/i18n/languages.py packs $packs
+    if ($LASTEXITCODE -ne 0) { throw 'Language pack generation failed.' }
+    & python ./tools/i18n/languages.py verify $packs
+    if ($LASTEXITCODE -ne 0) { throw 'The language packs are not the ones this build describes.' }
+    $packFiles = @(Get-ChildItem -LiteralPath $packs -Filter 'AetherShell-language-*.json' | Sort-Object Name | ForEach-Object { $_.FullName })
+    $files = @($setup) + $packFiles
     if ([Environment]::GetEnvironmentVariable('AETHER_RELEASE_SIGNING_KEY_FILE')) {
         $packageStage = 'manifest signing'
         & python ./scripts/release/sign_manifest.py $manifest

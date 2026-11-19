@@ -1,0 +1,74 @@
+# English (United Kingdom) (en-GB): English (United Kingdom). The interface texts of Aether Shell, translated from English.
+# Edit the tr: lines; keep {} placeholders, a single & access key and \n as in the English.
+# A variant of en: only the texts that differ from it are listed.
+
+## app
+
+en: Unrecognized or invalid Aether Shell command line.
+tr: Unrecognised or invalid Aether Shell command line.
+
+## search-names
+
+en: Airplane mode settings
+tr: Flight mode settings
+
+en: Color settings
+tr: Colour settings
+
+## settings-pages
+
+en: Behavior
+tr: Behaviour
+
+en: Maximized windows stay above the Dock instead of under it.
+tr: Maximised windows stay above the Dock instead of under it.
+
+en: Maximized windows stay below the Top Bar.
+tr: Maximised windows stay below the Top Bar.
+
+en: Color mode, accent, motion speed and the look of the Dock and Top Bar.
+tr: Colour mode, accent, motion speed and the look of the Dock and Top Bar.
+
+en: Liquid blur color
+tr: Liquid blur colour
+
+en: Automatic keeps the glass's own colors. Text and icons stay readable whatever the color.
+tr: Automatic keeps the glass's own colours. Text and icons stay readable whatever the colour.
+
+en: Liquid color strength
+tr: Liquid colour strength
+
+en: How much of the chosen color the blur layer takes.
+tr: How much of the chosen colour the blur layer takes.
+
+en: Color mode
+tr: Colour mode
+
+en: Accent color
+tr: Accent colour
+
+en: Keeps magnification and launch bounce clear of maximized windows.
+tr: Keeps magnification and launch bounce clear of maximised windows.
+
+en: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximized applications.
+tr: While Aether Shell runs, it hides the Windows taskbar and reserves space below maximised applications.
+
+## shell
+
+en: Initializing
+tr: Initialising
+
+en: Cellular
+tr: Mobile
+
+en: Minimized — preview unavailable
+tr: Minimised — preview unavailable
+
+en: Minimized, preview unavailable
+tr: Minimised, preview unavailable
+
+en: Minimized
+tr: Minimised
+
+en: Airplane mode
+tr: Flight mode

@@ -1,0 +1,183 @@
+# D70: Settings status lines, update states and confirmations (src/settings/ui, src/ui/form).
+
+en: GitHub could not be reached.
+
+en: GitHub did not answer the request just now.
+
+en: The release did not pass verification, so nothing was installed.
+
+en: There is not enough free disk space.
+
+en: Windows refused access to the update files.
+
+en: {} bytes
+
+en: {} KB
+
+en: {} MB
+
+en: Status
+
+en: Check &now
+
+en: Download and install
+
+en: &Later
+
+en: S&kip this version
+
+en: &Release details
+
+en: Disable &notifications
+
+en: Release notes
+
+en: the new version
+
+en: Installed: {}.
+
+en: Automatic update checks are off
+
+en: Check now looks for a newer release once.
+
+en: Last checked {}
+
+en: Not checked yet
+
+en: Checking for updates...
+
+en: Aether Shell is up to date
+
+en: Latest published release: {}.
+
+en: Version {} is available
+
+en: Download size: {}.
+
+en: Downloading version {}...
+
+en: Received {} of {} ({}%).
+
+en: Received {}; total size unknown.
+
+en: Version {} is ready to install
+
+en: Verified with the signed release manifest and SHA-256.
+
+en: The update could not be completed
+
+en: It installs by hand for now: open Release details, then download and run its setup.
+
+en: Failure: {}.
+
+en: Choose Retry Download to try again.
+
+en: Use Check now to try again.
+
+en: Next automatic check: {}.
+
+en: &Install update
+
+en: Retry &Download
+
+en: &Download and install
+
+en: Windows' startup state could not be read in this session.
+
+en: Windows will start it at your next sign-in.
+
+en: Right now it will not start at sign-in.
+
+en: It is turned off in Task Manager or Windows Settings, which decide until it is turned on there.
+
+en: Windows would start another copy of Aether Shell.
+
+en: Windows reports a startup state this version cannot read.
+
+en: The close action could not be completed.
+
+en: Enter a complete number before saving; the field marked in red is not one.
+
+en: Settings could not be validated.
+
+en: Sign-in startup was left as it was, because settings could not be saved.
+
+en: Settings could not be saved, and Windows' sign-in startup could not be put back. Apply again to retry.
+
+en: Settings saved.
+
+en: Settings changed in memory; saving failed. Apply again to retry.
+
+en: Settings could not be applied.
+
+en: Some values were corrected to their supported range.
+
+en: Startup registration is unavailable in this session.
+
+en: Changing startup registration...
+
+en: Windows did not change startup registration. Check Task Manager's startup setting.
+
+en: Startup registration could not be changed.
+
+en: Defaults saved; startup is disabled.
+
+en: Defaults applied; saving failed. Apply again to retry.
+
+en: Defaults could not be applied.
+
+en: Startup was not disabled; settings were kept.
+
+en: Location search is unavailable.
+
+en: Searching Open-Meteo locations...
+
+en: Location search failed. Check your connection and try again.
+
+en: No place matched that search.
+
+en: Choose a location to save it.
+
+en: Reset all settings?
+
+en: Preferences and pinned applications return to their defaults and startup at sign-in is turned off.
+
+en: Your Windows taskbar choice is kept. A backup of the current settings file is kept.
+
+en: &Reset
+
+en: Cancel
+
+en: Pinned applications saved.
+
+en: Pins changed in memory; saving failed. Apply again to retry.
+
+en: Defaults could not be restored because startup registration is unavailable.
+
+en: Pinned application could not be added.
+
+en: Choose an application to add first.
+
+en: Pinned applications could not be changed.
+
+en: Choose a pinned application first.
+
+en: Desktop status is unavailable in this session.
+
+en: Desktop status is unavailable.
+
+en: Password
+
+# D83: the status of the chosen language on Settings > Language ({} is the language's own name, then the pack's size).
+
+en: Downloading {} from GitHub ({}). English is shown until it is ready.
+
+en: {} could not be downloaded. English is shown until it is; choose Download below to try again.
+
+en: {} is not on this PC yet. English is shown until it is downloaded.
+
+en: {} is on this PC.
+
+en: Every language is on this PC.
+
+en: Choose a language to download first.
