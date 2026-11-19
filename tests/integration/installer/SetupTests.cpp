@@ -56,9 +56,28 @@ AETHER_TEST("setup: isolated silent install, repair and uninstall preserve user 
 }
 AETHER_TEST("setup: explicit removal deletes only isolated user data") {
     IsolatedRoot fixture;const auto root=fixture.path/L"install";const auto data=fixture.path/L"data";const auto outside=fixture.path/L"sentinel.txt";
-    REQUIRE(fs::WriteFileAtomic(outside,"synthetic sibling").ok());REQUIRE(fs::EnsureDirectory(data).ok());REQUIRE(fs::WriteFileAtomic(data/L"settings.json","synthetic").ok());
+    REQUIRE(fs::WriteFileAtomic(outside,"synthetic sibling").ok());
+    REQUIRE(fs::WriteFileAtomic(data/L"config"/L"settings.json","synthetic").ok());REQUIRE(fs::WriteFileAtomic(data/L"logs"/L"aether.log","synthetic").ok());
     REQUIRE_EQ(Setup(root,data),DWORD{0});REQUIRE_EQ(Setup(root,data,{L"--uninstall",L"--remove-user-data"}),DWORD{0});
     CHECK_FALSE(std::filesystem::exists(root));CHECK_FALSE(std::filesystem::exists(data));CHECK_EQ(fs::ReadFile(outside,1024).value(),std::string("synthetic sibling"));
+}
+AETHER_TEST("setup: uninstall keeps a person's own files in both folders, with or without removing Aether's data") {
+    // A01: only what Aether made goes; a file someone keeps in these folders stays, with the folder that holds it.
+    for(const bool removeData:{false,true}) {
+        IsolatedRoot fixture;const auto root=fixture.path/L"install";const auto data=fixture.path/L"data";
+        REQUIRE(fs::WriteFileAtomic(data/L"config"/L"settings.json","synthetic").ok());
+        REQUIRE(fs::WriteFileAtomic(data/L"my notes.txt","synthetic person's file").ok());
+        REQUIRE_EQ(Setup(root,data),DWORD{0});
+        REQUIRE(fs::WriteFileAtomic(root/L"my plugin.txt","synthetic person's file").ok());
+        REQUIRE(fs::WriteFileAtomic(root/L"kept"/L"inner.txt","synthetic person's folder").ok());
+        std::vector<std::wstring> arguments{L"--uninstall"};if(removeData)arguments.push_back(L"--remove-user-data");
+        REQUIRE_EQ(Setup(root,data,arguments),DWORD{0});
+        CHECK_EQ(fs::ReadFile(root/L"my plugin.txt",1024).value(),std::string("synthetic person's file"));
+        CHECK_EQ(fs::ReadFile(root/L"kept"/L"inner.txt",1024).value(),std::string("synthetic person's folder"));
+        for(const auto* owned:{L"versions",L"staging",L"AetherShell.exe",L"AetherShellSetup.exe",L"install-state.json"}) CHECK_FALSE(std::filesystem::exists(root/owned));
+        CHECK_EQ(fs::ReadFile(data/L"my notes.txt",1024).value(),std::string("synthetic person's file"));
+        CHECK_EQ(std::filesystem::exists(data/L"config"),!removeData);
+    }
 }
 AETHER_TEST("setup: malformed arguments fail without creating installation") {
     IsolatedRoot fixture;const auto root=fixture.path/L"install";const auto data=fixture.path/L"data";

@@ -166,6 +166,7 @@ struct TopBarWindow::Impl final : ui::accessibility::IAccessibleSurfaceModel {
     std::optional<int> touchItem;
     bool registered = false;
     std::optional<RECT> reservedBounds;
+    std::uint64_t reregisteredAt = 0;   // D85: the last time a lost reservation was registered again
     bool relayouting = false;
     bool fullscreen = false;
     bool heldBack = false;
@@ -727,6 +728,30 @@ void TopBarWindow::Relayout() {
 }
 
 void TopBarWindow::OnExplorerRestarted() { impl_->RemoveAppBar(); Relayout(); }
+std::optional<RECT> TopBarWindow::ReservedStripPx() const noexcept {
+    if (impl_->destroyed || !impl_->registered || !impl_->reservedBounds) return std::nullopt;
+    return impl_->reservedBounds;
+}
+bool TopBarWindow::EnsureReservation() {
+    auto& p = *impl_;
+    if (!Handle() || p.destroyed || p.testBounds || !p.context.allowAppBar) return false;
+    const bool wanted = (p.settings.reserveSpace || IsTextPresentation(p.settings, p.tokens)) && !p.settings.autoHide;
+    if (!wanted) return false;
+    bool missing = !p.registered || !p.reservedBounds;   // Explorer refused the registration (not ready yet)
+    if (!missing) {
+        MONITORINFO info{sizeof(info)};
+        if (!::GetMonitorInfoW(::MonitorFromRect(&*p.reservedBounds, MONITOR_DEFAULTTONEAREST), &info)) return false;
+        missing = info.rcWork.top < p.reservedBounds->bottom;   // Windows' work area no longer leaves it out
+    }
+    if (!missing) return false;
+    const auto now = ::GetTickCount64();
+    if (p.reregisteredAt && now - p.reregisteredAt < 3000) return false;
+    p.reregisteredAt = now;
+    AETHER_LOG_WARN("topbar", "the Top Bar's strip was missing from Windows' work area; reserving it again");
+    p.RemoveAppBar();
+    Relayout();
+    return true;
+}
 void TopBarWindow::SetAutoHidden(bool hidden) {
     auto& p = *impl_;
     if (p.autoHidden == hidden || p.destroyed) return;

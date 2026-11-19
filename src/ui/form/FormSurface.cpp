@@ -285,7 +285,7 @@ struct FormSurface::Impl final : graphics::IFrameClient {
     [[nodiscard]] bool SmartActive() const noexcept { return smart && smart->Started(); }
     [[nodiscard]] bool WantsSmart() const noexcept {
         return smartDevice && smartDevice->Capabilities().hostBackdrop && material == FormMaterial::Acrylic && !Framed() &&
-               tokens.liquid && tokens.liquidSmart && tokens.mode != graphics::ThemeMode::HighContrast;
+               tokens.liquid && tokens.liquidSmart && tokens.transparencyEnabled && tokens.mode != graphics::ThemeMode::HighContrast;
     }
     void UpdateSmartGlass() noexcept {
         try {
@@ -2967,6 +2967,7 @@ void FormSurface::EnableSmartGlass(graphics::GraphicsDevice* device, std::functi
     }
 }
 bool FormSurface::SmartGlassActive() const noexcept { return impl_->SmartActive(); }
+const SmartMask* FormSurface::SmartGlassMask() const noexcept { return impl_->SmartActive() ? &impl_->smart->Mask() : nullptr; }
 
 void FormSurface::SetMaximizedFrame(bool maximized) {
     auto& impl = *impl_;

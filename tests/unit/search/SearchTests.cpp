@@ -150,3 +150,13 @@ AETHER_TEST("search files: a found file says what it is and where, and shortcuts
     CHECK_EQ(file.parsingName, std::wstring(L"C:\\Users\\a\\Downloads\\Trip.mp4"));
     CHECK_EQ(file.displayName, std::wstring(L"Trip.mp4"));
 }
+
+AETHER_TEST("file search: the index is searched only within the person's own folders, never all of it (A06)") {
+    using aether::search::ScopeRestriction;
+    CHECK(ScopeRestriction({}).empty());                          // none of them: no file is searched at all
+    const std::vector<std::wstring> none{L""};
+    CHECK(ScopeRestriction(none).empty());
+    const std::vector<std::wstring> folders{L"C:\\Users\\a\\Documents", L"D:\\O'Brien\\Pictures"};
+    CHECK_EQ(ScopeRestriction(folders),
+             std::wstring(L"AND (SCOPE='file:C:/Users/a/Documents' OR SCOPE='file:D:/O''Brien/Pictures')"));   // quotes doubled
+}

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 //
-// D84: Liquid's smart transparency. The mask is pure, so these tests give it own content and content behind and read
-// the cells: full blur where own content lies over other content, light blur over the plain desktop, clear elsewhere,
-// soft one-cell edges that never lower a cell.
+// D84, D86: Liquid's smart transparency. The mask is pure, so these tests give it own content and content behind and
+// read the cells: full blur wherever a window lies behind and where own content lies over the desktop's icons, light
+// blur under own content over the plain desktop, clear elsewhere, soft edges that never lower a cell.
 #include "AetherTest.h"
 
 #include "graphics/Theme.h"
@@ -46,17 +46,31 @@ AETHER_TEST("smart glass: an empty or degenerate client gives an empty mask") {
     CHECK(ComputeSmartMask(100, 100, 0, {}, {}, 0).cells.empty());
 }
 
-AETHER_TEST("smart glass: own content over other content blurs fully, over the plain desktop lightly") {
-    // Own text at cells (2..3, 2); another window behind the left half only.
+AETHER_TEST("smart glass: own content over the desktop's icons blurs fully, over the plain desktop lightly") {
+    // Own text at cells (2..3, 2) and (8..9, 2); desktop icons behind the left half only.
     const std::vector<RECT> own{{16, 16, 32, 24}, {64, 16, 80, 24}};
-    const std::vector<RECT> busy{{0, 0, 48, 80}};
-    const auto mask = ComputeSmartMask(96, 80, 8, own, busy, 0);
-    CHECK_EQ(Cell(mask, 2, 2), 255);   // text over a window
+    const std::vector<RECT> icons{{0, 0, 48, 80}};
+    const auto mask = ComputeSmartMask(96, 80, 8, own, icons, 0);
+    CHECK_EQ(Cell(mask, 2, 2), 255);   // text over an icon's name
     CHECK_EQ(Cell(mask, 3, 2), 255);
     CHECK_EQ(Cell(mask, 8, 2), 115);   // text over the desktop picture: 0.45
     CHECK_EQ(Cell(mask, 9, 2), 115);
-    CHECK_EQ(Cell(mask, 0, 9), 0);     // nothing of its own, even over the window behind: clear
+    CHECK_EQ(Cell(mask, 0, 9), 0);     // nothing of its own over the icons: clear
     CHECK_EQ(Cell(mask, 5, 7), 0);
+}
+
+AETHER_TEST("smart glass: a window behind is blurred fully wherever it lies, content of the form's or not") {
+    // Own text at cells (2..3, 2) and (8..9, 2); another window behind the left half only.
+    const std::vector<RECT> own{{16, 16, 32, 24}, {64, 16, 80, 24}};
+    const std::vector<RECT> windows{{0, 0, 48, 80}};
+    const auto mask = ComputeSmartMask(96, 80, 8, own, {}, 0, {}, windows);
+    CHECK_EQ(Cell(mask, 2, 2), 255);   // text over the window
+    CHECK_EQ(Cell(mask, 0, 9), 255);   // nothing of its own, but the window is behind: blurred all the same
+    CHECK_EQ(Cell(mask, 5, 0), 255);
+    CHECK_EQ(Cell(mask, 8, 2), 115);   // text over the desktop picture beside the window: light
+    CHECK_EQ(Cell(mask, 11, 9), 0);    // the plain desktop picture, nothing of its own: clear
+    CHECK(Cell(mask, 6, 9) > 0);       // the blur fades out past the window's edge
+    CHECK(Cell(mask, 6, 9) < 255);
 }
 
 AETHER_TEST("smart glass: edges fade as a gradient over three cells and never lower a cell") {
@@ -102,6 +116,7 @@ AETHER_TEST("smart glass: equal inputs give equal masks, so an unchanged scene i
     const std::vector<RECT> busy{{0, 0, 30, 30}};
     CHECK(ComputeSmartMask(120, 80, 8, own, busy, 6) == ComputeSmartMask(120, 80, 8, own, busy, 6));
     CHECK_FALSE(ComputeSmartMask(120, 80, 8, own, busy, 6) == ComputeSmartMask(120, 80, 8, own, {}, 6));
+    CHECK_FALSE(ComputeSmartMask(120, 80, 8, own, {}, 6, {}, busy) == ComputeSmartMask(120, 80, 8, own, {}, 6));
 }
 
 AETHER_TEST("smart glass: own content is the visible leaf controls, clipped by what holds them") {

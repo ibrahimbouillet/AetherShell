@@ -10,6 +10,8 @@
 #include "core/Cancellation.h"
 #include "core/Result.h"
 
+#include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -25,5 +27,8 @@ namespace aether::search {
 // Up to `maxResults` files and folders of the index whose name matches `query`. Unavailable when Windows Search is
 // off or the index cannot be read; the shell then simply shows no files.
 [[nodiscard]] Result<std::vector<apps::ApplicationInfo>> FindFiles(std::wstring_view query, std::size_t maxResults, const CancellationToken& cancel);
+// Pure (tests): the index query's restriction to `folders` (Windows paths), or nothing when there is none: then no
+// file is searched at all, never the whole index (A06).
+[[nodiscard]] std::wstring ScopeRestriction(std::span<const std::wstring> folders);
 
 }  // namespace aether::search

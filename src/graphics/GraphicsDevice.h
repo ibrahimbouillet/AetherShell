@@ -85,10 +85,18 @@ public:
     void ResetRecovery() noexcept;
     [[nodiscard]] bool RecoveryExhausted() const noexcept { return recovery_.Exhausted(); }
     [[nodiscard]] std::uint64_t Generation() const noexcept { return generation_; }
+    // Tests (A02): recovery under `policy`, its next `count` attempts failing as if no device could be made.
+    void SimulateFailedRecoveriesForTests(unsigned count, DeviceRecoveryPolicy policy) noexcept {
+        simulatedFailures_ = count;
+        recovery_ = policy;
+    }
 
     // Raised on the UI thread after the rendering device changed. Every device-dependent resource
     // (bitmaps, brushes, effects) must be recreated and every surface redrawn.
     Signal<> DeviceReplaced;
+    // A02: raised on the UI thread when recovery spent its budget: nothing retries until ResetRecovery, so Aether's
+    // surfaces may stay unpainted (the host gives the Windows taskbar back until DeviceReplaced).
+    Signal<> RecoveryGaveUp;
 
     [[nodiscard]] static bool IsDeviceLostError(HRESULT hr) noexcept;
 
@@ -98,6 +106,7 @@ private:
 
     DeviceRecoveryPolicy recovery_;
     UINT_PTR recoveryTimer_ = 0;
+    unsigned simulatedFailures_ = 0;
 
     winrt::Windows::System::DispatcherQueueController dispatcherQueueController_{nullptr};
     wuc::Compositor compositor_{nullptr};

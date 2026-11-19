@@ -25,6 +25,10 @@ Before publishing a milestone:
    print secrets or signing locations. If signing is unavailable, keep the unsigned manifest local;
    a draft manual-install alpha may contain only the audited setup/checksums and state that automatic
    updates are not available yet. Never weaken the production verifier to make a release pass.
+   Authenticode (A04) is separate: once the owner has a code-signing identity, `package.ps1 -Sign`
+   signs the embedded programs and the setup and verifies them against Windows' trust
+   ([docs/release/CODE_SIGNING.md](docs/release/CODE_SIGNING.md)); release notes say whether the setup
+   is signed, checked with `Get-AuthenticodeSignature` on the file actually published.
 7. Prepare release notes with actual version/source/test receipts, changes, limitations and install/
    rollback instructions. Create a draft prerelease for the alpha. Publish only under the owner's
    release authorization after assets/notes are concrete and reviewed; a source push is separate.

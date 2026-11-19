@@ -208,3 +208,19 @@ pending; geometry tests alone are not evidence that Explorer honors/restores the
   (`CloseTrayOverflow`), treats an overflow that Windows closed within 0.5 s (dismissed by that very
   press) as the toggle's close, and a 100 ms watch timer flips the chevron back when Windows closes the
   overflow on its own.
+
+## D85 — the Top Bar's strip kept clear (test 4.2, S-083)
+
+- **`TopStrip.h/.cpp`:** while the Top Bar reserves space (Auto-Hide off), an out-of-context WinEvent hook
+  (foreground, move/size start and end, minimize end, show; never Aether's own process) and a sweep of all windows
+  (when it is turned on, after display changes and once the reservation is back) look at top-level windows. `FitBelowStrip` (pure) gives the new frame: a
+  maximized window is fitted to the work area once the work area leaves the strip out (until then the reservation is
+  asked again), an ordinary window under the strip moves down by as much and is made shorter only if it would pass the
+  work area's bottom and can be resized (at least 160 px tall). Never touched: full-screen, other monitors, tool,
+  topmost, click-through or no-activate windows, the desktop and shell windows, a window being dragged.
+  `StripRetryBudget` allows three moves per window per minute. Moves use `SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE |
+  SWP_NOZORDER`; a window that moved is looked at again 600 ms later. The keeper reports whether an application window
+  still covers the strip, and the Top Bar then shows its glass strip.
+- **Watchdog:** a one-second timer calls `TopBarWindow::EnsureReservation`.
+- **Tests:** `tests/unit/app/TopStripTests.cpp` (geometry and budget). No automated case moves another program's
+  window or changes the real work area; live behavior is the owner's check.

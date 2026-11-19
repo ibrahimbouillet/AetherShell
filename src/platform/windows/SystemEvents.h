@@ -57,6 +57,7 @@ public:
     Signal<SessionNotifications> SessionNotificationStateChanged;  // registered late, or given up
     Signal<LPARAM> RawInput;                     // WM_INPUT, for a raw-input registration on this window
     Signal<> PowerSettingChanged;                // WM_POWERBROADCAST / PBT_POWERSETTINGCHANGE / PBT_APMPOWERSTATUSCHANGE
+                                                 // (energy saver on or off included)
 
 private:
     static LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -66,6 +67,7 @@ private:
 
     SessionRegistrar registrar_;
     HWND hwnd_ = nullptr;
+    HPOWERNOTIFY powerSaving_ = nullptr;
     UINT taskbarCreatedMessage_ = 0;
     bool sessionNotificationsRegistered_ = false;
     SessionNotifications sessionState_ = SessionNotifications::Pending;

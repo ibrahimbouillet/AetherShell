@@ -94,7 +94,14 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
 - Real external application launches/UWP frame attribution, audio changes and startup registration
   are not exercised by automation; tests use fakes and read-only real status sampling.
 - The first live official signed-update cycle requires an owner-controlled release signing key.
-  Unsigned manifests must stay local. Authenticode signing is not configured.
+  Unsigned manifests must stay local. Authenticode signing is ready in the build (`package.ps1 -Sign`,
+  D88) but no code-signing identity exists yet, so releases are unsigned and SmartScreen warns.
+- Test 4.2's Top Bar strip keeper (D85) is unit-tested only: automation never changes the real work
+  area or moves other programs' windows. It does not watch every move of a window, only when one is
+  shown, activated or let go after a drag, so a program that moves itself under the bar later is put
+  back at its next activation. Programs running as administrator cannot be moved by Aether.
+- An automatic update or its rollback starts the application without the launcher's supervision
+  (A12, AS4-23); automatic updates stay off while the manifest is unsigned.
 - The initial visual identity is an original proposal for alpha, pending owner direction.
 - Product-wide startup/memory/idle CPU release budgets remain open (Q-001). Search latency has a
   separate measured engineering target.

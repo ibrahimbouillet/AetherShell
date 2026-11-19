@@ -216,6 +216,7 @@ struct WeatherProvider::Impl {
     void Run() noexcept;
     void ApplyConfigLocked(std::unique_lock<std::mutex>& lock);
     void LoadCacheLocked(std::unique_lock<std::mutex>& lock);
+    void EraseCacheLocked(std::unique_lock<std::mutex>& lock);
     void FetchLocked(std::unique_lock<std::mutex>& lock);
     void CompleteFetchLocked(std::unique_lock<std::mutex>& lock);
     [[nodiscard]] FetchOutcome FetchOnce(const WeatherConfig& request, const CancellationToken& cancel) const;
@@ -290,6 +291,7 @@ void WeatherProvider::Impl::ApplyConfigLocked(std::unique_lock<std::mutex>& lock
         retryIndex = 0;
         if (!applied.enabled) {
             AETHER_LOG_INFO(kLog, "weather disabled");
+            EraseCacheLocked(lock);   // A08: weather off keeps no place on disk
             return;
         }
         if (!identity) {
@@ -325,9 +327,27 @@ void WeatherProvider::Impl::LoadCacheLocked(std::unique_lock<std::mutex>& lock) 
         }
         return;
     }
-    if (const auto& reading = loaded.value(); reading && (!lastGood || reading->fetchedAt > lastGood->fetchedAt)) {
+    const auto& reading = loaded.value();
+    if (reading && !cache::IsWithinMaxAge(*reading, time.SystemNow())) {
+        // A08: past the six hours it could be shown for, the reading (and its place) goes from disk too.
+        lock.unlock();
+        auto erased = cache::Erase(cacheFile);
+        lock.lock();
+        if (!erased) AETHER_LOG_WARN(kLog, "expired weather cache could not be removed ({})", ToString(erased.error().code));
+        return;
+    }
+    if (reading && (!lastGood || reading->fetchedAt > lastGood->fetchedAt)) {
         lastGood = *reading;
     }
+}
+
+void WeatherProvider::Impl::EraseCacheLocked(std::unique_lock<std::mutex>& lock) {
+    lastGood.reset();
+    cacheLoaded = false;   // enabled again: whatever is on disk then is read again
+    lock.unlock();
+    auto erased = cache::Erase(cacheFile);
+    lock.lock();
+    if (!erased) AETHER_LOG_WARN(kLog, "weather cache could not be removed ({})", ToString(erased.error().code));
 }
 
 void WeatherProvider::Impl::FetchLocked(std::unique_lock<std::mutex>& lock) {

@@ -26,7 +26,8 @@ security fixes while the project is in its 0.x development phase.
   Details: `docs/decisions/0004-update-trust-model.md`, `docs/decisions/0005-installation-layout-and-rollback.md`.
 - **Authenticode**: the project does not own a code-signing certificate yet. Until it does, Windows
   SmartScreen may warn about the installer; the signed manifest remains the authenticity mechanism
-  for updates.
+  for updates. The build signs the programs and the setup as soon as one is configured
+  (`scripts/package.ps1 -Sign`, `docs/release/CODE_SIGNING.md`); SmartScreen is never bypassed.
 - **Untrusted input**: release notes, weather responses and GitHub API data are parsed with size and
   depth limits and rendered as plain text only. Search never executes typed text, and applications
   are launched only through the Windows shell from discovered entries, never from constructed command

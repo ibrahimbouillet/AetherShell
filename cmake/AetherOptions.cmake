@@ -26,6 +26,10 @@ set(AETHER_MODULES "all" CACHE STRING
 option(AETHER_BUILD_TESTS "Build the automated test executables" ON)
 option(AETHER_BUILD_SHOWCASE_RUNNER "Build the owner-started local cinematic capture runner" OFF)
 option(AETHER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (enabled in CI)" OFF)
+# A04: Authenticode-sign the programs embedded in setup (scripts/release/sign_code.ps1, configured through the
+# environment; docs/release/CODE_SIGNING.md). ALLOW_UNTRUSTED accepts a local test certificate, never for a release.
+option(AETHER_CODE_SIGN "Authenticode-sign the programs before setup embeds them" OFF)
+option(AETHER_CODE_SIGN_ALLOW_UNTRUSTED "Accept a signing certificate Windows does not trust (local tests only)" OFF)
 
 set(AETHER_SOURCE_REVISION "" CACHE STRING "Source revision embedded in the binaries (defaults to the git HEAD)")
 set(AETHER_SOURCE_REVISION_RESOLVED "${AETHER_SOURCE_REVISION}")

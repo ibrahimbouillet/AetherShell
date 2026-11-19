@@ -608,6 +608,30 @@ AETHER_TEST("controlcenter integration: keyboard opening shows focus and moves t
     CHECK(fixture.intents.empty()); CHECK_FALSE(fixture.wrongThread);
 }
 
+AETHER_TEST("controlcenter integration: no battery row on a PC without one, an unreadable or a valid battery keeps it (A14)") {
+    auto absent = Synthetic(false);
+    absent.battery = status::BatterySnapshot{};
+    absent.battery.state = status::ProviderState::Unavailable;   // Windows says: no battery
+    absent.battery.batteryPresent = false;
+    Fixture fixture; fixture.Initialize(absent);
+    CHECK_FALSE(Has(Ids(fixture), 500));
+    auto unreadable = Synthetic(false);
+    unreadable.battery = status::BatterySnapshot{};
+    unreadable.battery.state = status::ProviderState::Error;     // Windows could not say
+    fixture.window->SetState(unreadable);
+    REQUIRE(Has(Ids(fixture), 500));
+    Client(fixture, [](IUIAutomation& automation, HWND hwnd) {
+        auto root = Root(automation, hwnd);
+        Need(Name(*Item(automation, *root, 500)) == L"Power and battery settings");   // no fabricated level
+    });
+    fixture.window->SetState(Synthetic(false));
+    REQUIRE(Has(Ids(fixture), 500));
+    Client(fixture, [](IUIAutomation& automation, HWND hwnd) {
+        auto root = Root(automation, hwnd);
+        Need(Name(*Item(automation, *root, 500)) == L"Battery 78 percent, Power and battery settings");
+    });
+}
+
 AETHER_TEST("controlcenter integration: unknown ranges stay unavailable and closed queues cannot act") {
     Fixture fixture; fixture.Initialize(ControlCenterState{});
     Client(fixture, [](IUIAutomation& automation, HWND hwnd) {

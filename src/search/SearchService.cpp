@@ -202,6 +202,7 @@ struct SearchService::Impl {
     WorkerPool worker;
     WorkerPool files;                   // D68: Windows' index answers out of process: never in the way of the rest
     std::uint64_t fileGeneration = 0;   // the latest file request; older ones are dropped
+    CancellationSource fileCancellation;   // A07: the latest file request's; a newer one cancels it
     bool fileFailureLogged = false;
     mutable std::mutex mutex;
     CancellationSource cancellation;
@@ -215,22 +216,33 @@ struct SearchService::Impl {
 SearchService::SearchService(IUiDispatcher& dispatcher) : impl_(std::make_shared<Impl>(dispatcher)) {}
 SearchService::~SearchService() {
     CancellationSource cancellation;
-    { std::lock_guard lock(impl_->mutex); impl_->alive = false; cancellation = impl_->cancellation; }
+    CancellationSource fileCancellation;
+    { std::lock_guard lock(impl_->mutex); impl_->alive = false; cancellation = impl_->cancellation; fileCancellation = impl_->fileCancellation; }
     cancellation.Cancel();
+    fileCancellation.Cancel();   // A07: a file query in progress stops instead of holding the shutdown
     impl_->worker.Shutdown();
     impl_->files.Shutdown();
 }
 
 void SearchService::QueryFiles(std::wstring query, std::size_t maxResults, FilesDelivered delivered) {
     std::uint64_t generation = 0;
-    { std::lock_guard lock(impl_->mutex); if (!impl_->alive) return; generation = ++impl_->fileGeneration; }
+    CancellationSource previous, source;
+    {
+        std::lock_guard lock(impl_->mutex);
+        if (!impl_->alive) return;
+        generation = ++impl_->fileGeneration;
+        previous = impl_->fileCancellation;
+        impl_->fileCancellation = source;
+    }
+    previous.Cancel();   // A07: the request this one overtakes stops its work in progress
     const std::weak_ptr<Impl> weak = impl_;
-    (void)impl_->files.Post([weak, generation, query = std::move(query), maxResults, delivered = std::move(delivered)]() mutable {
+    (void)impl_->files.Post([weak, generation, cancel = source.Token(), query = std::move(query), maxResults, delivered = std::move(delivered)]() mutable {
         auto state = weak.lock();
         if (!state) return;
         { std::lock_guard lock(state->mutex); if (!state->alive || generation != state->fileGeneration) return; }   // overtaken
         Result<std::vector<SearchResult>> answer = std::vector<SearchResult>{};
-        auto files = FindFiles(query, maxResults, CancellationToken{});
+        auto files = FindFiles(query, maxResults, cancel);
+        if (cancel.IsCancelled()) return;   // overtaken while it ran: its answer is never shown
         if (!files) {
             std::lock_guard lock(state->mutex);
             if (!state->fileFailureLogged) {

@@ -76,9 +76,14 @@ public:
     // What lies behind the written items on the desktop, measured by the host from the desktop picture: it decides
     // their ink. Nothing: the theme decides, under a stronger halo.
     void SetBackdropProfile(std::optional<BackdropProfile> profile);
-    // An application window lies under the bar (the host's Auto-Hide observation): the written items then sit on a
-    // strip of the style's glass, from edge to edge, instead of straight on that window.
+    // An application window lies under the bar (the host's observation): the written items then sit on a strip of the
+    // style's glass, from edge to edge, instead of straight on that window.
     void SetOverWindows(bool over);
+    // D85: the strip the bar reserves in Windows' work area (screen pixels), or nothing when it reserves none.
+    [[nodiscard]] std::optional<RECT> ReservedStripPx() const noexcept;
+    // D85: when Windows' work area no longer leaves the reserved strip out (Explorer lost or never kept the
+    // reservation), registers it again: at most once every three seconds. True when it did.
+    bool EnsureReservation();
     // A host action started from `item` failed: a short explanation below that item, never over a
     // hidden, suppressed or disabled bar.
     void ReportItemFailure(ItemKind item, std::wstring_view message);

@@ -833,7 +833,17 @@ private:
 #endif
         if(success_ && !options_.uninstall && launch_ && ::SendMessageW(launch_,BM_GETCHECK,0,0)==BST_CHECKED) {
             ::EnableWindow(window_,FALSE);const auto root=options_.root;
-            const auto data=options_.data;worker_.Post([this,root,data]{auto layout=install::InstallLayout::Create(root);if(layout)(void)install::LaunchInstalledShell(*layout,{L"--data-dir",data.native()});dispatcher_.Post([]{::PostQuitMessage(0);});});
+            const auto data=options_.data;worker_.Post([this,root,data]{
+                auto layout=install::InstallLayout::Create(root);
+                const bool started=layout && install::LaunchInstalledShell(*layout,{L"--data-dir",data.native()});
+                dispatcher_.Post([this,started]{
+                    if(started){::PostQuitMessage(0);return;}
+                    // A05: installed but not started: said so, and Finish then closes without starting it.
+                    ::EnableWindow(window_,TRUE);
+                    if(launch_)::SendMessageW(launch_,BM_SETCHECK,BST_UNCHECKED,0);
+                    SetStatus(L"Aether Shell could not start. Choose Repair in Windows Settings > Apps > Installed apps.",form::Severity::Error);
+                });
+            });
         } else ::PostQuitMessage(success_?0:1);
     }
     static LRESULT CALLBACK Proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {

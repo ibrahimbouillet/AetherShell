@@ -14,6 +14,8 @@ namespace aether::platform {
 namespace {
 constexpr wchar_t kClassName[] = L"AetherShell.SystemEvents";
 constexpr UINT_PTR kSessionRetryTimer = 1;
+// GUID_POWER_SAVING_STATUS (energy saver on or off), spelled out so no GUID library is needed.
+constexpr GUID kPowerSavingStatus{0xe00958c0, 0xc213, 0x4ace, {0xac, 0x77, 0xfe, 0xcc, 0xed, 0x2e, 0xee, 0xa5}};
 }
 
 SessionLockState CurrentSessionLockState() noexcept {
@@ -51,6 +53,8 @@ Result<void> SystemEvents::Create() {
     if (!hwnd_) return LastWin32Error("CreateWindowEx(SystemEvents)");
     // Allow TaskbarCreated through UIPI when Explorer runs at a different integrity level.
     if (taskbarCreatedMessage_) ::ChangeWindowMessageFilterEx(hwnd_, taskbarCreatedMessage_, MSGFLT_ALLOW, nullptr);
+    // Energy saver turning on or off arrives as PBT_POWERSETTINGCHANGE (D86: Windows' transparency follows it).
+    powerSaving_ = ::RegisterPowerSettingNotification(hwnd_, &kPowerSavingStatus, DEVICE_NOTIFY_WINDOW_HANDLE);
     if (!registrar_.registerWindow) {
         registrar_.registerWindow = [](HWND window) { return ::WTSRegisterSessionNotification(window, NOTIFY_FOR_THIS_SESSION) != FALSE; };
         registrar_.unregisterWindow = [](HWND window) { (void)::WTSUnRegisterSessionNotification(window); };
@@ -98,6 +102,10 @@ void SystemEvents::TryRegisterSession() noexcept {
 void SystemEvents::Destroy() noexcept {
     if (!hwnd_) return;
     ::KillTimer(hwnd_, kSessionRetryTimer);
+    if (powerSaving_) {
+        (void)::UnregisterPowerSettingNotification(powerSaving_);
+        powerSaving_ = nullptr;
+    }
     if (sessionNotificationsRegistered_) {
         try { if (registrar_.unregisterWindow) registrar_.unregisterWindow(hwnd_); } catch (...) {}
         sessionNotificationsRegistered_ = false;

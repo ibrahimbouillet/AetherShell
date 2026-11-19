@@ -118,6 +118,43 @@ AETHER_TEST("weather provider: disabled sends no requests and touches no cache")
     CHECK_EQ(http.RequestCount(), std::size_t{1});
 }
 
+AETHER_TEST("weather provider: turning weather off removes the cached place and reading from disk (A08)") {
+    FakeHttpClient http;
+    http.RespondWith(200, ForecastBody(15.3, 2, 1));
+    FakeTimeSource time;
+    ReportRecorder recorder;
+    const auto cacheFile = NewCacheFile();
+    WeatherProvider provider(http, time, cacheFile, ParisConfig());
+    REQUIRE(provider.StartWithReports(recorder.Listener()).ok());
+    Settle(provider);
+    REQUIRE(std::filesystem::exists(cacheFile));   // a successful fetch is cached
+    auto disabled = ParisConfig();
+    disabled.enabled = false;
+    REQUIRE(provider.UpdateConfig(disabled).ok());
+    Settle(provider);
+    CHECK_FALSE(std::filesystem::exists(cacheFile));
+    // Weather turned on again starts from nothing on disk: it fetches anew.
+    REQUIRE(provider.UpdateConfig(ParisConfig()).ok());
+    Settle(provider);
+    CHECK_EQ(http.RequestCount(), std::size_t{2});
+    CHECK(std::filesystem::exists(cacheFile));
+}
+
+AETHER_TEST("weather provider: a cache file left from before weather was off is removed at start (A08)") {
+    FakeHttpClient http;
+    FakeTimeSource time;
+    ReportRecorder recorder;
+    const auto cacheFile = NewCacheFile();
+    REQUIRE(cache::Save(cacheFile, CachedParis(time, 10min)).ok());
+    auto disabled = ParisConfig();
+    disabled.enabled = false;
+    WeatherProvider provider(http, time, cacheFile, disabled);
+    REQUIRE(provider.StartWithReports(recorder.Listener()).ok());
+    Settle(provider);
+    CHECK_FALSE(std::filesystem::exists(cacheFile));
+    CHECK_EQ(http.RequestCount(), std::size_t{0});
+}
+
 AETHER_TEST("weather provider: enabled without coordinates is LocationNotConfigured") {
     FakeHttpClient http;
     http.RespondWith(200, ForecastBody(15.3, 2, 1));
@@ -402,6 +439,7 @@ AETHER_TEST("weather provider: cache older than six hours is ignored") {
     Settle(provider);
     CHECK_EQ(provider.Current().state, WeatherState::Offline);
     CHECK_FALSE(AnyTemperature(recorder.Reports()));
+    CHECK_FALSE(std::filesystem::exists(cacheFile));   // A08: past its six hours it goes from disk too
 }
 
 AETHER_TEST("weather provider: cache for another location or unit is ignored") {

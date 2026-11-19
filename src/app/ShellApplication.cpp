@@ -8,6 +8,7 @@
 #include "app/PanelDismissal.h"
 #include "app/TaskbarController.h"
 #include "app/TaskbarRecovery.h"
+#include "app/TopStrip.h"
 #include "app/TouchEdgeReveal.h"
 #include "app/WorkAreaInsets.h"
 #include "app/WindowCorners.h"
@@ -212,6 +213,11 @@ struct ShellApplication::Impl {
     std::unique_ptr<TaskbarController> taskbar;
     std::unique_ptr<WindowCorners> windowCorners;
     std::unique_ptr<WorkAreaInsets> sideInsets;
+    std::unique_ptr<TopStripKeeper> topStrip;   // D85: application windows kept out of the Top Bar's strip
+    bool stripCovered = false;                  // D85: an application window still lies under the strip
+    bool graphicsSuspendedTaskbar = false;      // A02: the Windows taskbar came back because the device was lost
+    bool energySaver = platform::EnergySaverOn();   // D86: Windows draws no transparency while it is on
+    bool remoteSession = platform::RemoteSession(); // D86: no smart transparency through Remote Desktop
     std::unique_ptr<welcome::WelcomeWindow> welcomeWindow;
     welcome::WelcomeController welcomeController{welcome::WelcomeTiming{10000}};   // D62: the greeting, then the 3-second arrival
     std::shared_ptr<const welcome::BackdropImage> welcomeBackdrop;
@@ -647,6 +653,8 @@ struct ShellApplication::Impl {
     }
     void OnSessionChanged(WPARAM change) {
         const auto now = ::GetTickCount64();
+        // D86: shown on this PC's screen again or through Remote Desktop: smart transparency follows.
+        if (const bool remote = platform::RemoteSession(); remote != remoteSession) { remoteSession = remote; QueueApplySettings(); }
         if (change == WTS_SESSION_LOCK || change == WTS_CONSOLE_DISCONNECT || change == WTS_REMOTE_DISCONNECT || change == WTS_SESSION_LOGOFF)
             EndArrivalReplay(false);
         switch (change) {
@@ -974,7 +982,7 @@ struct ShellApplication::Impl {
         if (closing || !settings || !settings->Loaded()) return;
         const auto& value = settings->Current();
         const bool topOn = topbar && value.topBar.autoHide, dockOn = dock && value.dock.autoHide;
-        if (!topOn) { topAutoHide.Reset(); if (topbar) { topbar->SetAutoHidden(false); topbar->SetOverWindows(false); } }
+        if (!topOn) { topAutoHide.Reset(); if (topbar) { topbar->SetAutoHidden(false); topbar->SetOverWindows(stripCovered); } }   // D85: the keeper's observation
         if (!dockOn) { dockAutoHide.Reset(); if (dock) dock->SetAutoHidden(false); }
         autoHideWatchesTouch = topOn || dockOn;
         UpdateTouchWatch();
@@ -1132,6 +1140,7 @@ struct ShellApplication::Impl {
     void OnExplorerRestarted() {
         if(sideInsets)(void)sideInsets->OnExplorerRestarted();
         if (topbar) topbar->OnExplorerRestarted();
+        if (topStrip) topStrip->SweepSoon();   // D85: windows laid out while Explorer had no strip
         if (nativeTaskbarAccess && catalogReady && settings && settings->Current().general.replaceWindowsTaskbar && settings->Current().general.syncTaskbarPins) ImportTaskbarPins();
         const bool wanted = taskbar && taskbarRequested.value_or(false) && !closing;
         if (dock && !dock->OnExplorerRestarted() && wanted && !taskbarReservationFailed) { FailTaskbarReservation(); return; }
@@ -1303,6 +1312,7 @@ struct ShellApplication::Impl {
         if (!settings) return home;
         const auto& value = settings->Current().weather;
         home.unit = value.unit == settings::TemperatureUnit::Celsius ? status::TemperatureUnit::Celsius : status::TemperatureUnit::Fahrenheit;
+        home.refreshMinutes = value.refreshMinutes;   // A11: the open window follows the chosen interval
         const bool consent = value.enabled && value.useWindowsLocation && value.windowsLocationConsent;
         home.locating = locationPending || locationConsentPending;
         if (!nativeTaskbarAccess) home.permission = LocationPermission::Unavailable;  // an isolated instance never asks
@@ -1752,6 +1762,8 @@ void ShellApplication::Impl::ApplySettings() {
     shellMotion = motion;
     UpdateSideInsets();
     UpdateAutoHide();
+    // D85: while the Top Bar reserves its strip (Reserve screen space, or the written bar), windows are kept out of it.
+    if (topStrip) topStrip->SetEnabled(!closing && topbar && !value.topBar.autoHide && (value.topBar.reserveSpace || topbar->TextPresentation()));
     if (searchWindow) searchWindow->SetTheme(tokens, motion);
     if (controls) controls->SetTheme(tokens, motion);
     if (weatherWindow) weatherWindow->SetTheme(tokens, motion);   // D78: a Top Bar panel, in the shell's mode and style
@@ -1760,7 +1772,8 @@ void ShellApplication::Impl::ApplySettings() {
     // D79: Settings follows the chosen style too: Liquid there when Liquid is chosen, Grain otherwise.
     appTokens.liquid = value.general.surfaceStyle == settings::SurfaceStyle::Liquid && appTokens.mode != graphics::ThemeMode::HighContrast;
     appTokens.liquidGlass = LiquidGlassFrom(value, appTokens);
-    appTokens.liquidSmart = appTokens.liquid && value.general.liquidSmart;   // D84
+    // D84; D86: not through Remote Desktop, which may show the desktop unblurred (the ordinary Liquid glass there).
+    appTokens.liquidSmart = appTokens.liquid && value.general.liquidSmart && !platform::RemoteSession();
     appMotion = motion;
     if (settingsWindow) settingsWindow->SetTheme(appTokens, appMotion);
     if (relocalized) {
@@ -1952,6 +1965,10 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
     controls = std::make_unique<controlcenter::ControlCenterWindow>(graphics, scheduler, dispatcher);
     if (auto result = controls->Initialize(); !result) return result;
     sideInsets=std::make_unique<WorkAreaInsets>(nativeTaskbarAccess);
+    topStrip = std::make_unique<TopStripKeeper>(nativeTaskbarAccess, TopStripCallbacks{
+        [this]() -> std::optional<RECT> { return topbar ? topbar->ReservedStripPx() : std::nullopt; },
+        [this] { if (topbar && !closing) (void)topbar->EnsureReservation(); },
+        [this](bool covered) { stripCovered = covered; if (topbar && !(settings && settings->Current().topBar.autoHide)) topbar->SetOverWindows(covered); }});
     windowCorners=std::make_unique<WindowCorners>(nativeTaskbarAccess, paths.executableDir / L"AetherShellApp.exe");
     connections.push_back(controls->Requested.Connect([this](controlcenter::ControlIntent intent) { HandleControl(intent); }));
     // D78: the weather window. Optional: the shell runs without it.
@@ -2058,10 +2075,23 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         ::KillTimer(events.Handle(), kTaskbarResumeTimer); automaticResume = false; resumeTimerArmed = false;
         if (!SetTaskbarReplacementSuspended(false) && settingsWindow) settingsWindow->ReportActionStatus(L"Taskbar replacement could not resume; Windows remains available");
     }));
+    // A02: when the rendering device cannot be recovered, Aether's bars may stay unpainted: the Windows taskbar comes
+    // back, and replacement resumes once the device does (a display change or a resume grants a fresh budget).
+    connections.push_back(graphics.RecoveryGaveUp.Connect([this]{
+        if (closing || !taskbar || !taskbarRequested.value_or(false) || taskbar->Suspended()) return;
+        AETHER_LOG_WARN("app", "taskbar replacement: rendering device lost; showing the Windows taskbar until it recovers");
+        if (SetTaskbarReplacementSuspended(true)) graphicsSuspendedTaskbar = true;
+    }));
+    connections.push_back(graphics.DeviceReplaced.Connect([this]{
+        if (!std::exchange(graphicsSuspendedTaskbar, false)) return;
+        if (closing || !taskbar || !taskbarRequested.value_or(false) || !taskbar->Suspended()) return;
+        AETHER_LOG_INFO("app", "taskbar replacement: rendering device recovered; resuming");
+        (void)SetTaskbarReplacementSuspended(false);
+    }));
     connections.push_back(topbar->FullscreenChanged.Connect([this](bool hidden){ fullscreenSuppressed=hidden; if(hidden && controls)controls->Close(); ApplyDockSuppression(); }));
     connections.push_back(settings->Changed().Connect([this](const settings::Settings&){ ++settingsRevision; ApplySettings(); }));
     connections.push_back(events.ThemeChanged.Connect([this]{ QueueApplySettings(); }));
-    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (DesktopPictureHeld()) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); UpdateTopBarBackdrop(true); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
+    connections.push_back(events.DisplayChanged.Connect([this]{ graphics.ResetRecovery(); if (DesktopPictureHeld()) RequestDesktopPicture();EndArrivalReplay(false);ApplyWelcome(welcomeController.Canceled()); if(welcomeController.SessionLocked())ApplyWelcome(welcomeController.Locked(WelcomeEnabled(),::GetTickCount64())); if(controls)controls->Close(); if(sideInsets)(void)sideInsets->Refresh(); if(topbar)topbar->Relayout(); if(topStrip)topStrip->SweepSoon(); UpdateTopBarBackdrop(true); if(dock && !dock->Relayout() && taskbarRequested.value_or(false))FailTaskbarReservation(); }));
     connections.push_back(events.ExplorerRestarted.Connect([this]{ OnExplorerRestarted(); }));
     const auto clockChanged = [this] { providers->clock->NotifyTimeChanged(); providers->battery->Refresh(); providers->network->Refresh(); weather->NotifyClockChanged(); RefreshWindowsWeatherLocation(); if(updates)updates->NotifyClockChanged(); };
     connections.push_back(events.TimeChanged.Connect(clockChanged));
@@ -2070,14 +2100,22 @@ Result<void> ShellApplication::Impl::StartSurfaces() {
         // Waking without a lock is the same moment for the person as an unlock.
         if (!welcomeController.SessionLocked()) ApplyWelcome(welcomeController.Unlocked(WelcomeAllowed(), ::GetTickCount64()));
     }));
-    connections.push_back(events.PowerSettingChanged.Connect([this]{ providers->battery->Refresh(); }));
+    connections.push_back(events.PowerSettingChanged.Connect([this]{
+        providers->battery->Refresh();
+        // D86: energy saver turns Windows' transparency off and on; the styles follow it.
+        if (const bool saver = platform::EnergySaverOn(); saver != energySaver) { energySaver = saver; QueueApplySettings(); }
+    }));
     connections.push_back(events.SettingChanged.Connect([this](UINT action, const std::wstring& section){
         if (action == SPI_SETDESKWALLPAPER && DesktopPictureHeld()) RequestDesktopPicture();   // D63: the water shows the new picture
         if (action == SPI_SETDESKWALLPAPER) UpdateTopBarBackdrop(true);                        // D71: the ink reads over the new picture
         // AS4-08: a work-area broadcast (every AppBar change, Auto-Hide included) is answered by the
         // surfaces' own relayout; it never re-applies the configuration (relayouts, hotkeys, updates).
         switch (ClassifySettingChange(action, section)) {
-            case SettingChangeScope::WorkArea: return;
+            case SettingChangeScope::WorkArea:
+                // D85: Explorer may have dropped the Top Bar's strip; the windows it laid out are looked at again.
+                if (topbar && !closing) (void)topbar->EnsureReservation();
+                if (topStrip) topStrip->SweepSoon();
+                return;
             case SettingChangeScope::Locale:
                 providers->clock->NotifyTimeChanged(); providers->keyboard->Refresh();
                 SyncWindowsLanguages();   // D83: a language added to Windows gets its pack
@@ -2363,6 +2401,7 @@ void ShellApplication::Impl::Stop() noexcept {
     connections.clear(); channel.Close();
     if (windowCorners) windowCorners->Stop();
     windowCorners.reset();
+    topStrip.reset();   // its callbacks read the Top Bar
     if (weatherWindow) weatherWindow->Close();
     weatherWindow.reset();
     controls.reset(); sideInsets.reset();
@@ -2494,6 +2533,7 @@ Result<int> ShellApplication::Run(CommandLine command, platform::AppPaths paths,
             // The corner helper is wanted only while replacement is active, which this timer covers:
             // a helper that died or failed to start is noticed and retried with a bounded back-off.
             if (impl_->windowCorners && !impl_->closing) impl_->windowCorners->Poll();
+            if (impl_->topbar && !impl_->closing) (void)impl_->topbar->EnsureReservation();   // D85
             return true;
         }
         if (message.message == WM_TIMER && message.hwnd == impl_->events.Handle() && message.wParam == kUpdaterPollTimer) {

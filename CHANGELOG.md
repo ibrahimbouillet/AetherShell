@@ -6,6 +6,36 @@ All notable changes to Aether Shell are documented here. The format follows
 
 ## [Unreleased]
 
+Test 4.2 (`0.4.2-alpha.4`, D85–D88), not published.
+
+### Changed
+
+- **No application covers the Top Bar** (D85): the space the Top Bar reserves is checked every second and reserved
+  again when Windows lost it (for example when Explorer started after Aether at sign-in). A maximized window under the
+  bar is fitted to the space left for it, and a window moved or shown under the bar moves down below it. Full-screen
+  windows, other monitors and Windows' own surfaces are never touched. If a window still lies there, the written Top
+  Bar sits on a strip of glass instead of on that window.
+- **Smart transparency blurs every window behind Settings** (D86): wherever another window lies behind Settings, all of
+  it there is blurred, between Settings' own cards too, so no text from behind can be read through it. Energy saver
+  turns Aether's transparency off as it does Windows'; through Remote Desktop Settings keeps the ordinary Liquid glass.
+
+### Fixed (audit of test 4.8, D87)
+
+- Uninstalling removes only Aether's own files and folders; a file you keep in its folders stays (A01).
+- If the graphics device cannot be recovered, the Windows taskbar comes back until it can (A02).
+- Setup says when Aether Shell could not start at the end of an installation (A05).
+- File search stays within your own folders even when none of them can be found, and a search you typed over stops at
+  once (A06, A07).
+- Turning weather off removes the last place and reading from disk; an expired reading is removed too (A08).
+- The weather window shows "Now" only for a recent forecast, drops a forecast six hours old, follows a position that
+  moves in small steps, and refreshes at the interval chosen in Settings (A09–A11).
+- Quick Settings shows no battery row on a PC without a battery (A14).
+
+### Added
+
+- **Code signing, ready for a certificate** (D88): `scripts/package.ps1 -Sign` Authenticode-signs the programs and the
+  setup with the publisher's identity once one is configured (docs/release/CODE_SIGNING.md). This build is not signed.
+
 ## [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4) — 2026-11-19
 
 Alpha 4 (D62–D84). Release notes: [docs/releases/0.4.0-alpha.4.md](docs/releases/0.4.0-alpha.4.md).

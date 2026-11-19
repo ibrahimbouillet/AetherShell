@@ -3508,3 +3508,27 @@ then stays off); a standard account.
 `eb0cbce0968767edc47b76b5b35f043775e13f151d9dfba3fe11b42d0f2d46aa`, built by `scripts/package.ps1 -BuildDir build/wf-claude-v4` (package privacy audit passed) from the tree
 this entry describes, with the 40 language packs and the checksums file. The manifest is unsigned and stays local.
 Test 4.11's build moved to `dist/test-4.11/`.
+
+### S-083 — test 4.2: no application over the Top Bar, smart transparency over windows, the 4.8 audit, signing ready (Claude, 2026-11-19)
+
+**What changed:** D85 (the Top Bar's reservation kept, windows put back below the strip, a glass strip under the written
+items while something still covers it), D86 (every window behind Settings fully blurred; energy saver and Remote Desktop
+follow Windows' transparency), D87 (audit items A01, A02, A05–A11, A13, A14), D88 (Authenticode signing in the package,
+ready for an identity). Version `0.4.2-alpha.4`.
+
+| Check | Result |
+| --- | --- |
+| Unit gate (`ctest -L unit -j 8`, Release `/W4 /WX`, `build/wf-claude-v4`) | **26/26** on the first run. Changed modules: app 88 (new `TopStripTests.cpp`: 11 geometry and budget cases), ui_form 25 (`SmartGlassTests.cpp`: a window behind blurred wherever it lies; icons under own content), search 9 (A06 scope), weather 70 (A08: the cache erased when weather is off, and at start when already off), install 17, platform 39, graphics 111, topbar 28 |
+| Integration, whole suite (`ctest -L integration`, serial, Release) | **19/19 on the first run** (581.9 s), the ui_form motion and the search_ui/weather_ui timing cases included. New cases: setup uninstall keeps a person's own files in both folders (A01); a lost device given up once, then a fresh budget (A02, `DeviceRecoveryIntegrationTests.cpp`); small moves that add up move the followed weather place, a wobble does not (A10); no battery row without a battery, an unreadable or a valid battery keeps it (A14) |
+| Native smart glass (`aether_ui_form_integration_tests "smart glass"`) | pass: over the private test pattern behind the form, stripes' edge loss mean 3.53 (largest 98) under the content and 3.62 (largest 147) far from it, against a stripe step of 3.1–3.3: the window behind is blurred everywhere (S-082: 0.011 far from the content) |
+| Signing (`scripts/package.ps1 -Sign -TestCertificate`, separate `build/wf-claude-v4-signed`, output outside the checkout) | pass: a fresh Release build signed `AetherShellApp.exe`, `AetherShell.exe` and `AetherShellUpdater.exe` before setup embedded them (the payload manifest's SHA-256 equal to the signed copies) and then the setup, before the manifest and checksums; the package privacy audit passed. All four carry the throwaway certificate's signature; Windows reports `UnknownError` (an untrusted root) as expected, so `-AllowUntrusted` accepted them. No time stamp (`AETHER_SIGN_TIMESTAMP_URL=none`), no certificate store touched; the certificate and that package stay outside the checkout and are never published |
+| Package (`scripts/package.ps1 -BuildDir build/wf-claude-v4`, unsigned) | `AetherShell-0.4.2-alpha.4-win-x64-setup.exe`, 8766976 bytes, SHA-256 `ac2e079e49ad627f6896dd77e93e9c434f0875a6c319f971ec6cc9d891ee1c93`; package privacy audit passed; 40 language packs equal to `LanguageTable.inc` (the 0.4.0-alpha.4 packs, unchanged texts); unsigned programs and manifest, kept local. The package's build recompiled `TopStrip.cpp` and `ShellApplication.cpp` after a line-ending-only normalization of `TopStrip.*` (same text as the tested build). Test 4.12's build (the published Alpha 4) moved to `dist/test-4.12/` |
+
+**By source review only (no test):** A05 (setup reports a failed final launch), A07 (an overtaken file query cancelled
+through `ICommand::Cancel`), A09 ("Now" and the six-hour drop in the weather window: the forecast's fetch time has no
+test clock), A11 (the window's refresh timer), the strip keeper's live window moves and the reservation watchdog (tests
+never change the real work area or move another program's window), energy saver and Remote Desktop.
+
+**Not executed, so not claimed:** test 4.2 on the owner's desktop (Visual Studio Code and Chrome maximized, Explorer
+starting after Aether at sign-in, Settings over Visual Studio Code); a signature by a trusted identity and SmartScreen's
+answer to it; a laptop with energy saver; Remote Desktop; a standard account; Windows 10.

@@ -1,6 +1,29 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 Ibrahim Bouillet
 file(MAKE_DIRECTORY "${OUTPUT_DIR}")
+# A04: with SIGN_SCRIPT, copies of the three programs are Authenticode-signed first; the copies are what is hashed
+# and embedded. Without it (the default), no signed copy is left behind from an earlier signed build.
+set(_signed_dir "${OUTPUT_DIR}/signed")
+file(REMOVE_RECURSE "${_signed_dir}")
+if(SIGN_SCRIPT)
+    file(MAKE_DIRECTORY "${_signed_dir}")
+    file(COPY_FILE "${APP}" "${_signed_dir}/AetherShellApp.exe")
+    file(COPY_FILE "${LAUNCHER}" "${_signed_dir}/AetherShell.exe")
+    file(COPY_FILE "${UPDATER}" "${_signed_dir}/AetherShellUpdater.exe")
+    set(_sign_options)
+    if(SIGN_ALLOW_UNTRUSTED)
+        list(APPEND _sign_options -AllowUntrusted)
+    endif()
+    execute_process(COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File "${SIGN_SCRIPT}" ${_sign_options}
+                            "${_signed_dir}/AetherShellApp.exe" "${_signed_dir}/AetherShell.exe" "${_signed_dir}/AetherShellUpdater.exe"
+                    RESULT_VARIABLE _signed)
+    if(NOT _signed EQUAL 0)
+        message(FATAL_ERROR "Code signing failed: see scripts/release/sign_code.ps1 and docs/release/CODE_SIGNING.md.")
+    endif()
+    set(APP "${_signed_dir}/AetherShellApp.exe")
+    set(LAUNCHER "${_signed_dir}/AetherShell.exe")
+    set(UPDATER "${_signed_dir}/AetherShellUpdater.exe")
+endif()
 set(_sources "${APP}" "${LAUNCHER}" "${UPDATER}" "${REPO}/LICENSE" "${REPO}/THIRD_PARTY_NOTICES.md")
 set(_names AetherShellApp.exe AetherShell.exe AetherShellUpdater.exe LICENSE THIRD_PARTY_NOTICES.md)
 set(_manifest "{\"schemaVersion\":1,\"product\":\"AetherShell\",\"version\":\"${VERSION}\",\"architecture\":\"${ARCHITECTURE}\",\"files\":[")

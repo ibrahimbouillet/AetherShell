@@ -7,7 +7,40 @@
 > keep raw output local until every frame passes privacy review. See AGENTS.md and
 > [showcase capture notes](docs/showcase-capture.md).
 
-## Current checkpoint — Alpha 4 published: languages from the release, Liquid's smart transparency (`0.4.0-alpha.4`, D83–D84, S-082, 2026-11-19)
+## Current checkpoint — test 4.2: no application over the Top Bar, smart transparency over windows, the 4.8 audit, signing ready (`0.4.2-alpha.4`, D85–D88, S-083, 2026-11-19)
+
+The owner installed test 4.1 (the published Alpha 4) and sent screenshots: Visual Studio Code and Chrome, maximized, under
+the written Top Bar; Settings over Visual Studio Code showing its text sharply; SmartScreen's warning on the setup. They
+handed over the audit made on test 4.8 ("Donc, exécute tout ça").
+
+- **Top Bar strip (D85, T70):** `TopBarWindow::EnsureReservation` checks each second (and at work-area changes and
+  Explorer restarts) that Windows' work area leaves the reserved strip out and reserves it again when lost, at most
+  every 3 s. `src/app/TopStrip.*` (wired in `ShellApplication`) fits maximized windows under the strip to the work
+  area and moves an ordinary window moved or shown under it down below it; never full screen, other monitors, tool,
+  topmost or click-through windows, the shell's own, or a window being dragged; three moves a minute per window at
+  most; only while Auto-Hide is off. While a window still lies there, the written items sit on a glass strip.
+- **Smart transparency (D86, T71):** every mask cell with a window behind is fully blurred, between Settings' own
+  content too. Energy saver counts as transparency off (`platform::EnergySaverOn`, re-applied on
+  `GUID_POWER_SAVING_STATUS`); through Remote Desktop Settings keeps ordinary Liquid. A veil painted by the form itself
+  was not done: it would repaint Settings at every move behind it.
+- **Audit of 4.8 (D87, T72):** A01 uninstall removes only Aether's entries; A02 the taskbar comes back when graphics
+  recovery gives up; A05 setup reports a failed final launch; A06/A07 file search only in the person's folders, an
+  overtaken query cancelled; A08 the weather cache erased when weather is off or the reading expired; A09–A11 the
+  weather window's "Now", six-hour drop, followed position and refresh interval; A13 docs; A14 no battery row without
+  a battery. **Open:** A03 (owner's decision on old approximate consent and the precise position); A12 deferred (AS4-23).
+- **Signing (D88, T73):** `scripts/release/sign_code.ps1`, `AETHER_CODE_SIGN`, `scripts/package.ps1 -Sign`,
+  docs/release/CODE_SIGNING.md. SmartScreen is never bypassed; the identity (SignPath Foundation, Certum, Azure Artifact
+  Signing or a commercial certificate) is the owner's to choose. This build is unsigned.
+- **Evidence (S-083):** unit gate 26/26 and the whole integration suite 19/19 on the first run (Release); the native
+  smart glass case shows a window behind blurred as much far from the content as under it; signing checked with a
+  throwaway local certificate only (the three embedded programs and the setup signed, the payload pinning the signed bytes).
+- Committed locally; **not pushed (D65)**. Test 4.12's build (the published Alpha 4) moved to `dist/test-4.12/`.
+
+**Next:** the owner installs test 4.2 over 4.1 and checks Visual Studio Code and Chrome maximized, Settings over them,
+and a sign-in (Explorer after Aether). Owner's choices: a signing identity (D88) and A03. Not verified: the strip
+keeper live on the owner's desktop, energy saver on a laptop, Remote Desktop, a standard account, Windows 10.
+
+## Earlier — Alpha 4 published: languages from the release, Liquid's smart transparency (`0.4.0-alpha.4`, D83–D84, S-082, 2026-11-19)
 
 The owner asked for every language Windows offers, downloaded from the release when chosen (with each one's size shown,
 as Windows does), and for Liquid to blur only where text could lie over text. After looking at the Settings window they
@@ -1479,7 +1512,7 @@ One grouped Wi-Fi/audio/battery action opens real media/system controls. Dock/Ba
 
 ## NEXT SESSION START HERE
 
-**Current state: Alpha 4 (0.4.0-alpha.4) published as Latest (D83–D84, S-082, 2026-11-19); next, Alpha 4.1's faster start (T69)**; read the checkpoint at the top first. Older assignment
+**Current state: test 4.2 (0.4.2-alpha.4, D85–D88, S-083, 2026-11-19) committed locally, not pushed; Alpha 4 (0.4.0-alpha.4) is the published Latest**; read the checkpoint at the top first. Older assignment
 text follows. **Assignment: D51 / T50–T52, S-061 (2026-11-01).** Read the current checkpoint at the top, then
 the status table in `docs/specs/v4-stability-audit.md`. The source work is in the working tree,
 uncommitted. Next: owner trial of a private build, then whatever it shows; the open AS4 entries; the

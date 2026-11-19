@@ -109,6 +109,13 @@ Result<void> Save(const std::filesystem::path& file, const WeatherReading& readi
     return fs::WriteFileAtomic(file, Serialize(reading));
 }
 
+Result<void> Erase(const std::filesystem::path& file) {
+    std::error_code error;
+    std::filesystem::remove(file, error);
+    if (error) return MakeError(ErrorCode::Io, "weather cache could not be removed", error.value());
+    return Ok();
+}
+
 bool IsWithinMaxAge(const WeatherReading& reading, system_clock::time_point now) noexcept {
     if (reading.fetchedAt > now + kMaxFutureSkew) return false;
     return now - reading.fetchedAt < kMaxCacheAge;

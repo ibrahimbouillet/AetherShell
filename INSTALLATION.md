@@ -28,8 +28,10 @@ normal exit restores the Windows taskbar. Explorer remains running, and Windows 
 to configure Windows rather than Aether Shell. Recovery limitations and emergency commands are in
 the [user guide](USER_GUIDE.md).
 
-Unsigned application/setup binaries can trigger SmartScreen. This alpha has no Authenticode
-publisher certificate. Check the exact release source and SHA-256 before deciding to run it:
+Unsigned application/setup binaries can trigger SmartScreen ("Windows protected your PC"). This alpha has no
+Authenticode publisher certificate yet; the build can sign once the owner has one (A04,
+[docs/release/CODE_SIGNING.md](docs/release/CODE_SIGNING.md)). Setup never asks for administrator rights. Check the
+exact release source and SHA-256 before deciding to run it; then **More info** > **Run anyway** starts it:
 
 ```powershell
 Get-FileHash .\AetherShell-0.4.0-alpha.4-win-x64-setup.exe -Algorithm SHA256

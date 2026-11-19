@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 Ibrahim Bouillet
 //
-// D84: Liquid's smart transparency for a form window (Settings). The window looks at what lies behind it and blurs
-// only where its own content needs it:
-//   * where its own text or controls lie over other content (a window, the desktop's icons and their names): the full
-//     blur and tint, so text never reads over text;
+// D84, D86: Liquid's smart transparency for a form window (Settings). The window looks at what lies behind it:
+//   * wherever another window lies behind it: the full blur and veil, whether the form has content there or not, so
+//     nothing of that window is ever read through the form (D86);
+//   * where its own text or controls lie over the desktop's icons and their names: the full blur too;
 //   * where its own content lies over the plain desktop picture: a light blur;
-//   * where it has nothing of its own: fully clear, the desktop and the windows behind seen as they are.
+//   * anywhere else (the plain desktop picture, nothing of its own): fully clear.
 //
 // DWM's system backdrop blurs a whole window, and a composition layer of the window itself is drawn over its GDI
 // content. So the blur lives in a second window: a click-through, never-activated window without a redirection
@@ -51,11 +51,12 @@ struct SmartMask {
 };
 
 // Pure (tests): the mask of a client area `width` x `height` pixels in cells of `cellPx`. `own` is the form's own
-// content and `busy` the other content behind it, both in client pixels; own content is widened by `marginPx`. A cell
-// with own content gets levels.busy where other content lies behind it and levels.quiet otherwise; a cell without own
-// content gets 0. Edges fade out as a gradient over three cells outward, never lowering a cell.
+// content, `busy` the desktop's icons behind it and `windows` the other windows behind it, all in client pixels; own
+// content is widened by `marginPx`. A cell with a window behind it gets levels.busy (D86); otherwise a cell with own
+// content gets levels.busy where an icon lies behind it and levels.quiet elsewhere; any other cell gets 0. Edges fade out
+// as a gradient over three cells outward, never lowering a cell.
 [[nodiscard]] SmartMask ComputeSmartMask(int width, int height, int cellPx, std::span<const RECT> own, std::span<const RECT> busy,
-                                         int marginPx, SmartGlassLevels levels = {});
+                                         int marginPx, SmartGlassLevels levels = {}, std::span<const RECT> windows = {});
 
 // What lies behind `window` (screen pixels, clipped to its rectangle): the visible, uncloaked top-level windows below
 // it in z-order that are not click-through overlays, by their DWM frame bounds. Their content is not read: any such

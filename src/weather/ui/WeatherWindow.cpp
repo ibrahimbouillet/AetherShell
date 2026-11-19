@@ -55,7 +55,10 @@ constexpr std::size_t kHourCells = 12;
 constexpr std::size_t kMapSamples = 14;
 
 constexpr UINT_PTR kRefreshTimer = 61, kSearchTimer = 62, kCaretTimer = 63;
-constexpr UINT kRefreshMs = 15u * 60u * 1000u;  // D78: the same rhythm as the Top Bar's weather
+// A09: the first hour reads "Now" only while the forecast is this recent; past six hours (FR-010) without an update
+// it is no longer shown.
+constexpr auto kNowFor = std::chrono::minutes(60);
+constexpr auto kShownFor = std::chrono::hours(6);
 constexpr UINT kSearchDelayMs = 350;
 constexpr double kFreshSeconds = 10.0 * 60.0;  // opening again within this reuses the forecast
 constexpr double kRestSeconds = 60.0;          // the illustrations rest after a minute without input
@@ -474,7 +477,7 @@ struct WeatherWindow::Impl final : aether::ui::accessibility::IAccessibleSurface
         for (std::size_t i = 0; i < kHourCells && i * 2 < f.hourly.size(); ++i) {
             const auto h = HourAt(i);
             texts.push_back({kHourText + static_cast<int>(i), HourCell(i),
-                             Join({i == 0 ? T(L"Now") : FormatHour(h.localTime), FormatTemperature(h.temperature, unit),
+                             Join({i == 0 && ForecastIsNow() ? T(L"Now") : FormatHour(h.localTime), FormatTemperature(h.temperature, unit),
                                    i18n::Tr(ConditionText(h.weatherCode))})});
         }
         for (std::size_t i = 0; i < f.daily.size() && i < kForecastDays; ++i) {
@@ -743,6 +746,11 @@ struct WeatherWindow::Impl final : aether::ui::accessibility::IAccessibleSurface
             error.clear();
         } else if (loaded.error && loaded.error->code != ErrorCode::Cancelled) {
             error = T(ErrorText(loaded.error->code));
+            // A09: six hours without an update: the old forecast is no longer shown at all.
+            if (forecast && std::chrono::system_clock::now() - forecast->fetchedAt >= kShownFor) {
+                forecast.reset();
+                forecastFor = ShownPlace{};
+            }
         }
         country = loaded.country;
         view = loaded.view;
@@ -1094,6 +1102,14 @@ struct WeatherWindow::Impl final : aether::ui::accessibility::IAccessibleSurface
         return t;
     }
     // The hours shown: every other one from now, Now being the current conditions.
+    // A09: the forecast's first hour is the present one (else it keeps its own hour).
+    [[nodiscard]] bool ForecastIsNow() const {
+        return forecast && std::chrono::system_clock::now() - forecast->fetchedAt < kNowFor;
+    }
+    // D78, A11: the same rhythm as the Top Bar's weather.
+    [[nodiscard]] UINT RefreshMs() const noexcept {
+        return static_cast<UINT>(std::clamp(home.refreshMinutes, 10, 180)) * 60u * 1000u;
+    }
     [[nodiscard]] HourlyPoint HourAt(std::size_t index) const {
         auto hour = forecast->hourly[index * 2];
         if (index == 0) {
@@ -1415,7 +1431,7 @@ struct WeatherWindow::Impl final : aether::ui::accessibility::IAccessibleSurface
         for (std::size_t i = 0; i < kHourCells && i * 2 < f.hourly.size(); ++i) {
             const auto h = HourAt(i);
             const auto cell = HourCell(i);
-            g.Text(i == 0 ? T(L"Now") : FormatHour(h.localTime), D2D1::RectF(cell.left, cell.top + 2.0f, cell.right, cell.top + 18.0f),
+            g.Text(i == 0 && ForecastIsNow() ? T(L"Now") : FormatHour(h.localTime), D2D1::RectF(cell.left, cell.top + 2.0f, cell.right, cell.top + 18.0f),
                    i == 0 ? g.Primary() : g.Secondary(), 11.0f, i == 0 ? DWRITE_FONT_WEIGHT_SEMI_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
                    DWRITE_TEXT_ALIGNMENT_CENTER);
             const float cx = (cell.left + cell.right) / 2.0f;
@@ -1850,7 +1866,7 @@ Result<void> WeatherWindow::Open(const RECT& anchorPx, bool dropDown, bool keybo
     ShowAnimated(graphics::MakeEnterTransition(from, p.tokens, p.motion), true);
     ::SetForegroundWindow(Handle());
     if (keyboard && p.edit) ::SetFocus(p.edit);
-    ::SetTimer(Handle(), kRefreshTimer, kRefreshMs, nullptr);
+    ::SetTimer(Handle(), kRefreshTimer, p.RefreshMs(), nullptr);
     p.Wake();
     return Ok();
 }
@@ -1897,8 +1913,14 @@ void WeatherWindow::SetHome(const WeatherHome& home) {
     const auto before = p.home;
     p.home = home;
     if (!home.locating && before.locating) p.permissionUntil = 0.0;
-    const bool moved = before.source != home.source || std::abs(before.latitude - home.latitude) > 0.02 ||
-                       std::abs(before.longitude - home.longitude) > 0.02 || before.name != home.name || before.unit != home.unit;
+    // A10: a position is compared with the place shown, not with the previous sample, so small steps that add up to a
+    // move do move it (a GPS wobble below 0.02 degrees around the shown place still does not).
+    const bool shownElsewhere = !p.place.valid || std::abs(p.place.latitude - home.latitude) > 0.02 ||
+                                std::abs(p.place.longitude - home.longitude) > 0.02;
+    const bool moved = before.source != home.source || before.name != home.name || before.unit != home.unit ||
+                       (home.source != HomeSource::None && shownElsewhere);
+    // A11: a new refresh interval applies to the open window at once.
+    if (before.refreshMinutes != home.refreshMinutes && IsShown()) ::SetTimer(Handle(), kRefreshTimer, p.RefreshMs(), nullptr);
     if (moved && !p.place.searched) {
         p.place = p.HomePlace();
         if (!Impl::SamePlace(p.forecastFor, p.place) || before.unit != home.unit) p.forecast.reset();

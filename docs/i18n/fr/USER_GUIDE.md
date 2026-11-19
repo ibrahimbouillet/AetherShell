@@ -65,16 +65,21 @@ Les Paramètres comportent les pages Dock, Barre du haut, Météo, Mises à jour
 Bienvenue et Langue. La météo est désactivée au départ. Choisissez la position automatique de Windows (avec votre accord) ou
 une position manuelle avant de l'activer. Windows peut refuser la localisation ; dans ce cas, aucune position ni
 météo n'est inventée. La recherche manuelle d'un lieu envoie le nom saisi à Open-Meteo ; les prévisions envoient les
-coordonnées approximatives choisies. La position n'est jamais déduite d'un nom de réseau Wi-Fi ni d'une adresse IP
-brute. Les prévisions en cache disparaissent au bout de six heures. Attribution des données : Open-Meteo.com, CC BY 4.0.
+coordonnées du lieu choisi, arrondies selon **Position précise** (voir la fenêtre météo ci-dessous). La position n'est
+jamais déduite d'un nom de réseau Wi-Fi ni d'une adresse IP brute. Les prévisions en cache ne sont plus montrées au bout
+de six heures ; le dernier relevé enregistré sur le disque est effacé à ce moment-là et dès que la météo est désactivée.
+Attribution des données : Open-Meteo.com, CC BY 4.0.
 
 **La fenêtre météo** (Alpha 4) : cliquez sur la météo dans la Top Bar (son menu du clic droit garde **Paramètres
 météo…**), ou Paramètres → Météo → **Ouvrir la météo**. Elle montre le lieu, son heure locale et le ciel de son heure,
 la température et le ressenti, les 24 prochaines heures, 7 jours, l'arc du soleil, l'humidité, le vent, l'UV et la
 pression, et une carte du pays avec ses températures actuelles. Recherchez une autre ville, ou choisissez **Ma
 position** ; si la position n'est pas encore autorisée, la fenêtre la demande à Windows ou ouvre ses paramètres de
-localisation. **Position précise** (activée par défaut) utilise la position de Windows à environ 100 m près ;
-désactivée, elle est arrondie à environ 10 km. L'icône météo de la Top Bar ne bouge que sous le pointeur. La carte
+localisation. **Position précise** (activée par défaut) demande à Windows sa meilleure position et l'arrondit à
+environ 100 m ; désactivée, elle est arrondie à environ 10 km. La justesse réelle dépend de ce que Windows peut
+mesurer (Wi-Fi, GPS) : Aether arrondit ce qu'il reçoit, il ne le rend pas plus précis. Restée ouverte, la fenêtre
+s'actualise à l'intervalle choisi dans Paramètres → Météo ; une prévision de plus d'une heure montre son heure au lieu
+de « Maintenant », et disparaît après six heures sans mise à jour. L'icône météo de la Top Bar ne bouge que sous le pointeur. La carte
 vient de Natural Earth (domaine public) et est enregistrée dans l'application. Avec **Liquid** choisi dans Apparence,
 la fenêtre météo, les Réglages rapides, la Recherche, les menus et les aperçus du Dock sont en verre comme les barres,
 et les Paramètres prennent un aspect Liquid ; avec **Grain**, tous sont granuleux.

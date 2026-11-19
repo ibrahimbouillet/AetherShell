@@ -57,6 +57,8 @@ class GraphicsDevice;
 
 namespace aether::ui::form {
 
+struct SmartMask;
+
 enum class FormMaterial { Acrylic, Solid, Native };
 [[nodiscard]] std::string_view ToString(FormMaterial material) noexcept;
 
@@ -159,11 +161,14 @@ public:
     void SetMaximizedFrame(bool maximized);
     [[nodiscard]] bool MaximizedFrame() const noexcept;
     // D84: Liquid's smart transparency (SmartGlass.h). With a device, a Liquid Acrylic form whose tokens ask for it
-    // (liquidSmart) draws no blur of its own: a window below it blurs only under its content. `extraContent` adds what
-    // the owner paints itself (caption buttons, marks, pictures), in client pixels. Null turns it off. It also stays
-    // off while maximized, in high contrast and where the compositor cannot blur the desktop.
+    // (liquidSmart) draws no blur of its own: a window below it blurs wherever another window lies behind and under
+    // its content (D86). `extraContent` adds what the owner paints itself (caption buttons, marks, pictures), in client
+    // pixels. Null turns it off. It also stays off while maximized, without transparency (energy saver included), in
+    // high contrast and where the compositor cannot blur the desktop.
     void EnableSmartGlass(graphics::GraphicsDevice* device, std::function<std::vector<RECT>()> extraContent = {});
     [[nodiscard]] bool SmartGlassActive() const noexcept;
+    // Diagnostics and tests: the smart glass's mask last drawn, or null while it is off.
+    [[nodiscard]] const SmartMask* SmartGlassMask() const noexcept;
     [[nodiscard]] UINT Dpi() const noexcept;
     [[nodiscard]] float ToPx(float dip) const noexcept;
     [[nodiscard]] float ToDip(float px) const noexcept;

@@ -5,12 +5,54 @@
 #include "core/FileSystem.h"
 
 #include <algorithm>
+#include <cwchar>
+#include <span>
+#include <string>
+#include <vector>
 
 namespace aether::install {
 namespace {
 Result<void> CompletePayload(const PayloadManifest& manifest) {
     for(const auto required:{"AetherShell.exe","AetherShellApp.exe","AetherShellUpdater.exe","LICENSE","THIRD_PARTY_NOTICES.md"}) {
         if(std::none_of(manifest.files.begin(),manifest.files.end(),[&](const PayloadFile& file){ return file.name==required; })) return MakeError(ErrorCode::Validation,"setup lacks a required application file");
+    }
+    return Ok();
+}
+// A01: what Aether puts in its program folder and in its data folder. Uninstalling removes these and nothing else, so a
+// file a person keeps there survives, and so does the folder holding it.
+constexpr const wchar_t* kProgramEntries[]{L"versions", L"staging", L"AetherShell.exe", L"AetherShellSetup.exe", L"install-state.json"};
+constexpr const wchar_t* kDataEntries[]{L"config", L"logs", L"cache", L"updates", L"languages", L"Showcase"};
+Result<void> RemoveWithRetry(const InstallLayout& layout,const std::filesystem::path& path) {
+    auto removed=detail::Remove(layout,path);
+    // A process that just exited may hold its image or a log for a few more scheduler turns: at most one second.
+    for(unsigned retry=0;!removed && retry<40 &&
+        (removed.error().platformCode==ERROR_SHARING_VIOLATION || removed.error().platformCode==ERROR_ACCESS_DENIED);++retry) {
+        ::Sleep(25);removed=detail::Remove(layout,path);
+    }
+    return removed;
+}
+Result<void> RemoveOwned(const InstallLayout& layout,std::span<const wchar_t* const> entries) {
+    std::error_code ec;
+    if(!std::filesystem::exists(layout.root,ec)) return ec?Result<void>(MakeError(ErrorCode::Io,"cannot inspect installation files",ec.value())):Ok();
+    auto safe=detail::Safe(layout,layout.root); if(!safe) return safe;
+    for(const auto* name:entries) {
+        const auto path=layout.root/name;
+        ec.clear(); const auto status=std::filesystem::symlink_status(path,ec);
+        if(ec || status.type()==std::filesystem::file_type::not_found) continue;
+        auto removed=RemoveWithRetry(layout,path); if(!removed) return removed;
+    }
+    // What an interrupted atomic write of one of these left beside it ("install-state.json.tmp-<process>-<n>").
+    std::vector<std::filesystem::path> leftovers;
+    for(std::filesystem::directory_iterator it(layout.root,ec),end; !ec && it!=end; it.increment(ec)) {
+        const auto name=it->path().filename().wstring();
+        for(const auto* owned:entries)
+            if(name.size()>std::wcslen(owned)+5 && name.starts_with(std::wstring(owned)+L".tmp-")) { leftovers.push_back(it->path()); break; }
+    }
+    for(const auto& leftover:leftovers) { auto removed=RemoveWithRetry(layout,leftover); if(!removed) return removed; }
+    ec.clear();
+    if(std::filesystem::is_empty(layout.root,ec) && !ec) {
+        std::filesystem::remove(layout.root,ec);
+        if(ec) return MakeError(ErrorCode::Io,"cannot remove installation folder",ec.value());
     }
     return Ok();
 }
@@ -101,13 +143,9 @@ Result<void> Uninstall(const InstallLayout& layout,const std::filesystem::path& 
         auto cleanupOptions=options;
         if(options.registerInstallation) {cleanupOptions.startMenuShortcut=true;cleanupOptions.desktopShortcut=true;}
         auto registration=RemoveRegistration(layout,cleanupOptions); if(!registration) return registration;
-        auto removed=detail::Remove(layout,layout.root);
-        for(unsigned retry=0;!removed && retry<40 &&
-            (removed.error().platformCode==ERROR_SHARING_VIOLATION || removed.error().platformCode==ERROR_ACCESS_DENIED);++retry) {
-            ::Sleep(25);removed=detail::Remove(layout,layout.root);
-        }
-        if(!removed)return removed;
-        if(data) return detail::Remove(*data,data->root);
+        // A01: Aether's own files and folders only; the folders go only when nothing else is left in them.
+        auto removed=RemoveOwned(layout,kProgramEntries); if(!removed) return removed;
+        if(data) return RemoveOwned(*data,kDataEntries);
         return Ok();
     } catch(...) { return MakeError(ErrorCode::Io,"uninstall failed"); }
 }

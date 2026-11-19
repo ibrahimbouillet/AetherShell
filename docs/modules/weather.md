@@ -220,12 +220,18 @@ Exception messages from transports and listeners are omitted because they can co
 
 ## Limitations
 
-- **Unresolved cache-expiry requirement:** the scheduler executes synchronous `IHttpClient::Send`
-  on its own worker. It cannot publish expiry transitions while that call is in progress. A Cached
-  snapshot published shortly before the six-hour cutoff can remain visible beyond that cutoff until
-  the request finishes or is cancelled. Configured transport timeouts limit normal requests; the
-  injected transport determines whether those limits are enforced. Independent review identified
-  this gap; the unit suite does not establish strict expiry during an in-flight request.
+- **Cache expiry during a request (resolved 2026-10-18, GAP-006):** HTTP runs on a private request
+  worker while the scheduler keeps publishing, so a Cached snapshot expires at six hours even while a
+  request is still blocked ("Independent expiry scheduling" below; the provider test "cache expires
+  while a refresh is still blocked in HTTP"). Until that date the scheduler ran the request itself and
+  could not expire the snapshot meanwhile.
+- **What stays on disk (A08, 2026-11-19):** `cache\weather.json` holds the last reading with its
+  rounded location key and times. It is removed when weather is turned off (also at start when it is
+  already off) and when it is found past its six hours; a new successful fetch replaces it.
+- **The detailed window (A09, A11, 2026-11-19):** its first hour reads "Now" only while its forecast
+  is under an hour old (else it shows that hour); after six hours without an update the old forecast
+  is no longer shown. While open it refreshes at Settings > Weather's interval, as the Top Bar does.
+  A followed position is compared with the place shown, so small moves that add up move it (A10).
 - `WeatherSnapshot` (owned by `status`) has no day/night field; `isDay` and the glyph travel in
   `WeatherReport`. Adding `std::optional<bool> isDay` to the shared snapshot would let consumers use the
   plain `IStatusProvider` contract.

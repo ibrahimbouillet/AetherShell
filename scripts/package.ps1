@@ -5,7 +5,11 @@ param(
     [string]$BuildDir = 'build/package',
     [string]$OutputDir = 'dist',
     [ValidateSet('x64','arm64')][string]$Arch = 'x64',
-    [switch]$SkipBuild
+    [switch]$SkipBuild,
+    # A04: Authenticode-sign the programs and the setup (scripts/release/sign_code.ps1, configured through the
+    # environment; docs/release/CODE_SIGNING.md). -TestCertificate accepts a local test certificate: never published.
+    [switch]$Sign,
+    [switch]$TestCertificate
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -13,16 +17,23 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $projectRoot
 $packageStage = 'configuration validation'
 try {
+    if ($TestCertificate -and -not $Sign) { throw '-TestCertificate needs -Sign.' }
     if (-not $SkipBuild) {
         $packageStage = 'Release build'
+        $signing = if ($Sign) { 'ON' } else { 'OFF' }
+        $untrusted = if ($TestCertificate) { 'ON' } else { 'OFF' }
         & ./scripts/build.ps1 -Config release -BuildDir $BuildDir -Modules installer -Arch $Arch `
-            -Target AetherShellSetup -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON'
+            -Target AetherShellSetup -CMakeArgs @('-DAETHER_WARNINGS_AS_ERRORS=ON', "-DAETHER_CODE_SIGN=$signing",
+                                                  "-DAETHER_CODE_SIGN_ALLOW_UNTRUSTED=$untrusted")
     }
     $packageStage = 'configuration validation'
     $buildPath = if ([IO.Path]::IsPathRooted($BuildDir)) { [IO.Path]::GetFullPath($BuildDir) } else { [IO.Path]::GetFullPath((Join-Path $projectRoot $BuildDir)) }
     $outputPath = if ([IO.Path]::IsPathRooted($OutputDir)) { [IO.Path]::GetFullPath($OutputDir) } else { [IO.Path]::GetFullPath((Join-Path $projectRoot $OutputDir)) }
     $cache = Get-Content -LiteralPath (Join-Path $buildPath 'CMakeCache.txt') -Raw
     if ($cache -notmatch '(?m)^CMAKE_BUILD_TYPE:STRING=Release\s*$') { throw 'Packaging requires a Release build.' }
+    $packageStage = 'code signing configuration'
+    $payloadSigned = $cache -match '(?m)^AETHER_CODE_SIGN:BOOL=ON\s*$'
+    if ($Sign -ne $payloadSigned) { throw 'The build''s programs are not signed as asked: build again with or without -Sign.' }
     $info = Get-Content -LiteralPath (Join-Path $buildPath 'generated/aether/BuildInfo.h') -Raw
     if ($info -notmatch 'kVersion = "([^"]+)"') { throw 'Cannot read the built version.' }
     $version = $Matches[1]
@@ -41,6 +52,14 @@ try {
         $setup = Join-Path $outputPath "AetherShell-$version-win-$Arch-setup.exe"
         Copy-Item -LiteralPath $inputSetup -Destination $setup
     } finally { $lockedSetup.Dispose() }
+    if ($Sign) {
+        # The setup is signed last, after its embedded programs: the manifest and checksums below pin the signed file.
+        $packageStage = 'code signing'
+        if ($TestCertificate) { & ./scripts/release/sign_code.ps1 -AllowUntrusted $setup } else { & ./scripts/release/sign_code.ps1 $setup }
+        Write-Host 'Setup and programs Authenticode-signed.'
+    } else {
+        Write-Warning 'UNSIGNED PROGRAMS: Windows SmartScreen warns about an unsigned setup. Sign releases with -Sign (docs/release/CODE_SIGNING.md).'
+    }
     $packageStage = 'manifest generation'
     $manifest = Join-Path $outputPath "AetherShell-$version-manifest.json"
     # A reused output directory may contain a signature for the previous setup's manifest.

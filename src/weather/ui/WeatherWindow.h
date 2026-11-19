@@ -58,6 +58,8 @@ struct WeatherHome {
     LocationPermission permission = LocationPermission::Unknown;
     bool locating = false;  // a location read is under way
     status::TemperatureUnit unit = status::TemperatureUnit::Celsius;
+    // A11: Settings > Weather's refresh interval (10..180 minutes), which the open window follows as the Top Bar does.
+    int refreshMinutes = 15;
 };
 
 struct WeatherWindowContext {

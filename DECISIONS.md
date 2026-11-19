@@ -111,6 +111,93 @@ Windows-owned and pre-renderer emergency UI retain honest documented native exce
 directional sheen, clipped square shadows, backend rewrite, new dependency or publication follows
 from this visual direction. Implementation and owner visual acceptance are still pending.
 
+### D87 — Audit of 2026-11-18 (version 4.8): what 4.2 corrects, what waits
+
+Owner, 2026-11-19, handing over the audit made on test 4.8: "il te dit plein de trucs très importants à changer ou à
+modifier... exécute tout ça". The audit's items, against the code of 4.2:
+
+- **A01, uninstall:** only what Aether made goes. The program folder loses `versions`, `staging`, `AetherShell.exe`,
+  `AetherShellSetup.exe`, `install-state.json` (and an interrupted atomic write of one of them); the data folder, when
+  the person asks, `config`, `logs`, `cache`, `updates`, `languages`, `Showcase`. A folder goes only when nothing is
+  left in it, so a person's own file survives with the folder holding it.
+- **A02, a lost rendering device:** when recovery spends its budget (`GraphicsDevice::RecoveryGaveUp`), the Windows
+  taskbar comes back, and replacement resumes when a display change or a resume brings the device back.
+- **A05, setup's last step:** a launch that fails keeps the window open with "Aether Shell could not start. Choose
+  Repair..." (a text already translated), and Finish then closes without starting it.
+- **A06, A07, file search:** without any of the person's folders, no file is searched (never the whole index); a
+  request overtaken by a newer one, or the service closing, cancels the index's work (`ICommand::Cancel`).
+- **A08, weather on disk:** `cache\weather.json` is removed when weather is turned off (at start too) and when it is
+  found past its six hours.
+- **A09, A10, A11, the weather window:** "Now" only for a forecast under an hour old (else its hour); nothing after six
+  hours without an update; a followed position compared with the place shown, so small moves add up; the Settings
+  refresh interval followed while the window is open.
+- **A13:** the weather documents date the old expiry finding and say what the precise position rounds and what it
+  cannot make more precise. **A14:** no battery row on a PC Windows says has no battery.
+- **A04, the publisher signature:** D88.
+- **Waiting:** A03 (whether an approximate weather consent given before D78 covers the precise position) is the
+  owner's decision, asked with 4.2. A12 (who supervises the application after an automatic update or its rollback)
+  stays with AS4-23: automatic updates are not enabled while the manifest is unsigned, so the path is dormant.
+
+Evidence: TEST_STATUS S-083.
+
+### D88 — Signing Aether Shell's programs; SmartScreen is never bypassed (A04)
+
+Owner, 2026-11-19: Windows warns about the setup "comme si c'était un virus", which will frighten people; wanted "un
+exécutable autonome qui peut se lancer dans n'importe quel ordinateur sans appeler Windows. Peut-être juste en
+demandant une autorisation".
+
+- SmartScreen judges a downloaded program by its publisher's signature and that identity's reputation. Setup asks
+  for no administrator rights, so SmartScreen is the only prompt. It is never bypassed or hidden from (no removing
+  the download mark, no packing): that would be evading a security feature. The way is a real Authenticode identity.
+- **The build is ready for one:** `scripts/package.ps1 -Sign` signs the application, launcher and updater before setup
+  embeds them (the payload manifest pins the signed bytes), then the setup, before the release manifest and checksums;
+  `scripts/release/sign_code.ps1` (signtool, SHA-256, RFC 3161 time stamp) verifies each against Windows' trust and
+  fails otherwise. The identity is configured privately through the environment: a certificate in the signer's store
+  or token, or Azure Artifact Signing. Nothing creates or trusts a certificate on the machine.
+- **The identity is the owner's to obtain:** SignPath Foundation (free for open source, signed as "SignPath
+  Foundation"), a Certum open-source certificate in the owner's name, Azure Artifact Signing, or a commercial
+  certificate (docs/release/CODE_SIGNING.md). Until then releases are unsigned and say so.
+
+FR-018–FR-022, D62. Evidence: TEST_STATUS S-083 (signed with a throwaway local test certificate only).
+
+### D86 — Smart transparency blurs every window behind; it follows Windows' own transparency (amends D84)
+
+Owner, 2026-11-19, with test 4.1 (the published Alpha 4) installed: "le style intelligent n'est pas assez au point":
+Settings over Visual Studio Code showed that window's text sharp between its own. Earlier (2026-11-18): "Dès qu'il y
+a un plan derrière, il est flouté."
+
+- **Wherever another window lies behind Settings, the whole of it there is fully blurred**, content of Settings' own
+  or not: nothing of that window is read through it, between its cards or under its navigation. Over the plain
+  desktop picture D84 is unchanged: a light blur under Settings' content, clear elsewhere; its icons and their names
+  are blurred under its content.
+- **Windows' transparency, as Windows shows it:** energy saver turns Windows' transparency off, so Aether's styles
+  follow it (the opaque look while it is on, back when it goes off). Through Remote Desktop, where the desktop may
+  not be blurred, Settings keeps the ordinary Liquid glass instead of the smart one.
+- I could not reproduce a failing blur on this PC: it held for an active, a reactivated and an inactive Settings and
+  over a maximized ordinary window. The clear gaps between Settings' own content are what let the text behind read.
+
+FR-044, NFR-002. Evidence: TEST_STATUS S-083.
+
+### D85 — No application covers the Top Bar's strip
+
+Owner, 2026-11-19, with test 4.1 installed: Visual Studio Code and Chrome, maximized, rose under the written Top Bar
+"alors que normalement il y a une marge qui fait que l'application ne peut pas monter. Donc on doit vraiment redessiner
+et empêcher toutes les applications de déranger l'espace de notre logiciel."
+
+- **The reservation is kept:** the strip the Top Bar reserves is checked against Windows' work area every second, at
+  each work-area change and after Explorer restarts. When Windows lost it (an Explorer that started after Aether at
+  sign-in, a taskbar recreated), the Top Bar reserves it again, at most once every three seconds.
+- **Windows are put back below it:** while the Top Bar reserves space (Auto-Hide off), a maximized window under the
+  strip is fitted to the work area as soon as the work area leaves the strip out, and an ordinary window moved or
+  shown under the strip moves down by as much (made shorter if it would pass the work area's bottom and can be
+  resized). Full-screen windows, other monitors, tool windows, topmost and click-through overlays, the desktop and
+  Windows' own shell windows are never touched; nothing is ever moved while it is being dragged. A window that keeps
+  going back is left alone after three moves a minute.
+- **And if something still lies there:** the written items sit on a strip of the style's glass instead of straight on
+  that window.
+
+FR-001, FR-011, FR-043. Evidence: TEST_STATUS S-083.
+
 ### D84 — Liquid's smart transparency in the Settings window
 
 Owner, 2026-11-18: in Liquid, the window "detects what is behind it": blur where there is text behind, a little blur

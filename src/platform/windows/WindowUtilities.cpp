@@ -76,8 +76,15 @@ bool SystemPrefersDarkShell() noexcept {
 
 bool SystemTransparencyEnabled() noexcept {
     const auto value = ReadPersonalizeValue(L"EnableTransparency");
-    return !value.has_value() || *value != 0;
+    return (!value.has_value() || *value != 0) && !EnergySaverOn();
 }
+
+bool EnergySaverOn() noexcept {
+    SYSTEM_POWER_STATUS power{};
+    return ::GetSystemPowerStatus(&power) && power.SystemStatusFlag == 1;
+}
+
+bool RemoteSession() noexcept { return ::GetSystemMetrics(SM_REMOTESESSION) != 0; }
 
 bool HighContrastEnabled() noexcept {
     HIGHCONTRASTW contrast{sizeof(contrast)};

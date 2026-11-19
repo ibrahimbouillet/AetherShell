@@ -169,11 +169,13 @@ void CALLBACK GraphicsDevice::RecoveryTimer(HWND, UINT, UINT_PTR id, DWORD) noex
 void GraphicsDevice::RequestRecovery() noexcept {
     if (recoveryTimer_ || recovery_.Exhausted()) return;  // already scheduled, or waiting for a reset
     Result<void> recovered = MakeError(ErrorCode::Internal, "device recovery failed");
-    try { recovered = HandleDeviceLost(); } catch (...) {}
+    if (simulatedFailures_) --simulatedFailures_;
+    else try { recovered = HandleDeviceLost(); } catch (...) {}
     if (recovered) { recovery_.Succeeded(); return; }
     const auto delay = recovery_.Failed();
     if (!delay) {
         AETHER_LOG_ERROR("graphics", "rendering device could not be recovered after {} attempts", recovery_.Failures());
+        try { RecoveryGaveUp.Emit(); } catch (...) {}
         return;
     }
     AETHER_LOG_WARN("graphics", "rendering device recovery failed; retrying in {} ms", *delay);

@@ -45,6 +45,12 @@ high contrast, when the device has `hostBackdrop`. Settings is its only user.
 - Tests: `tests/unit/ui_form/SmartGlassTests.cpp` (mask, own content) and
   `tests/integration/ui_form/SmartGlassIntegrationTests.cpp` (over the private test pattern: stripes' edges intact far
   from the content and gone under it; the blur window's place and styles; gone when turned off).
+- **D86 (test 4.2):** `ComputeSmartMask` also takes the windows behind on their own: every cell over one is fully
+  blurred, whether the form's own content lies there or not, so nothing of that window reads between the form's cards
+  (icons on the plain desktop keep the D84 rule: full only under own content). `FormSurface::WantsSmart` needs
+  Windows' transparency, which `platform::SystemTransparencyEnabled` now reports off while energy saver is on; the
+  application turns smart glass off in a Remote Desktop session (`platform::RemoteSession`). The native case also checks
+  a window behind blurred both under the form's content and away from it.
 
 ## Painting model
 

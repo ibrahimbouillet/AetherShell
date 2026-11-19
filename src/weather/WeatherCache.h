@@ -42,6 +42,9 @@ inline constexpr std::chrono::minutes kMaxFutureSkew{5};
 
 [[nodiscard]] Result<void> Save(const std::filesystem::path& file, const WeatherReading& reading);
 
+// A08: removes the cached reading (its place and times) from disk; nothing to remove is success.
+[[nodiscard]] Result<void> Erase(const std::filesystem::path& file);
+
 // True when `reading` may still be shown at `now` (age below kMaxCacheAge, not from the future).
 [[nodiscard]] bool IsWithinMaxAge(const WeatherReading& reading, std::chrono::system_clock::time_point now) noexcept;
 

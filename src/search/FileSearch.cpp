@@ -72,9 +72,9 @@ std::wstring PathOfUrl(std::wstring_view url) {
 }
 
 // The person's own places, as Start's search shows them: Desktop, Documents, Downloads, Pictures, Videos, Music and
-// OneDrive, as one restriction of the index's query. Without any, the whole index.
-std::wstring ScopeRestriction() {
-    std::wstring scopes;
+// OneDrive, those that exist.
+std::vector<std::wstring> PersonalFolders() {
+    std::vector<std::wstring> folders;
     for (const auto& folder : {FOLDERID_Desktop, FOLDERID_Documents, FOLDERID_Downloads, FOLDERID_Pictures, FOLDERID_Videos, FOLDERID_Music,
                                FOLDERID_SkyDrive}) {
         PWSTR raw = nullptr;
@@ -82,12 +82,9 @@ std::wstring ScopeRestriction() {
         std::wstring path(raw);
         ::CoTaskMemFree(raw);
         if (::GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) continue;
-        std::replace(path.begin(), path.end(), L'\\', L'/');
-        std::wstring quoted;   // a SQL string: its quotes doubled
-        for (const wchar_t c : path) { quoted += c; if (c == L'\'') quoted += L'\''; }
-        scopes += (scopes.empty() ? L"" : L" OR ") + std::wstring(L"SCOPE='file:") + quoted + L"'";
+        folders.push_back(std::move(path));
     }
-    return scopes.empty() ? std::wstring(L"AND SCOPE='file:'") : L"AND (" + scopes + L")";
+    return folders;
 }
 
 // What a person does not look for among their files: hidden folders (".git", ".venv"), package and cache folders.
@@ -100,6 +97,18 @@ bool InToolingFolder(std::wstring_view path) {
 }
 
 }  // namespace
+
+std::wstring ScopeRestriction(std::span<const std::wstring> folders) {
+    std::wstring scopes;
+    for (auto path : folders) {
+        if (path.empty()) continue;
+        std::replace(path.begin(), path.end(), L'\\', L'/');
+        std::wstring quoted;   // a SQL string: its quotes doubled
+        for (const wchar_t c : path) { quoted += c; if (c == L'\'') quoted += L'\''; }
+        scopes += (scopes.empty() ? L"" : L" OR ") + std::wstring(L"SCOPE='file:") + quoted + L"'";
+    }
+    return scopes.empty() ? std::wstring{} : L"AND (" + scopes + L")";
+}
 
 std::wstring_view FileKindOf(std::wstring_view path, bool folder) noexcept {
     if (folder) return L"Folder";
@@ -156,7 +165,9 @@ Result<std::vector<apps::ApplicationInfo>> FindFiles(std::wstring_view query, st
         (void)helper->put_QueryMaxResults(static_cast<LONG>(std::min<std::size_t>(maxResults * 3, 300)));
         (void)helper->put_QuerySelectColumns(L"System.ItemUrl,System.FileName,System.ItemType,System.ItemFolderNameDisplay");
         (void)helper->put_QueryContentProperties(L"System.FileName");   // names, never what is inside the files
-        const auto scope = ScopeRestriction();
+        // A06: none of the person's places is there: no files, never the whole index.
+        const auto scope = ScopeRestriction(PersonalFolders());
+        if (scope.empty()) return found;
         (void)helper->put_QueryWhereRestrictions(scope.c_str());
         (void)helper->put_QuerySorting(L"System.Search.Rank DESC");
         CoTaskString sql, connection;
@@ -181,7 +192,13 @@ Result<std::vector<apps::ApplicationInfo>> FindFiles(std::wstring_view query, st
         if (SUCCEEDED(hr)) hr = session->CreateCommand(nullptr, __uuidof(ICommandText), reinterpret_cast<IUnknown**>(command.put()));
         if (SUCCEEDED(hr)) hr = command->SetCommandText(kDefaultDialect, sql.value);
         winrt::com_ptr<IRowset> rows;
+        // A07: a request overtaken by a newer one (or the service closing) stops the index's work in progress. OLE DB
+        // lets ICommand::Cancel be called from another thread while Execute runs.
+        CancellationToken::Registration stop;
+        if (SUCCEEDED(hr)) stop = cancel.OnCancel([running = command.get()] { try { (void)running->Cancel(); } catch (...) {} });
+        if (SUCCEEDED(hr) && cancel.IsCancelled()) return found;
         if (SUCCEEDED(hr)) hr = command->Execute(nullptr, __uuidof(IRowset), nullptr, nullptr, reinterpret_cast<IUnknown**>(rows.put()));
+        if (cancel.IsCancelled()) return found;
         if (FAILED(hr) || !rows) return platform::ErrorFromHResult(FAILED(hr) ? hr : E_FAIL, "the index could not be searched");
         winrt::com_ptr<IAccessor> accessor = rows.try_as<IAccessor>();
         if (!accessor) return MakeError(ErrorCode::Unavailable, "the index's rows cannot be read");

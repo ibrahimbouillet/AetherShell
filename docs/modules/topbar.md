@@ -174,6 +174,13 @@ panel. Glass uses explicit `Elevation::Bar` and `tokens.glass.backdropOpacity`, 
 arrow/chevron geometry and round stroke tokens. High contrast suppresses decoration/fades; identical
 display models and repeated runtime state request no new frames.
 
+D85 (test 4.2): `ReservedStripPx` is the strip the bar reserves on the primary monitor (none while the
+reservation is off or the bar hidden), and `EnsureReservation` reserves it again when Windows' work area no
+longer leaves it out (an Explorer started after Aether, a recreated taskbar), at most once every 3 s; the
+application calls it every second, at work-area changes and after Explorer restarts. `src/app/TopStrip`
+puts other windows back below the strip; `SetOverWindows` lays the written items on glass while one still
+covers it.
+
 Tests set `allowAppBar=false`, which disables registration and the global foreground hook entirely;
 they never change the real work area. Live reservation/full-screen/Explorer-restart behavior still
 requires authorized desktop qualification, including Windows 10 and monitor/DPI changes.

@@ -34,8 +34,13 @@ void ExcludeFromPeek(HWND hwnd) noexcept;
 // undocumented SystemUsesLightTheme value of the same Personalize key (cosmetic only); when it is absent,
 // falls back to SystemPrefersDarkApps().
 [[nodiscard]] bool SystemPrefersDarkShell() noexcept;
-// "Transparency effects" setting (EnableTransparency); defaults to enabled.
+// Transparency as Windows shows it: the "Transparency effects" setting (EnableTransparency; defaults to enabled), and
+// energy saver off, since Windows draws no transparency while energy saver is on (D86).
 [[nodiscard]] bool SystemTransparencyEnabled() noexcept;
+// Energy saver (battery saver) is on: SYSTEM_POWER_STATUS::SystemStatusFlag.
+[[nodiscard]] bool EnergySaverOn() noexcept;
+// This session is shown through Remote Desktop, where the desktop may not be blurred (SM_REMOTESESSION).
+[[nodiscard]] bool RemoteSession() noexcept;
 // High-contrast theme active.
 [[nodiscard]] bool HighContrastEnabled() noexcept;
 // "Show animations in Windows" (SPI_GETCLIENTAREAANIMATION); defaults to enabled.

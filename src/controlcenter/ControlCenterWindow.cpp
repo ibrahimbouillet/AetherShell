@@ -447,7 +447,9 @@ struct ControlCenterWindow::Impl final : ui::accessibility::IAccessibleSurfaceMo
         }
         const float footer = FooterTop();
         const bool batteryKnown = state.battery.state == status::ProviderState::Available;
-        if (!batteryKnown || state.battery.batteryPresent) {
+        // A14: a PC Windows says has no battery shows no battery row; a battery Windows cannot read still shows one.
+        const bool noBattery = state.battery.state == status::ProviderState::Unavailable && !state.battery.batteryPresent;
+        if (!noBattery && (!batteryKnown || state.battery.batteryPresent)) {
             std::wstring name = T(L"Power and battery settings");
             if (batteryKnown && state.battery.percent) name = i18n::TrFormat(L"Battery {} percent, {}", *state.battery.percent, name);
             Add(kBattery, D2D1::RectF(left + 12.0f, footer + 8.0f, left + 124.0f, footer + 40.0f), std::move(name));

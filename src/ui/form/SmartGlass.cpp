@@ -133,14 +133,14 @@ ATOM RegisterBackdropClass() {
 }  // namespace
 
 SmartMask ComputeSmartMask(int width, int height, int cellPx, std::span<const RECT> own, std::span<const RECT> busy, int marginPx,
-                           SmartGlassLevels levels) {
+                           SmartGlassLevels levels, std::span<const RECT> windows) {
     SmartMask mask;
     if (width <= 0 || height <= 0 || cellPx <= 0) return mask;
     mask.cellPx = cellPx;
     mask.columns = (width + cellPx - 1) / cellPx;
     mask.rows = (height + cellPx - 1) / cellPx;
     const std::size_t count = static_cast<std::size_t>(mask.columns) * static_cast<std::size_t>(mask.rows);
-    std::vector<std::uint8_t> ownCells(count, 0), busyCells(count, 0);
+    std::vector<std::uint8_t> ownCells(count, 0), busyCells(count, 0), windowCells(count, 0);
     const RECT client{0, 0, width, height};
     const int margin = std::max(0, marginPx);
     for (const auto& rect : own.first(std::min(own.size(), kMaxRects))) {
@@ -151,9 +151,14 @@ SmartMask ComputeSmartMask(int width, int height, int cellPx, std::span<const RE
         RECT clipped{};
         if (::IntersectRect(&clipped, &rect, &client)) Rasterize(busyCells, mask.columns, mask.rows, cellPx, clipped);
     }
+    for (const auto& rect : windows.first(std::min(windows.size(), kMaxRects))) {
+        RECT clipped{};
+        if (::IntersectRect(&clipped, &rect, &client)) Rasterize(windowCells, mask.columns, mask.rows, cellPx, clipped);
+    }
     const std::uint8_t busyLevel = Level(levels.busy), quietLevel = Level(levels.quiet);
     std::vector<std::uint8_t> raw(count, 0);
-    for (std::size_t i = 0; i < count; ++i) raw[i] = ownCells[i] ? (busyCells[i] ? busyLevel : quietLevel) : 0;
+    for (std::size_t i = 0; i < count; ++i)
+        raw[i] = windowCells[i] ? busyLevel : ownCells[i] ? (busyCells[i] ? busyLevel : quietLevel) : 0;
     // A gradient at the edges: each pass makes every cell at least the average of its 3x3 neighbourhood, so the blur
     // fades out over kSoftPasses cells (and linear filtering smooths each cell into the next).
     mask.cells = std::move(raw);
@@ -477,14 +482,18 @@ struct SmartGlass::Impl final : TimerTarget {
                 auto extra = extraContent();
                 own.insert(own.end(), extra.begin(), extra.end());
             }
-            auto busy = WindowsBehind(form);
+            // A window behind is blurred wherever it lies (owner: "as soon as there is a layer behind, it is blurred");
+            // the desktop's icons only under the form's own content.
+            auto windows = WindowsBehind(form);
+            std::vector<RECT> busy;
             {
                 std::lock_guard lock(iconMutex);
-                busy.insert(busy.end(), icons.begin(), icons.end());
+                busy = icons;
             }
             // Behind is in screen pixels; the mask is in the client's.
+            for (auto& rect : windows) ::OffsetRect(&rect, -client.left, -client.top);
             for (auto& rect : busy) ::OffsetRect(&rect, -client.left, -client.top);
-            auto next = ComputeSmartMask(client.right - client.left, client.bottom - client.top, cell, own, busy, margin);
+            auto next = ComputeSmartMask(client.right - client.left, client.bottom - client.top, cell, own, busy, margin, {}, windows);
             if (!force && maskDrawn && next == mask) return;
             mask = std::move(next);
             Draw();

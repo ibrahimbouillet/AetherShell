@@ -458,6 +458,46 @@ AETHER_TEST("weather_ui integration: the permission banner asks the host and nev
     CHECK_FALSE(names.contains(6));
 }
 
+// The latitude of the last forecast request (the "&hourly=" one), or NaN.
+double LastForecastLatitude(const Fixture& fixture) {
+    const auto requests = fixture.http.Requests();
+    for (auto it = requests.rbegin(); it != requests.rend(); ++it)
+        if (it->url.find("&hourly=") != std::string::npos) {
+            const auto latitude = Coordinates(it->url, "latitude");
+            if (!latitude.empty()) return latitude.front();
+        }
+    return std::nan("");
+}
+
+AETHER_TEST("weather_ui integration: small moves that add up move the followed place, a wobble does not (A10)") {
+    WeatherHome here;
+    here.source = HomeSource::PreciseLocation;
+    here.latitude = 48.85;
+    here.longitude = 2.35;
+    here.permission = LocationPermission::Granted;
+    Fixture fixture; fixture.Initialize(here);
+    fixture.Open();
+    fixture.Loaded();
+    CHECK(std::abs(LastForecastLatitude(fixture) - 48.85) < 0.001);
+    // Two steps of 0.012 degrees: neither alone passes 0.02, together they do.
+    for (int step = 1; step <= 2; ++step) {
+        here.latitude = 48.85 + 0.012 * step;
+        fixture.window->SetHome(here);
+        RunFor(fixture.loop, 50);
+    }
+    REQUIRE(fixture.WaitFor([&] { return std::abs(LastForecastLatitude(fixture) - 48.874) < 0.001; }, 5000));
+    RunFor(fixture.loop, 300);
+    // A wobble around the place now shown: no new request.
+    const auto requests = fixture.http.RequestCount();
+    for (const double wobble : {0.008, -0.009, 0.005}) {
+        here.latitude = 48.874 + wobble;
+        fixture.window->SetHome(here);
+        RunFor(fixture.loop, 50);
+    }
+    RunFor(fixture.loop, 300);
+    CHECK_EQ(fixture.http.RequestCount(), requests);
+}
+
 AETHER_TEST("weather_ui integration: the illustrations move, then stand still and draw nothing under reduced motion") {
     Fixture fixture; fixture.Initialize(Paris(), graphics::MotionPolicy{false, 1.0f});
     fixture.Open();
