@@ -30,6 +30,10 @@ option(AETHER_WARNINGS_AS_ERRORS "Treat compiler warnings as errors (enabled in 
 # environment; docs/release/CODE_SIGNING.md). ALLOW_UNTRUSTED accepts a local test certificate, never for a release.
 option(AETHER_CODE_SIGN "Authenticode-sign the programs before setup embeds them" OFF)
 option(AETHER_CODE_SIGN_ALLOW_UNTRUSTED "Accept a signing certificate Windows does not trust (local tests only)" OFF)
+# D88: programs signed elsewhere (SignPath, from .github/workflows/signed-release.yml): an absolute folder holding the
+# signed AetherShellApp.exe, AetherShell.exe and AetherShellUpdater.exe, each checked against this build's own
+# (scripts/release/check_signed.ps1) before setup embeds it. Exclusive with AETHER_CODE_SIGN.
+set(AETHER_SIGNED_PROGRAMS_DIR "" CACHE PATH "Folder of this build's programs, Authenticode-signed elsewhere")
 
 set(AETHER_SOURCE_REVISION "" CACHE STRING "Source revision embedded in the binaries (defaults to the git HEAD)")
 set(AETHER_SOURCE_REVISION_RESOLVED "${AETHER_SOURCE_REVISION}")

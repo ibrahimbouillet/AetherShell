@@ -31,14 +31,22 @@ handed over the audit made on test 4.8 ("Donc, exécute tout ça").
 - **Signing (D88, T73):** `scripts/release/sign_code.ps1`, `AETHER_CODE_SIGN`, `scripts/package.ps1 -Sign`,
   docs/release/CODE_SIGNING.md. SmartScreen is never bypassed; the identity (SignPath Foundation, Certum, Azure Artifact
   Signing or a commercial certificate) is the owner's to choose. This build is unsigned.
+- **SignPath chosen (S-084):** the owner chose SignPath Foundation. `.github/workflows/signed-release.yml` (manual, on
+  GitHub's runners: programs signed by SignPath, setup built around them, setup signed by SignPath, then packaged),
+  `.signpath/artifact-configurations/` (`programs`, `setup`), `scripts/release/check_signed.ps1` (a file signed
+  elsewhere must be this build's own bytes plus a trusted signature), `AETHER_SIGNED_PROGRAMS_DIR`,
+  `package.ps1 -SignedSetup`, the README's code signing policy and `PRIVACY.md`. Rehearsed locally with the throwaway
+  certificate standing in for SignPath; never run on GitHub. The owner's steps are in docs/release/CODE_SIGNING.md.
 - **Evidence (S-083):** unit gate 26/26 and the whole integration suite 19/19 on the first run (Release); the native
   smart glass case shows a window behind blurred as much far from the content as under it; signing checked with a
   throwaway local certificate only (the three embedded programs and the setup signed, the payload pinning the signed bytes).
 - Committed locally; **not pushed (D65)**. Test 4.12's build (the published Alpha 4) moved to `dist/test-4.12/`.
 
 **Next:** the owner installs test 4.2 over 4.1 and checks Visual Studio Code and Chrome maximized, Settings over them,
-and a sign-in (Explorer after Aether). Owner's choices: a signing identity (D88) and A03. Not verified: the strip
-keeper live on the owner's desktop, energy saver on a laptop, Remote Desktop, a standard account, Windows 10.
+and a sign-in (Explorer after Aether). Owner: push (with approval), two-factor authentication, the application to
+SignPath Foundation, then SignPath's settings and the repository's secret and variables (CODE_SIGNING.md); A03. Not
+verified: the strip keeper live on the owner's desktop, energy saver on a laptop, Remote Desktop, a standard account,
+Windows 10, the signing workflow on GitHub.
 
 ## Earlier — Alpha 4 published: languages from the release, Liquid's smart transparency (`0.4.0-alpha.4`, D83–D84, S-082, 2026-11-19)
 

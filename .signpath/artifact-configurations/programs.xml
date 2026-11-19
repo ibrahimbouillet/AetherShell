@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Copyright (c) 2026 Ibrahim Bouillet -->
+<!-- SignPath artifact configuration "programs" (D88, docs/release/CODE_SIGNING.md): the three Aether Shell programs
+     that setup embeds, uploaded as one ZIP by .github/workflows/signed-release.yml. Each must carry Aether Shell's
+     product name and this release's version, and is Authenticode-signed. -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file-set product-name="Aether Shell" product-version="${version}">
+      <include path="AetherShellApp.exe" />
+      <include path="AetherShell.exe" />
+      <include path="AetherShellUpdater.exe" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>

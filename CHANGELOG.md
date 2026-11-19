@@ -35,6 +35,10 @@ Test 4.2 (`0.4.2-alpha.4`, D85–D88), not published.
 
 - **Code signing, ready for a certificate** (D88): `scripts/package.ps1 -Sign` Authenticode-signs the programs and the
   setup with the publisher's identity once one is configured (docs/release/CODE_SIGNING.md). This build is not signed.
+- **Signing through SignPath Foundation** (D88): the *Signed release* workflow builds the programs on GitHub, has
+  SignPath sign them, builds the setup around them (each checked to be this build's own plus a trusted signature) and
+  has SignPath sign the setup. The README now has a code signing policy, and `PRIVACY.md` says what Aether Shell sends
+  over the network and when. Waiting for SignPath Foundation to accept the project.
 
 ## [0.4.0-alpha.4](https://github.com/ibrahimbouillet/AetherShell/releases/tag/v0.4.0-alpha.4) — 2026-11-19
 

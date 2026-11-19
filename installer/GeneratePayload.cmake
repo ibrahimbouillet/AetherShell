@@ -2,7 +2,9 @@
 # Copyright (c) 2026 Ibrahim Bouillet
 file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 # A04: with SIGN_SCRIPT, copies of the three programs are Authenticode-signed first; the copies are what is hashed
-# and embedded. Without it (the default), no signed copy is left behind from an earlier signed build.
+# and embedded. With SIGNED_PROGRAMS_DIR (D88), the programs signed elsewhere are checked against this build's own
+# (the same bytes plus a trusted signature) and those are embedded. Without either (the default), no signed copy is
+# left behind from an earlier signed build.
 set(_signed_dir "${OUTPUT_DIR}/signed")
 file(REMOVE_RECURSE "${_signed_dir}")
 if(SIGN_SCRIPT)
@@ -23,6 +25,24 @@ if(SIGN_SCRIPT)
     set(APP "${_signed_dir}/AetherShellApp.exe")
     set(LAUNCHER "${_signed_dir}/AetherShell.exe")
     set(UPDATER "${_signed_dir}/AetherShellUpdater.exe")
+elseif(SIGNED_PROGRAMS_DIR)
+    file(MAKE_DIRECTORY "${_signed_dir}")
+    set(_check_options)
+    if(SIGN_ALLOW_UNTRUSTED)
+        list(APPEND _check_options -AllowUntrusted)
+    endif()
+    foreach(_program "APP;AetherShellApp.exe" "LAUNCHER;AetherShell.exe" "UPDATER;AetherShellUpdater.exe")
+        list(GET _program 0 _variable)
+        list(GET _program 1 _name)
+        execute_process(COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File "${CHECK_SCRIPT}" ${_check_options}
+                                -Unsigned "${${_variable}}" -Signed "${SIGNED_PROGRAMS_DIR}/${_name}"
+                        RESULT_VARIABLE _same)
+        if(NOT _same EQUAL 0)
+            message(FATAL_ERROR "The signed ${_name} is not this build's program with a trusted signature: see docs/release/CODE_SIGNING.md.")
+        endif()
+        file(COPY_FILE "${SIGNED_PROGRAMS_DIR}/${_name}" "${_signed_dir}/${_name}")
+        set(${_variable} "${_signed_dir}/${_name}")
+    endforeach()
 endif()
 set(_sources "${APP}" "${LAUNCHER}" "${UPDATER}" "${REPO}/LICENSE" "${REPO}/THIRD_PARTY_NOTICES.md")
 set(_names AetherShellApp.exe AetherShell.exe AetherShellUpdater.exe LICENSE THIRD_PARTY_NOTICES.md)

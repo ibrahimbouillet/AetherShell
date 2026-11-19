@@ -1,0 +1,152 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 Ibrahim Bouillet
+#
+# Signed release package (A04, D88), run by hand from the Actions tab for a release. On a GitHub-hosted runner it
+# builds the Release programs, has SignPath sign them (SignPath Foundation's certificate; each request is approved by
+# the maintainer in SignPath), builds the setup around the signed programs (each checked against this build's own),
+# has SignPath sign the setup, then packages it with its checksums and language packs as a workflow artifact for
+# review. Publishing the GitHub release stays a separate, manual step (RELEASE_PROCESS.md).
+#
+# Needs, in the repository's Settings > Secrets and variables > Actions: the secret SIGNPATH_API_TOKEN and the
+# variables SIGNPATH_ORGANIZATION_ID, SIGNPATH_PROJECT_SLUG and SIGNPATH_SIGNING_POLICY_SLUG; in SignPath, the
+# artifact configurations "programs" and "setup" from .signpath/artifact-configurations/ (docs/release/CODE_SIGNING.md).
+name: Signed release
+
+on:
+  workflow_dispatch:
+
+# Least privilege: the job reads the repository, and SignPath reads this run's artifacts through the job's token.
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: signed-release
+  cancel-in-progress: false
+
+jobs:
+  signed-package:
+    name: Build, sign with SignPath and package (Windows x64, Release)
+    runs-on: windows-2025
+    timeout-minutes: 180
+    steps:
+      - name: Check the SignPath configuration
+        shell: pwsh
+        env:
+          TOKEN_SET: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
+          ORGANIZATION: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          PROJECT: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          POLICY: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+        run: |
+          $missing = @()
+          if ($env:TOKEN_SET -ne 'true') { $missing += 'secret SIGNPATH_API_TOKEN' }
+          if (-not $env:ORGANIZATION) { $missing += 'variable SIGNPATH_ORGANIZATION_ID' }
+          if (-not $env:PROJECT) { $missing += 'variable SIGNPATH_PROJECT_SLUG' }
+          if (-not $env:POLICY) { $missing += 'variable SIGNPATH_SIGNING_POLICY_SLUG' }
+          if ($missing) { throw "SignPath is not configured: $($missing -join ', ') (docs/release/CODE_SIGNING.md)." }
+
+      - name: Check out the source revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build the Release programs
+        shell: pwsh
+        run: >
+          ./scripts/build.ps1 -Config release -BuildDir build/release -Modules installer
+          -Target AetherShellApp,AetherShell,AetherShellUpdater
+          -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON','-DAETHER_SOURCE_REVISION=${{ github.sha }}'
+
+      - name: Read the built version
+        id: version
+        shell: pwsh
+        run: |
+          $info = Get-Content -LiteralPath build/release/generated/aether/BuildInfo.h -Raw
+          if ($info -notmatch 'kVersion = "([^"]+)"') { throw 'Cannot read the built version.' }
+          "version=$($Matches[1])" >> $env:GITHUB_OUTPUT
+
+      - name: Stage the programs for signing
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/signing/programs | Out-Null
+          foreach ($program in 'app/AetherShellApp.exe', 'launcher/AetherShell.exe', 'updater/AetherShellUpdater.exe') {
+            Copy-Item -LiteralPath "build/release/modules/$program" -Destination build/signing/programs/
+          }
+
+      - name: Upload the unsigned programs
+        id: unsigned-programs
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unsigned-programs
+          path: build/signing/programs/*.exe
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign the programs (SignPath)
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092 # v3.0
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: programs
+          github-artifact-id: ${{ steps.unsigned-programs.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: build/signing/programs-signed
+          parameters: |
+            version: "${{ steps.version.outputs.version }}"
+
+      # The programs are not rebuilt: the same revision and options, only the setup's payload changes. Each signed
+      # program must be this build's own plus a trusted signature (scripts/release/check_signed.ps1).
+      - name: Build the setup around the signed programs
+        shell: pwsh
+        run: |
+          $signed = (Resolve-Path build/signing/programs-signed).Path -replace '\\', '/'
+          ./scripts/build.ps1 -Config release -BuildDir build/release -Modules installer -Target AetherShellSetup `
+            -CMakeArgs '-DAETHER_WARNINGS_AS_ERRORS=ON', '-DAETHER_SOURCE_REVISION=${{ github.sha }}', "-DAETHER_SIGNED_PROGRAMS_DIR=$signed"
+
+      - name: Stage the setup for signing
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/signing/setup | Out-Null
+          Copy-Item -LiteralPath build/release/modules/installer/AetherShellSetup.exe -Destination build/signing/setup/
+
+      - name: Upload the unsigned setup
+        id: unsigned-setup
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unsigned-setup
+          path: build/signing/setup/AetherShellSetup.exe
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Sign the setup (SignPath)
+        uses: signpath/github-action-submit-signing-request@f6d04783b4569d051e0c80105fe66e82819d0092 # v3.0
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: setup
+          github-artifact-id: ${{ steps.unsigned-setup.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: build/signing/setup-signed
+          parameters: |
+            version: "${{ steps.version.outputs.version }}"
+
+      - name: Package the signed setup
+        shell: pwsh
+        run: ./scripts/package.ps1 -BuildDir build/release -SkipBuild -SignedSetup build/signing/setup-signed/AetherShellSetup.exe
+
+      - name: Upload the signed package for review
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: AetherShell-${{ steps.version.outputs.version }}-win-x64-signed
+          path: |
+            dist/*-win-x64-setup.exe
+            dist/*-checksums.txt
+            dist/*-languages/*.json
+          if-no-files-found: error
+          retention-days: 30

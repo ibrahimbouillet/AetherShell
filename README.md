@@ -136,8 +136,25 @@ number of abnormal crashes; Quit, recovery and uninstall remain available. Windo
 timing, so Aether cannot guarantee that its interface appears before the native taskbar at sign-in.
 
 This alpha is distributed for manual installation. Automatic updates require a signed release
-manifest; no unsigned manifest is published. The setup binary is not Authenticode-signed, so Windows
-may show a SmartScreen warning. See [installation and verification](INSTALLATION.md).
+manifest; no unsigned manifest is published. The setup binary is not Authenticode-signed yet, so Windows
+may show a SmartScreen warning; see the [code signing policy](#code-signing-policy) and
+[installation and verification](INSTALLATION.md).
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- **Committers and reviewers:** [Ibrahim Bouillet](https://github.com/ibrahimbouillet), the maintainer.
+- **Approvers:** [Ibrahim Bouillet](https://github.com/ibrahimbouillet), who approves each signing request.
+
+Only programs built from this repository's source by its GitHub Actions workflow
+([signed-release.yml](.github/workflows/signed-release.yml)) are signed: the application, its launcher, its updater
+and the setup, which carry the product name "Aether Shell". Each release is approved by hand before it is signed.
+Until SignPath Foundation has accepted the project, releases are unsigned and say so in their notes.
+How it works: [docs/release/CODE_SIGNING.md](docs/release/CODE_SIGNING.md).
+
+**Privacy:** Aether Shell has no telemetry. It contacts GitHub (languages and, unless turned off, update checks) and,
+only when you turn weather on, Open-Meteo. See the [privacy policy](PRIVACY.md).
 
 ## Compatibility
 
@@ -172,7 +189,8 @@ results. A successful build or test suite does not by itself qualify every Windo
 
 - [Architecture](ARCHITECTURE.md) · [Project specification](PROJECT_SPEC.md) · [Task status](TASKS.md)
 - [User guide](USER_GUIDE.md) · [Installation](INSTALLATION.md) · [Update and rollback](UPDATE_AND_ROLLBACK.md)
-- [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+- [Security policy](SECURITY.md) · [Privacy](PRIVACY.md) · [Code signing policy](#code-signing-policy)
+- [Contributing](CONTRIBUTING.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
 
 For contributors and coding assistants, start with [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md).
 

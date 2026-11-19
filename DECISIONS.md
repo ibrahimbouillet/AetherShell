@@ -158,7 +158,16 @@ demandant une autorisation".
   Foundation"), a Certum open-source certificate in the owner's name, Azure Artifact Signing, or a commercial
   certificate (docs/release/CODE_SIGNING.md). Until then releases are unsigned and say so.
 
-FR-018–FR-022, D62. Evidence: TEST_STATUS S-083 (signed with a throwaway local test certificate only).
+- **The owner's choice (2026-11-19): SignPath Foundation** ("SignPath (gratuit)"). Releases are built and signed by
+  `.github/workflows/signed-release.yml` on GitHub's runners: SignPath signs the three programs, setup is built around
+  them, SignPath signs the setup; each request is approved by the maintainer. A program or setup signed elsewhere is
+  embedded or packaged only if it is this build's own bytes plus a trusted signature (`scripts/release/check_signed.ps1`,
+  `AETHER_SIGNED_PROGRAMS_DIR`, `package.ps1 -SignedSetup`). The publisher Windows shows is "SignPath Foundation". The
+  README carries the code signing policy SignPath Foundation requires (its attribution, the team's roles, a link to
+  `PRIVACY.md`). The application, two-factor authentication and SignPath's settings are the owner's.
+
+FR-018–FR-022, D62. Evidence: TEST_STATUS S-083 (signed with a throwaway local test certificate only), S-084 (the
+SignPath path rehearsed locally with that certificate standing in for SignPath).
 
 ### D86 — Smart transparency blurs every window behind; it follows Windows' own transparency (amends D84)
 

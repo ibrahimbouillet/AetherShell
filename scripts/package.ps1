@@ -9,6 +9,10 @@ param(
     # A04: Authenticode-sign the programs and the setup (scripts/release/sign_code.ps1, configured through the
     # environment; docs/release/CODE_SIGNING.md). -TestCertificate accepts a local test certificate: never published.
     [switch]$Sign,
+    # D88: the setup of this build, signed elsewhere (SignPath, .github/workflows/signed-release.yml), for a build whose
+    # programs were signed there too (AETHER_SIGNED_PROGRAMS_DIR). It replaces the audited setup once
+    # scripts/release/check_signed.ps1 finds the same bytes plus a trusted signature.
+    [string]$SignedSetup = '',
     [switch]$TestCertificate
 )
 $ErrorActionPreference = 'Stop'
@@ -16,8 +20,11 @@ Set-StrictMode -Version Latest
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $projectRoot
 $packageStage = 'configuration validation'
+$unsignedCopy = $null   # a setup copied to the output folder but not yet signed as asked
 try {
-    if ($TestCertificate -and -not $Sign) { throw '-TestCertificate needs -Sign.' }
+    if ($Sign -and $SignedSetup) { throw '-Sign signs here, -SignedSetup takes a setup signed elsewhere: choose one.' }
+    if ($SignedSetup -and -not $SkipBuild) { throw '-SignedSetup needs -SkipBuild: the build that made that setup.' }
+    if ($TestCertificate -and -not ($Sign -or $SignedSetup)) { throw '-TestCertificate needs -Sign or -SignedSetup.' }
     if (-not $SkipBuild) {
         $packageStage = 'Release build'
         $signing = if ($Sign) { 'ON' } else { 'OFF' }
@@ -34,6 +41,10 @@ try {
     $packageStage = 'code signing configuration'
     $payloadSigned = $cache -match '(?m)^AETHER_CODE_SIGN:BOOL=ON\s*$'
     if ($Sign -ne $payloadSigned) { throw 'The build''s programs are not signed as asked: build again with or without -Sign.' }
+    $payloadSignedElsewhere = $cache -match '(?m)^AETHER_SIGNED_PROGRAMS_DIR:[A-Z]+=\S'
+    if ([bool]$SignedSetup -ne $payloadSignedElsewhere) {
+        throw 'A setup signed elsewhere needs programs signed there too (AETHER_SIGNED_PROGRAMS_DIR), and only with -SignedSetup.'
+    }
     $info = Get-Content -LiteralPath (Join-Path $buildPath 'generated/aether/BuildInfo.h') -Raw
     if ($info -notmatch 'kVersion = "([^"]+)"') { throw 'Cannot read the built version.' }
     $version = $Matches[1]
@@ -51,12 +62,22 @@ try {
         New-Item -ItemType Directory -Force -Path $outputPath | Out-Null
         $setup = Join-Path $outputPath "AetherShell-$version-win-$Arch-setup.exe"
         Copy-Item -LiteralPath $inputSetup -Destination $setup
+        if ($Sign -or $SignedSetup) { $unsignedCopy = $setup }
     } finally { $lockedSetup.Dispose() }
     if ($Sign) {
         # The setup is signed last, after its embedded programs: the manifest and checksums below pin the signed file.
         $packageStage = 'code signing'
         if ($TestCertificate) { & ./scripts/release/sign_code.ps1 -AllowUntrusted $setup } else { & ./scripts/release/sign_code.ps1 $setup }
+        $unsignedCopy = $null
         Write-Host 'Setup and programs Authenticode-signed.'
+    } elseif ($SignedSetup) {
+        # D88: the audited setup's bytes plus a trusted signature, or nothing: the manifest and checksums pin it.
+        $packageStage = 'signed setup check'
+        $check = @{ Unsigned = $setup; Signed = $SignedSetup; AllowUntrusted = [bool]$TestCertificate }
+        & ./scripts/release/check_signed.ps1 @check
+        Copy-Item -LiteralPath $SignedSetup -Destination $setup -Force
+        $unsignedCopy = $null
+        Write-Host 'Setup and programs Authenticode-signed elsewhere; each checked against this build.'
     } else {
         Write-Warning 'UNSIGNED PROGRAMS: Windows SmartScreen warns about an unsigned setup. Sign releases with -Sign (docs/release/CODE_SIGNING.md).'
     }
@@ -94,6 +115,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Checksum generation failed.' }
     Write-Host "Package prepared for review: AetherShell-$version-win-$Arch-setup.exe"
 } catch {
+    # A setup that was to be signed and is not never stays under the release's name.
+    if ($unsignedCopy -and (Test-Path -LiteralPath $unsignedCopy)) { Remove-Item -LiteralPath $unsignedCopy -Force }
     # PowerShell's default exception rendering can expose user-specific source/input paths.
     [Console]::Error.WriteLine("package: failed during $packageStage; check the local inputs and rebuild if needed.")
     exit 1

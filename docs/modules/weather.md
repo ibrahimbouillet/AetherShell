@@ -242,8 +242,8 @@ Exception messages from transports and listeners are omitted because they can co
 - `Retry-After` in HTTP-date form is ignored (the regular backoff applies).
 - Sleep handling relies on the system-clock deadlines and `NotifyClockChanged()`; if the application
   does not forward `ResumedFromSleep`/`TimeChanged`, catching up can take up to 10 minutes.
-- Disabling weather stops all traffic but does not delete `weather.json` (which holds the rounded
-  coordinates of the last location).
+- Disabling weather stops all traffic and deletes `weather.json` (A08, 2026-11-19; before that it
+  kept the rounded coordinates of the last location).
 - Forecast URLs format coordinates with four decimals; that formatting does not express the accuracy
   of the source. Automatic Windows fixes are rounded to 0.001 degree (about 100 m, at most two minutes old) with
   Settings' *Precise location* (D78, the default), else to 0.1 degree (roughly a 10 km scale), while manual search

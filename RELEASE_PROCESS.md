@@ -30,7 +30,8 @@ Before publishing a milestone:
    ([docs/release/CODE_SIGNING.md](docs/release/CODE_SIGNING.md)); release notes say whether the setup
    is signed, checked with `Get-AuthenticodeSignature` on the file actually published.
 7. Prepare release notes with actual version/source/test receipts, changes, limitations and install/
-   rollback instructions. Create a draft prerelease for the alpha. Publish only under the owner's
+   rollback instructions, and a link to the README's code signing policy (SignPath Foundation's condition for
+   download pages); a release signed through SignPath comes from `.github/workflows/signed-release.yml`. Create a draft prerelease for the alpha. Publish only under the owner's
    release authorization after assets/notes are concrete and reviewed; a source push is separate.
 
 A complete authenticated update release contains correctly named setup asset(s), the exact signed

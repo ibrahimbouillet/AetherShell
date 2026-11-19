@@ -3532,3 +3532,24 @@ never change the real work area or move another program's window), energy saver 
 **Not executed, so not claimed:** test 4.2 on the owner's desktop (Visual Studio Code and Chrome maximized, Explorer
 starting after Aether at sign-in, Settings over Visual Studio Code); a signature by a trusted identity and SmartScreen's
 answer to it; a laptop with energy saver; Remote Desktop; a standard account; Windows 10.
+
+### S-084 — signing through SignPath Foundation, rehearsed locally (Claude, 2026-11-19)
+
+**What changed:** the owner chose SignPath Foundation (D88). New: `.github/workflows/signed-release.yml`,
+`.signpath/artifact-configurations/programs.xml` and `setup.xml`, `scripts/release/check_signed.ps1`, the CMake cache
+path `AETHER_SIGNED_PROGRAMS_DIR` (installer/GeneratePayload.cmake checks and embeds programs signed elsewhere),
+`scripts/package.ps1 -SignedSetup` (and an unsigned copy removed when signing fails), `PRIVACY.md`, the README's code
+signing policy. The application is unchanged: test 4.2's setup (S-083) stays the one to install.
+
+| Check | Result |
+| --- | --- |
+| `check_signed.ps1` on real files (the S-083 test-signed programs against their unsigned builds) | the three programs accepted with `-AllowUntrusted`; refused: the same program without `-AllowUntrusted` (Windows does not trust the test certificate), another program, an unsigned file, a signed copy with one byte changed in its middle; each refusal exits 1 |
+| The workflow's path with the throwaway certificate as SignPath (`build/wf-claude-v4-signed`, output outside the checkout) | the built programs signed as copies; setup built with `AETHER_SIGNED_PROGRAMS_DIR` (the programs not relinked; each checked, then embedded, all three carry the test signature); the setup signed as a copy; `package.ps1 -SkipBuild -SignedSetup -TestCertificate`: privacy audit passed, same-program check passed, checksums of the signed setup (8775088 bytes) |
+| The check guards a rebuilt program | a first run had the application relinked between signing and the setup build (the git HEAD embedded in the build had moved with S-083's commit); the payload step refused it. The workflow passes the commit as `AETHER_SOURCE_REVISION` to both builds |
+| Refusals of `package.ps1` | exit 1 for `-SignedSetup` without `-SkipBuild`, an untrusted signature without `-TestCertificate`, an unsigned file as the signed setup, programs signed elsewhere without `-SignedSetup`, `-Sign` with `-SignedSetup`; nothing left in the output folder |
+| Setup with the signed payload (`aether_installer_integration_tests` in that build) | **14/14** |
+| Workflow file | each `run:` script parses with PowerShell's parser; even indentation, no tabs; actions pinned by commit (SignPath's `github-action-submit-signing-request` v3.0, 2026-09-10). No YAML or actionlint tool here: the workflow itself has not run |
+| Artifact configurations | well-formed XML, in the form of SignPath's documented examples; not yet accepted by SignPath's editor |
+
+**Not executed, so not claimed:** the workflow on GitHub; SignPath's acceptance, its artifact configurations and
+signing; a release signed by SignPath Foundation and SmartScreen's answer to it.
