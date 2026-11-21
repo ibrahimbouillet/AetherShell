@@ -49,6 +49,12 @@ Without `-Sign` the package says `UNSIGNED PROGRAMS` and SmartScreen will warn.
 
 ## Releases signed through SignPath (the owner's choice, 2026-11-19)
 
+**Status: not accepted yet.** On 2026-11-20 SignPath Foundation answered that the project does not yet show enough
+public visibility (recognition, users, community) and invited a new application once it has gained broader
+recognition; it also offers SignPath's paid subscription. The owner's choice (2026-11-21): no certificate for now,
+neither paid nor Certum; make the project better known, then apply again. Until then releases are unsigned and the
+README's policy carries no SignPath attribution. Everything below stays ready and has not run on GitHub.
+
 The owner chose **SignPath Foundation** (D88). SignPath signs only what GitHub Actions built from this public
 repository, on GitHub's own runners, after the maintainer approves each request in SignPath. The certificate is
 SignPath Foundation's, so Windows shows "SignPath Foundation" as the publisher; the README's
@@ -101,7 +107,7 @@ such a package is never published.
 All public code-signing keys must now live in hardware or a cloud HSM, and the issuer verifies the person or
 organisation first. The options, cheapest first (check current prices and eligibility on each provider's site):
 
-1. **SignPath Foundation** (free for open-source projects; **chosen**, above). The program is signed by SignPath's own certificate
+1. **SignPath Foundation** (free for open-source projects; **chosen**, above; not accepted yet, 2026-11-20). The program is signed by SignPath's own certificate
    from a GitHub Actions build of the public repository; the publisher shown is "SignPath Foundation" rather than
    the owner's name. Needs an OSI licence (MIT: yes), an application and a CI build that SignPath can verify.
 2. **Certum Open Source Code Signing** (low yearly price). An individual's certificate in the owner's name, with

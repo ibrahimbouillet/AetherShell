@@ -147,8 +147,8 @@ native à l'ouverture de session.
 
 Cette alpha s'installe manuellement. Les mises à jour automatiques exigent un manifeste de version signé ; aucun
 manifeste non signé n'est publié. L'installateur n'est pas encore signé Authenticode : Windows peut donc afficher un
-avertissement SmartScreen. Voir la [politique de signature du code](README.md#code-signing-policy) (signature
-gratuite par SignPath.io, certificat de SignPath Foundation), la [confidentialité](PRIVACY.md) et
+avertissement SmartScreen. Voir la [politique de signature du code](README.md#code-signing-policy) (pas encore
+de signature ; le projet refera une demande à SignPath Foundation), la [confidentialité](PRIVACY.md) et
 [installation et vérification](docs/i18n/fr/INSTALLATION.md).
 
 ## Compatibilité

@@ -142,7 +142,11 @@ may show a SmartScreen warning; see the [code signing policy](#code-signing-poli
 
 ## Code signing policy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+Releases are not code-signed yet. Each one says so in its notes and publishes SHA-256 checksums to compare with
+([installation and verification](INSTALLATION.md)). Signing is ready in the build. In November 2026 the project
+applied to [SignPath Foundation](https://signpath.org/)'s free code signing for open-source projects; it was too early,
+as Aether Shell was not yet known widely enough, and it will apply again. Whenever a release is signed, these rules
+apply:
 
 - **Committers and reviewers:** [Ibrahim Bouillet](https://github.com/ibrahimbouillet), the maintainer.
 - **Approvers:** [Ibrahim Bouillet](https://github.com/ibrahimbouillet), who approves each signing request.
@@ -150,7 +154,6 @@ Free code signing provided by [SignPath.io](https://about.signpath.io/), certifi
 Only programs built from this repository's source by its GitHub Actions workflow
 ([signed-release.yml](.github/workflows/signed-release.yml)) are signed: the application, its launcher, its updater
 and the setup, which carry the product name "Aether Shell". Each release is approved by hand before it is signed.
-Until SignPath Foundation has accepted the project, releases are unsigned and say so in their notes.
 How it works: [docs/release/CODE_SIGNING.md](docs/release/CODE_SIGNING.md).
 
 **Privacy:** Aether Shell has no telemetry. It contacts GitHub (languages and, unless turned off, update checks) and,

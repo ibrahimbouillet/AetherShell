@@ -95,8 +95,9 @@ The current release is 3.5, `0.3.5-alpha.3` (D61, published 2026-11-05), which i
   are not exercised by automation; tests use fakes and read-only real status sampling.
 - The first live official signed-update cycle requires an owner-controlled release signing key.
   Unsigned manifests must stay local. Authenticode signing is ready in the build (`package.ps1 -Sign`,
-  and through SignPath Foundation in `.github/workflows/signed-release.yml`, D88), but the project has not
-  been accepted by SignPath Foundation yet, so releases are unsigned and SmartScreen warns. The signing
+  and through SignPath Foundation in `.github/workflows/signed-release.yml`, D88), but SignPath Foundation
+  has not accepted the project yet (2026-11-20: not yet known widely enough; a new application is planned),
+  so releases are unsigned and SmartScreen warns. The signing
   workflow has never run on GitHub. Once signed, the publisher shown is "SignPath Foundation", and
   SmartScreen may still warn until that signature has earned reputation.
 - Test 4.2's Top Bar strip keeper (D85) is unit-tested only: automation never changes the real work

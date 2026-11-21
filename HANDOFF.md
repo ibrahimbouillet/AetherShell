@@ -37,14 +37,17 @@ handed over the audit made on test 4.8 ("Donc, exécute tout ça").
   elsewhere must be this build's own bytes plus a trusted signature), `AETHER_SIGNED_PROGRAMS_DIR`,
   `package.ps1 -SignedSetup`, the README's code signing policy and `PRIVACY.md`. Rehearsed locally with the throwaway
   certificate standing in for SignPath; never run on GitHub. The owner's steps are in docs/release/CODE_SIGNING.md.
+- **SignPath Foundation's answer (2026-11-20):** not accepted yet, the project not yet known widely enough; a new
+  application is welcome later. The owner keeps releases unsigned for now (no paid service, no Certum) and works on
+  making the project known before applying again. The README's policy no longer claims SignPath signing (D88).
 - **Evidence (S-083):** unit gate 26/26 and the whole integration suite 19/19 on the first run (Release); the native
   smart glass case shows a window behind blurred as much far from the content as under it; signing checked with a
   throwaway local certificate only (the three embedded programs and the setup signed, the payload pinning the signed bytes).
-- Committed locally; **not pushed (D65)**. Test 4.12's build (the published Alpha 4) moved to `dist/test-4.12/`.
+- Pushed with the owner's approval (2026-11-19). Test 4.12's build (the published Alpha 4) moved to `dist/test-4.12/`.
 
 **Next:** the owner installs test 4.2 over 4.1 and checks Visual Studio Code and Chrome maximized, Settings over them,
-and a sign-in (Explorer after Aether). Owner: push (with approval), two-factor authentication, the application to
-SignPath Foundation, then SignPath's settings and the repository's secret and variables (CODE_SIGNING.md); A03. Not
+and a sign-in (Explorer after Aether). Owner: making the project better known, then a new application to
+SignPath Foundation (CODE_SIGNING.md); A03. Not
 verified: the strip keeper live on the owner's desktop, energy saver on a laptop, Remote Desktop, a standard account,
 Windows 10, the signing workflow on GitHub.
 

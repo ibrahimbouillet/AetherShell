@@ -165,6 +165,11 @@ demandant une autorisation".
   `AETHER_SIGNED_PROGRAMS_DIR`, `package.ps1 -SignedSetup`). The publisher Windows shows is "SignPath Foundation". The
   README carries the code signing policy SignPath Foundation requires (its attribution, the team's roles, a link to
   `PRIVACY.md`). The application, two-factor authentication and SignPath's settings are the owner's.
+- **Not accepted yet (2026-11-20):** SignPath Foundation found the project not yet visible enough (public recognition,
+  users, community) and invited a new application later, or SignPath's paid subscription. **The owner's choice
+  (2026-11-21):** no certificate for now (neither paid nor Certum); make the project better known, then apply again.
+  Releases stay unsigned and say so. The README's policy no longer carries SignPath's attribution, which only a release
+  SignPath Foundation signed may show; the roles and the rules stay for when one is.
 
 FR-018–FR-022, D62. Evidence: TEST_STATUS S-083 (signed with a throwaway local test certificate only), S-084 (the
 SignPath path rehearsed locally with that certificate standing in for SignPath).
